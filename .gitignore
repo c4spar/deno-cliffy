@@ -1,0 +1,13 @@
+.idea/
+.vscode/
+
+# Files that help ensure VSCode can work but we don't want checked into the repo
+node_modules
+tsconfig.json
+package.json
+package-lock.json
+yarn.lock
+
+# MacOS generated files
+.DS_Store
+.DS_Store?
