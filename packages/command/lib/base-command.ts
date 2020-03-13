@@ -11,7 +11,6 @@ import {
 } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
 import format from '../../x/format.ts';
-import { Command } from './command.ts';
 import {
     CommandMap,
     IAction,
@@ -75,7 +74,7 @@ export class BaseCommand {
             this.removeCommand( name );
         }
 
-        const subCommand = ( cmd || new Command() ).reset();
+        const subCommand = ( cmd || new BaseCommand() ).reset();
 
         subCommand.name = name;
         subCommand.setPath( this.path );
