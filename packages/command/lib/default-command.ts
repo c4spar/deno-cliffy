@@ -30,4 +30,8 @@ export class DefaultCommand extends BaseCommand {
 
             .reset();
     }
+
+    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
+        return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
+    }
 }

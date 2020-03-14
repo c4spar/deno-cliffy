@@ -1,4 +1,5 @@
 import { CompletionsCommand } from '../commands/completions.ts';
+import { BaseCommand } from './base-command.ts';
 import { DefaultCommand } from './default-command.ts';
 
 /**
@@ -19,5 +20,9 @@ export class Command extends DefaultCommand {
 
         this.command( 'completions', new CompletionsCommand( this ) )
             .reset();
+    }
+
+    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
+        return super.command( nameAndArguments, cmd || new Command(), override );
     }
 }
