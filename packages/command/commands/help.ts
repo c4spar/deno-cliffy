@@ -210,10 +210,10 @@ export class HelpCommand extends BaseCommand {
             str += yellow( arg.optionalValue ? '[' : '<' );
 
             let name = '';
+            name += arg.name;
             if ( arg.variadic ) {
                 name += '...';
             }
-            name += arg.name;
             name = magenta( name );
 
             str += name;
