@@ -2,6 +2,8 @@
 
 A collection of modules for creating interactive command line tools.
 
+![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master)
+
 **Included modules:**
 
 * **[table](packages/table/):** Render data in table structure with correct indentation and support for multi-line rows.
