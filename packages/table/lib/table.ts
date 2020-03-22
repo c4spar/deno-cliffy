@@ -1,3 +1,4 @@
+import { bold } from 'https://deno.land/std/fmt/colors.ts';
 import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';
 import { addRow } from './row.ts';
 import { ITableOptions } from './types.ts';
@@ -28,18 +29,6 @@ export function table( opts: ITableOptions ): string {
     const padding = typeof opts.padding === 'undefined' ? CELL_PADDING : opts.padding;
     const sizes: number[] = [];
 
-    const header: string[] | undefined = opts
-        .header
-        ?.map( ( name, i ) => {
-            const size = sizes[ i ];
-            const pad: number = Array.isArray( padding ) ? padding[ i ] : padding;
-            return fill( size + pad, name ).bold();
-        } );
-
-    if ( header ) {
-        rows.push( header );
-    }
-
     const cellCount = Math.max( ...opts.rows.map( row => Object.keys( row ).length ) );
 
     for ( let cellIndex = 0; cellIndex < cellCount; cellIndex++ ) {
@@ -55,7 +44,13 @@ export function table( opts: ITableOptions ): string {
             maxCellWidth = MAX_CELL_WIDTH;
         }
 
-        sizes[ cellIndex ] = Math.max( minCellWidth, Math.min( maxCellWidth, cellWidth ) );
+        sizes[ cellIndex ] = Math.min( maxCellWidth, Math.max( minCellWidth, opts.header ? opts.header[ cellIndex ].length : 0, cellWidth ) );
+    }
+
+
+    if ( opts.header ) {
+        const header: string[] | undefined = opts.header.map( ( name: string ) => bold( name ) );
+        addRow( rows, header, sizes );
     }
 
     for ( const row of opts.rows ) {
