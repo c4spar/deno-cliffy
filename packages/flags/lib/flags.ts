@@ -232,16 +232,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         throw new Error( 'Wrongly used parseValue.' );
                     }
 
-                    const parse: ITypeHandler<any> =
-                        ( typeof option.type === 'function' && option.type )
-                        || ( opts.types && arg.type && opts.types[ arg.type ] )
-                        || Types[ arg.type || OptionType.STRING ];
-
-                    if ( !parse ) {
-                        throw new Error( `Unknown parser ${ arg.type }` );
-                    }
-
-                    let result = parse( option, arg, nextValue );
+                    let result = parseFlagValue( option, arg, nextValue, opts );
 
                     if ( typeof result !== 'undefined' ) {
                         increase = true;
@@ -261,6 +252,23 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     }
 
     return { flags, unknown, literal };
+}
+
+export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false, opts: IParseOptions ): any {
+
+    const parse: ITypeHandler<any> =
+        // Type registered with option
+        ( typeof option.type === 'function' && option.type )
+        // Type registered with parse() options
+        || ( opts.types && arg.type && opts.types[ arg.type ] )
+        // Default type
+        || Types[ arg.type || OptionType.STRING ];
+
+    if ( !parse ) {
+        throw new Error( `Unknown parser ${ arg.type }` );
+    }
+
+    return parse( option, arg, nextValue );
 }
 
 /**
