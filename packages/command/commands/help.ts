@@ -18,7 +18,10 @@ export class HelpCommand extends BaseCommand {
 
             .description( 'Show this help.' )
 
-            .action( ( flags: IFlags, name: string ) => this.show( name ) );
+            .action( ( flags: IFlags, name: string ) => {
+                this.show( name );
+                Deno.exit( 0 );
+            } );
     }
 
     /**

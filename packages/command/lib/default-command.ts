@@ -18,12 +18,18 @@ export class DefaultCommand extends BaseCommand {
 
         this.option( '-h, --help [arg:boolean]', 'Show this help.', {
                 standalone: true,
-                action: () => this.help()
+                action: () => {
+                    this.help();
+                    Deno.exit( 0 );
+                }
             } )
 
             .option( '-V, --version [arg:boolean]', 'Show the version number for this program.', {
                 standalone: true,
-                action: () => this.log( this.ver )
+                action: () => {
+                    this.log( this.ver );
+                    Deno.exit( 0 );
+                }
             } )
 
             .command( 'help', new HelpCommand( this ) )
