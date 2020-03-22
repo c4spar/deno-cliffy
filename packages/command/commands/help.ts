@@ -134,7 +134,7 @@ export class HelpCommand extends BaseCommand {
                     option.flags.split( /,? +/g ).map( flag => blue( flag ) ).join( ', ' ),
                     this.highlight( option.typeDefinition || '' ),
                     red( bold( '-' ) ),
-                    option.description,
+                    option.description.split( '\n' ).shift() as string,
                     getHints( option )
                 ] )
             ];
@@ -147,7 +147,7 @@ export class HelpCommand extends BaseCommand {
                     [ command.name, ...command.aliases ].map( name => blue( name ) ).join( ', ' ),
                     this.highlight( command.cmd.getArgsDefinition() || '' ),
                     red( bold( '-' ) ),
-                    command.cmd.getDescription()
+                    command.cmd.getDescription().split( '\n' ).shift() as string
                 ] )
             ];
         };
