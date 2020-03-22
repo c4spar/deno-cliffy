@@ -1,6 +1,6 @@
 const { stdout, stderr } = Deno;
 import { dim, red } from 'https://deno.land/std/fmt/colors.ts';
-import { parseFlags } from '../../flags/lib/flags.ts';
+import { parseFlags, parseFlagValue } from '../../flags/lib/flags.ts';
 import {
     IFlags,
     IFlagsResult,
@@ -436,6 +436,8 @@ export class BaseCommand {
 
             const params = this.parseArguments( unknown );
 
+            this.validateEnvVars();
+
             if ( dry ) {
                 return { options: flags, args: params, cmd: this };
             }
@@ -543,6 +545,30 @@ export class BaseCommand {
         } catch ( e ) {
             throw this.error( e );
         }
+    }
+
+    /**
+     * Validate environment variables.
+     */
+    protected validateEnvVars() {
+
+        if ( !this.envVars.length ) {
+            return;
+        }
+
+        const types = Object.assign( {}, BaseCommand.types, this.types );
+        const denoEnv = Deno.env();
+
+        this.envVars.forEach( ( env: IEnvVariable ) => {
+            const name = env.names.find( name => name in denoEnv );
+            if ( name ) {
+                try {
+                    parseFlagValue( { name }, env.details, denoEnv[ name ], { types } );
+                } catch ( e ) {
+                    throw new Error( `Environment variable '${ name }' must be of type ${ env.details.type } but got: ${ denoEnv[ name ] }` );
+                }
+            }
+        } );
     }
 
     /**
