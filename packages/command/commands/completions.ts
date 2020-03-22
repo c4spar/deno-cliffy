@@ -27,6 +27,7 @@ To enable zsh completions for this program add following line to your ${ dim( it
 
     ${ dim( italic( 'source <(command-name completions zsh)' ) ) }
 ` )
+            .default( 'help' )
             .command( 'zsh', new ZshCompletionsCommand( this.parent ) )
             .command( 'bash', new BashCompletionsCommand( this.parent ) )
             .reset();
