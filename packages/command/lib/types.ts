@@ -59,7 +59,8 @@ export interface IOption extends IFlagOptions {
 export interface IEnvVariable {
     names: string[];
     description: string;
-    type: OptionType;
+    type: string;
+    details: IArgumentDetails;
 }
 
 /**

@@ -336,24 +336,31 @@ export class BaseCommand {
      */
     public env( name: string, description: string ): this {
 
-        const names: string[] = name.split( /, */g );
+        const result = this.splitArguments( name );
 
-        const parts: string[] = names[ names.length - 1 ].split( /[ =]+/g );
-        names[ names.length - 1 ] = parts.shift() as string;
-        const type: OptionType = parts.pop() as OptionType || OptionType.BOOLEAN;
-
-        if ( parts.length ) {
-            throw this.error( new Error( `Invalid environment variable: ${ name }` ) );
+        if ( !result.typeDefinition ) {
+            result.typeDefinition = '<value:boolean>';
         }
 
-        if ( names.some( envName => this.cmd.hasEnvVar( envName ) ) ) {
+        if ( result.args.some( envName => this.cmd.hasEnvVar( envName ) ) ) {
             throw this.error( new Error( `Environment variable already exists: ${ name }` ) );
         }
 
+        const details = this.parseArgsDefinition( result.typeDefinition );
+
+        if ( details.length > 1 ) {
+            throw this.error( new Error( `An environment variable can only have one value but got: ${ name }` ) );
+        } else if ( details.length && details[ 0 ].optionalValue ) {
+            throw this.error( new Error( `An environment variable can not have an optional value but '${ name }' is defined as optional.` ) );
+        } else if ( details.length && details[ 0 ].variadic ) {
+            throw this.error( new Error( `An environment variable can not have an variadic value but '${ name }' is defined as variadic.` ) );
+        }
+
         this.cmd.envVars.push( {
-            names,
+            names: result.args,
             description,
-            type
+            type: result.typeDefinition,
+            details: details.shift() as IArgumentDetails
         } );
 
         return this;
@@ -518,7 +525,7 @@ export class BaseCommand {
      */
     protected splitArguments( args: string ) {
 
-        const parts = args.trim().split( /[, ] */g );
+        const parts = args.trim().split( /[, =] */g );
         const typeParts = [];
 
         while ( parts[ parts.length - 1 ] && parts[ parts.length - 1 ].match( /^[<\[].+[\]>]$/ ) ) {
