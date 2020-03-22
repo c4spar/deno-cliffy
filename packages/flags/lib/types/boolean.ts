@@ -6,15 +6,17 @@ export const boolean: ITypeHandler<boolean> = ( option: IFlagOptions, arg: IFlag
         arg.optionalValue = true;
     }
 
-    if ( value && ~[ '1', 'true' ].indexOf( value ) ) {
+    if ( !value ) {
+        return;
+    }
+
+    if ( ~[ '1', 'true' ].indexOf( value ) ) {
         return true;
     }
 
-    if ( value && ~[ '0', 'false' ].indexOf( value ) ) {
+    if ( ~[ '0', 'false' ].indexOf( value ) ) {
         return false;
     }
 
-    if ( value ) {
-        throw new Error( `Option --${ option.name } must be of type boolean but got: ${ value }` );
-    }
+    throw new Error( `Option --${ option.name } must be of type boolean but got: ${ value }` );
 };
