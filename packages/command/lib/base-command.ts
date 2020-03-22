@@ -7,6 +7,8 @@ import {
     IFlagValue,
     IFlagValueHandler,
     IFlagValueType,
+    ITypeHandler,
+    ITypeHandlerMap,
     OptionType
 } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
@@ -27,6 +29,7 @@ import {
  */
 export class BaseCommand {
 
+    protected static types: ITypeHandlerMap = {};
     protected rawArgs: string[] = [];
     protected name: string = location.pathname.split( '/' ).pop() as string;
     protected path: string = this.name;
@@ -37,6 +40,7 @@ export class BaseCommand {
     protected commands: CommandMap[] = [];
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
+    protected types: ITypeHandlerMap = {};
     protected cmd: BaseCommand = this;
     protected argsDefinition: string | undefined;
     protected isExecutable: boolean = false;
@@ -45,6 +49,14 @@ export class BaseCommand {
     protected _allowEmpty: boolean = true;
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
+
+    /**
+     * Register global custom type.
+     */
+    public static type( type: string, typeHandler: ITypeHandler<any>, override?: boolean ): void {
+
+        this.types[ type ] = typeHandler;
+    }
 
     /**
      * Add new sub-command.
@@ -225,6 +237,20 @@ export class BaseCommand {
      */
     public default( name: string ): this {
         this.cmd.defaultCommand = name;
+        return this;
+    }
+
+    /**
+     * Register command specific custom type.
+     */
+    public type( type: string, typeHandler: ITypeHandler<any> ): this {
+
+        if ( this.cmd.types[ type ] ) {
+            throw this.error( new Error( `Type '${ type }' already exists.` ) );
+        }
+
+        this.cmd.types[ type ] = typeHandler;
+
         return this;
     }
 
@@ -511,6 +537,7 @@ export class BaseCommand {
                 stopEarly,
                 allowEmpty: this._allowEmpty,
                 flags: this.options,
+                types: Object.assign( {}, BaseCommand.types, this.types ),
                 knownFlaks
             } );
         } catch ( e ) {
