@@ -16,7 +16,7 @@ export class HelpCommand extends BaseCommand {
 
         this.arguments( '[command:string]' )
 
-            .description( 'Show this help.' )
+            .description( 'Show this help or the help of a sub-command.' )
 
             .action( ( flags: IFlags, name: string ) => {
                 this.show( name );
