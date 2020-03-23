@@ -27,7 +27,7 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
 
 ### Content
 
-- [Creating a programm](#creating-a-program)
+- [Creating a program](#creating-a-program)
 - [Options](#options)
   - [Common option types: boolean, number and string](#common-option-types-boolean-number-and-string)
   - [List option types](#list-option-types)
@@ -49,13 +49,13 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
   - [Override exit handling](#override-exit-handling)
   - [Specify environment variables](#specify-the-argument-syntax)
   - [Specify examples](#specify-examples)
-- [Default options & commands](#default-options-commands)
+- [Default options & commands](#default-options--commands)
   - [Version option](#version-option)
-  - [Help option & command](#help-option-command)
+  - [Help option & command](#help-option--command)
   - [Completions command](#completions-command)
 - [License](#license)
 
-## Creating a programm
+## Creating a program
 
 To create a program with cliffy you can import the `Command` class from the cliffy module https://deno.land/x/cliffy/mod.ts or directly from the command module https://deno.land/x/cliffy/command.ts.
 
@@ -75,7 +75,7 @@ await new Command()
 ```textile
 $ ./examples/command/creating-a-program.ts help
 
-  Usage:   creating-a-programm.ts
+  Usage:   creating-a-program.ts
   Version: v0.0.1
 
   Description:
