@@ -821,10 +821,13 @@ $ ./examples/command/help-option-and-command.ts help
 
 ```
 
-The `help` sub-command excepts also a name of a sub-command as argument.
+The `help` sub-command excepts also a name of a sub-command as argument to show the help of the sub-command. But you can also use the help flag and command directly from the sub-command.
 
 ```
 $ ./examples/command/help-option-and-command.ts help completions
+$ ./examples/command/help-option-and-command.ts completions -h
+$ ./examples/command/help-option-and-command.ts completions --help
+$ ./examples/command/help-option-and-command.ts completions help
 
   Usage:   completions
   Version: v0.0.0
