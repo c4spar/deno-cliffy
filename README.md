@@ -10,9 +10,9 @@ A collection of modules for creating interactive command line tools.
 
 * **[table](packages/table/):** Render data in table structure with correct indentation and support for multi-line rows.
 
-* **[flags](packages/flags/):** Parsing command line arguments.
+* **[flags](packages/flags/):** Parse command line arguments.
 
-* **[command](packages/command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions.
+* **[command](packages/command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions (inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
 
 **Todo's:**
 
