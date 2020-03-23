@@ -502,7 +502,7 @@ export class BaseCommand {
 
         try {
             await Deno.run( {
-                args: [ executable, ...args ]
+                cmd: [ executable, ...args ]
             } );
             return;
         } catch ( e ) {
@@ -513,7 +513,7 @@ export class BaseCommand {
 
         try {
             await Deno.run( {
-                args: [ executable + '.ts', ...args ]
+                cmd: [ executable + '.ts', ...args ]
             } );
             return;
         } catch ( e ) {
