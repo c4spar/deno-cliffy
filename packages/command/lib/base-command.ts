@@ -43,6 +43,7 @@ export class BaseCommand {
     protected _allowEmpty: boolean = true;
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
+    protected args: IArgumentDetails[] = [];
 
     /**
      * Add new sub-command.
@@ -587,14 +588,12 @@ export class BaseCommand {
      */
     protected parseArguments( args: string[] ): IFlagValue[] {
 
-        const expectedArgs: IArgumentDetails[] = this.argsDefinition ? this.parseArgsDefinition( this.argsDefinition ) : [];
-
         const params: IFlagValue[] = [];
 
         // remove array reference
         args = args.slice( 0 );
 
-        if ( !expectedArgs.length ) {
+        if ( !this.hasArguments() ) {
 
             if ( args.length ) {
                 if ( this.hasCommands() ) {
@@ -608,8 +607,8 @@ export class BaseCommand {
 
             if ( !args.length ) {
 
-                const required = expectedArgs.filter( expectedArg => !expectedArg.optionalValue )
-                                             .map( expectedArg => expectedArg.name );
+                const required = this.getArguments().filter( expectedArg => !expectedArg.optionalValue )
+                                     .map( expectedArg => expectedArg.name );
 
                 if ( required.length ) {
                     throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
@@ -618,7 +617,7 @@ export class BaseCommand {
                 return params;
             }
 
-            for ( const expectedArg of expectedArgs ) {
+            for ( const expectedArg of this.getArguments() ) {
 
                 if ( !expectedArg.optionalValue && !args.length ) {
                     throw this.error( new Error( `Missing argument: ${ expectedArg.name }` ) );
@@ -765,6 +764,33 @@ export class BaseCommand {
     public getArgsDefinition(): string | undefined {
 
         return this.argsDefinition;
+    }
+
+    /**
+     * Get argument.
+     */
+    public getArgument( name: string ): IArgumentDetails | undefined {
+
+        return this.getArguments().find( arg => arg.name === name );
+    }
+
+    /**
+     * Get arguments.
+     */
+    public getArguments(): IArgumentDetails[] {
+
+        if ( !this.args.length && this.argsDefinition ) {
+            this.args = this.parseArgsDefinition( this.argsDefinition );
+        }
+
+        return this.args;
+    }
+
+    /**
+     * Check if command has arguments.
+     */
+    public hasArguments() {
+        return !!this.argsDefinition;
     }
 
     /**
