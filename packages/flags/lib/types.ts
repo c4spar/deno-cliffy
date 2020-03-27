@@ -71,18 +71,15 @@ export interface IFlagOptions extends IFlagArgument {
  */
 export type ITypeHandler<T> = ( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => T | undefined;
 
-/**
- * Map of type handlers.
- */
-export type ITypeHandlerMap = IGenericObject<ITypeHandler<any>>
+export type IParseType = ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => any | undefined;
 
 /**
  * Parse settings.
  */
 export interface IParseOptions {
+    parse?: IParseType;
     stopEarly?: boolean;
     allowEmpty?: boolean;
     flags?: IFlagOptions[];
     knownFlaks?: IFlags;
-    types?: ITypeHandlerMap;
 }

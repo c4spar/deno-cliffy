@@ -1,18 +1,6 @@
 import camelCase from '../../x/camelCase.ts';
 import { normalize } from './normalize.ts';
-import {
-    IFlagArgument,
-    IFlagOptions,
-    IFlags,
-    IFlagsResult,
-    IFlagValue,
-    IFlagValueType,
-    IGenericObject,
-    IParseOptions,
-    IType,
-    ITypeHandler,
-    OptionType
-} from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IGenericObject, IParseOptions, IType, OptionType } from './types.ts';
 import { boolean } from './types/boolean.ts';
 import { number } from './types/number.ts';
 import { string } from './types/string.ts';
@@ -232,7 +220,9 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         throw new Error( 'Wrongly used parseValue.' );
                     }
 
-                    let result = parseFlagValue( option, arg, nextValue, opts );
+                    let result = opts.parse ?
+                        opts.parse( arg.type || OptionType.STRING, option, arg, nextValue ) :
+                        parseFlagValue( option, arg, nextValue );
 
                     if ( typeof result !== 'undefined' ) {
                         increase = true;
@@ -254,21 +244,15 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     return { flags, unknown, literal };
 }
 
-export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false, opts: IParseOptions ): any {
+export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ): any {
 
-    const parse: ITypeHandler<any> =
-        // Type registered with option
-        ( typeof option.type === 'function' && option.type )
-        // Type registered with parse() options
-        || ( opts.types && arg.type && opts.types[ arg.type ] )
-        // Default type
-        || Types[ arg.type || OptionType.STRING ];
+    const type = Types[ arg.type || OptionType.STRING ];
 
-    if ( !parse ) {
-        throw new Error( `Unknown parser ${ arg.type }` );
+    if ( !type ) {
+        throw new Error( `Unknown type ${ arg.type }` );
     }
 
-    return parse( option, arg, nextValue );
+    return type( option, arg, nextValue );
 }
 
 /**
