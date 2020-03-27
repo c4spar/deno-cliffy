@@ -34,7 +34,7 @@ export class BaseCommand {
     protected desc: string = 'No description ...';
     protected fn: IAction | undefined;
     protected options: IOption[] = [];
-    protected commands: CommandMap[] = [];
+    protected commands: Map<string, CommandMap> = new Map();
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
     protected cmd: BaseCommand = this;
@@ -94,7 +94,7 @@ export class BaseCommand {
             subCommand.arguments( result.typeDefinition );
         }
 
-        this.commands.push( { name, cmd: subCommand, aliases } );
+        this.commands.set( name, { name, cmd: subCommand, aliases } );
 
         this.select( name );
 
@@ -847,7 +847,7 @@ export class BaseCommand {
      */
     public hasCommands(): boolean {
 
-        return this.commands.length > 0;
+        return this.commands.size > 0;
     }
 
     /**
@@ -855,7 +855,7 @@ export class BaseCommand {
      */
     public getCommandMaps(): CommandMap[] {
 
-        return this.commands;
+        return Array.from( this.commands.values() );
     }
 
     /**
@@ -863,7 +863,7 @@ export class BaseCommand {
      */
     public getCommands(): BaseCommand[] {
 
-        return this.commands.map( cmd => cmd.cmd );
+        return this.getCommandMaps().map( cmd => cmd.cmd );
     }
 
     /**
@@ -873,8 +873,7 @@ export class BaseCommand {
      */
     public hasCommand( name: string ): boolean {
 
-        return !!this.commands
-                     .find( command => command.name === name || command.aliases.indexOf( name ) !== -1 );
+        return this.commands.has( name );
     }
 
     /**
@@ -894,12 +893,10 @@ export class BaseCommand {
      */
     public getCommandMap( name: string ): CommandMap {
 
-        const cmd: CommandMap | undefined = this
-            .commands
-            .find( command => command.name === name || command.aliases.indexOf( name ) !== -1 );
+        const cmd: CommandMap | undefined = this.commands.get( name );
 
         if ( !cmd ) {
-            throw this.error( new Error( `Sub-command not found: ${ name } -> ${ JSON.stringify( this.commands.map( cmd => [ cmd.name, cmd.aliases ] ) ) }` ) );
+            throw this.error( new Error( `Sub-command not found: ${ name }` ) );
         }
 
         return cmd;
@@ -910,15 +907,12 @@ export class BaseCommand {
      *
      * @param name Name of the command.
      */
-    public removeCommand( name: string ): BaseCommand | undefined {
+    public removeCommand( name: string ): BaseCommand {
 
-        const index = this.commands.findIndex( command => command.name === name );
+        const command = this.getCommand( name );
+        this.commands.delete( name );
 
-        if ( index === -1 ) {
-            return;
-        }
-
-        return this.commands.splice( index, 1 )[ 0 ].cmd;
+        return command;
     }
 
     /**
