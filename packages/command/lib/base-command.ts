@@ -8,7 +8,9 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { CommandMap, IAction, IArgumentDetails, ICommandOption, IEnvVariable, IExample, IFlagsParseResult, IOption } from './types.ts';
+import { CommandMap, IAction, IArgumentDetails, ICommandOption, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
+
+const hasEnvPermissions: boolean = ( await Deno.permissions.query( { name: 'env' } ) ).state === 'granted';
 
 /**
  * Map of type's.
@@ -66,7 +68,7 @@ export class BaseCommand {
             throw this.error( new Error( 'Missing command name.' ) );
         }
 
-        if ( this.getCommand( name ) ) {
+        if ( this.hasCommand( name ) ) {
             if ( !override ) {
                 throw this.error( new Error( `Duplicate command: ${ name }` ) );
             }
@@ -114,7 +116,7 @@ export class BaseCommand {
             throw this.error( new Error( `Duplicate alias: ${ alias }` ) );
         }
 
-        this.getCommandMap( this.cmdName )?.aliases.push( alias );
+        this.getCommandMap( this.cmdName ).aliases.push( alias );
 
         return this;
     }
@@ -135,24 +137,10 @@ export class BaseCommand {
      */
     public select( name: string ): this {
 
-        const cmd = this.getCommand( name );
-
-        if ( !cmd ) {
-            throw this.error( new Error( `Sub-command not found: ${ name }` ) );
-        }
-
-        this.cmd = cmd;
+        this.cmd = this.getCommand( name );
         this.cmdName = name;
 
         return this;
-    }
-
-    /**
-     * Execute help command.
-     */
-    public help() {
-
-        this.getCommand( 'help' )?.execute( {} );
     }
 
     /********************************************************************************
@@ -395,7 +383,7 @@ export class BaseCommand {
 
         this.rawArgs = args;
 
-        const subCommand = this.rawArgs.length && this.getCommand( this.rawArgs[ 0 ] );
+        const subCommand = this.rawArgs.length && this.hasCommand( this.rawArgs[ 0 ] ) && this.getCommand( this.rawArgs[ 0 ] );
 
         if ( subCommand ) {
             return await subCommand.parse( this.rawArgs.slice( 1 ), dry );
@@ -439,7 +427,7 @@ export class BaseCommand {
      * @param options A map of options.
      * @param args Command arguments.
      */
-    protected async execute( options: IFlags, ...args: IFlagValue[] ): Promise<IFlagsParseResult> {
+    protected async execute( options: IFlags = {}, ...args: IFlagValue[] ): Promise<IFlagsParseResult> {
 
         const actionOption = this.findActionFlag( options, args );
 
@@ -458,14 +446,12 @@ export class BaseCommand {
 
         } else if ( this.defaultCommand ) {
 
-            const defaultCommand = this.getCommand( this.defaultCommand );
-
-            if ( !defaultCommand ) {
+            if ( !this.hasCommand( this.defaultCommand ) ) {
                 throw this.error( new Error( `Default command '${ this.defaultCommand }' not found.` ) );
             }
 
             try {
-                await defaultCommand.execute( options, ...args );
+                await this.getCommand( this.defaultCommand ).execute( options, ...args );
             } catch ( e ) {
                 throw this.error( e );
             }
@@ -887,7 +873,8 @@ export class BaseCommand {
      */
     public hasCommand( name: string ): boolean {
 
-        return !!this.getCommand( name );
+        return !!this.commands
+                     .find( command => command.name === name || command.aliases.indexOf( name ) !== -1 );
     }
 
     /**
@@ -895,9 +882,9 @@ export class BaseCommand {
      *
      * @param name Name of the sub-command.
      */
-    public getCommand( name: string ): BaseCommand | undefined {
+    public getCommand( name: string ): BaseCommand {
 
-        return this.getCommandMap( name )?.cmd;
+        return this.getCommandMap( name ).cmd;
     }
 
     /**
@@ -905,10 +892,17 @@ export class BaseCommand {
      *
      * @param name Name of the sub-command.
      */
-    public getCommandMap( name: string ): CommandMap | undefined {
+    public getCommandMap( name: string ): CommandMap {
 
-        return this.commands.find( command =>
-            command.name === name || command.aliases.indexOf( name ) !== -1 );
+        const cmd: CommandMap | undefined = this
+            .commands
+            .find( command => command.name === name || command.aliases.indexOf( name ) !== -1 );
+
+        if ( !cmd ) {
+            throw this.error( new Error( `Sub-command not found: ${ name } -> ${ JSON.stringify( this.commands.map( cmd => [ cmd.name, cmd.aliases ] ) ) }` ) );
+        }
+
+        return cmd;
     }
 
     /**
@@ -1047,19 +1041,43 @@ export class BaseCommand {
      * Handle error. If throwOnError is enabled all error's will be thrown, if not `Deno.exit(1)` will be called.
      *
      * @param error Error to handle.
+     * @param showHelp Show help.
      */
-    public error( error: Error ): string | Error {
+    public error( error: Error, showHelp: boolean = true ): Error {
 
         if ( this.throwOnError ) {
             return error;
         }
 
-        const { DENO_COMMAND_DEBUG } = Deno.env();
+        const { CLIFFY_DEBUG } = hasEnvPermissions ? Deno.env() : {} as any;
 
-        this.help();
-        this.logError( DENO_COMMAND_DEBUG ? error : error.message );
+        showHelp && this.help();
+        this.logError( CLIFFY_DEBUG ? error : error.message );
         this.log();
 
         Deno.exit( 1 );
+    }
+
+    /**
+     * Execute help command.
+     */
+    public help() {
+
+        this.getHelpCommand().show();
+    }
+
+    public getHelpCommand(): IHelpCommand {
+
+        if ( !this.hasCommand( 'help' ) ) {
+            throw this.error( new Error( `No help command registered.` ), false );
+        }
+
+        const helpCommand = this.getCommand( 'help' );
+
+        if ( !isHelpCommand( helpCommand ) ) {
+            throw this.error( new Error( `The registered help command does not correctly implement interface IHelpCommand.` ), false );
+        }
+
+        return helpCommand;
     }
 }

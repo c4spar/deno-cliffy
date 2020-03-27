@@ -3,12 +3,12 @@ import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
 import { renderTable } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
 import { BaseCommand } from '../lib/base-command.ts';
-import { CommandMap, IArgumentDetails, IEnvVariable, IOption } from '../lib/types.ts';
+import { CommandMap, IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
 
 /**
  * Generates well formatted and colored help output for specified command.
  */
-export class HelpCommand extends BaseCommand {
+export class HelpCommand extends BaseCommand implements IHelpCommand {
 
     public constructor( protected parent: BaseCommand ) {
 
@@ -18,7 +18,7 @@ export class HelpCommand extends BaseCommand {
 
             .description( 'Show this help or the help of a sub-command.' )
 
-            .action( ( flags: IFlags, name: string ) => {
+            .action( ( flags: IFlags, name?: string ) => {
                 this.show( name );
                 Deno.exit( 0 );
             } );
@@ -27,13 +27,9 @@ export class HelpCommand extends BaseCommand {
     /**
      * Render help output.
      */
-    protected show( name?: string ): void {
+    public show( name?: string ): void {
 
-        const cmd = name ? this.parent.getCommand( name ) : this.parent;
-
-        if ( !cmd ) {
-            throw new Error( `Unknown command: ${ name }` );
-        }
+        const cmd: BaseCommand = name ? this.parent.getCommand( name ) : this.parent;
 
         const indent = 2;
         const padding = 2;

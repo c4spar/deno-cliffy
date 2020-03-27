@@ -79,3 +79,13 @@ export interface IFlagsParseResult {
     args: IFlagValue[]
     cmd: BaseCommand;
 }
+
+export interface IHelpCommand extends BaseCommand {
+
+    show( name?: string ): void;
+}
+
+export function isHelpCommand( cmd: BaseCommand ): cmd is IHelpCommand {
+
+    return typeof ( cmd as any ).show === 'function';
+}
