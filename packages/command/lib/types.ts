@@ -25,6 +25,7 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
  */
 export interface IArgumentDetails extends IFlagArgument {
     name: string;
+    type: OptionType | string;
 }
 
 /**
@@ -45,12 +46,11 @@ export interface ICommandOption extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlag
 /**
  * Command option setting's.
  */
-export interface IOption extends IFlagOptions {
+export interface IOption extends ICommandOption, IFlagOptions {
     description: string,
     flags: string;
     typeDefinition?: string;
-    allowEmpty?: boolean;
-    action?: IAction;
+    args: IArgumentDetails[];
 }
 
 /**
