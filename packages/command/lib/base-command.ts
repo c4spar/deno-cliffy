@@ -1,35 +1,30 @@
 const { stdout, stderr } = Deno;
 import { dim, red } from 'https://deno.land/std/fmt/colors.ts';
-import { parseFlags, parseFlagValue } from '../../flags/lib/flags.ts';
-import {
-    IFlags,
-    IFlagsResult,
-    IFlagValue,
-    IFlagValueHandler,
-    IFlagValueType,
-    ITypeHandler,
-    ITypeHandlerMap,
-    OptionType
-} from '../../flags/lib/types.ts';
+import { parseFlags } from '../../flags/lib/flags.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
 import format from '../../x/format.ts';
-import {
-    CommandMap,
-    IAction,
-    IArgumentDetails,
-    ICommandOption,
-    IEnvVariable,
-    IExample,
-    IFlagsParseResult,
-    IOption
-} from './types.ts';
+import { BooleanType } from '../types/boolean.ts';
+import { NumberType } from '../types/number.ts';
+import { StringType } from '../types/string.ts';
+import { Type } from '../types/type.ts';
+import { CommandMap, IAction, IArgumentDetails, ICommandOption, IEnvVariable, IExample, IFlagsParseResult, IOption } from './types.ts';
+
+/**
+ * Map of type's.
+ */
+export type ITypeMap = IGenericObject<Type<any> | ITypeHandler<any>>
 
 /**
  * Base command implementation without pre configured command's and option's.
  */
 export class BaseCommand {
 
-    protected static types: ITypeHandlerMap = {};
+    protected types: ITypeMap = {
+        string: new StringType(),
+        number: new NumberType(),
+        boolean: new BooleanType()
+    };
     protected rawArgs: string[] = [];
     protected name: string = location.pathname.split( '/' ).pop() as string;
     protected path: string = this.name;
@@ -40,7 +35,6 @@ export class BaseCommand {
     protected commands: CommandMap[] = [];
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
-    protected types: ITypeHandlerMap = {};
     protected cmd: BaseCommand = this;
     protected argsDefinition: string | undefined;
     protected isExecutable: boolean = false;
@@ -49,14 +43,6 @@ export class BaseCommand {
     protected _allowEmpty: boolean = true;
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
-
-    /**
-     * Register global custom type.
-     */
-    public static type( type: string, typeHandler: ITypeHandler<any>, override?: boolean ): void {
-
-        this.types[ type ] = typeHandler;
-    }
 
     /**
      * Add new sub-command.
@@ -243,9 +229,9 @@ export class BaseCommand {
     /**
      * Register command specific custom type.
      */
-    public type( type: string, typeHandler: ITypeHandler<any> ): this {
+    public type( type: string, typeHandler: Type<any> | ITypeHandler<any>, override?: boolean ): this {
 
-        if ( this.cmd.types[ type ] ) {
+        if ( this.cmd.types[ type ] && !override ) {
             throw this.error( new Error( `Type '${ type }' already exists.` ) );
         }
 
@@ -537,10 +523,13 @@ export class BaseCommand {
         try {
             return parseFlags( args, {
                 stopEarly,
+                knownFlaks,
                 allowEmpty: this._allowEmpty,
                 flags: this.options,
-                types: Object.assign( {}, BaseCommand.types, this.types ),
-                knownFlaks
+                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => {
+                    const parser = this.types[ type ];
+                    return parser instanceof Type ? parser.parse( option, arg, nextValue ) : parser( option, arg, nextValue );
+                }
             } );
         } catch ( e ) {
             throw this.error( e );
@@ -556,16 +545,17 @@ export class BaseCommand {
             return;
         }
 
-        const types = Object.assign( {}, BaseCommand.types, this.types );
         const denoEnv = Deno.env();
 
         this.envVars.forEach( ( env: IEnvVariable ) => {
             const name = env.names.find( name => name in denoEnv );
             if ( name ) {
                 try {
-                    parseFlagValue( { name }, env.details, denoEnv[ name ], { types } );
+                    // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
+                    const parser = this.types[ env.type ];
+                    parser instanceof Type ? parser.parse( { name }, env, denoEnv[ name ] ) : parser( { name }, env, denoEnv[ name ] );
                 } catch ( e ) {
-                    throw new Error( `Environment variable '${ name }' must be of type ${ env.details.type } but got: ${ denoEnv[ name ] }` );
+                    throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ denoEnv[ name ] }` );
                 }
             }
         } );
