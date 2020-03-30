@@ -1,36 +1,26 @@
 import { BaseCommand } from '../../command/lib/base-command.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagValue, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagValue, IGenericObject, OptionType } from '../../flags/lib/types.ts';
 
-/**
- * Command map.
- */
+/** Command map. */
 export interface CommandMap {
     name: string;
     aliases: string[];
     cmd: BaseCommand;
 }
 
-/**
- * Action handler.
- */
+/** Action handler. */
 export type IAction = ( options: any, ...args: any[] ) => void | Promise<void>;
 
-/**
- * Omit key from object.
- */
+/** Omit key from object. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
-/**
- * Argument details.
- */
+/** Argument details. */
 export interface IArgumentDetails extends IFlagArgument {
     name: string;
     type: OptionType | string;
 }
 
-/**
- * Command settings.
- */
+/** Command settings. */
 export interface ICommandOption extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
     'name'>,
     'args'>,
@@ -43,9 +33,7 @@ export interface ICommandOption extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlag
     action?: IAction;
 }
 
-/**
- * Command option setting's.
- */
+/** Command option setting's. */
 export interface IOption extends ICommandOption, IFlagOptions {
     description: string,
     flags: string;
@@ -53,9 +41,7 @@ export interface IOption extends ICommandOption, IFlagOptions {
     args: IArgumentDetails[];
 }
 
-/**
- * Environment variable setting's.
- */
+/** Environment variable setting's. */
 export interface IEnvVariable {
     names: string[];
     description: string;
@@ -63,22 +49,24 @@ export interface IEnvVariable {
     details: IArgumentDetails;
 }
 
-/**
- * Example setting's.
- */
+/** Example setting's. */
 export interface IExample {
     name: string;
     description: string;
 }
 
-/**
- * Result of `cmd.parse()`.
- */
+/** Result of `cmd.parse()`. */
 export interface IFlagsParseResult {
     options: IFlags,
     args: IFlagValue[]
     cmd: BaseCommand;
 }
+
+/** Type parser method. */
+export type ICompleteHandler = () => string[] | Promise<string[]>;
+
+/** Map of type handlers. */
+export type ICompleteHandlerMap = IGenericObject<ICompleteHandler>
 
 export interface IHelpCommand extends BaseCommand {
 

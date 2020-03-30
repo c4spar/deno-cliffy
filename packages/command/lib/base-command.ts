@@ -8,7 +8,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { CommandMap, IAction, IArgumentDetails, ICommandOption, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
+import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
 
 const hasEnvPermissions: boolean = ( await Deno.permissions.query( { name: 'env' } ) ).state === 'granted';
 
@@ -37,6 +37,7 @@ export class BaseCommand {
     protected commands: Map<string, CommandMap> = new Map();
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
+    protected completions: ICompleteHandlerMap = {};
     protected cmd: BaseCommand = this;
     protected argsDefinition: string | undefined;
     protected isExecutable: boolean = false;
@@ -225,6 +226,20 @@ export class BaseCommand {
         }
 
         this.cmd.types[ type ] = typeHandler;
+
+        return this;
+    }
+
+    /**
+     * Register command specific custom type.
+     */
+    public complete( action: string, completeHandler: ICompleteHandler ): this {
+
+        if ( this.cmd.completions[ action ] ) {
+            throw this.error( new Error( `Completion '${ action }' already exists.` ) );
+        }
+
+        this.cmd.completions[ action ] = completeHandler;
 
         return this;
     }
