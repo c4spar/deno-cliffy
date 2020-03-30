@@ -244,6 +244,11 @@ export class BaseCommand {
         return this;
     }
 
+    public getActionNames(): string[] {
+
+        return [ ...Object.keys( this.cmd.completions ), ...Object.keys( this.cmd.types ) ];
+    }
+
     /**
      * Throw error's instead of calling `Deno.exit()` to handle error's manually.
      * This has no effect for parent commands. Only for the command on which this method was called and all child commands.
