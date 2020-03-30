@@ -259,6 +259,21 @@ export class BaseCommand {
         return this;
     }
 
+    public async getCompletion( action: string ): Promise<string[] | undefined> {
+
+        if ( this.cmd.completions[ action ] ) {
+            return this.cmd.completions[ action ]();
+        }
+
+        const type = this.cmd.types[ action ];
+
+        if ( type instanceof Type ) {
+            return type.complete();
+        }
+
+        return undefined;
+    }
+
     /**
      * Add new option (flag).
      *
@@ -819,6 +834,14 @@ export class BaseCommand {
     public getDescription(): string {
 
         return this.desc;
+    }
+
+    public getShortDescription(): string {
+
+        return this.getDescription()
+                   .trim()
+                   .split( '\n' )
+                   .shift() as string;
     }
 
     /**
