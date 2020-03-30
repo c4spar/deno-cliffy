@@ -16,7 +16,11 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 /** Argument details. */
 export interface IArgumentDetails extends IFlagArgument {
+    /** Argument name. */
     name: string;
+    /** Shell completion action. */
+    action: string;
+    /** Arguments type. */
     type: OptionType | string;
 }
 
