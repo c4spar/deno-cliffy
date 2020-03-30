@@ -2,6 +2,7 @@ import { bold, dim, italic } from 'https://deno.land/std/fmt/colors.ts';
 import { BaseCommand } from '../lib/base-command.ts';
 import { DefaultCommand } from '../lib/default-command.ts';
 import { BashCompletionsCommand } from './completions/bash.ts';
+import { CompleteCommand } from './completions/complete.ts';
 import { ZshCompletionsCommand } from './completions/zsh.ts';
 
 /**
@@ -41,6 +42,7 @@ or create a separate file in the ${ dim( italic( 'zsh_completion.d' ) ) } direct
             .default( 'help' )
             .command( 'zsh', new ZshCompletionsCommand( this.parent ) )
             .command( 'bash', new BashCompletionsCommand( this.parent ) )
+            .command( 'complete', new CompleteCommand( this.parent ) )
             .reset();
     }
 
