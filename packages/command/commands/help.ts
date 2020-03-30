@@ -4,6 +4,7 @@ import { renderTable } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
 import { BaseCommand } from '../lib/base-command.ts';
 import { CommandMap, IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
+import { CommandListType } from '../types/command-list.ts';
 
 /**
  * Generates well formatted and colored help output for specified command.
@@ -14,7 +15,9 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
 
         super();
 
-        this.arguments( '[command:string]' )
+        this
+            .type( 'command', new CommandListType( this.parent ) )
+            .arguments( '[command:command]' )
 
             .description( 'Show this help or the help of a sub-command.' )
 
@@ -217,13 +220,11 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
 
             str += name;
 
-            if ( arg.type ) {
-                str += yellow( ':' );
-                str += red( arg.type );
+            str += yellow( ':' );
+            str += red( arg.type );
 
-                if ( arg.list ) {
-                    str += green( '[]' );
-                }
+            if ( arg.list ) {
+                str += green( '[]' );
             }
 
             str += yellow( arg.optionalValue ? ']' : '>' );
