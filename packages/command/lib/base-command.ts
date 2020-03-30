@@ -409,7 +409,7 @@ export class BaseCommand {
 
             const { flags, unknown } = this.parseFlags( this.rawArgs, true );
 
-            const params = this.parseArguments( unknown );
+            const params = this.parseArguments( unknown, flags );
 
             this.validateEnvVars();
 
@@ -572,7 +572,7 @@ export class BaseCommand {
      *
      * @param args
      */
-    protected parseArguments( args: string[] ): IFlagValue[] {
+    protected parseArguments( args: string[], flags: IFlags ): IFlagValue[] {
 
         const params: IFlagValue[] = [];
 
@@ -593,11 +593,16 @@ export class BaseCommand {
 
             if ( !args.length ) {
 
-                const required = this.getArguments().filter( expectedArg => !expectedArg.optionalValue )
+                const required = this.getArguments()
+                                     .filter( expectedArg => !expectedArg.optionalValue )
                                      .map( expectedArg => expectedArg.name );
 
                 if ( required.length ) {
-                    throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
+                    const flagNames: string[] = Object.keys( flags );
+                    const isStandaloneOption: boolean | undefined = flagNames.length === 1 && this.getOption( flagNames[ 0 ] )?.standalone;
+                    if ( required.length && !isStandaloneOption ) {
+                        throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
+                    }
                 }
 
                 return params;
