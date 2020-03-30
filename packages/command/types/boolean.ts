@@ -8,4 +8,9 @@ export class BooleanType extends Type<boolean> {
 
         return boolean( option, arg, value );
     }
+
+    public complete(): string[] {
+
+        return [ 'true', 'false' ];
+    }
 }

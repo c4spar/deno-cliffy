@@ -8,4 +8,9 @@ export class NumberType extends Type<number> {
 
         return number( option, arg, value );
     }
+
+    public complete(): string[] {
+
+        return [];
+    }
 }

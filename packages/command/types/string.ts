@@ -8,4 +8,9 @@ export class StringType extends Type<string> {
 
         return string( option, arg, value );
     }
+
+    public complete(): string[] {
+
+        return [];
+    }
 }
