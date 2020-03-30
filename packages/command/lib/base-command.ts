@@ -680,8 +680,9 @@ export class BaseCommand {
             let details: IArgumentDetails = {
                 optionalValue: arg[ 0 ] !== '<',
                 name: parts[ 1 ],
+                action: parts[ 3 ] || type,
                 variadic: false,
-                list: type ? arg.indexOf( type + '[]' ) !== -1 : undefined,
+                list: type ? arg.indexOf( type + '[]' ) !== -1 : false,
                 type
             };
 
