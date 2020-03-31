@@ -1,3 +1,29 @@
+# [v0.3.0](https://github.com/c4spar/deno-cli/compare/v0.2.0...80d7ba4) (Tue Mar 31 17:49:50 2020)
+
+### Features
+
+* add support for deno v0.38.0 ([80d7ba4](https://github.com/c4spar/deno-cli/commit/80d7ba4), [9824899](https://github.com/c4spar/deno-cli/commit/9824899), [26b58be](https://github.com/c4spar/deno-cli/commit/26b58be))
+* **command:** add support for custom type class's ([7006a67](https://github.com/c4spar/deno-cli/commit/7006a67))
+* **flags:** add `parse` and remove `types` option to simplify custom types ([d1bc510](https://github.com/c4spar/deno-cli/commit/d1bc510))
+
+### Bug Fixes
+
+* **command:** suppress `Missing argument(s)` error for standalone options ([47b162e](https://github.com/c4spar/deno-cli/commit/47b162e))
+* **command:** fix `IArgumentDetails` and `IOption` interface ([52193e5](https://github.com/c4spar/deno-cli/commit/52193e5))
+
+### Code Refactoring
+
+* **command:** change type of commands from Array to Map ([52f7e1f](https://github.com/c4spar/deno-cli/commit/52f7e1f))
+* **command:** refactor sub-command helper methods ([d6d1b05](https://github.com/c4spar/deno-cli/commit/d6d1b05))
+* **command:** refactor internal args handling and add some args helper methods ([957347e](https://github.com/c4spar/deno-cli/commit/957347e))
+
+### Documentation Updates
+
+* update `README.md` ([bee4767](https://github.com/c4spar/deno-cli/commit/bee4767), [d779851](https://github.com/c4spar/deno-cli/commit/d779851), [063905d](https://github.com/c4spar/deno-cli/commit/063905d), [4fc534d](https://github.com/c4spar/deno-cli/commit/4fc534d))
+* **flags:** update `README.md` ([3a9a2a4](https://github.com/c4spar/deno-cli/commit/3a9a2a4))
+
+
+
 # [v0.2.0](https://github.com/c4spar/deno-cli/compare/v0.1.0...v0.2.0) (Mon Mar 23 00:36:36 2020)
 
 ### Features
