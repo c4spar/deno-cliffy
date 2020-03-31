@@ -8,11 +8,11 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
 
 ![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v0.38.0-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
 
-### Features
+### ✨ Features
 
 * ⭐️ chainable ⭐️
 * ⭐️ short and long flags ⭐️
-* ⭐️ sub-commands ⭐️
+* ⭐️ nested sub-commands ⭐️
 * ⭐️ aliases ⭐️
 * ⭐️ depending & conflicting options ⭐️
 * ⭐️ negatable options ⭐️
@@ -182,7 +182,7 @@ const { options } = await new Command()
     // comma separated list
     .option( '-l, --list <items:number[]>', 'comma separated list of numbers.' )
     // space separated list
-    .option( '-o, --other-list <items:string[]>', 'comma separated list of strings.', { separator: ' ' } )
+    .option( '-o, --other-list <items:string[]>', 'space separated list of strings.', { separator: ' ' } )
     .parse( Deno.args );
 
 console.log( options );
@@ -563,7 +563,7 @@ await new Command()
     } ) )
     .parse( Deno.args );
 
-// Command implemented using separate executable file (description is passes as second parameter to `.command()`)
+// Command implemented using separate executable file (description is passed as second parameter to `.command()`)
 await new Command()
     .command( 'start <service>', 'Start named service.' )
     .command( 'stop [service]', 'Stop named service, or all if no name supplied.' )
