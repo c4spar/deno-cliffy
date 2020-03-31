@@ -53,18 +53,22 @@ autoload -U is-at-least
 
 (( $+functions[__${ snakeCase( this.parent.getName() ) }_script] )) ||
 function __${ snakeCase( this.parent.getName() ) }_script {
-    local name="\${1}"; shift
-    local type="\${1}"; shift
+    local name="$1"; shift
+    local action="$1"; shift
     integer ret=1
     local -a values
-    values=( \$( ${ this.parent.getName() } completions complete $type $@) )
-    if (( \${#values[@]} )); then
-        _values "$name: $type" $values[@] && ret=0
-    else
-        # _message "$name: $type" && ret=0
-        # _values "$name: $type" "" && ret=0
-    fi
-    return ret
+    local expl
+    _tags "$name"
+    while _tags; do
+        if _requested "$name"; then
+            values=( \$( ${ this.parent.getName() } completions complete $action $@) )
+            if (( \${#values[@]} )); then
+                while _next_label "$name" expl "$action"; do
+                    compadd -S '' "\$expl[@]" $values[@]
+                done
+            fi
+        fi
+    done
 }
 
 ${ this.generateCompletions( this.parent, true ).trim() }
@@ -93,7 +97,7 @@ compdef _${ snakeCase( this.parent.getPath() ) } ${ this.parent.getPath() }
             return '';
         }
 
-        const completions = `(( $+functions[_${ snakeCase( command.getPath() ) }] )) ||
+        return `(( $+functions[_${ snakeCase( command.getPath() ) }] )) ||
 function _${ snakeCase( command.getPath() ) }() {`
             + ( root ? `\n\n    local context state state_descr line\n    typeset -A opt_args` : '' )
             + this.generateCommandCompletions( command )
@@ -104,8 +108,6 @@ function _${ snakeCase( command.getPath() ) }() {`
             + command.getCommands()
                      .map( subCommand => this.generateCompletions( subCommand ) )
                      .join( '' );
-
-        return completions;
     }
 
     protected generateCommandCompletions( command: BaseCommand ): string {
