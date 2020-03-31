@@ -8,4 +8,5 @@ export interface ITableOptions {
     maxSize?: number | number[];
     minSize?: number | number[];
     rows: any[][];
+    border?: boolean;
 }
