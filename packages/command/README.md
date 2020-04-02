@@ -32,6 +32,7 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
   - [Common option types: boolean, number and string](#common-option-types-boolean-number-and-string)
   - [List option types](#list-option-types)
   - [Custom option types](#custom-option-types)
+  - [Auto completion](#auto-completion)
   - [Variadic options](#variadic-options)
   - [Default option value](#default-option-value)
   - [Required options](#required-options)
@@ -99,9 +100,14 @@ Options are defined with the `.option()` method. Each option can have multiple s
 
 The options can be accessed as properties on the options object passed to the `.action()` handler and return by the `.parse()` method. Multi-word options such as `--template-engine` are camel-cased, becoming `options.templateEngine` etc. Multiple short flags may be combined as a single arg, for example `-abc` is equivalent to `-a -b -c`.
 
+
 ### Common option types: boolean, number and string
 
-There are three pre defined option types: a `boolean` flag, a `number` and a `string` option which can take a value (declared using angle or square brackets). All are undefined unless specified on command line or as default value.
+Each option can have multiple required and optional values. Required values are declared using angle brackets and optional values with square brackets. Each value can take a type and an action: `<name:type:action>`
+
+There are three pre defined option types: `boolean`, `number` and `string`. An `boolean` value can be one of: `true`, `false`, `1` or `0`, a `number` can be any nummeric value and a `string` can be any value.
+
+Type and action are both optional. The type defaults to `boolean` and the action to the type specific action. Action are used for shell completion and will be more explained in the [autocompletion](#autocompletion) section.
 
 ```typescript
 #!/usr/bin/env -S deno --allow-env
@@ -112,11 +118,11 @@ const { options } = await new Command()
     // boolean with optional value
     .option( '-d, --debug', 'output extra debugging.' )
     // boolean with optional value
-    .option( '-s, --small [small:boolean]', 'Small pizza size.' )
+    .option( '-c, --cash [cash:boolean]', 'Pay with cash.' )
+    // boolean with required value
+    .option( '-s, --small <small:boolean>', 'Small pizza size.' )
     // string with required value
-    .option( '-p, --pizza-type <type>', 'Flavour of pizza.' )
-    // string with required value
-    .option( '-n, --notes <note:string>', 'Notes.' )
+    .option( '-p, --pizza-type <type:string>', 'Flavour of pizza.' )
     // number with required value
     .option( '-a, --amount <amount:number>', 'Pieces of pizza.' )
     // parse arguments
@@ -138,10 +144,6 @@ if ( options.pizzaType ) {
 
 if ( options.amount ) {
     console.log( '- %s pieces', options.amount );
-}
-
-if ( options.notes ) {
-    console.log( '- notes: %s', options.notes );
 }
 ```
 
@@ -196,37 +198,36 @@ $ ./examples/command/03-list-option-type.ts -o "1 2 3"
 { list: [1, 2, 3] }
 ```
 
+
 ### Custom option types
 
-You can also extend the command with custom option type's.
+There are to ways to declare custom types. The first method is using a function.
 
 ```typescript
 #!/usr/bin/env -S deno --allow-env
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
+import { IFlagArgument, IFlagOptions, ITypeHandler } from 'https://deno.land/x/cliffy/flags.ts';
 
 const email = (): ITypeHandler<string> => {
-    
+
     const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    
+
     return ( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined => {
 
         if ( value ) {
             if ( !emailRegex.test( value.toLowerCase() ) ) {
-                throw new Error( `Option --${ option.name } must be of type email but got: ${ value }` );
+                throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
             }
-            return value;
         }
+
+        return value || undefined;
     };
 };
 
-// Register email as global type:
-Command.type( 'email', email() );
-
 const { options } = await new Command()
-    // Register email as command specific type:
-    .type( 'email', email() )
     .option( '-e, --email <value:email>', 'Your email address.' )
+    .type( 'email', email() )
     .parse( Deno.args );
 
 console.log( options );
@@ -241,6 +242,80 @@ $ ./examples/command/custom-option-type.ts -e my@email.de
 $ ./examples/command/custom-option-type.ts -e "my @email.de"
 Option --email must be a valid email but got: my @email.de
 ```
+
+The second method to declare a custom type is using a class:
+
+```typescript
+#!/usr/bin/env -S deno --allow-env
+
+import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
+import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags.ts';
+
+class EmailType extends Type<string> {
+
+    protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    parse( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined {
+
+        if ( value ) {
+            if ( !this.emailRegex.test( value.toLowerCase() ) ) {
+                throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+            }
+        }
+
+        return value || undefined;
+    }
+
+    complete(): string[] {
+        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
+    }
+}
+
+await new Command()
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .type( 'email', new EmailType() )
+    .parse( Deno.args );
+
+```
+
+
+### Auto completion
+
+Cliffy supports auto-completion out of the box for `zsh` and `bash`.
+
+> At the moment only `zsh` is supported.
+
+Some predefined types like `boolean` has predefined auto-completion. There are two ways to add auto-completion to types. One option is defining an action. An auto-completion action is declared with the `.complete()` method and can be used in the command arguments declaration and by any option. The action is added after the type separated by colon.
+
+```typescript
+import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .arguments( '[value:string:email]' )
+    .option( '-e, --email <value:string:email>', 'Your email address.' )
+    .complete( 'email', () => [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ] )
+    .parse( Deno.args );
+```
+
+Another way to add autocompletion is by creating a custom type class with a `.complete()` method.
+
+```typescript
+import { Command, StringType } from 'https://deno.land/x/cliffy/command.ts';
+
+class EmailType extends StringType {
+
+    complete(): string[] {
+        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
+    }
+}
+
+await new Command()
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .type( 'email', new EmailType() )
+    .parse( Deno.args );
+```
+
+Enabling auto completion is emplained in the [completions command](#completions-command) section.
 
 ### Variadic options
 
@@ -472,7 +547,7 @@ $ ./examples/command/custom-option-processing.ts --color blue --color yellow --c
 
 Standalone options cannot be combine with any command and option. For example the `--help` and `--version` flag. You can achieve this with the `standalone` option.
 
-```
+```typescript
 #!/usr/bin/env -S deno --allow-env
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
@@ -490,7 +565,7 @@ Error: Option --standalone cannot be combined with other options.
 
 ### Specify an action for an option
 
-```
+```typescript
 #!/usr/bin/env -S deno --allow-env
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
