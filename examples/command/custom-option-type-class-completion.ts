@@ -1,0 +1,15 @@
+#!/usr/bin/env -S deno --allow-env
+
+import { Command, StringType } from '../../command.ts';
+
+class EmailType extends StringType {
+
+    complete(): string[] {
+        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
+    }
+}
+
+await new Command()
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .type( 'email', new EmailType() )
+    .parse( Deno.args );

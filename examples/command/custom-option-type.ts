@@ -13,21 +13,16 @@ const email = (): ITypeHandler<string> => {
             if ( !emailRegex.test( value.toLowerCase() ) ) {
                 throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
             }
-            return value;
         }
+
+        return value || undefined;
     };
 };
 
-// Register email as global type:
-Command.type( 'email', email() );
-
 const { options } = await new Command()
-    // Register email as command specific type:
+    .arguments( '[value:string:email]' )
+    .option( '-e, --email <value:email>', 'Your email address.' )
     .type( 'email', email() )
-    .option( '-e, --email <value:email>', 'Your email address.', {
-        // Register email as option specific type:
-        // type: email()
-    } )
     .parse( Deno.args );
 
 console.log( options );
