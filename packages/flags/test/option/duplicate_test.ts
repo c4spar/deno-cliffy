@@ -1,6 +1,6 @@
-import { parseFlags } from '../lib/flags.ts';
-import { OptionType } from '../lib/types.ts';
-import { assertThrows } from './lib/assert.ts';
+import { parseFlags } from '../../lib/flags.ts';
+import { OptionType } from '../../lib/types.ts';
+import { assertThrows } from '../lib/assert.ts';
 
 const options = {
     stopEarly: false,

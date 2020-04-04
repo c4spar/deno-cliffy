@@ -1,6 +1,6 @@
-import { parseFlags } from '../lib/flags.ts';
-import { OptionType } from '../lib/types.ts';
-import { assertEquals, assertThrows } from './lib/assert.ts';
+import { parseFlags } from '../../lib/flags.ts';
+import { OptionType } from '../../lib/types.ts';
+import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = {
     stopEarly: false,
@@ -9,7 +9,6 @@ const options = {
         name: 'flag',
         aliases: [ 'f' ],
         type: OptionType.BOOLEAN,
-        optionalValue: true,
         standalone: true
     }, {
         name: 'all',

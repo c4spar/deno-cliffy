@@ -1,6 +1,6 @@
-import { parseFlags } from '../lib/flags.ts';
-import { OptionType } from '../lib/types.ts';
-import { assertEquals, assertThrows } from './lib/assert.ts';
+import { parseFlags } from '../../lib/flags.ts';
+import { OptionType } from '../../lib/types.ts';
+import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = {
     stopEarly: false,
@@ -49,7 +49,7 @@ Deno.test( function flags_optionAliases_flags() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionAliases_fInvalidValie() {
+Deno.test( function flags_optionAliases_InvalidValue_f() {
 
     assertThrows(
         () => parseFlags( [ '-f', 'value' ], options ),
@@ -58,7 +58,7 @@ Deno.test( function flags_optionAliases_fInvalidValie() {
     );
 } );
 
-Deno.test( function flags_optionAliases_flInvalidValue() {
+Deno.test( function flags_optionAliases_InvalidValue_fl() {
 
     assertThrows(
         () => parseFlags( [ '--fl', 'value' ], options ),
@@ -67,7 +67,7 @@ Deno.test( function flags_optionAliases_flInvalidValue() {
     );
 } );
 
-Deno.test( function flags_optionAliases_flagInvalidValue() {
+Deno.test( function flags_optionAliases_InvalidValue_flag() {
 
     assertThrows(
         () => parseFlags( [ '--flag', 'value' ], options ),
@@ -76,7 +76,7 @@ Deno.test( function flags_optionAliases_flagInvalidValue() {
     );
 } );
 
-Deno.test( function flags_optionAliases_flagsInvalidValue() {
+Deno.test( function flags_optionAliases_InvalidValue_flags() {
 
     assertThrows(
         () => parseFlags( [ '--flags', 'value' ], options ),

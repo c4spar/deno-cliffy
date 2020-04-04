@@ -1,6 +1,6 @@
-import { parseFlags } from '../lib/flags.ts';
-import { OptionType } from '../lib/types.ts';
-import { assertEquals, assertThrows } from './lib/assert.ts';
+import { parseFlags } from '../../lib/flags.ts';
+import { OptionType } from '../../lib/types.ts';
+import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = {
     allowEmpty: false,
@@ -61,7 +61,7 @@ Deno.test( function flags_optionConflicts_videoAudioImageType() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionConflicts_videoAudioImageType() {
+Deno.test( function flags_optionConflicts_videoTypeDependsOnImageType() {
 
     assertThrows(
         () => parseFlags( [ '-v', 'value', '-a', 'value' ], options ),

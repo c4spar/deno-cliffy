@@ -1,5 +1,5 @@
-import { parseFlags } from '../lib/flags.ts';
-import { assertThrows } from './lib/assert.ts';
+import { parseFlags } from '../../lib/flags.ts';
+import { assertThrows } from '../lib/assert.ts';
 
 Deno.test( function flags_allowEmpty_enabled() {
 
