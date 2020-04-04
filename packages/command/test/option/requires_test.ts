@@ -3,9 +3,9 @@ import { assertEquals, assertThrowsAsync } from '../lib/assert.ts';
 
 const cmd = new Command()
     .throwErrors()
-    .option( '-v, --video-type [value:string]', 'description ...', { requires: [ 'audio-type', 'image-type' ] } )
-    .option( '-a, --audio-type [value:string]', 'description ...', { requires: [ 'video-type', 'image-type' ] } )
-    .option( '-i, --image-type [value:string]', 'description ...', { requires: [ 'video-type', 'audio-type' ] } )
+    .option( '-v, --video-type [value:string]', 'description ...', { depends: [ 'audio-type', 'image-type' ] } )
+    .option( '-a, --audio-type [value:string]', 'description ...', { depends: [ 'video-type', 'image-type' ] } )
+    .option( '-i, --image-type [value:string]', 'description ...', { depends: [ 'video-type', 'audio-type' ] } )
     .action( () => {} );
 
 Deno.test( async function command_optionRequire_noArguments() {

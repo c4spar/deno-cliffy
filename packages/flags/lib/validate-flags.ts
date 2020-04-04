@@ -50,7 +50,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
             }
         } );
 
-        option.requires?.forEach( ( flag: string ) => {
+        option.depends?.forEach( ( flag: string ) => {
             if ( !isset( flag ) ) {
                 throw new Error( `Option --${ option.name } depends on option: --${ flag }` );
             }

@@ -429,7 +429,7 @@ You ordered a pizza with sauce and parmesan cheese
 
 ### Options which depends on other options
 
-Some options can not be call without other options. You can specify depending options with the `requires` option.
+Some options can not be call without other options. You can specify depending options with the `depends` option.
 
 ```typescript
 #!/usr/bin/env -S deno --allow-env
@@ -438,7 +438,7 @@ import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
     .option( '-a, --audio-codec <type:string>', 'description ...' )
-    .option( '-v, --video-codec <type:string>', 'description ...', { requires: [ 'audio-codec' ] } )
+    .option( '-v, --video-codec <type:string>', 'description ...', { depends: [ 'audio-codec' ] } )
     .parse( Deno.args );
 
 console.log( options );

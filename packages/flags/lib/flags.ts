@@ -33,7 +33,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     const unknown: string[] = [];
 
     opts.flags.forEach( opt => {
-        opt.requires?.forEach( flag => {
+        opt.depends?.forEach( flag => {
             if ( !opts.flags || !getOption( opts.flags, flag ) ) {
                 throw new Error( `Unknown required option: ${ flag }` );
             }

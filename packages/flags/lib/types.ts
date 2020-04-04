@@ -62,7 +62,7 @@ export interface IFlagOptions extends IFlagArgument {
     standalone?: boolean;
     default?: IDefaultValue;
     required?: boolean;
-    requires?: string[];
+    depends?: string[];
     conflicts?: string[];
     value?: IFlagValueHandler;
     collect?: boolean;

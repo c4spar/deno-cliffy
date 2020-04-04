@@ -9,17 +9,17 @@ const options = <IParseOptions>{
         name: 'video-type',
         aliases: [ 'v' ],
         type: OptionType.STRING,
-        requires: [ 'audio-type', 'image-type' ]
+        depends: [ 'audio-type', 'image-type' ]
     }, {
         name: 'audio-type',
         aliases: [ 'a' ],
         type: OptionType.STRING,
-        requires: [ 'video-type', 'image-type' ]
+        depends: [ 'video-type', 'image-type' ]
     }, {
         name: 'image-type',
         aliases: [ 'i' ],
         type: OptionType.STRING,
-        requires: [ 'video-type', 'audio-type' ]
+        depends: [ 'video-type', 'audio-type' ]
     } ]
 };
 

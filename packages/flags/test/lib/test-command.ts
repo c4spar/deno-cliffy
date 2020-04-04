@@ -29,21 +29,21 @@ export const flags = [ {
     aliases: [ 'v' ],
     type: OptionType.STRING,
     required: true,
-    requires: [ 'audio-type', 'image-type' ],
+    depends: [ 'audio-type', 'image-type' ],
     conflicts: [ 'type' ]
 }, {
     name: 'audio-type',
     aliases: [ 'a' ],
     type: OptionType.STRING,
     required: true,
-    requires: [ 'video-type', 'image-type' ],
+    depends: [ 'video-type', 'image-type' ],
     conflicts: [ 'type' ]
 }, {
     name: 'image-type',
     aliases: [ 'a' ],
     type: OptionType.STRING,
     required: true,
-    requires: [ 'video-type', 'audio-type' ],
+    depends: [ 'video-type', 'audio-type' ],
     conflicts: [ 'type' ]
 }, {
     name: 'amount',

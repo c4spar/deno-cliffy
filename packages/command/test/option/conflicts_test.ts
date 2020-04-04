@@ -10,17 +10,17 @@ const cmd = new Command()
     } )
     .option( '-v, --video-type [value:string]', 'description ...', {
         required: true,
-        requires: [ 'audio-type', 'image-type' ],
+        depends: [ 'audio-type', 'image-type' ],
         conflicts: [ 'type' ]
     } )
     .option( '-a, --audio-type [value:string]', 'description ...', {
         required: true,
-        requires: [ 'video-type', 'image-type' ],
+        depends: [ 'video-type', 'image-type' ],
         conflicts: [ 'type' ]
     } )
     .option( '-i, --image-type [value:string]', 'description ...', {
         required: true,
-        requires: [ 'video-type', 'audio-type' ],
+        depends: [ 'video-type', 'audio-type' ],
         conflicts: [ 'type' ]
     } )
     .action( () => {} );
