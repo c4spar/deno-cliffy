@@ -1,14 +1,6 @@
 import { IFlagArgument, IFlagOptions, ITypeHandler } from '../types.ts';
 
-export const boolean: ITypeHandler<boolean> = ( option: IFlagOptions, arg: IFlagArgument, value: string | false ): boolean | undefined => {
-
-    if ( typeof arg.optionalValue === 'undefined' ) {
-        arg.optionalValue = true;
-    }
-
-    if ( !value ) {
-        return;
-    }
+export const boolean: ITypeHandler<boolean> = ( option: IFlagOptions, arg: IFlagArgument, value: string ): boolean => {
 
     if ( ~[ '1', 'true' ].indexOf( value ) ) {
         return true;

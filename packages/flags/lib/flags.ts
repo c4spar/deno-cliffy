@@ -83,16 +83,13 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
 
                 option = {
                     name,
-                    args: [ {
-                        optionalValue: true,
-                        type: OptionType.STRING
-                    } ]
+                    optionalValue: true,
+                    type: OptionType.STRING
                 };
-            } else {
+            }
 
-                if ( !option.args || !option.args.length ) {
-                    option.args = [ option ];
-                }
+            if ( !option.args || !option.args.length ) {
+                option.args = [ option ];
             }
 
             if ( !option.name ) {
@@ -146,12 +143,12 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         throw new Error( `Negate not supported by --${ option.name }. Only optional option or options of type boolean can be negated.` );
                     }
                     flags[ friendlyName ] = false;
-                    // don't allow args for negate flags:--no-<flag>
-                    // if ( hasNext() ) {
-                    //     argIndex++;
-                    //     parseNext();
-                    // }
                     return;
+                }
+
+                // make boolean value optional per default
+                if ( option.type === OptionType.BOOLEAN && typeof option.optionalValue === 'undefined' ) {
+                    option.optionalValue = true;
                 }
 
                 let result: IFlagValue | undefined;
@@ -161,7 +158,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
 
                     const parsed: IFlagValueType[] = next()
                         .split( arg.separator || ',' )
-                        .map( nextValue => {
+                        .map( ( nextValue: string ) => {
                             const value = parseValue( nextValue );
                             if ( typeof value === 'undefined' ) {
                                 throw new Error( `List item of option --${ option?.name } must be of type ${ option?.type } but got: ${ nextValue }` );
@@ -173,7 +170,9 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         result = parsed;
                     }
                 } else {
-                    result = parseValue( hasNext() && next() );
+                    if ( hasNext() ) {
+                        result = parseValue( next() );
+                    }
                 }
 
                 if ( increase ) {
@@ -214,7 +213,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         typeof arg !== 'undefined';
                 }
 
-                function parseValue( nextValue: string | false ): IFlagValueType | undefined {
+                function parseValue( nextValue: string ): IFlagValueType {
 
                     if ( !option ) {
                         throw new Error( 'Wrongly used parseValue.' );
@@ -244,7 +243,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     return { flags, unknown, literal };
 }
 
-export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ): any {
+export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {
 
     const type = Types[ arg.type || OptionType.STRING ];
 

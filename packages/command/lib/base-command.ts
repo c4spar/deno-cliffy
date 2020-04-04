@@ -548,7 +548,7 @@ export class BaseCommand {
                 knownFlaks,
                 allowEmpty: this._allowEmpty,
                 flags: this.options,
-                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => {
+                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => {
                     const parser = this.types[ type ];
                     return parser instanceof Type ? parser.parse( option, arg, nextValue ) : parser( option, arg, nextValue );
                 }

@@ -4,7 +4,7 @@ import { Type } from './type.ts';
 
 export class BooleanType extends Type<boolean> {
 
-    public parse( option: IFlagOptions, arg: IFlagArgument, value: string | false ): boolean | undefined {
+    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): boolean {
 
         return boolean( option, arg, value );
     }

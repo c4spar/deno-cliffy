@@ -4,7 +4,7 @@ import { Type } from './type.ts';
 
 export class StringType extends Type<string> {
 
-    public parse( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined {
+    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
 
         return string( option, arg, value );
     }

@@ -2,7 +2,7 @@ export interface IGenericObject<T> {
     [ name: string ]: T;
 }
 
-export type IType<T> = ( option: IFlagOptions, arg: IFlagArgument, value: string | false ) => T | undefined;
+export type IType<T> = ( option: IFlagOptions, arg: IFlagArgument, value: string ) => T | undefined;
 
 export enum OptionType {
     STRING = 'string',
@@ -50,7 +50,7 @@ export type IDefaultValue = IFlagValue | ( () => undefined | IFlagValue );
 /**
  * Flag value handler for custom value processing.
  */
-export type IFlagValueHandler<T = any> = ( val: any, previous?: T ) => T;
+export type IFlagValueHandler = ( val: any, previous?: any ) => any;
 
 /**
  * Flag settings.
@@ -71,9 +71,9 @@ export interface IFlagOptions extends IFlagArgument {
 /**
  * Type parser method.
  */
-export type ITypeHandler<T> = ( option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => T | undefined;
+export type ITypeHandler<T> = ( option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => T;
 
-export type IParseType = ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string | false ) => any | undefined;
+export type IParseType<T = any> = ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => T;
 
 /**
  * Parse settings.

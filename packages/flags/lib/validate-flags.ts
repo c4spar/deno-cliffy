@@ -44,13 +44,13 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
             return;
         }
 
-        option.conflicts?.forEach( flag => {
+        option.conflicts?.forEach( ( flag: string ) => {
             if ( isset( flag ) ) {
                 throw new Error( `Option --${ option.name } conflicts with option: --${ flag }` );
             }
         } );
 
-        option.requires?.forEach( flag => {
+        option.requires?.forEach( ( flag: string ) => {
             if ( !isset( flag ) ) {
                 throw new Error( `Option --${ option.name } depends on option: --${ flag }` );
             }
@@ -83,9 +83,9 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
             if ( (
                     !option.conflicts ||
-                    !option.conflicts.find( flag => !!values[ flag ] )
+                    !option.conflicts.find( ( flag: string ) => !!values[ flag ] )
                 ) &&
-                !options.find( opt => opt.option?.conflicts?.find( flag => flag === option.name ) )
+                !options.find( opt => opt.option?.conflicts?.find( ( flag: string ) => flag === option.name ) )
             ) {
                 throw new Error( `Missing required option: --${ option.name }` );
             }
