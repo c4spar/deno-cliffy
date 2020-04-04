@@ -38,5 +38,3 @@ Deno.test( async function flags_allowEmpty_disabled() {
         await cmd.parse( [] );
     }, Error, 'No arguments.' );
 } );
-
-await Deno.runTests();

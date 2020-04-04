@@ -94,5 +94,3 @@ Deno.test( function flags_optionRequire_imageVideo() {
         'Option --image-type depends on option: --audio-type'
     );
 } );
-
-await Deno.runTests();

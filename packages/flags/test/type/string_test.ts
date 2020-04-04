@@ -59,5 +59,3 @@ Deno.test( function flags_typeString_flagMissing() {
         'Missing value for option: --flag'
     );
 } );
-
-await Deno.runTests();

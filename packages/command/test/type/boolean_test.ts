@@ -107,5 +107,3 @@ Deno.test( async function command_optionStandalone_flagCombineLong() {
         await cmd.parse( [ '-f', 'unknown' ] );
     }, Error, 'Option --flag must be of type boolean but got: unknown' );
 } );
-
-await Deno.runTests();

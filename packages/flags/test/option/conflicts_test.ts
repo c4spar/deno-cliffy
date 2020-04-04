@@ -70,5 +70,3 @@ Deno.test( function flags_optionConflicts_videoTypeDependsOnImageType() {
         'Option --video-type depends on option: --image-type'
     );
 } );
-
-await Deno.runTests();

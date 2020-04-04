@@ -42,5 +42,3 @@ Deno.test( function flags_allowEmpty_disabled() {
         'No arguments.'
     );
 } );
-
-await Deno.runTests();

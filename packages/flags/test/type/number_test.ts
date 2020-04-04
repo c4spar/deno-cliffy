@@ -68,5 +68,3 @@ Deno.test( function flags_typeNumber_flagInvalidType() {
         'Option --flag must be of type number but got: abc'
     );
 } );
-
-await Deno.runTests();

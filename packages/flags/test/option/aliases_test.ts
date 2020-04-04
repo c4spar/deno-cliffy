@@ -85,5 +85,3 @@ Deno.test( function flags_optionAliases_InvalidValue_flags() {
         'Option --flag must be of type boolean but got: value'
     );
 } );
-
-await Deno.runTests();

@@ -34,5 +34,3 @@ Deno.test( async function command_optionStandalone_flagCombineLong() {
         await cmd.parse( [ '-f', 'abc' ] );
     }, Error, 'Option --flag must be of type number but got: abc' );
 } );
-
-await Deno.runTests();

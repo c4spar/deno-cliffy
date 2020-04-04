@@ -121,5 +121,3 @@ Deno.test( function flags_typeBoolean_flagInvalidType() {
         'Option --flag must be of type boolean but got: unknown'
     );
 } );
-
-await Deno.runTests();

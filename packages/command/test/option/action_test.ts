@@ -23,5 +23,3 @@ Deno.test( async function command_optionAction_action() {
     assertEquals( actionArgs, [ 'arg' ] );
     assertEquals( args, [ 'arg' ] );
 } );
-
-await Deno.runTests();

@@ -44,5 +44,3 @@ Deno.test( function flags_optionStandalone_flagCombineLong() {
         'Option --flag cannot be combined with other options.'
     );
 } );
-
-await Deno.runTests();

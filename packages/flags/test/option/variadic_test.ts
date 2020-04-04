@@ -150,5 +150,3 @@ Deno.test( function flags_optionVariadic_exactLastOptionalVariadic() {
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
-
-await Deno.runTests();

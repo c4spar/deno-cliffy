@@ -27,5 +27,3 @@ Deno.test( async function command_optionStandalone_flagCombineLong() {
         await cmd.parse( [ '-f', 'value', 'unknown' ] );
     }, Error, 'Unknown command: unknown' );
 } );
-
-await Deno.runTests();

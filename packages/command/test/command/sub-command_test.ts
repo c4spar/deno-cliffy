@@ -84,5 +84,3 @@ Deno.test( async function command_subCommand3_typeString_flagMissing() {
         await command().parse( [ 'sub-command2', 'sub-command3', 'input-path' ] );
     }, Error, 'Missing argument: output' );
 } );
-
-await Deno.runTests();

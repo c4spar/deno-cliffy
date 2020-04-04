@@ -25,5 +25,3 @@ Deno.test( function flags_optionVariadic_optional() {
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
-
-await Deno.runTests();

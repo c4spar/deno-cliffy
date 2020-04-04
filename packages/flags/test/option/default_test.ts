@@ -59,5 +59,3 @@ Deno.test( function flags_optionDefault_defaultValues() {
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
-
-await Deno.runTests();

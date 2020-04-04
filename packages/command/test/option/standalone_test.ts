@@ -28,5 +28,3 @@ Deno.test( async function command_optionStandalone_flagCombineLong() {
         await cmd.parse( [ '--flag', '--all' ] );
     }, Error, 'Option --flag cannot be combined with other options' );
 } );
-
-await Deno.runTests();

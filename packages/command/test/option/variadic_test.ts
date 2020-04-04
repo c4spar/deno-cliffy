@@ -103,5 +103,3 @@ Deno.test( async function command_optionVariadic_exactLastOptionalVariadic() {
     assertEquals( options, { variadicOption: [ 1, 'abc', true, false, true, false ] } );
     assertEquals( args, [] );
 } );
-
-await Deno.runTests();

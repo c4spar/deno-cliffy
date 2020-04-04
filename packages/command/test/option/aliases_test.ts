@@ -65,5 +65,3 @@ Deno.test( async function command_optionAliases_flagsInvalidValue() {
         await cmd.parse( [ '--flags', 'value' ] );
     }, Error, 'Option --flag must be of type boolean but got: value' );
 } );
-
-await Deno.runTests();

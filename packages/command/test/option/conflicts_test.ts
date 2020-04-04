@@ -54,5 +54,3 @@ Deno.test( async function command_optionConflicts_videoAudioImageType() {
         await cmd.parse( [ '-v', 'value', '-a', 'value' ] );
     }, Error, 'Option --video-type depends on option: --image-type' );
 } );
-
-await Deno.runTests();

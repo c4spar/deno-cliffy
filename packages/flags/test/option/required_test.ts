@@ -29,5 +29,3 @@ Deno.test( function flags_optionRequired_noArguments() {
         'Missing required option: --flag'
     );
 } );
-
-await Deno.runTests();

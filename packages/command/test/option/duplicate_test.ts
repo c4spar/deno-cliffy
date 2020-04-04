@@ -40,5 +40,3 @@ Deno.test( async function command_optionDuplicate_flagTrueNoFlagTrue() {
         await cmd.parse( [ '-f', 'true', '--no-flag', 'true' ] );
     }, Error, 'Duplicate option: --no-flag' );
 } );
-
-await Deno.runTests();

@@ -98,5 +98,3 @@ Deno.test( function flags_optionCollect_number() {
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
-
-await Deno.runTests();
