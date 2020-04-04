@@ -1,4 +1,63 @@
-# [v0.3.0](https://github.com/c4spar/deno-cli/compare/v0.2.0...80d7ba4) (Tue Mar 31 17:49:50 2020)
+# [v0.4.0](https://github.com/c4spar/deno-cli/compare/v0.3.0...v0.4.0) (Sat Apr 4 23:34:06 2020)
+
+* feat: add support for deno v0.39.0 ([d828f0c](https://github.com/c4spar/deno-cli/commit/d828f0c))
+
+### Features
+
+* **command:** add zsh completions support ([9493d90](https://github.com/c4spar/deno-cli/commit/9493d90), [f54d3a2](https://github.com/c4spar/deno-cli/commit/f54d3a2))
+* **command:** add `complete` sub-command to `completions` command ([fb63ec7](https://github.com/c4spar/deno-cli/commit/fb63ec7))
+* **command:** add complete method for custom auto completions ([7d5d25e](https://github.com/c4spar/deno-cli/commit/7d5d25e), [9406a84](https://github.com/c4spar/deno-cli/commit/9406a84), [5ce209d](https://github.com/c4spar/deno-cli/commit/5ce209d))
+* **command:** complete command names on help command ([5897be1](https://github.com/c4spar/deno-cli/commit/5897be1))
+* **command:** add `action` type ([164585e](https://github.com/c4spar/deno-cli/commit/164585e))
+* **command:** add `command` type ([2b9608c](https://github.com/c4spar/deno-cli/commit/2b9608c))
+* **command:** add autocompletion for types ([16d5237](https://github.com/c4spar/deno-cli/commit/16d5237))
+* **flags:** support method as option default value ([ce09421](https://github.com/c4spar/deno-cli/commit/ce09421))
+* **table:** add `border` option ([a785164](https://github.com/c4spar/deno-cli/commit/a785164))
+
+### Bug Fixes
+
+* **flags:** fix default value ([0244b50](https://github.com/c4spar/deno-cli/commit/0244b50))
+
+### Code Refactoring
+
+* **command:** export default types ([34fcddd](https://github.com/c4spar/deno-cli/commit/34fcddd))
+* **command:** make `complete` method in custom type class's optional. ([253cd74](https://github.com/c4spar/deno-cli/commit/253cd74))
+* **command:** update `completions` description ([a3c5c72](https://github.com/c4spar/deno-cli/commit/a3c5c72))
+* **flags:** refactor `validateFlags` method ([2b51730](https://github.com/c4spar/deno-cli/commit/2b51730))
+* **flags:** refactor `getOptions` method ([3927c36](https://github.com/c4spar/deno-cli/commit/3927c36))
+
+### Chore
+
+* **license:** update copyright ([8264b1a](https://github.com/c4spar/deno-cli/commit/8264b1a))
+
+### Unit/Integration Tests
+
+* **command:** update sub-command test ([0939b6d](https://github.com/c4spar/deno-cli/commit/0939b6d))
+* **command,flags:** don't call `Deno.runTests()` in test's ([57f3a34](https://github.com/c4spar/deno-cli/commit/57f3a34))
+* **flags:** refactor test's ([cf97a15](https://github.com/c4spar/deno-cli/commit/cf97a15), [c021659](https://github.com/c4spar/deno-cli/commit/c021659))
+* **flags:** add value test ([6e3bc57](https://github.com/c4spar/deno-cli/commit/6e3bc57))
+* **flags:** add default value test ([2fbfd54](https://github.com/c4spar/deno-cli/commit/2fbfd54))
+* **flags:** add collect test ([3c14011](https://github.com/c4spar/deno-cli/commit/3c14011))
+
+### Documentation Updates
+
+* **command:** update `README.md` ([c7ff502](https://github.com/c4spar/deno-cli/commit/c7ff502), [4eaed60](https://github.com/c4spar/deno-cli/commit/4eaed60))
+* **command:** add custom type examples ([290d24d](https://github.com/c4spar/deno-cli/commit/290d24d))
+
+### BREAKING CHANGES
+
+* **command,flags:** rename `requires` option to `depends` ([c937466](https://github.com/c4spar/deno-cli/commit/c937466))
+
+    To define depending options you have tu use the options `depends` instead of `requires` now.
+
+* **command,flags:** call `parseValue` only if the flag has a value ([ab5ba30](https://github.com/c4spar/deno-cli/commit/ab5ba30))
+
+    Change type of `value` param from `Type.parse()` method from `string | false` to `string`
+
+
+
+
+# [v0.3.0](https://github.com/c4spar/deno-cli/compare/v0.2.0...v0.3.0) (Tue Mar 31 17:49:50 2020)
 
 ### Features
 
