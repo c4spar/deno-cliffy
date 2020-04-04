@@ -5,6 +5,11 @@ import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
 
 // @TODO: add support for knownFlaks
 
+interface IFlagOptionsMap {
+    name: string;
+    option?: IFlagOptions;
+}
+
 /**
  * Validate flags.
  *
@@ -15,10 +20,6 @@ import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
  */
 export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
 
-    const keys = Object.keys( values );
-
-    const options = keys.map( name => ( { name, option: getOption( flags, paramCase( name ) ) } ) );
-
     // Set default value's
     for ( const option of flags ) {
         const name: string = camelCase( option.name );
@@ -27,9 +28,13 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         }
     }
 
+    const keys = Object.keys( values );
+
     if ( keys.length === 0 && allowEmpty ) {
         return;
     }
+
+    const options: IFlagOptionsMap[] = keys.map( name => ( { name, option: getOption( flags, paramCase( name ) ) } ) );
 
     for ( const { name, option } of options ) {
 
