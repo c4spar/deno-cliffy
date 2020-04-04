@@ -113,7 +113,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
             if ( typeof flags[ friendlyName ] === 'undefined' ) {
 
                 if ( typeof option.default !== 'undefined' ) {
-                    flags[ friendlyName ] = option.default;
+                    flags[ friendlyName ] = typeof option.default === 'function' ? option.default() : option.default;
                 } else if ( option.args && option.args[ 0 ].optionalValue ) {
                     flags[ friendlyName ] = true;
                 } else {

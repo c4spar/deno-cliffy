@@ -19,22 +19,11 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
     const options = keys.map( name => ( { name, option: getOption( flags, paramCase( name ) ) } ) );
 
+    // Set default value's
     for ( const option of flags ) {
-
-        const name = camelCase( option.name );
-
-        if (
-            typeof option.default !== 'undefined'
-            && (
-                typeof values[ name ] === 'undefined'
-                // @TODO: create a test for list default value
-                // || (
-                //     Array.isArray( values[ name ] )
-                //     && ( values[ name ] as any[] )?.filter( val => typeof val !== 'undefined' ).length === 0
-                // )
-            )
-        ) {
-            values[ name ] = option.default;
+        const name: string = camelCase( option.name );
+        if ( typeof values[ name ] === 'undefined' && typeof option.default !== 'undefined' ) {
+            values[ name ] = typeof option.default === 'function' ? option.default() : option.default;
         }
     }
 

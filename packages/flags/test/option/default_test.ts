@@ -34,6 +34,11 @@ const options = <IParseOptions>{
         aliases: [ 'N' ],
         type: OptionType.NUMBER,
         default: 1
+    }, {
+        name: 'method',
+        aliases: [ 'm' ],
+        type: OptionType.NUMBER,
+        default: () => 1
     } ]
 };
 
@@ -41,16 +46,16 @@ Deno.test( function flags_optionDefault_defaultValues() {
 
     const { flags, unknown, literal } = parseFlags( [], options );
 
-    assertEquals( flags, { boolean: false, string: '0', number: 0, boolean2: true, string2: '1', number2: 1 } );
+    assertEquals( flags, { boolean: false, string: '0', number: 0, boolean2: true, string2: '1', number2: 1, method: 1 } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
 
 Deno.test( function flags_optionDefault_defaultValues() {
 
-    const { flags, unknown, literal } = parseFlags( [ '-b', '1', '-s', '1', '-n', '1', '-B', '0', '-S', '0', '-N', '0' ], options );
+    const { flags, unknown, literal } = parseFlags( [ '-b', '1', '-s', '1', '-n', '1', '-B', '0', '-S', '0', '-N', '0', '-m', '0' ], options );
 
-    assertEquals( flags, { boolean: true, string: '1', number: 1, boolean2: false, string2: '0', number2: 0 } );
+    assertEquals( flags, { boolean: true, string: '1', number: 1, boolean2: false, string2: '0', number2: 0, method: 0 } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );

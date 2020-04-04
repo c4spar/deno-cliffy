@@ -45,6 +45,8 @@ export interface IFlagArgument {
     separator?: string;
 }
 
+export type IDefaultValue = IFlagValue | ( () => undefined | IFlagValue );
+
 /**
  * Flag value handler for custom value processing.
  */
@@ -58,7 +60,7 @@ export interface IFlagOptions extends IFlagArgument {
     args?: IFlagArgument[];
     aliases?: string[];
     standalone?: boolean;
-    default?: IFlagValue,
+    default?: IDefaultValue;
     required?: boolean;
     requires?: string[];
     conflicts?: string[];
