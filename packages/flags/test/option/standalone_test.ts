@@ -1,8 +1,9 @@
 import { parseFlags } from '../../lib/flags.ts';
+import { IParseOptions } from '../../lib/types.ts';
 import { OptionType } from '../../lib/types.ts';
 import { assertEquals, assertThrows } from '../lib/assert.ts';
 
-const options = {
+const options = <IParseOptions>{
     stopEarly: false,
     allowEmpty: false,
     flags: [ {
