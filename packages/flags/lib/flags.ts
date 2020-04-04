@@ -23,7 +23,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     !opts.flags && ( opts.flags = [] );
 
     const normalized = normalize( args );
-    let option: IFlagOptions | null = null;
+    let option: IFlagOptions | undefined;
 
     let inLiteral = false;
     let negate = false;
@@ -260,7 +260,7 @@ export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextVa
  * @param flags Source option's array.
  * @param name  Name of the option.
  */
-export function getOption( flags: IFlagOptions[], name: string ): IFlagOptions | null {
+export function getOption( flags: IFlagOptions[], name: string ): IFlagOptions | undefined {
 
     while ( name[ 0 ] === '-' ) {
         name = name.slice( 1 );
@@ -272,7 +272,7 @@ export function getOption( flags: IFlagOptions[], name: string ): IFlagOptions |
         }
     }
 
-    return null;
+    return;
 }
 
 /**
