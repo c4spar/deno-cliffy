@@ -1,3 +1,4 @@
+import { encode } from 'https://deno.land/std/encoding/utf8.ts';
 import { bold } from 'https://deno.land/std/fmt/colors.ts';
 import { border } from './border.ts';
 import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';
@@ -14,7 +15,7 @@ export function renderTable( opts: ITableOptions ) {
 
     const output: string = table( opts );
 
-    Deno.stdout.writeSync( new TextEncoder().encode( output + '\n' ) );
+    Deno.stdout.writeSync( encode( output + '\n' ) );
 }
 
 /**

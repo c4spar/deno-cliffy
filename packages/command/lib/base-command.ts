@@ -1,4 +1,5 @@
 const { stdout, stderr } = Deno;
+import { encode } from 'https://deno.land/std/encoding/utf8.ts';
 import { dim, red } from 'https://deno.land/std/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
@@ -1047,7 +1048,7 @@ export class BaseCommand {
      */
     public write( ...args: any[] ) {
 
-        stdout.writeSync( new TextEncoder().encode( fill( 2 ) + format( ...args ) ) );
+        stdout.writeSync( encode( fill( 2 ) + format( ...args ) ) );
     }
 
     /**
@@ -1057,7 +1058,7 @@ export class BaseCommand {
      */
     public writeError( ...args: any[] ) {
 
-        stderr.writeSync( new TextEncoder().encode( fill( 2 ) + red( format( `[${ this.name }]`, ...args ) ) ) );
+        stderr.writeSync( encode( fill( 2 ) + red( format( `[ERROR:${ this.name }]`, ...args ) ) ) );
     }
 
     /**
