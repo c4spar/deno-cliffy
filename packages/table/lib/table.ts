@@ -1,5 +1,5 @@
-import { encode } from 'https://deno.land/std/encoding/utf8.ts';
-import { bold } from 'https://deno.land/std/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.39.0/encoding/utf8.ts';
+import { bold } from 'https://deno.land/std@v0.39.0/fmt/colors.ts';
 import { border } from './border.ts';
 import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';
 import { addRow } from './row.ts';
