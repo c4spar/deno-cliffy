@@ -265,10 +265,6 @@ class EmailType extends Type<string> {
 
         return value || undefined;
     }
-
-    complete(): string[] {
-        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
-    }
 }
 
 await new Command()
@@ -647,7 +643,7 @@ await new Command()
 
 ### Specify the argument syntax
 
-You can use `.arguments()` to specify the arguments for the top-level command and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after a optional input.
+You can use `.arguments()` to specify the arguments for the top-level command and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
 
 * `[name:type]` optional value.
 * `<name:type>` required value.
