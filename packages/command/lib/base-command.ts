@@ -1,6 +1,6 @@
 const { stdout, stderr } = Deno;
-import { encode } from 'https://deno.land/std@v0.39.0/encoding/utf8.ts';
-import { dim, red } from 'https://deno.land/std@v0.39.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.40.0/encoding/utf8.ts';
+import { dim, red } from 'https://deno.land/std@v0.40.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
