@@ -1,6 +1,6 @@
 import { blue, bold, dim, green, magenta, red, yellow } from 'https://deno.land/std@v0.39.0/fmt/colors.ts';
 import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
-import { renderTable } from '../../table/lib/table.ts';
+import { Table } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
 import { BaseCommand } from '../lib/base-command.ts';
 import { CommandMap, IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
@@ -35,69 +35,62 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         const cmd: BaseCommand = name ? this.parent.getCommand( name ) : this.parent;
 
         const indent = 2;
-        const padding = 2;
 
         const renderHelp = () => {
 
             // Header
             renderLine();
-            renderTable( {
-                padding: 1,
-                indent: indent,
-                rows: getHeader()
-            } );
+            Table.from( getHeader() )
+                 .indent( indent )
+                 .padding( 1 )
+                 .render();
 
             // Description
             if ( cmd.getDescription() ) {
                 renderLabel( 'Description' );
-                renderTable( {
-                    indent: indent * 2,
-                    maxSize: 140,
-                    rows: getDescription()
-                } );
+                Table.from( getDescription() )
+                     .indent( indent * 2 )
+                     .maxCellWidth( 140 )
+                     .padding( 1 )
+                     .render();
             }
 
             // Options
             if ( cmd.hasOptions() ) {
                 renderLabel( 'Options' );
-                renderTable( {
-                    padding: [ padding, padding, 1, padding ],
-                    indent: indent * 2,
-                    maxSize: [ 60, 60, 80, 60 ],
-                    rows: getOptions()
-                } );
+                Table.from( getOptions() )
+                     .padding( [ 2, 2, 1, 2 ] )
+                     .indent( indent * 2 )
+                     .maxCellWidth( [ 60, 60, 80, 60 ] )
+                     .render();
             }
 
             // Commands
             if ( cmd.hasCommands() ) {
                 renderLabel( 'Commands' );
-                renderTable( {
-                    padding: [ padding, padding, 1, padding ],
-                    indent: indent * 2,
-                    rows: getCommands()
-                } );
+                Table.from( getCommands() )
+                     .padding( [ 2, 2, 1, 2 ] )
+                     .indent( indent * 2 )
+                     .render();
             }
 
             // Environment variables
             if ( cmd.hasEnvVars() ) {
                 renderLabel( 'Environment variables' );
-                renderTable( {
-                    // padding,
-                    padding: 1,
-                    indent: indent * 2,
-                    rows: getEnvVars()
-                } );
+                Table.from( getEnvVars() )
+                     .padding( 2 )
+                     .indent( indent * 2 )
+                     .render();
             }
 
             // Examples
             if ( cmd.hasExamples() ) {
                 renderLabel( 'Examples' );
-                renderTable( {
-                    maxSize: 150,
-                    padding: 1,
-                    indent: indent * 2,
-                    rows: getExamples()
-                } );
+                Table.from( getExamples() )
+                     .padding( 1 )
+                     .indent( indent * 2 )
+                     .maxCellWidth( 150 )
+                     .render();
             }
 
             renderLine();
