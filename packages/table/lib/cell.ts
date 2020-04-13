@@ -1,22 +1,42 @@
-import { MAX_CELL_WIDTH } from './const.ts';
-import { consumeWords, fill, stripeColors } from './utils.ts';
+export type ICell = string | Cell;
 
-/**
- * Add cell to row.
- *
- * @param row       The row on which the cell will be appended.
- * @param cell      The cell to append.
- * @param maxLength Max cell length.
- */
-export function addCell( row: string[], cell: string, maxLength: number = MAX_CELL_WIDTH ) {
+export interface ICellOptions {
+    border?: boolean;
+}
 
-    const length = Math.min( maxLength, stripeColors( cell ).length );
+export class Cell extends String {
 
-    const current = consumeWords( length, cell );
+    protected options: ICellOptions = {};
 
-    let next = cell.slice( current.length + 1 );
+    public static from( cell: ICell ): Cell {
+        if ( cell instanceof Cell ) {
+            return cell.clone();
+        }
+        return new this( cell );
+    }
 
-    row.push( current + fill( maxLength - stripeColors( current ).length ) );
+    public clone( value?: ICell ): Cell {
+        const clone = new Cell( value ?? this );
+        clone.options = Object.create( this.options );
+        return clone;
+    }
 
-    return next;
+    /**
+     * Setter:
+     */
+
+    public border( enable: boolean, override: boolean = true ): this {
+        if ( override || typeof this.options.border === 'undefined' ) {
+            this.options.border = enable;
+        }
+        return this;
+    }
+
+    /**
+     * Getter:
+     */
+
+    public getBorder( defaultValue?: boolean ): boolean | undefined {
+        return this.options.border ?? defaultValue;
+    }
 }

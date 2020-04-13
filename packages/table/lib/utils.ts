@@ -1,5 +1,5 @@
 /**
- * Get next words from the beginning of {content} until all words have a length lower then {length}.
+ * Get next words from the beginning of [content] until all words have a length lower or equal then [length].
  *
  * @param length    Max length of all words.
  * @param content   The text content.
@@ -7,32 +7,30 @@
 export function consumeWords( length: number, content: string ): string {
 
     let consumed = '';
-    const words = content.split( / /g );
+    const words: string[] = content.split( / /g );
 
     for ( let i = 0; i < words.length; i++ ) {
 
-        let word: string;
-        let hasLineBreak = words[ i ].indexOf( '\n' ) !== -1;
+        let word: string = words[ i ];
+        let hasLineBreak = word.indexOf( '\n' ) !== -1;
 
         if ( hasLineBreak ) {
-            word = words[ i ].split( '\n' ).shift() || '';
-        } else {
-            word = words[ i ];
+            word = word.split( '\n' ).shift() as string;
+        }
+
+        // consume minimum one word
+        if ( consumed ) {
+            const nextLength = stripeColors( word ).length;
+            const consumedLength = stripeColors( consumed ).length;
+            if ( consumedLength + nextLength >= length ) {
+                break;
+            }
         }
 
         consumed += ( i > 0 ? ' ' : '' ) + word;
 
         if ( hasLineBreak ) {
             break;
-        }
-
-        const next = words[ i + 1 ];
-        if ( next ) {
-            const nextLength = stripeColors( next ).length;
-            const consumedLength = stripeColors( consumed ).length;
-            if ( consumedLength + 1 + nextLength > length ) {
-                break;
-            }
         }
     }
 
@@ -59,8 +57,11 @@ export function stripeColors( str: string ): string {
  */
 export function fill( count: number, str: string = '', char: string = ' ' ) {
 
-    while ( str.length < count ) {
+    let length = stripeColors( str ).length;
+
+    while ( length < count ) {
         str += char;
+        length += char.length;
     }
 
     return str;
@@ -69,9 +70,16 @@ export function fill( count: number, str: string = '', char: string = ' ' ) {
 /**
  * Get longest cell from given row index.
  *
- * @param index Row index.
- * @param rows  The rows.
  */
-export function longest( index: number, rows: string[][] ): number {
-    return Math.max( ...rows.map( row => stripeColors( row[ index ] || '' ).length || 0 ) );
+export function longest( index: number, rows: ( string | String )[][], maxWidth?: number ): number {
+
+    return Math.max(
+        ...rows.map( row => ( row[ index ] || '' )
+            .split( '\n' )
+            .map( ( r: string ) => {
+                const str = typeof maxWidth === 'undefined' ? r : consumeWords( maxWidth, r );
+                return stripeColors( str ).length || 0;
+            } )
+        ).flat()
+    );
 }

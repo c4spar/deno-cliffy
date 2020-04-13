@@ -1,29 +1,45 @@
-import { addCell } from './cell.ts';
+import { ICell } from './cell.ts';
 
-/**
- * Add row to rows.
- *
- * @param rows  The rows on which the row will be appended.
- * @param row   The row to append.
- * @param size  Max cell length for each cell in the row.
- */
-export function addRow( rows: string[][], row: string[], size: number[] ): void {
+export type IRow<T = ICell> = T[] | Row<T>;
 
-    const line: string[] = [];
-    let buffering = false;
+export interface IRowOptions {
+    indent?: number;
+    border?: boolean;
+}
 
-    for ( let i = 0; i < row.length; i++ ) {
+export class Row<T = ICell> extends Array<T> {
 
-        row[ i ] = addCell( line, row[ i ], size[ i ] );
+    protected options: IRowOptions = {};
 
-        if ( row[ i ] ) {
-            buffering = true;
+    public static from<T = ICell>( row: IRow<T> ): Row<T> {
+        if ( row instanceof Row ) {
+            return row.clone();
         }
+        return new Row( ...row );
     }
 
-    rows.push( line );
+    public clone(): Row<T> {
+        const clone = new Row( ...this );
+        clone.options = Object.create( this.options );
+        return clone;
+    }
 
-    if ( buffering ) {
-        addRow( rows, row, size );
+    /**
+     * Setter:
+     */
+
+    public border( enable: boolean, override: boolean = true ): this {
+        if ( override || typeof this.options.border === 'undefined' ) {
+            this.options.border = enable;
+        }
+        return this;
+    }
+
+    /**
+     * Getter:
+     */
+
+    public getBorder( defaultValue?: boolean ): boolean | undefined {
+        return this.options.border ?? defaultValue;
     }
 }
