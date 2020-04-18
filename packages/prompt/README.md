@@ -14,7 +14,7 @@ Create interactive prompts like: checkbox, confirm, input, number, select, etc..
 import { Confirm } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Confirm.prompt( {
-    message: '[CONFIRM] How old are you?'
+    message: 'Would you like to buy a pizza?'
 } );
 ```
 
@@ -24,7 +24,7 @@ await Confirm.prompt( {
 import { Input } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Input.prompt( {
-    message: '[INPUT] How old are you?'
+    message: `What's your name?`
 } );
 ```
 
@@ -34,29 +34,29 @@ await Input.prompt( {
 import { Number } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Number.prompt( {
-    message: '[NUMBER] How old are you?'
+    message: 'How old are you?'
 } );
 ```
 
 ### Select
 
 ```typescript
-import { Select } from 'https://deno.land/x/cliffy/prompt.ts';
+import { Select, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Select.prompt( {
-    message: '[SELECT] How old are you?',
-    values: [ 'one', 'two', new Separator(), 'three' ]
+    message: 'Select your pizza?',
+    values: [ 'margherita', 'caprese', new Separator( 'Special' ), 'diavola' ]
 } );
 ```
 
 ### Checkbox
 
 ```typescript
-import { Checkbox } from 'https://deno.land/x/cliffy/prompt.ts';
+import { Checkbox, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Checkbox.prompt( {
-    message: '[CHECKBOX] How old are you?',
-    values: [ 'one', 'two', new Separator(), 'three' ]
+    message: `Du you like any extra's?`,
+    values: [ 'mozzarella', 'olive', new Separator( 'Special' ), 'buffalo mozzarella' ]
 } );
 ```
 
