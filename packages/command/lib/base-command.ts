@@ -1,6 +1,6 @@
 const { stdout, stderr } = Deno;
-import { encode } from 'https://deno.land/std@v0.40.0/encoding/utf8.ts';
-import { dim, red } from 'https://deno.land/std@v0.40.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
+import { dim, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
@@ -96,12 +96,31 @@ export class BaseCommand {
             subCommand.arguments( result.typeDefinition );
         }
 
+        // if ( name === '*' && !subCommand.isExecutable ) {
+        //     subCommand.isExecutable = true;
+        // }
+
         this.commands.set( name, { name, cmd: subCommand, aliases } );
 
         this.select( name );
 
         return this;
     }
+
+    // public static async exists( name: string ) {
+    //
+    //     const proc = Deno.run( {
+    //         cmd: [ 'sh', '-c', 'compgen -c' ],
+    //         stdout: 'piped',
+    //         stderr: 'piped'
+    //     } );
+    //     const output: Uint8Array = await proc.output();
+    //     const commands = new TextDecoder().decode( output )
+    //                                       .trim()
+    //                                       .split( '\n' );
+    //
+    //     return commands.indexOf( name ) !== -1;
+    // }
 
     /**
      * Add new command alias.
@@ -510,6 +529,7 @@ export class BaseCommand {
         const executable = names.join( '-' );
 
         try {
+            // @TODO: create getEnv() method which should return all known environment variables and pass it to Deno.run({env})
             await Deno.run( {
                 cmd: [ executable, ...args ]
             } );
@@ -590,6 +610,20 @@ export class BaseCommand {
      * @param args Arguments definition.
      */
     protected splitArguments( args: string ) {
+
+        // const parts = args.trim().split( /[,<\[]/g ).map( ( arg: string ) => arg.trim() );
+        // const typeParts: string[] = [];
+        //
+        // while ( parts[ parts.length - 1 ] && parts[ parts.length - 1 ].match( /[\]>]$/ ) ) {
+        //     let arg = parts.pop() as string;
+        //     const lastPart = arg.slice( 0, -1 );
+        //     arg = lastPart === ']' ? `[${ arg }` : `<${ arg }`;
+        //     typeParts.unshift( arg );
+        // }
+        //
+        // const typeDefinition: string | undefined = typeParts.join( ' ' ) || undefined;
+        //
+        // return { args: parts, typeDefinition };
 
         const parts = args.trim().split( /[, =] */g );
         const typeParts = [];
@@ -944,6 +978,7 @@ export class BaseCommand {
     public getCommandMap( name: string ): CommandMap {
 
         const cmd: CommandMap | undefined = this.commands.get( name );
+        // || this.commands.get( '*' );
 
         if ( !cmd ) {
             throw this.error( new Error( `Sub-command not found: ${ name }` ) );

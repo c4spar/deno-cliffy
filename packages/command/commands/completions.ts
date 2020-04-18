@@ -1,4 +1,4 @@
-import { bold, dim, italic } from 'https://deno.land/std@v0.40.0/fmt/colors.ts';
+import { bold, dim, italic } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { BaseCommand } from '../lib/base-command.ts';
 import { DefaultCommand } from '../lib/default-command.ts';
 import { BashCompletionsCommand } from './completions/bash.ts';

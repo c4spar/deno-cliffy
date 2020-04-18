@@ -32,6 +32,11 @@ export class DefaultCommand extends BaseCommand {
                 }
             } )
 
+            // .option( '-v, --verbose [arg:number]', 'Increase debug output.', {
+            //     collect: true,
+            //     value: ( val: boolean, prev: number = 0 ) => val ? prev + 1 : prev - 1
+            // } )
+
             .command( 'help', new HelpCommand( this ) )
 
             .reset();
