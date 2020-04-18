@@ -1,6 +1,6 @@
 # Cliffy - ANSI Escape 
 
-ANSI escape helper class for handling cli cursor, erase output and scroll window.
+ANSI escape module for handling cli cursor, erase output and scroll window.
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github)
 
