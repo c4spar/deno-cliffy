@@ -18,6 +18,16 @@ await Confirm.prompt( {
 } );
 ```
 
+### Toggle
+
+```typescript
+import { Toggle } from 'https://deno.land/x/cliffy/prompt.ts';
+
+await Toggle.prompt( {
+    message: 'Would you like to buy a pizza?'
+} );
+```
+
 ### Input
 
 ```typescript
@@ -35,6 +45,16 @@ import { Number } from 'https://deno.land/x/cliffy/prompt.ts';
 
 await Number.prompt( {
     message: 'How old are you?'
+} );
+```
+
+### List
+
+```typescript
+import { List } from 'https://deno.land/x/cliffy/prompt.ts';
+
+await List.prompt( {
+    message: 'Enter keywords'                
 } );
 ```
 
