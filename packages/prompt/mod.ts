@@ -9,3 +9,4 @@ export * from './prompts/generic-input.ts';
 export * from './prompts/input.ts';
 export * from './prompts/number.ts';
 export * from './prompts/select.ts';
+export * from './prompts/toggle.ts';
