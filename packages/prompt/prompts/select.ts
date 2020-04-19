@@ -1,9 +1,8 @@
 import { blue, dim } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
-import { PromptModule } from '../lib/prompt-module.ts';
+import { PromptModule, PromptModuleOptions } from '../lib/prompt-module.ts';
 import { Separator } from '../lib/separator.ts';
-import { PromptModuleOptions } from '../lib/types.ts';
 
 export interface SelectPromptOptions extends PromptModuleOptions<string> {
     pointer?: string;
@@ -11,21 +10,21 @@ export interface SelectPromptOptions extends PromptModuleOptions<string> {
     values?: ( string | Separator )[] | { [ s: string ]: string | Separator }
 }
 
-export class Select<O extends SelectPromptOptions> extends PromptModule<string, O> {
+export interface SelectPromptSettings extends SelectPromptOptions {
+    pointer: string;
+}
+
+export class Select<O extends SelectPromptOptions, S extends SelectPromptSettings> extends PromptModule<string, O, S> {
 
     protected index: number = 0;
     protected selected: number = 0;
 
     public static async prompt( options: SelectPromptOptions ): Promise<string | undefined> {
 
-        return new this( options ).run();
-    }
-
-    constructor( options: O ) {
-        super( {
+        return new this( {
             pointer: blue( Figures.POINTER ),
             ...options
-        } );
+        } ).run();
     }
 
     protected async clear() {
@@ -38,10 +37,10 @@ export class Select<O extends SelectPromptOptions> extends PromptModule<string, 
 
         this.selected = index;
 
-        let message = this.options.message;
+        let message = this.settings.message;
 
-        if ( this.options.default ) {
-            message += dim( ` (${ this.options.default })` );
+        if ( this.settings.default ) {
+            message += dim( ` (${ this.settings.default })` );
         }
 
         this.question( message, true );
@@ -76,7 +75,7 @@ export class Select<O extends SelectPromptOptions> extends PromptModule<string, 
 
             case 'return':
             case 'enter':
-                return this.validateValue( <string>this.keys()[ this.selected ] );
+                return this.validateValue( this.keys()[ this.selected ] as string );
         }
 
         return false;
@@ -174,7 +173,7 @@ export class Select<O extends SelectPromptOptions> extends PromptModule<string, 
             return;
         }
 
-        line += isSelected ? `${ this.options.pointer } ` : '  ';
+        line += isSelected ? `${ this.settings.pointer } ` : '  ';
 
         const value = this.transform( val );
 
@@ -182,11 +181,11 @@ export class Select<O extends SelectPromptOptions> extends PromptModule<string, 
     }
 
     protected keys(): ( string | Separator )[] {
-        return Array.isArray( this.options.values ) ? this.options.values : Object.keys( this.options.values as any );
+        return Array.isArray( this.settings.values ) ? this.settings.values : Object.keys( this.settings.values as any );
     }
 
     protected values(): ( string | Separator )[] {
-        return Array.isArray( this.options.values ) ? this.options.values : Object.values( this.options.values as any );
+        return Array.isArray( this.settings.values ) ? this.settings.values : Object.values( this.settings.values as any );
     }
 
     protected length(): number {
@@ -194,6 +193,6 @@ export class Select<O extends SelectPromptOptions> extends PromptModule<string, 
     }
 
     protected maxRows() {
-        return this.options.maxRows || this.length();
+        return this.settings.maxRows || this.length();
     }
 }

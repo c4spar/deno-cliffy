@@ -6,23 +6,29 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import format from '../../x/format.ts';
 import { Figures } from './figures.ts';
 import { readKeySync } from './read-line.ts';
-import { PromptModuleOptions, ValidateResult } from './types.ts';
 
-export interface PromptModuleConstructor<T, O extends PromptModuleOptions<T>> {
+export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-    new( options: O ): PromptModule<T, O>
-
-    prompt: ( options: O ) => Promise<T | undefined>
+export interface PromptModuleOptions<T> {
+    message: string;
+    default?: T;
+    sanitize?: ( value: string ) => T | undefined;
+    validate?: ( value: T | undefined ) => ValidateResult;
+    transform?: ( value: T | undefined ) => boolean;
 }
 
-export abstract class PromptModule<T, O extends PromptModuleOptions<T>> {
+export interface PromptModuleSettings<T> extends PromptModuleOptions<T> {
+
+}
+
+export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extends PromptModuleSettings<T>> {
 
     protected screen = AnsiEscape.from( Deno.stdout );
     protected lastError: string | undefined;
     protected isRunning: boolean = false;
     protected value: T | undefined;
 
-    protected constructor( protected options: O ) {}
+    protected constructor( protected settings: S ) {}
 
     protected abstract prompt(): void | Promise<void>;
 
@@ -39,7 +45,7 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>> {
 
     protected abstract async handleEvent( event: KeyEvent ): Promise<boolean>;
 
-    protected abstract sanitize( value: string | T ): T | undefined;
+    protected abstract sanitize( value: string ): T | undefined;
 
     protected abstract validate( value: T | undefined ): ValidateResult;
 
@@ -50,8 +56,9 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>> {
     }
 
     protected clear() {
-        this.screen.cursorLeft();
-        this.screen.eraseDown();
+        this.screen
+            .cursorLeft()
+            .eraseDown();
     }
 
     protected async execute(): Promise<T | undefined> {
@@ -77,23 +84,24 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>> {
         }
 
         this.isRunning = false;
-        this.screen.cursorLeft();
-        this.screen.eraseDown();
 
-        this.screen.cursorShow();
+        this.screen
+            .cursorLeft()
+            .eraseDown()
+            .cursorShow();
 
         return this.value;
     }
 
-    protected async validateValue( line: string | T ): Promise<boolean> {
+    protected async validateValue( line: string ): Promise<boolean> {
 
-        if ( !line && typeof this.options.default !== 'undefined' ) {
-            line = this.options.default;
+        if ( !line && typeof this.settings.default !== 'undefined' ) {
+            this.value = this.settings.default;
+        } else {
+            this.value = this.settings.sanitize ? this.settings.sanitize( line ) : this.sanitize( line );
         }
 
-        this.value = this.options.sanitize ? this.options.sanitize( line ) : this.sanitize( line );
-
-        const validation = await ( this.options.validate ? this.options.validate( this.value ) : this.validate( this.value ) );
+        const validation = await ( this.settings.validate ? this.settings.validate( this.value ) : this.validate( this.value ) );
 
         if ( validation === false ) {
 

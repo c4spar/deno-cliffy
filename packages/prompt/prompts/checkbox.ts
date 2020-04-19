@@ -1,4 +1,4 @@
-import { dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
 import { Separator } from '../lib/separator.ts';
@@ -9,23 +9,25 @@ export interface CheckboxPromptOptions extends SelectPromptOptions {
     uncheck?: string;
 }
 
-export class Checkbox extends Select<CheckboxPromptOptions> {
+export interface CheckboxPromptSettings extends CheckboxPromptOptions {
+    pointer: string;
+    check: string;
+    uncheck: string;
+}
+
+export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettings> {
 
     public static async prompt( options: CheckboxPromptOptions ): Promise<string | undefined> {
 
-        return new this( options ).run();
-    }
-
-    protected checked: string[] = [];
-
-
-    constructor( options: CheckboxPromptOptions ) {
-        super( {
+        return new this( {
+            pointer: blue( Figures.POINTER ),
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options
-        } );
+        } ).run();
     }
+
+    protected checked: string[] = [];
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
@@ -72,9 +74,9 @@ export class Checkbox extends Select<CheckboxPromptOptions> {
 
     protected async selectValue() {
 
-        const promises = this.checked.map( checked => this.validateValue( checked ) );
-        const result = await Promise.all( promises );
-        const isValid: boolean = result.every( isValid => isValid );
+        const promises = this.checked.map( ( checked: string ) => this.validateValue( checked ) );
+        const result: boolean[] = await Promise.all( promises );
+        const isValid: boolean = result.every( ( isValid: boolean ) => isValid );
 
         return isValid;
     }
@@ -110,8 +112,8 @@ export class Checkbox extends Select<CheckboxPromptOptions> {
             return;
         }
 
-        line += isSelected ? `${ this.options.pointer } ` : '  ';
-        line += isChecked ? `${ this.options.check } ` : `${ this.options.uncheck } `;
+        line += isSelected ? `${ this.settings.pointer } ` : '  ';
+        line += isChecked ? `${ this.settings.check } ` : `${ this.settings.uncheck } `;
 
         const value = this.transform( val );
 

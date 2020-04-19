@@ -5,7 +5,11 @@ export interface NumberPromptOptions extends GenericInputPromptOptions<number> {
 
 }
 
-export class Number extends GenericInput<number, NumberPromptOptions> {
+export interface NumberPromptSettings extends NumberPromptOptions {
+
+}
+
+export class Number extends GenericInput<number, NumberPromptOptions, NumberPromptSettings> {
 
     public static async prompt( options: NumberPromptOptions ): Promise<number | undefined> {
 

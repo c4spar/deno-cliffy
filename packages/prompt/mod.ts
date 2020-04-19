@@ -2,7 +2,6 @@ export * from './lib/figures.ts';
 export * from './lib/prompt-module.ts';
 export * from './lib/read-line.ts';
 export * from './lib/separator.ts';
-export * from './lib/types.ts';
 
 export * from './prompts/checkbox.ts';
 export * from './prompts/confirm.ts';

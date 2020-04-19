@@ -3,19 +3,22 @@ import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
-import { PromptModule } from '../lib/prompt-module.ts';
-import { PromptModuleOptions } from '../lib/types.ts';
+import { PromptModule, PromptModuleOptions } from '../lib/prompt-module.ts';
 
 export interface GenericInputPromptOptions<T> extends PromptModuleOptions<T> {
     pointer?: string;
 }
 
-export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>> extends PromptModule<T, O> {
+export interface GenericInputPromptSettings<T> extends GenericInputPromptOptions<T> {
+
+}
+
+export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S extends GenericInputPromptSettings<T>> extends PromptModule<T, O, S> {
 
     protected input: string = '';
     protected index: number = 0;
 
-    constructor( options: O ) {
+    protected constructor( options: S ) {
         super( {
             pointer: blue( Figures.POINTER_SMALL ),
             ...options
@@ -24,13 +27,13 @@ export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>> ex
 
     public prompt(): void {
 
-        let message = ` ${ yellow( '?' ) } ${ bold( this.options.message ) }`;
+        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
 
-        if ( this.options.default ) {
-            message += ' ' + dim( `(${ this.options.default })` );
+        if ( this.settings.default ) {
+            message += ' ' + dim( `(${ this.settings.default })` );
         }
 
-        message += ' ' + this.options.pointer + ' ';
+        message += ' ' + this.settings.pointer + ' ';
 
         const length = encode( stripeColors( message ) ).length;
 

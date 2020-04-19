@@ -4,7 +4,11 @@ export interface InputPromptOptions extends GenericInputPromptOptions<string> {
 
 }
 
-export class Input extends GenericInput<string, InputPromptOptions> {
+export interface InputPromptSettings extends InputPromptOptions {
+
+}
+
+export class Input extends GenericInput<string, InputPromptOptions, InputPromptSettings> {
 
     public static async prompt( options: InputPromptOptions ): Promise<string | undefined> {
 
