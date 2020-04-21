@@ -25,7 +25,7 @@ export class List extends GenericInput<string[], ListPromptOptions, ListPromptSe
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } `;
 
-        if ( this.settings.default ) {
+        if ( typeof this.settings.default !== 'undefined' ) {
             message += dim( `(${ this.settings.default.join( `${ this.settings.separator } ` ) }) ` );
         }
 

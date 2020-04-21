@@ -39,7 +39,7 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
 
         let message = this.settings.message;
 
-        if ( this.settings.default ) {
+        if ( typeof this.settings.default !== 'undefined' ) {
             message += dim( ` (${ this.settings.default })` );
         }
 

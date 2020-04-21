@@ -29,7 +29,7 @@ export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S 
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
 
-        if ( this.settings.default ) {
+        if ( typeof this.settings.default !== 'undefined' ) {
             message += ' ' + dim( `(${ this.settings.default })` );
         }
 
