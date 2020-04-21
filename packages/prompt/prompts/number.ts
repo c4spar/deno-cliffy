@@ -76,43 +76,60 @@ export class Number extends GenericInput<number, NumberPromptOptions, NumberProm
         return false;
     }
 
-    public increaseValue() {
+    protected manipulateIndex( decrease?: boolean ) {
 
         if ( this.input[ this.index ] === '-' ) {
             this.index++;
         }
 
-        let value = parseInt( this.input ) || 0;
-        const oldLength = value.toString().length;
-        value += parseInt( '1'.padEnd( oldLength - this.index, '0' ) );
-        this.input = value.toString();
+        if ( this.input.length && ( this.index > this.input.length - 1 ) ) {
+            this.index--;
+        }
+
+        const decimalIndex: number = this.input.indexOf( '.' );
+        const [ abs, dec ] = this.input.split( '.' );
+
+        if ( dec && this.index === decimalIndex ) {
+            this.index--;
+        }
+
+        const inDecimal: boolean = decimalIndex !== -1 && this.index > decimalIndex;
+        let value: string = ( inDecimal ? dec : abs ) || '0';
+        const oldLength: number = this.input.length;
+        const index: number = inDecimal ? this.index - decimalIndex - 1 : this.index;
+        const increaseValue = Math.pow( 10, value.length - index - 1 );
+
+        value = ( parseInt( value ) + ( decrease ? -increaseValue : increaseValue ) ).toString();
+
+        this.input = !dec ? value : ( this.index > decimalIndex ? abs + '.' + value : value + '.' + dec );
+
         if ( this.input.length > oldLength ) {
             this.index++;
         } else if ( this.input.length < oldLength && this.input[ this.index - 1 ] !== '-' ) {
             this.index--;
         }
+
         this.index = Math.max( 0, Math.min( this.index, this.input.length - 1 ) );
+    }
+
+    public increaseValue() {
+        this.manipulateIndex( false );
     }
 
     public decreaseValue() {
-
-        if ( this.input[ this.index ] === '-' ) {
-            this.index++;
-        }
-
-        let value = parseInt( this.input ) || 0;
-        const oldLength = value.toString().length;
-        value -= parseInt( '1'.padEnd( oldLength - this.index, '0' ) );
-        this.input = value.toString();
-        if ( this.input.length > oldLength ) {
-            this.index++;
-        }
-        this.index = Math.max( 0, Math.min( this.index, this.input.length - 1 ) );
+        this.manipulateIndex( true );
     }
 
     protected addChar( char: string ): void {
-        if ( !isNaN( char as any ) ||
-            ( this.settings.float && char === '.' && this.input.length && this.input.indexOf( '.' ) === -1 ) ) {
+
+        if ( !isNaN( char as any ) ) {
+            super.addChar( char );
+        } else if (
+            this.settings.float &&
+            char === '.' &&
+            this.input.indexOf( '.' ) === -1 &&
+            ( this.input[ 0 ] === '-' ? this.index > 1 : this.index > 0 )
+        ) {
             super.addChar( char );
         }
     }
@@ -152,4 +169,28 @@ export class Number extends GenericInput<number, NumberPromptOptions, NumberProm
     protected transform( value: number ): number {
         return value;
     }
+
+    // protected getChar( index: number = this.index ): string {
+    //     return this.input.slice( index, index + 1 );
+    // }
+    //
+    // protected setChar( value: string | number, index: number = this.index ) {
+    //     this.input = this.input.slice( 0, index ) + value.toString() + this.input.slice( index + 1 );
+    // }
+    //
+    // public parseValue() {
+    //     if ( this.input.length === 0 ) {
+    //         return 0;
+    //     }
+    //
+    //     const value: number = parseFloat( this.input );
+    //
+    //     if ( value < 0 ) {
+    //
+    //     }
+    //
+    //     const length = this.input.length;
+    //     const value = parseFloat( this.getChar() ) || 0;
+    //     this.input = this.input.slice( 0, this.index ) + ( value - 1 ) + this.input.slice( this.index + 1 );
+    // }
 }
