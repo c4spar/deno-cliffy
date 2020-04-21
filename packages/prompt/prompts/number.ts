@@ -2,18 +2,30 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { GenericInput, GenericInputPromptOptions } from './generic-input.ts';
 
 export interface NumberPromptOptions extends GenericInputPromptOptions<number> {
-
+    min?: number;
+    max?: number;
+    float?: boolean;
+    round?: number;
 }
 
 export interface NumberPromptSettings extends NumberPromptOptions {
-
+    min: number;
+    max: number;
+    float: boolean;
+    round: number;
 }
 
 export class Number extends GenericInput<number, NumberPromptOptions, NumberPromptSettings> {
 
     public static async prompt( options: NumberPromptOptions ): Promise<number | undefined> {
 
-        return new this( options ).run();
+        return new this( {
+            min: -Infinity,
+            max: Infinity,
+            float: false,
+            round: 2,
+            ...options
+        } ).run();
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -99,18 +111,42 @@ export class Number extends GenericInput<number, NumberPromptOptions, NumberProm
     }
 
     protected addChar( char: string ): void {
-        if ( isNaN( char as any ) ) {
-            return;
+        if ( !isNaN( char as any ) ||
+            ( this.settings.float && char === '.' && this.input.length && this.input.indexOf( '.' ) === -1 ) ) {
+            super.addChar( char );
         }
-        super.addChar( char );
     }
 
     protected sanitize( value: string ): number | undefined {
-        return !value || isNaN( value as any ) ? undefined : parseFloat( value );
+
+        if ( !value || isNaN( value as any ) ) {
+            return;
+        }
+
+        const val: number = parseFloat( value );
+
+        if ( this.settings.float ) {
+            return parseFloat( val.toFixed( this.settings.round ) );
+        }
+
+        return val;
     }
 
-    protected validate( value: number | undefined ): boolean {
-        return typeof value === 'number';
+    protected validate( value: number | undefined ): boolean | string {
+
+        if ( typeof value !== 'number' ) {
+            return false;
+        }
+
+        if ( value > this.settings.max ) {
+            return `Value must be lower or equal than ${ this.settings.max }`;
+        }
+
+        if ( value < this.settings.min ) {
+            return `Value must be greater or equal than ${ this.settings.min }`;
+        }
+
+        return true;
     }
 
     protected transform( value: number ): number {
