@@ -55,11 +55,11 @@ export class Number extends GenericInput<number, NumberPromptOptions, NumberProm
                 break;
 
             case 'delete':
-                this.deleteChar();
+                this.deleteCharRight();
                 break;
 
             case 'backspace':
-                this.removeChar();
+                this.deleteChar();
                 break;
 
             case 'return':

@@ -69,11 +69,11 @@ export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S 
                 break;
 
             case 'delete':
-                this.deleteChar();
+                this.deleteCharRight();
                 break;
 
             case 'backspace':
-                this.removeChar();
+                this.deleteChar();
                 break;
 
             case 'return':
@@ -91,28 +91,24 @@ export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S 
     }
 
     protected addChar( char: string ): void {
-
         this.input = this.input.slice( 0, this.index ) + char + this.input.slice( this.index );
         this.index++;
     }
 
     protected moveCursorLeft(): void {
-
         if ( this.index > 0 ) {
             this.index--;
         }
     }
 
     protected moveCursorRight(): void {
-
         if ( this.index < this.input.length ) {
             const index = this.input.indexOf( ' ', this.index );
             this.index++;
         }
     }
 
-    protected removeChar(): void {
-
+    protected deleteChar(): void {
         if ( this.index > 0 ) {
             this.index--;
             this.screen.cursorBackward( 1 );
@@ -120,14 +116,13 @@ export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S 
         }
     }
 
-    protected deleteChar(): void {
+    protected deleteCharRight(): void {
         if ( this.index < this.input.length ) {
             this.input = this.input.slice( 0, this.index ) + this.input.slice( this.index + 1 );
         }
     }
 
     protected async selectValue(): Promise<boolean> {
-
         const isValid = await this.validateValue( this.input );
         if ( isValid ) {
             this.writeLine();
