@@ -65,6 +65,13 @@ export class List extends GenericInput<string[], ListPromptOptions, ListPromptSe
         }
     }
 
+    protected deleteChar(): void {
+        if ( this.input[ this.index - 1 ] === ' ' ) {
+            super.deleteChar();
+        }
+        super.deleteChar();
+    }
+
     protected sanitize( value: string ): string[] {
         return value.trim().split( this.regexp() );
     }
