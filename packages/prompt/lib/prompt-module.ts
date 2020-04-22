@@ -73,7 +73,7 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extend
 
         if ( this.lastError ) {
             this.screen.cursorSave();
-            this.write( '\n' );
+            this.writeLine();
             this.error( this.lastError );
             this.screen.cursorRestore();
             this.lastError = undefined;
