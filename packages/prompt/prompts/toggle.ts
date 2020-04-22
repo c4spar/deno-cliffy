@@ -55,14 +55,19 @@ export class Toggle extends GenericInput<boolean, TogglePromptOptions, TogglePro
                 }
                 break;
 
-            case 'n':
+            case this.settings.inactive[ 0 ].toLowerCase():
+            case 'n': // no nein non
             case 'left':
-                this.selectNo();
+                this.selectInactive();
                 break;
 
-            case 'y':
+            case this.settings.active[ 0 ].toLowerCase():
+            case 'y': // yes
+            case 'j': // ja
+            case 's': // si
+            case 'o': // oui
             case 'right':
-                this.selectYes();
+                this.selectActive();
                 break;
 
             case 'return':
@@ -73,24 +78,22 @@ export class Toggle extends GenericInput<boolean, TogglePromptOptions, TogglePro
         return false;
     }
 
-    protected selectYes() {
+    protected selectActive() {
         this.input = this.settings.active;
     }
 
-    protected selectNo() {
+    protected selectInactive() {
         this.input = this.settings.inactive;
     }
 
     protected sanitize( value: string ): boolean | undefined {
 
-        switch ( value.toLowerCase() ) {
+        switch ( value ) {
 
-            case 'y':
-            case 'yes':
+            case this.settings.active:
                 return true;
 
-            case 'n':
-            case 'no':
+            case this.settings.inactive:
                 return false;
         }
 
@@ -102,6 +105,6 @@ export class Toggle extends GenericInput<boolean, TogglePromptOptions, TogglePro
     }
 
     protected transform( value: boolean ): any {
-        return value ? 'Yes' : 'No';
+        return value ? this.settings.active : this.settings.inactive;
     }
 }
