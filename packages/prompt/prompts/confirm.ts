@@ -67,7 +67,7 @@ export class Confirm extends GenericInput<boolean, ConfirmPromptOptions, Confirm
         return typeof value === 'boolean';
     }
 
-    protected transform( value: boolean ): any {
+    protected transform( value: boolean ): string {
         return value ? 'Yes' : 'No';
     }
 }

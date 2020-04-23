@@ -104,7 +104,7 @@ export class Toggle extends GenericInput<boolean, TogglePromptOptions, TogglePro
         return typeof value === 'boolean';
     }
 
-    protected transform( value: boolean ): any {
+    protected transform( value: boolean ): string {
         return value ? this.settings.active : this.settings.inactive;
     }
 }

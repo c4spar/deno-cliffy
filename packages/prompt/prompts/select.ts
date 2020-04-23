@@ -89,7 +89,7 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
         return true;
     }
 
-    protected transform( value: string ): any {
+    protected transform( value: string ): string {
 
         return value.split( ' ' )
                     .map( val => val.slice( 0, 1 ).toUpperCase() + val.slice( 1 ) )
@@ -99,21 +99,16 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
     protected async selectPrevious(): Promise<void> {
 
         if ( this.selected > 0 ) {
-
             this.selected--;
-
             if ( this.selected < this.index ) {
                 this.index--;
             }
-
             if ( this.values()[ this.selected ] instanceof Separator ) {
                 return this.selectPrevious();
             }
         } else {
-
             this.selected = this.length() - 1;
             this.index = this.length() - this.maxRows();
-
             if ( this.values()[ this.selected ] instanceof Separator ) {
                 return this.selectPrevious();
             }
@@ -123,20 +118,15 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
     protected async selectNext(): Promise<void> {
 
         if ( this.selected < this.length() - 1 ) {
-
             this.selected++;
-
             if ( this.selected >= this.index + this.maxRows() ) {
                 this.index++;
             }
-
             if ( this.values()[ this.selected ] instanceof Separator ) {
                 return this.selectNext();
             }
         } else {
-
             this.selected = this.index = 0;
-
             if ( this.values()[ this.selected ] instanceof Separator ) {
                 return this.selectNext();
             }
@@ -153,14 +143,7 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
             const key: string | Separator = keys[ i ];
             const val: string | Separator = values[ i ];
 
-            if ( key instanceof Separator ) {
-                this.writeListItem( val );
-                continue;
-            }
-
-            const isSelected: boolean = keys[ this.selected ] === key;
-
-            this.writeListItem( val, isSelected );
+            this.writeListItem( val, keys[ this.selected ] === key );
         }
     }
 
@@ -175,7 +158,7 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
 
         line += isSelected ? `${ this.settings.pointer } ` : '  ';
 
-        const value = this.transform( val );
+        const value: string = this.transform( val );
 
         this.writeLine( `${ line }${ isSelected ? value : dim( value ) }` );
     }

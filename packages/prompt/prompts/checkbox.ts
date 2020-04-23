@@ -115,7 +115,7 @@ export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettin
         line += isSelected ? `${ this.settings.pointer } ` : '  ';
         line += isChecked ? `${ this.settings.check } ` : `${ this.settings.uncheck } `;
 
-        const value = this.transform( val );
+        const value: string = this.transform( val );
 
         this.writeLine( `${ line }${ isSelected ? value : dim( value ) }` );
     }

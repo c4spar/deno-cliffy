@@ -166,8 +166,8 @@ export class Number extends GenericInput<number, NumberPromptOptions, NumberProm
         return true;
     }
 
-    protected transform( value: number ): number {
-        return value;
+    protected transform( value: number ): string {
+        return value.toString();
     }
 
     // protected getChar( index: number = this.index ): string {

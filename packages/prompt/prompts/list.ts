@@ -80,7 +80,7 @@ export class List extends GenericInput<string[], ListPromptOptions, ListPromptSe
         return Array.isArray( value ) && ( value.every( ( val: string ) => val.trim().length > 0 ) || 'Value cannot be empty.' );
     }
 
-    protected transform( value: string[] ): any {
+    protected transform( value: string[] ): string {
         return value.join( `${ this.settings.separator } ` );
     }
 }
