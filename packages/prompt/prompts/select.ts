@@ -4,10 +4,12 @@ import { Figures } from '../lib/figures.ts';
 import { PromptModule, PromptModuleOptions } from '../lib/prompt-module.ts';
 import { Separator } from '../lib/separator.ts';
 
+export type ISelectValueOptions = ( string | Separator )[] | { [ s: string ]: string | Separator };
+
 export interface SelectPromptOptions extends PromptModuleOptions<string> {
     pointer?: string;
     maxRows?: number;
-    values?: ( string | Separator )[] | { [ s: string ]: string | Separator }
+    values: ISelectValueOptions;
 }
 
 export interface SelectPromptSettings extends SelectPromptOptions {
@@ -17,7 +19,7 @@ export interface SelectPromptSettings extends SelectPromptOptions {
 export class Select<O extends SelectPromptOptions, S extends SelectPromptSettings> extends PromptModule<string, O, S> {
 
     protected index: number = 0;
-    protected selected: number = 0;
+    protected selected: number = typeof this.settings.default !== 'undefined' ? this.keys().indexOf( this.settings.default ) || 0 : 0;
 
     public static async prompt( options: SelectPromptOptions ): Promise<string | undefined> {
 
@@ -33,9 +35,7 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
         this.screen.eraseDown();
     }
 
-    public async prompt( index: number = this.selected ): Promise<void> {
-
-        this.selected = index;
+    public async prompt(): Promise<void> {
 
         let message = this.settings.message;
 
