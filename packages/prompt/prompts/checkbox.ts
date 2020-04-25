@@ -7,12 +7,14 @@ import { Select, SelectPromptOptions } from './select.ts';
 export interface CheckboxPromptOptions extends SelectPromptOptions {
     check?: string;
     uncheck?: string;
+    checked?: string[];
 }
 
 export interface CheckboxPromptSettings extends CheckboxPromptOptions {
     pointer: string;
     check: string;
     uncheck: string;
+    checked: string[];
 }
 
 export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettings> {
@@ -23,11 +25,10 @@ export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettin
             pointer: blue( Figures.POINTER ),
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
+            checked: [],
             ...options
         } ).run();
     }
-
-    protected checked: string[] = [];
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
@@ -63,18 +64,18 @@ export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettin
 
         const keys: ( string | Separator )[] = this.keys();
         const selected: string | Separator = keys[ this.selected ];
-        const index = typeof selected === 'string' ? this.checked.indexOf( selected ) : -1;
+        const index = typeof selected === 'string' ? this.settings.checked.indexOf( selected ) : -1;
 
         if ( index === -1 ) {
-            this.checked.push( <string>selected );
+            this.settings.checked.push( <string>selected );
         } else {
-            this.checked.splice( index, 1 );
+            this.settings.checked.splice( index, 1 );
         }
     }
 
     protected async selectValue() {
 
-        const promises = this.checked.map( ( checked: string ) => this.validateValue( checked ) );
+        const promises = this.settings.checked.map( ( checked: string ) => this.validateValue( checked ) );
         const result: boolean[] = await Promise.all( promises );
         const isValid: boolean = result.every( ( isValid: boolean ) => isValid );
 
@@ -97,7 +98,7 @@ export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettin
             }
 
             const isSelected: boolean = keys[ this.selected ] === key;
-            const isChecked: boolean = this.checked.indexOf( key ) !== -1;
+            const isChecked: boolean = this.settings.checked.indexOf( key ) !== -1;
 
             this.writeListItem( val, isSelected, isChecked );
         }
