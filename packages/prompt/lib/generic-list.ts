@@ -132,6 +132,6 @@ export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V
     protected abstract writeListItem( item: GenericListItemSettings, isSelected?: boolean ): void;
 
     protected maxRows() {
-        return this.settings.maxRows || this.settings.values.length;
+        return Math.min( this.settings.values.length, this.settings.maxRows || this.settings.values.length );
     }
 }
