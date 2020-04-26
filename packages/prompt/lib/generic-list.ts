@@ -1,5 +1,5 @@
 import camelCase from '../../x/camelCase.ts';
-import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from '../lib/generic-prompt.ts';
+import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
 
 export interface GenericListItemOptions {
     label?: string;

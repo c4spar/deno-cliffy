@@ -1,7 +1,7 @@
 import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
 export interface TogglePromptOptions extends GenericInputPromptOptions<boolean> {
     active?: string;

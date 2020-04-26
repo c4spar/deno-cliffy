@@ -2,7 +2,7 @@ import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
 import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
 export interface ListPromptOptions extends GenericInputPromptOptions<string[]> {
     separator?: string;

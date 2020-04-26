@@ -1,7 +1,7 @@
 import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListNamedItemOptions, GenericListPromptOptions, GenericListPromptSettings } from './generic-list.ts';
+import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListNamedItemOptions, GenericListPromptOptions, GenericListPromptSettings } from '../lib/generic-list.ts';
 
 export interface CheckboxItemOptions extends GenericListItemOptions {
     checked?: boolean;
