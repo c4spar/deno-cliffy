@@ -1,5 +1,5 @@
 import camelCase from '../../x/camelCase.ts';
-import { PromptModule, PromptModuleOptions, PromptModuleSettings } from '../lib/prompt-module.ts';
+import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from '../lib/generic-prompt.ts';
 
 export interface GenericListItemOptions {
     label?: string;
@@ -23,17 +23,17 @@ export type GenericListValueOptions =
     | { [ s: string ]: string | GenericListItemOptions };
 export type GenericListValueSettings = GenericListItemSettings[];
 
-export interface GenericListPromptOptions<T, V> extends PromptModuleOptions<T, V> {
+export interface GenericListPromptOptions<T, V> extends GenericPromptOptions<T, V> {
     maxRows?: number;
     values: GenericListValueOptions;
 }
 
-export interface GenericListPromptSettings<T, V> extends PromptModuleSettings<T, V> {
+export interface GenericListPromptSettings<T, V> extends GenericPromptSettings<T, V> {
     maxRows: number;
     values: GenericListValueSettings;
 }
 
-export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V>> extends PromptModule<T, V, S> {
+export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V>> extends GenericPrompt<T, V, S> {
 
     protected index: number = 0;
     protected selected: number = 0;

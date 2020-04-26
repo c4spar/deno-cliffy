@@ -8,7 +8,7 @@ import { readKeySync } from './read-line.ts';
 
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-export interface PromptModuleOptions<T, V> {
+export interface GenericPromptOptions<T, V> {
     message: string;
     default?: T;
     sanitize?: ( value: V ) => T | undefined;
@@ -16,9 +16,9 @@ export interface PromptModuleOptions<T, V> {
     transform?: ( value: T ) => string;
 }
 
-export interface PromptModuleSettings<T, V> extends PromptModuleOptions<T, V> {}
+export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> {}
 
-export abstract class PromptModule<T, V, S extends PromptModuleSettings<T, V>> {
+export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>> {
 
     protected screen = AnsiEscape.from( Deno.stdout );
     protected lastError: string | undefined;

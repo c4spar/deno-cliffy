@@ -1,5 +1,5 @@
 export * from './lib/figures.ts';
-export * from './lib/prompt-module.ts';
+export * from './lib/generic-prompt.ts';
 export * from './lib/read-line.ts';
 export * from './lib/separator.ts';
 
