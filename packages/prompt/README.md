@@ -84,9 +84,7 @@ All prompts have the following base options:
 ```typescript
 import { Input } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Input.prompt( {
-    message: `What's your name?`
-} );
+const name: string = await Input.prompt( `What's your name?` );
 ```
 
 **Options**
@@ -106,9 +104,7 @@ await Input.prompt( {
 ```typescript
 import { Number } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Number.prompt( {
-    message: 'How old are you?'
-} );
+const age: number = await Number.prompt( 'How old are you?' );
 ```
 
 **Options**
@@ -132,9 +128,7 @@ await Number.prompt( {
 ```typescript
 import { Confirm } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Confirm.prompt( {
-    message: 'Would you like to buy a pizza?'
-} );
+const pizza: boolean = await Confirm.prompt( 'Would you like to buy a pizza?' );
 ```
 
 **Options**
@@ -156,9 +150,7 @@ await Confirm.prompt( {
 ```typescript
 import { Toggle } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Toggle.prompt( {
-    message: 'Would you like to buy a pizza?'
-} );
+const pizza: boolean = await Toggle.prompt( 'Would you like to buy a pizza?' );
 ```
 
 **Options**
@@ -187,9 +179,7 @@ await Toggle.prompt( {
 ```typescript
 import { List } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await List.prompt( {
-    message: 'Enter comma separated keywords'                
-} );
+const keywords: string[] = await List.prompt( 'Enter keywords' );
 ```
 
 **↑ back to:** [Prompt types](#-types)
@@ -203,9 +193,9 @@ await List.prompt( {
 ```typescript
 import { Select, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Select.prompt( {
+const pizza: string = await Select.prompt( {
     message: 'Select your pizza?',
-    values: [ 'margherita', 'caprese', new Separator( 'Special' ), 'diavola' ]
+    values: ['Margherita', 'Caprese', Select.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
 } );
 ```
 
@@ -216,13 +206,13 @@ await Select.prompt( {
 | pointer | `string` | No | Change the pointer icon. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled? }}` or Array of strings or objects `[{ name, label?, disabled? }, ...]`. |
+| values | `object | (string|object)[]` | Yes | Object `{[name: string]: string | {label?, disabled? }}` or Array of strings or objects `[{ name, label?, disabled? }, ...]`. |
 
 **Value Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| name | `string` | Only if used in `Array` | The name is used as key for the results object. |
+| name | `string` | Only if used in `Array` | Value which will be returned as result. |
 | label | `string` | No | Label is displayed in the list. Defaults to `name` |
 | disabled | `boolean` | No | Disabled item. Can't be selected. |
 
@@ -237,9 +227,9 @@ await Select.prompt( {
 ```typescript
 import { Checkbox, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
-await Checkbox.prompt( {
-    message: `Du you like any extra's?`,
-    values: [ 'mozzarella', 'olive', new Separator( 'Special' ), 'buffalo mozzarella' ]
+const pizza: string[] = await Checkbox.prompt( {
+    message: 'Select your pizza?',
+    values: [ 'Margherita', 'Caprese', Checkbox.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
 } );
 ```
 
@@ -252,13 +242,13 @@ await Checkbox.prompt( {
 | uncheck | `string` | No | Change the uncheck icon. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled?, checked? }}` or Array of strings or objects `[{ name, label?, disabled?, checked? }, ...]`. |
+| values | `object | (string|object)[]` | Yes | Object `{[name: string]: string | {label?, disabled?, checked? }}` or Array of strings or objects `[{ name, label?, disabled?, checked? }, ...]`. |
 
 **Value Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| name | `string` | Only if used in `Array` | The name is used as key for the results object. |
+| name | `string` | Only if used in `Array` | Value which will be added to the returned result array. |
 | label | `string` | No | Label is displayed in the list. Defaults to `name`. |
 | disabled | `boolean` | No | Disabled item. Can't be selected. |
 | checked | `boolean` | No | Whether item is checked or not. Defaults to `false`. |
