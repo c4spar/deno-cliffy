@@ -1,14 +1,29 @@
-# Cliffy - Prompt 
+<h1 align="center">Cliffy ❯ Prompt</h1>
 
-Create interactive prompts like: checkbox, confirm, input, number, select, etc...
+<p align="center">
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" alt="version" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" alt="release date" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" alt="build status" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" alt="licence" />
+  </a>
+</p>
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github)
+<p align="center">
+  <b> Create beautiful interactive prompts</b></br>
+  <sub>>_ Input, Number, Confirm, Toggle, List, Select, Checkbox and many more...<sub>
+</p>
 
-![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v0.41.0|v0.40.0|v0.39.0-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
+## ❯ Content
 
-* [Usage](#❯-types)
-* [Types](#❯-types)
-* [API](#❯-api)
+* [Usage](#-usage)
+* [Types](#-types)
 
 ## ❯ Usage
 
@@ -40,15 +55,13 @@ const result = await Input.prompt({message: 'Do you prefer cats or dogs?'});
 
 ## ❯ Types
 
-* [input](#--input)
-* [number](#--number)
-* [confirm](#--confirm)
-* [toggle](#--toggle)
-* [list](#--list)
-* [select](#--select)
-* [checkbox](#--checkbox)
-
-## ❯ API
+* [input](#%EF%B8%8F-input)
+* [number](#%EF%B8%8F-number)
+* [confirm](#%EF%B8%8F-confirm)
+* [toggle](#%EF%B8%8F-toggle)
+* [list](#%EF%B8%8F-list)
+* [select](#%EF%B8%8F-select)
+* [checkbox](#%EF%B8%8F-checkbox)
 
 **Options**
 
@@ -62,13 +75,9 @@ All prompts have the following base options:
 | validate | `( value: T | undefined ) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
 | hint | `string` | No | Hint to display to the user. (not implemented) |
 
+***
+
 ### ✏️ Input
-
-**Options**
-
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
 
 **Example**
 
@@ -80,17 +89,17 @@ await Input.prompt( {
 } );
 ```
 
-### 1️2️3️Number
-
 **Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
 | pointer | `string` | No | Change the pointer icon. |
-| min | `number` | No | Min value. Defaults to `-infinity`. |
-| max | `number` | No | Max value. Defaults to `Infinity`. |
-| float | `boolean` | No | Allow floating point inputs. Defaults to `false`. |
-| round | `number` | No | Round float values to `x` decimals. Defaults to `2`. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
+
+### 1️2️3️ Number
 
 **Example**
 
@@ -102,15 +111,21 @@ await Number.prompt( {
 } );
 ```
 
-### 👌 Confirm
-
 **Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
 | pointer | `string` | No | Change the pointer icon. |
-| active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
-| inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
+| min | `number` | No | Min value. Defaults to `-infinity`. |
+| max | `number` | No | Max value. Defaults to `Infinity`. |
+| float | `boolean` | No | Allow floating point inputs. Defaults to `false`. |
+| round | `number` | No | Round float values to `x` decimals. Defaults to `2`. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
+
+### 👌 Confirm
 
 **Example**
 
@@ -122,8 +137,6 @@ await Confirm.prompt( {
 } );
 ```
 
-### 🔘 Toggle
-
 **Options**
 
 | Param | Type | Required | Description |
@@ -131,6 +144,12 @@ await Confirm.prompt( {
 | pointer | `string` | No | Change the pointer icon. |
 | active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
 | inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
+
+### 🔘 Toggle
 
 **Example**
 
@@ -141,6 +160,18 @@ await Toggle.prompt( {
     message: 'Would you like to buy a pizza?'
 } );
 ```
+
+**Options**
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| pointer | `string` | No | Change the pointer icon. |
+| active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
+| inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
 
 ### 🚃,🚃,🚃 List
 
@@ -161,24 +192,11 @@ await List.prompt( {
 } );
 ```
 
+**↑ back to:** [Prompt types](#-types)
+
+***
+
 ### ❯ Select
-
-**Options**
-
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
-| indent | `string` | No | List indentation. Defaults to `' '` |
-| maxRows | `number` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
-| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled? }}` or Array of strings or objects `[{ name, label?, disabled? }, ...]`. |
-
-**Value Options**
-
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| name | `string` | Only if used in `Array` | The name is used as key for the results object. |
-| label | `string` | No | Label is displayed in the list. Defaults to `name` |
-| disabled | `boolean` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
 
 **Example**
 
@@ -191,28 +209,28 @@ await Select.prompt( {
 } );
 ```
 
-### ✔️ Checkbox
-
 **Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
 | pointer | `string` | No | Change the pointer icon. |
-| check | `string` | No | Change the check icon. |
-| uncheck | `string` | No | Change the uncheck icon. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
-| maxRows | `number` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
-| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled?, checked? }}` or Array of strings or objects `[{ name, label?, disabled?, checked? }, ...]`. |
+| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
+| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled? }}` or Array of strings or objects `[{ name, label?, disabled? }, ...]`. |
 
 **Value Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
 | name | `string` | Only if used in `Array` | The name is used as key for the results object. |
-| label | `string` | No | Label is displayed in the list. Defaults to `name`. |
-| disabled | `boolean` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
-| checked | `boolean` | No | Whether item is checked or not. Defaults to `false`. |
-| icon | `boolean` | No | Show or hide item icon. Defaults to `true`. |
+| label | `string` | No | Label is displayed in the list. Defaults to `name` |
+| disabled | `boolean` | No | Disabled item. Can't be selected. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
+
+### ✔️ Checkbox
 
 **Example**
 
@@ -224,6 +242,29 @@ await Checkbox.prompt( {
     values: [ 'mozzarella', 'olive', new Separator( 'Special' ), 'buffalo mozzarella' ]
 } );
 ```
+
+**Options**
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| pointer | `string` | No | Change the pointer icon. |
+| check | `string` | No | Change the check icon. |
+| uncheck | `string` | No | Change the uncheck icon. |
+| indent | `string` | No | List indentation. Defaults to `' '` |
+| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
+| values | `string` | Yes | Object `{[name: string]: string | {label?, disabled?, checked? }}` or Array of strings or objects `[{ name, label?, disabled?, checked? }, ...]`. |
+
+**Value Options**
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| name | `string` | Only if used in `Array` | The name is used as key for the results object. |
+| label | `string` | No | Label is displayed in the list. Defaults to `name`. |
+| disabled | `boolean` | No | Disabled item. Can't be selected. |
+| checked | `boolean` | No | Whether item is checked or not. Defaults to `false`. |
+| icon | `boolean` | No | Show or hide item icon. Defaults to `true`. |
+
+**↑ back to:** [Prompt types](#-types)
 
 ## License
 
