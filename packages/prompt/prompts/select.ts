@@ -55,7 +55,7 @@ export class Select<S extends SelectPromptSettings> extends GenericList<string, 
         return super.mapItem( item ) as SelectItemSettings;
     }
 
-    public async prompt(): Promise<void> {
+    protected getMessage(): string {
 
         let message = this.settings.message;
 
@@ -63,9 +63,7 @@ export class Select<S extends SelectPromptSettings> extends GenericList<string, 
             message += dim( ` (${ this.settings.default })` );
         }
 
-        this.question( message, true );
-
-        this.writeListItems();
+        return message;
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {

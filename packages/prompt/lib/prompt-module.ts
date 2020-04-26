@@ -27,7 +27,13 @@ export abstract class PromptModule<T, V, S extends PromptModuleSettings<T, V>> {
 
     protected constructor( protected settings: S ) {}
 
-    protected abstract prompt(): void | Promise<void>;
+    protected async prompt(): Promise<void> {
+        await this.setMessage( await this.getMessage() );
+    }
+
+    protected abstract getMessage(): string | Promise<string>;
+
+    protected abstract setMessage( message: string ): void | Promise<void>;
 
     protected async read(): Promise<boolean> {
 

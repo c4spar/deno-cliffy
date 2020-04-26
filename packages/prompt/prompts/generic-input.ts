@@ -1,8 +1,7 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
-import { Figures } from '../lib/figures.ts';
 import { PromptModule, PromptModuleOptions, PromptModuleSettings } from '../lib/prompt-module.ts';
 
 export interface GenericInputPromptOptions<T> extends PromptModuleOptions<T, string> {
@@ -18,20 +17,18 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
     protected input: string = '';
     protected index: number = 0;
 
-    protected constructor( options: S ) {
-        super( {
-            pointer: blue( Figures.POINTER_SMALL ),
-            ...options
-        } );
-    }
-
-    public prompt(): void {
+    protected getMessage(): string {
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
 
         if ( typeof this.settings.default !== 'undefined' ) {
             message += ' ' + dim( `(${ this.settings.default })` );
         }
+
+        return message;
+    }
+
+    protected setMessage( message: string ) {
 
         message += ' ' + this.settings.pointer + ' ';
 

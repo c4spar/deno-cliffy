@@ -66,6 +66,13 @@ export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V
         };
     }
 
+    protected setMessage( message: string ) {
+
+        this.question( message, true );
+
+        this.writeListItems();
+    }
+
     protected async clear() {
         this.screen.eraseLines( this.maxRows() + 2 );
         this.screen.cursorLeft();

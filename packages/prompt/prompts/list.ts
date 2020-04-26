@@ -23,15 +23,20 @@ export class List extends GenericInput<string[], ListPromptSettings> {
         } ).run();
     }
 
-    public prompt(): void {
+    protected getMessage(): string {
 
-        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } `;
+        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
 
         if ( typeof this.settings.default !== 'undefined' ) {
-            message += dim( `(${ this.settings.default.join( `${ this.settings.separator } ` ) }) ` );
+            message += dim( ` (${ this.settings.default.join( `${ this.settings.separator } ` ) })` );
         }
 
-        message += `${ this.settings.pointer } `;
+        return message;
+    }
+
+    protected setMessage( message: string ) {
+
+        message += ' ' + this.settings.pointer + ' ';
 
         const length = encode( stripeColors( message ) ).length;
 
@@ -44,9 +49,9 @@ export class List extends GenericInput<string[], ListPromptSettings> {
 
         const inputDiff = oldInput.length - this.input.length;
 
-        this.write( message );
-
         this.index -= inputDiff;
+
+        this.write( message );
 
         this.screen.cursorTo( length - 1 + this.index );
     }

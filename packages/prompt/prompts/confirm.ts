@@ -1,6 +1,4 @@
-import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
-import { stripeColors } from '../../table/lib/utils.ts';
+import { blue, bold, dim, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
 
@@ -26,7 +24,7 @@ export class Confirm extends GenericInput<boolean, ConfirmPromptSettings> {
         } ).run();
     }
 
-    public prompt(): void {
+    public getMessage(): string {
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } `;
 
@@ -38,15 +36,7 @@ export class Confirm extends GenericInput<boolean, ConfirmPromptSettings> {
             message += dim( `(${ this.settings.active.toLowerCase() }/${ this.settings.inactive.toLowerCase() })` );
         }
 
-        message += ' ' + this.settings.pointer + ' ';
-
-        const length = encode( stripeColors( message ) ).length;
-
-        message += underline( this.input );
-
-        this.write( message );
-
-        this.screen.cursorTo( length - 1 + this.index );
+        return message;
     }
 
     protected sanitize( value: string ): boolean | undefined {

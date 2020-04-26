@@ -76,7 +76,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxPromptSett
         };
     }
 
-    public async prompt(): Promise<void> {
+    protected getMessage(): string {
 
         let message = this.settings.message;
 
@@ -84,9 +84,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxPromptSett
             message += dim( ` (${ this.settings.default.join( ', ' ) })` );
         }
 
-        this.question( message, true );
-
-        this.writeListItems();
+        return message;
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {

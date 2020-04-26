@@ -25,7 +25,7 @@ export class Toggle extends GenericInput<boolean, TogglePromptSettings> {
         } ).run();
     }
 
-    public prompt(): void {
+    public getMessage(): string {
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } ${ this.settings.pointer } `;
 
@@ -37,6 +37,10 @@ export class Toggle extends GenericInput<boolean, TogglePromptSettings> {
             message += dim( `${ this.settings.inactive } / ${ this.settings.active }` );
         }
 
+        return message;
+    }
+
+    protected setMessage( message: string ) {
         this.write( message );
     }
 
