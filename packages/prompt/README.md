@@ -56,12 +56,12 @@ const result = await Input.prompt({message: 'Do you prefer cats or dogs?'});
 ## ❯ Types
 
 * [input](#%EF%B8%8F-input)
-* [number](#%EF%B8%8F-number)
-* [confirm](#%EF%B8%8F-confirm)
-* [toggle](#%EF%B8%8F-toggle)
-* [list](#%EF%B8%8F-list)
-* [select](#%EF%B8%8F-select)
-* [checkbox](#%EF%B8%8F-checkbox)
+* [number](#1%EF%B8%8F2%EF%B8%8F3%EF%B8%8F-number)
+* [confirm](#-confirm)
+* [toggle](#-toggle)
+* [list](#-list)
+* [select](#-select)
+* [checkbox](#%EF%B8%8F--checkbox)
 
 **Options**
 
