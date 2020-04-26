@@ -15,7 +15,11 @@ export interface TogglePromptSettings extends GenericInputPromptSettings<boolean
 
 export class Toggle extends GenericInput<boolean, TogglePromptSettings> {
 
-    public static async prompt( options: TogglePromptOptions ): Promise<boolean | undefined> {
+    public static async prompt( options: string | TogglePromptOptions ): Promise<boolean | undefined> {
+
+        if ( typeof options === 'string' ) {
+            options = { message: options };
+        }
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),

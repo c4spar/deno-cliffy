@@ -14,7 +14,11 @@ export interface ConfirmPromptSettings extends GenericInputPromptSettings<boolea
 
 export class Confirm extends GenericInput<boolean, ConfirmPromptSettings> {
 
-    public static async prompt( options: ConfirmPromptOptions ): Promise<boolean | undefined> {
+    public static async prompt( options: string | ConfirmPromptOptions ): Promise<boolean | undefined> {
+
+        if ( typeof options === 'string' ) {
+            options = { message: options };
+        }
 
         return new this( {
             active: 'y',

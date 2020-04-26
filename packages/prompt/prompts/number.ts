@@ -19,7 +19,11 @@ export interface NumberPromptSettings extends GenericInputPromptSettings<number>
 
 export class Number extends GenericInput<number, NumberPromptSettings> {
 
-    public static async prompt( options: NumberPromptOptions ): Promise<number | undefined> {
+    public static async prompt( options: string | NumberPromptOptions ): Promise<number | undefined> {
+
+        if ( typeof options === 'string' ) {
+            options = { message: options };
+        }
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),

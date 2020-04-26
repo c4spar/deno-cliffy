@@ -12,7 +12,11 @@ export interface InputPromptSettings extends GenericInputPromptSettings<string> 
 
 export class Input extends GenericInput<string, InputPromptSettings> {
 
-    public static async prompt( options: InputPromptOptions ): Promise<string | undefined> {
+    public static async prompt( options: string | InputPromptOptions ): Promise<string | undefined> {
+
+        if ( typeof options === 'string' ) {
+            options = { message: options };
+        }
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
