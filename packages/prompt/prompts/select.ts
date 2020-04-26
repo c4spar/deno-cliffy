@@ -37,7 +37,7 @@ export class Select<S extends SelectPromptSettings> extends GenericList<string, 
         return new this( {
             pointer: blue( Figures.POINTER ),
             indent: ' ',
-            maxRows: 0,
+            maxRows: 10,
             ...options,
             values
         } ).run();

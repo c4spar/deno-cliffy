@@ -49,7 +49,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxPromptSett
         return new this( {
             pointer: blue( Figures.POINTER ),
             indent: ' ',
-            maxRows: 0,
+            maxRows: 10,
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options,
