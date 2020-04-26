@@ -3,17 +3,17 @@ import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
-import { PromptModule, PromptModuleOptions } from '../lib/prompt-module.ts';
+import { PromptModule, PromptModuleOptions, PromptModuleSettings } from '../lib/prompt-module.ts';
 
-export interface GenericInputPromptOptions<T> extends PromptModuleOptions<T> {
+export interface GenericInputPromptOptions<T> extends PromptModuleOptions<T, string> {
     pointer?: string;
 }
 
-export interface GenericInputPromptSettings<T> extends GenericInputPromptOptions<T> {
-
+export interface GenericInputPromptSettings<T> extends PromptModuleSettings<T, string> {
+    pointer: string;
 }
 
-export abstract class GenericInput<T, O extends GenericInputPromptOptions<T>, S extends GenericInputPromptSettings<T>> extends PromptModule<T, O, S> {
+export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> extends PromptModule<T, string, S> {
 
     protected input: string = '';
     protected index: number = 0;

@@ -1,5 +1,7 @@
+import { blue } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
-import { GenericInput, GenericInputPromptOptions } from './generic-input.ts';
+import { Figures } from '../lib/figures.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
 
 export interface NumberPromptOptions extends GenericInputPromptOptions<number> {
     min?: number;
@@ -8,18 +10,19 @@ export interface NumberPromptOptions extends GenericInputPromptOptions<number> {
     round?: number;
 }
 
-export interface NumberPromptSettings extends NumberPromptOptions {
+export interface NumberPromptSettings extends GenericInputPromptSettings<number> {
     min: number;
     max: number;
     float: boolean;
     round: number;
 }
 
-export class Number extends GenericInput<number, NumberPromptOptions, NumberPromptSettings> {
+export class Number extends GenericInput<number, NumberPromptSettings> {
 
     public static async prompt( options: NumberPromptOptions ): Promise<number | undefined> {
 
         return new this( {
+            pointer: blue( Figures.POINTER_SMALL ),
             min: -Infinity,
             max: Infinity,
             float: false,

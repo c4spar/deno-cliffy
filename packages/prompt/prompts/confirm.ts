@@ -1,25 +1,27 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
-import { GenericInput, GenericInputPromptOptions } from './generic-input.ts';
+import { Figures } from '../lib/figures.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
 
 export interface ConfirmPromptOptions extends GenericInputPromptOptions<boolean> {
     active?: string;
     inactive?: string;
 }
 
-export interface ConfirmPromptSettings extends ConfirmPromptOptions {
+export interface ConfirmPromptSettings extends GenericInputPromptSettings<boolean> {
     active: string;
     inactive: string;
 }
 
-export class Confirm extends GenericInput<boolean, ConfirmPromptOptions, ConfirmPromptSettings> {
+export class Confirm extends GenericInput<boolean, ConfirmPromptSettings> {
 
     public static async prompt( options: ConfirmPromptOptions ): Promise<boolean | undefined> {
 
         return new this( {
             active: 'y',
             inactive: 'n',
+            pointer: blue( Figures.POINTER_SMALL ),
             ...options
         } ).run();
     }

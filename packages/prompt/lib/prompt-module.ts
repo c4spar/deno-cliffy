@@ -1,4 +1,3 @@
-const { stdout } = Deno;
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
 import { bold, dim, red, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { AnsiEscape } from '../../ansi-escape/lib/ansi-escape.ts';
@@ -9,19 +8,17 @@ import { readKeySync } from './read-line.ts';
 
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-export interface PromptModuleOptions<T> {
+export interface PromptModuleOptions<T, V> {
     message: string;
     default?: T;
-    sanitize?: ( value: string ) => T | undefined;
+    sanitize?: ( value: V ) => T | undefined;
     validate?: ( value: T | undefined ) => ValidateResult;
-    transform?: ( value: T | undefined ) => boolean;
+    transform?: ( value: T ) => string;
 }
 
-export interface PromptModuleSettings<T> extends PromptModuleOptions<T> {
+export interface PromptModuleSettings<T, V> extends PromptModuleOptions<T, V> {}
 
-}
-
-export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extends PromptModuleSettings<T>> {
+export abstract class PromptModule<T, V, S extends PromptModuleSettings<T, V>> {
 
     protected screen = AnsiEscape.from( Deno.stdout );
     protected lastError: string | undefined;
@@ -45,11 +42,11 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extend
 
     protected abstract async handleEvent( event: KeyEvent ): Promise<boolean>;
 
-    protected abstract sanitize( value: string ): T | undefined;
+    protected abstract sanitize( value: V ): T | undefined;
 
     protected abstract validate( value: T | undefined ): ValidateResult;
 
-    protected abstract transform( value: T | undefined ): any;
+    protected abstract transform( value: T ): string;
 
     public async run(): Promise<T | undefined> {
         return this.execute();
@@ -93,13 +90,18 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extend
         return this.value;
     }
 
-    protected async validateValue( line: string ): Promise<boolean> {
+    protected sanitizeValue( value: V ): T | undefined {
 
-        if ( !line && typeof this.settings.default !== 'undefined' ) {
-            this.value = this.settings.default;
-        } else {
-            this.value = this.settings.sanitize ? this.settings.sanitize( line ) : this.sanitize( line );
+        if ( !value && typeof this.settings.default !== 'undefined' ) {
+            return this.settings.default;
         }
+
+        return this.settings.sanitize ? this.settings.sanitize( value ) : this.sanitize( value );
+    }
+
+    protected async validateValue( value: V ): Promise<boolean> {
+
+        this.value = this.sanitizeValue( value );
 
         const validation = await ( this.settings.validate ? this.settings.validate( this.value ) : this.validate( this.value ) );
 
@@ -116,11 +118,11 @@ export abstract class PromptModule<T, O extends PromptModuleOptions<T>, S extend
     }
 
     protected write( ...args: any[] ) {
-        stdout.writeSync( encode( ...args ) );
+        Deno.stdout.writeSync( encode( ...args ) );
     }
 
     protected writeLine( ...args: any[] ) {
-        stdout.writeSync( encode( format( ...args ) + '\n' ) );
+        Deno.stdout.writeSync( encode( format( ...args ) + '\n' ) );
     }
 
     protected error( ...args: any[] ) {

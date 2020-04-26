@@ -1,33 +1,92 @@
 import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
-import { Separator } from '../lib/separator.ts';
-import { Select, SelectPromptOptions } from './select.ts';
+import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListNamedItemOptions, GenericListPromptOptions, GenericListPromptSettings } from './generic-list.ts';
 
-export interface CheckboxPromptOptions extends SelectPromptOptions {
-    check?: string;
-    uncheck?: string;
-    checked?: string[];
+export interface CheckboxItemOptions extends GenericListItemOptions {
+    checked?: boolean;
+    icon?: boolean;
 }
 
-export interface CheckboxPromptSettings extends CheckboxPromptOptions {
+export interface CheckboxNamedItemOptions extends GenericListNamedItemOptions {
+    checked?: boolean;
+    icon?: boolean;
+}
+
+export interface CheckboxItemSettings extends GenericListItemSettings {
+    checked: boolean;
+    icon: boolean;
+}
+
+export type CheckboxValueOptions =
+    ( string | CheckboxNamedItemOptions )[]
+    | { [ s: string ]: string | CheckboxItemOptions };
+export type CheckboxValueSettings = CheckboxItemSettings[];
+
+export interface CheckboxPromptOptions extends GenericListPromptOptions<string[], string[]> {
+    indent?: string;
+    pointer?: string;
+    check?: string;
+    uncheck?: string;
+    values: CheckboxValueOptions;
+}
+
+export interface CheckboxPromptSettings extends GenericListPromptSettings<string[], string[]> {
+    indent: string;
     pointer: string;
     check: string;
     uncheck: string;
-    checked: string[];
+    values: CheckboxValueSettings;
 }
 
-export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettings> {
+export class Checkbox extends GenericList<string[], string[], CheckboxPromptSettings> {
 
-    public static async prompt( options: CheckboxPromptOptions ): Promise<string | undefined> {
+    public static async prompt( options: CheckboxPromptOptions ): Promise<string[] | undefined> {
+
+        const items: CheckboxNamedItemOptions[] = this.mapValues( options.values );
+        const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
 
         return new this( {
             pointer: blue( Figures.POINTER ),
+            indent: ' ',
+            maxRows: 0,
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
-            checked: [],
-            ...options
+            ...options,
+            values
         } ).run();
+    }
+
+    public static separator( label: string = '------------' ): CheckboxNamedItemOptions {
+        return {
+            ...super.separator(),
+            icon: false
+        };
+    }
+
+    protected static mapValues( optValues: CheckboxValueOptions ): CheckboxNamedItemOptions[] {
+        return super.mapValues( optValues ) as CheckboxNamedItemOptions[];
+    }
+
+    protected static mapItem( item: CheckboxNamedItemOptions, defaults?: string[] ): CheckboxItemSettings {
+        return {
+            ...super.mapItem( item ),
+            checked: typeof item.checked === 'undefined' && defaults && defaults.indexOf( item.name ) !== -1 ? true : !!item.checked,
+            icon: typeof item.icon === 'undefined' ? true : item.icon
+        };
+    }
+
+    public async prompt(): Promise<void> {
+
+        let message = this.settings.message;
+
+        if ( typeof this.settings.default !== 'undefined' ) {
+            message += dim( ` (${ this.settings.default.join( ', ' ) })` );
+        }
+
+        this.question( message, true );
+
+        this.writeListItems();
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -61,63 +120,55 @@ export class Checkbox extends Select<CheckboxPromptOptions, CheckboxPromptSettin
     }
 
     protected checkValue() {
+        const item = this.settings.values[ this.selected ];
+        item.checked = !item.checked;
+    }
 
-        const keys: ( string | Separator )[] = this.keys();
-        const selected: string | Separator = keys[ this.selected ];
-        const index = typeof selected === 'string' ? this.settings.checked.indexOf( selected ) : -1;
-
-        if ( index === -1 ) {
-            this.settings.checked.push( <string>selected );
-        } else {
-            this.settings.checked.splice( index, 1 );
-        }
+    protected values() {
+        return this.settings.values
+                   .filter( item => item.checked )
+                   .map( item => item.name );
     }
 
     protected async selectValue() {
-
-        const promises = this.settings.checked.map( ( checked: string ) => this.validateValue( checked ) );
-        const result: boolean[] = await Promise.all( promises );
-        const isValid: boolean = result.every( ( isValid: boolean ) => isValid );
-
-        return isValid;
+        return this.validateValue( this.values() );
     }
 
-    protected writeListItems() {
+    protected writeListItem( item: CheckboxItemSettings, isSelected?: boolean ) {
 
-        const keys: ( string | Separator )[] = this.keys();
-        const values: ( string | Separator )[] = this.values();
+        let line = this.settings.indent;
 
-        for ( let i = this.index; i < this.index + this.maxRows(); i++ ) {
-
-            const key: string | Separator = keys[ i ];
-            const val: string | Separator = values[ i ];
-
-            if ( key instanceof Separator ) {
-                this.writeListItem( val );
-                continue;
-            }
-
-            const isSelected: boolean = keys[ this.selected ] === key;
-            const isChecked: boolean = this.settings.checked.indexOf( key ) !== -1;
-
-            this.writeListItem( val, isSelected, isChecked );
-        }
-    }
-
-    protected writeListItem( val: string | Separator, isSelected?: boolean, isChecked?: boolean ) {
-
-        let line = '    ';
-
-        if ( val instanceof Separator ) {
-            this.writeLine( `${ line }  ${ val.content() }` );
-            return;
-        }
-
+        // pointer
         line += isSelected ? `${ this.settings.pointer } ` : '  ';
-        line += isChecked ? `${ this.settings.check } ` : `${ this.settings.uncheck } `;
 
-        const value: string = this.transform( val );
+        // icon
+        if ( item.icon ) {
+            let check = item.checked ? `${ this.settings.check } ` : `${ this.settings.uncheck } `;
+            if ( item.disabled ) {
+                check = dim( check );
+            }
+            line += check;
+        } else {
+            line += '  ';
+        }
 
-        this.writeLine( `${ line }${ isSelected ? value : dim( value ) }` );
+        // value
+        const value: string = item.label;
+        line += `${ isSelected ? value : dim( value ) }`;
+
+        this.writeLine( line );
+    }
+
+    protected sanitize( value: string[] ): string[] {
+        return value;
+    }
+
+    protected validate( value: string[] ): boolean {
+        return true;
+    }
+
+    protected transform( value: string[] ): string {
+        return value.map( val => val.slice( 0, 1 ).toUpperCase() + val.slice( 1 ) )
+                    .join( ' ' );
     }
 }

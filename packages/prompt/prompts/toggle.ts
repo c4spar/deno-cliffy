@@ -1,22 +1,24 @@
-import { bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
-import { GenericInput, GenericInputPromptOptions } from './generic-input.ts';
+import { Figures } from '../lib/figures.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
 
 export interface TogglePromptOptions extends GenericInputPromptOptions<boolean> {
     active?: string;
     inactive?: string;
 }
 
-export interface TogglePromptSettings extends TogglePromptOptions {
+export interface TogglePromptSettings extends GenericInputPromptSettings<boolean> {
     active: string;
     inactive: string;
 }
 
-export class Toggle extends GenericInput<boolean, TogglePromptOptions, TogglePromptSettings> {
+export class Toggle extends GenericInput<boolean, TogglePromptSettings> {
 
     public static async prompt( options: TogglePromptOptions ): Promise<boolean | undefined> {
 
         return new this( {
+            pointer: blue( Figures.POINTER_SMALL ),
             active: 'Yes',
             inactive: 'No',
             ...options

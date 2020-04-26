@@ -1,21 +1,23 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
-import { GenericInput, GenericInputPromptOptions } from './generic-input.ts';
+import { Figures } from '../lib/figures.ts';
+import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from './generic-input.ts';
 
 export interface ListPromptOptions extends GenericInputPromptOptions<string[]> {
     separator?: string;
 }
 
-export interface ListPromptSettings extends ListPromptOptions {
+export interface ListPromptSettings extends GenericInputPromptSettings<string[]> {
     separator: string;
 }
 
-export class List extends GenericInput<string[], ListPromptOptions, ListPromptSettings> {
+export class List extends GenericInput<string[], ListPromptSettings> {
 
     public static async prompt( options: ListPromptOptions ): Promise<string[] | undefined> {
 
         return new this( {
+            pointer: blue( Figures.POINTER_SMALL ),
             separator: ',',
             ...options
         } ).run();

@@ -1,38 +1,58 @@
 import { blue, dim } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
-import { KeyEvent } from '../../keycode/mod.ts';
+import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { PromptModule, PromptModuleOptions } from '../lib/prompt-module.ts';
-import { Separator } from '../lib/separator.ts';
+import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListNamedItemOptions, GenericListPromptOptions, GenericListPromptSettings } from './generic-list.ts';
 
-export type ISelectValueOptions = ( string | Separator )[] | { [ s: string ]: string | Separator };
-
-export interface SelectPromptOptions extends PromptModuleOptions<string> {
-    pointer?: string;
-    maxRows?: number;
-    values: ISelectValueOptions;
+export interface SelectItemOptions extends GenericListItemOptions {
 }
 
-export interface SelectPromptSettings extends SelectPromptOptions {
+export interface SelectNamedItemOptions extends GenericListNamedItemOptions {
+}
+
+export interface SelectItemSettings extends GenericListItemSettings {
+}
+
+export type SelectValueOptions = ( string | SelectNamedItemOptions )[] | { [ s: string ]: string | SelectItemOptions };
+export type SelectValueSettings = SelectItemSettings[];
+
+export interface SelectPromptOptions extends GenericListPromptOptions<string, string> {
+    indent?: string;
+    pointer?: string;
+}
+
+export interface SelectPromptSettings extends GenericListPromptSettings<string, string> {
+    indent: string;
     pointer: string;
 }
 
-export class Select<O extends SelectPromptOptions, S extends SelectPromptSettings> extends PromptModule<string, O, S> {
+export class Select<S extends SelectPromptSettings> extends GenericList<string, string, S> {
 
-    protected index: number = 0;
-    protected selected: number = typeof this.settings.default !== 'undefined' ? this.keys().indexOf( this.settings.default ) || 0 : 0;
+    protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.values.findIndex( item => item.name === this.settings.default ) || 0 : 0;
 
     public static async prompt( options: SelectPromptOptions ): Promise<string | undefined> {
 
+        const items: SelectNamedItemOptions[] = this.mapValues( options.values );
+        const values: SelectValueSettings = items.map( item => this.mapItem( item ) );
+
         return new this( {
             pointer: blue( Figures.POINTER ),
-            ...options
+            indent: ' ',
+            maxRows: 0,
+            ...options,
+            values
         } ).run();
     }
 
-    protected async clear() {
-        this.screen.eraseLines( this.maxRows() + 2 );
-        this.screen.cursorLeft();
-        this.screen.eraseDown();
+    public static separator( label: string = '------------' ): SelectNamedItemOptions {
+        return super.separator();
+    }
+
+    protected static mapValues( optValues: SelectValueOptions ): SelectNamedItemOptions[] {
+        return super.mapValues( optValues ) as SelectNamedItemOptions[];
+    }
+
+    protected static mapItem( item: SelectNamedItemOptions ): SelectItemSettings {
+        return super.mapItem( item ) as SelectItemSettings;
     }
 
     public async prompt(): Promise<void> {
@@ -46,13 +66,6 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
         this.question( message, true );
 
         this.writeListItems();
-    }
-
-    protected async read(): Promise<boolean> {
-
-        this.screen.cursorHide();
-
-        return super.read();
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -75,10 +88,28 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
 
             case 'return':
             case 'enter':
-                return this.validateValue( this.keys()[ this.selected ] as string );
+                return this.selectValue();
         }
 
         return false;
+    }
+
+    protected async selectValue() {
+        return this.validateValue( this.settings.values[ this.selected ].name );
+    }
+
+    protected writeListItem( item: SelectItemSettings, isSelected?: boolean ) {
+
+        let line = this.settings.indent;
+
+        // pointer
+        line += isSelected ? `${ this.settings.pointer } ` : '  ';
+
+        // value
+        const value: string = item.label;
+        line += `${ isSelected ? value : dim( value ) }`;
+
+        this.writeLine( line );
     }
 
     protected sanitize( value: string ): string {
@@ -90,92 +121,6 @@ export class Select<O extends SelectPromptOptions, S extends SelectPromptSetting
     }
 
     protected transform( value: string ): string {
-
-        return value.split( ' ' )
-                    .map( val => val.slice( 0, 1 ).toUpperCase() + val.slice( 1 ) )
-                    .join( ' ' );
-    }
-
-    protected async selectPrevious(): Promise<void> {
-
-        if ( this.selected > 0 ) {
-            this.selected--;
-            if ( this.selected < this.index ) {
-                this.index--;
-            }
-            if ( this.values()[ this.selected ] instanceof Separator ) {
-                return this.selectPrevious();
-            }
-        } else {
-            this.selected = this.length() - 1;
-            this.index = this.length() - this.maxRows();
-            if ( this.values()[ this.selected ] instanceof Separator ) {
-                return this.selectPrevious();
-            }
-        }
-    }
-
-    protected async selectNext(): Promise<void> {
-
-        if ( this.selected < this.length() - 1 ) {
-            this.selected++;
-            if ( this.selected >= this.index + this.maxRows() ) {
-                this.index++;
-            }
-            if ( this.values()[ this.selected ] instanceof Separator ) {
-                return this.selectNext();
-            }
-        } else {
-            this.selected = this.index = 0;
-            if ( this.values()[ this.selected ] instanceof Separator ) {
-                return this.selectNext();
-            }
-        }
-    }
-
-    protected writeListItems() {
-
-        const keys: ( string | Separator )[] = this.keys();
-        const values: ( string | Separator )[] = this.values();
-
-        for ( let i = this.index; i < this.index + this.maxRows(); i++ ) {
-
-            const key: string | Separator = keys[ i ];
-            const val: string | Separator = values[ i ];
-
-            this.writeListItem( val, keys[ this.selected ] === key );
-        }
-    }
-
-    protected writeListItem( val: string | Separator, isSelected?: boolean ) {
-
-        let line: string = '    ';
-
-        if ( val instanceof Separator ) {
-            this.writeLine( `${ line }  ${ val.content() }` );
-            return;
-        }
-
-        line += isSelected ? `${ this.settings.pointer } ` : '  ';
-
-        const value: string = this.transform( val );
-
-        this.writeLine( `${ line }${ isSelected ? value : dim( value ) }` );
-    }
-
-    protected keys(): ( string | Separator )[] {
-        return Array.isArray( this.settings.values ) ? this.settings.values : Object.keys( this.settings.values as any );
-    }
-
-    protected values(): ( string | Separator )[] {
-        return Array.isArray( this.settings.values ) ? this.settings.values : Object.values( this.settings.values as any );
-    }
-
-    protected length(): number {
-        return this.keys().length;
-    }
-
-    protected maxRows() {
-        return this.settings.maxRows || this.length();
+        return value;
     }
 }
