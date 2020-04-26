@@ -43,15 +43,15 @@ const result = await Input.prompt({message: 'Do you prefer cats or dogs?'});
 
 ### 🔗 Prompt Chain
 
-> Working progress
+> Work in progress
 
 ### 📃 Prompt List
 
-> Working progress
+> Work in progress
 
 ### 💫 Dynamic Prompts
 
-> Working progress
+> Work in progress
 
 ## ❯ Types
 
