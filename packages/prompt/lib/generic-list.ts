@@ -1,26 +1,18 @@
-import camelCase from '../../x/camelCase.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
 
 export interface GenericListItemOptions {
-    label?: string;
+    value: string;
+    name?: string;
     disabled?: boolean;
 }
 
-export interface GenericListNamedItemOptions extends GenericListItemOptions {
+export interface GenericListItemSettings extends GenericListItemOptions {
     name: string;
-    label?: string;
-    disabled?: boolean;
-}
-
-export interface GenericListItemSettings extends GenericListNamedItemOptions {
-    name: string;
-    label: string;
+    value: string;
     disabled: boolean;
 }
 
-export type GenericListValueOptions =
-    ( string | GenericListNamedItemOptions )[]
-    | { [ s: string ]: string | GenericListItemOptions };
+export type GenericListValueOptions = ( string | GenericListItemOptions )[];
 export type GenericListValueSettings = GenericListItemSettings[];
 
 export interface GenericListPromptOptions<T, V> extends GenericPromptOptions<T, V> {
@@ -38,30 +30,22 @@ export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V
     protected index: number = 0;
     protected selected: number = 0;
 
-    public static separator( label: string = '------------' ): GenericListNamedItemOptions {
-        return { name: label, label, disabled: true };
+    public static separator( label: string = '------------' ): GenericListItemOptions {
+        return { name: label, value: label, disabled: true };
     }
 
-    protected static mapValues( optValues: GenericListValueOptions ): GenericListNamedItemOptions[] {
+    protected static mapValues( optValues: GenericListValueOptions ): GenericListItemOptions[] {
 
-        if ( Array.isArray( optValues ) ) {
-            return Object.values( optValues )
-                         .map( ( item: string | GenericListNamedItemOptions ) =>
-                             typeof item === 'string' ? { name: item } : item );
-        }
-
-        return Object.keys( optValues )
-                     .map( ( name: string ) => {
-                         const item: string | GenericListItemOptions = optValues[ name ];
-                         return typeof item === 'string' ? { name, label: item } : { name, ...item };
-                     } );
+        return Object.values( optValues )
+                     .map( ( item: string | GenericListItemOptions ) =>
+                         typeof item === 'string' ? { value: item } : item );
     }
 
-    protected static mapItem( item: GenericListNamedItemOptions ): GenericListItemSettings {
+    protected static mapItem( item: GenericListItemOptions ): GenericListItemSettings {
 
         return {
-            name: camelCase( item.name ),
-            label: item.label || item.name,
+            value: item.value,
+            name: typeof item.name === 'undefined' ? item.value : item.name,
             disabled: !!item.disabled
         };
     }
