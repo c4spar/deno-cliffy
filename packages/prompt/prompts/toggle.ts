@@ -3,19 +3,19 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-export interface TogglePromptOptions extends GenericInputPromptOptions<boolean> {
+export interface ToggleOptions extends GenericInputPromptOptions<boolean> {
     active?: string;
     inactive?: string;
 }
 
-export interface TogglePromptSettings extends GenericInputPromptSettings<boolean> {
+export interface ToggleSettings extends GenericInputPromptSettings<boolean> {
     active: string;
     inactive: string;
 }
 
-export class Toggle extends GenericInput<boolean, TogglePromptSettings> {
+export class Toggle extends GenericInput<boolean, ToggleSettings> {
 
-    public static async prompt( options: string | TogglePromptOptions ): Promise<boolean | undefined> {
+    public static async prompt( options: string | ToggleOptions ): Promise<boolean | undefined> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

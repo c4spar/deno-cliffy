@@ -3,23 +3,23 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-export interface NumberPromptOptions extends GenericInputPromptOptions<number> {
+export interface NumberOptions extends GenericInputPromptOptions<number> {
     min?: number;
     max?: number;
     float?: boolean;
     round?: number;
 }
 
-export interface NumberPromptSettings extends GenericInputPromptSettings<number> {
+export interface NumberSettings extends GenericInputPromptSettings<number> {
     min: number;
     max: number;
     float: boolean;
     round: number;
 }
 
-export class Number extends GenericInput<number, NumberPromptSettings> {
+export class Number extends GenericInput<number, NumberSettings> {
 
-    public static async prompt( options: string | NumberPromptOptions ): Promise<number | undefined> {
+    public static async prompt( options: string | NumberOptions ): Promise<number | undefined> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

@@ -15,17 +15,17 @@ export interface GenericListItemSettings extends GenericListItemOptions {
 export type GenericListValueOptions = ( string | GenericListItemOptions )[];
 export type GenericListValueSettings = GenericListItemSettings[];
 
-export interface GenericListPromptOptions<T, V> extends GenericPromptOptions<T, V> {
+export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
     maxRows?: number;
-    values: GenericListValueOptions;
+    options: GenericListValueOptions;
 }
 
-export interface GenericListPromptSettings<T, V> extends GenericPromptSettings<T, V> {
+export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
     maxRows: number;
     values: GenericListValueSettings;
 }
 
-export abstract class GenericList<T, V, S extends GenericListPromptSettings<T, V>> extends GenericPrompt<T, V, S> {
+export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> extends GenericPrompt<T, V, S> {
 
     protected index: number = 0;
     protected selected: number = 0;

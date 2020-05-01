@@ -2,17 +2,17 @@ import { blue } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-export interface InputPromptOptions extends GenericInputPromptOptions<string> {
+export interface InputOptions extends GenericInputPromptOptions<string> {
 
 }
 
-export interface InputPromptSettings extends GenericInputPromptSettings<string> {
+export interface InputSettings extends GenericInputPromptSettings<string> {
 
 }
 
-export class Input extends GenericInput<string, InputPromptSettings> {
+export class Input extends GenericInput<string, InputSettings> {
 
-    public static async prompt( options: string | InputPromptOptions ): Promise<string | undefined> {
+    public static async prompt( options: string | InputOptions ): Promise<string | undefined> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

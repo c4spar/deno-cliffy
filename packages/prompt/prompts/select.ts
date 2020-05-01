@@ -1,7 +1,7 @@
 import { blue, dim } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListPromptOptions, GenericListPromptSettings } from '../lib/generic-list.ts';
+import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListOptions, GenericListSettings } from '../lib/generic-list.ts';
 
 export interface SelectItemOptions extends GenericListItemOptions {
 }
@@ -12,23 +12,23 @@ export interface SelectItemSettings extends GenericListItemSettings {
 export type SelectValueOptions = ( string | SelectItemOptions )[];
 export type SelectValueSettings = SelectItemSettings[];
 
-export interface SelectPromptOptions extends GenericListPromptOptions<string, string> {
+export interface SelectOptions extends GenericListOptions<string, string> {
     indent?: string;
     pointer?: string;
 }
 
-export interface SelectPromptSettings extends GenericListPromptSettings<string, string> {
+export interface SelectSettings extends GenericListSettings<string, string> {
     indent: string;
     pointer: string;
 }
 
-export class Select<S extends SelectPromptSettings> extends GenericList<string, string, S> {
+export class Select<S extends SelectSettings> extends GenericList<string, string, S> {
 
     protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.values.findIndex( item => item.name === this.settings.default ) || 0 : 0;
 
-    public static async prompt( options: SelectPromptOptions ): Promise<string | undefined> {
+    public static async prompt( options: SelectOptions ): Promise<string | undefined> {
 
-        const items: SelectItemOptions[] = this.mapValues( options.values );
+        const items: SelectItemOptions[] = this.mapValues( options.options );
         const values: SelectValueSettings = items.map( item => this.mapItem( item ) );
 
         return new this( {

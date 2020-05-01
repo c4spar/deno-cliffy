@@ -2,19 +2,19 @@ import { blue, bold, dim, yellow } from 'https://deno.land/std@v0.41.0/fmt/color
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-export interface ConfirmPromptOptions extends GenericInputPromptOptions<boolean> {
+export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
     active?: string;
     inactive?: string;
 }
 
-export interface ConfirmPromptSettings extends GenericInputPromptSettings<boolean> {
+export interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
     active: string;
     inactive: string;
 }
 
-export class Confirm extends GenericInput<boolean, ConfirmPromptSettings> {
+export class Confirm extends GenericInput<boolean, ConfirmSettings> {
 
-    public static async prompt( options: string | ConfirmPromptOptions ): Promise<boolean | undefined> {
+    public static async prompt( options: string | ConfirmOptions ): Promise<boolean | undefined> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

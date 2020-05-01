@@ -1,7 +1,7 @@
 import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListPromptOptions, GenericListPromptSettings } from '../lib/generic-list.ts';
+import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListOptions, GenericListSettings } from '../lib/generic-list.ts';
 
 export interface CheckboxItemOptions extends GenericListItemOptions {
     checked?: boolean;
@@ -16,15 +16,15 @@ export interface CheckboxItemSettings extends GenericListItemSettings {
 export type CheckboxValueOptions = ( string | CheckboxItemOptions )[];
 export type CheckboxValueSettings = CheckboxItemSettings[];
 
-export interface CheckboxPromptOptions extends GenericListPromptOptions<string[], string[]> {
+export interface CheckboxOptions extends GenericListOptions<string[], string[]> {
     indent?: string;
     pointer?: string;
     check?: string;
     uncheck?: string;
-    values: CheckboxValueOptions;
+    options: CheckboxValueOptions;
 }
 
-export interface CheckboxPromptSettings extends GenericListPromptSettings<string[], string[]> {
+export interface CheckboxSettings extends GenericListSettings<string[], string[]> {
     indent: string;
     pointer: string;
     check: string;
@@ -32,11 +32,11 @@ export interface CheckboxPromptSettings extends GenericListPromptSettings<string
     values: CheckboxValueSettings;
 }
 
-export class Checkbox extends GenericList<string[], string[], CheckboxPromptSettings> {
+export class Checkbox extends GenericList<string[], string[], CheckboxSettings> {
 
-    public static async prompt( options: CheckboxPromptOptions ): Promise<string[] | undefined> {
+    public static async prompt( options: CheckboxOptions ): Promise<string[] | undefined> {
 
-        const items: CheckboxItemOptions[] = this.mapValues( options.values );
+        const items: CheckboxItemOptions[] = this.mapValues( options.options );
         const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
 
         return new this( {

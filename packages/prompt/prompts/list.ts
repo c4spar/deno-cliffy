@@ -4,17 +4,17 @@ import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-export interface ListPromptOptions extends GenericInputPromptOptions<string[]> {
+export interface ListOptions extends GenericInputPromptOptions<string[]> {
     separator?: string;
 }
 
-export interface ListPromptSettings extends GenericInputPromptSettings<string[]> {
+export interface ListSettings extends GenericInputPromptSettings<string[]> {
     separator: string;
 }
 
-export class List extends GenericInput<string[], ListPromptSettings> {
+export class List extends GenericInput<string[], ListSettings> {
 
-    public static async prompt( options: string | ListPromptOptions ): Promise<string[] | undefined> {
+    public static async prompt( options: string | ListOptions ): Promise<string[] | undefined> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };
