@@ -32,13 +32,13 @@
 Execute a single prompt with a single message which returns the user input.
 
 ```typescript
-const result = await Input.prompt('Do you prefer cats or dogs?');
+const result: string = await Input.prompt('Do you prefer cats or dogs?');
 ```
 
 Execute a single prompt with an options object.
 
 ```typescript
-const result = await Input.prompt({message: 'Do you prefer cats or dogs?'});
+const result: string = await Input.prompt({message: 'Do you prefer cats or dogs?'});
 ```
 
 ### 🔗 Prompt Chain
@@ -59,11 +59,11 @@ const result = await Input.prompt({message: 'Do you prefer cats or dogs?'});
 * [number](#1%EF%B8%8F2%EF%B8%8F3%EF%B8%8F-number)
 * [confirm](#-confirm)
 * [toggle](#-toggle)
-* [list](#-list)
+* [list](#---list)
 * [select](#-select)
 * [checkbox](#%EF%B8%8F-checkbox)
 
-**Options**
+#### Base Options
 
 All prompts have the following base options:
 
@@ -71,9 +71,10 @@ All prompts have the following base options:
 | ----- | :--: | :--: | ----------- |
 | message | `string` | Yes | Prompt message to display. |
 | default | `T` | No | Default value. Type depends on prompt type. |
-| sanitize | `( value: V ) => T | undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
+| transform | `( value: V ) => T | undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
 | validate | `( value: T | undefined ) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
 | hint | `string` | No | Hint to display to the user. (not implemented) |
+| pointer | `string` | No | Change the pointer icon. |
 
 ***
 
@@ -89,9 +90,7 @@ const name: string = await Input.prompt( `What's your name?` );
 
 **Options**
 
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
+The `Input` prompt has all [base](#base-options) options and no prompt specific options.
 
 **↑ back to:** [Prompt types](#-types)
 
@@ -109,9 +108,10 @@ const age: number = await Number.prompt( 'How old are you?' );
 
 **Options**
 
+The `Number` prompt has all [base options](#base-options) and the following prompt specific options.
+
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
 | min | `number` | No | Min value. Defaults to `-infinity`. |
 | max | `number` | No | Max value. Defaults to `Infinity`. |
 | float | `boolean` | No | Allow floating point inputs. Defaults to `false`. |
@@ -133,9 +133,10 @@ const pizza: boolean = await Confirm.prompt( 'Would you like to buy a pizza?' );
 
 **Options**
 
+The `Config` prompt has all [base options](#base-options) and the following prompt specific options.
+
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
 | active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
 | inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
 
@@ -155,9 +156,10 @@ const pizza: boolean = await Toggle.prompt( 'Would you like to buy a pizza?' );
 
 **Options**
 
+The `Toggle` prompt has all [base options](#base-options) and the following prompt specific options.
+
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
 | active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
 | inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
 
@@ -165,16 +167,17 @@ const pizza: boolean = await Toggle.prompt( 'Would you like to buy a pizza?' );
 
 ***
 
-### 🚃,🚃,🚃 List
+### 🚃, 🚃, 🚃 List
 
 **Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
 | separator | `string` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
 
 **Example**
+
+The `List` prompt has all [base options](#base-options) and the following prompt specific options.
 
 ```typescript
 import { List } from 'https://deno.land/x/cliffy/prompt.ts';
@@ -195,25 +198,27 @@ import { Select, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
 const pizza: string = await Select.prompt( {
     message: 'Select your pizza?',
-    values: ['Margherita', 'Caprese', Select.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
+    options: ['Margherita', 'Caprese', Select.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
 } );
 ```
 
 **Options**
 
+The `Select` prompt has all [base options](#base-options) and the following prompt specific options.
+
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
-| indent | `string` | No | List indentation. Defaults to `' '` |
+| options | `(string|Option)[]` | Yes | Array of string's or Option's. |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| values | `object | (string|object)[]` | Yes | Object `{[name: string]: string | {label?, disabled? }}` or Array of strings or objects `[{ name, label?, disabled? }, ...]`. |
+| indent | `string` | No | List indentation. Defaults to `' '` |
+| listPointer | `string` | No | Change the list pointer icon. |
 
-**Value Options**
+**`Option` Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| name | `string` | Only if used in `Array` | Value which will be returned as result. |
-| label | `string` | No | Label is displayed in the list. Defaults to `name` |
+| value | `string` | Yes | Value which will be returned as result. |
+| name | `string` | No | Name is displayed in the list. Defaults to `value` |
 | disabled | `boolean` | No | Disabled item. Can't be selected. |
 
 **↑ back to:** [Prompt types](#-types)
@@ -229,27 +234,29 @@ import { Checkbox, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
 
 const pizza: string[] = await Checkbox.prompt( {
     message: 'Select your pizza?',
-    values: [ 'Margherita', 'Caprese', Checkbox.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
+    options: [ 'Margherita', 'Caprese', Checkbox.Separator( 'Special' ), {value: 'Diavola', disabled: true}]
 } );
 ```
 
 **Options**
 
+The `Checkbox` prompt has all [base options](#base-options) and the following prompt specific options.
+
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| pointer | `string` | No | Change the pointer icon. |
+| options | `(string|Option)[]` | Yes | Array of string's or Option's. |
+| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
+| indent | `string` | No | List indentation. Defaults to `' '` |
+| listPointer | `string` | No | Change the list pointer icon. |
 | check | `string` | No | Change the check icon. |
 | uncheck | `string` | No | Change the uncheck icon. |
-| indent | `string` | No | List indentation. Defaults to `' '` |
-| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| values | `object | (string|object)[]` | Yes | Object `{[name: string]: string | {label?, disabled?, checked? }}` or Array of strings or objects `[{ name, label?, disabled?, checked? }, ...]`. |
 
-**Value Options**
+**`Option` Options**
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| name | `string` | Only if used in `Array` | Value which will be added to the returned result array. |
-| label | `string` | No | Label is displayed in the list. Defaults to `name`. |
+| value | `string` | Yes | Value which will be added to the returned result array. |
+| name | `string` | No | Name is displayed in the list. Defaults to `value`. |
 | disabled | `boolean` | No | Disabled item. Can't be selected. |
 | checked | `boolean` | No | Whether item is checked or not. Defaults to `false`. |
 | icon | `boolean` | No | Show or hide item icon. Defaults to `true`. |
