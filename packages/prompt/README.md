@@ -7,6 +7,9 @@
   <a href="https://github.com/c4spar/deno-cliffy/releases">
     <img src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" alt="release date" />
   </a>
+  <a href="https://deno.land/">
+    <img src="https://img.shields.io/badge/deno-v0.41.0-green?logo=deno" alt="deno" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" alt="build status" />
   </a>
@@ -208,7 +211,7 @@ The `Select` prompt has all [base options](#base-options) and the following prom
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| options | `(string|Option)[]` | Yes | Array of string's or Option's. |
+| options | `(string \| Option)[]` | Yes | Array of string's or Option's. |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
 | listPointer | `string` | No | Change the list pointer icon. |
@@ -244,7 +247,7 @@ The `Checkbox` prompt has all [base options](#base-options) and the following pr
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| options | `(string|Option)[]` | Yes | Array of string's or Option's. |
+| options | `(string \| Option)[]` | Yes | Array of string's or Option's. |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
 | listPointer | `string` | No | Change the list pointer icon. |
