@@ -61,14 +61,14 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
 
             case 'return':
             case 'enter':
-                return this.selectValue();
+                return true;
         }
 
         return false;
     }
 
-    protected async selectValue() {
-        return this.validateValue( this.settings.values[ this.selected ].value );
+    protected getValue(): string {
+        return this.settings.values[ this.selected ].value;
     }
 
     protected writeListItem( item: SelectOptionSettings, isSelected?: boolean ) {

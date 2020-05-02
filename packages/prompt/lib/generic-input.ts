@@ -60,7 +60,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
 
             case 'return':
             case 'enter':
-                return this.selectValue();
+                return true;
 
             default:
                 if ( event.sequence ) {
@@ -104,7 +104,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
         }
     }
 
-    protected async selectValue(): Promise<boolean> {
-        return this.validateValue( this.input );
+    protected getValue(): string {
+        return this.input;
     }
 }

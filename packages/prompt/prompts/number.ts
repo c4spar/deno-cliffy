@@ -71,7 +71,7 @@ export class Number extends GenericInput<number, NumberSettings> {
 
             case 'return':
             case 'enter':
-                return this.selectValue();
+                return true;
 
             default:
                 if ( event.sequence ) {

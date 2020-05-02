@@ -91,7 +91,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
             case 'return':
             case 'enter':
-                return this.selectValue();
+                return true;
         }
 
         return false;
@@ -102,14 +102,10 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         item.checked = !item.checked;
     }
 
-    protected values() {
+    protected getValue(): string[] {
         return this.settings.values
                    .filter( item => item.checked )
                    .map( item => item.value );
-    }
-
-    protected async selectValue() {
-        return this.validateValue( this.values() );
     }
 
     protected writeListItem( item: CheckboxOptionSettings, isSelected?: boolean ) {

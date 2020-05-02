@@ -78,7 +78,7 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
 
             case 'return':
             case 'enter':
-                return this.selectValue();
+                return true;
         }
 
         return false;

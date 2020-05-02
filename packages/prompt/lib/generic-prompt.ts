@@ -49,6 +49,8 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected abstract format( value: T ): string;
 
+    protected abstract getValue(): V;
+
     protected clear() {
         this.screen
             .cursorLeft()
@@ -114,12 +116,18 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
             return false;
         }
 
-        return this.handleEvent( event );
+        const done: boolean = await this.handleEvent( event );
+
+        if ( done ) {
+            return this.validateValue( this.getValue() );
+        }
+
+        return false;
     }
 
     protected transformValue( value: V ): T | undefined {
 
-        if ( typeof value === 'undefined' && typeof this.settings.default !== 'undefined' ) {
+        if ( !value && typeof this.settings.default !== 'undefined' ) {
             return this.settings.default;
         }
 
