@@ -87,7 +87,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         this.writeLine( line );
     }
 
-    protected sanitize( value: string ): string {
+    protected transform( value: string ): string {
         return value;
     }
 

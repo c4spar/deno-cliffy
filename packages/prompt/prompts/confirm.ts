@@ -43,7 +43,7 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         return message;
     }
 
-    protected sanitize( value: string ): boolean | undefined {
+    protected transform( value: string ): boolean | undefined {
 
         switch ( value.toLowerCase() ) {
 

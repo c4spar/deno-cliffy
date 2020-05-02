@@ -24,7 +24,7 @@ export class Input extends GenericInput<string, InputSettings> {
         } ).prompt();
     }
 
-    protected sanitize( value: string ): string | undefined {
+    protected transform( value: string ): string | undefined {
         return value;
     }
 

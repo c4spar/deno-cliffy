@@ -92,7 +92,7 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
         this.input = this.settings.inactive;
     }
 
-    protected sanitize( value: string ): boolean | undefined {
+    protected transform( value: string ): boolean | undefined {
 
         switch ( value ) {
 

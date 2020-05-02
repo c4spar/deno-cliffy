@@ -11,7 +11,7 @@ export type ValidateResult = string | boolean | Promise<string | boolean>;
 export interface GenericPromptOptions<T, V> {
     message: string;
     default?: T;
-    sanitize?: ( value: V ) => T | undefined;
+    transform?: ( value: V ) => T | undefined;
     validate?: ( value: T | undefined ) => ValidateResult;
     hint?: string;
     pointer?: string;
@@ -43,7 +43,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected abstract async handleEvent( event: KeyEvent ): Promise<boolean>;
 
-    protected abstract sanitize( value: V ): T | undefined;
+    protected abstract transform( value: V ): T | undefined;
 
     protected abstract validate( value: T | undefined ): ValidateResult;
 
@@ -117,18 +117,18 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         return this.handleEvent( event );
     }
 
-    protected sanitizeValue( value: V ): T | undefined {
+    protected transformValue( value: V ): T | undefined {
 
-        if ( !value && typeof this.settings.default !== 'undefined' ) {
+        if ( typeof value === 'undefined' && typeof this.settings.default !== 'undefined' ) {
             return this.settings.default;
         }
 
-        return this.settings.sanitize ? this.settings.sanitize( value ) : this.sanitize( value );
+        return this.settings.transform ? this.settings.transform( value ) : this.transform( value );
     }
 
     protected async validateValue( value: V ): Promise<boolean> {
 
-        this.value = this.sanitizeValue( value );
+        this.value = this.transformValue( value );
 
         const validation = await ( this.settings.validate ? this.settings.validate( this.value ) : this.validate( this.value ) );
 

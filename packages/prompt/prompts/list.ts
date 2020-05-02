@@ -72,7 +72,7 @@ export class List extends GenericInput<string[], ListSettings> {
         super.deleteChar();
     }
 
-    protected sanitize( value: string ): string[] {
+    protected transform( value: string ): string[] {
         return value.trim().split( this.regexp() );
     }
 

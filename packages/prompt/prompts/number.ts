@@ -141,7 +141,7 @@ export class Number extends GenericInput<number, NumberSettings> {
         }
     }
 
-    protected sanitize( value: string ): number | undefined {
+    protected transform( value: string ): number | undefined {
 
         if ( !value || isNaN( value as any ) ) {
             return;

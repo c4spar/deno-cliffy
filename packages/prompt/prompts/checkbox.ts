@@ -71,6 +71,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         switch ( event.name ) {
 
             case 'c':
+                // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
@@ -136,7 +137,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         this.writeLine( line );
     }
 
-    protected sanitize( value: string[] ): string[] {
+    protected transform( value: string[] ): string[] {
         return value;
     }
 
