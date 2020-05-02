@@ -10,12 +10,11 @@ export type ValidateResult = string | boolean | Promise<string | boolean>;
 
 export interface GenericPromptOptions<T, V> {
     message: string;
-    pointer?: string;
     default?: T;
     sanitize?: ( value: V ) => T | undefined;
     validate?: ( value: T | undefined ) => ValidateResult;
-    transform?: ( value: T ) => string;
     hint?: string;
+    pointer?: string;
 }
 
 export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> {
@@ -48,7 +47,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected abstract validate( value: T | undefined ): ValidateResult;
 
-    protected abstract transform( value: T ): string;
+    protected abstract format( value: T ): string;
 
     protected clear() {
         this.screen
@@ -87,7 +86,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         }
 
         this.clear();
-        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.transform( this.value as T ) ) }` );
+        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.format( this.value as T ) ) }` );
 
         this.screen.cursorShow();
 
@@ -101,7 +100,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
 
         if ( typeof this.settings.default !== 'undefined' ) {
-            message += dim( ` (${ this.transform( this.settings.default ) })` );
+            message += dim( ` (${ this.format( this.settings.default ) })` );
         }
 
         return message;

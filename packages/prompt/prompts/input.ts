@@ -32,7 +32,7 @@ export class Input extends GenericInput<string, InputSettings> {
         return !!( value && value.length );
     }
 
-    protected transform( value: string ): string {
+    protected format( value: string ): string {
         return value;
     }
 }

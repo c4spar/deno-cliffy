@@ -173,7 +173,7 @@ export class Number extends GenericInput<number, NumberSettings> {
         return true;
     }
 
-    protected transform( value: number ): string {
+    protected format( value: number ): string {
         return value.toString();
     }
 

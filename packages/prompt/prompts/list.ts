@@ -80,7 +80,7 @@ export class List extends GenericInput<string[], ListSettings> {
         return Array.isArray( value ) && ( value.every( ( val: string ) => val.trim().length > 0 ) || 'Value cannot be empty.' );
     }
 
-    protected transform( value: string[] ): string {
+    protected format( value: string[] ): string {
         return value.join( `, ` );
     }
 }

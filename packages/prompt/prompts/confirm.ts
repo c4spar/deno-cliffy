@@ -63,7 +63,7 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         return typeof value === 'boolean';
     }
 
-    protected transform( value: boolean ): string {
+    protected format( value: boolean ): string {
         return value ? 'Yes' : 'No';
     }
 }

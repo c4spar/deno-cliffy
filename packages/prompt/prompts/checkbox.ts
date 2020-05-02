@@ -144,7 +144,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         return true;
     }
 
-    protected transform( value: string[] ): string {
+    protected format( value: string[] ): string {
         return value.join( ', ' );
     }
 }

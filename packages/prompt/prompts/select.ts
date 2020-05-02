@@ -95,7 +95,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         return true;
     }
 
-    protected transform( value: string ): string {
+    protected format( value: string ): string {
         return value;
     }
 }
