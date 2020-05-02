@@ -1,20 +1,20 @@
 import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListOptions, GenericListSettings } from '../lib/generic-list.ts';
+import { GenericList, GenericListOption, GenericListOptions, GenericListOptionSettings, GenericListSettings } from '../lib/generic-list.ts';
 
-export interface CheckboxItemOptions extends GenericListItemOptions {
+export interface CheckboxOption extends GenericListOption {
     checked?: boolean;
     icon?: boolean;
 }
 
-export interface CheckboxItemSettings extends GenericListItemSettings {
+export interface CheckboxOptionSettings extends GenericListOptionSettings {
     checked: boolean;
     icon: boolean;
 }
 
-export type CheckboxValueOptions = ( string | CheckboxItemOptions )[];
-export type CheckboxValueSettings = CheckboxItemSettings[];
+export type CheckboxValueOptions = ( string | CheckboxOption )[];
+export type CheckboxValueSettings = CheckboxOptionSettings[];
 
 export interface CheckboxOptions extends GenericListOptions<string[], string[]> {
     check?: string;
@@ -32,7 +32,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
     public static async prompt( options: CheckboxOptions ): Promise<string[] | undefined> {
 
-        const items: CheckboxItemOptions[] = this.mapValues( options.options );
+        const items: CheckboxOption[] = this.mapValues( options.options );
         const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
 
         return new this( {
@@ -47,18 +47,18 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         } ).prompt();
     }
 
-    public static separator( label: string = '------------' ): CheckboxItemOptions {
+    public static separator( label: string = '------------' ): CheckboxOption {
         return {
             ...super.separator(),
             icon: false
         };
     }
 
-    protected static mapValues( optValues: CheckboxValueOptions ): CheckboxItemOptions[] {
-        return super.mapValues( optValues ) as CheckboxItemOptions[];
+    protected static mapValues( optValues: CheckboxValueOptions ): CheckboxOption[] {
+        return super.mapValues( optValues ) as CheckboxOption[];
     }
 
-    protected static mapItem( item: CheckboxItemOptions, defaults?: string[] ): CheckboxItemSettings {
+    protected static mapItem( item: CheckboxOption, defaults?: string[] ): CheckboxOptionSettings {
         return {
             ...super.mapItem( item ),
             checked: typeof item.checked === 'undefined' && defaults && defaults.indexOf( item.value ) !== -1 ? true : !!item.checked,
@@ -112,7 +112,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         return this.validateValue( this.values() );
     }
 
-    protected writeListItem( item: CheckboxItemSettings, isSelected?: boolean ) {
+    protected writeListItem( item: CheckboxOptionSettings, isSelected?: boolean ) {
 
         let line = this.settings.indent;
 

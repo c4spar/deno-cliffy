@@ -1,16 +1,14 @@
 import { blue, dim } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericList, GenericListItemOptions, GenericListItemSettings, GenericListOptions, GenericListSettings } from '../lib/generic-list.ts';
+import { GenericList, GenericListOption, GenericListOptions, GenericListOptionSettings, GenericListSettings } from '../lib/generic-list.ts';
 
-export interface SelectItemOptions extends GenericListItemOptions {
-}
+export interface SelectOption extends GenericListOption {}
 
-export interface SelectItemSettings extends GenericListItemSettings {
-}
+export interface SelectOptionSettings extends GenericListOptionSettings {}
 
-export type SelectValueOptions = ( string | SelectItemOptions )[];
-export type SelectValueSettings = SelectItemSettings[];
+export type SelectValueOptions = ( string | SelectOption )[];
+export type SelectValueSettings = SelectOptionSettings[];
 
 export interface SelectOptions extends GenericListOptions<string, string> {}
 
@@ -22,7 +20,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
 
     public static async prompt( options: SelectOptions ): Promise<string | undefined> {
 
-        const items: SelectItemOptions[] = this.mapValues( options.options );
+        const items: SelectOption[] = this.mapValues( options.options );
         const values: SelectValueSettings = items.map( item => this.mapItem( item ) );
 
         return new this( {
@@ -35,12 +33,12 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         } ).prompt();
     }
 
-    protected static mapValues( optValues: SelectValueOptions ): SelectItemOptions[] {
-        return super.mapValues( optValues ) as SelectItemOptions[];
+    protected static mapValues( optValues: SelectValueOptions ): SelectOption[] {
+        return super.mapValues( optValues ) as SelectOption[];
     }
 
-    protected static mapItem( item: SelectItemOptions ): SelectItemSettings {
-        return super.mapItem( item ) as SelectItemSettings;
+    protected static mapItem( item: SelectOption ): SelectOptionSettings {
+        return super.mapItem( item ) as SelectOptionSettings;
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -73,7 +71,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         return this.validateValue( this.settings.values[ this.selected ].value );
     }
 
-    protected writeListItem( item: SelectItemSettings, isSelected?: boolean ) {
+    protected writeListItem( item: SelectOptionSettings, isSelected?: boolean ) {
 
         let line = this.settings.indent;
 

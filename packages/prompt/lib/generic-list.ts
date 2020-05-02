@@ -1,19 +1,19 @@
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
 
-export interface GenericListItemOptions {
+export interface GenericListOption {
     value: string;
     name?: string;
     disabled?: boolean;
 }
 
-export interface GenericListItemSettings extends GenericListItemOptions {
+export interface GenericListOptionSettings extends GenericListOption {
     name: string;
     value: string;
     disabled: boolean;
 }
 
-export type GenericListValueOptions = ( string | GenericListItemOptions )[];
-export type GenericListValueSettings = GenericListItemSettings[];
+export type GenericListValueOptions = ( string | GenericListOption )[];
+export type GenericListValueSettings = GenericListOptionSettings[];
 
 export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
     indent?: string;
@@ -34,18 +34,18 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     protected index: number = 0;
     protected selected: number = 0;
 
-    public static separator( label: string = '------------' ): GenericListItemOptions {
+    public static separator( label: string = '------------' ): GenericListOption {
         return { value: label, disabled: true };
     }
 
-    protected static mapValues( optValues: GenericListValueOptions ): GenericListItemOptions[] {
+    protected static mapValues( optValues: GenericListValueOptions ): GenericListOption[] {
 
         return Object.values( optValues )
-                     .map( ( item: string | GenericListItemOptions ) =>
+                     .map( ( item: string | GenericListOption ) =>
                          typeof item === 'string' ? { value: item } : item );
     }
 
-    protected static mapItem( item: GenericListItemOptions ): GenericListItemSettings {
+    protected static mapItem( item: GenericListOption ): GenericListOptionSettings {
 
         return {
             value: item.value,
@@ -118,7 +118,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
         }
     }
 
-    protected abstract writeListItem( item: GenericListItemSettings, isSelected?: boolean ): void;
+    protected abstract writeListItem( item: GenericListOptionSettings, isSelected?: boolean ): void;
 
     protected height() {
         return Math.min( this.settings.values.length, this.settings.maxRows || this.settings.values.length );
