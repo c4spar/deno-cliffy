@@ -90,7 +90,6 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
             case 'return':
             case 'enter':
-                this.writeLine();
                 return this.selectValue();
         }
 

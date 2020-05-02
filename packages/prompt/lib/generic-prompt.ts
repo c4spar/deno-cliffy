@@ -1,5 +1,5 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { bold, dim, red, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, bold, dim, green, red, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { AnsiEscape } from '../../ansi-escape/lib/ansi-escape.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import format from '../../x/format.ts';
@@ -15,6 +15,7 @@ export interface GenericPromptOptions<T, V> {
     sanitize?: ( value: V ) => T | undefined;
     validate?: ( value: T | undefined ) => ValidateResult;
     transform?: ( value: T ) => string;
+    hint?: string;
 }
 
 export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> {
@@ -58,23 +59,30 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
         this.isRunning = true;
 
-        await this.setPrompt( await this.getMessage() );
+        // be shure there are empty lines after the cursor to fix restoring the cursor if terminal output is bigger than terminal window.
+        const message: string = await this.getMessage();
+        this.preBufferEmptyLines( this.lastError || this.settings.hint || '' );
 
-        if ( this.lastError ) {
+        await this.setPrompt( message );
+
+        if ( this.lastError || this.settings.hint ) {
             this.screen.cursorSave();
             this.writeLine();
-            this.error( this.lastError );
+            if ( this.lastError ) {
+                this.error( this.lastError );
+                this.lastError = undefined;
+            } else if ( this.settings.hint ) {
+                this.hint( this.settings.hint );
+            }
             this.screen.cursorRestore();
-            this.lastError = undefined;
         }
 
         if ( !await this.read() ) {
             return this.execute();
         }
 
-        this.screen.cursorUp(); // move cursor up by 1 because the use hit enter
         this.clear();
-        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ yellow( this.transform( this.value as T ) ) }` );
+        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.transform( this.value as T ) ) }` );
 
         this.screen.cursorShow();
 
@@ -133,14 +141,28 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     }
 
     protected write( ...args: any[] ) {
-        Deno.stdout.writeSync( encode( ...args ) );
+        Deno.stdout.writeSync( encode( format( ...args ) ) );
     }
 
     protected writeLine( ...args: any[] ) {
         Deno.stdout.writeSync( encode( format( ...args ) + '\n' ) );
     }
 
+    protected preBufferEmptyLines( message: string ) {
+        const linesCount: number = message.split( '\n' ).length;
+        this.write( '\n'.repeat( linesCount ) );
+        this.screen.cursorUp( linesCount );
+    }
+
     protected error( ...args: any[] ) {
-        this.write( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) + '\n' );
+        this.write( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) );
+    }
+
+    protected message( ...args: any[] ) {
+        this.write( blue( ` ${ Figures.POINTER } ` ) + format( ...args ) );
+    }
+
+    protected hint( ...args: any[] ) {
+        this.write( dim( blue( ` ${ Figures.POINTER } ` ) + format( ...args ) ) );
     }
 }

@@ -63,7 +63,6 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
 
             case 'return':
             case 'enter':
-                this.writeLine();
                 return this.selectValue();
         }
 

@@ -1,5 +1,5 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { underline } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
@@ -105,10 +105,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
     }
 
     protected async selectValue(): Promise<boolean> {
-        const isValid = await this.validateValue( this.input );
-        if ( isValid ) {
-            this.writeLine();
-        }
-        return isValid;
+        return this.validateValue( this.input );
     }
 }
