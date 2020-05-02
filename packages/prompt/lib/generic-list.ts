@@ -62,9 +62,10 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     }
 
     protected clear() {
-        this.screen.eraseLines( this.maxRows() + 2 );
-        this.screen.cursorLeft();
-        this.screen.eraseDown();
+        // clear list
+        this.screen.eraseLines( this.height() + 2 );
+        // clear message and reset cursor
+        super.clear();
     }
 
     protected async read(): Promise<boolean> {
@@ -86,7 +87,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
             }
         } else {
             this.selected = this.settings.values.length - 1;
-            this.index = this.settings.values.length - this.maxRows();
+            this.index = this.settings.values.length - this.height();
             if ( this.settings.values[ this.selected ].disabled ) {
                 return this.selectPrevious();
             }
@@ -97,7 +98,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
 
         if ( this.selected < this.settings.values.length - 1 ) {
             this.selected++;
-            if ( this.selected >= this.index + this.maxRows() ) {
+            if ( this.selected >= this.index + this.height() ) {
                 this.index++;
             }
             if ( this.settings.values[ this.selected ].disabled ) {
@@ -112,14 +113,14 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     }
 
     protected writeListItems() {
-        for ( let i = this.index; i < this.index + this.maxRows(); i++ ) {
+        for ( let i = this.index; i < this.index + this.height(); i++ ) {
             this.writeListItem( this.settings.values[ i ], this.selected === i );
         }
     }
 
     protected abstract writeListItem( item: GenericListItemSettings, isSelected?: boolean ): void;
 
-    protected maxRows() {
+    protected height() {
         return Math.min( this.settings.values.length, this.settings.maxRows || this.settings.values.length );
     }
 }
