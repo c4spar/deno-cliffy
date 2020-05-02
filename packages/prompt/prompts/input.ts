@@ -24,12 +24,12 @@ export class Input extends GenericInput<string, InputSettings> {
         } ).prompt();
     }
 
-    protected transform( value: string ): string | undefined {
-        return value;
+    protected validate( value: string ): boolean {
+        return typeof value === 'string' && value.length > 0;
     }
 
-    protected validate( value: string | undefined ): boolean {
-        return !!( value && value.length );
+    protected transform( value: string ): string | undefined {
+        return value.trim();
     }
 
     protected format( value: string ): string {

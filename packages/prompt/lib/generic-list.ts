@@ -26,7 +26,7 @@ export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
     indent: string;
     listPointer: string;
     maxRows: number;
-    values: GenericListValueSettings;
+    options: GenericListValueSettings;
 }
 
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> extends GenericPrompt<T, V, S> {
@@ -82,13 +82,13 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
             if ( this.selected < this.index ) {
                 this.index--;
             }
-            if ( this.settings.values[ this.selected ].disabled ) {
+            if ( this.settings.options[ this.selected ].disabled ) {
                 return this.selectPrevious();
             }
         } else {
-            this.selected = this.settings.values.length - 1;
-            this.index = this.settings.values.length - this.height();
-            if ( this.settings.values[ this.selected ].disabled ) {
+            this.selected = this.settings.options.length - 1;
+            this.index = this.settings.options.length - this.height();
+            if ( this.settings.options[ this.selected ].disabled ) {
                 return this.selectPrevious();
             }
         }
@@ -96,17 +96,17 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
 
     protected async selectNext(): Promise<void> {
 
-        if ( this.selected < this.settings.values.length - 1 ) {
+        if ( this.selected < this.settings.options.length - 1 ) {
             this.selected++;
             if ( this.selected >= this.index + this.height() ) {
                 this.index++;
             }
-            if ( this.settings.values[ this.selected ].disabled ) {
+            if ( this.settings.options[ this.selected ].disabled ) {
                 return this.selectNext();
             }
         } else {
             this.selected = this.index = 0;
-            if ( this.settings.values[ this.selected ].disabled ) {
+            if ( this.settings.options[ this.selected ].disabled ) {
                 return this.selectNext();
             }
         }
@@ -114,13 +114,13 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
 
     protected writeListItems() {
         for ( let i = this.index; i < this.index + this.height(); i++ ) {
-            this.writeListItem( this.settings.values[ i ], this.selected === i );
+            this.writeListItem( this.settings.options[ i ], this.selected === i );
         }
     }
 
     protected abstract writeListItem( item: GenericListOptionSettings, isSelected?: boolean ): void;
 
     protected height() {
-        return Math.min( this.settings.values.length, this.settings.maxRows || this.settings.values.length );
+        return Math.min( this.settings.options.length, this.settings.maxRows || this.settings.options.length );
     }
 }

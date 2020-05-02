@@ -16,7 +16,7 @@ export interface SelectSettings extends GenericListSettings<string, string> {}
 
 export class Select<S extends SelectSettings> extends GenericList<string, string, S> {
 
-    protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.values.findIndex( item => item.name === this.settings.default ) || 0 : 0;
+    protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.options.findIndex( item => item.name === this.settings.default ) || 0 : 0;
 
     public static async prompt( options: SelectOptions ): Promise<string | undefined> {
 
@@ -29,7 +29,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
             indent: ' ',
             maxRows: 10,
             ...options,
-            values
+            options: values
         } ).prompt();
     }
 
@@ -68,7 +68,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
     }
 
     protected getValue(): string {
-        return this.settings.values[ this.selected ].value;
+        return this.settings.options[ this.selected ].value;
     }
 
     protected writeListItem( item: SelectOptionSettings, isSelected?: boolean ) {
@@ -85,12 +85,14 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         this.writeLine( line );
     }
 
-    protected transform( value: string ): string {
-        return value;
+    protected validate( value: string ): boolean {
+        return typeof value === 'string' &&
+            value.length > 0 &&
+            this.settings.options.findIndex( option => option.value === value ) !== -1;
     }
 
-    protected validate( value: string ): boolean {
-        return true;
+    protected transform( value: string ): string {
+        return value.trim();
     }
 
     protected format( value: string ): string {

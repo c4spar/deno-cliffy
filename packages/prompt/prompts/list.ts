@@ -1,5 +1,5 @@
 import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, underline } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
@@ -72,12 +72,12 @@ export class List extends GenericInput<string[], ListSettings> {
         super.deleteChar();
     }
 
-    protected transform( value: string ): string[] {
-        return value.trim().split( this.regexp() );
+    protected validate( value: string ): boolean | string {
+        return typeof value === 'string' && value.length > 0;
     }
 
-    protected validate( value: string[] | undefined ): boolean | string {
-        return Array.isArray( value ) && ( value.every( ( val: string ) => val.trim().length > 0 ) || 'Value cannot be empty.' );
+    protected transform( value: string ): string[] {
+        return value.trim().split( this.regexp() );
     }
 
     protected format( value: string[] ): string {

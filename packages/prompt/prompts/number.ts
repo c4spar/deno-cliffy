@@ -129,7 +129,7 @@ export class Number extends GenericInput<number, NumberSettings> {
 
     protected addChar( char: string ): void {
 
-        if ( !isNaN( char as any ) ) {
+        if ( isNumeric( char ) ) {
             super.addChar( char );
         } else if (
             this.settings.float &&
@@ -141,11 +141,26 @@ export class Number extends GenericInput<number, NumberSettings> {
         }
     }
 
-    protected transform( value: string ): number | undefined {
+    protected validate( value: string ): boolean | string {
 
-        if ( !value || isNaN( value as any ) ) {
-            return;
+        if ( !isNumeric( value ) ) {
+            return false;
         }
+
+        const val: number = parseFloat( value );
+
+        if ( val > this.settings.max ) {
+            return `Value must be lower or equal than ${ this.settings.max }`;
+        }
+
+        if ( val < this.settings.min ) {
+            return `Value must be greater or equal than ${ this.settings.min }`;
+        }
+
+        return true;
+    }
+
+    protected transform( value: string ): number | undefined {
 
         const val: number = parseFloat( value );
 
@@ -156,48 +171,11 @@ export class Number extends GenericInput<number, NumberSettings> {
         return val;
     }
 
-    protected validate( value: number | undefined ): boolean | string {
-
-        if ( typeof value !== 'number' ) {
-            return false;
-        }
-
-        if ( value > this.settings.max ) {
-            return `Value must be lower or equal than ${ this.settings.max }`;
-        }
-
-        if ( value < this.settings.min ) {
-            return `Value must be greater or equal than ${ this.settings.min }`;
-        }
-
-        return true;
-    }
-
     protected format( value: number ): string {
         return value.toString();
     }
+}
 
-    // protected getChar( index: number = this.index ): string {
-    //     return this.input.slice( index, index + 1 );
-    // }
-    //
-    // protected setChar( value: string | number, index: number = this.index ) {
-    //     this.input = this.input.slice( 0, index ) + value.toString() + this.input.slice( index + 1 );
-    // }
-    //
-    // public parseValue() {
-    //     if ( this.input.length === 0 ) {
-    //         return 0;
-    //     }
-    //
-    //     const value: number = parseFloat( this.input );
-    //
-    //     if ( value < 0 ) {
-    //
-    //     }
-    //
-    //     const length = this.input.length;
-    //     const value = parseFloat( this.getChar() ) || 0;
-    //     this.input = this.input.slice( 0, this.index ) + ( value - 1 ) + this.input.slice( this.index + 1 );
-    // }
+function isNumeric( value: string | number ): value is ( number | string ) {
+    return typeof value === 'number' || ( !!value && !isNaN( value as any ) );
 }

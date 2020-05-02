@@ -1,4 +1,4 @@
-import { blue, bold, dim, underline, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, dim, underline } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
@@ -92,22 +92,18 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
         this.input = this.settings.inactive;
     }
 
+    protected validate( value: string ): boolean {
+        return [ this.settings.active, this.settings.inactive ].indexOf( value ) !== -1;
+    }
+
     protected transform( value: string ): boolean | undefined {
-
         switch ( value ) {
-
             case this.settings.active:
                 return true;
-
             case this.settings.inactive:
                 return false;
         }
-
         return;
-    }
-
-    protected validate( value: boolean | undefined ): boolean {
-        return typeof value === 'boolean';
     }
 
     protected format( value: boolean ): string {

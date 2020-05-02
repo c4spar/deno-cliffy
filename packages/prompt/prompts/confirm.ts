@@ -21,8 +21,8 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         }
 
         return new this( {
-            active: 'y',
-            inactive: 'n',
+            active: 'Yes',
+            inactive: 'No',
             pointer: blue( Figures.POINTER_SMALL ),
             ...options
         } ).prompt();
@@ -33,37 +33,39 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } `;
 
         if ( this.settings.default === true ) {
-            message += dim( `(${ this.settings.active.toUpperCase() }/${ this.settings.inactive.toLowerCase() })` );
+            message += dim( `(${ this.settings.active[ 0 ].toUpperCase() }/${ this.settings.inactive[ 0 ].toLowerCase() })` );
         } else if ( this.settings.default === false ) {
-            message += dim( `(${ this.settings.active.toLowerCase() }/${ this.settings.inactive.toUpperCase() })` );
+            message += dim( `(${ this.settings.active[ 0 ].toLowerCase() }/${ this.settings.inactive[ 0 ].toUpperCase() })` );
         } else {
-            message += dim( `(${ this.settings.active.toLowerCase() }/${ this.settings.inactive.toLowerCase() })` );
+            message += dim( `(${ this.settings.active[ 0 ].toLowerCase() }/${ this.settings.inactive[ 0 ].toLowerCase() })` );
         }
 
         return message;
     }
 
+    protected validate( value: string ): boolean {
+        return typeof value === 'string' &&
+            [
+                this.settings.active[ 0 ].toLowerCase(),
+                this.settings.active.toLowerCase(),
+                this.settings.inactive[ 0 ].toLowerCase(),
+                this.settings.inactive.toLowerCase()
+            ].indexOf( value.toLowerCase() ) !== -1;
+    }
+
     protected transform( value: string ): boolean | undefined {
-
         switch ( value.toLowerCase() ) {
-
-            case 'y':
-            case 'yes':
+            case this.settings.active[ 0 ].toLowerCase():
+            case this.settings.active.toLowerCase():
                 return true;
-
-            case 'n':
-            case 'no':
+            case this.settings.inactive[ 0 ].toLowerCase():
+            case this.settings.inactive.toLowerCase():
                 return false;
         }
-
         return;
     }
 
-    protected validate( value: boolean | undefined ): boolean {
-        return typeof value === 'boolean';
-    }
-
     protected format( value: boolean ): string {
-        return value ? 'Yes' : 'No';
+        return value ? this.settings.active : this.settings.inactive;
     }
 }

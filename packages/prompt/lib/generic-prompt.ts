@@ -11,8 +11,8 @@ export type ValidateResult = string | boolean | Promise<string | boolean>;
 export interface GenericPromptOptions<T, V> {
     message: string;
     default?: T;
+    validate?: ( value: V ) => ValidateResult;
     transform?: ( value: V ) => T | undefined;
-    validate?: ( value: T | undefined ) => ValidateResult;
     hint?: string;
     pointer?: string;
 }
@@ -45,7 +45,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected abstract transform( value: V ): T | undefined;
 
-    protected abstract validate( value: T | undefined ): ValidateResult;
+    protected abstract validate( value: V ): ValidateResult;
 
     protected abstract format( value: T ): string;
 
@@ -136,17 +136,14 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected async validateValue( value: V ): Promise<boolean> {
 
-        this.value = this.transformValue( value );
-
-        const validation = await ( this.settings.validate ? this.settings.validate( this.value ) : this.validate( this.value ) );
+        const validation = await ( this.settings.validate ? this.settings.validate( value ) : this.validate( value ) );
 
         if ( validation === false ) {
-
             this.lastError = `Invalid answer.`;
-
         } else if ( typeof validation === 'string' ) {
-
             this.lastError = validation;
+        } else {
+            this.value = this.transformValue( value );
         }
 
         return !this.lastError;

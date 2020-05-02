@@ -25,7 +25,7 @@ export interface CheckboxOptions extends GenericListOptions<string[], string[]> 
 export interface CheckboxSettings extends GenericListSettings<string[], string[]> {
     check: string;
     uncheck: string;
-    values: CheckboxValueSettings;
+    options: CheckboxValueSettings;
 }
 
 export class Checkbox extends GenericList<string[], string[], CheckboxSettings> {
@@ -43,7 +43,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options,
-            values
+            options: values
         } ).prompt();
     }
 
@@ -98,12 +98,12 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
     }
 
     protected checkValue() {
-        const item = this.settings.values[ this.selected ];
+        const item = this.settings.options[ this.selected ];
         item.checked = !item.checked;
     }
 
     protected getValue(): string[] {
-        return this.settings.values
+        return this.settings.options
                    .filter( item => item.checked )
                    .map( item => item.value );
     }
@@ -133,12 +133,16 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         this.writeLine( line );
     }
 
-    protected transform( value: string[] ): string[] {
-        return value;
+    protected validate( value: string[] ): boolean {
+        return Array.isArray( value ) &&
+            value.every( val =>
+                typeof val === 'string' &&
+                val.length > 0 &&
+                this.settings.options.findIndex( option => option.value === val ) !== -1 );
     }
 
-    protected validate( value: string[] ): boolean {
-        return true;
+    protected transform( value: string[] ): string[] {
+        return value.map( val => val.trim() );
     }
 
     protected format( value: string[] ): string {
