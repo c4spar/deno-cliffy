@@ -16,11 +16,11 @@ A collection of modules for creating interactive command line tools.
 
 * **[keycode](packages/keycode/):** Parse ANSI key codes.
 
+* **[prompt](packages/prompt/):** Create interactive prompts like: checkbox, confirm, input, number, select, etc...
+
 * **[table](packages/table/):** Create cli table's with border, padding, nested table's, etc...
 
 **Todo's:**
-
-* **prompt:** Create interactive prompts like: input, checkbox, list, etc...
 
 * **console:** Run a sub-shell with auto-completion and auto-suggestion for a specific command.
 
