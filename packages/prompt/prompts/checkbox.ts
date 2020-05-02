@@ -2,6 +2,7 @@ import { blue, dim, green, red } from 'https://deno.land/std@v0.41.0/fmt/colors.
 import { KeyEvent } from '../../keycode/mod.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericList, GenericListOption, GenericListOptions, GenericListOptionSettings, GenericListSettings } from '../lib/generic-list.ts';
+import { GenericPrompt } from '../lib/generic-prompt.ts';
 
 export interface CheckboxOption extends GenericListOption {
     checked?: boolean;
@@ -29,6 +30,10 @@ export interface CheckboxSettings extends GenericListSettings<string[], string[]
 }
 
 export class Checkbox extends GenericList<string[], string[], CheckboxSettings> {
+
+    public static inject( value: string[] ): void {
+        GenericPrompt.inject( value );
+    }
 
     public static async prompt( options: CheckboxOptions ): Promise<string[] | undefined> {
 

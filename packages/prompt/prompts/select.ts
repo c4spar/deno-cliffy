@@ -2,6 +2,7 @@ import { blue, dim } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericList, GenericListOption, GenericListOptions, GenericListOptionSettings, GenericListSettings } from '../lib/generic-list.ts';
+import { GenericPrompt } from '../lib/generic-prompt.ts';
 
 export interface SelectOption extends GenericListOption {}
 
@@ -17,6 +18,10 @@ export interface SelectSettings extends GenericListSettings<string, string> {}
 export class Select<S extends SelectSettings> extends GenericList<string, string, S> {
 
     protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.options.findIndex( item => item.name === this.settings.default ) || 0 : 0;
+
+    public static inject( value: string ): void {
+        GenericPrompt.inject( value );
+    }
 
     public static async prompt( options: SelectOptions ): Promise<string | undefined> {
 

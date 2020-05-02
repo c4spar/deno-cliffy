@@ -23,10 +23,16 @@ export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> 
 
 export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>> {
 
+    protected static injectedValue: any | undefined;
+
     protected screen = AnsiEscape.from( Deno.stdout );
     protected lastError: string | undefined;
     protected isRunning: boolean = false;
     protected value: T | undefined;
+
+    public static inject( value: any ): void {
+        GenericPrompt.injectedValue = value;
+    }
 
     protected constructor( protected settings: S ) {}
 
@@ -92,6 +98,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
         this.screen.cursorShow();
 
+        GenericPrompt.injectedValue = undefined;
         this.isRunning = false;
 
         return this.value;
@@ -109,6 +116,11 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     }
 
     protected async read(): Promise<boolean> {
+
+        if ( typeof GenericPrompt.injectedValue !== 'undefined' ) {
+            const value: V = GenericPrompt.injectedValue;
+            return this.validateValue( value );
+        }
 
         const event: KeyEvent | undefined = await readKeySync();
 
@@ -164,6 +176,9 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     }
 
     protected error( ...args: any[] ) {
+        if ( typeof GenericPrompt.injectedValue !== 'undefined' ) {
+            throw new Error( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) );
+        }
         this.write( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) );
     }
 

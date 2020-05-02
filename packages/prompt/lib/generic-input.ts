@@ -13,6 +13,10 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
     protected input: string = '';
     protected index: number = 0;
 
+    public static inject( value: string ): void {
+        GenericPrompt.inject( value );
+    }
+
     protected setPrompt( message: string ) {
 
         message += ' ' + this.settings.pointer + ' ';
