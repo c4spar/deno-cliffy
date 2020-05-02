@@ -71,8 +71,8 @@ All prompts have the following base options:
 | ----- | :--: | :--: | ----------- |
 | message | `string` | Yes | Prompt message to display. |
 | default | `T` | No | Default value. Type depends on prompt type. |
-| transform | `( value: V ) => T | undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
-| validate | `( value: T | undefined ) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
+| transform | `(value: V) => T \| undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
+| validate | `(value: T \| undefined) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
 | hint | `string` | No | Hint to display to the user. (not implemented) |
 | pointer | `string` | No | Change the pointer icon. |
 
