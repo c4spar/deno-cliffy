@@ -1,0 +1,57 @@
+import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { List } from '../prompts/list.ts';
+import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
+
+Deno.test( async function prompt_list() {
+    console.log();
+    List.inject( 'tag1, tag2, tag3' );
+    const result: string[] | undefined = await List.prompt( 'message' );
+    assertEquals( result, [ 'tag1', 'tag2', 'tag3' ] );
+} );
+
+Deno.test( async function prompt_list() {
+    console.log();
+    List.inject( 'tag1 tag2 tag3' );
+    const result: string[] | undefined = await List.prompt( {
+        message: 'message',
+        separator: ' '
+    } );
+    assertEquals( result, [ 'tag1', 'tag2', 'tag3' ] );
+} );
+
+Deno.test( async function prompt_list() {
+    console.log();
+    List.inject( ' tag tag1 ; tag2 ; tag3 ' );
+    const result: string[] | undefined = await List.prompt( {
+        message: 'message',
+        separator: ';'
+    } );
+    assertEquals( result, [ 'tag tag1', 'tag2', 'tag3' ] );
+} );
+
+Deno.test( async function prompt_list() {
+    console.log();
+    List.inject( ' tag tag1 -tag2-tag3 ' );
+    const result: string[] | undefined = await List.prompt( {
+        message: 'message',
+        separator: '-'
+    } );
+    assertEquals( result, [ 'tag tag1', 'tag2', 'tag3' ] );
+} );
+
+Deno.test( async function prompt_confirm_emptyValue() {
+    console.log();
+    await assertThrowsAsync( async () => {
+        List.inject( '' );
+        await List.prompt( 'message' );
+    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+} );
+
+// @TODO: add maxLength option to list pormpt
+Deno.test( async function prompt_confirm_nullValue() {
+    console.log();
+    await assertThrowsAsync( async () => {
+        List.inject( null as any );
+        await List.prompt( 'message' );
+    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+} );
