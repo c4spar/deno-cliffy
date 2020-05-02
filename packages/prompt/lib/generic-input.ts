@@ -4,31 +4,16 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
 
-export interface GenericInputPromptOptions<T> extends GenericPromptOptions<T, string> {
-    pointer?: string;
-}
+export interface GenericInputPromptOptions<T> extends GenericPromptOptions<T, string> {}
 
-export interface GenericInputPromptSettings<T> extends GenericPromptSettings<T, string> {
-    pointer: string;
-}
+export interface GenericInputPromptSettings<T> extends GenericPromptSettings<T, string> {}
 
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> extends GenericPrompt<T, string, S> {
 
     protected input: string = '';
     protected index: number = 0;
 
-    protected getMessage(): string {
-
-        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
-
-        if ( typeof this.settings.default !== 'undefined' ) {
-            message += ' ' + dim( `(${ this.settings.default })` );
-        }
-
-        return message;
-    }
-
-    protected setMessage( message: string ) {
+    protected setPrompt( message: string ) {
 
         message += ' ' + this.settings.pointer + ' ';
 

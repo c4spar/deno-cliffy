@@ -25,10 +25,10 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
             inactive: 'n',
             pointer: blue( Figures.POINTER_SMALL ),
             ...options
-        } ).run();
+        } ).prompt();
     }
 
-    public getMessage(): string {
+    protected getMessage(): string {
 
         let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } `;
 

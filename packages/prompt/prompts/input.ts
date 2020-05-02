@@ -21,7 +21,7 @@ export class Input extends GenericInput<string, InputSettings> {
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
             ...options
-        } ).run();
+        } ).prompt();
     }
 
     protected sanitize( value: string ): string | undefined {

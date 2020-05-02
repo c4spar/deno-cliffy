@@ -32,7 +32,7 @@ export class Number extends GenericInput<number, NumberSettings> {
             float: false,
             round: 2,
             ...options
-        } ).run();
+        } ).prompt();
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {

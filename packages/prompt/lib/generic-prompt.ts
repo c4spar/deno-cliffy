@@ -10,13 +10,16 @@ export type ValidateResult = string | boolean | Promise<string | boolean>;
 
 export interface GenericPromptOptions<T, V> {
     message: string;
+    pointer?: string;
     default?: T;
     sanitize?: ( value: V ) => T | undefined;
     validate?: ( value: T | undefined ) => ValidateResult;
     transform?: ( value: T ) => string;
 }
 
-export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> {}
+export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> {
+    pointer: string;
+}
 
 export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>> {
 
@@ -27,24 +30,11 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected constructor( protected settings: S ) {}
 
-    protected async prompt(): Promise<void> {
-        await this.setMessage( await this.getMessage() );
+    public async prompt(): Promise<T | undefined> {
+        return this.execute();
     }
 
-    protected abstract getMessage(): string | Promise<string>;
-
-    protected abstract setMessage( message: string ): void | Promise<void>;
-
-    protected async read(): Promise<boolean> {
-
-        const event: KeyEvent | undefined = await readKeySync();
-
-        if ( !event ) {
-            return false;
-        }
-
-        return this.handleEvent( event );
-    }
+    protected abstract setPrompt( message: string ): void | Promise<void>;
 
     protected abstract async handleEvent( event: KeyEvent ): Promise<boolean>;
 
@@ -53,10 +43,6 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     protected abstract validate( value: T | undefined ): ValidateResult;
 
     protected abstract transform( value: T ): string;
-
-    public async run(): Promise<T | undefined> {
-        return this.execute();
-    }
 
     protected clear() {
         this.screen
@@ -72,7 +58,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
         this.isRunning = true;
 
-        await this.prompt();
+        await this.setPrompt( await this.getMessage() );
 
         if ( this.lastError ) {
             this.screen.cursorSave();
@@ -86,14 +72,37 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
             return this.execute();
         }
 
+        this.screen.cursorUp(); // move cursor up by 1 because the use hit enter
+        this.clear();
+        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ yellow( this.transform( this.value as T ) ) }` );
+
+        this.screen.cursorShow();
+
         this.isRunning = false;
 
-        this.screen
-            .cursorLeft()
-            .eraseDown()
-            .cursorShow();
-
         return this.value;
+    }
+
+    protected getMessage(): string | Promise<string> {
+
+        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
+
+        if ( typeof this.settings.default !== 'undefined' ) {
+            message += dim( ` (${ this.transform( this.settings.default ) })` );
+        }
+
+        return message;
+    }
+
+    protected async read(): Promise<boolean> {
+
+        const event: KeyEvent | undefined = await readKeySync();
+
+        if ( !event ) {
+            return false;
+        }
+
+        return this.handleEvent( event );
     }
 
     protected sanitizeValue( value: V ): T | undefined {
@@ -132,10 +141,6 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     }
 
     protected error( ...args: any[] ) {
-        this.write( bold( ` ${ Figures.CROSS } ` ) + red( format( ...args ) ) + '\n' );
-    }
-
-    protected question( message: string, lineBreak: boolean = false ) {
-        this.write( ` ${ yellow( '?' ) } ${ bold( message ) }` + ( lineBreak ? '\n' : ' ' ) );
+        this.write( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) + '\n' );
     }
 }

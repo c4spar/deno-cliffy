@@ -17,16 +17,12 @@ export type CheckboxValueOptions = ( string | CheckboxItemOptions )[];
 export type CheckboxValueSettings = CheckboxItemSettings[];
 
 export interface CheckboxOptions extends GenericListOptions<string[], string[]> {
-    indent?: string;
-    pointer?: string;
     check?: string;
     uncheck?: string;
     options: CheckboxValueOptions;
 }
 
 export interface CheckboxSettings extends GenericListSettings<string[], string[]> {
-    indent: string;
-    pointer: string;
     check: string;
     uncheck: string;
     values: CheckboxValueSettings;
@@ -40,14 +36,15 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
 
         return new this( {
-            pointer: blue( Figures.POINTER ),
+            pointer: blue( Figures.POINTER_SMALL ),
+            listPointer: blue( Figures.POINTER ),
             indent: ' ',
             maxRows: 10,
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options,
             values
-        } ).run();
+        } ).prompt();
     }
 
     public static separator( label: string = '------------' ): CheckboxItemOptions {
@@ -67,17 +64,6 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             checked: typeof item.checked === 'undefined' && defaults && defaults.indexOf( item.value ) !== -1 ? true : !!item.checked,
             icon: typeof item.icon === 'undefined' ? true : item.icon
         };
-    }
-
-    protected getMessage(): string {
-
-        let message = this.settings.message;
-
-        if ( typeof this.settings.default !== 'undefined' ) {
-            message += dim( ` (${ this.settings.default.join( ', ' ) })` );
-        }
-
-        return message;
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -104,6 +90,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
             case 'return':
             case 'enter':
+                this.writeLine();
                 return this.selectValue();
         }
 
@@ -130,7 +117,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         let line = this.settings.indent;
 
         // pointer
-        line += isSelected ? `${ this.settings.pointer } ` : '  ';
+        line += isSelected ? `${ this.settings.listPointer } ` : '  ';
 
         // icon
         if ( item.icon ) {
@@ -159,7 +146,6 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
     }
 
     protected transform( value: string[] ): string {
-        return value.map( val => val.slice( 0, 1 ).toUpperCase() + val.slice( 1 ) )
-                    .join( ' ' );
+        return value.join( ', ' );
     }
 }

@@ -24,21 +24,10 @@ export class List extends GenericInput<string[], ListSettings> {
             pointer: blue( Figures.POINTER_SMALL ),
             separator: ',',
             ...options
-        } ).run();
+        } ).prompt();
     }
 
-    protected getMessage(): string {
-
-        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) }`;
-
-        if ( typeof this.settings.default !== 'undefined' ) {
-            message += dim( ` (${ this.settings.default.join( `${ this.settings.separator } ` ) })` );
-        }
-
-        return message;
-    }
-
-    protected setMessage( message: string ) {
+    protected setPrompt( message: string ) {
 
         message += ' ' + this.settings.pointer + ' ';
 
@@ -92,6 +81,6 @@ export class List extends GenericInput<string[], ListSettings> {
     }
 
     protected transform( value: string[] ): string {
-        return value.join( `${ this.settings.separator } ` );
+        return value.join( `, ` );
     }
 }

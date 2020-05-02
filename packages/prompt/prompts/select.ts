@@ -12,15 +12,9 @@ export interface SelectItemSettings extends GenericListItemSettings {
 export type SelectValueOptions = ( string | SelectItemOptions )[];
 export type SelectValueSettings = SelectItemSettings[];
 
-export interface SelectOptions extends GenericListOptions<string, string> {
-    indent?: string;
-    pointer?: string;
-}
+export interface SelectOptions extends GenericListOptions<string, string> {}
 
-export interface SelectSettings extends GenericListSettings<string, string> {
-    indent: string;
-    pointer: string;
-}
+export interface SelectSettings extends GenericListSettings<string, string> {}
 
 export class Select<S extends SelectSettings> extends GenericList<string, string, S> {
 
@@ -32,16 +26,13 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         const values: SelectValueSettings = items.map( item => this.mapItem( item ) );
 
         return new this( {
-            pointer: blue( Figures.POINTER ),
+            pointer: blue( Figures.POINTER_SMALL ),
+            listPointer: blue( Figures.POINTER ),
             indent: ' ',
             maxRows: 10,
             ...options,
             values
-        } ).run();
-    }
-
-    public static separator( label: string = '------------' ): SelectItemOptions {
-        return super.separator();
+        } ).prompt();
     }
 
     protected static mapValues( optValues: SelectValueOptions ): SelectItemOptions[] {
@@ -50,17 +41,6 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
 
     protected static mapItem( item: SelectItemOptions ): SelectItemSettings {
         return super.mapItem( item ) as SelectItemSettings;
-    }
-
-    protected getMessage(): string {
-
-        let message = this.settings.message;
-
-        if ( typeof this.settings.default !== 'undefined' ) {
-            message += dim( ` (${ this.settings.default })` );
-        }
-
-        return message;
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
@@ -83,6 +63,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
 
             case 'return':
             case 'enter':
+                this.writeLine();
                 return this.selectValue();
         }
 
@@ -98,7 +79,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         let line = this.settings.indent;
 
         // pointer
-        line += isSelected ? `${ this.settings.pointer } ` : '  ';
+        line += isSelected ? `${ this.settings.listPointer } ` : '  ';
 
         // value
         const value: string = item.name;

@@ -16,11 +16,15 @@ export type GenericListValueOptions = ( string | GenericListItemOptions )[];
 export type GenericListValueSettings = GenericListItemSettings[];
 
 export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
+    indent?: string;
+    listPointer?: string;
     maxRows?: number;
     options: GenericListValueOptions;
 }
 
 export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
+    indent: string;
+    listPointer: string;
     maxRows: number;
     values: GenericListValueSettings;
 }
@@ -31,7 +35,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     protected selected: number = 0;
 
     public static separator( label: string = '------------' ): GenericListItemOptions {
-        return { name: label, value: label, disabled: true };
+        return { value: label, disabled: true };
     }
 
     protected static mapValues( optValues: GenericListValueOptions ): GenericListItemOptions[] {
@@ -50,14 +54,14 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
         };
     }
 
-    protected setMessage( message: string ) {
+    protected setPrompt( message: string ) {
 
-        this.question( message, true );
+        this.writeLine( message );
 
         this.writeListItems();
     }
 
-    protected async clear() {
+    protected clear() {
         this.screen.eraseLines( this.maxRows() + 2 );
         this.screen.cursorLeft();
         this.screen.eraseDown();

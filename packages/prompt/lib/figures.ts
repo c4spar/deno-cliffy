@@ -6,7 +6,7 @@ const main = {
     RADIO_ON: '◉',
     RADIO_OFF: '◯',
     TICK: '✔',
-    CROSS: '✖',
+    CROSS: '✘',
     ELLIPSIS: '…',
     POINTER_SMALL: '›',
     LINE: '─',

@@ -26,12 +26,12 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
             active: 'Yes',
             inactive: 'No',
             ...options
-        } ).run();
+        } ).prompt();
     }
 
-    public getMessage(): string {
+    protected setPrompt( message: string ) {
 
-        let message = ` ${ yellow( '?' ) } ${ bold( this.settings.message ) } ${ this.settings.pointer } `;
+        message += ` ${ this.settings.pointer } `;
 
         if ( this.input === this.settings.active ) {
             message += `${ dim( `${ this.settings.inactive } /` ) } ${ underline( this.settings.active ) }`;
@@ -41,10 +41,6 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
             message += dim( `${ this.settings.inactive } / ${ this.settings.active }` );
         }
 
-        return message;
-    }
-
-    protected setMessage( message: string ) {
         this.write( message );
     }
 
