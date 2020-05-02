@@ -32,7 +32,12 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     protected constructor( protected settings: S ) {}
 
     public async prompt(): Promise<T | undefined> {
-        return this.execute();
+        try {
+            return this.execute();
+        } catch ( e ) {
+            this.screen.cursorShow();
+            throw e;
+        }
     }
 
     protected abstract setPrompt( message: string ): void | Promise<void>;
