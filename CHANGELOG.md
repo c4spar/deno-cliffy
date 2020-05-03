@@ -1,6 +1,37 @@
-# [v0.4.0](https://github.com/c4spar/deno-cli/compare/v0.3.0...v0.4.0) (Sat Apr 4 23:34:06 2020)
+# [v0.5.0](https://github.com/c4spar/deno-cli/compare/v0.4.0...v0.5.0) (Sun May 3 02:11:43 2020)
 
-* feat: add support for deno v0.39.0 ([d828f0c](https://github.com/c4spar/deno-cli/commit/d828f0c))
+### Features
+
+* **ansi-escape:** add `ansi escape` module (#1) ([0ac92c2](https://github.com/c4spar/deno-cli/commit/0ac92c2))
+* **keycode:** add `keycode` module ([f61d033](https://github.com/c4spar/deno-cli/commit/f61d033), [3be5b72](https://github.com/c4spar/deno-cli/commit/3be5b72), [9869720](https://github.com/c4spar/deno-cli/commit/9869720))
+* **prompt:** add `prompt` module (#4) ([df2221e](https://github.com/c4spar/deno-cli/commit/df2221e))
+
+### Code Refactoring
+
+* use explicit version of deno std module's ([fcdf97a](https://github.com/c4spar/deno-cli/commit/fcdf97a))
+* use utf8 encoding module instead of `TextEncoder` for text encoding ([b29e1ba](https://github.com/c4spar/deno-cli/commit/b29e1ba))
+* **command:** use new `Table` class in help command ([5f203d1](https://github.com/c4spar/deno-cli/commit/5f203d1))
+
+### Chore
+
+* add support for deno v0.42.0 ([d860d3a](https://github.com/c4spar/deno-cli/commit/d860d3a), [db61141](https://github.com/c4spar/deno-cli/commit/db61141), [cddb7d1](https://github.com/c4spar/deno-cli/commit/cddb7d1), [83c767c](https://github.com/c4spar/deno-cli/commit/83c767c), [e0ff7b5](https://github.com/c4spar/deno-cli/commit/e0ff7b5), [c8af716](https://github.com/c4spar/deno-cli/commit/c8af716))
+
+### Documentation Updates
+
+* update `README.md` ([fcf1402](https://github.com/c4spar/deno-cli/commit/fcf1402))
+* **command:** update `README.md` ([7434f79](https://github.com/c4spar/deno-cli/commit/7434f79))
+* **table:** add table examples ([e7c1761](https://github.com/c4spar/deno-cli/commit/e7c1761))
+
+### BREAKING CHANGES
+
+* **table:** rewrite table module ([65988b7](https://github.com/c4spar/deno-cli/commit/65988b7))
+
+    Old table method's like `table` and `renderTable` are replaced by the new `Table` class.
+
+
+
+
+# [v0.4.0](https://github.com/c4spar/deno-cli/compare/v0.3.0...v0.4.0) (Sat Apr 4 23:34:06 2020)
 
 ### Features
 
@@ -28,6 +59,7 @@
 
 ### Chore
 
+* add support for deno v0.39.0 ([d828f0c](https://github.com/c4spar/deno-cli/commit/d828f0c))
 * **license:** update copyright ([8264b1a](https://github.com/c4spar/deno-cli/commit/8264b1a))
 
 ### Unit/Integration Tests
