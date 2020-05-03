@@ -1,7 +1,7 @@
 import camelCase from '../../x/camelCase.ts';
 import paramCase from '../../x/paramCase.ts';
 import { getOption } from './flags.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagValue, IGenericObject } from './types.ts';
 
 // @TODO: add support for knownFlaks
 
@@ -15,16 +15,18 @@ interface IFlagOptionsMap {
  *
  * @param flags         Available flag options.
  * @param values        Flag to validate.
+ * @param defaultValues Values marked as default value.
  * @param knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
  */
-export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
+export function validateFlags( flags: IFlagOptions[], values: IFlags, defaultValues: IGenericObject<boolean> = {}, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
 
     // Set default value's
     for ( const option of flags ) {
         const name: string = camelCase( option.name );
         if ( typeof values[ name ] === 'undefined' && typeof option.default !== 'undefined' ) {
             values[ name ] = typeof option.default === 'function' ? option.default() : option.default;
+            defaultValues[ name ] = true;
         }
     }
 
@@ -44,6 +46,12 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
         if ( option.standalone ) {
             if ( keys.length > 1 ) {
+
+                // dont't throw an error if all values are coming from the default option.
+                if ( options.every( ( { option } ) => option && ( option.standalone || defaultValues[ option.name ] ) ) ) {
+                    return;
+                }
+
                 throw new Error( `Option --${ option.name } cannot be combined with other options.` );
             }
             return;
@@ -56,7 +64,8 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         } );
 
         option.depends?.forEach( ( flag: string ) => {
-            if ( !isset( flag ) ) {
+            // dont't throw an error if the value is coming from the default option.
+            if ( !isset( flag ) && !defaultValues[ option.name ] ) {
                 throw new Error( `Option --${ option.name } depends on option: --${ flag }` );
             }
         } );
