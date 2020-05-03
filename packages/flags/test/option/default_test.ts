@@ -42,7 +42,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( 'flags optionDefault defaultValues', () => {
+Deno.test( 'flags default option: no arguments', () => {
 
     const { flags, unknown, literal } = parseFlags( [], options );
 
@@ -59,7 +59,7 @@ Deno.test( 'flags optionDefault defaultValues', () => {
     assertEquals( literal, [] );
 } );
 
-Deno.test( 'flags optionDefault defaultValues', () => {
+Deno.test( 'flags default option: override default values', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-b', '1', '-s', '1', '-n', '1', '-B', '0', '-S', '0', '-N', '0', '-m', '0' ], options );
 
@@ -71,6 +71,23 @@ Deno.test( 'flags optionDefault defaultValues', () => {
         string2: '0',
         number2: 0,
         method: 0
+    } );
+    assertEquals( unknown, [] );
+    assertEquals( literal, [] );
+} );
+
+Deno.test( 'flags optionDefault override default value with optional value', () => {
+
+    const { flags, unknown, literal } = parseFlags( [ '-b' ], options );
+
+    assertEquals( flags, {
+        boolean: true,
+        string: '0',
+        number: 0,
+        boolean2: true,
+        string2: '1',
+        number2: 1,
+        method: 1
     } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );

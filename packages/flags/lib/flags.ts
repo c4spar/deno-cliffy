@@ -172,6 +172,8 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                 } else {
                     if ( hasNext() ) {
                         result = parseValue( next() );
+                    } else if ( arg.optionalValue && arg.type === OptionType.BOOLEAN ) {
+                        result = true;
                     }
                 }
 
@@ -219,7 +221,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         throw new Error( 'Wrongly used parseValue.' );
                     }
 
-                    let result = opts.parse ?
+                    let result: IFlagValueType = opts.parse ?
                         opts.parse( arg.type || OptionType.STRING, option, arg, nextValue ) :
                         parseFlagValue( option, arg, nextValue );
 
