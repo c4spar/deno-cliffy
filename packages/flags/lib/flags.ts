@@ -29,6 +29,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     let negate = false;
 
     const flags: IFlags = {};
+    const defaultValues: IGenericObject<boolean> = {};
     const literal: string[] = [];
     const unknown: string[] = [];
 
@@ -111,6 +112,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
 
                 if ( typeof option.default !== 'undefined' ) {
                     flags[ friendlyName ] = typeof option.default === 'function' ? option.default() : option.default;
+                    defaultValues[ friendlyName ] = true;
                 } else if ( option.args && option.args[ 0 ].optionalValue ) {
                     flags[ friendlyName ] = true;
                 } else {
@@ -172,6 +174,8 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                 } else {
                     if ( hasNext() ) {
                         result = parseValue( next() );
+                    } else if ( arg.optionalValue && arg.type === OptionType.BOOLEAN ) {
+                        result = true;
                     }
                 }
 
@@ -219,7 +223,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
                         throw new Error( 'Wrongly used parseValue.' );
                     }
 
-                    let result = opts.parse ?
+                    let result: IFlagValueType = opts.parse ?
                         opts.parse( arg.type || OptionType.STRING, option, arg, nextValue ) :
                         parseFlagValue( option, arg, nextValue );
 
@@ -237,7 +241,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
     }
 
     if ( opts.flags && opts.flags.length ) {
-        validateFlags( opts.flags, flags, opts.knownFlaks, opts.allowEmpty );
+        validateFlags( opts.flags, flags, defaultValues, opts.knownFlaks, opts.allowEmpty );
     }
 
     return { flags, unknown, literal };
