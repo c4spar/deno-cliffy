@@ -6,7 +6,7 @@ const cmd = new Command()
     .option( '-f, --flag, --fl, --flags [value:boolean]', 'description ...' )
     .action( () => {} );
 
-Deno.test( async function command_optionAliases_f() {
+Deno.test( 'command optionAliases f', async () => {
 
     const { options, args } = await cmd.parse( [ '-f' ] );
 
@@ -14,7 +14,7 @@ Deno.test( async function command_optionAliases_f() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionAliases_fl() {
+Deno.test( 'command optionAliases fl', async () => {
 
     const { options, args } = await cmd.parse( [ '--fl' ] );
 
@@ -22,7 +22,7 @@ Deno.test( async function command_optionAliases_fl() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionAliases_flag() {
+Deno.test( 'command optionAliases flag', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag' ] );
 
@@ -30,7 +30,7 @@ Deno.test( async function command_optionAliases_flag() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionAliases_flags() {
+Deno.test( 'command optionAliases flags', async () => {
 
     const { options, args } = await cmd.parse( [ '--flags' ] );
 
@@ -38,28 +38,28 @@ Deno.test( async function command_optionAliases_flags() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionAliases_fInvalidValie() {
+Deno.test( 'command optionAliases fInvalidValie', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'value' ] );
     }, Error, 'Option --flag must be of type boolean but got: value' );
 } );
 
-Deno.test( async function command_optionAliases_flInvalidValue() {
+Deno.test( 'command optionAliases flInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '--fl', 'value' ] );
     }, Error, 'Option --flag must be of type boolean but got: value' );
 } );
 
-Deno.test( async function command_optionAliases_flagInvalidValue() {
+Deno.test( 'command optionAliases flagInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '--flag', 'value' ] );
     }, Error, 'Option --flag must be of type boolean but got: value' );
 } );
 
-Deno.test( async function command_optionAliases_flagsInvalidValue() {
+Deno.test( 'command optionAliases flagsInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '--flags', 'value' ] );

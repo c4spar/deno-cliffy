@@ -25,14 +25,14 @@ const cmd = new Command()
     } )
     .action( () => {} );
 
-Deno.test( async function command_optionConflicts_noArguments() {
+Deno.test( 'command optionConflicts noArguments', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [] );
     }, Error, 'Missing required option: --type' );
 } );
 
-Deno.test( async function command_optionConflicts_type() {
+Deno.test( 'command optionConflicts type', async () => {
 
     const { options, args } = await cmd.parse( [ '-t', 'value' ] );
 
@@ -40,7 +40,7 @@ Deno.test( async function command_optionConflicts_type() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionConflicts_videoAudioImageType() {
+Deno.test( 'command optionConflicts videoAudioImageType', async () => {
 
     const { options, args } = await cmd.parse( [ '-v', 'value', '-a', 'value', '--image-type', 'value' ] );
 
@@ -48,7 +48,7 @@ Deno.test( async function command_optionConflicts_videoAudioImageType() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionConflicts_videoAudioImageType() {
+Deno.test( 'command optionConflicts videoAudioImageType', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-v', 'value', '-a', 'value' ] );

@@ -6,7 +6,7 @@ const cmd = new Command()
     .option( '-f, --flag [value:boolean]', 'description ...' )
     .action( () => {} );
 
-Deno.test( async function command_typeString_flag() {
+Deno.test( 'command typeString flag', async () => {
 
     const { options, args } = await cmd.parse( [ '-f' ] );
 
@@ -14,7 +14,7 @@ Deno.test( async function command_typeString_flag() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag' ] );
 
@@ -22,7 +22,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '-f', 'true' ] );
 
@@ -30,7 +30,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag', 'true' ] );
 
@@ -38,7 +38,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '-f', 'false' ] );
 
@@ -46,7 +46,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag', 'false' ] );
 
@@ -54,7 +54,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '-f', '1' ] );
 
@@ -62,7 +62,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag', '1' ] );
 
@@ -70,7 +70,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '-f', '0' ] );
 
@@ -78,7 +78,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag', '0' ] );
 
@@ -86,7 +86,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--no-flag' ] );
 
@@ -94,14 +94,14 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionStandalone_flagCombineLong() {
+Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'true', 'unknown' ] );
     }, Error, 'Unknown command: unknown' );
 } );
 
-Deno.test( async function command_optionStandalone_flagCombineLong() {
+Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'unknown' ] );

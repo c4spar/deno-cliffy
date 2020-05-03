@@ -1,23 +1,15 @@
-import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { Input } from '../prompts/input.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 
-Deno.test( async function prompt_input() {
+Deno.test( 'prompt input: value', async () => {
     console.log();
     Input.inject( 'hallo' );
     const result: string | undefined = await Input.prompt( 'message' );
     assertEquals( result, 'hallo' );
 } );
 
-Deno.test( async function prompt_input_emptyValue() {
-    console.log();
-    await assertThrowsAsync( async () => {
-        Input.inject( '' );
-        await Input.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
-} );
-
-Deno.test( async function prompt_input_option_validate() {
+Deno.test( 'prompt input: validate option', async () => {
     console.log();
     Input.inject( 'a'.repeat( 9 ) );
     const result: string | undefined = await Input.prompt( {
@@ -27,7 +19,15 @@ Deno.test( async function prompt_input_option_validate() {
     assertEquals( result, 'a'.repeat( 9 ) );
 } );
 
-Deno.test( async function prompt_input_option_validateInvalid() {
+Deno.test( 'prompt input: empty value', async () => {
+    console.log();
+    await assertThrowsAsync( async () => {
+        Input.inject( '' );
+        await Input.prompt( 'message' );
+    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+} );
+
+Deno.test( 'prompt input: invalid value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Input.inject( 'a'.repeat( 10 ) );
@@ -38,7 +38,7 @@ Deno.test( async function prompt_input_option_validateInvalid() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_confirm_nullValue() {
+Deno.test( 'prompt input: null value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Input.inject( null as any );

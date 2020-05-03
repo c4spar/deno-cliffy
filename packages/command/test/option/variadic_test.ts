@@ -12,7 +12,7 @@ const cmd = new Command()
 
 // Optional:
 
-Deno.test( async function command_optionVariadic_optional() {
+Deno.test( 'command optionVariadic optional', async () => {
 
     const { options, args } = await cmd.parse( [ '-o' ] );
 
@@ -22,7 +22,7 @@ Deno.test( async function command_optionVariadic_optional() {
 
 // Boolean:
 
-Deno.test( async function command_optionVariadic_boolean() {
+Deno.test( 'command optionVariadic boolean', async () => {
 
     const { options, args } = await cmd.parse( [ '-b', '1', '0', 'true', 'false' ] );
 
@@ -30,7 +30,7 @@ Deno.test( async function command_optionVariadic_boolean() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionVariadic_booleanInvalidValue() {
+Deno.test( 'command optionVariadic booleanInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-b', '1', '0', 'true', 'false', '2' ] );
@@ -39,7 +39,7 @@ Deno.test( async function command_optionVariadic_booleanInvalidValue() {
 
 // String:
 
-Deno.test( async function command_optionVariadic_string() {
+Deno.test( 'command optionVariadic string', async () => {
 
     const { options, args } = await cmd.parse( [ '-s', '1', '0', 'true', 'false' ] );
 
@@ -49,7 +49,7 @@ Deno.test( async function command_optionVariadic_string() {
 
 // Number:
 
-Deno.test( async function command_optionVariadic_number() {
+Deno.test( 'command optionVariadic number', async () => {
 
     const { options, args } = await cmd.parse( [ '-n', '1', '0', '654', '1.2' ] );
 
@@ -57,7 +57,7 @@ Deno.test( async function command_optionVariadic_number() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionVariadic_numberInvalidValue() {
+Deno.test( 'command optionVariadic numberInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-n', '1', '0', '654', 'abc', '1,2' ] );
@@ -66,7 +66,7 @@ Deno.test( async function command_optionVariadic_numberInvalidValue() {
 
 // Exact:
 
-Deno.test( async function command_optionVariadic_exact() {
+Deno.test( 'command optionVariadic exact', async () => {
 
     const { options, args } = await cmd.parse( [ '-v', '1', 'abc', '1' ] );
 
@@ -74,21 +74,21 @@ Deno.test( async function command_optionVariadic_exact() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionVariadic_exactInvalidValue() {
+Deno.test( 'command optionVariadic exactInvalidValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-v', 'abc', 'abc', '1' ] );
     }, Error, 'Option --variadic-option must be of type number but got: abc' );
 } );
 
-Deno.test( async function command_optionVariadic_exactMissingValue() {
+Deno.test( 'command optionVariadic exactMissingValue', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-v', '1' ] );
     }, Error, 'Missing value for option: --variadic-option' );
 } );
 
-Deno.test( async function command_optionVariadic_exactLastOptional() {
+Deno.test( 'command optionVariadic exactLastOptional', async () => {
 
     const { options, args } = await cmd.parse( [ '-v', '1', 'abc' ] );
 
@@ -96,7 +96,7 @@ Deno.test( async function command_optionVariadic_exactLastOptional() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionVariadic_exactLastOptionalVariadic() {
+Deno.test( 'command optionVariadic exactLastOptionalVariadic', async () => {
 
     const { options, args } = await cmd.parse( [ '-v', '1', 'abc', '1', '0', 'true', 'false' ] );
 

@@ -1,14 +1,14 @@
-import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
+import { encode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
 import { cursor, erase, image, ImageOptions, link, scroll } from './csi.ts';
 
 export class AnsiEscape {
 
     /** Create instance from file. */
-    public static from( file: Deno.File ): AnsiEscape {
+    public static from( file: Deno.WriterSync ): AnsiEscape {
         return new this( file );
     }
 
-    protected constructor( protected file: Deno.File ) {}
+    protected constructor( protected file: Deno.WriterSync ) {}
 
     /** Write to file. */
     public write( code: string ): this {

@@ -17,7 +17,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionVariadic_optional() {
+Deno.test( 'flags optionVariadic optional', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', '1', '-F', '1' ], options );
 

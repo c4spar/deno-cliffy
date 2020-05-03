@@ -22,7 +22,7 @@ function command( states: any = {} ): Command {
             .action( () => { states.action3 = true; } ) );
 }
 
-Deno.test( async function command_subCommand() {
+Deno.test( 'command subCommand', async () => {
 
     const stats: any = {};
     const cmd: Command = command( stats );
@@ -36,7 +36,7 @@ Deno.test( async function command_subCommand() {
     assertEquals( stats.action3, undefined );
 } );
 
-Deno.test( async function command_subCommand2() {
+Deno.test( 'command subCommand2', async () => {
 
     const stats: any = {};
     const cmd: Command = command( stats );
@@ -50,7 +50,7 @@ Deno.test( async function command_subCommand2() {
     assertEquals( stats.action3, undefined );
 } );
 
-Deno.test( async function command_subCommand3() {
+Deno.test( 'command subCommand3', async () => {
 
     const stats: any = {};
     const cmd: Command = command( stats );
@@ -64,21 +64,21 @@ Deno.test( async function command_subCommand3() {
     assertEquals( stats.action3, true );
 } );
 
-Deno.test( async function command_subCommand_typeString_flagMissing() {
+Deno.test( 'command subCommand typeString flagMissing', async () => {
 
     await assertThrowsAsync( async () => {
         await command().parse( [ 'sub-command', 'input-path' ] );
     }, Error, 'Missing argument: output' );
 } );
 
-Deno.test( async function command_subCommand2_typeString_flagMissing() {
+Deno.test( 'command subCommand2 typeString flagMissing', async () => {
 
     await assertThrowsAsync( async () => {
         await command().parse( [ 'sub-command2', 'input-path' ] );
     }, Error, 'Missing argument: output' );
 } );
 
-Deno.test( async function command_subCommand3_typeString_flagMissing() {
+Deno.test( 'command subCommand3 typeString flagMissing', async () => {
 
     await assertThrowsAsync( async () => {
         await command().parse( [ 'sub-command2', 'sub-command3', 'input-path' ] );

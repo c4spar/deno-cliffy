@@ -5,7 +5,7 @@ const cmd = new Command()
     .throwErrors()
     .option( '-f, --flag [value:string]', 'description ...' ).action( () => {} );
 
-Deno.test( async function command_typeString_flag() {
+Deno.test( 'command typeString flag', async () => {
 
     const { options, args } = await cmd.parse( [ '-f' ] );
 
@@ -13,7 +13,7 @@ Deno.test( async function command_typeString_flag() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_typeString_flagValue() {
+Deno.test( 'command typeString flagValue', async () => {
 
     const { options, args } = await cmd.parse( [ '--flag', 'value' ] );
 
@@ -21,7 +21,7 @@ Deno.test( async function command_typeString_flagValue() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionStandalone_flagCombineLong() {
+Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'value', 'unknown' ] );

@@ -28,4 +28,4 @@ const win = {
     POINTER: '>'
 };
 
-export const Figures = Deno.build.os === 'win' ? win : main;
+export const Figures = Deno.build.os === 'windows' ? win : main;

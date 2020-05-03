@@ -8,7 +8,7 @@ const cmd = new Command()
     .option( '-i, --image-type [value:string]', 'description ...', { depends: [ 'video-type', 'audio-type' ] } )
     .action( () => {} );
 
-Deno.test( async function command_optionRequire_noArguments() {
+Deno.test( 'command optionRequire noArguments', async () => {
 
     const { options, args } = await cmd.parse( [] );
 
@@ -16,7 +16,7 @@ Deno.test( async function command_optionRequire_noArguments() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionRequire_videoAudioImageType() {
+Deno.test( 'command optionRequire videoAudioImageType', async () => {
 
     const { options, args } = await cmd.parse( [ '-v', 'value', '-a', 'value', '--image-type', 'value' ] );
 
@@ -24,42 +24,42 @@ Deno.test( async function command_optionRequire_videoAudioImageType() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionRequire_videoType() {
+Deno.test( 'command optionRequire videoType', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-v', 'value' ] );
     }, Error, 'Option --video-type depends on option: --audio-type' );
 } );
 
-Deno.test( async function command_optionRequire_audioType() {
+Deno.test( 'command optionRequire audioType', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-a', 'value' ] );
     }, Error, 'Option --audio-type depends on option: --video-type' );
 } );
 
-Deno.test( async function command_optionRequire_imageType() {
+Deno.test( 'command optionRequire imageType', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-i', 'value' ] );
     }, Error, 'Option --image-type depends on option: --video-type' );
 } );
 
-Deno.test( async function command_optionRequire_videoAudio() {
+Deno.test( 'command optionRequire videoAudio', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-v', 'value', '-a', 'value' ] );
     }, Error, 'Option --video-type depends on option: --image-type' );
 } );
 
-Deno.test( async function command_optionRequire_audioVideo() {
+Deno.test( 'command optionRequire audioVideo', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-a', 'value', '-v', 'value' ] );
     }, Error, 'Option --audio-type depends on option: --image-type' );
 } );
 
-Deno.test( async function command_optionRequire_imageVideo() {
+Deno.test( 'command optionRequire imageVideo', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-i', 'value', '-v', 'value' ] );

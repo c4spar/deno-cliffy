@@ -1,7 +1,7 @@
 import { Command } from '../../lib/command.ts';
 import { assertEquals, assertThrowsAsync } from '../lib/assert.ts';
 
-Deno.test( async function flags_allowEmpty_enabled() {
+Deno.test( 'flags allowEmpty enabled', async () => {
 
     const { options, args } = await new Command()
         .throwErrors()
@@ -14,7 +14,7 @@ Deno.test( async function flags_allowEmpty_enabled() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function flags_allowEmpty_disabledNoFlags() {
+Deno.test( 'flags allowEmpty disabledNoFlags', async () => {
 
     const { options, args } = await new Command()
         .throwErrors()
@@ -26,7 +26,7 @@ Deno.test( async function flags_allowEmpty_disabledNoFlags() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function flags_allowEmpty_disabled() {
+Deno.test( 'flags allowEmpty disabled', async () => {
 
     const cmd = new Command()
         .throwErrors()

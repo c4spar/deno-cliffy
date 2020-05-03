@@ -1,8 +1,8 @@
-import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { Checkbox } from '../prompts/checkbox.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 
-Deno.test( async function prompt_checkbox() {
+Deno.test( 'prompt checkbox: valid value', async () => {
     console.log();
     Checkbox.inject( [ 'value1', 'value3' ] );
     const result: string[] | undefined = await Checkbox.prompt( {
@@ -12,7 +12,7 @@ Deno.test( async function prompt_checkbox() {
     assertEquals( result, [ 'value1', 'value3' ] );
 } );
 
-Deno.test( async function prompt_checkbox_emptyValue() {
+Deno.test( 'prompt checkbox: empty value', async () => {
     console.log();
     Checkbox.inject( [] );
     const result: string[] | undefined = await Checkbox.prompt( {
@@ -22,7 +22,7 @@ Deno.test( async function prompt_checkbox_emptyValue() {
     assertEquals( result, [] );
 } );
 
-Deno.test( async function prompt_checkbox_invalidValue() {
+Deno.test( 'prompt checkbox: invalid value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Checkbox.inject( [ 'value3', 'value4' ] );
@@ -33,7 +33,7 @@ Deno.test( async function prompt_checkbox_invalidValue() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_checkbox_nullValue() {
+Deno.test( 'prompt checkbox: null value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Checkbox.inject( null as any );

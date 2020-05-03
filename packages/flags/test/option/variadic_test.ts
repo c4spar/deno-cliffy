@@ -44,7 +44,7 @@ const options = <IParseOptions>{
 
 // Optional:
 
-Deno.test( function flags_optionVariadic_optional() {
+Deno.test( 'flags optionVariadic optional', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-o' ], options );
 
@@ -55,7 +55,7 @@ Deno.test( function flags_optionVariadic_optional() {
 
 // Boolean:
 
-Deno.test( function flags_optionVariadic_boolean() {
+Deno.test( 'flags optionVariadic boolean', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-b', '1', '0', 'true', 'false' ], options );
 
@@ -64,7 +64,7 @@ Deno.test( function flags_optionVariadic_boolean() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionVariadic_booleanInvalidValue() {
+Deno.test( 'flags optionVariadic booleanInvalidValue', () => {
 
     assertThrows(
         () => parseFlags( [ '-b', '1', '0', 'true', 'false', '2' ], options ),
@@ -75,7 +75,7 @@ Deno.test( function flags_optionVariadic_booleanInvalidValue() {
 
 // String:
 
-Deno.test( function flags_optionVariadic_string() {
+Deno.test( 'flags optionVariadic string', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-s', '1', '0', 'true', 'false' ], options );
 
@@ -86,7 +86,7 @@ Deno.test( function flags_optionVariadic_string() {
 
 // Number:
 
-Deno.test( function flags_optionVariadic_number() {
+Deno.test( 'flags optionVariadic number', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-n', '1', '0', '654', '1.2' ], options );
 
@@ -95,7 +95,7 @@ Deno.test( function flags_optionVariadic_number() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionVariadic_numberInvalidValue() {
+Deno.test( 'flags optionVariadic numberInvalidValue', () => {
 
     assertThrows(
         () => parseFlags( [ '-n', '1', '0', '654', 'abc', '1,2' ], options ),
@@ -106,7 +106,7 @@ Deno.test( function flags_optionVariadic_numberInvalidValue() {
 
 // Exact:
 
-Deno.test( function flags_optionVariadic_exact() {
+Deno.test( 'flags optionVariadic exact', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', '1' ], options );
 
@@ -115,7 +115,7 @@ Deno.test( function flags_optionVariadic_exact() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionVariadic_exactInvalidValue() {
+Deno.test( 'flags optionVariadic exactInvalidValue', () => {
 
     assertThrows(
         () => parseFlags( [ '-e', 'abc', 'abc', '1' ], options ),
@@ -124,7 +124,7 @@ Deno.test( function flags_optionVariadic_exactInvalidValue() {
     );
 } );
 
-Deno.test( function flags_optionVariadic_exactMissingValue() {
+Deno.test( 'flags optionVariadic exactMissingValue', () => {
 
     assertThrows(
         () => parseFlags( [ '-e', '1' ], options ),
@@ -133,7 +133,7 @@ Deno.test( function flags_optionVariadic_exactMissingValue() {
     );
 } );
 
-Deno.test( function flags_optionVariadic_exactLastOptional() {
+Deno.test( 'flags optionVariadic exactLastOptional', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc' ], options );
 
@@ -142,7 +142,7 @@ Deno.test( function flags_optionVariadic_exactLastOptional() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionVariadic_exactLastOptionalVariadic() {
+Deno.test( 'flags optionVariadic exactLastOptionalVariadic', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', '1', '0', 'true', 'false' ], options );
 

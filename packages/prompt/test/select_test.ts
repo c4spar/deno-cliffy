@@ -1,8 +1,8 @@
-import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { Select } from '../prompts/select.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 
-Deno.test( async function prompt_select() {
+Deno.test( 'prompt select: value', async () => {
     console.log();
     Select.inject( 'value2' );
     const result: string | undefined = await Select.prompt( {
@@ -12,7 +12,7 @@ Deno.test( async function prompt_select() {
     assertEquals( result, 'value2' );
 } );
 
-Deno.test( async function prompt_select_emptyValue() {
+Deno.test( 'prompt select: empty value', async () => {
     await assertThrowsAsync( async () => {
         Select.inject( '' );
         await Select.prompt( {
@@ -22,7 +22,7 @@ Deno.test( async function prompt_select_emptyValue() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_select_invalidValue() {
+Deno.test( 'prompt select: invalid value', async () => {
     await assertThrowsAsync( async () => {
         Select.inject( 'value4' );
         await Select.prompt( {
@@ -32,7 +32,7 @@ Deno.test( async function prompt_select_invalidValue() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_select_nullValue() {
+Deno.test( 'prompt select: null value', async () => {
     await assertThrowsAsync( async () => {
         Select.inject( null as any );
         await Select.prompt( {

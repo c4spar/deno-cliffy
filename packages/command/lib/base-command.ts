@@ -1,6 +1,6 @@
 const { stdout, stderr } = Deno;
-import { encode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
-import { dim, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
+import { dim, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
@@ -588,7 +588,8 @@ export class BaseCommand {
             return;
         }
 
-        const denoEnv = Deno.env();
+        // @TODO: check for permissions and use Deno.env.get()
+        const denoEnv = Deno.env.toObject();
 
         this.envVars.forEach( ( env: IEnvVariable ) => {
             const name = env.names.find( name => name in denoEnv );
@@ -784,6 +785,8 @@ export class BaseCommand {
                 return option;
             }
         }
+
+        return;
     }
 
     /********************************************************************************
@@ -1128,7 +1131,7 @@ export class BaseCommand {
             return error;
         }
 
-        const { CLIFFY_DEBUG } = hasEnvPermissions ? Deno.env() : {} as any;
+        const CLIFFY_DEBUG: boolean = hasEnvPermissions ? !!Deno.env.get( 'CLIFFY_DEBUG' ) : false;
 
         showHelp && this.help();
         this.logError( CLIFFY_DEBUG ? error : error.message );

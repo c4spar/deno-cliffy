@@ -1,6 +1,5 @@
 import { parseFlags } from '../../lib/flags.ts';
-import { IParseOptions } from '../../lib/types.ts';
-import { OptionType } from '../../lib/types.ts';
+import { IParseOptions, OptionType } from '../../lib/types.ts';
 import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = <IParseOptions>{
@@ -23,7 +22,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionRequire_noArguments() {
+Deno.test( 'flags optionRequire noArguments', () => {
 
     const { flags, unknown, literal } = parseFlags( [], options );
 
@@ -32,7 +31,7 @@ Deno.test( function flags_optionRequire_noArguments() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionRequire_videoAudioImageType() {
+Deno.test( 'flags optionRequire videoAudioImageType', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-v', 'value', '-a', 'value', '--image-type', 'value' ], options );
 
@@ -41,7 +40,7 @@ Deno.test( function flags_optionRequire_videoAudioImageType() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionRequire_videoType() {
+Deno.test( 'flags optionRequire videoType', () => {
 
     assertThrows(
         () => parseFlags( [ '-v', 'value' ], options ),
@@ -50,7 +49,7 @@ Deno.test( function flags_optionRequire_videoType() {
     );
 } );
 
-Deno.test( function flags_optionRequire_audioType() {
+Deno.test( 'flags optionRequire audioType', () => {
 
     assertThrows(
         () => parseFlags( [ '-a', 'value' ], options ),
@@ -59,7 +58,7 @@ Deno.test( function flags_optionRequire_audioType() {
     );
 } );
 
-Deno.test( function flags_optionRequire_imageType() {
+Deno.test( 'flags optionRequire imageType', () => {
 
     assertThrows(
         () => parseFlags( [ '-i', 'value' ], options ),
@@ -68,7 +67,7 @@ Deno.test( function flags_optionRequire_imageType() {
     );
 } );
 
-Deno.test( function flags_optionRequire_videoAudio() {
+Deno.test( 'flags optionRequire videoAudio', () => {
 
     assertThrows(
         () => parseFlags( [ '-v', 'value', '-a', 'value' ], options ),
@@ -77,7 +76,7 @@ Deno.test( function flags_optionRequire_videoAudio() {
     );
 } );
 
-Deno.test( function flags_optionRequire_audioVideo() {
+Deno.test( 'flags optionRequire audioVideo', () => {
 
     assertThrows(
         () => parseFlags( [ '-a', 'value', '-v', 'value' ], options ),
@@ -86,7 +85,7 @@ Deno.test( function flags_optionRequire_audioVideo() {
     );
 } );
 
-Deno.test( function flags_optionRequire_imageVideo() {
+Deno.test( 'flags optionRequire imageVideo', () => {
 
     assertThrows(
         () => parseFlags( [ '-i', 'value', '-v', 'value' ], options ),

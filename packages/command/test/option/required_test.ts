@@ -7,7 +7,7 @@ const cmd = new Command()
     .option( '-f, --flag [value:string]', 'description ...', { required: true } )
     .action( () => {} );
 
-Deno.test( async function command_optionRequired() {
+Deno.test( 'command optionRequired', async () => {
 
     const { options, args } = await cmd.parse( [ '-f', 'value' ] );
 
@@ -15,7 +15,7 @@ Deno.test( async function command_optionRequired() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionRequired_noArguments() {
+Deno.test( 'command optionRequired noArguments', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [] );

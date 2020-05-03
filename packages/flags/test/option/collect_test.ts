@@ -27,7 +27,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionCollect_flag() {
+Deno.test( 'flags optionCollect flag', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', '-f' ], options ),
@@ -36,7 +36,7 @@ Deno.test( function flags_optionCollect_flag() {
     );
 } );
 
-Deno.test( function flags_optionCollect_flagLong() {
+Deno.test( 'flags optionCollect flagLong', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', '--flag' ], options ),
@@ -45,7 +45,7 @@ Deno.test( function flags_optionCollect_flagLong() {
     );
 } );
 
-Deno.test( function flags_optionCollect_flagTrueLongFalse() {
+Deno.test( 'flags optionCollect flagTrueLongFalse', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', 'true', '--flag', 'false' ], options ),
@@ -54,7 +54,7 @@ Deno.test( function flags_optionCollect_flagTrueLongFalse() {
     );
 } );
 
-Deno.test( function flags_optionCollect_flagTrueNoFlag() {
+Deno.test( 'flags optionCollect flagTrueNoFlag', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', 'true', '--no-flag' ], options ),
@@ -63,7 +63,7 @@ Deno.test( function flags_optionCollect_flagTrueNoFlag() {
     );
 } );
 
-Deno.test( function flags_optionCollect_flagTrueNoFlagTrue() {
+Deno.test( 'flags optionCollect flagTrueNoFlagTrue', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', 'true', '--no-flag', 'true' ], options ),
@@ -72,7 +72,7 @@ Deno.test( function flags_optionCollect_flagTrueNoFlagTrue() {
     );
 } );
 
-Deno.test( function flags_optionCollect_boolean() {
+Deno.test( 'flags optionCollect boolean', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-b', '1', '--boolean', '0' ], options );
 
@@ -81,7 +81,7 @@ Deno.test( function flags_optionCollect_boolean() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionCollect_string() {
+Deno.test( 'flags optionCollect string', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-s', '1', '--string', '0' ], options );
 
@@ -90,7 +90,7 @@ Deno.test( function flags_optionCollect_string() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionCollect_number() {
+Deno.test( 'flags optionCollect number', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-n', '1', '--number', '0' ], options );
 

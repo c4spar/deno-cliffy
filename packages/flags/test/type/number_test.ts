@@ -24,7 +24,7 @@ const requiredValueOptions = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_typeNumber_flag() {
+Deno.test( 'flags typeNumber flag', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f' ], optionalValueOptions );
 
@@ -33,7 +33,7 @@ Deno.test( function flags_typeNumber_flag() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeNumber_flagValue() {
+Deno.test( 'flags typeNumber flagValue', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag', '123' ], optionalValueOptions );
 
@@ -42,7 +42,7 @@ Deno.test( function flags_typeNumber_flagValue() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeNumber_flagValueUnknown() {
+Deno.test( 'flags typeNumber flagValueUnknown', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', '456', 'unknown' ], optionalValueOptions );
 
@@ -51,7 +51,7 @@ Deno.test( function flags_typeNumber_flagValueUnknown() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeNumber_flagMissing() {
+Deno.test( 'flags typeNumber flagMissing', () => {
 
     assertThrows(
         () => parseFlags( [ '-f' ], requiredValueOptions ),
@@ -60,7 +60,7 @@ Deno.test( function flags_typeNumber_flagMissing() {
     );
 } );
 
-Deno.test( function flags_typeNumber_flagInvalidType() {
+Deno.test( 'flags typeNumber flagInvalidType', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', 'abc' ], requiredValueOptions ),

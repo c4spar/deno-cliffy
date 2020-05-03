@@ -1,6 +1,5 @@
 import { parseFlags } from '../../lib/flags.ts';
-import { IParseOptions } from '../../lib/types.ts';
-import { OptionType } from '../../lib/types.ts';
+import { IParseOptions, OptionType } from '../../lib/types.ts';
 import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = <IParseOptions>{
@@ -12,7 +11,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionRequired() {
+Deno.test( 'flags optionRequired', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', 'value' ], options );
 
@@ -21,7 +20,7 @@ Deno.test( function flags_optionRequired() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionRequired_noArguments() {
+Deno.test( 'flags optionRequired noArguments', () => {
 
     assertThrows(
         () => parseFlags( [], options ),

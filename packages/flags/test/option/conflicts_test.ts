@@ -1,6 +1,5 @@
 import { parseFlags } from '../../lib/flags.ts';
-import { IParseOptions } from '../../lib/types.ts';
-import { OptionType } from '../../lib/types.ts';
+import { IParseOptions, OptionType } from '../../lib/types.ts';
 import { assertEquals, assertThrows } from '../lib/assert.ts';
 
 const options = <IParseOptions>{
@@ -35,7 +34,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionConflicts_noArguments() {
+Deno.test( 'flags optionConflicts noArguments', () => {
 
     assertThrows(
         () => parseFlags( [], options ),
@@ -44,7 +43,7 @@ Deno.test( function flags_optionConflicts_noArguments() {
     );
 } );
 
-Deno.test( function flags_optionConflicts_type() {
+Deno.test( 'flags optionConflicts type', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-t', 'value' ], options );
 
@@ -53,7 +52,7 @@ Deno.test( function flags_optionConflicts_type() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionConflicts_videoAudioImageType() {
+Deno.test( 'flags optionConflicts videoAudioImageType', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-v', 'value', '-a', 'value', '--image-type', 'value' ], options );
 
@@ -62,7 +61,7 @@ Deno.test( function flags_optionConflicts_videoAudioImageType() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionConflicts_videoTypeDependsOnImageType() {
+Deno.test( 'flags optionConflicts videoTypeDependsOnImageType', () => {
 
     assertThrows(
         () => parseFlags( [ '-v', 'value', '-a', 'value' ], options ),

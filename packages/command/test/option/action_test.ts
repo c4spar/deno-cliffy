@@ -1,7 +1,7 @@
 import { Command } from '../../lib/command.ts';
 import { assertEquals } from '../lib/assert.ts';
 
-Deno.test( async function command_optionAction_action() {
+Deno.test( 'command optionAction action', async () => {
 
     let actionOptions!: any;
     let actionArgs!: string[];

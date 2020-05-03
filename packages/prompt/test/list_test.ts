@@ -1,15 +1,15 @@
-import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { List } from '../prompts/list.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 
-Deno.test( async function prompt_list() {
+Deno.test( 'prompt list: , separator option: ","', async () => {
     console.log();
     List.inject( 'tag1, tag2, tag3' );
     const result: string[] | undefined = await List.prompt( 'message' );
     assertEquals( result, [ 'tag1', 'tag2', 'tag3' ] );
 } );
 
-Deno.test( async function prompt_list() {
+Deno.test( 'prompt list: separator option: " "', async () => {
     console.log();
     List.inject( 'tag1 tag2 tag3' );
     const result: string[] | undefined = await List.prompt( {
@@ -19,7 +19,7 @@ Deno.test( async function prompt_list() {
     assertEquals( result, [ 'tag1', 'tag2', 'tag3' ] );
 } );
 
-Deno.test( async function prompt_list() {
+Deno.test( 'prompt list: separator option: ";"', async () => {
     console.log();
     List.inject( ' tag tag1 ; tag2 ; tag3 ' );
     const result: string[] | undefined = await List.prompt( {
@@ -29,7 +29,7 @@ Deno.test( async function prompt_list() {
     assertEquals( result, [ 'tag tag1', 'tag2', 'tag3' ] );
 } );
 
-Deno.test( async function prompt_list() {
+Deno.test( 'prompt list: separator option: "-"', async () => {
     console.log();
     List.inject( ' tag tag1 -tag2-tag3 ' );
     const result: string[] | undefined = await List.prompt( {
@@ -39,7 +39,7 @@ Deno.test( async function prompt_list() {
     assertEquals( result, [ 'tag tag1', 'tag2', 'tag3' ] );
 } );
 
-Deno.test( async function prompt_confirm_emptyValue() {
+Deno.test( 'prompt list: empty value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         List.inject( '' );
@@ -48,7 +48,7 @@ Deno.test( async function prompt_confirm_emptyValue() {
 } );
 
 // @TODO: add maxLength option to list pormpt
-Deno.test( async function prompt_confirm_nullValue() {
+Deno.test('prompt list: null value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         List.inject( null as any );

@@ -1,7 +1,7 @@
 import { parseFlags } from '../../lib/flags.ts';
 import { assertThrows } from '../lib/assert.ts';
 
-Deno.test( function flags_allowEmpty_enabled() {
+Deno.test( 'flags allowEmpty enabled', () => {
 
     parseFlags( [], {
         allowEmpty: true,
@@ -12,7 +12,7 @@ Deno.test( function flags_allowEmpty_enabled() {
     } );
 } );
 
-Deno.test( function flags_allowEmpty_noFlags() {
+Deno.test( 'flags allowEmpty noFlags', () => {
 
     parseFlags( [], {
         allowEmpty: true,
@@ -20,7 +20,7 @@ Deno.test( function flags_allowEmpty_noFlags() {
     } );
 } );
 
-Deno.test( function flags_allowEmpty_disabledNoFlags() {
+Deno.test( 'flags allowEmpty disabledNoFlags', () => {
 
     parseFlags( [], {
         allowEmpty: false,
@@ -28,7 +28,7 @@ Deno.test( function flags_allowEmpty_disabledNoFlags() {
     } );
 } );
 
-Deno.test( function flags_allowEmpty_disabled() {
+Deno.test( 'flags allowEmpty disabled', () => {
 
     assertThrows(
         () => parseFlags( [], {

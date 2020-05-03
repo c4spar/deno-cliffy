@@ -1,4 +1,4 @@
-import { blue, bold, dim, green, magenta, red, yellow } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { blue, bold, dim, green, magenta, red, yellow } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
 import { Table } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';

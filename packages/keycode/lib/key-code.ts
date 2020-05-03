@@ -1,4 +1,4 @@
-import { decode } from 'https://deno.land/std@v0.41.0/encoding/utf8.ts';
+import { decode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
 import { KeyMap, KeyMapCtrl, KeyMapShift } from './key-codes.ts';
 import { IKey, KeyEvent } from './key-event.ts';
 
@@ -17,7 +17,7 @@ export class KeyCode {
         try {
             return this.parseEscapeSequence( data );
         } catch ( e ) {
-            if ( envPermissionStatus.state === 'granted' && Deno.env().CLIFFY_DEBUG ) {
+            if ( envPermissionStatus.state === 'granted' && Deno.env.get( 'CLIFFY_DEBUG' ) ) {
                 Deno.stderr.writeSync( new TextEncoder().encode( e.toString() + '\n' ) );
             }
         }

@@ -1,22 +1,22 @@
-import { bold, red } from 'https://deno.land/std@v0.41.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
 import { Toggle } from '../prompts/toggle.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 
-Deno.test( async function prompt_toggle_yes() {
+Deno.test( 'prompt toggle: yes', async () => {
     console.log();
     Toggle.inject( 'Yes' );
     const result: boolean | undefined = await Toggle.prompt( 'message' );
     assertEquals( result, true );
 } );
 
-Deno.test( async function prompt_toggle_no() {
+Deno.test( 'prompt toggle: no', async () => {
     console.log();
     Toggle.inject( 'No' );
     const result: boolean | undefined = await Toggle.prompt( 'message' );
     assertEquals( result, false );
 } );
 
-Deno.test( async function prompt_toggle_emptyValue() {
+Deno.test( 'prompt toggle: empty value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Toggle.inject( '' );
@@ -24,7 +24,7 @@ Deno.test( async function prompt_toggle_emptyValue() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_toggle_invalidValue() {
+Deno.test( 'prompt toggle: invalid value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Toggle.inject( 'aaa' );
@@ -32,7 +32,7 @@ Deno.test( async function prompt_toggle_invalidValue() {
     }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
-Deno.test( async function prompt_toggle_nullValue() {
+Deno.test( 'prompt toggle: null value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Toggle.inject( null as any );

@@ -18,7 +18,7 @@ const options = <IParseOptions>{
     } ]
 };
 
-Deno.test( function flags_optionStandalone_flag() {
+Deno.test( 'flags optionStandalone flag', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f' ], options );
 
@@ -27,7 +27,7 @@ Deno.test( function flags_optionStandalone_flag() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_optionStandalone_flagCombine() {
+Deno.test( 'flags optionStandalone flagCombine', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', '-a' ], options ),
@@ -36,7 +36,7 @@ Deno.test( function flags_optionStandalone_flagCombine() {
     );
 } );
 
-Deno.test( function flags_optionStandalone_flagCombineLong() {
+Deno.test( 'flags optionStandalone flagCombineLong', () => {
 
     assertThrows(
         () => parseFlags( [ '--flag', '--all' ], options ),

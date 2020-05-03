@@ -1,7 +1,5 @@
 import camelCase from './camelCase.ts';
 
-const { env } = Deno;
-
 /**
  * Build up the default `inspectOpts` object from the environment variables.
  * Used in `deno.inspect` in node.
@@ -18,7 +16,7 @@ export interface InspectOpts {
 }
 
 export function getInspectOpts(): InspectOpts {
-    const currentEnv = env();
+    const currentEnv = Deno.env.toObject();
     const inspectOpts: InspectOpts = Object
         .keys( currentEnv )
         .filter( key => /^debug_/i.test( key ) )

@@ -7,7 +7,7 @@ const cmd = new Command()
     .option( '-a, --all [value:boolean]', 'description ...' )
     .action( () => {} );
 
-Deno.test( async function command_optionStandalone_flag() {
+Deno.test( 'command optionStandalone flag', async () => {
 
     const { options, args } = await cmd.parse( [ '-f' ] );
 
@@ -15,14 +15,14 @@ Deno.test( async function command_optionStandalone_flag() {
     assertEquals( args, [] );
 } );
 
-Deno.test( async function command_optionStandalone_flagCombine() {
+Deno.test( 'command optionStandalone flagCombine', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', '-a' ] );
     }, Error, 'Option --flag cannot be combined with other options' );
 } );
 
-Deno.test( async function command_optionStandalone_flagCombineLong() {
+Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '--flag', '--all' ] );

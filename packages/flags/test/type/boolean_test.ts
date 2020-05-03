@@ -14,7 +14,7 @@ const options = {
     } ]
 };
 
-Deno.test( function flags_typeBoolean_flag() {
+Deno.test( 'flags typeBoolean flag', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f' ], options );
 
@@ -23,7 +23,7 @@ Deno.test( function flags_typeBoolean_flag() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagLong() {
+Deno.test( 'flags typeBoolean flagLong', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag' ], options );
 
@@ -32,7 +32,7 @@ Deno.test( function flags_typeBoolean_flagLong() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagTrue() {
+Deno.test( 'flags typeBoolean flagTrue', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', 'true' ], options );
 
@@ -41,7 +41,7 @@ Deno.test( function flags_typeBoolean_flagTrue() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagLongTrue() {
+Deno.test( 'flags typeBoolean flagLongTrue', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag', 'true' ], options );
 
@@ -50,7 +50,7 @@ Deno.test( function flags_typeBoolean_flagLongTrue() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagFalse() {
+Deno.test( 'flags typeBoolean flagFalse', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', 'false' ], options );
 
@@ -59,7 +59,7 @@ Deno.test( function flags_typeBoolean_flagFalse() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagLongFalseUnknown() {
+Deno.test( 'flags typeBoolean flagLongFalseUnknown', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag', 'false', 'unknown' ], options );
 
@@ -68,7 +68,7 @@ Deno.test( function flags_typeBoolean_flagLongFalseUnknown() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagTrue() {
+Deno.test( 'flags typeBoolean flagTrue', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', '1' ], options );
 
@@ -77,7 +77,7 @@ Deno.test( function flags_typeBoolean_flagTrue() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagLongTrue() {
+Deno.test( 'flags typeBoolean flagLongTrue', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag', '1' ], options );
 
@@ -86,7 +86,7 @@ Deno.test( function flags_typeBoolean_flagLongTrue() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagFalse() {
+Deno.test( 'flags typeBoolean flagFalse', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', '0' ], options );
 
@@ -95,7 +95,7 @@ Deno.test( function flags_typeBoolean_flagFalse() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagLongFalseUnknown() {
+Deno.test( 'flags typeBoolean flagLongFalseUnknown', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--flag', '0', 'unknown' ], options );
 
@@ -104,7 +104,7 @@ Deno.test( function flags_typeBoolean_flagLongFalseUnknown() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_noFlagUnknown() {
+Deno.test( 'flags typeBoolean noFlagUnknown', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '--no-flag', 'unknown' ], options );
 
@@ -113,7 +113,7 @@ Deno.test( function flags_typeBoolean_noFlagUnknown() {
     assertEquals( literal, [] );
 } );
 
-Deno.test( function flags_typeBoolean_flagInvalidType() {
+Deno.test( 'flags typeBoolean flagInvalidType', () => {
 
     assertThrows(
         () => parseFlags( [ '-f', 'unknown' ], options ),
