@@ -1,3 +1,11 @@
+# [v0.5.1](https://github.com/c4spar/deno-cli/compare/v0.5.0...v0.5.1) (Sun May 3 21:09:49 2020)
+
+### Bug Fixes
+
+* **flags:** default option incompatible with depends option and boolean flag's ([b76a9a7](https://github.com/c4spar/deno-cli/commit/b76a9a7))
+
+
+
 # [v0.5.0](https://github.com/c4spar/deno-cli/compare/v0.4.0...v0.5.0) (Sun May 3 02:11:43 2020)
 
 ### Features
