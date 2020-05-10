@@ -588,21 +588,21 @@ export class BaseCommand {
             return;
         }
 
-        // @TODO: check for permissions and use Deno.env.get()
-        const denoEnv = Deno.env.toObject();
-
-        this.envVars.forEach( ( env: IEnvVariable ) => {
-            const name = env.names.find( name => name in denoEnv );
-            if ( name ) {
-                try {
-                    // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
-                    const parser = this.types[ env.type ];
-                    parser instanceof Type ? parser.parse( { name }, env, denoEnv[ name ] ) : parser( { name }, env, denoEnv[ name ] );
-                } catch ( e ) {
-                    throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ denoEnv[ name ] }` );
+        if ( hasEnvPermissions ) {
+            this.envVars.forEach( ( env: IEnvVariable ) => {
+                const name = env.names.find( name => !!Deno.env.get( name ) );
+                if ( name ) {
+                    const value: string | undefined = Deno.env.get( name );
+                    try {
+                        // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
+                        const parser = this.types[ env.type ];
+                        parser instanceof Type ? parser.parse( { name }, env, value || '' ) : parser( { name }, env, value || '' );
+                    } catch ( e ) {
+                        throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
+                    }
                 }
-            }
-        } );
+            } );
+        }
     }
 
     /**

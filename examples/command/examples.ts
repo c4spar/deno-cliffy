@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno
 
 import { red } from 'https://deno.land/std/fmt/colors.ts';
 import { Command } from '../../packages/command/lib/command.ts';

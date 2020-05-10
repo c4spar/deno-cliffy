@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno
 
 import { Command, Type } from '../../command.ts';
 import { IFlagArgument, IFlagOptions } from '../../flags.ts';

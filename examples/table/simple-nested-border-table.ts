@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno
 
 import { Table } from '../../packages/table/lib/table.ts';
 

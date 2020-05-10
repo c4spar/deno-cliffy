@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno
 
 import { Command } from '../../packages/command/lib/command.ts';
 import { IFlags } from '../../packages/flags/lib/types.ts';
