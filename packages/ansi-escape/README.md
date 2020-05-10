@@ -1,10 +1,30 @@
-# Cliffy - ANSI Escape 
+<h1 align="center">Cliffy ❯ ANSI Escape</h1>
 
-ANSI escape module for handling cli cursor, erase output and scroll window.
+<p align="center">
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://deno.land/">
+    <img alt="Deno version" src="https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:flags?label=issues&logo=github">
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+</p>
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github)
-
-![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
+<p align="center">
+  <b>Control cli cursor, erase output and scroll window.</b></br>
+  <sub>>_ Used by cliffy's <a href="../prompt/">prompt</a> module<sub>
+</p>
 
 ## Usage
 

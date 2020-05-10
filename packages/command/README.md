@@ -1,12 +1,30 @@
-# Cliffy - Command 
+<h1 align="center">Cliffy ❯ Command</h1>
 
-The complete solution for [Deno](https://deno.land/) command-line interfaces, inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md).
+<p align="center">
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://deno.land/">
+    <img alt="Deno version" src="https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:command?label=issues&logo=github">
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+</p>
 
-**WARNING:** This module is still under development. Not all features are fully implemented and it is possible you get some breaking changes if you upgrade to a newer version. If you find a bug or have a feature request feel free to create an issue.
-
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github)
-
-![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
+<p align="center">
+  <b> The complete solution for <a href="https://deno.land/">Deno</a> command-line interfaces </b></br>
+  <sub>>_ Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions <sub>
+</p>
 
 ### ✨ Features
 
@@ -25,7 +43,7 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
 * ⭐️ auto generated help ⭐️
 * ⭐️ out of the box support for shell completion's ⭐️
 
-### Content
+### Table of content
 
 - [Creating a program](#creating-a-program)
 - [Options](#options)

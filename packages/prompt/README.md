@@ -2,19 +2,22 @@
 
 <p align="center">
   <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" alt="version" />
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" alt="release date" />
+    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" />
   </a>
   <a href="https://deno.land/">
     <img src="https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno" alt="deno" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
-    <img src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" alt="build status" />
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:prompt?label=issues&logo=github">
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
-    <img src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" alt="licence" />
+    <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
 </p>
 

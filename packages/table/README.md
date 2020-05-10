@@ -1,8 +1,31 @@
-# Cliffy - Table 
+<h1 align="center">Cliffy ❯ Table </h1>
 
-Render data in table structure with correct indentation and support for multi-line rows.
+<p align="center">
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://deno.land/">
+    <img src="https://img.shields.io/badge/deno-v0.42.0-green?logo=deno" alt="deno" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:table?label=issues&logo=github">
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
+    <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+</p>
 
-![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master)
+<p align="center">
+  <b> Easy solution to render table's on the command line </b></br>
+  <sub>>_ Create cli table's with border, padding, nested table's, etc... <sub>
+</p>
+
 
 ## Usage
 
