@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command, StringType } from '../../command.ts';
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Checkbox, Confirm, Input, Number, Select, Separator } from '../../packages/prompt/mod.ts';
 

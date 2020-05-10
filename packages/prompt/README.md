@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github" alt="release date" />
   </a>
   <a href="https://deno.land/">
-    <img src="https://img.shields.io/badge/deno-v0.42.0-green?logo=deno" alt="deno" />
+    <img src="https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno" alt="deno" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" alt="build status" />

@@ -6,7 +6,7 @@ The complete solution for [Deno](https://deno.land/) command-line interfaces, in
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github) ![GitHub Release Date](https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github)
 
-![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v0.42.0-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
+![Build Status](https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master) ![Deno version](https://img.shields.io/badge/deno-v1.0.0%20rc2-green?logo=deno) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/c4spar/deno-cliffy?logo=github) ![GitHub issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?logo=github) ![GitHub licence](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)
 
 ### ✨ Features
 
@@ -63,7 +63,7 @@ To create a program with cliffy you can import the `Command` class from the clif
 The `Command` class is used to create a new command or sub-command.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -110,7 +110,7 @@ There are three pre defined option types: `boolean`, `number` and `string`. An `
 Type and action are both optional. The type defaults to `boolean` and the action to the type specific action. Action are used for shell completion and will be more explained in the [autocompletion](#autocompletion) section.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -176,7 +176,7 @@ pizza details:
 Each type of option's can be a list of comma seperated items. The default seperator is a `,` and can be changed with the `separator` option.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -204,7 +204,7 @@ $ ./examples/command/03-list-option-type.ts -o "1 2 3"
 There are to ways to declare custom types. The first method is using a function.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 import { IFlagArgument, IFlagOptions, ITypeHandler } from 'https://deno.land/x/cliffy/flags.ts';
@@ -246,7 +246,7 @@ Option --email must be a valid email but got: my @email.de
 The second method to declare a custom type is using a class:
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
 import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags.ts';
@@ -318,7 +318,7 @@ Enabling auto completion is emplained in the [completions command](#completions-
 The last argument of an option can be variadic, and only the last argument. To make an argument variadic you append ... to the argument name. For example:
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -342,7 +342,7 @@ $ ./examples/command/variadic-options.ts -d dir1 dir2 dir3
 You can specify a default value for an option with an optional value.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -366,7 +366,7 @@ cheese: mozzarella
 You may specify a required (mandatory) option.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -388,7 +388,7 @@ You can call the long name from an option with a boolean or an optional value (d
 You can specify a default value for the flag and it can be overridden on command line.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -428,7 +428,7 @@ You ordered a pizza with sauce and parmesan cheese
 Some options can not be call without other options. You can specify depending options with the `depends` option.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -456,7 +456,7 @@ $ ./examples/command/dependend-options.ts -a aac -v x265
 Sometimes some options can not be called together. You can specify conflicting options with the `conflicts` option.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -489,7 +489,7 @@ You may specify a function to do custom processing of option values. The callbac
 This allows you to coerce the option value to the desired type, or accumulate values, or do entirely custom processing.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -544,7 +544,7 @@ $ ./examples/command/custom-option-processing.ts --color blue --color yellow --c
 Standalone options cannot be combine with any command and option. For example the `--help` and `--version` flag. You can achieve this with the `standalone` option.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -562,7 +562,7 @@ Error: Option --standalone cannot be combined with other options.
 ### Specify an action for an option
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -585,7 +585,7 @@ await new Command()
 The action handler is called when the command is executed. It gets passed an object with all options defined by the user and additional arguments which are passed to the command.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -611,7 +611,7 @@ You can specify sub-commands using the `.command()` method. There are three ways
 In the first parameter to `.command()` you specify the command name and any command arguments. The arguments may be `<required>` or `[optional]`, and the last argument may also be variadic.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -661,7 +661,7 @@ The type can be one of:
 or any [custom type](#custom-option-types).
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -678,7 +678,7 @@ console.log( 'directories:', args[2] || "no directories given");
 The last argument of a command can be variadic, and only the last argument. To make an argument variadic you append `...` to the argument name. The variadic argument is passed to the action handler as an array.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -700,7 +700,7 @@ When `.command()` is invoked with a description argument, this tells cliffy that
 You handle the options for an executable (sub)command in the executable, and don't declare them at the top-level.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -718,7 +718,7 @@ await new Command()
 By default cliffy calls `Deno.exit` when it detects errors. You can override this behaviour with the `.throwErrors()` method.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -752,7 +752,7 @@ You can define environment variabels for a command which will be validated when 
 All environment variables will be shown with the [help](#help-option-and-command) option and command.
 
 ```typescript
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno run --allow-env
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -776,7 +776,7 @@ Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
 You can add some examples for your command which will be printed with the [help](#help-option-and-command) option and command.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { red } from 'https://deno.land/std/fmt/colors.ts';
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
@@ -824,7 +824,7 @@ Every instance of the `Command` class has some pre defenied options and sub-comm
 The `--version` and `-V` option flag prints the version number defined with the `version()` method. The version number will also be printed within the output of the [help](#help-option-command) option and command.
 
 ```typescript
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -843,7 +843,7 @@ $ ./examples/command/version-options.ts --version
 The help information is auto-generated based on the information you have defined on your program.
 
 ```typescript
-#!/usr/bin/env -S deno --allow-env
+#!/usr/bin/env -S deno run --allow-env
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 

@@ -1,4 +1,4 @@
-import { BufReader, ReadLineResult } from 'https://deno.land/std@v0.42.0/io/bufio.ts';
+import { BufReader, ReadLineResult } from 'https://deno.land/std@v0.50.0/io/bufio.ts';
 import { KeyCode, KeyEvent } from '../../keycode/mod.ts';
 
 export async function readLineSync(): Promise<string> {

@@ -1,11 +1,13 @@
-import { decode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
+import { decode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
 import { KeyMap, KeyMapCtrl, KeyMapShift } from './key-codes.ts';
 import { IKey, KeyEvent } from './key-event.ts';
 
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = '\x1b';
 
-const envPermissionStatus: Deno.PermissionStatus = await Deno.permissions.query( { name: 'env' } );
+const permissions: any = ( Deno as any ).PermissionStatus;
+const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
+const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 // https://github.com/nodejs/node/blob/v13.13.0/lib/internal/readline/utils.js
@@ -17,7 +19,7 @@ export class KeyCode {
         try {
             return this.parseEscapeSequence( data );
         } catch ( e ) {
-            if ( envPermissionStatus.state === 'granted' && Deno.env.get( 'CLIFFY_DEBUG' ) ) {
+            if ( hasEnvPermissions && Deno.env.get( 'CLIFFY_DEBUG' ) ) {
                 Deno.stderr.writeSync( new TextEncoder().encode( e.toString() + '\n' ) );
             }
         }
@@ -68,7 +70,7 @@ export class KeyCode {
             sequence: undefined,
             ctrl: false,
             meta: false,
-            shift: false,
+            shift: false
         };
 
         if ( ch === kEscape ) {

@@ -1,6 +1,6 @@
 const { stdout, stderr } = Deno;
-import { encode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
-import { dim, red } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
+import { dim, red } from 'https://deno.land/std@v0.50.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
@@ -11,7 +11,9 @@ import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
 import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
 
-const hasEnvPermissions: boolean = ( await Deno.permissions.query( { name: 'env' } ) ).state === 'granted';
+const permissions: any = ( Deno as any ).PermissionStatus;
+const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
+const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 
 /**
  * Map of type's.
@@ -29,7 +31,9 @@ export class BaseCommand {
         boolean: new BooleanType()
     };
     protected rawArgs: string[] = [];
-    protected name: string = location.pathname.split( '/' ).pop() as string;
+    // @TODO: get script name: https://github.com/denoland/deno/pull/5034
+    // protected name: string = location.pathname.split( '/' ).pop() as string;
+    protected name: string = 'COMMAND';
     protected path: string = this.name;
     protected ver: string = '0.0.0';
     protected desc: string = 'No description ...';
@@ -433,6 +437,10 @@ export class BaseCommand {
      * @param dry Execute command after parsed.
      */
     public async parse( args: string[], dry?: boolean ): Promise<IFlagsParseResult> {
+
+        // if ( !this.name ) {
+        //     throw new Error( 'Missing command name' );
+        // }
 
         this.reset();
 

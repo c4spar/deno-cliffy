@@ -1,5 +1,5 @@
-import { encode } from 'https://deno.land/std@v0.42.0/encoding/utf8.ts';
-import { blue, bold, dim, green, red, yellow } from 'https://deno.land/std@v0.42.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
+import { blue, bold, dim, green, red, yellow } from 'https://deno.land/std@v0.50.0/fmt/colors.ts';
 import { AnsiEscape } from '../../ansi-escape/lib/ansi-escape.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import format from '../../x/format.ts';

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno
+#!/usr/bin/env -S deno run
 
 import { Command, Type } from '../../command.ts';
 import { IFlagArgument, IFlagOptions } from '../../flags.ts';
@@ -7,7 +7,7 @@ class EmailType extends Type<string> {
 
     protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    parse( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined {
+    parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
 
         if ( value ) {
             if ( !this.emailRegex.test( value.toLowerCase() ) ) {
@@ -15,7 +15,7 @@ class EmailType extends Type<string> {
             }
         }
 
-        return value || undefined;
+        return value;
     }
 }
 
