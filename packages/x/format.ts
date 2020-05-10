@@ -1,16 +1,14 @@
 // Copied from https://github.com/defunctzombie/node-util/blob/master/util.ts
 // Modified to format %o and %O as deno objects
 const { inspect } = Deno;
-import { getInspectOpts } from './inspector-ops.ts';
 
-const inspectOpts = getInspectOpts();
 const formatRegExp = /%[sdjoO%]/g;
 
 export default function format( ...args: any[] ) {
     if ( typeof args[ 0 ] !== 'string' ) {
         let objects = [];
         for ( let i = 0; i < arguments.length; i++ ) {
-            objects.push( inspect( arguments[ i ], inspectOpts ) );
+            objects.push( inspect( arguments[ i ] ) );
         }
         return objects.join( ' ' );
     }
@@ -38,7 +36,7 @@ export default function format( ...args: any[] ) {
                 }
             case '%o':
             case '%O':
-                return inspect( args[ i++ ], inspectOpts );
+                return inspect( args[ i++ ] );
             default:
                 return x;
         }
