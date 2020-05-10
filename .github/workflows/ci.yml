@@ -29,5 +29,17 @@ jobs:
         curl -fsSL https://deno.land/x/install/install.sh | sh -s ${{ matrix.deno_version }}
         deno -h
 
-    - name: Run test's
-      run: deno test --allow-env
+    - name: Run comand test's
+      run: deno test packages/command
+
+    - name: Run flags test's
+      run: deno test packages/flags
+
+    - name: Run keycode test's
+      run: deno test packages/keycode
+
+    - name: Run prompt test's
+      run: deno test packages/prompt --unstable
+
+    - name: Run table test's
+      run: deno test packages/table
