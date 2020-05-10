@@ -1,3 +1,24 @@
+# [v0.6.0](https://github.com/c4spar/deno-cli/compare/v0.5.1...v0.6.0) (Mon May 11 01:33:23 2020)
+
+### Code Refactoring
+
+* **command:** make command's executable without --allow-env flag #11 ([03117ed](https://github.com/c4spar/deno-cli/commit/03117ed))
+* **x:** make format executable without --allow-env flag #11 ([2db057e](https://github.com/c4spar/deno-cli/commit/2db057e))
+
+### Chore
+
+* add support for deno v1.0.0-rc2 ([acb84e1](https://github.com/c4spar/deno-cli/commit/acb84e1))
+
+### Documentation Updates
+
+* update readme's ([7e549c9](https://github.com/c4spar/deno-cli/commit/7e549c9))
+
+### BREAKING CHANGES
+
+* **prompt:** prompt requires the --unstable flag to work with deno >= v0.42.0 ([6cd9d3f](https://github.com/c4spar/deno-cli/commit/6cd9d3f))
+
+
+
 # [v0.5.1](https://github.com/c4spar/deno-cli/compare/v0.5.0...v0.5.1) (Sun May 3 21:09:49 2020)
 
 ### Bug Fixes
