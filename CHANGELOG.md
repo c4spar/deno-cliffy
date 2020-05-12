@@ -1,3 +1,11 @@
+# [v0.6.1](https://github.com/c4spar/deno-cli/compare/v0.6.0...v0.6.1) (Tue May 12 22:42:37 2020)
+
+### Bug Fixes
+
+* add missing entry files and module exports for prompt & keycode module #19 ([f16863d](https://github.com/c4spar/deno-cli/commit/f16863d))
+
+
+
 # [v0.6.0](https://github.com/c4spar/deno-cli/compare/v0.5.1...v0.6.0) (Mon May 11 01:33:23 2020)
 
 ### Code Refactoring
