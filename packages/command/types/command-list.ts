@@ -8,7 +8,6 @@ export class CommandListType extends StringType {
     }
 
     public complete(): string[] {
-
-        return this.cmd.getCommands().map( ( cmd => cmd.getName() ) );
+        return this.cmd.getCommands().map( cmd => cmd.getName() );
     }
 }

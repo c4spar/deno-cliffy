@@ -33,9 +33,9 @@ export class BaseCommand {
     protected rawArgs: string[] = [];
     // @TODO: get script name: https://github.com/denoland/deno/pull/5034
     // protected name: string = location.pathname.split( '/' ).pop() as string;
-    protected name: string = 'COMMAND';
-    protected path: string = this.name;
-    protected ver: string = '0.0.0';
+    protected _name: string = 'COMMAND';
+    protected _parent?: BaseCommand;
+    protected ver: string = '';
     protected desc: string = 'No description ...';
     protected fn: IAction | undefined;
     protected options: IOption[] = [];
@@ -83,13 +83,8 @@ export class BaseCommand {
 
         const subCommand = ( cmd || new BaseCommand() ).reset();
 
-        subCommand.name = name;
-        subCommand.setPath( this.path );
-        this.throwOnError && subCommand.throwErrors();
-
-        if ( this.ver ) {
-            subCommand.version( this.ver );
-        }
+        subCommand._name = name;
+        subCommand._parent = this;
 
         if ( executableDescription ) {
             subCommand.isExecutable = true;
@@ -171,6 +166,14 @@ export class BaseCommand {
     /********************************************************************************
      **** SUB HANDLER ***************************************************************
      ********************************************************************************/
+
+    /**
+     * Get or set command name.
+     */
+    public name( name: string ): this {
+        this.cmd._name = name;
+        return this;
+    }
 
     /**
      * Set command version.
@@ -279,8 +282,11 @@ export class BaseCommand {
      */
     public throwErrors(): this {
         this.cmd.throwOnError = true;
-        this.getCommands().forEach( cmd => cmd.throwErrors() );
         return this;
+    }
+
+    protected shouldThrowErrors(): boolean {
+        return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
     }
 
     public async getCompletion( action: string ): Promise<string[] | undefined> {
@@ -530,7 +536,7 @@ export class BaseCommand {
      */
     protected async executeExecutable( args: string[] ) {
 
-        const [ main, ...names ] = this.path.split( ' ' );
+        const [ main, ...names ] = this.getPath().split( ' ' );
 
         names.unshift( main.replace( /\.ts$/, '' ) );
 
@@ -664,7 +670,7 @@ export class BaseCommand {
                 if ( this.hasCommands() ) {
                     throw this.error( new Error( `Unknown command: ${ args.join( ' ' ) }` ) );
                 } else {
-                    throw this.error( new Error( `No arguments allowed for command: ${ this.name }` ) );
+                    throw this.error( new Error( `No arguments allowed for command: ${ this._name }` ) );
                 }
             }
 
@@ -802,11 +808,10 @@ export class BaseCommand {
      ********************************************************************************/
 
     /**
-     * Get command name.
+     * Get or set command name.
      */
     public getName(): string {
-
-        return this.name;
+        return this._name;
     }
 
     /**
@@ -814,21 +819,7 @@ export class BaseCommand {
      */
     public getPath(): string {
 
-        return this.path;
-    }
-
-    /**
-     * Set command path.
-     *
-     * @param path Command path.
-     */
-    public setPath( path: string ): this {
-
-        this.path = `${ path } ${ this.name }`;
-
-        this.getCommands().forEach( command => command.setPath( this.path ) );
-
-        return this;
+        return this._parent ? this._parent.getPath() + ' ' + this._name : this._name;
     }
 
     /**
@@ -867,11 +858,10 @@ export class BaseCommand {
     }
 
     /**
-     * Get command arguments.
+     * Get command version.
      */
     public getVersion(): string {
-
-        return this.ver;
+        return this.ver || ( this._parent?.getVersion() ?? '' );
     }
 
     /**
@@ -1104,7 +1094,7 @@ export class BaseCommand {
      */
     public writeError( ...args: any[] ) {
 
-        stderr.writeSync( encode( fill( 2 ) + red( format( `[ERROR:${ this.name }]`, ...args ) ) ) );
+        stderr.writeSync( encode( fill( 2 ) + red( format( `[ERROR:${ this._name }]`, ...args ) ) ) );
     }
 
     /**
@@ -1128,14 +1118,14 @@ export class BaseCommand {
     }
 
     /**
-     * Handle error. If throwOnError is enabled all error's will be thrown, if not `Deno.exit(1)` will be called.
+     * Handle error. If `.throwErrors()` was called all error's will be thrown, otherwise `Deno.exit(1)` will be called.
      *
      * @param error Error to handle.
      * @param showHelp Show help.
      */
     public error( error: Error, showHelp: boolean = true ): Error {
 
-        if ( this.throwOnError ) {
+        if ( this.shouldThrowErrors() ) {
             return error;
         }
 
