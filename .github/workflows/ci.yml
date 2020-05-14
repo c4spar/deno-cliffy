@@ -29,7 +29,7 @@ jobs:
         curl -fsSL https://deno.land/x/install/install.sh | sh -s ${{ matrix.deno_version }}
         deno -h
 
-    - name: Run comand test's
+    - name: Run command test's
       run: deno test packages/command
 
     - name: Run flags test's
