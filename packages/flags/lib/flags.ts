@@ -18,7 +18,7 @@ const Types: IGenericObject<IType<any>> = {
  * @param args  Command line arguments e.g: `Deno.args`
  * @param opts  Parse options.
  */
-export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsResult {
+export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ): IFlagsResult<O> {
 
     !opts.flags && ( opts.flags = [] );
 
@@ -244,7 +244,7 @@ export function parseFlags( args: string[], opts: IParseOptions = {} ): IFlagsRe
         validateFlags( opts.flags, flags, defaultValues, opts.knownFlaks, opts.allowEmpty );
     }
 
-    return { flags, unknown, literal };
+    return { flags: flags as any as O, unknown, literal };
 }
 
 export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {

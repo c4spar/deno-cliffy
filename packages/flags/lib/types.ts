@@ -28,8 +28,8 @@ export type IFlags = IGenericObject<undefined | IFlagValue | IFlagValue[]>;
 /**
  * Parse result.
  */
-export interface IFlagsResult {
-    flags: IFlags;
+export interface IFlagsResult<O = any> {
+    flags: O;
     unknown: string[];
     literal: string[];
 }

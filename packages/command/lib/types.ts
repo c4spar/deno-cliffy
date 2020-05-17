@@ -1,15 +1,15 @@
 import { BaseCommand } from '../../command/lib/base-command.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagValue, IGenericObject, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IFlagValue, IGenericObject, OptionType } from '../../flags/lib/types.ts';
 
 /** Command map. */
-export interface CommandMap {
+export interface CommandMap<O = any> {
     name: string;
     aliases: string[];
-    cmd: BaseCommand;
+    cmd: BaseCommand<O>;
 }
 
 /** Action handler. */
-export type IAction = ( options: any, ...args: any[] ) => void | Promise<void>;
+export type IAction<O> = ( options: O, ...args: any[] ) => void | Promise<void>;
 
 /** Omit key from object. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -25,7 +25,7 @@ export interface IArgumentDetails extends IFlagArgument {
 }
 
 /** Command settings. */
-export interface ICommandOption extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
+export interface ICommandOption<O> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
     'name'>,
     'args'>,
     'type'>,
@@ -34,11 +34,11 @@ export interface ICommandOption extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlag
     'variadic'>,
     'list'> {
     override?: boolean;
-    action?: IAction;
+    action?: IAction<O>;
 }
 
 /** Command option setting's. */
-export interface IOption extends ICommandOption, IFlagOptions {
+export interface IOption<O = any> extends ICommandOption<O>, IFlagOptions {
     description: string,
     flags: string;
     typeDefinition?: string;
@@ -60,10 +60,10 @@ export interface IExample {
 }
 
 /** Result of `cmd.parse()`. */
-export interface IFlagsParseResult {
-    options: IFlags,
+export interface IFlagsParseResult<O> {
+    options: O,
     args: IFlagValue[]
-    cmd: BaseCommand;
+    cmd: BaseCommand<O>;
 }
 
 /** Type parser method. */
@@ -72,12 +72,11 @@ export type ICompleteHandler = () => string[] | Promise<string[]>;
 /** Map of type handlers. */
 export type ICompleteHandlerMap = IGenericObject<ICompleteHandler>
 
-export interface IHelpCommand extends BaseCommand {
-
+export interface IHelpCommand<O = any> extends BaseCommand<O> {
     show( name?: string ): void;
 }
 
-export function isHelpCommand( cmd: BaseCommand ): cmd is IHelpCommand {
+export function isHelpCommand<O = any>( cmd: BaseCommand<O> ): cmd is IHelpCommand<O> {
 
     return typeof ( cmd as any ).show === 'function';
 }
