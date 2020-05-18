@@ -1,5 +1,5 @@
 import { BaseCommand } from '../../command/lib/base-command.ts';
-import { IFlagArgument, IFlagOptions, IFlagValue, IGenericObject, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IGenericObject, OptionType } from '../../flags/lib/types.ts';
 
 /** Command map. */
 export interface CommandMap<O = any> {
@@ -9,7 +9,7 @@ export interface CommandMap<O = any> {
 }
 
 /** Action handler. */
-export type IAction<O> = ( options: O, ...args: any[] ) => void | Promise<void>;
+export type IAction<O, A extends Array<any>> = ( options: O, ...args: A ) => void | Promise<void>;
 
 /** Omit key from object. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -25,7 +25,7 @@ export interface IArgumentDetails extends IFlagArgument {
 }
 
 /** Command settings. */
-export interface ICommandOption<O> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
+export interface ICommandOption<O, A extends Array<any>> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
     'name'>,
     'args'>,
     'type'>,
@@ -34,11 +34,11 @@ export interface ICommandOption<O> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IF
     'variadic'>,
     'list'> {
     override?: boolean;
-    action?: IAction<O>;
+    action?: IAction<O, A>;
 }
 
 /** Command option setting's. */
-export interface IOption<O = any> extends ICommandOption<O>, IFlagOptions {
+export interface IOption<O = any, A extends Array<any> = any> extends ICommandOption<O, A>, IFlagOptions {
     description: string,
     flags: string;
     typeDefinition?: string;
@@ -60,9 +60,9 @@ export interface IExample {
 }
 
 /** Result of `cmd.parse()`. */
-export interface IFlagsParseResult<O> {
+export interface IFlagsParseResult<O, A> {
     options: O,
-    args: IFlagValue[]
+    args: A
     cmd: BaseCommand<O>;
 }
 

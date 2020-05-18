@@ -23,7 +23,7 @@ export type ITypeMap = IGenericObject<Type<any> | ITypeHandler<any>>
 /**
  * Base command implementation without pre configured command's and option's.
  */
-export class BaseCommand<O = any> {
+export class BaseCommand<O = any, A extends Array<any> = any> {
 
     protected types: ITypeMap = {
         string: new StringType(),
@@ -37,8 +37,8 @@ export class BaseCommand<O = any> {
     protected _parent?: BaseCommand;
     protected ver: string = '0.0.0';
     protected desc: string = 'No description ...';
-    protected fn: IAction<O> | undefined;
-    protected options: IOption<O>[] = [];
+    protected fn: IAction<O, A> | undefined;
+    protected options: IOption<O, A>[] = [];
     protected commands: Map<string, CommandMap> = new Map();
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
@@ -210,7 +210,7 @@ export class BaseCommand<O = any> {
      *
      * @param fn Callback method.
      */
-    public action( fn: IAction<O> ): this {
+    public action( fn: IAction<O, A> ): this {
         this.cmd.fn = fn;
         this.reset();
         return this;
@@ -320,8 +320,8 @@ export class BaseCommand<O = any> {
      * @param desc Flag description.
      * @param opts Flag options.
      */
-    public option( flags: string, desc: string, opts?: ICommandOption<O> ): this;
-    public option( flags: string, desc: string, opts?: ICommandOption<O> | IFlagValueHandler ): this {
+    public option( flags: string, desc: string, opts?: ICommandOption<O, A> ): this;
+    public option( flags: string, desc: string, opts?: ICommandOption<O, A> | IFlagValueHandler ): this {
 
         if ( typeof opts === 'function' ) {
             return this.option( flags, desc, { value: opts } );
@@ -335,7 +335,7 @@ export class BaseCommand<O = any> {
 
         const args: IArgumentDetails[] = result.typeDefinition ? this.parseArgsDefinition( result.typeDefinition ) : [];
 
-        const option: IOption<O> = {
+        const option: IOption<O, A> = {
             name: '',
             description: desc,
             args,
@@ -442,7 +442,7 @@ export class BaseCommand<O = any> {
      * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
      * @param dry Execute command after parsed.
      */
-    public async parse( args: string[], dry?: boolean ): Promise<IFlagsParseResult<O>> {
+    public async parse( args: string[], dry?: boolean ): Promise<IFlagsParseResult<O, A>> {
 
         // if ( !this.name ) {
         //     throw new Error( 'Missing command name' );
@@ -464,15 +464,15 @@ export class BaseCommand<O = any> {
                 await this.executeExecutable( this.rawArgs );
             }
 
-            return { options: {} as O, args: this.rawArgs, cmd: this };
+            return { options: {} as O, args: this.rawArgs as any as A, cmd: this };
 
         } else if ( this._useRawArgs ) {
 
             if ( dry ) {
-                return { options: {} as O, args: this.rawArgs, cmd: this };
+                return { options: {} as O, args: this.rawArgs as any as A, cmd: this };
             }
 
-            return await this.execute( {} as O, ...this.rawArgs );
+            return await this.execute( {} as O, ...this.rawArgs as A );
 
         } else {
 
@@ -483,7 +483,7 @@ export class BaseCommand<O = any> {
             this.validateEnvVars();
 
             if ( dry ) {
-                return { options: flags, args: params, cmd: this };
+                return { options: flags, args: params as any as A, cmd: this };
             }
 
             return await this.execute( flags, ...params );
@@ -496,13 +496,13 @@ export class BaseCommand<O = any> {
      * @param options A map of options.
      * @param args Command arguments.
      */
-    protected async execute( options: O, ...args: IFlagValue[] ): Promise<IFlagsParseResult<O>> {
+    protected async execute( options: O, ...args: A ): Promise<IFlagsParseResult<O, A>> {
 
-        const actionOption = this.findActionFlag( options, args );
+        const actionOption = this.findActionFlag( options );
 
         if ( actionOption && actionOption.action ) {
             await actionOption.action( options, ...args );
-            return { options, args, cmd: this };
+            return { options, args: args as any as A, cmd: this };
         }
 
         if ( this.fn ) {
@@ -526,7 +526,7 @@ export class BaseCommand<O = any> {
             }
         }
 
-        return { options, args, cmd: this };
+        return { options, args: args as any as A, cmd: this };
     }
 
     /**
@@ -655,7 +655,7 @@ export class BaseCommand<O = any> {
     /**
      * Match commands and arguments from command line arguments.
      */
-    protected parseArguments( args: string[], flags: O ): IFlagValue[] {
+    protected parseArguments( args: string[], flags: O ): A {
 
         const params: IFlagValue[] = [];
 
@@ -688,7 +688,7 @@ export class BaseCommand<O = any> {
                     }
                 }
 
-                return params;
+                return params as A;
             }
 
             for ( const expectedArg of this.getArguments() ) {
@@ -715,7 +715,7 @@ export class BaseCommand<O = any> {
             }
         }
 
-        return params;
+        return params as A;
     }
 
     /**
@@ -783,9 +783,8 @@ export class BaseCommand<O = any> {
      * Execute help command if help flag is set.
      *
      * @param flags Command options.
-     * @param args Command arguments.
      */
-    protected findActionFlag( flags: O, args: IFlagValue[] ): IOption<O> | undefined {
+    protected findActionFlag( flags: O ): IOption<O, A> | undefined {
 
         const flagNames = Object.keys( flags );
 
