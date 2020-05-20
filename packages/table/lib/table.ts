@@ -1,4 +1,4 @@
-import { encode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
+import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { border } from './border.ts';
 import { Cell, ICell } from './cell.ts';
 import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';

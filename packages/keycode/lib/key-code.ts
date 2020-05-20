@@ -1,4 +1,4 @@
-import { decode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
+import { decode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { KeyMap, KeyMapCtrl, KeyMapShift } from './key-codes.ts';
 import { IKey, KeyEvent } from './key-event.ts';
 
