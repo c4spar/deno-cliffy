@@ -42,7 +42,7 @@ or create a separate file in the ${ dim( italic( 'zsh_completion.d' ) ) } direct
             .default( 'help' )
             .command( 'zsh', new ZshCompletionsCommand( this.parent ) )
             .command( 'bash', new BashCompletionsCommand( this.parent ) )
-            .command( 'complete', new CompleteCommand( this.parent ) )
+            .command( 'complete', new CompleteCommand( this.parent ).hidden() )
             .reset();
     }
 

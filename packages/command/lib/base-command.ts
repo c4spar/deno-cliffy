@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
+import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -52,6 +52,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
     protected args: IArgumentDetails[] = [];
+    protected isHidden: boolean = false;
 
     /**
      * Add new sub-command.
@@ -146,7 +147,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public reset(): this {
         this.cmd = this;
-        this.getCommands().forEach( cmd => cmd.reset() );
+        this.getCommands( true ).forEach( cmd => cmd.reset() );
         return this;
     }
 
@@ -192,6 +193,16 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public description( description: string ): this {
         this.cmd.desc = description;
+        return this;
+    }
+
+    /**
+     * Set command description.
+     *
+     * @param description Short command description.
+     */
+    public hidden(): this {
+        this.cmd.isHidden = true;
         return this;
     }
 
@@ -665,7 +676,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         if ( !this.hasArguments() ) {
 
             if ( args.length ) {
-                if ( this.hasCommands() ) {
+                if ( this.hasCommands( true ) ) {
                     throw this.error( new Error( `Unknown command: ${ args.join( ' ' ) }` ) );
                 } else {
                     throw this.error( new Error( `No arguments allowed for command: ${ this._name }` ) );
@@ -927,25 +938,35 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Checks whether the command has sub-commands or not.
      */
-    public hasCommands(): boolean {
+    public hasCommands( includeHidden?: boolean ): boolean {
 
-        return this.commands.size > 0;
+        if ( includeHidden ) {
+            return this.commands.size > 0;
+        }
+
+        return this.getCommandMaps( includeHidden ).length > 0;
     }
 
     /**
      * Get sub-command maps.
      */
-    public getCommandMaps(): CommandMap[] {
+    public getCommandMaps( includeHidden?: boolean ): CommandMap[] {
 
-        return Array.from( this.commands.values() );
+        const cmds: CommandMap[] = Array.from( this.commands.values() );
+
+        if ( includeHidden ) {
+            return cmds;
+        }
+
+        return cmds.filter( ( { cmd }: CommandMap ) => !cmd.isHidden );
     }
 
     /**
      * Get sub-commands.
      */
-    public getCommands(): BaseCommand[] {
+    public getCommands( includeHidden?: boolean ): BaseCommand[] {
 
-        return this.getCommandMaps().map( cmd => cmd.cmd );
+        return this.getCommandMaps( includeHidden ).map( ( { cmd }: CommandMap ) => cmd );
     }
 
     /**
