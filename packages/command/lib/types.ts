@@ -60,7 +60,7 @@ export interface IExample {
 }
 
 /** Result of `cmd.parse()`. */
-export interface IFlagsParseResult<O, A> {
+export interface IParseResult<O, A> {
     options: O,
     args: A
     cmd: BaseCommand<O>;

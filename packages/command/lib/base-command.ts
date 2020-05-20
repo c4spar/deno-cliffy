@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
+import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -442,7 +442,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
      * @param dry Execute command after parsed.
      */
-    public async parse( args: string[], dry?: boolean ): Promise<IFlagsParseResult<O, A>> {
+    public async parse( args: string[], dry?: boolean ): Promise<IParseResult<O, A>> {
 
         // if ( !this.name ) {
         //     throw new Error( 'Missing command name' );
@@ -496,7 +496,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * @param options A map of options.
      * @param args Command arguments.
      */
-    protected async execute( options: O, ...args: A ): Promise<IFlagsParseResult<O, A>> {
+    protected async execute( options: O, ...args: A ): Promise<IParseResult<O, A>> {
 
         const actionOption = this.findActionFlag( options );
 
