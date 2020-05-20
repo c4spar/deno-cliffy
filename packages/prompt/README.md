@@ -13,7 +13,7 @@
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/ci/badge.svg?branch=master" />
   </a>
-  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
+  <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Aprompt">
     <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:prompt?label=issues&logo=github">
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
