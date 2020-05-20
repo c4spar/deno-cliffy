@@ -1,3 +1,4 @@
+import { encode } from 'https://deno.land/std@v0.50.0/encoding/utf8.ts';
 import { blue, bold, dim, green, magenta, red, yellow } from 'https://deno.land/std@v0.50.0/fmt/colors.ts';
 import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
 import { Table } from '../../table/lib/table.ts';
@@ -27,76 +28,81 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             } );
     }
 
+    public show( name?: string ) {
+        Deno.stdout.writeSync( encode( this.getHelp( name ) ) );
+    }
+
     /**
      * Render help output.
      */
-    public show( name?: string ): void {
+    public getHelp( name?: string ): string {
 
         const cmd: BaseCommand = name ? this.parent.getCommand( name ) : this.parent;
 
+        let output = '';
         const indent = 2;
 
         const renderHelp = () => {
 
             // Header
             renderLine();
-            Table.from( getHeader() )
-                 .indent( indent )
-                 .padding( 1 )
-                 .render();
+            output += Table.from( getHeader() )
+                .indent( indent )
+                .padding( 1 )
+                .toString();
 
             // Description
             if ( cmd.getDescription() ) {
                 renderLabel( 'Description' );
-                Table.from( getDescription() )
-                     .indent( indent * 2 )
-                     .maxCellWidth( 140 )
-                     .padding( 1 )
-                     .render();
+                output += Table.from( getDescription() )
+                    .indent( indent * 2 )
+                    .maxCellWidth( 140 )
+                    .padding( 1 )
+                    .toString();
             }
 
             // Options
             if ( cmd.hasOptions() ) {
                 renderLabel( 'Options' );
-                Table.from( getOptions() )
-                     .padding( [ 2, 2, 1, 2 ] )
-                     .indent( indent * 2 )
-                     .maxCellWidth( [ 60, 60, 80, 60 ] )
-                     .render();
+                output += Table.from( getOptions() )
+                    .padding( [ 2, 2, 1, 2 ] )
+                    .indent( indent * 2 )
+                    .maxCellWidth( [ 60, 60, 80, 60 ] )
+                    .toString();
             }
 
             // Commands
             if ( cmd.hasCommands() ) {
                 renderLabel( 'Commands' );
-                Table.from( getCommands() )
-                     .padding( [ 2, 2, 1, 2 ] )
-                     .indent( indent * 2 )
-                     .render();
+                output += Table.from( getCommands() )
+                    .padding( [ 2, 2, 1, 2 ] )
+                    .indent( indent * 2 )
+                    .toString();
             }
 
             // Environment variables
             if ( cmd.hasEnvVars() ) {
                 renderLabel( 'Environment variables' );
-                Table.from( getEnvVars() )
-                     .padding( 2 )
-                     .indent( indent * 2 )
-                     .render();
+                output += Table.from( getEnvVars() )
+                    .padding( 2 )
+                    .indent( indent * 2 )
+                    .toString();
             }
 
             // Examples
             if ( cmd.hasExamples() ) {
                 renderLabel( 'Examples' );
-                Table.from( getExamples() )
-                     .padding( 1 )
-                     .indent( indent * 2 )
-                     .maxCellWidth( 150 )
-                     .render();
+                output += Table.from( getExamples() )
+                    .padding( 1 )
+                    .indent( indent * 2 )
+                    .maxCellWidth( 150 )
+                    .toString();
             }
 
             renderLine();
         };
 
-        const renderLine = ( ...args: any[] ) => this.log( ...args );
+        const renderLine = ( ...args: any[] ) => output += ( args.length ? ' '.repeat( indent ) + format( ...args ) : '' ) + '\n';
 
         const renderLabel = ( label: string ) => {
             renderLine();
@@ -189,6 +195,8 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         };
 
         renderHelp();
+
+        return output;
     }
 
     /**

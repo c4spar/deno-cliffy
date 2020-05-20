@@ -74,6 +74,7 @@ export type ICompleteHandlerMap = IGenericObject<ICompleteHandler>
 
 export interface IHelpCommand<O = any> extends BaseCommand<O> {
     show( name?: string ): void;
+    getHelp( name?: string ): string;
 }
 
 export function isHelpCommand<O = any>( cmd: BaseCommand<O> ): cmd is IHelpCommand<O> {
