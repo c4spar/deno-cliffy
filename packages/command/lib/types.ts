@@ -34,6 +34,7 @@ export interface ICommandOption<O, A extends Array<any>> extends Omit<Omit<Omit<
     'variadic'>,
     'list'> {
     override?: boolean;
+    hidden?: boolean;
     action?: IAction<O, A>;
 }
 

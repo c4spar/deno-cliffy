@@ -891,18 +891,26 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Checks whether the command has options or not.
      */
-    public hasOptions(): boolean {
+    public hasOptions( includeHidden?: boolean ): boolean {
 
-        return this.options.length > 0;
+        if ( includeHidden ) {
+            return this.options.length > 0;
+        }
+
+        return this.options.filter( opt => !opt.hidden ).length > 0;
     }
 
-    public getOptions(): IOption<O>[] {
+    public getOptions( includeHidden?: boolean ): IOption<O>[] {
 
-        return this.options;
+        if ( includeHidden ) {
+            return this.options;
+        }
+
+        return this.options.filter( opt => !opt.hidden );
     }
 
     /**
-     * Checks whether the command has an option with given name not.
+     * Checks whether the command has an option with given name or not.
      */
     public hasOption( name: string ): boolean {
 
