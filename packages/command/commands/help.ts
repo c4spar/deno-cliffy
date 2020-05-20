@@ -175,14 +175,16 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
 
         const getHints = ( option: IFlagOptions ): string => {
             const hints = [];
-            if ( option.required || option.conflicts ) {
-                option.required && hints.push( yellow( `required` ) );
-                typeof option.default !== 'undefined' && hints.push( blue( bold( `Default: ` ) ) + blue( format( option.default ) ) );
-                option.conflicts && hints.push( red( bold( `conflicts: ` ) ) + option.conflicts.map( conflict => red( conflict ) ).join( ', ' ) );
-            }
+
+            option.required && hints.push( yellow( `required` ) );
+            typeof option.default !== 'undefined' && hints.push( blue( bold( `Default: ` ) ) + blue( format( option.default ) ) );
+            option.depends && option.depends.length && hints.push( red( bold( `depends: ` ) ) + option.depends.map( depends => red( depends ) ).join( ', ' ) );
+            option.conflicts && option.conflicts.length && hints.push( red( bold( `conflicts: ` ) ) + option.conflicts.map( conflict => red( conflict ) ).join( ', ' ) );
+
             if ( hints.length ) {
                 return `(${ hints.join( ', ' ) })`;
             }
+
             return '';
         };
 
