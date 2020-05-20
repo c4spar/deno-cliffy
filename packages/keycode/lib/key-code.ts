@@ -5,7 +5,7 @@ import { IKey, KeyEvent } from './key-event.ts';
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = '\x1b';
 
-const permissions: any = ( Deno as any ).PermissionStatus;
+const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
 const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 

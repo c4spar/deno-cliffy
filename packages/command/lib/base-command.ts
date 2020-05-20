@@ -11,7 +11,7 @@ import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
 import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IFlagsParseResult, IHelpCommand, IOption, isHelpCommand } from './types.ts';
 
-const permissions: any = ( Deno as any ).PermissionStatus;
+const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
 const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 
