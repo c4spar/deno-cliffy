@@ -1,14 +1,13 @@
-#!/usr/bin/env -S deno run
+#!/usr/bin/env -S deno run --unstable
 
-import { Checkbox, Confirm, Input, Number, Select, Separator } from '../../packages/prompt/mod.ts';
+import { Checkbox, Confirm, Input, Number, Select, Toggle } from '../../packages/prompt/mod.ts';
 
 await Confirm.prompt( {
     message: 'Would you like to buy a pizza?'
 } );
 
-await Confirm.prompt( {
-    message: 'Would you like to buy a pizza?',
-    mode: 'legacy'
+await Toggle.prompt( {
+    message: 'Would you like to buy a pizza?'
 } );
 
 await Input.prompt( {
@@ -21,10 +20,10 @@ await Number.prompt( {
 
 await Select.prompt( {
     message: 'Select your pizza?',
-    values: [ 'margherita', 'caprese', new Separator( 'Special' ), 'diavola' ]
+    options: [ 'margherita', 'caprese', Select.separator( 'Special' ), 'diavola' ]
 } );
 
 await Checkbox.prompt( {
     message: `Du you like any extra's?`,
-    values: [ 'mozzarella', 'olive', new Separator( 'Special' ), 'buffalo mozzarella' ]
+    options: [ 'mozzarella', 'olive', Checkbox.separator( 'Special' ), 'buffalo mozzarella' ]
 } );
