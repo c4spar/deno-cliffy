@@ -68,6 +68,7 @@
   - [Override exit handling](#override-exit-handling)
   - [Specify environment variables](#specify-the-argument-syntax)
   - [Specify examples](#specify-examples)
+- [Generic options and arguments](#generic-options-and-arguments)
 - [Default options & commands](#default-options--commands)
   - [Version option](#version-option)
   - [Help option & command](#help-option--command)
@@ -832,6 +833,41 @@ $ ./examples/command/examples.ts help
                   Can have mutliple lines and colors.
 
 ```
+
+## Generic options and arguments
+
+You can define an interface for your command options and a tuple for the command arguments.
+
+Here's how to do that:
+
+```typescript
+#!/usr/bin/env -S deno run
+
+import { Command, IParseResult } from 'https://deno.land/x/cliffy/command.ts';
+
+type Arguments = [ string, string ];
+
+interface Options {
+    name: string;
+    age: number;
+    email?: string;
+}
+
+const result: IParseResult<Options, Arguments> = await new Command<Options, Arguments>()
+    .version( '0.1.0' )
+    .arguments( '<input:string> [output:string]' )
+    .option( '-n, --name <name:string>', 'description ...', { required: true } )
+    .option( '-a, --age <age:number>', 'description ...', { required: true } )
+    .option( '-e, --email <email:string>', 'description ...' )
+    .action( ( options: Options, input: string, output?: string ) => {} )
+    .parse( Deno.args );
+
+const options: Options = result.options;
+const input: string = result.args[ 0 ];
+const output: string | undefined = result.args[ 1 ];
+```
+
+**Example**: `deno run https://deno.land/x/cliffy/examples/command/generic.ts`
 
 ## Default options & commands
 
