@@ -355,6 +355,14 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             ...opts
         };
 
+        if ( option.separator ) {
+            for ( const arg of args ) {
+                if ( arg.list ) {
+                    arg.separator = option.separator;
+                }
+            }
+        }
+
         for ( const part of result.args ) {
 
             const arg = part.trim();
