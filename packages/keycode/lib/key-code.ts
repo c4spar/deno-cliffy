@@ -93,7 +93,7 @@ export class KeyCode {
                 s += ( ch = next() );
 
                 if ( ch >= '0' && ch <= '9' ) {
-                    modifier = ( ch as any >> 0 ) - 1;
+                    modifier = ( ( ch as any ) >> 0 ) - 1;
                     s += ( ch = next() );
                 }
 
@@ -168,10 +168,10 @@ export class KeyCode {
 
                 if ( ( match = cmd.match( /^(\d\d?)(;(\d))?([~^$])$/ ) ) ) {
                     code += match[ 1 ] + match[ 4 ];
-                    modifier = ( match[ 3 ] as any || 1 ) - 1;
+                    modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
                 } else if ( ( match = cmd.match( /^((\d;)?(\d))?([A-Za-z])$/ ) ) ) {
                     code += match[ 4 ];
-                    modifier = ( match[ 3 ] as any || 1 ) - 1;
+                    modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
                 } else {
                     code += cmd;
                 }
@@ -247,11 +247,12 @@ export class KeyCode {
     }
 }
 
-function charLengthAt( str: string, i: number ) {
-    if ( str.length <= i ) {
+function charLengthAt( str: string, i: number ): number {
+    const pos: number | undefined = str.codePointAt( i );
+    if ( typeof pos === 'undefined' ) {
         // Pretend to move to the right. This is necessary to autocomplete while
         // moving to the right.
         return 1;
     }
-    return str.codePointAt( i ) as number >= kUTF16SurrogateThreshold ? 2 : 1;
+    return pos >= kUTF16SurrogateThreshold ? 2 : 1;
 }
