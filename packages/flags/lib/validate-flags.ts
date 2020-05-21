@@ -48,7 +48,9 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, defaultVal
             if ( keys.length > 1 ) {
 
                 // dont't throw an error if all values are coming from the default option.
-                if ( options.every( ( { option } ) => option && ( option.standalone || defaultValues[ option.name ] ) ) ) {
+                if ( options.every( ( { option: opt } ) => opt &&
+                    ( option === opt || defaultValues[ opt.name ] ) )
+                ) {
                     return;
                 }
 
