@@ -19,8 +19,9 @@ interface IFlagOptionsMap {
  * @param knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
  */
-export function validateFlags( flags: IFlagOptions[], values: IFlags, defaultValues: IGenericObject<boolean> = {}, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
+export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
 
+    const defaultValues: IGenericObject<boolean> = {};
     // Set default value's
     for ( const option of flags ) {
         const name: string = camelCase( option.name );

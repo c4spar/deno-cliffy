@@ -29,7 +29,6 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     let negate = false;
 
     const flags: IFlags = {};
-    const defaultValues: IGenericObject<boolean> = {};
     const literal: string[] = [];
     const unknown: string[] = [];
 
@@ -112,7 +111,6 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
 
                 if ( typeof option.default !== 'undefined' ) {
                     flags[ friendlyName ] = typeof option.default === 'function' ? option.default() : option.default;
-                    defaultValues[ friendlyName ] = true;
                 } else if ( option.args && option.args[ 0 ].optionalValue ) {
                     flags[ friendlyName ] = true;
                 } else {
@@ -241,7 +239,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     }
 
     if ( opts.flags && opts.flags.length ) {
-        validateFlags( opts.flags, flags, defaultValues, opts.knownFlaks, opts.allowEmpty );
+        validateFlags( opts.flags, flags, opts.knownFlaks, opts.allowEmpty );
     }
 
     return { flags: flags as any as O, unknown, literal };
