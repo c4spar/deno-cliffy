@@ -688,13 +688,14 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             if ( !args.length ) {
 
                 const required = this.getArguments()
-                                     .filter( expectedArg => !expectedArg.optionalValue )
-                                     .map( expectedArg => expectedArg.name );
+                    .filter( expectedArg => !expectedArg.optionalValue )
+                    .map( expectedArg => expectedArg.name );
 
                 if ( required.length ) {
                     const flagNames: string[] = Object.keys( flags );
-                    const isStandaloneOption: boolean | undefined = flagNames.length === 1 && this.getOption( flagNames[ 0 ] )?.standalone;
-                    if ( required.length && !isStandaloneOption ) {
+                    const hasStandaloneOption: boolean = !!flagNames.find( name => this.getOption( name )?.standalone );
+
+                    if ( !hasStandaloneOption ) {
                         throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
                     }
                 }
@@ -883,9 +884,9 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     public getShortDescription(): string {
 
         return this.getDescription()
-                   .trim()
-                   .split( '\n' )
-                   .shift() as string;
+            .trim()
+            .split( '\n' )
+            .shift() as string;
     }
 
     /**
