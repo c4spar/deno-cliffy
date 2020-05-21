@@ -55,6 +55,7 @@
   - [Default option value](#default-option-value)
   - [Required options](#required-options)
   - [Negatable options](#negatable-options)
+  - [Global options](#global-options)
   - [Options which depends on other options](#options-which-depends-on-other-options)
   - [Options which conflicts with other options](#options-which-conflicts-with-other-options)
   - [Custom option processing](#custom-option-processing)
@@ -452,6 +453,38 @@ You ordered a pizza with no sauce and no cheese
 
 $ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --cheese parmesan
 You ordered a pizza with sauce and parmesan cheese
+```
+
+### Global options
+
+To share options with child commands with the `global` option.
+
+```typescript
+#!/usr/bin/env -S deno run
+
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .version( '0.1.0' )
+    .option( '-l, --local [val:string]', 'Only available on this command.' )
+    .option( '-g, --global [val:string]', 'Available on this and all nested child command\'s.', { global: true } )
+    .action( console.log )
+
+    .command( 'command1', new Command()
+        .description( 'Some sub command.' )
+        .action( console.log )
+
+        .command( 'command2', new Command()
+            .description( 'Some nested sub command.' )
+            .action( console.log )
+        )
+    )
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/global-options.ts command1 command2 -g test
+{ global: "test" }
 ```
 
 ### Options which depends on other options

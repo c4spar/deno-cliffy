@@ -214,12 +214,12 @@ function _${ snakeCase( command.getPath() ) }() {`
         const baseName: string = cmdArgs.shift() as string;
         const completionsPath: string = cmdArgs.join( ' ' );
 
-        const excluded: string[] = command.getOptions()
-                                          .map( option => option.standalone ? option.flags.split( /[, ] */g ) : false )
-                                          .flat()
-                                          .filter( flag => typeof flag === 'string' ) as string[];
+        const excluded: string[] = command.getOptions( false )
+            .map( option => option.standalone ? option.flags.split( /[, ] */g ) : false )
+            .flat()
+            .filter( flag => typeof flag === 'string' ) as string[];
 
-        for ( const option of command.getOptions() ) {
+        for ( const option of command.getOptions( false ) ) {
 
             const optExcluded = option.conflicts ? [ ...excluded, ...option.conflicts ] : excluded;
 

@@ -332,8 +332,8 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * @param desc Flag description.
      * @param opts Flag options.
      */
-    public option( flags: string, desc: string, opts?: ICommandOption<O, A> ): this;
-    public option( flags: string, desc: string, opts?: ICommandOption<O, A> | IFlagValueHandler ): this {
+    public option( flags: string, desc: string, opts?: ICommandOption ): this;
+    public option( flags: string, desc: string, opts?: ICommandOption | IFlagValueHandler ): this {
 
         if ( typeof opts === 'function' ) {
             return this.option( flags, desc, { value: opts } );
@@ -347,7 +347,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const args: IArgumentDetails[] = result.typeDefinition ? this.parseArgsDefinition( result.typeDefinition ) : [];
 
-        const option: IOption<O, A> = {
+        const option: IOption = {
             name: '',
             description: desc,
             args,
@@ -383,7 +383,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
                 option.aliases.push( name );
             }
 
-            if ( this.cmd.getOption( name ) ) {
+            if ( this.cmd.getBaseOption( name, true ) ) {
                 if ( opts?.override ) {
                     this.removeOption( name );
                 } else {
@@ -598,7 +598,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
                 stopEarly,
                 knownFlaks,
                 allowEmpty: this._allowEmpty,
-                flags: this.options,
+                flags: this.getOptions( true ),
                 parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => {
                     const parser = this.types[ type ];
                     return parser instanceof Type ? parser.parse( option, arg, nextValue ) : parser( option, arg, nextValue );
@@ -698,7 +698,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
                 if ( required.length ) {
                     const flagNames: string[] = Object.keys( flags );
-                    const hasStandaloneOption: boolean = !!flagNames.find( name => this.getOption( name )?.standalone );
+                    const hasStandaloneOption: boolean = !!flagNames.find( name => this.getOption( name, true )?.standalone );
 
                     if ( !hasStandaloneOption ) {
                         throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
@@ -801,13 +801,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param flags Command options.
      */
-    protected findActionFlag( flags: O ): IOption<O, A> | undefined {
+    protected findActionFlag( flags: O ): IOption | undefined {
 
         const flagNames = Object.keys( flags );
 
         for ( const flag of flagNames ) {
 
-            const option = this.getOption( flag );
+            const option = this.getOption( flag, true );
 
             if ( option?.action ) {
                 return option;
@@ -904,40 +904,106 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Checks whether the command has options or not.
      */
-    public hasOptions( includeHidden?: boolean ): boolean {
+    public hasOptions( hidden?: boolean ): boolean {
 
-        if ( includeHidden ) {
-            return this.options.length > 0;
-        }
-
-        return this.options.filter( opt => !opt.hidden ).length > 0;
+        return this.getOptions( hidden ).length > 0;
     }
 
-    public getOptions( includeHidden?: boolean ): IOption<O>[] {
+    public getOptions( hidden?: boolean ): IOption[] {
 
-        if ( includeHidden ) {
-            return this.options;
+        return this.getGlobalOptions( hidden ).concat( this.getBaseOptions( hidden ) );
+    }
+
+    public getBaseOptions( hidden?: boolean ): IOption[] {
+
+        if ( !this.options.length ) {
+            return [];
         }
 
-        return this.options.filter( opt => !opt.hidden );
+        return hidden ? this.options.slice( 0 ) : this.options.filter( opt => !opt.hidden );
+    }
+
+    public getGlobalOptions( hidden?: boolean ): IOption[] {
+
+        const getOptions = ( cmd: BaseCommand | undefined, options: IOption[] = [], names: string[] = [] ): IOption[] => {
+
+            if ( cmd && cmd.options.length ) {
+
+                cmd.options.forEach( ( option: IOption ) => {
+                    if (
+                        option.global &&
+                        !this.options.find( opt => opt.name === option.name ) &&
+                        names.indexOf( option.name ) === -1 &&
+                        ( hidden || !option.hidden )
+                    ) {
+                        names.push( option.name );
+                        options.push( option );
+                    }
+                } );
+
+                return getOptions( cmd._parent, options, names );
+            }
+
+            return options;
+        };
+
+        return getOptions( this._parent );
     }
 
     /**
      * Checks whether the command has an option with given name or not.
+     *
+     * @param name Name of the option. Must be in param-case.
+     * @param hidden Include hidden options.
      */
-    public hasOption( name: string ): boolean {
+    public hasOption( name: string, hidden?: boolean ): boolean {
 
-        return !!this.getOption( name );
+        return !!this.getOption( name, hidden );
     }
 
     /**
      * Get option by name.
      *
      * @param name Name of the option. Must be in param-case.
+     * @param hidden Include hidden options.
      */
-    public getOption( name: string ): IOption<O> | undefined {
+    public getOption( name: string, hidden?: boolean ): IOption | undefined {
 
-        return this.options.find( option => option.name === name );
+        return this.getBaseOption( name, hidden ) ?? this.getGlobalOption( name, hidden );
+    }
+
+    /**
+     * Get base option by name.
+     *
+     * @param name Name of the option. Must be in param-case.
+     * @param hidden Include hidden options.
+     */
+    public getBaseOption( name: string, hidden?: boolean ): IOption | undefined {
+
+        const option = this.options.find( option => option.name === name );
+
+        return option && ( hidden || !option.hidden ) ? option : undefined;
+    }
+
+    /**
+     * Get global option from parent command's by name.
+     *
+     * @param name Name of the option. Must be in param-case.
+     * @param hidden Include hidden options.
+     */
+    public getGlobalOption( name: string, hidden?: boolean ): IOption | undefined {
+
+        if ( !this._parent ) {
+            return;
+        }
+
+        let option: IOption | undefined = this._parent.getBaseOption( name, hidden );
+
+        if ( !option || !option.global ) {
+            return this._parent.getGlobalOption( name, hidden );
+        }
+
+        return option;
     }
 
     /**
@@ -945,7 +1011,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param name Name of the option. Must be in param-case.
      */
-    public removeOption( name: string ): IOption<O> | undefined {
+    public removeOption( name: string ): IOption | undefined {
 
         const index = this.options.findIndex( option => option.name === name );
 
@@ -959,23 +1025,23 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Checks whether the command has sub-commands or not.
      */
-    public hasCommands( includeHidden?: boolean ): boolean {
+    public hasCommands( hidden?: boolean ): boolean {
 
-        if ( includeHidden ) {
+        if ( hidden ) {
             return this.commands.size > 0;
         }
 
-        return this.getCommands( includeHidden ).length > 0;
+        return this.getCommands( hidden ).length > 0;
     }
 
     /**
      * Get sub-commands.
      */
-    public getCommands( includeHidden?: boolean ): BaseCommand[] {
+    public getCommands( hidden?: boolean ): BaseCommand[] {
 
         const cmds: BaseCommand[] = Array.from( this.commands.values() );
 
-        if ( includeHidden ) {
+        if ( hidden ) {
             return cmds;
         }
 

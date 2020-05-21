@@ -18,7 +18,7 @@ export interface IArgumentDetails extends IFlagArgument {
 }
 
 /** Command settings. */
-export interface ICommandOption<O, A extends Array<any>> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
+export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
     'name'>,
     'args'>,
     'type'>,
@@ -28,6 +28,7 @@ export interface ICommandOption<O, A extends Array<any>> extends Omit<Omit<Omit<
     'list'> {
     override?: boolean;
     hidden?: boolean;
+    global?: boolean;
     action?: IAction<O, A>;
 }
 
@@ -54,7 +55,7 @@ export interface IExample {
 }
 
 /** Result of `cmd.parse()`. */
-export interface IParseResult<O, A> {
+export interface IParseResult<O = any, A extends Array<any> = any> {
     options: O,
     args: A
     cmd: BaseCommand<O>;

@@ -128,7 +128,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         const getOptions = (): string[][] => {
 
             return [
-                ...cmd.getOptions().map( ( option: IOption ) => [
+                ...cmd.getOptions( false ).map( ( option: IOption ) => [
                     option.flags.split( /,? +/g ).map( flag => blue( flag ) ).join( ', ' ),
                     this.highlight( option.typeDefinition || '' ),
                     red( bold( '-' ) ),
