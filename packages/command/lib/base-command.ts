@@ -461,11 +461,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
      * @param dry Execute command after parsed.
      */
-    public async parse( args: string[], dry?: boolean ): Promise<IParseResult<O, A>> {
-
-        // if ( !this.name ) {
-        //     throw new Error( 'Missing command name' );
-        // }
+    public async parse( args: string[] = Deno.args, dry?: boolean ): Promise<IParseResult<O, A>> {
 
         this.reset();
 
