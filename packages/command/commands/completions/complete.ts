@@ -1,3 +1,4 @@
+import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { IFlags } from '../../../flags/lib/types.ts';
 import { BaseCommand } from '../../lib/base-command.ts';
 import { DefaultCommand } from '../../lib/default-command.ts';
@@ -29,7 +30,7 @@ export class CompleteCommand extends DefaultCommand {
                 const result: string[] = await cmd.getCompletion( action ) || [];
 
                 if ( result && result.length ) {
-                    Deno.stdout.writeSync( new TextEncoder().encode( result.join( ' ' ) ) );
+                    Deno.stdout.writeSync( encode( result.join( ' ' ) ) );
                 }
             } )
             .default( 'help' )

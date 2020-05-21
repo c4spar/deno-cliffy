@@ -1,9 +1,10 @@
-import { BufReader, ReadLineResult } from 'https://deno.land/std@v0.52.0/io/bufio.ts';
+import { decode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
+import { BufReader } from 'https://deno.land/std@v0.52.0/io/bufio.ts';
 import { KeyCode, KeyEvent } from '../../keycode/mod.ts';
 
-export async function readLineSync(): Promise<string> {
+export async function readLineSync(): Promise<string | undefined> {
     const result = await new BufReader( Deno.stdin ).readLine();
-    return new TextDecoder().decode( ( <ReadLineResult>result ).line );
+    return result ? decode( result.line ) : undefined;
 }
 
 export async function readCharSync(): Promise<Uint8Array | undefined> {
