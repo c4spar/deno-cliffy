@@ -59,11 +59,13 @@
   - [Options which conflicts with other options](#options-which-conflicts-with-other-options)
   - [Custom option processing](#custom-option-processing)
   - [Standalone options](#standalone-options)
+  - [Hidden options](#hidden-options)
   - [Specify an action for an option](#specify-an-action-for-an-option)
 - [Commands](#commands)
   - [Action handler](#action-handler)
   - [Sub-commands](#sub-commands)
   - [Specify the argument syntax](#specify-the-argument-syntax)
+  - [Hidden commands](#hidden-commands)
   - [Git-style executable sub-commands](#git-style-executable-sub-commands)
   - [Override exit handling](#override-exit-handling)
   - [Specify environment variables](#specify-the-argument-syntax)
@@ -578,6 +580,22 @@ $ ./examples/command/standalone-option.ts --standalone --other
 Error: Option --standalone cannot be combined with other options.
 ```
 
+### Hidden options
+
+To exclude option's from the help and completion command's you can use the `hidden` option.
+
+```typescript
+#!/usr/bin/env -S deno run
+
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .option( '-H, --hidden [hidden:boolean]', 'Nobody knows about me!', { hidden: true } )
+    .parse( Deno.args );
+```
+
+**Example:** `deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h`
+
 ### Specify an action for an option
 
 ```typescript
@@ -711,6 +729,23 @@ await new Command()
     } )
     .parse( Deno.args );
 ```
+
+### Hidden commands
+
+To exclude commands's from the help and completion command's you can use the `.hidden()` method.
+
+```typescript
+#!/usr/bin/env -S deno run
+
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .command( 'top-secret', 'Nobody knows about me!' )
+    .hidden()
+    .parse( Deno.args );
+```
+
+**Example:** `deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h`
 
 ### Git-style executable sub-commands
 
@@ -867,7 +902,7 @@ const input: string = result.args[ 0 ];
 const output: string | undefined = result.args[ 1 ];
 ```
 
-**Example**: `deno run https://deno.land/x/cliffy/examples/command/generic.ts`
+**Example:** `deno run https://deno.land/x/cliffy/examples/command/generic.ts`
 
 ## Default options & commands
 
