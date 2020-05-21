@@ -431,7 +431,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             throw this.error( new Error( `Environment variable already exists: ${ name }` ) );
         }
 
-        const details = this.parseArgsDefinition( result.typeDefinition );
+        const details: IArgumentDetails[] = this.parseArgsDefinition( result.typeDefinition );
 
         if ( details.length > 1 ) {
             throw this.error( new Error( `An environment variable can only have one value but got: ${ name }` ) );
@@ -444,7 +444,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.cmd.envVars.push( {
             names: result.args,
             description,
-            type: result.typeDefinition,
+            type: details[ 0 ].type,
             details: details.shift() as IArgumentDetails
         } );
 
