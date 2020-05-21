@@ -1,3 +1,50 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (Fri May 22 01:11:03 2020)
+
+### Features
+
+* **command:** add support for hidden options's #23 ([42f701f](https://github.com/c4spar/deno-cli/commit/42f701f))
+* **command:** add support for hidden command's #22 ([1866b75](https://github.com/c4spar/deno-cli/commit/1866b75))
+* **command:** add `.getHelp()` method to `HelpCommand` ([9b96d10](https://github.com/c4spar/deno-cli/commit/9b96d10))
+* **command:** add `.name()` method and refactor internal name and path handling (#21) ([362d8ea](https://github.com/c4spar/deno-cli/commit/362d8ea))
+* **command:** make arguments generic ([8a153a7](https://github.com/c4spar/deno-cli/commit/8a153a7))
+* **command,flags:** make options generic ([09a3d00](https://github.com/c4spar/deno-cli/commit/09a3d00))
+
+### Bug Fixes
+
+* **command:** environment variables are always invalid ([fa131eb](https://github.com/c4spar/deno-cli/commit/fa131eb))
+* **command:** separator option is ignored ([0405244](https://github.com/c4spar/deno-cli/commit/0405244))
+* **command:** default option incompatible with standalone option ([e9e6aa5](https://github.com/c4spar/deno-cli/commit/e9e6aa5))
+* **command:** depends info is not shown in help output ([0e2e860](https://github.com/c4spar/deno-cli/commit/0e2e860))
+* **command,keycode:** `CLIFFY_DEBUG` does not work ([4e90d77](https://github.com/c4spar/deno-cli/commit/4e90d77))
+* **flags:** standalone option could be combined with options whose value is optional and has a default value ([5cd8287](https://github.com/c4spar/deno-cli/commit/5cd8287))
+* **flags:** standalone option could be combined with another standalone option ([cb91b85](https://github.com/c4spar/deno-cli/commit/cb91b85))
+* **keycode:** fix compile error which happened with deno v1.0.1 ([dcfa470](https://github.com/c4spar/deno-cli/commit/dcfa470))
+* **keycode:** remove doublicate export of `IGenericObject` ([28fd483](https://github.com/c4spar/deno-cli/commit/28fd483))
+
+### Code Refactoring
+
+* use encoding/utf8 for text encoding ([81d4b04](https://github.com/c4spar/deno-cli/commit/81d4b04))
+
+### Chore
+
+* **ci:** fix typo ([33ca82c](https://github.com/c4spar/deno-cli/commit/33ca82c))
+* **ci:** update deno version to v1.0.1 ([2f25d8b](https://github.com/c4spar/deno-cli/commit/2f25d8b), [fd98c80](https://github.com/c4spar/deno-cli/commit/fd98c80), [15f55ae](https://github.com/c4spar/deno-cli/commit/15f55ae))
+* **deno:** update deno/std to v0.52.0 ([4b354cd](https://github.com/c4spar/deno-cli/commit/4b354cd))
+
+### Documentation Updates
+
+* fix issues link ([c64282e](https://github.com/c4spar/deno-cli/commit/c64282e))
+* **command:** add executable example commands ([8fbe263](https://github.com/c4spar/deno-cli/commit/8fbe263))
+* **command:** add documentation and example's for hidden command's and option's ([0c2f400](https://github.com/c4spar/deno-cli/commit/0c2f400))
+* **command:** add generic types example and documentation ([0998f55](https://github.com/c4spar/deno-cli/commit/0998f55))
+* **prompt:** fix prompt example ([90f8595](https://github.com/c4spar/deno-cli/commit/90f8595))
+
+### BREAKING CHANGES
+
+* **command:** rename `IFlagsParseResult` to `IParseResult` ([eaeb634](https://github.com/c4spar/deno-cli/commit/eaeb634))
+
+
+
 # [v0.6.1](https://github.com/c4spar/deno-cli/compare/v0.6.0...v0.6.1) (Tue May 12 22:42:37 2020)
 
 ### Bug Fixes
