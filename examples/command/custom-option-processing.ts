@@ -3,14 +3,10 @@
 import { Command } from '../../packages/command/lib/command.ts';
 
 const { options } = await new Command()
-    .option( '-f, --float <value:number>', 'float argument' )
-    .option( '-i, --integer <value:number>', 'integer argument' )
-    .option( '-v, --variadic <value...:string>', 'repeatable value' )
-    .option( '-l, --list <items:string[]>', 'comma separated list' )
     .option( '-o, --object <item:string>', 'map string to object', ( value: string ): { value: string } => {
         return { value };
     } )
-    .option( '-C, --color <item:string>', 'map string to object', {
+    .option( '-C, --color <item:string>', 'collect colors', {
         collect: true,
         value: ( value: string, previous: string[] = [] ): string[] => {
 

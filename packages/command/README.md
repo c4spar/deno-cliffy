@@ -169,21 +169,21 @@ if ( options.amount ) {
 ```
 
 ```
-$ ./examples/command/common-option-types.ts -d
-{ debug: true, small: undefined, pizzaType: undefined }
+$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -d
+{ debug: true }
 pizza details:
 
-$ ./examples/command/common-option-types.ts -p
+$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -p
 Error: Missing value for option: --pizza-type
 
-$ ./examples/command/common-option-types.ts -ds -p vegetarian
-{ debug: true, small: true, pizzaType: 'vegetarian' }
+$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -ds -p vegetarian
+{ debug: true, small: true, pizzaType: "vegetarian" }
 pizza details:
 - small pizza size
 - vegetarian
 
-$ ./examples/command/common-option-types.ts --pizza-type cheese --amount 2 --notes "notes ..."
-{ pizzaType: "cheese", amount: 2, notes: "notes ...", debug: true }
+$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -d --pizza-type cheese --amount 2 --notes "notes ..."
+{ debug: true, pizzaType: "cheese", amount: 2, notes: "notes ..." }
 pizza details:
 - cheese
 - 2 pieces
@@ -212,11 +212,11 @@ console.log( options );
 ```
 
 ```
-$ ./examples/command/03-list-option-type.ts -l 1,2,3
-{ list: [1, 2, 3] }
+$ deno run https://deno.land/x/cliffy/examples/command/list-option-type.ts -l 1,2,3
+{ list: [ 1, 2, 3 ] }
 
-$ ./examples/command/03-list-option-type.ts -o "1 2 3"
-{ list: [1, 2, 3] }
+$ deno run https://deno.land/x/cliffy/examples/command/list-option-type.ts -o "1 2 3"
+{ otherList: [ "1", "2", "3" ] }
 ```
 
 
@@ -255,12 +255,12 @@ console.log( options );
 ```
 
 ```
-$ ./examples/command/custom-option-type.ts -e my@email.de
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my@email.de"
 { email: "my@email.de" }
 ```
 
 ```
-$ ./examples/command/custom-option-type.ts -e "my @email.de"
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my @email.de"
 Option --email must be a valid email but got: my @email.de
 ```
 
@@ -293,6 +293,16 @@ await new Command()
     .type( 'email', new EmailType() )
     .parse( Deno.args );
 
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my@email.de"
+{ email: "my@email.de" }
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my @email.de"
+Option --email must be a valid email but got: my @email.de
 ```
 
 
@@ -332,7 +342,7 @@ await new Command()
     .parse( Deno.args );
 ```
 
-Enabling auto completion is emplained in the [completions command](#completions-command) section.
+Enabling auto completion is explained in the [completions command](#completions-command) section.
 
 ### Variadic options
 
@@ -354,7 +364,7 @@ console.log( options );
 The variadic option is returned as an array.
 
 ```
-$ ./examples/command/variadic-options.ts -d dir1 dir2 dir3
+$ deno run https://deno.land/x/cliffy/examples/command/variadic-options.ts -d dir1 dir2 dir3
 { dir: [ "dir1", "dir2", "dir3" ] }
 ```
 
@@ -375,10 +385,10 @@ console.log( `cheese: ${options.cheese}` );
 ```
 
 ```
-$ ./examples/command/default-option-value.ts
+$ deno run https://deno.land/x/cliffy/examples/command/default-option-value.ts
 cheese: blue
 
-$ ./examples/command/default-option-value.ts --cheese mozzarella
+$ deno run https://deno.land/x/cliffy/examples/command/default-option-value.ts --cheese mozzarella
 cheese: mozzarella
 ```
 
@@ -398,8 +408,8 @@ await new Command()
 ```
 
 ```
-$ ./examples/command/required-options.ts
-Error: Missing required option: --cheese
+$ deno run https://deno.land/x/cliffy/examples/command/required-options.ts
+Missing required option: --cheese
 ```
 
 ### Negatable options
@@ -425,22 +435,22 @@ console.log( `You ordered a pizza with ${ sauceStr } and ${ cheeseStr }` );
 ```
 
 ```
-$ ./examples/command/negatable-options.ts
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts
 You ordered a pizza with sauce and mozzarella cheese
 
-$ ./examples/command/negatable-options.ts --cheese
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts  --cheese
 You ordered a pizza with sauce and mozzarella cheese
 
-$ ./examples/command/negatable-options.ts --sauce
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts  --sauce
 You ordered a pizza with sauce and mozzarella cheese
 
-$ ./examples/command/negatable-options.ts --cheese blue
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --cheese blue
 You ordered a pizza with sauce and blue cheese
 
-$ ./examples/command/negatable-options.ts --no-sauce --no-cheese
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --no-sauce --no-cheese
 You ordered a pizza with no sauce and no cheese
 
-$ ./examples/command/negatable-options.ts --cheese parmesan
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --cheese parmesan
 You ordered a pizza with sauce and parmesan cheese
 ```
 
@@ -462,14 +472,14 @@ console.log( options );
 ```
 
 ```
-$ ./examples/command/dependend-options.ts -a aac
-{ audioCodec: "mp3" }
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac
+{ audioCodec: "aac" }
 
-$ ./examples/command/dependend-options.ts -v x265
-Error: Option --video-codec depends on option: --audio-codec
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -v x265
+Option --video-codec depends on option: --audio-codec
 
-$ ./examples/command/dependend-options.ts -a aac -v x265
-{ audioCodec: "mp3", videoCodec: "x265" }
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac -v x265
+{ audioCodec: "aac", videoCodec: "x265" }
 ```
 
 ### Options which conflicts with other options
@@ -490,22 +500,24 @@ console.log( options );
 ```
 
 ```
-$ ./examples/command/conflicting-options.ts -f file1
+$ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -f file1
 { file: "file1" }
 
-$ ./examples/command/conflicting-options.ts -i
+$ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -i
 { stdin: true }
 
-$ ./examples/command/conflicting-options.ts -f file1 -i
+$ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -f file1 -i
 Error: Option --stdin conflicts with option: --file
 
-$ ./examples/command/conflicting-options.ts -if file1
+$ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -if file1
 Error: Option --stdin conflicts with option: --file
 ```
 
 ### Custom option processing
 
 You may specify a function to do custom processing of option values. The callback function receives one parameter, the user specified parsed value (string|number|boolean) and it returns the new value for the option.
+
+If collect is enabled the function receives as second parameter the previous value.
 
 This allows you to coerce the option value to the desired type, or accumulate values, or do entirely custom processing.
 
@@ -515,14 +527,10 @@ This allows you to coerce the option value to the desired type, or accumulate va
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
-    .option( '-f, --float <value:number>', 'float argument' )
-    .option( '-i, --integer <value:number>', 'integer argument' )
-    .option( '-v, --variadic <value...:string>', 'repeatable value' )
-    .option( '-l, --list <items:string[]>', 'comma separated list' )
     .option( '-o, --object <item:string>', 'map string to object', ( value: string ): { value: string } => {
         return { value };
     } )
-    .option( '-c, --color <item:string>', 'map string to object', {
+    .option( '-C, --color <item:string>', 'collect colors', {
         collect: true,
         value: ( value: string, previous: string[] = [] ): string[] => {
 
@@ -541,22 +549,12 @@ console.log( options );
 ```
 
 ```
-$ ./examples/command/custom-option-processing.ts -f 1e2
-{ float: 100 }
-
-$ ./examples/command/custom-option-processing.ts --integer 2
-{ integer: 2 }
-
-$ ./examples/command/custom-option-processing.ts -c a b c
-{ collect: [ "a", "b", "c" ] }
-
-$ ./examples/command/custom-option-processing.ts --list x,y,z
-{ list: [ "x", "y", "z" ] }
-
-$ ./examples/command/custom-option-processing.ts --object a
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-processing.ts --object a
 { object: { value: "a" } }
 
-$ ./examples/command/custom-option-processing.ts --color blue --color yellow --color red
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-processing.ts --color blue \
+                                                                                   --color yellow \
+                                                                                   --color red
 { color: [ "blue", "yellow", "red" ] }
 ```
 
@@ -576,7 +574,7 @@ await new Command()
 ```
 
 ```
-$ ./examples/command/standalone-option.ts --standalone --other
+$ deno run https://deno.land/x/cliffy/examples/command/standalone-options.ts --standalone --other
 Error: Option --standalone cannot be combined with other options.
 ```
 
@@ -594,7 +592,9 @@ await new Command()
     .parse( Deno.args );
 ```
 
-**Example:** `deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h`
+```
+$ deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h
+```
 
 ### Specify an action for an option
 
@@ -613,6 +613,13 @@ await new Command()
         }
     } )
     .parse( Deno.args );
+
+console.log('not executed');
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/action-options.ts -i
+Some info
 ```
 
 ## Commands
@@ -633,6 +640,14 @@ await new Command()
         console.log( 'remove ' + dir + ( recursive ? ' recursively' : '' ) );
     } )
     .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/action-handler.ts rm dir
+remove dir
+
+$ deno run https://deno.land/x/cliffy/examples/command/action-handler.ts rm dir -r
+remove dir recursively
 ```
 
 ### Sub-commands
@@ -712,6 +727,11 @@ console.log( 'environment:', args[1] || "no environment given");
 console.log( 'directories:', args[2] || "no directories given");
 ```
 
+```
+$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax.ts
+Error: Missing argument(s): cmd
+```
+
 The last argument of a command can be variadic, and only the last argument. To make an argument variadic you append `...` to the argument name. The variadic argument is passed to the action handler as an array.
 
 ```typescript
@@ -730,6 +750,13 @@ await new Command()
     .parse( Deno.args );
 ```
 
+```
+$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax-variadic.ts rmdir dir1 dir2 dir3
+rmdir dir1
+rmdir dir2
+rmdir dir3
+```
+
 ### Hidden commands
 
 To exclude commands's from the help and completion command's you can use the `.hidden()` method.
@@ -745,7 +772,9 @@ await new Command()
     .parse( Deno.args );
 ```
 
-**Example:** `deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h`
+```
+$ deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h
+```
 
 ### Git-style executable sub-commands
 
@@ -789,12 +818,13 @@ try {
 ```
 
 ```textile
-$ ./examples/command/override-exit-handling.ts -t
+$ deno run https://deno.land/x/cliffy/examples/command/override-exit-handling.ts -t
 [CUSTOM_ERROR] Error: Unknown option: -t
-    at parseFlags (flags.ts:93:27)
-    at Command.parseFlags (base-command.ts:522:20)
-    at Command.parse (base-command.ts:421:45)
-    at 17-override-exit-handling.ts:10:10
+    at parseFlags (https://deno.land/x/cliffy/packages/flags/lib/flags.ts:82:27)
+    at Command.parseFlags (https://deno.land/x/cliffy/packages/command/lib/base-command.ts:581:20)
+    at Command.parse (https://deno.land/x/cliffy/packages/command/lib/base-command.ts:479:45)
+    at https://deno.land/x/cliffy/examples/command/override-exit-handling.ts:11:10
+    at <anonymous> (<anonymous>)
 ```
 
 Make sure the executables have proper modes, like `755`.
@@ -818,10 +848,10 @@ console.log( Deno.env().SOME_ENV_VAR );
 ```
 
 ```
-$ SOME_ENV_VAR=1 ./examples/command/environment-variables.ts
+$ SOME_ENV_VAR=1 deno run --unstable --allow-env https://deno.land/x/cliffy/examples/command/environment-variables.ts
 1
 
-$ SOME_ENV_VAR=abc ./examples/command/environment-variables.ts
+$ SOME_ENV_VAR=abc deno run --unstable --allow-env https://deno.land/x/cliffy/examples/command/environment-variables.ts
 Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
 ```
 
@@ -841,10 +871,10 @@ await new Command()
 ```
 
 ```
-$ ./examples/command/examples.ts help
+$ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
-  Usage:   examples.ts
-  Version: v0.0.0
+  Usage:   COMMAND
+  Version: v
 
   Description:
 
@@ -857,8 +887,8 @@ $ ./examples/command/examples.ts help
 
   Commands:
 
-    help         [command:string]  - Show this help.
-    completions                    - Generate shell completions for zsh and bash.
+    help         [command:command]  - Show this help or the help of a sub-command.
+    completions                     - Generate shell completions for zsh and bash.
 
   Examples:
 
@@ -866,7 +896,6 @@ $ ./examples/command/examples.ts help
                   Description ...
 
                   Can have mutliple lines and colors.
-
 ```
 
 ## Generic options and arguments
@@ -902,8 +931,6 @@ const input: string = result.args[ 0 ];
 const output: string | undefined = result.args[ 1 ];
 ```
 
-**Example:** `deno run https://deno.land/x/cliffy/examples/command/generic.ts`
-
 ## Default options & commands
 
 Every instance of the `Command` class has some pre defenied options and sub-commands. If you don't need these pre defined option's and sub-command's you can use the `BaseCommand` class instedd of the `Command` class.
@@ -922,8 +949,8 @@ await new Command()
     .parse( Deno.args );
 ```
 ```
-$ ./examples/command/version-options.ts -V
-$ ./examples/command/version-options.ts --version
+$ deno run https://deno.land/x/cliffy/examples/command/version-options.ts -V
+$ deno run https://deno.land/x/cliffy/examples/command/version-options.ts --version
 0.0.1
 ```
 
@@ -947,9 +974,9 @@ await new Command()
 The `--help` and `-h` option flag and also the `help` sub-command prints the auto generated help.
 
 ```
-$ ./examples/command/help-option-and-command.ts -h
-$ ./examples/command/help-option-and-command.ts --help
-$ ./examples/command/help-option-and-command.ts help
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts -h
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts --help
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help
 
   Usage:   help-option-and-command.ts
   Version: v0.1.0
@@ -984,13 +1011,13 @@ $ ./examples/command/help-option-and-command.ts help
 The `help` sub-command excepts also a name of a sub-command as argument to show the help of the sub-command. But you can also use the help flag and command directly from the sub-command.
 
 ```
-$ ./examples/command/help-option-and-command.ts help completions
-$ ./examples/command/help-option-and-command.ts completions -h
-$ ./examples/command/help-option-and-command.ts completions --help
-$ ./examples/command/help-option-and-command.ts completions help
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help completions
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions -h
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions --help
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions help
 
   Usage:   completions
-  Version: v0.0.0
+  Version: v0.1.0
 
   Description:
 
