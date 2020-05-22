@@ -2,34 +2,29 @@ const { stdout, stderr } = Deno;
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { dim, red } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, IGenericObject, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
 import format from '../../x/format.ts';
 import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand } from './types.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
 const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 
 /**
- * Map of type's.
- */
-export type ITypeMap = IGenericObject<Type<any> | ITypeHandler<any>>
-
-/**
  * Base command implementation without pre configured command's and option's.
  */
 export class BaseCommand<O = any, A extends Array<any> = any> {
 
-    protected types: ITypeMap = {
-        string: new StringType(),
-        number: new NumberType(),
-        boolean: new BooleanType()
-    };
+    protected types: ITypeMap = new Map<string, ITypeSettings>( [
+        [ 'string', { name: 'string', handler: new StringType() } ],
+        [ 'number', { name: 'number', handler: new NumberType() } ],
+        [ 'boolean', { name: 'boolean', handler: new BooleanType() } ]
+    ] );
     protected rawArgs: string[] = [];
     // @TODO: get script name: https://github.com/denoland/deno/pull/5034
     // protected name: string = location.pathname.split( '/' ).pop() as string;
@@ -258,13 +253,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Register command specific custom type.
      */
-    public type( type: string, typeHandler: Type<any> | ITypeHandler<any>, override?: boolean ): this {
+    public type( name: string, handler: Type<any> | ITypeHandler<any>, options?: ITypeOption ): this {
 
-        if ( this.cmd.types[ type ] && !override ) {
-            throw this.error( new Error( `Type '${ type }' already exists.` ) );
+        if ( this.cmd.types.get( name ) && !options?.override ) {
+            throw this.error( new Error( `Type '${ name }' already exists.` ) );
         }
 
-        this.cmd.types[ type ] = typeHandler;
+        this.cmd.types.set( name, { ...options, name, handler } );
 
         return this;
     }
@@ -281,11 +276,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.cmd.completions[ action ] = completeHandler;
 
         return this;
-    }
-
-    public getActionNames(): string[] {
-
-        return [ ...Object.keys( this.cmd.completions ), ...Object.keys( this.cmd.types ) ];
     }
 
     /**
@@ -307,10 +297,10 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             return this.cmd.completions[ action ]();
         }
 
-        const type = this.cmd.types[ action ];
+        const type = this.cmd.types.get( action );
 
-        if ( type instanceof Type ) {
-            return type.complete();
+        if ( type?.handler instanceof Type ) {
+            return type.handler.complete();
         }
 
         return undefined;
@@ -599,14 +589,24 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
                 knownFlaks,
                 allowEmpty: this._allowEmpty,
                 flags: this.getOptions( true ),
-                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => {
-                    const parser = this.types[ type ];
-                    return parser instanceof Type ? parser.parse( option, arg, nextValue ) : parser( option, arg, nextValue );
-                }
+                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) =>
+                    this.parseType( type, option, arg, nextValue )
             } );
         } catch ( e ) {
             throw this.error( e );
         }
+    }
+
+    protected parseType( name: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {
+
+        const type: ITypeSettings | undefined = this.getType( name );
+
+        if ( !type ) {
+            throw this.error( new Error( `No type registered with name: ${ name }` ) );
+        }
+
+        // @TODO: pass only name & value to .parse() method
+        return type.handler instanceof Type ? type.handler.parse( option, arg, nextValue ) : type.handler( option, arg, nextValue );
     }
 
     /**
@@ -625,8 +625,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
                     const value: string | undefined = Deno.env.get( name );
                     try {
                         // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
-                        const parser = this.types[ env.type ];
-                        parser instanceof Type ? parser.parse( { name }, env, value || '' ) : parser( { name }, env, value || '' );
+                        this.parseType( env.type, { name }, env, value || '' );
                     } catch ( e ) {
                         throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
                     }
@@ -1085,6 +1084,70 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.commands.delete( name );
 
         return command;
+    }
+
+    public getTypes(): ITypeSettings[] {
+        return this.getGlobalTypes().concat( this.getBaseTypes() );
+    }
+
+    public getBaseTypes(): ITypeSettings[] {
+        return Array.from( this.types.values() );
+    }
+
+    public getGlobalTypes(): ITypeSettings[] {
+
+        const getTypes = ( cmd: BaseCommand | undefined, types: ITypeSettings[] = [], names: string[] = [] ): ITypeSettings[] => {
+
+            if ( cmd && cmd.types.size ) {
+
+                cmd.types.forEach( ( type: ITypeSettings ) => {
+                    if (
+                        type.global &&
+                        !this.types.has( type.name ) &&
+                        names.indexOf( type.name ) === -1
+                    ) {
+                        names.push( type.name );
+                        types.push( type );
+                    }
+                } );
+
+                return getTypes( cmd._parent, types, names );
+            }
+
+            return types;
+        };
+
+        return getTypes( this._parent );
+    }
+
+    protected getType( name: string ): ITypeSettings | undefined {
+
+        return this.getBaseType( name ) ?? this.getGlobalType( name );
+    }
+
+    protected getBaseType( name: string ): ITypeSettings | undefined {
+
+        return this.types.get( name );
+    }
+
+    protected getGlobalType( name: string ): ITypeSettings | undefined {
+
+        if ( !this._parent ) {
+            return;
+        }
+
+        let cmd: ITypeSettings | undefined = this._parent.getBaseType( name );
+
+        if ( !cmd?.global ) {
+            return this._parent.getGlobalType( name );
+        }
+
+        return cmd;
+    }
+
+    public getActionNames(): string[] {
+
+        return [ ...Object.keys( this.cmd.completions ), ...this.getTypes().map( type => type.name ) ];
     }
 
     /**

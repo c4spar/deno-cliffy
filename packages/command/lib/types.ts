@@ -1,5 +1,7 @@
-import { BaseCommand } from '../../command/lib/base-command.ts';
+import { BaseCommand } from './base-command.ts';
+import { ITypeHandler } from '../../flags/lib/types.ts';
 import { IFlagArgument, IFlagOptions, IGenericObject, OptionType } from '../../flags/lib/types.ts';
+import { Type } from '../types/type.ts';
 
 /** Action handler. */
 export type IAction<O, A extends Array<any>> = ( options: O, ...args: A ) => void | Promise<void>;
@@ -47,6 +49,20 @@ export interface IEnvVariable {
     type: string;
     details: IArgumentDetails;
 }
+
+/** Type option's. */
+export interface ITypeOption {
+    override?: boolean;
+    global?: boolean;
+}
+
+/** Type option's. */
+export interface ITypeSettings extends ITypeOption {
+    name: string;
+    handler: Type<any> | ITypeHandler<any>;
+}
+
+export type ITypeMap = Map<string, ITypeSettings>;
 
 /** Example setting's. */
 export interface IExample {

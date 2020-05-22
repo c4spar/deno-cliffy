@@ -223,7 +223,9 @@ $ deno run https://deno.land/x/cliffy/examples/command/list-option-type.ts -o "1
 
 ### Custom option types
 
-There are to ways to declare custom types. The first method is using a function.
+You can register custom types with the `.type()` method. The first argument is the name of the type, the second can be either a function or an instance of `Type` and the third argument is an options object.
+
+This example shows you how to use a function as type handler.
 
 ```typescript
 #!/usr/bin/env -S deno run
@@ -248,8 +250,8 @@ const email = (): ITypeHandler<string> => {
 };
 
 const { options } = await new Command()
-    .option( '-e, --email <value:email>', 'Your email address.' )
     .type( 'email', email() )
+    .option( '-e, --email <value:email>', 'Your email address.' )
     .parse( Deno.args );
 
 console.log( options );
@@ -265,7 +267,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e 
 Option --email must be a valid email but got: my @email.de
 ```
 
-The second method to declare a custom type is using a class:
+This example shows you how to use a class as type handler.
 
 ```typescript
 #!/usr/bin/env -S deno run
@@ -306,6 +308,29 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.
 Option --email must be a valid email but got: my @email.de
 ```
 
+To make an type available for child commands you can set the `global` option in the options argument.
+
+```
+await new Command()
+    .type( 'email', email(), { global: true } )
+
+    .command( 'login' )
+    .description( 'Login with email.' )
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .action( console.log )
+
+    .command( 'config' )
+    .description( 'Manage config.' )
+    .option( '-a, --admin-email [value:email]', 'Get or set admin email address.' )
+    .action( console.log )
+
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/global-custom-type.ts login --email "my@email.de"
+{ email: "my@email.de" }
+```
 
 ### Auto completion
 
