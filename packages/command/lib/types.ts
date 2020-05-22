@@ -77,11 +77,18 @@ export interface IParseResult<O = any, A extends Array<any> = any> {
     cmd: BaseCommand<O>;
 }
 
+export interface ICompleteOptions {
+    override?: boolean;
+    global?: boolean;
+}
+
+export interface ICompleteSettings extends ICompleteOptions {
+    name: string;
+    complete: ICompleteHandler;
+}
+
 /** Type parser method. */
 export type ICompleteHandler = () => string[] | Promise<string[]>;
-
-/** Map of type handlers. */
-export type ICompleteHandlerMap = IGenericObject<ICompleteHandler>
 
 export interface IHelpCommand<O = any> extends BaseCommand<O> {
     show( name?: string ): void;

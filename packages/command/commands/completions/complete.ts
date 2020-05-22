@@ -2,6 +2,7 @@ import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { IFlags } from '../../../flags/lib/types.ts';
 import { BaseCommand } from '../../lib/base-command.ts';
 import { DefaultCommand } from '../../lib/default-command.ts';
+import { ICompleteSettings } from '../../lib/types.ts';
 import { ActionListType } from '../../types/action-list.ts';
 import { CommandListType } from '../../types/command-list.ts';
 
@@ -27,9 +28,10 @@ export class CompleteCommand extends DefaultCommand {
                     return;
                 }
 
-                const result: string[] = await cmd.getCompletion( action ) || [];
+                const completion: ICompleteSettings | undefined = cmd.getCompletion( action );
+                const result: string[] = await completion?.complete() ?? [];
 
-                if ( result && result.length ) {
+                if ( result?.length ) {
                     Deno.stdout.writeSync( encode( result.join( ' ' ) ) );
                 }
             } )

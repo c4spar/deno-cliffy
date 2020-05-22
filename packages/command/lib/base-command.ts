@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -38,7 +38,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
     protected aliases: string[] = [];
-    protected completions: ICompleteHandlerMap = {};
+    protected completions: Map<string, ICompleteSettings> = new Map();
     protected cmd: BaseCommand = this;
     protected argsDefinition: string | undefined;
     protected isExecutable: boolean = false;
@@ -261,19 +261,27 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         this.cmd.types.set( name, { ...options, name, handler } );
 
+        if ( handler instanceof Type && typeof handler.complete !== 'undefined' ) {
+            this.complete( name, () => handler.complete(), options );
+        }
+
         return this;
     }
 
     /**
      * Register command specific custom type.
      */
-    public complete( action: string, completeHandler: ICompleteHandler ): this {
+    public complete( name: string, complete: ICompleteHandler, options?: ICompleteOptions ): this {
 
-        if ( this.cmd.completions[ action ] ) {
-            throw this.error( new Error( `Completion '${ action }' already exists.` ) );
+        if ( this.cmd.completions.has( name ) && !options?.override ) {
+            throw this.error( new Error( `Completion '${ name }' already exists.` ) );
         }
 
-        this.cmd.completions[ action ] = completeHandler;
+        this.cmd.completions.set( name, {
+            name,
+            complete,
+            ...options
+        } );
 
         return this;
     }
@@ -291,19 +299,63 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
     }
 
-    public async getCompletion( action: string ): Promise<string[] | undefined> {
+    public getCompletions() {
+        return this.getGlobalCompletions().concat( this.getBaseCompletions() );
+    }
 
-        if ( this.cmd.completions[ action ] ) {
-            return this.cmd.completions[ action ]();
+    public getBaseCompletions(): ICompleteSettings[] {
+        return Array.from( this.completions.values() );
+    }
+
+    public getGlobalCompletions(): ICompleteSettings[] {
+
+        const getCompletions = ( cmd: BaseCommand | undefined, completions: ICompleteSettings[] = [], names: string[] = [] ): ICompleteSettings[] => {
+
+            if ( cmd && cmd.completions.size ) {
+
+                cmd.completions.forEach( ( completion: ICompleteSettings ) => {
+                    if (
+                        completion.global &&
+                        !this.completions.has( completion.name ) &&
+                        names.indexOf( completion.name ) === -1
+                    ) {
+                        names.push( completion.name );
+                        completions.push( completion );
+                    }
+                } );
+
+                return getCompletions( cmd._parent, completions, names );
+            }
+
+            return completions;
+        };
+
+        return getCompletions( this._parent );
+    }
+
+    public getCompletion( name: string ) {
+
+        return this.getBaseCompletion( name ) ?? this.getGlobalCompletion( name );
+    }
+
+    public getBaseCompletion( name: string ): ICompleteSettings | undefined {
+
+        return this.completions.get( name );
+    }
+
+    public getGlobalCompletion( name: string ): ICompleteSettings | undefined {
+
+        if ( !this._parent ) {
+            return;
         }
 
-        const type = this.cmd.types.get( action );
+        let completion: ICompleteSettings | undefined = this._parent.getBaseCompletion( name );
 
-        if ( type?.handler instanceof Type ) {
-            return type.handler.complete();
+        if ( !completion?.global ) {
+            return this._parent.getGlobalCompletion( name );
         }
 
-        return undefined;
+        return completion;
     }
 
     /**
@@ -1143,11 +1195,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         }
 
         return cmd;
-    }
-
-    public getActionNames(): string[] {
-
-        return [ ...Object.keys( this.cmd.completions ), ...this.getTypes().map( type => type.name ) ];
     }
 
     /**
