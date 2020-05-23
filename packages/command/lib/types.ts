@@ -1,13 +1,6 @@
 import { BaseCommand } from '../../command/lib/base-command.ts';
 import { IFlagArgument, IFlagOptions, IGenericObject, OptionType } from '../../flags/lib/types.ts';
 
-/** Command map. */
-export interface CommandMap<O = any> {
-    name: string;
-    aliases: string[];
-    cmd: BaseCommand<O>;
-}
-
 /** Action handler. */
 export type IAction<O, A extends Array<any>> = ( options: O, ...args: A ) => void | Promise<void>;
 
@@ -75,6 +68,7 @@ export type ICompleteHandlerMap = IGenericObject<ICompleteHandler>
 
 export interface IHelpCommand<O = any> extends BaseCommand<O> {
     show( name?: string ): void;
+
     getHelp( name?: string ): string;
 }
 

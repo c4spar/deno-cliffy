@@ -4,7 +4,7 @@ import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
 import { Table } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
 import { BaseCommand } from '../lib/base-command.ts';
-import { CommandMap, IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
+import { IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
 import { CommandListType } from '../types/command-list.ts';
 
 /**
@@ -141,11 +141,11 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         const getCommands = (): string[][] => {
 
             return [
-                ...cmd.getCommandMaps().map( ( command: CommandMap ) => [
-                    [ command.name, ...command.aliases ].map( name => blue( name ) ).join( ', ' ),
-                    this.highlight( command.cmd.getArgsDefinition() || '' ),
+                ...cmd.getCommands().map( ( command: BaseCommand ) => [
+                    [ command.getName(), ...command.getAliases() ].map( name => blue( name ) ).join( ', ' ),
+                    this.highlight( command.getArgsDefinition() || '' ),
                     red( bold( '-' ) ),
-                    command.cmd.getDescription().split( '\n' ).shift() as string
+                    command.getDescription().split( '\n' ).shift() as string
                 ] )
             ];
         };

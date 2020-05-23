@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { CommandMap, IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand } from './types.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteHandlerMap, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -39,15 +39,15 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected desc: string = 'No description ...';
     protected fn: IAction<O, A> | undefined;
     protected options: IOption<O, A>[] = [];
-    protected commands: Map<string, CommandMap> = new Map();
+    protected commands: Map<string, BaseCommand> = new Map();
     protected examples: IExample[] = [];
     protected envVars: IEnvVariable[] = [];
+    protected aliases: string[] = [];
     protected completions: ICompleteHandlerMap = {};
     protected cmd: BaseCommand = this;
     protected argsDefinition: string | undefined;
     protected isExecutable: boolean = false;
     protected throwOnError: boolean = false;
-    protected cmdName: string | undefined;
     protected _allowEmpty: boolean = true;
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
@@ -100,7 +100,9 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         //     subCommand.isExecutable = true;
         // }
 
-        this.commands.set( name, { name, cmd: subCommand, aliases } );
+        aliases.forEach( alias => subCommand.aliases.push( alias ) );
+
+        this.commands.set( name, subCommand );
 
         this.select( name );
 
@@ -129,7 +131,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public alias( alias: string ): this {
 
-        if ( !this.cmdName ) {
+        if ( this.cmd === this ) {
             throw this.error( new Error( `Failed to add alias '${ alias }'. No sub command selected.` ) );
         }
 
@@ -137,7 +139,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             throw this.error( new Error( `Duplicate alias: ${ alias }` ) );
         }
 
-        this.getCommandMap( this.cmdName ).aliases.push( alias );
+        this.cmd.aliases.push( alias );
 
         return this;
     }
@@ -159,7 +161,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     public select( name: string ): this {
 
         this.cmd = this.getCommand( name );
-        this.cmdName = name;
 
         return this;
     }
@@ -828,6 +829,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     }
 
     /**
+     * Get command name aliases.
+     */
+    public getAliases(): string[] {
+        return this.aliases;
+    }
+
+    /**
      * Get full command path of all parent command names's and current command name.
      */
     public getPath(): string {
@@ -957,21 +965,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             return this.commands.size > 0;
         }
 
-        return this.getCommandMaps( includeHidden ).length > 0;
-    }
-
-    /**
-     * Get sub-command maps.
-     */
-    public getCommandMaps( includeHidden?: boolean ): CommandMap[] {
-
-        const cmds: CommandMap[] = Array.from( this.commands.values() );
-
-        if ( includeHidden ) {
-            return cmds;
-        }
-
-        return cmds.filter( ( { cmd }: CommandMap ) => !cmd.isHidden );
+        return this.getCommands( includeHidden ).length > 0;
     }
 
     /**
@@ -979,7 +973,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public getCommands( includeHidden?: boolean ): BaseCommand[] {
 
-        return this.getCommandMaps( includeHidden ).map( ( { cmd }: CommandMap ) => cmd );
+        const cmds: BaseCommand[] = Array.from( this.commands.values() );
+
+        if ( includeHidden ) {
+            return cmds;
+        }
+
+        return cmds.filter( ( cmd: BaseCommand ) => !cmd.isHidden );
     }
 
     /**
@@ -999,18 +999,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public getCommand<O = any>( name: string ): BaseCommand<O> {
 
-        return this.getCommandMap( name ).cmd;
-    }
-
-    /**
-     * Get sub-command map with given name.
-     *
-     * @param name Name of the sub-command.
-     */
-    public getCommandMap<O = any>( name: string ): CommandMap<O> {
-
-        const cmd: CommandMap<O> | undefined = this.commands.get( name );
-        // || this.commands.get( '*' );
+        const cmd: BaseCommand<O> | undefined = this.commands.get( name );
 
         if ( !cmd ) {
             throw this.error( new Error( `Sub-command not found: ${ name }` ) );
