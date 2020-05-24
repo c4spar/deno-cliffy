@@ -1,3 +1,15 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (Sun May 24 12:58:04 2020)
+
+### Bug Fixes
+
+* **command:** help command fails with registered environment variables (#31) ([b176bd4](https://github.com/c4spar/deno-cli/commit/b176bd4))
+
+### Chore
+
+* **ci:** test's in `packages/command/test/command` were not executed ([2436fd2](https://github.com/c4spar/deno-cli/commit/2436fd2))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (Fri May 22 01:11:03 2020)
 
 ### Features
