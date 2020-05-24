@@ -2,10 +2,11 @@ import { stripeColors } from '../../../table/lib/utils.ts';
 import { Command } from '../../lib/command.ts';
 import { assertEquals } from '../lib/assert.ts';
 
-Deno.test( 'hidden command help', async () => {
+Deno.test( 'command: help command', async () => {
 
     const cmd: Command = new Command()
         .throwErrors()
+
         .version( '1.0.0' )
         .description( 'Test description ...' )
         .option( '-t, --test [val:string]', 'test description' )
@@ -20,11 +21,17 @@ Deno.test( 'hidden command help', async () => {
             depends: [ 'test' ],
             conflicts: [ 'depends' ]
         } )
+        .env( 'SOME_ENV_VAR=<value:number>', 'Description ...' )
+        .env( 'SOME_ENV_VAR_2 <value>', 'Description 2 ...' )
+
         .command( 'sub-command <input:string> <output:string>' )
         .description( 'sub command description.' )
+
         .command( 'hidden-command <input:string> <output:string>' )
         .description( 'Nobody knows about me!' )
-        .hidden();
+        .hidden()
+
+        .reset();
 
     const output: string = cmd.getHelpCommand().getHelp();
 
@@ -52,6 +59,11 @@ Deno.test( 'hidden command help', async () => {
     help         [command:command]               - Show this help or the help of a sub-command.
     completions                                  - Generate shell completions for zsh and bash.
     sub-command  <input:string> <output:string>  - sub command description.                    
+
+  Environment variables:
+
+    SOME_ENV_VAR    <value:number>  - Description ...  
+    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
 ` );
 } );

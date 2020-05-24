@@ -155,7 +155,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             return [
                 ...cmd.getEnvVars().map( ( envVar: IEnvVariable ) => [
                     envVar.names.map( name => blue( name ) ).join( ', ' ),
-                    this.highlight( envVar.type ),
+                    this.highlightDetails( envVar.details ),
                     `${ red( bold( '-' ) ) } ${ envVar.description }`
                 ] )
             ];
@@ -208,33 +208,37 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             return type;
         }
 
-        return this.parseArgsDefinition( type ).map( ( arg: IArgumentDetails ) => {
+        return this.parseArgsDefinition( type ).map( ( arg: IArgumentDetails ) => this.highlightDetails( arg ) ).join( ' ' );
+    }
 
-            let str = '';
+    /**
+     * Colorize argument type's.
+     */
+    protected highlightDetails( arg: IArgumentDetails ): string {
 
-            str += yellow( arg.optionalValue ? '[' : '<' );
+        let str = '';
 
-            let name = '';
-            name += arg.name;
-            if ( arg.variadic ) {
-                name += '...';
-            }
-            name = magenta( name );
+        str += yellow( arg.optionalValue ? '[' : '<' );
 
-            str += name;
+        let name = '';
+        name += arg.name;
+        if ( arg.variadic ) {
+            name += '...';
+        }
+        name = magenta( name );
 
-            str += yellow( ':' );
-            str += red( arg.type );
+        str += name;
 
-            if ( arg.list ) {
-                str += green( '[]' );
-            }
+        str += yellow( ':' );
+        str += red( arg.type );
 
-            str += yellow( arg.optionalValue ? ']' : '>' );
+        if ( arg.list ) {
+            str += green( '[]' );
+        }
 
-            return str;
+        str += yellow( arg.optionalValue ? ']' : '>' );
 
-        } ).join( ' ' );
+        return str;
     }
 }
 
