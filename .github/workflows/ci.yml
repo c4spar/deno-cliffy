@@ -30,7 +30,7 @@ jobs:
         deno -h
 
     - name: Run command test's
-      run: deno test packages/command
+      run: deno test packages/command/test/command && deno test packages/command/test/option
 
     - name: Run flags test's
       run: deno test packages/flags
