@@ -66,6 +66,7 @@
   - [Action handler](#action-handler)
   - [Sub-commands](#sub-commands)
   - [Specify the argument syntax](#specify-the-argument-syntax)
+  - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
   - [Git-style executable sub-commands](#git-style-executable-sub-commands)
   - [Override exit handling](#override-exit-handling)
@@ -482,7 +483,7 @@ You ordered a pizza with sauce and parmesan cheese
 
 ### Global options
 
-To share options with child commands with the `global` option.
+To share options with child commands you can use the `global` option.
 
 ```typescript
 #!/usr/bin/env -S deno run
@@ -813,6 +814,40 @@ $ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax-variadic
 rmdir dir1
 rmdir dir2
 rmdir dir3
+```
+
+### Global commands
+
+To share commands with child commands you can use the `.global()` method.
+
+```typescript
+#!/usr/bin/env -S deno run
+
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .version( '0.1.0' )
+
+    .command( 'global [val:string]' )
+    .description( 'global ...' )
+    .global()
+    .action( console.log )
+
+    .command( 'command1', new Command()
+        .description( 'Some sub command.' )
+
+        .command( 'command2', new Command()
+            .description( 'Some nested sub command.' )
+        )
+    )
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/global-commands.ts command1 command2 global test
+{} test
+```
+
 ```
 
 ### Hidden commands

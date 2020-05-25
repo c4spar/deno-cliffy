@@ -93,7 +93,7 @@ compdef _${ snakeCase( this.parent.getPath() ) } ${ this.parent.getPath() }
      */
     private generateCompletions( command: BaseCommand, root?: boolean ): string {
 
-        if ( !command.hasCommands() && !command.hasOptions() && !command.hasArguments() ) {
+        if ( !command.hasCommands( false ) && !command.hasOptions() && !command.hasArguments() ) {
             return '';
         }
 
@@ -105,14 +105,14 @@ function _${ snakeCase( command.getPath() ) }() {`
             + this.generateArgumentCompletions( command )
             + this.generateActions( command )
             + `\n}\n\n`
-            + command.getCommands()
-                     .map( subCommand => this.generateCompletions( subCommand ) )
-                     .join( '' );
+            + command.getCommands( false )
+                .map( subCommand => this.generateCompletions( subCommand ) )
+                .join( '' );
     }
 
     protected generateCommandCompletions( command: BaseCommand ): string {
 
-        const commands = command.getCommands();
+        const commands = command.getCommands( false );
 
         let completions: string = commands
             .map( ( subCommand: BaseCommand ) =>
@@ -150,10 +150,10 @@ function _${ snakeCase( command.getPath() ) }() {`
 
     protected generateSubCommandCompletions( command: BaseCommand ): string {
 
-        if ( command.hasCommands() ) {
+        if ( command.hasCommands( false ) ) {
 
             const actions: string = command
-                .getCommands()
+                .getCommands( false )
                 .map( ( command: BaseCommand ) => `${ command.getName() }) _${ snakeCase( command.getPath() ) } ;;` )
                 .join( '\n            ' );
 
@@ -180,11 +180,11 @@ function _${ snakeCase( command.getPath() ) }() {`
             argsCommand += ` \\\n        ${ options.join( ' \\\n        ' ) }`;
         }
 
-        if ( command.hasCommands() || command.hasArguments() ) {
+        if ( command.hasCommands( false ) || command.hasArguments() ) {
             argsCommand += ` \\\n        '${ ++argIndex }: :_commands'`;
         }
 
-        if ( command.hasArguments() || command.hasCommands() ) {
+        if ( command.hasArguments() || command.hasCommands( false ) ) {
 
             const args: string[] = [];
 
@@ -199,7 +199,7 @@ function _${ snakeCase( command.getPath() ) }() {`
 
             argsCommand += args.map( ( arg: string ) => `\\\n        '${ arg }'` ).join( '' );
 
-            if ( command.hasCommands() ) {
+            if ( command.hasCommands( false ) ) {
                 argsCommand += ` \\\n        '*:: :->command_args'`;
             }
         }
@@ -289,7 +289,7 @@ function _${ snakeCase( command.getPath() ) }() {`
                     `${ name }) __${ snakeCase( this.parent.getName() ) }_script ${ action.arg.name } ${ action.arg.action } ${ action.cmd } ;;` );
         }
 
-        if ( command.hasCommands() ) {
+        if ( command.hasCommands( false ) ) {
             actions.unshift( `command_args) _command_args ;;` );
         }
 

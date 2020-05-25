@@ -20,8 +20,9 @@ export class CompleteCommand extends DefaultCommand {
             .type( 'command', new CommandListType( this.parent ) )
             .action( async ( options: IFlags, action: string, commandNames: string[] ) => {
 
-                let cmd: BaseCommand = commandNames
-                    .reduce( ( cmd: BaseCommand, name: string ): BaseCommand => cmd.getCommand( name ), parent );
+                let cmd: BaseCommand | undefined = commandNames
+                    .reduce( ( cmd: BaseCommand | undefined, name: string ): BaseCommand | undefined =>
+                        cmd?.getCommand( name, false ), parent );
 
                 if ( !cmd ) {
                     console.error( `Auto-completion failed. Command not found: ${ commandNames.join( ' ' ) }` );

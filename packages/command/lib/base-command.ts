@@ -48,6 +48,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected _useRawArgs: boolean = false;
     protected args: IArgumentDetails[] = [];
     protected isHidden: boolean = false;
+    protected isGlobal: boolean = false;
 
     /**
      * Add new sub-command.
@@ -70,7 +71,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             throw this.error( new Error( 'Missing command name.' ) );
         }
 
-        if ( this.hasCommand( name ) ) {
+        if ( this.getBaseCommand( name, true ) ) {
             if ( !override ) {
                 throw this.error( new Error( `Duplicate command: ${ name }` ) );
             }
@@ -130,7 +131,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             throw this.error( new Error( `Failed to add alias '${ alias }'. No sub command selected.` ) );
         }
 
-        if ( this.hasCommand( alias ) ) {
+        if ( this.cmd.aliases.indexOf( alias ) !== -1 ) {
             throw this.error( new Error( `Duplicate alias: ${ alias }` ) );
         }
 
@@ -144,7 +145,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public reset(): this {
         this.cmd = this;
-        this.getCommands( true ).forEach( cmd => cmd.reset() );
+        this.getBaseCommands( true ).forEach( cmd => cmd.reset() );
         return this;
     }
 
@@ -155,7 +156,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public select( name: string ): this {
 
-        this.cmd = this.getCommand( name );
+        const cmd = this.getBaseCommand( name, true );
+
+        if ( !cmd ) {
+            throw this.error( new Error( `Sub-command not found: ${ name }` ) );
+        }
+
+        this.cmd = cmd;
 
         return this;
     }
@@ -193,12 +200,18 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     }
 
     /**
-     * Set command description.
-     *
-     * @param description Short command description.
+     * Hide command from help, completions, etc.
      */
     public hidden(): this {
         this.cmd.isHidden = true;
+        return this;
+    }
+
+    /**
+     * Make command globally available.
+     */
+    public global(): this {
+        this.cmd.isGlobal = true;
         return this;
     }
 
@@ -510,7 +523,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         this.rawArgs = args;
 
-        const subCommand = this.rawArgs.length && this.hasCommand( this.rawArgs[ 0 ] ) && this.getCommand( this.rawArgs[ 0 ] );
+        const subCommand = this.rawArgs.length > 0 && this.getCommand( this.rawArgs[ 0 ], true );
 
         if ( subCommand ) {
             return await subCommand.parse( this.rawArgs.slice( 1 ), dry );
@@ -573,12 +586,14 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         } else if ( this.defaultCommand ) {
 
-            if ( !this.hasCommand( this.defaultCommand ) ) {
+            const cmd = this.getCommand( this.defaultCommand, true );
+
+            if ( !cmd ) {
                 throw this.error( new Error( `Default command '${ this.defaultCommand }' not found.` ) );
             }
 
             try {
-                await this.getCommand( this.defaultCommand ).execute( options, ...args );
+                await cmd.execute( options, ...args );
             } catch ( e ) {
                 throw this.error( e );
             }
@@ -1078,10 +1093,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public hasCommands( hidden?: boolean ): boolean {
 
-        if ( hidden ) {
-            return this.commands.size > 0;
-        }
-
         return this.getCommands( hidden ).length > 0;
     }
 
@@ -1090,36 +1101,81 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public getCommands( hidden?: boolean ): BaseCommand[] {
 
-        const cmds: BaseCommand[] = Array.from( this.commands.values() );
+        return this.getGlobalCommands( hidden ).concat( this.getBaseCommands( hidden ) );
+    }
 
-        if ( hidden ) {
-            return cmds;
-        }
+    public getBaseCommands( hidden?: boolean ): BaseCommand[] {
+        const commands = Array.from( this.commands.values() );
+        return hidden ? commands : commands.filter( cmd => !cmd.isHidden );
+    }
 
-        return cmds.filter( ( cmd: BaseCommand ) => !cmd.isHidden );
+    public getGlobalCommands( hidden?: boolean ): BaseCommand[] {
+
+        const getCommands = ( cmd: BaseCommand | undefined, commands: BaseCommand[] = [], names: string[] = [] ): BaseCommand[] => {
+
+            if ( cmd && cmd.commands.size ) {
+
+                cmd.commands.forEach( ( cmd: BaseCommand ) => {
+                    if (
+                        cmd.isGlobal &&
+                        this !== cmd &&
+                        !this.commands.has( cmd._name ) &&
+                        names.indexOf( cmd._name ) === -1 &&
+                        ( hidden || !cmd.isHidden )
+                    ) {
+                        names.push( cmd._name );
+                        commands.push( cmd );
+                    }
+                } );
+
+                return getCommands( cmd._parent, commands, names );
+            }
+
+            return commands;
+        };
+
+        return getCommands( this._parent );
     }
 
     /**
      * Checks whether the command has a sub-command with given name or not.
      *
      * @param name Name of the command.
+     * @param hidden Include hidden commands.
      */
-    public hasCommand( name: string ): boolean {
+    public hasCommand( name: string, hidden?: boolean ): boolean {
 
-        return this.commands.has( name );
+        return !!this.getCommand( name, hidden );
     }
 
     /**
      * Get sub-command with given name.
      *
      * @param name Name of the sub-command.
+     * @param hidden Include hidden commands.
      */
-    public getCommand<O = any>( name: string ): BaseCommand<O> {
+    public getCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
 
-        const cmd: BaseCommand<O> | undefined = this.commands.get( name );
+        return this.getBaseCommand( name, hidden ) ?? this.getGlobalCommand( name, hidden );
+    }
 
-        if ( !cmd ) {
-            throw this.error( new Error( `Sub-command not found: ${ name }` ) );
+    public getBaseCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
+
+        let cmd: BaseCommand | undefined = this.commands.get( name );
+
+        return cmd && ( hidden || !cmd.isHidden ) ? cmd : undefined;
+    }
+
+    public getGlobalCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
+
+        if ( !this._parent ) {
+            return;
+        }
+
+        let cmd: BaseCommand | undefined = this._parent.getBaseCommand( name, hidden );
+
+        if ( !cmd?.isGlobal ) {
+            return this._parent.getGlobalCommand( name, hidden );
         }
 
         return cmd;
@@ -1130,10 +1186,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param name Name of the command.
      */
-    public removeCommand<O = any>( name: string ): BaseCommand<O> {
+    public removeCommand<O = any>( name: string ): BaseCommand<O> | undefined {
 
-        const command = this.getCommand( name );
-        this.commands.delete( name );
+        const command = this.getBaseCommand( name, true );
+
+        if ( command ) {
+            this.commands.delete( name );
+        }
 
         return command;
     }
@@ -1344,11 +1403,11 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
     public getHelpCommand(): IHelpCommand {
 
-        if ( !this.hasCommand( 'help' ) ) {
+        const helpCommand = this.getCommand( 'help', true );
+
+        if ( !helpCommand ) {
             throw this.error( new Error( `No help command registered.` ), false );
         }
-
-        const helpCommand = this.getCommand( 'help' );
 
         if ( !isHelpCommand( helpCommand ) ) {
             throw this.error( new Error( `The registered help command does not correctly implement interface IHelpCommand.` ), false );

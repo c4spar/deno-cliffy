@@ -37,7 +37,11 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
      */
     public getHelp( name?: string ): string {
 
-        const cmd: BaseCommand = name ? this.parent.getCommand( name ) : this.parent;
+        const cmd: BaseCommand | undefined = name ? this.parent.getCommand( name, false ) : this.parent;
+
+        if ( !cmd ) {
+            throw this.error( new Error( `Sub-command not found: ${ name }` ) );
+        }
 
         let output = '';
         const indent = 2;
@@ -72,7 +76,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             }
 
             // Commands
-            if ( cmd.hasCommands() ) {
+            if ( cmd.hasCommands( false ) ) {
                 renderLabel( 'Commands' );
                 output += Table.from( getCommands() )
                     .padding( [ 2, 2, 1, 2 ] )
@@ -141,7 +145,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         const getCommands = (): string[][] => {
 
             return [
-                ...cmd.getCommands().map( ( command: BaseCommand ) => [
+                ...cmd.getCommands( false ).map( ( command: BaseCommand ) => [
                     [ command.getName(), ...command.getAliases() ].map( name => blue( name ) ).join( ', ' ),
                     this.highlight( command.getArgsDefinition() || '' ),
                     red( bold( '-' ) ),
