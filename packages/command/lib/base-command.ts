@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IEnvVariable, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IEnvVariable, IEnvVarOption, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -474,8 +474,9 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param name          Name of the environment variable.
      * @param description   The description of the environment variable.
+     * @param options       Environment variable options.
      */
-    public env( name: string, description: string ): this {
+    public env( name: string, description: string, options?: IEnvVarOption ): this {
 
         const result = this.splitArguments( name );
 
@@ -483,7 +484,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             result.typeDefinition = '<value:boolean>';
         }
 
-        if ( result.args.some( envName => this.cmd.hasEnvVar( envName ) ) ) {
+        if ( result.args.some( envName => this.cmd.getBaseEnvVar( envName, true ) ) ) {
             throw this.error( new Error( `Environment variable already exists: ${ name }` ) );
         }
 
@@ -501,7 +502,8 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             names: result.args,
             description,
             type: details[ 0 ].type,
-            details: details.shift() as IArgumentDetails
+            details: details.shift() as IArgumentDetails,
+            ...options
         } );
 
         return this;
@@ -681,12 +683,14 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     protected validateEnvVars() {
 
-        if ( !this.envVars.length ) {
+        const envVars = this.getEnvVars( true );
+
+        if ( !envVars.length ) {
             return;
         }
 
         if ( hasEnvPermissions ) {
-            this.envVars.forEach( ( env: IEnvVariable ) => {
+            envVars.forEach( ( env: IEnvVariable ) => {
                 const name = env.names.find( name => !!Deno.env.get( name ) );
                 if ( name ) {
                     const value: string | undefined = Deno.env.get( name );
@@ -1259,37 +1263,97 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Checks whether the command has environment variables or not.
      */
-    public hasEnvVars(): boolean {
+    public hasEnvVars( hidden?: boolean ): boolean {
 
-        return this.envVars.length > 0;
+        return this.getEnvVars( hidden ).length > 0;
     }
 
     /**
      * Get environment variables.
      */
-    public getEnvVars(): IEnvVariable[] {
+    public getEnvVars( hidden?: boolean ): IEnvVariable[] {
 
-        return this.envVars;
+        return this.getGlobalEnvVars( hidden ).concat( this.getBaseEnvVars( hidden ) );
+    }
+
+    public getBaseEnvVars( hidden?: boolean ): IEnvVariable[] {
+
+        if ( !this.envVars.length ) {
+            return [];
+        }
+
+        return hidden ? this.envVars.slice( 0 ) : this.envVars.filter( env => !env.hidden );
+    }
+
+    public getGlobalEnvVars( hidden?: boolean ): IEnvVariable[] {
+
+        const getEnvVars = ( cmd: BaseCommand | undefined, envVars: IEnvVariable[] = [], names: string[] = [] ): IEnvVariable[] => {
+
+            if ( cmd && cmd.envVars.length ) {
+
+                cmd.envVars.forEach( ( envVar: IEnvVariable ) => {
+                    if (
+                        envVar.global &&
+                        !this.envVars.find( env => env.names[ 0 ] === envVar.names[ 0 ] ) &&
+                        names.indexOf( envVar.names[ 0 ] ) === -1 &&
+                        ( hidden || !envVar.hidden )
+                    ) {
+                        names.push( envVar.names[ 0 ] );
+                        envVars.push( envVar );
+                    }
+                } );
+
+                return getEnvVars( cmd._parent, envVars, names );
+            }
+
+            return envVars;
+        };
+
+        return getEnvVars( this._parent );
     }
 
     /**
      * Checks whether the command has an environment variable with given name or not.
      *
      * @param name Name of the environment variable.
+     * @param hidden Include hidden environment variable.
      */
-    public hasEnvVar( name: string ): boolean {
+    public hasEnvVar( name: string, hidden?: boolean ): boolean {
 
-        return !!this.getEnvVar( name );
+        return !!this.getEnvVar( name, hidden );
     }
 
     /**
      * Get environment variable with given name.
      *
-     * @param name Name of the example.
+     * @param name Name of the environment variable.
+     * @param hidden Include hidden environment variable.
      */
-    public getEnvVar( name: string ): string | undefined {
+    public getEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
 
-        return this.envVars.find( env => env.names.indexOf( name ) !== -1 )?.description;
+        return this.getBaseEnvVar( name, hidden ) ?? this.getGlobalEnvVar( name, hidden );
+    }
+
+    public getBaseEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
+
+        const envVar: IEnvVariable | undefined = this.envVars.find( env => env.names.indexOf( name ) !== -1 );
+
+        return envVar && ( hidden || !envVar.hidden ) ? envVar : undefined;
+    }
+
+    public getGlobalEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
+
+        if ( !this._parent ) {
+            return;
+        }
+
+        let envVar: IEnvVariable | undefined = this._parent.getBaseEnvVar( name, hidden );
+
+        if ( !envVar?.global ) {
+            return this._parent.getGlobalEnvVar( name, hidden );
+        }
+
+        return envVar;
     }
 
     /**

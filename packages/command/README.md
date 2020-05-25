@@ -925,26 +925,34 @@ Make sure the executables have proper modes, like `755`.
 
 ### Environment variables
 
-You can define environment variabels for a command which will be validated when the command is executed.
-All environment variables will be shown with the [help](#help-option-and-command) option and command.
+You can define environment variables for a command that are validated when the command is executed.
+Environment variables are listed with the [help](#help-option-and-command) option and command.
+An environment variable can be marked as `global` and `hidden`.
+`hidden` variables are not listed in the help output and `global` variables are validated for
+the command for which they are registered and for all nested child commands.
+
+To allow deno to access environment variables you have to set the `--allow-env` flag.
+At the moment its also required to set the `--unstable` flag because deno's permissions api is marked as unstable.
 
 ```typescript
-#!/usr/bin/env -S deno run --allow-env
+#!/usr/bin/env -S deno run --allow-env --unstable
 
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
-    .env( 'SOME_ENV_VAR=<value:number>', 'Description ...' )
+    .env( 'SOME_ENV_VAR=<value:number>', 'Description ...', { global: true, hidden: false } )
+    .command( 'hello' )
+    .description( 'world ...' )
     .parse( Deno.args );
 
-console.log( Deno.env().SOME_ENV_VAR );    
+console.log( Deno.env.get( 'SOME_ENV_VAR' ) );
 ```
 
 ```
-$ SOME_ENV_VAR=1 deno run --unstable --allow-env https://deno.land/x/cliffy/examples/command/environment-variables.ts
+$ SOME_ENV_VAR=1 deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment-variables.ts
 1
 
-$ SOME_ENV_VAR=abc deno run --unstable --allow-env https://deno.land/x/cliffy/examples/command/environment-variables.ts
+$ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment-variables.ts
 Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
 ```
 

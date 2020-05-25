@@ -85,7 +85,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             }
 
             // Environment variables
-            if ( cmd.hasEnvVars() ) {
+            if ( cmd.hasEnvVars( false ) ) {
                 renderLabel( 'Environment variables' );
                 output += Table.from( getEnvVars() )
                     .padding( 2 )
@@ -157,7 +157,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         const getEnvVars = (): string[][] => {
 
             return [
-                ...cmd.getEnvVars().map( ( envVar: IEnvVariable ) => [
+                ...cmd.getEnvVars( false ).map( ( envVar: IEnvVariable ) => [
                     envVar.names.map( name => blue( name ) ).join( ', ' ),
                     this.highlightDetails( envVar.details ),
                     `${ red( bold( '-' ) ) } ${ envVar.description }`

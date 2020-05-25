@@ -42,8 +42,13 @@ export interface IOption<O = any, A extends Array<any> = any> extends ICommandOp
     args: IArgumentDetails[];
 }
 
+export interface IEnvVarOption {
+    hidden?: boolean;
+    global?: boolean;
+}
+
 /** Environment variable setting's. */
-export interface IEnvVariable {
+export interface IEnvVariable extends IEnvVarOption {
     names: string[];
     description: string;
     type: string;
