@@ -1,3 +1,20 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (Fri May 29 00:33:24 2020)
+
+### Features
+
+* **command:** add support for global and hidden environment variable's ([9e98940](https://github.com/c4spar/deno-cli/commit/9e98940))
+* **command:** add support for global command's ([ec42c7a](https://github.com/c4spar/deno-cli/commit/ec42c7a))
+* **command:** add support for global completion's ([1d814e2](https://github.com/c4spar/deno-cli/commit/1d814e2))
+* **command:** add support for global type's ([91c1569](https://github.com/c4spar/deno-cli/commit/91c1569))
+* **command:** add support for global option's (#2) ([7d6e7cf](https://github.com/c4spar/deno-cli/commit/7d6e7cf))
+* **command:** make `args` parameter optional in `.parse()` method ([fabfd32](https://github.com/c4spar/deno-cli/commit/fabfd32))
+
+### Code Refactoring
+
+* **command:** remove `ICommandMap` interface ([eb3f578](https://github.com/c4spar/deno-cli/commit/eb3f578))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (Sun May 24 12:58:04 2020)
 
 ### Bug Fixes
