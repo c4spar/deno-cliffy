@@ -10,24 +10,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        deno_version: [ 'v1.0.1' ]
+        deno_version: [ 'v1.0.2' ]
 
     steps:
     - name: Configure git
       run: git config --global core.symlinks true
 
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@master
 
-    - name: Configure environment variable's
-      run: |
-        echo "::set-env name=DENO_INSTALL::$HOME/.local"
-        echo "::add-path::$HOME/.local/bin"
-
-    - name: Install deno ${{ matrix.deno_version }}
-      run: |
-        curl -fsSL https://deno.land/x/install/install.sh | sh -s ${{ matrix.deno_version }}
-        deno -h
+    - name: Setup Deno
+      uses: denolib/setup-deno@master
+      with:
+        deno-version: ${{ matrix.deno_version }}
 
     - name: Run command test's
       run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/option && deno test packages/command/test/type
