@@ -21,7 +21,7 @@ Deno.test( 'prompt toggle: empty value', async () => {
     await assertThrowsAsync( async () => {
         Toggle.inject( '' );
         await Toggle.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt toggle: invalid value', async () => {
@@ -29,7 +29,7 @@ Deno.test( 'prompt toggle: invalid value', async () => {
     await assertThrowsAsync( async () => {
         Toggle.inject( 'aaa' );
         await Toggle.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt toggle: null value', async () => {
@@ -37,5 +37,5 @@ Deno.test( 'prompt toggle: null value', async () => {
     await assertThrowsAsync( async () => {
         Toggle.inject( null as any );
         await Toggle.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );

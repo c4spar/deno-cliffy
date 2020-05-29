@@ -27,19 +27,19 @@ Deno.test( 'prompt number: empty value', async () => {
     await assertThrowsAsync( async () => {
         Number.inject( '' );
         await Number.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt number: invalid value', async () => {
     await assertThrowsAsync( async () => {
         Number.inject( 'abc' );
         await Number.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt number: null value', async () => {
     await assertThrowsAsync( async () => {
         Number.inject( null as any );
         await Number.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );

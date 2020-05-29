@@ -24,7 +24,7 @@ Deno.test( 'prompt input: empty value', async () => {
     await assertThrowsAsync( async () => {
         Input.inject( '' );
         await Input.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt input: invalid value', async () => {
@@ -35,7 +35,7 @@ Deno.test( 'prompt input: invalid value', async () => {
             message: 'message',
             validate: value => value.length < 10
         } );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt input: null value', async () => {
@@ -43,5 +43,5 @@ Deno.test( 'prompt input: null value', async () => {
     await assertThrowsAsync( async () => {
         Input.inject( null as any );
         await Input.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );

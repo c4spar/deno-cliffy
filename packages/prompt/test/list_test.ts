@@ -44,7 +44,7 @@ Deno.test( 'prompt list: empty value', async () => {
     await assertThrowsAsync( async () => {
         List.inject( '' );
         await List.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 // @TODO: add maxLength option to list pormpt
@@ -53,5 +53,5 @@ Deno.test('prompt list: null value', async () => {
     await assertThrowsAsync( async () => {
         List.inject( null as any );
         await List.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );

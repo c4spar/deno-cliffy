@@ -30,7 +30,7 @@ Deno.test( 'prompt checkbox: invalid value', async () => {
             message: 'message',
             options: [ { value: 'value1' }, { value: 'value2' }, 'value3' ]
         } );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt checkbox: null value', async () => {
@@ -41,5 +41,5 @@ Deno.test( 'prompt checkbox: null value', async () => {
             message: 'message',
             options: [ { value: 'value1' }, { value: 'value2' }, 'value3' ]
         } );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );

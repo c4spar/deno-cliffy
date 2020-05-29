@@ -35,7 +35,7 @@ Deno.test( 'prompt confirm: empty value', async () => {
     await assertThrowsAsync( async () => {
         Confirm.inject( '' );
         await Confirm.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt confirm: invalid value', async () => {
@@ -43,7 +43,7 @@ Deno.test( 'prompt confirm: invalid value', async () => {
     await assertThrowsAsync( async () => {
         Confirm.inject( 'noo' );
         await Confirm.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
 
 Deno.test( 'prompt confirm: null value', async () => {
@@ -51,5 +51,5 @@ Deno.test( 'prompt confirm: null value', async () => {
     await assertThrowsAsync( async () => {
         Confirm.inject( null as any );
         await Confirm.prompt( 'message' );
-    }, Error, red( `${ bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
