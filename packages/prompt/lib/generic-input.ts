@@ -70,7 +70,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
                 return true;
 
             default:
-                if ( event.sequence ) {
+                if ( event.sequence && !event.meta && !event.ctrl ) {
                     this.addChar( event.sequence );
                 }
                 break;

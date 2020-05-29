@@ -74,7 +74,7 @@ export class Number extends GenericInput<number, NumberSettings> {
                 return true;
 
             default:
-                if ( event.sequence ) {
+                if ( event.sequence && !event.meta && !event.ctrl ) {
                     this.addChar( event.sequence );
                 }
                 break;
