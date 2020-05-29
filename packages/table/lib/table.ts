@@ -212,8 +212,16 @@ export class Table extends Array<IRow> {
     protected renderCell( cell: Cell, maxLength: number ): { current: string, next: Cell } {
 
         const length: number = Math.min( maxLength, stripeColors( cell.toString() ).length );
-        const words: string = consumeWords( length, cell.toString() );
-        const next = cell.slice( words.length + 1 );
+        let words: string = consumeWords( length, cell.toString() );
+
+        // break word if word is longer than max length
+        const breakWord = stripeColors( words ).length > length;
+        if ( breakWord ) {
+            words = words.slice( 0, length );
+        }
+
+        // get next content and remove leading space if breakWord is not true
+        const next = cell.slice( words.length + ( breakWord ? 0 : 1 ) );
         const fillLength = maxLength - stripeColors( words ).length;
         const current = words + ' '.repeat( fillLength );
 

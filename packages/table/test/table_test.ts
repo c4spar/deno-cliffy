@@ -17,6 +17,30 @@ cell1 cell2 cell3
 `.slice( 1 ) );
 } );
 
+Deno.test( 'simple table with word break', () => {
+    assertEquals(
+        Table.from( [
+                [ 'cell1', 'cell2 cell2', 'cell3' ],
+                [ 'cell1', 'cell2', 'cell3' ],
+                [ 'cell1', 'cell2', 'cell3 cell3' ]
+            ] )
+            .maxCellWidth( 4 )
+            .padding( 1 )
+            .toString(),
+        `
+cell cell cell
+1    2    3   
+     cell     
+     2        
+cell cell cell
+1    2    3   
+cell cell cell
+1    2    3   
+          cell
+          3   
+`.slice( 1 ) );
+} );
+
 Deno.test( 'simple border table', () => {
     assertEquals(
         Table.from( [
