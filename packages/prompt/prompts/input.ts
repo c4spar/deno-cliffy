@@ -12,7 +12,7 @@ export interface InputSettings extends GenericInputPromptSettings<string> {
 
 export class Input extends GenericInput<string, InputSettings> {
 
-    public static async prompt( options: string | InputOptions ): Promise<string | undefined> {
+    public static async prompt( options: string | InputOptions ): Promise<string> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

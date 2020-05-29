@@ -23,7 +23,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         GenericPrompt.inject( value );
     }
 
-    public static async prompt( options: SelectOptions ): Promise<string | undefined> {
+    public static async prompt( options: SelectOptions ): Promise<string> {
 
         const items: SelectOption[] = this.mapValues( options.options );
         const values: SelectValueSettings = items.map( item => this.mapItem( item ) );

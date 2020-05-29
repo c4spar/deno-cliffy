@@ -36,9 +36,9 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     protected constructor( protected settings: S ) {}
 
-    public async prompt(): Promise<T | undefined> {
+    public async prompt(): Promise<T> {
         try {
-            const result: T | undefined = await this.execute();
+            const result: T = await this.execute();
             this.screen.cursorShow();
             return result;
         } catch ( e ) {
@@ -65,7 +65,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
             .eraseDown();
     }
 
-    protected async execute(): Promise<T | undefined> {
+    protected async execute(): Promise<T> {
 
         if ( this.lastError || this.isRunning ) {
             this.clear();
@@ -73,7 +73,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
         this.isRunning = true;
 
-        // be shure there are empty lines after the cursor to fix restoring the cursor if terminal output is bigger than terminal window.
+        // be sure there are empty lines after the cursor to fix restoring the cursor if terminal output is bigger than terminal window.
         const message: string = await this.getMessage();
         this.preBufferEmptyLines( this.lastError || this.settings.hint || '' );
 
@@ -95,8 +95,12 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
             return this.execute();
         }
 
+        if ( typeof this.value === 'undefined' ) {
+            throw new Error( 'internal error: failed to read value' );
+        }
+
         this.clear();
-        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.format( this.value as T ) ) }` );
+        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.format( this.value ) ) }` );
 
         this.screen.cursorShow();
 

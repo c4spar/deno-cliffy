@@ -16,7 +16,7 @@ export interface ListSettings extends GenericInputPromptSettings<string[]> {
 
 export class List extends GenericInput<string[], ListSettings> {
 
-    public static async prompt( options: string | ListOptions ): Promise<string[] | undefined> {
+    public static async prompt( options: string | ListOptions ): Promise<string[]> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

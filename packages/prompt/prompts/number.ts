@@ -19,7 +19,7 @@ export interface NumberSettings extends GenericInputPromptSettings<number> {
 
 export class Number extends GenericInput<number, NumberSettings> {
 
-    public static async prompt( options: string | NumberOptions ): Promise<number | undefined> {
+    public static async prompt( options: string | NumberOptions ): Promise<number> {
 
         if ( typeof options === 'string' ) {
             options = { message: options };

@@ -35,7 +35,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         GenericPrompt.inject( value );
     }
 
-    public static async prompt( options: CheckboxOptions ): Promise<string[] | undefined> {
+    public static async prompt( options: CheckboxOptions ): Promise<string[]> {
 
         const items: CheckboxOption[] = this.mapValues( options.options );
         const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
