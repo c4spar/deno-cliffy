@@ -1,3 +1,16 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (Sat May 30 01:40:08 2020)
+
+### Bug Fixes
+
+* **table:** table fails if word is longer than maxCellWidth (#34) ([b6c5f07](https://github.com/c4spar/deno-cli/commit/b6c5f07))
+
+### Code Refactoring
+
+* **prompt:** remove `undefined` return type from `.prompt()` method's (#25) ([15f707a](https://github.com/c4spar/deno-cli/commit/15f707a))
+* **table:** remove unused method ([6d00cc3](https://github.com/c4spar/deno-cli/commit/6d00cc3))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (Fri May 29 19:22:19 2020)
 
 ### Bug Fixes
