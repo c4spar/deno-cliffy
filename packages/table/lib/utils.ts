@@ -49,25 +49,6 @@ export function stripeColors( str: string ): string {
 }
 
 /**
- * Fill string with given char until the string has a specified length.
- *
- * @param count The length until the string will be filled.
- * @param str   The string to fill.
- * @param char  The char to fill the string with.
- */
-export function fill( count: number, str: string = '', char: string = ' ' ) {
-
-    let length = stripeColors( str ).length;
-
-    while ( length < count ) {
-        str += char;
-        length += char.length;
-    }
-
-    return str;
-}
-
-/**
  * Get longest cell from given row index.
  *
  */
