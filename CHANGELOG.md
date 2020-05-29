@@ -1,3 +1,12 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (Fri May 29 19:22:19 2020)
+
+### Bug Fixes
+
+* **prompt:** ignore ctrl and meta keys in input prompt's ([1f266b6](https://github.com/c4spar/deno-cli/commit/1f266b6))
+* **prompt:** `c` character is not working in input prompt's ([a0d6545](https://github.com/c4spar/deno-cli/commit/a0d6545))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (Fri May 29 00:33:24 2020)
 
 ### Features
