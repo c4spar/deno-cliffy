@@ -24,7 +24,7 @@ Deno.test( 'prompt input: empty value', async () => {
     await assertThrowsAsync( async () => {
         Input.inject( '' );
         await Input.prompt( 'message' );
-    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Value must be longer then 1 but has a length of 0.` ) );
 } );
 
 Deno.test( 'prompt input: invalid value', async () => {

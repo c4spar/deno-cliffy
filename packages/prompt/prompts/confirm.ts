@@ -43,7 +43,7 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         return message;
     }
 
-    protected validate( value: string ): boolean {
+    protected validate( value: string ): boolean | string {
         return typeof value === 'string' &&
             [
                 this.settings.active[ 0 ].toLowerCase(),

@@ -11,7 +11,9 @@ await Toggle.prompt( {
 } );
 
 await Input.prompt( {
-    message: `What's your name?`
+    message: `What's your name?`,
+    minLength: 3,
+    maxLength: 8
 } );
 
 await Number.prompt( {
@@ -20,7 +22,9 @@ await Number.prompt( {
 
 await Secret.prompt( {
     message: 'Enter your password',
-    hidden: false
+    hidden: false,
+    minLength: 3,
+    maxLength: 8
 } );
 
 await Select.prompt( {

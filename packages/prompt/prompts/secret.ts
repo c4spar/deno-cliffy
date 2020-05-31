@@ -6,10 +6,14 @@ import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } f
 
 export interface SecretOptions extends GenericInputPromptOptions<string> {
     hidden?: boolean;
+    minLength?: number;
+    maxLength?: number;
 }
 
 export interface SecretSettings extends GenericInputPromptSettings<string> {
     hidden: boolean;
+    minLength: number;
+    maxLength: number;
 }
 
 export class Secret extends GenericInput<string, SecretSettings> {
@@ -23,6 +27,8 @@ export class Secret extends GenericInput<string, SecretSettings> {
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
             hidden: false,
+            minLength: 1,
+            maxLength: Infinity,
             ...options
         } ).prompt();
     }
@@ -49,8 +55,17 @@ export class Secret extends GenericInput<string, SecretSettings> {
         return `${ await this.getMessage() } ${ this.settings.pointer } ${ green( value ) }`;
     }
 
-    protected validate( value: string ): boolean {
-        return typeof value === 'string' && value.length > 0;
+    protected validate( value: string ): boolean | string {
+        if ( typeof value !== 'string' ) {
+            return false;
+        }
+        if ( value.length < this.settings.minLength ) {
+            return `Secret must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
+        }
+        if ( value.length > this.settings.maxLength ) {
+            return `Secret can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
+        }
+        return true;
     }
 
     protected transform( value: string ): string | undefined {
