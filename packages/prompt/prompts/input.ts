@@ -22,7 +22,7 @@ export class Input extends GenericInput<string, InputSettings> {
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
-            minLength: 1,
+            minLength: 0,
             maxLength: Infinity,
             ...options
         } ).prompt();

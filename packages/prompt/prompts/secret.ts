@@ -5,12 +5,14 @@ import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
 export interface SecretOptions extends GenericInputPromptOptions<string> {
+    label?: string;
     hidden?: boolean;
     minLength?: number;
     maxLength?: number;
 }
 
 export interface SecretSettings extends GenericInputPromptSettings<string> {
+    label: string;
     hidden: boolean;
     minLength: number;
     maxLength: number;
@@ -26,8 +28,9 @@ export class Secret extends GenericInput<string, SecretSettings> {
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
+            label: 'Password',
             hidden: false,
-            minLength: 1,
+            minLength: 0,
             maxLength: Infinity,
             ...options
         } ).prompt();
@@ -60,10 +63,10 @@ export class Secret extends GenericInput<string, SecretSettings> {
             return false;
         }
         if ( value.length < this.settings.minLength ) {
-            return `Secret must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
+            return `${this.settings.label} must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
         }
         if ( value.length > this.settings.maxLength ) {
-            return `Secret can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
+            return `${this.settings.label} can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
         }
         return true;
     }

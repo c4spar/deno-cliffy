@@ -101,7 +101,7 @@ The `Input` prompt has all [base](#base-options) and the following prompt specif
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| minLength | `number` | No | Min length of value. Defaults to `1`. |
+| minLength | `number` | No | Min length of value. Defaults to `0`. |
 | maxLength | `number` | No | Max length of value. Defaults to `infinity`. |
 
 **↑ back to:** [Prompt types](#-types)
@@ -149,9 +149,10 @@ The `Secret` prompt has all [base options](#base-options) and the following prom
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| minLength | `number` | No | Min length of secret value. Defaults to `1`. |
-| maxLength | `number` | No | Max length of secret value. Defaults to `infinity`. |
+| label | `string` | No | Name of secret. Defaults to `Password`. |
 | hidden | `number` | No | Hide input during typing and show a fix number of asterisk's on success. |
+| minLength | `number` | No | Min length of secret value. Defaults to `0`. |
+| maxLength | `number` | No | Max length of secret value. Defaults to `infinity`. |
 
 **↑ back to:** [Prompt types](#-types)
 

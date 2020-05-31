@@ -23,8 +23,11 @@ Deno.test( 'prompt secret: empty value', async () => {
     console.log();
     await assertThrowsAsync( async () => {
         Secret.inject( '' );
-        await Secret.prompt( 'message' );
-    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Secret must be longer then 1 but has a length of 0.` ) );
+        await Secret.prompt( {
+            message: 'message',
+            minLength: 8
+        } );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Password must be longer then 8 but has a length of 0.` ) );
 } );
 
 Deno.test( 'prompt secret: invalid value', async () => {
