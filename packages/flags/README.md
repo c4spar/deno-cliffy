@@ -52,13 +52,13 @@ const { flags, literal, unknown } = parseFlags( Deno.args, {
         aliases: [ 'f' ],
         type: OptionType.STRING,
         // file cannot be combined with stdin option
-        depends: [ 'stdin' ]
+        conflicts: [ 'stdin' ]
     }, {
         name: 'stdin',
         aliases: [ 'i' ],
         type: OptionType.BOOLEAN,
         // stdin cannot be combined with file option
-        depends: [ 'file' ]
+        conflicts: [ 'file' ]
     } ]
 } );
 
@@ -88,8 +88,8 @@ if ( flags.help ) {
 | standalone | `boolean ` | No | Cannot be combined with other options. |
 | default | `any` | No | Default option value. |
 | required | `boolean ` | No | Mark option as required and throw an error if the option is missing. |
-| depends | `string[]` | No | Array of option names on which depends on this option. |
-| conflicts | `string[]` | No | Array of option names on which conflicts with this option. |
+| depends | `string[]` | No | Array of option names that depends on this option. |
+| conflicts | `string[]` | No | Array of option names that conflicts with this option. |
 | collect | `boolean` | No | Allow to call this option multiple times and add each value to an array which will be returned as result. |
 | value | `( val: any, previous?: any ) => any` | No | Custom value processing. |
 

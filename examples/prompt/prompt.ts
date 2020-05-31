@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { Checkbox, Confirm, Input, Number, Select, Toggle } from '../../packages/prompt/mod.ts';
+import { Checkbox, Confirm, Input, Number, Secret, Select, Toggle } from '../../packages/prompt/mod.ts';
 
 await Confirm.prompt( {
     message: 'Would you like to buy a pizza?'
@@ -16,6 +16,11 @@ await Input.prompt( {
 
 await Number.prompt( {
     message: 'How old are you?'
+} );
+
+await Secret.prompt( {
+    message: 'Enter your password',
+    hidden: false
 } );
 
 await Select.prompt( {
