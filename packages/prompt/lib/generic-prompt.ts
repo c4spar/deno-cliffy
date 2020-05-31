@@ -100,7 +100,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         }
 
         this.clear();
-        this.writeLine( `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.format( this.value ) ) }` );
+        this.writeLine( await this.getSuccessMessage( this.value ) );
 
         this.screen.cursorShow();
 
@@ -119,6 +119,10 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         }
 
         return message;
+    }
+
+    protected async getSuccessMessage( value: T ) {
+        return `${ await this.getMessage() } ${ this.settings.pointer } ${ green( this.format( value ) ) }`;
     }
 
     protected async read(): Promise<boolean> {

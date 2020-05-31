@@ -63,6 +63,7 @@ const result: string = await Input.prompt({message: 'Do you prefer cats or dogs?
 
 * [input](#%EF%B8%8F-input)
 * [number](#1%EF%B8%8F2%EF%B8%8F3%EF%B8%8F-number)
+* [secret](#-secret)
 * [confirm](#-confirm)
 * [toggle](#-toggle)
 * [list](#---list)
@@ -122,6 +123,28 @@ The `Number` prompt has all [base options](#base-options) and the following prom
 | max | `number` | No | Max value. Defaults to `Infinity`. |
 | float | `boolean` | No | Allow floating point inputs. Defaults to `false`. |
 | round | `number` | No | Round float values to `x` decimals. Defaults to `2`. |
+
+**↑ back to:** [Prompt types](#-types)
+
+***
+
+### 🔑 Secret
+
+**Example**
+
+```typescript
+import { Secret } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const password: string = await Secret.prompt( 'Enter your password?' );
+```
+
+**Options**
+
+The `Secret` prompt has all [base options](#base-options) and the following prompt specific options.
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| hidden | `number` | No | Hide input during typing and show a fix number of asterisk's on success. |
 
 **↑ back to:** [Prompt types](#-types)
 
