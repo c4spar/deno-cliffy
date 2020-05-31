@@ -3,11 +3,13 @@ import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
 export interface InputOptions extends GenericInputPromptOptions<string> {
-
+    minLength?: number;
+    maxLength?: number;
 }
 
 export interface InputSettings extends GenericInputPromptSettings<string> {
-
+    minLength: number;
+    maxLength: number;
 }
 
 export class Input extends GenericInput<string, InputSettings> {
@@ -20,12 +22,23 @@ export class Input extends GenericInput<string, InputSettings> {
 
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
+            minLength: 1,
+            maxLength: Infinity,
             ...options
         } ).prompt();
     }
 
-    protected validate( value: string ): boolean {
-        return typeof value === 'string' && value.length > 0;
+    protected validate( value: string ): boolean | string {
+        if ( typeof value !== 'string' ) {
+            return false;
+        }
+        if ( value.length < this.settings.minLength ) {
+            return `Value must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
+        }
+        if ( value.length > this.settings.maxLength ) {
+            return `Value can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
+        }
+        return true;
     }
 
     protected transform( value: string ): string | undefined {

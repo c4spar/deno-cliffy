@@ -97,7 +97,12 @@ const name: string = await Input.prompt( `What's your name?` );
 
 **Options**
 
-The `Input` prompt has all [base](#base-options) options and no prompt specific options.
+The `Input` prompt has all [base](#base-options) and the following prompt specific options.
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| minLength | `number` | No | Min length of value. Defaults to `1`. |
+| maxLength | `number` | No | Max length of value. Defaults to `infinity`. |
 
 **↑ back to:** [Prompt types](#-types)
 
@@ -144,6 +149,8 @@ The `Secret` prompt has all [base options](#base-options) and the following prom
 
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
+| minLength | `number` | No | Min length of secret value. Defaults to `1`. |
+| maxLength | `number` | No | Max length of secret value. Defaults to `infinity`. |
 | hidden | `number` | No | Hide input during typing and show a fix number of asterisk's on success. |
 
 **↑ back to:** [Prompt types](#-types)

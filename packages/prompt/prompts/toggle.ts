@@ -92,7 +92,7 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
         this.input = this.settings.inactive;
     }
 
-    protected validate( value: string ): boolean {
+    protected validate( value: string ): boolean | string {
         return [ this.settings.active, this.settings.inactive ].indexOf( value ) !== -1;
     }
 

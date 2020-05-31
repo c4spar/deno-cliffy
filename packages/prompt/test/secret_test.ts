@@ -24,7 +24,7 @@ Deno.test( 'prompt secret: empty value', async () => {
     await assertThrowsAsync( async () => {
         Secret.inject( '' );
         await Secret.prompt( 'message' );
-    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Secret must be longer then 1 but has a length of 0.` ) );
 } );
 
 Deno.test( 'prompt secret: invalid value', async () => {

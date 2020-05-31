@@ -90,7 +90,7 @@ export class Select<S extends SelectSettings> extends GenericList<string, string
         this.writeLine( line );
     }
 
-    protected validate( value: string ): boolean {
+    protected validate( value: string ): boolean | string {
         return typeof value === 'string' &&
             value.length > 0 &&
             this.settings.options.findIndex( option => option.value === value ) !== -1;
