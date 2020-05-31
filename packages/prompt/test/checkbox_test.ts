@@ -43,3 +43,27 @@ Deno.test( 'prompt checkbox: null value', async () => {
         } );
     }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }Invalid answer.` ) );
 } );
+
+Deno.test( 'prompt checkbox: min options', async () => {
+    console.log();
+    await assertThrowsAsync( async () => {
+        Checkbox.inject( [ 'value1', 'value2' ] );
+        await Checkbox.prompt( {
+            message: 'message',
+            minOptions: 3,
+            options: [ { value: 'value1' }, { value: 'value2' }, 'value3' ]
+        } );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }The minimum number of options is 3 but got 2.` ) );
+} );
+
+Deno.test( 'prompt checkbox: max options', async () => {
+    console.log();
+    await assertThrowsAsync( async () => {
+        Checkbox.inject( [ 'value1', 'value2' ] );
+        await Checkbox.prompt( {
+            message: 'message',
+            maxOptions: 1,
+            options: [ { value: 'value1' }, { value: 'value2' }, 'value3' ]
+        } );
+    }, Error, red( `${ Deno.build.os === 'windows' ? bold( ' × ' ) : bold( ' ✘ ' ) }The maximum number of options is 1 but got 2.` ) );
+} );

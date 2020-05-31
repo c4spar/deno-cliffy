@@ -20,12 +20,16 @@ export type CheckboxValueSettings = CheckboxOptionSettings[];
 export interface CheckboxOptions extends GenericListOptions<string[], string[]> {
     check?: string;
     uncheck?: string;
+    minOptions?: number;
+    maxOptions?: number;
     options: CheckboxValueOptions;
 }
 
 export interface CheckboxSettings extends GenericListSettings<string[], string[]> {
     check: string;
     uncheck: string;
+    minOptions: number;
+    maxOptions: number;
     options: CheckboxValueSettings;
 }
 
@@ -45,6 +49,8 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             listPointer: blue( Figures.POINTER ),
             indent: ' ',
             maxRows: 10,
+            minOptions: 0,
+            maxOptions: Infinity,
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options,
@@ -109,8 +115,8 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
     protected getValue(): string[] {
         return this.settings.options
-                   .filter( item => item.checked )
-                   .map( item => item.value );
+            .filter( item => item.checked )
+            .map( item => item.value );
     }
 
     protected writeListItem( item: CheckboxOptionSettings, isSelected?: boolean ) {
@@ -138,12 +144,25 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
         this.writeLine( line );
     }
 
-    protected validate( value: string[] ): boolean {
-        return Array.isArray( value ) &&
-            value.every( val =>
-                typeof val === 'string' &&
-                val.length > 0 &&
-                this.settings.options.findIndex( option => option.value === val ) !== -1 );
+    protected validate( value: string[] ): boolean | string {
+
+        const isValidValue = Array.isArray( value ) && value.every( val =>
+            typeof val === 'string' &&
+            val.length > 0 &&
+            this.settings.options.findIndex( option => option.value === val ) !== -1 );
+
+        if ( !isValidValue ) {
+            return false;
+        }
+
+        if ( value.length < this.settings.minOptions ) {
+            return `The minimum number of options is ${ this.settings.minOptions } but got ${ value.length }.`;
+        }
+        if ( value.length > this.settings.maxOptions ) {
+            return `The maximum number of options is ${ this.settings.maxOptions } but got ${ value.length }.`;
+        }
+
+        return true;
     }
 
     protected transform( value: string[] ): string[] {

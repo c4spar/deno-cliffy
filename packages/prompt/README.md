@@ -287,6 +287,8 @@ The `Checkbox` prompt has all [base options](#base-options) and the following pr
 | ----- | :--: | :--: | ----------- |
 | options | `(string \| Option)[]` | Yes | Array of string's or Option's. |
 | maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
+| minOptions | `number` | No | Min number of selectable options. Defaults to `0`. |
+| maxOptions | `number` | No | Max number of selectable options. Defaults to `infinity`. |
 | indent | `string` | No | List indentation. Defaults to `' '` |
 | listPointer | `string` | No | Change the list pointer icon. |
 | check | `string` | No | Change the check icon. |
