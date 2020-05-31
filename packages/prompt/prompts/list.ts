@@ -8,10 +8,18 @@ import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } f
 // @TODO: add maxLength option to list prompt
 export interface ListOptions extends GenericInputPromptOptions<string[]> {
     separator?: string;
+    minLength?: number;
+    maxLength?: number;
+    minTags?: number;
+    maxTags?: number;
 }
 
 export interface ListSettings extends GenericInputPromptSettings<string[]> {
     separator: string;
+    minLength: number;
+    maxLength: number;
+    minTags: number;
+    maxTags: number;
 }
 
 export class List extends GenericInput<string[], ListSettings> {
@@ -25,6 +33,10 @@ export class List extends GenericInput<string[], ListSettings> {
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
             separator: ',',
+            minLength: 0,
+            maxLength: Infinity,
+            minTags: 0,
+            maxTags: Infinity,
             ...options
         } ).prompt();
     }
@@ -75,7 +87,30 @@ export class List extends GenericInput<string[], ListSettings> {
     }
 
     protected validate( value: string ): boolean | string {
-        return typeof value === 'string' && value.length > 0;
+
+        if ( typeof value !== 'string' ) {
+            return false;
+        }
+
+        const values = this.transform( value ).filter( val => val !== '' );
+
+        for ( const val of values ) {
+            if ( val.length < this.settings.minLength ) {
+                return `Value must be longer then ${ this.settings.minLength } but has a length of ${ val.length }.`;
+            }
+            if ( val.length > this.settings.maxLength ) {
+                return `Value can't be longer then ${ this.settings.maxLength } but has a length of ${ val.length }.`;
+            }
+        }
+
+        if ( values.length < this.settings.minTags ) {
+            return `The minimum number of tags is ${ this.settings.minTags } but got ${ values.length }.`;
+        }
+        if ( values.length > this.settings.maxTags ) {
+            return `The maximum number of tags is ${ this.settings.maxTags } but got ${ values.length }.`;
+        }
+
+        return true;
     }
 
     protected transform( value: string ): string[] {
