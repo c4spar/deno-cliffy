@@ -211,6 +211,10 @@ The `Toggle` prompt has all [base options](#base-options) and the following prom
 | Param | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
 | separator | `string` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
+| minLength | `number` | No | Min length of a single tag. Defaults to `0`. |
+| maxLength | `number` | No | Max length of a single tag. Defaults to `infinity`. |
+| minTags | `number` | No | Min number of tags. Defaults to `0`. |
+| maxTags | `number` | No | Max number of tags. Defaults to `infinity`. |
 
 **Example**
 
