@@ -5,36 +5,39 @@ on: [push, pull_request]
 jobs:
 
   build:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    name: Test on ${{ matrix.os }} with deno-${{ matrix.deno_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        deno_version: [ 'v1.0.2' ]
+        deno_version: [ 'v1.0.0', 'v1.0.5' ]
 
     steps:
-    - name: Configure git
-      run: git config --global core.symlinks true
+      - name: Configure git
+        run: git config --global core.symlinks true
 
-    - name: Clone repository
-      uses: actions/checkout@master
+      - name: Clone repository
+        uses: actions/checkout@master
 
-    - name: Setup Deno
-      uses: denolib/setup-deno@master
-      with:
-        deno-version: ${{ matrix.deno_version }}
+      - name: Setup Deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: ${{ matrix.deno_version }}
 
-    - name: Run command test's
-      run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/option && deno test packages/command/test/type
+      - name: Deno Version
+        run: deno -V
 
-    - name: Run flags test's
-      run: deno test packages/flags
+      - name: Run command test's
+        run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/option && deno test packages/command/test/type
 
-    - name: Run keycode test's
-      run: deno test packages/keycode
+      - name: Run flags test's
+        run: deno test packages/flags
 
-    - name: Run prompt test's
-      run: deno test packages/prompt --unstable
+      - name: Run keycode test's
+        run: deno test packages/keycode
 
-    - name: Run table test's
-      run: deno test packages/table
+      - name: Run prompt test's
+        run: deno test packages/prompt --unstable
+
+      - name: Run table test's
+        run: deno test packages/table
