@@ -870,7 +870,7 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h
 ```
 
-# Stop early
+### Stop early
 
 If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
 
