@@ -1,61 +1,63 @@
-import { parseFlags } from '../../lib/flags.ts';
-import { IParseOptions } from '../../lib/types.ts';
-import { OptionType } from '../../lib/types.ts';
-import { assertEquals, assertThrows } from '../lib/assert.ts';
+import { parseFlags } from "../../lib/flags.ts";
+import { IParseOptions } from "../../lib/types.ts";
+import { OptionType } from "../../lib/types.ts";
+import { assertEquals, assertThrows } from "../lib/assert.ts";
 
-const optionalValueOptions = <IParseOptions>{
-    stopEarly: false,
-    allowEmpty: false,
-    flags: [ {
-        name: 'flag',
-        aliases: [ 'f' ],
-        type: OptionType.STRING,
-        optionalValue: true
-    } ]
+const optionalValueOptions = <IParseOptions> {
+  stopEarly: false,
+  allowEmpty: false,
+  flags: [{
+    name: "flag",
+    aliases: ["f"],
+    type: OptionType.STRING,
+    optionalValue: true,
+  }],
 };
 
-const requiredValueOptions = <IParseOptions>{
-    stopEarly: false,
-    allowEmpty: false,
-    flags: [ {
-        name: 'flag',
-        aliases: [ 'f' ],
-        type: OptionType.STRING
-    } ]
+const requiredValueOptions = <IParseOptions> {
+  stopEarly: false,
+  allowEmpty: false,
+  flags: [{
+    name: "flag",
+    aliases: ["f"],
+    type: OptionType.STRING,
+  }],
 };
 
-Deno.test( 'flags typeString flag', () => {
+Deno.test("flags typeString flag", () => {
+  const { flags, unknown, literal } = parseFlags(["-f"], optionalValueOptions);
 
-    const { flags, unknown, literal } = parseFlags( [ '-f' ], optionalValueOptions );
+  assertEquals(flags, { flag: true });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
 
-    assertEquals( flags, { flag: true } );
-    assertEquals( unknown, [] );
-    assertEquals( literal, [] );
-} );
+Deno.test("flags typeString flagValue", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["--flag", "value"],
+    optionalValueOptions,
+  );
 
-Deno.test( 'flags typeString flagValue', () => {
+  assertEquals(flags, { flag: "value" });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
 
-    const { flags, unknown, literal } = parseFlags( [ '--flag', 'value' ], optionalValueOptions );
+Deno.test("flags typeString flagValueUnknown", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-f", '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√', "unknown"],
+    optionalValueOptions,
+  );
 
-    assertEquals( flags, { flag: 'value' } );
-    assertEquals( unknown, [] );
-    assertEquals( literal, [] );
-} );
+  assertEquals(flags, { flag: '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√' });
+  assertEquals(unknown, ["unknown"]);
+  assertEquals(literal, []);
+});
 
-Deno.test( 'flags typeString flagValueUnknown', () => {
-
-    const { flags, unknown, literal } = parseFlags( [ '-f', '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√', 'unknown' ], optionalValueOptions );
-
-    assertEquals( flags, { flag: '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√' } );
-    assertEquals( unknown, [ 'unknown' ] );
-    assertEquals( literal, [] );
-} );
-
-Deno.test( 'flags typeString flagMissing', () => {
-
-    assertThrows(
-        () => parseFlags( [ '-f' ], requiredValueOptions ),
-        Error,
-        'Missing value for option: --flag'
-    );
-} );
+Deno.test("flags typeString flagMissing", () => {
+  assertThrows(
+    () => parseFlags(["-f"], requiredValueOptions),
+    Error,
+    "Missing value for option: --flag",
+  );
+});

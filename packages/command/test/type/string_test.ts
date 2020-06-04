@@ -1,29 +1,30 @@
-import { Command } from '../../lib/command.ts';
-import { assertEquals, assertThrowsAsync } from '../lib/assert.ts';
+import { Command } from "../../lib/command.ts";
+import { assertEquals, assertThrowsAsync } from "../lib/assert.ts";
 
 const cmd = new Command()
-    .throwErrors()
-    .option( '-f, --flag [value:string]', 'description ...' ).action( () => {} );
+  .throwErrors()
+  .option("-f, --flag [value:string]", "description ...").action(() => {});
 
-Deno.test( 'command typeString flag', async () => {
+Deno.test("command typeString flag", async () => {
+  const { options, args } = await cmd.parse(["-f"]);
 
-    const { options, args } = await cmd.parse( [ '-f' ] );
+  assertEquals(options, { flag: true });
+  assertEquals(args, []);
+});
 
-    assertEquals( options, { flag: true } );
-    assertEquals( args, [] );
-} );
+Deno.test("command typeString flagValue", async () => {
+  const { options, args } = await cmd.parse(["--flag", "value"]);
 
-Deno.test( 'command typeString flagValue', async () => {
+  assertEquals(options, { flag: "value" });
+  assertEquals(args, []);
+});
 
-    const { options, args } = await cmd.parse( [ '--flag', 'value' ] );
-
-    assertEquals( options, { flag: 'value' } );
-    assertEquals( args, [] );
-} );
-
-Deno.test( 'command optionStandalone flagCombineLong', async () => {
-
-    await assertThrowsAsync( async () => {
-        await cmd.parse( [ '-f', 'value', 'unknown' ] );
-    }, Error, 'Unknown command: unknown' );
-} );
+Deno.test("command optionStandalone flagCombineLong", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await cmd.parse(["-f", "value", "unknown"]);
+    },
+    Error,
+    "Unknown command: unknown",
+  );
+});

@@ -1,1 +1,1 @@
-export * from './packages/keycode/mod.ts';
+export * from "./packages/keycode/mod.ts";

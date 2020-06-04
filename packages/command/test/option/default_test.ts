@@ -1,58 +1,46 @@
-import { Command } from '../../lib/command.ts';
-import { assertEquals } from '../lib/assert.ts';
+import { Command } from "../../lib/command.ts";
+import { assertEquals } from "../lib/assert.ts";
 
-Deno.test( 'command: option -> default', async () => {
+Deno.test("command: option -> default", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .option("--flag1", "flag 1")
+    .option("--flag2 <val:string>", "flag 2", { default: "example" })
+    .parse([]);
 
-    const { options, args } = await new Command()
-        .throwErrors()
+  assertEquals(options, { flag2: "example" });
+  assertEquals(args, []);
+});
 
-        .option( '--flag1', 'flag 1' )
-        .option( '--flag2 <val:string>', 'flag 2', { default: 'example' } )
+Deno.test("command: option -> default", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .option("--flag1", "flag 1")
+    .option("--flag2 <val:string>", "flag 2", { default: "example" })
+    .parse(["--flag1"]);
 
-        .parse( [] );
+  assertEquals(options, { flag1: true, flag2: "example" });
+  assertEquals(args, []);
+});
 
-    assertEquals( options, { flag2: 'example' } );
-    assertEquals( args, [] );
-} );
+Deno.test("command: option -> default", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .option("--flag1", "flag 1")
+    .option("--flag2 <val:string>", "flag 2", { default: "example" })
+    .parse(["--flag2", "test"]);
 
-Deno.test( 'command: option -> default', async () => {
+  assertEquals(options, { flag2: "test" });
+  assertEquals(args, []);
+});
 
-    const { options, args } = await new Command()
-        .throwErrors()
+Deno.test("command: option -> default", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .option("--flag1", "flag 1")
+    .option("--flag2 <val:string>", "flag 2", { default: "example" })
+    .parse(["--flag1", "--flag2", "test"]);
 
-        .option( '--flag1', 'flag 1' )
-        .option( '--flag2 <val:string>', 'flag 2', { default: 'example' } )
-
-        .parse( [ '--flag1' ] );
-
-    assertEquals( options, { flag1: true, flag2: 'example' } );
-    assertEquals( args, [] );
-} );
-
-Deno.test( 'command: option -> default', async () => {
-
-    const { options, args } = await new Command()
-        .throwErrors()
-
-        .option( '--flag1', 'flag 1' )
-        .option( '--flag2 <val:string>', 'flag 2', { default: 'example' } )
-
-        .parse( [ '--flag2', 'test' ] );
-
-    assertEquals( options, { flag2: 'test' } );
-    assertEquals( args, [] );
-} );
-
-Deno.test( 'command: option -> default', async () => {
-
-    const { options, args } = await new Command()
-        .throwErrors()
-
-        .option( '--flag1', 'flag 1' )
-        .option( '--flag2 <val:string>', 'flag 2', { default: 'example' } )
-
-        .parse( [ '--flag1', '--flag2', 'test' ] );
-
-    assertEquals( options, { flag1: true, flag2: 'test' } );
-    assertEquals( args, [] );
-} );
+  assertEquals(options, { flag1: true, flag2: "test" });
+  assertEquals(args, []);
+});

@@ -1,1 +1,1 @@
-export * from './packages/command/mod.ts';
+export * from "./packages/command/mod.ts";

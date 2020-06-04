@@ -1,14 +1,14 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from '../../packages/command/lib/command.ts';
+import { Command } from "../../packages/command/lib/command.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .option( '-i, --info [arg:boolean]', 'Print some info.', {
-        standalone: true,
-        action: () => {
-            console.log( 'Some info' );
-            Deno.exit( 0 );
-        }
-    } )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .option("-i, --info [arg:boolean]", "Print some info.", {
+    standalone: true,
+    action: () => {
+      console.log("Some info");
+      Deno.exit(0);
+    },
+  })
+  .parse(Deno.args);

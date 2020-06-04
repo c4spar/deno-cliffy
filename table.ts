@@ -1,1 +1,1 @@
-export * from './packages/table/mod.ts';
+export * from "./packages/table/mod.ts";

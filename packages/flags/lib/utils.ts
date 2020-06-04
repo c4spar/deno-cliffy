@@ -5,11 +5,10 @@
  * @param str   The string to fill.
  * @param char  The char to fill the string with.
  */
-export function fill( count: number, str: string = '', char: string = ' ' ) {
+export function fill(count: number, str: string = "", char: string = " ") {
+  while (str.length < count) {
+    str += char;
+  }
 
-    while ( str.length < count ) {
-        str += char;
-    }
-
-    return str;
+  return str;
 }

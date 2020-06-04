@@ -1,1 +1,1 @@
-export * from './packages/flags/mod.ts';
+export * from "./packages/flags/mod.ts";

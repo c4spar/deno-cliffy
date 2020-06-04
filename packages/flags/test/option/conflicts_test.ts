@@ -1,71 +1,73 @@
-import { parseFlags } from '../../lib/flags.ts';
-import { IParseOptions, OptionType } from '../../lib/types.ts';
-import { assertEquals, assertThrows } from '../lib/assert.ts';
+import { parseFlags } from "../../lib/flags.ts";
+import { IParseOptions, OptionType } from "../../lib/types.ts";
+import { assertEquals, assertThrows } from "../lib/assert.ts";
 
-const options = <IParseOptions>{
-    allowEmpty: false,
-    flags: [ {
-        name: 'type',
-        aliases: [ 't' ],
-        type: OptionType.STRING,
-        required: true,
-        conflicts: [ 'video-type', 'audio-type', 'image-type' ]
-    }, {
-        name: 'video-type',
-        aliases: [ 'v' ],
-        type: OptionType.STRING,
-        required: true,
-        depends: [ 'audio-type', 'image-type' ],
-        conflicts: [ 'type' ]
-    }, {
-        name: 'audio-type',
-        aliases: [ 'a' ],
-        type: OptionType.STRING,
-        required: true,
-        depends: [ 'video-type', 'image-type' ],
-        conflicts: [ 'type' ]
-    }, {
-        name: 'image-type',
-        aliases: [ 'i' ],
-        type: OptionType.STRING,
-        required: true,
-        depends: [ 'video-type', 'audio-type' ],
-        conflicts: [ 'type' ]
-    } ]
+const options = <IParseOptions> {
+  allowEmpty: false,
+  flags: [{
+    name: "type",
+    aliases: ["t"],
+    type: OptionType.STRING,
+    required: true,
+    conflicts: ["video-type", "audio-type", "image-type"],
+  }, {
+    name: "video-type",
+    aliases: ["v"],
+    type: OptionType.STRING,
+    required: true,
+    depends: ["audio-type", "image-type"],
+    conflicts: ["type"],
+  }, {
+    name: "audio-type",
+    aliases: ["a"],
+    type: OptionType.STRING,
+    required: true,
+    depends: ["video-type", "image-type"],
+    conflicts: ["type"],
+  }, {
+    name: "image-type",
+    aliases: ["i"],
+    type: OptionType.STRING,
+    required: true,
+    depends: ["video-type", "audio-type"],
+    conflicts: ["type"],
+  }],
 };
 
-Deno.test( 'flags optionConflicts noArguments', () => {
+Deno.test("flags optionConflicts noArguments", () => {
+  assertThrows(
+    () => parseFlags([], options),
+    Error,
+    "Missing required option: --type",
+  );
+});
 
-    assertThrows(
-        () => parseFlags( [], options ),
-        Error,
-        'Missing required option: --type'
-    );
-} );
+Deno.test("flags optionConflicts type", () => {
+  const { flags, unknown, literal } = parseFlags(["-t", "value"], options);
 
-Deno.test( 'flags optionConflicts type', () => {
+  assertEquals(flags, { type: "value" });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
 
-    const { flags, unknown, literal } = parseFlags( [ '-t', 'value' ], options );
+Deno.test("flags optionConflicts videoAudioImageType", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-v", "value", "-a", "value", "--image-type", "value"],
+    options,
+  );
 
-    assertEquals( flags, { type: 'value' } );
-    assertEquals( unknown, [] );
-    assertEquals( literal, [] );
-} );
+  assertEquals(
+    flags,
+    { videoType: "value", audioType: "value", imageType: "value" },
+  );
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
 
-Deno.test( 'flags optionConflicts videoAudioImageType', () => {
-
-    const { flags, unknown, literal } = parseFlags( [ '-v', 'value', '-a', 'value', '--image-type', 'value' ], options );
-
-    assertEquals( flags, { videoType: 'value', audioType: 'value', imageType: 'value' } );
-    assertEquals( unknown, [] );
-    assertEquals( literal, [] );
-} );
-
-Deno.test( 'flags optionConflicts videoTypeDependsOnImageType', () => {
-
-    assertThrows(
-        () => parseFlags( [ '-v', 'value', '-a', 'value' ], options ),
-        Error,
-        'Option --video-type depends on option: --image-type'
-    );
-} );
+Deno.test("flags optionConflicts videoTypeDependsOnImageType", () => {
+  assertThrows(
+    () => parseFlags(["-v", "value", "-a", "value"], options),
+    Error,
+    "Option --video-type depends on option: --image-type",
+  );
+});

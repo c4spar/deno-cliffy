@@ -1,124 +1,136 @@
-import { KeyCode } from '../lib/key-code.ts';
-import { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from '../lib/key-codes.ts';
-import { IKey, KeyEvent } from '../lib/key-event.ts';
-import { assertEquals } from './lib/assert.ts';
+import { KeyCode } from "../lib/key-code.ts";
+import {
+  KeyMap,
+  KeyMapCtrl,
+  KeyMapShift,
+  SpecialKeyMap,
+} from "../lib/key-codes.ts";
+import { IKey, KeyEvent } from "../lib/key-event.ts";
+import { assertEquals } from "./lib/assert.ts";
 
-export const ESC = '\x1B';
+export const ESC = "\x1B";
 
-const defaults = <IKey>{
-    sequence: undefined,
-    name: undefined,
-    ctrl: false,
-    meta: false,
-    shift: false
+const defaults = <IKey> {
+  sequence: undefined,
+  name: undefined,
+  ctrl: false,
+  meta: false,
+  shift: false,
 };
 
-for ( const char of 'abcdefghijklmnopqrstuvwxyz123456789' ) {
+for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
+  Deno.test(`parse key: ${char}`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(char);
 
-    Deno.test( `parse key: ${ char }`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( char );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name: char.toLowerCase(),
-            sequence: char
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name: char.toLowerCase(),
+        sequence: char,
+      },
+    );
+  });
 }
 
-for ( const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ) {
+for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+  Deno.test(`parse key: shift + ${char.toLowerCase()}`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(char);
 
-    Deno.test( `parse key: shift + ${ char.toLowerCase() }`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( char );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name: char.toLowerCase(),
-            sequence: char,
-            shift: true
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name: char.toLowerCase(),
+        sequence: char,
+        shift: true,
+      },
+    );
+  });
 }
 
-for ( const char of '!"§$%&/()=?,;.:-_' ) {
+for (const char of '!"§$%&/()=?,;.:-_') {
+  Deno.test(`parse key: ${char}`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(char);
 
-    Deno.test( `parse key: ${ char }`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( char );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name: undefined,
-            sequence: char
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name: undefined,
+        sequence: char,
+      },
+    );
+  });
 }
 
-for ( const code of Object.keys( SpecialKeyMap ) ) {
+for (const code of Object.keys(SpecialKeyMap)) {
+  const name = SpecialKeyMap[code];
 
-    const name = SpecialKeyMap[ code ];
+  Deno.test(`parse key: ${name} (${code})`, function () {
+    // const keys: KeyEvent | undefined = KeyCode.parse( ESC + code );
+    const keys: KeyEvent | undefined = KeyCode.parse(code);
 
-    Deno.test( `parse key: ${ name } (${ code })`, function () {
-
-        // const keys: KeyEvent | undefined = KeyCode.parse( ESC + code );
-        const keys: KeyEvent | undefined = KeyCode.parse( code );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name,
-            sequence: code
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name,
+        sequence: code,
+      },
+    );
+  });
 }
 
-for ( const code of Object.keys( KeyMap ) ) {
+for (const code of Object.keys(KeyMap)) {
+  const name = KeyMap[code];
 
-    const name = KeyMap[ code ];
+  Deno.test(`parse key: ${name} (${code})`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(ESC + code);
 
-    Deno.test( `parse key: ${ name } (${ code })`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( ESC + code );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name,
-            sequence: undefined
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name,
+        sequence: undefined,
+      },
+    );
+  });
 }
 
-for ( const code of Object.keys( KeyMapShift ) ) {
+for (const code of Object.keys(KeyMapShift)) {
+  const name = KeyMapShift[code];
 
-    const name = KeyMapShift[ code ];
+  Deno.test(`parse key: shift + ${name} (${code})`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(ESC + code);
 
-    Deno.test( `parse key: shift + ${ name } (${ code })`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( ESC + code );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name,
-            sequence: undefined,
-            shift: true
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name,
+        sequence: undefined,
+        shift: true,
+      },
+    );
+  });
 }
 
-for ( const code of Object.keys( KeyMapCtrl ) ) {
+for (const code of Object.keys(KeyMapCtrl)) {
+  const name = KeyMapCtrl[code];
 
-    const name = KeyMapCtrl[ code ];
+  Deno.test(`parse key: ctrl + ${name} (${code})`, function () {
+    const keys: KeyEvent | undefined = KeyCode.parse(ESC + code);
 
-    Deno.test( `parse key: ctrl + ${ name } (${ code })`, function () {
-
-        const keys: KeyEvent | undefined = KeyCode.parse( ESC + code );
-
-        assertEquals( { ...keys }, <KeyEvent>{
-            ...defaults,
-            name,
-            sequence: undefined,
-            ctrl: true
-        } );
-    } );
+    assertEquals(
+      { ...keys },
+      <KeyEvent> {
+        ...defaults,
+        name,
+        sequence: undefined,
+        ctrl: true,
+      },
+    );
+  });
 }
