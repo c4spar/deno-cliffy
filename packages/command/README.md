@@ -849,8 +849,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-commands.ts comman
 {} test
 ```
 
-```
-
 ### Hidden commands
 
 To exclude commands's from the help and completion command's you can use the `.hidden()` method.
