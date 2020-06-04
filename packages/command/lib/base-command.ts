@@ -1395,6 +1395,10 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         return this.examples.find( example => example.name === name );
     }
 
+    public getRawArgs(): string[] {
+        return this.rawArgs;
+    }
+
     public getLiteralArgs(): string[] {
         return this.literalArgs;
     }
