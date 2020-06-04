@@ -26,6 +26,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         [ 'boolean', { name: 'boolean', handler: new BooleanType() } ]
     ] );
     protected rawArgs: string[] = [];
+    protected literalArgs: string[] = [];
     // @TODO: get script name: https://github.com/denoland/deno/pull/5034
     // protected name: string = location.pathname.split( '/' ).pop() as string;
     protected _name: string = 'COMMAND';
@@ -537,26 +538,28 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
                 await this.executeExecutable( this.rawArgs );
             }
 
-            return { options: {} as O, args: this.rawArgs as any as A, cmd: this };
+            return { options: {} as O, args: this.rawArgs as any as A, cmd: this, literal: this.literalArgs };
 
         } else if ( this._useRawArgs ) {
 
             if ( dry ) {
-                return { options: {} as O, args: this.rawArgs as any as A, cmd: this };
+                return { options: {} as O, args: this.rawArgs as any as A, cmd: this, literal: this.literalArgs };
             }
 
             return await this.execute( {} as O, ...this.rawArgs as A );
 
         } else {
 
-            const { flags, unknown } = this.parseFlags( this.rawArgs, true );
+            const { flags, unknown, literal } = this.parseFlags( this.rawArgs );
+
+            this.literalArgs = literal;
 
             const params = this.parseArguments( unknown, flags );
 
             this.validateEnvVars();
 
             if ( dry ) {
-                return { options: flags, args: params as any as A, cmd: this };
+                return { options: flags, args: params as any as A, cmd: this, literal: this.literalArgs };
             }
 
             return await this.execute( flags, ...params );
@@ -575,7 +578,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         if ( actionOption && actionOption.action ) {
             await actionOption.action( options, ...args );
-            return { options, args: args as any as A, cmd: this };
+            return { options, args: args as any as A, cmd: this, literal: this.literalArgs };
         }
 
         if ( this.fn ) {
@@ -601,7 +604,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             }
         }
 
-        return { options, args: args as any as A, cmd: this };
+        return { options, args: args as any as A, cmd: this, literal: this.literalArgs };
     }
 
     /**
@@ -1390,6 +1393,10 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     public getExample( name: string ): IExample | undefined {
 
         return this.examples.find( example => example.name === name );
+    }
+
+    public getLiteralArgs(): string[] {
+        return this.literalArgs;
     }
 
     /********************************************************************************

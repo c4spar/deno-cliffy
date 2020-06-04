@@ -1,7 +1,6 @@
-import { BaseCommand } from './base-command.ts';
-import { ITypeHandler } from '../../flags/lib/types.ts';
-import { IFlagArgument, IFlagOptions, IGenericObject, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { Type } from '../types/type.ts';
+import { BaseCommand } from './base-command.ts';
 
 /** Action handler. */
 export type IAction<O, A extends Array<any>> = ( options: O, ...args: A ) => void | Promise<void>;
@@ -77,8 +76,9 @@ export interface IExample {
 
 /** Result of `cmd.parse()`. */
 export interface IParseResult<O = any, A extends Array<any> = any> {
-    options: O,
-    args: A
+    options: O;
+    args: A;
+    literal: string[];
     cmd: BaseCommand<O>;
 }
 
