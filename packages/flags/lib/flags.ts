@@ -31,6 +31,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     const flags: IFlags = {};
     const literal: string[] = [];
     const unknown: string[] = [];
+    let stopEarly: boolean = false;
 
     opts.flags.forEach( opt => {
         opt.depends?.forEach( flag => {
@@ -63,7 +64,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
         const isFlag = current.length > 1 && current[ 0 ] === '-';
         const next = () => normalized[ i + 1 ];
 
-        if ( isFlag ) {
+        if ( isFlag && !stopEarly ) {
 
             if ( current[ 2 ] === '-' || ( current[ 1 ] === '-' && current.length === 3 ) ) {
                 throw new Error( `Invalid flag name: ${ current }` );
@@ -234,6 +235,9 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
             }
 
         } else {
+            if ( opts.stopEarly ) {
+                stopEarly = true;
+            }
             unknown.push( current );
         }
     }
