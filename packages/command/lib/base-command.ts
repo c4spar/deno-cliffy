@@ -45,6 +45,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected isExecutable: boolean = false;
     protected throwOnError: boolean = false;
     protected _allowEmpty: boolean = true;
+    protected _stopEarly: boolean = false;
     protected defaultCommand: string | undefined;
     protected _useRawArgs: boolean = false;
     protected args: IArgumentDetails[] = [];
@@ -244,6 +245,23 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public allowEmpty( allowEmpty: boolean = true ): this {
         this.cmd._allowEmpty = allowEmpty;
+        return this;
+    }
+
+    /**
+     * If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
+     *
+     * For example:
+     *     `command --debug-level warning server --port 80`
+     *
+     * Will result in:
+     *     - options: `{debugLevel: 'warning'}`
+     *     - args: `['server', '--port', '80']`
+     *
+     * @param stopEarly
+     */
+    public stopEarly( stopEarly: boolean = true ): this {
+        this.cmd._stopEarly = stopEarly;
         return this;
     }
 
@@ -650,15 +668,13 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * Parse command line args.
      *
      * @param args          Command line args.
-     * @param stopEarly     Stop early.
-     * @param knownFlaks    Known command line args.
      */
-    protected parseFlags( args: string[], stopEarly?: boolean, knownFlaks?: IFlags ): IFlagsResult<O> {
+    protected parseFlags( args: string[] ): IFlagsResult<O> {
 
         try {
             return parseFlags<O>( args, {
-                stopEarly,
-                knownFlaks,
+                stopEarly: this._stopEarly,
+                // knownFlaks,
                 allowEmpty: this._allowEmpty,
                 flags: this.getOptions( true ),
                 parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) =>
@@ -736,7 +752,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             typeParts.unshift( parts.pop() );
         }
 
-        const typeDefinition: string | undefined = typeParts.join( ' ' ) || undefined;
+        const typeDefinition: string = typeParts.join( ' ' );
 
         return { args: parts, typeDefinition };
     }

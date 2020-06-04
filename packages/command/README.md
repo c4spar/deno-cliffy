@@ -68,6 +68,7 @@
   - [Specify the argument syntax](#specify-the-argument-syntax)
   - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
+  - [Stop early](#stop-early)
   - [Git-style executable sub-commands](#git-style-executable-sub-commands)
   - [Override exit handling](#override-exit-handling)
   - [Specify environment variables](#specify-the-argument-syntax)
@@ -867,6 +868,30 @@ await new Command()
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h
+```
+
+# Stop early
+
+If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
+
+```typescript
+await new Command()
+    .stopEarly() // <-- enable stop early
+    .option( '-d, --debug-level <level:string>', '...' )
+    .arguments( '[script:string] [...args:number]' )
+    .action( ( options: any, script: string, args: string[] ) => {
+        console.log( 'options:', options );
+        console.log( 'script:', script );
+        console.log( 'args:', args );
+    } )
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/stop-early.ts -d warning server -p 80
+options: { debugLevel: "warning" }
+script: server
+args: [ "-p", "80" ]
 ```
 
 ### Git-style executable sub-commands
