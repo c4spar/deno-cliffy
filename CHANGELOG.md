@@ -1,3 +1,23 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.2...v0.9.0) (Fri Jun 5 00:31:38 2020)
+
+### Features
+
+* **command:** implement `.stopEarly()` method (#39) ([45f28e7](https://github.com/c4spar/deno-cli/commit/45f28e7))
+* **command:** add `.getRawArgs()` method ([4f18db7](https://github.com/c4spar/deno-cli/commit/4f18db7))
+* **command:** return `literal` arguments in `.parse()` method and add `.getLiteralArgs()` method (#26) ([385f38f](https://github.com/c4spar/deno-cli/commit/385f38f))
+* **flags:** implement `stopEarly` option (#39) ([ee683d3](https://github.com/c4spar/deno-cli/commit/ee683d3))
+* **prompt:** add `minOptions` and `maxOptions` option's to `Checkbox` prompt (#38) ([0980b42](https://github.com/c4spar/deno-cli/commit/0980b42))
+* **prompt:** add `minLength`, `maxLength`, `minTags` and `maxTags` option to `List` prompt (#37) ([6836a7d](https://github.com/c4spar/deno-cli/commit/6836a7d))
+* **prompt:** add `label` option to `Secret` prompt ([9127471](https://github.com/c4spar/deno-cli/commit/9127471))
+* **prompt:** add `minLength` and `maxLength` to `Input` and `Secret` prompt's (#36) ([2b13fab](https://github.com/c4spar/deno-cli/commit/2b13fab))
+* **prompt:** add secret prompt (#35) ([9aaa740](https://github.com/c4spar/deno-cli/commit/9aaa740))
+
+### Chore
+
+* **ci:** update deno version to v1.0.5 ([bb2eb25](https://github.com/c4spar/deno-cli/commit/bb2eb25))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (Sat May 30 01:40:08 2020)
 
 ### Bug Fixes
