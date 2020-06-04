@@ -45,7 +45,7 @@ export interface CheckboxSettings
 export class Checkbox extends GenericList<
   string[],
   string[],
-  CheckboxSettings,
+  CheckboxSettings
 > {
   public static inject(value: string[]): void {
     GenericPrompt.inject(value);
@@ -77,22 +77,23 @@ export class Checkbox extends GenericList<
   }
 
   protected static mapValues(
-    optValues: CheckboxValueOptions,
+    optValues: CheckboxValueOptions
   ): CheckboxOption[] {
     return super.mapValues(optValues) as CheckboxOption[];
   }
 
   protected static mapItem(
     item: CheckboxOption,
-    defaults?: string[],
+    defaults?: string[]
   ): CheckboxOptionSettings {
     return {
       ...super.mapItem(item),
-      checked: typeof item.checked === "undefined" &&
+      checked:
+        typeof item.checked === "undefined" &&
         defaults &&
         defaults.indexOf(item.value) !== -1
-        ? true
-        : !!item.checked,
+          ? true
+          : !!item.checked,
       icon: typeof item.icon === "undefined" ? true : item.icon,
     };
   }
@@ -170,10 +171,8 @@ export class Checkbox extends GenericList<
         (val) =>
           typeof val === "string" &&
           val.length > 0 &&
-          this.settings.options.findIndex((option) =>
-              option.value === val
-            ) !==
-            -1,
+          this.settings.options.findIndex((option) => option.value === val) !==
+            -1
       )
     );
   }
