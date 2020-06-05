@@ -12,9 +12,9 @@ import { BaseCommand } from './base-command.ts';
  */
 export class DefaultCommand<O = any, A extends Array<any> = any> extends BaseCommand<O, A> {
 
-    public constructor() {
+    public constructor(name?: string) {
 
-        super();
+        super(name);
 
         this.option( '-h, --help [arg:boolean]', 'Show this help.', {
                 standalone: true,

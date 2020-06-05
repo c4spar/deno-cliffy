@@ -14,9 +14,13 @@ import { DefaultCommand } from './default-command.ts';
  */
 export class Command<O = any, A extends Array<any> = any> extends DefaultCommand<O, A> {
 
-    public constructor() {
+    /**
+     * Set the name of the program.
+     * @param { name = example }
+     */
+    public constructor({name}: {name?:string} = {}) {
 
-        super();
+        super(name);
 
         this.command( 'completions', new CompletionsCommand( this ) )
             .reset();

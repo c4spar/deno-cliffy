@@ -52,6 +52,10 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected isHidden: boolean = false;
     protected isGlobal: boolean = false;
 
+    constructor(name?: string) {
+        if(name) this._name = name;
+    }
+
     /**
      * Add new sub-command.
      */
