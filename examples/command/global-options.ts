@@ -2,7 +2,7 @@
 
 import { Command } from '../../packages/command/lib/command.ts';
 
-await new Command({name: "Global"})
+await new Command()
     .version( '0.1.0' )
     .option( '-l, --local [val:string]', 'Only available on this command.' )
     .option( '-g, --global [val:string]', 'Available on this and all nested child command\'s.', { global: true } )
