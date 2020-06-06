@@ -18,6 +18,7 @@ const options = <IParseOptions>{
         name: 'boolean',
         aliases: [ 'b' ],
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         collect: true
     }, {
         name: 'number',

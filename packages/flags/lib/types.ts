@@ -40,6 +40,7 @@ export interface IFlagsResult<O = any> {
 export interface IFlagArgument {
     type?: OptionType | string;
     optionalValue?: boolean;
+    requiredValue?: boolean;
     variadic?: boolean;
     list?: boolean;
     separator?: string;

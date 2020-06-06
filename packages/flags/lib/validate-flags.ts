@@ -77,7 +77,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
         option.args?.forEach( ( arg: IFlagArgument, i: number ) => {
 
-            if ( !arg.optionalValue
+            if ( arg.requiredValue
                 && (
                     typeof values[ name ] === 'undefined'
                     || ( isArray && typeof ( values[ name ] as IFlagValue[] )[ i ] === 'undefined' )

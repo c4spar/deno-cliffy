@@ -29,11 +29,13 @@ const options = <IParseOptions>{
         name: 'variadic-option',
         aliases: [ 'e' ],
         args: [ {
-            type: OptionType.NUMBER,
-            optionalValue: false
+            type: OptionType.NUMBER
         }, {
             type: OptionType.STRING,
             optionalValue: false
+        }, {
+            type: OptionType.STRING,
+            optionalValue: true
         }, {
             type: OptionType.BOOLEAN,
             optionalValue: true,
@@ -106,11 +108,20 @@ Deno.test( 'flags optionVariadic numberInvalidValue', () => {
 
 // Exact:
 
-Deno.test( 'flags optionVariadic exact', () => {
+Deno.test( 'flags optionVariadic arg1 + arg2', () => {
 
-    const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', '1' ], options );
+    const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc' ], options );
 
-    assertEquals( flags, { variadicOption: [ 1, 'abc', true ] } );
+    assertEquals( flags, { variadicOption: [ 1, 'abc' ] } );
+    assertEquals( unknown, [] );
+    assertEquals( literal, [] );
+} );
+
+Deno.test( 'flags optionVariadic arg1 + arg2 + arg3', () => {
+
+    const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', 'def', '1', 'true' ], options );
+
+    assertEquals( flags, { variadicOption: [ 1, 'abc', 'def', true, true ] } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
@@ -118,7 +129,7 @@ Deno.test( 'flags optionVariadic exact', () => {
 Deno.test( 'flags optionVariadic exactInvalidValue', () => {
 
     assertThrows(
-        () => parseFlags( [ '-e', 'abc', 'abc', '1' ], options ),
+        () => parseFlags( [ '-e', 'abc', 'def', 'ghi', '1' ], options ),
         Error,
         'Option --variadic-option must be of type number but got: abc'
     );
@@ -144,9 +155,9 @@ Deno.test( 'flags optionVariadic exactLastOptional', () => {
 
 Deno.test( 'flags optionVariadic exactLastOptionalVariadic', () => {
 
-    const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', '1', '0', 'true', 'false' ], options );
+    const { flags, unknown, literal } = parseFlags( [ '-e', '1', 'abc', 'def', '1', '0', 'true', 'false' ], options );
 
-    assertEquals( flags, { variadicOption: [ 1, 'abc', true, false, true, false ] } );
+    assertEquals( flags, { variadicOption: [ 1, 'abc', 'def', true, false, true, false ] } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );

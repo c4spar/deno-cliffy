@@ -8,6 +8,7 @@ const options = <IParseOptions>{
         name: 'boolean',
         aliases: [ 'b' ],
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         default: false
     }, {
         name: 'string',
@@ -23,6 +24,7 @@ const options = <IParseOptions>{
         name: 'boolean2',
         aliases: [ 'B' ],
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         default: true
     }, {
         name: 'string2',

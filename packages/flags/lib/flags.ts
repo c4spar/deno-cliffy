@@ -23,7 +23,6 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     !opts.flags && ( opts.flags = [] );
 
     const normalized = normalize( args );
-    let option: IFlagOptions | undefined;
 
     let inLiteral = false;
     let negate = false;
@@ -48,6 +47,8 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
 
     for ( let i = 0; i < normalized.length; i++ ) {
 
+        let option: IFlagOptions | undefined;
+        let args: IFlagArgument[] | undefined;
         const current = normalized[ i ];
 
         // literal args after --
@@ -89,10 +90,6 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                 };
             }
 
-            if ( !option.args || !option.args.length ) {
-                option.args = [ option ];
-            }
-
             if ( !option.name ) {
                 throw new Error( `Missing name for option: ${ current }` );
             }
@@ -103,19 +100,29 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                 throw new Error( `Duplicate option: ${ current }` );
             }
 
+            args = option.args?.length ? option.args : [ {
+                type: option.type,
+                requiredValue: option.requiredValue,
+                optionalValue: option.optionalValue,
+                variadic: option.variadic,
+                list: option.list,
+                separator: option.separator
+            } ];
+
             let argIndex = 0;
+            let inOptionalArg = false;
             const previous = flags[ friendlyName ];
 
-            parseNext();
+            parseNext( option, args );
 
             if ( typeof flags[ friendlyName ] === 'undefined' ) {
 
                 if ( typeof option.default !== 'undefined' ) {
                     flags[ friendlyName ] = typeof option.default === 'function' ? option.default() : option.default;
-                } else if ( option.args && option.args[ 0 ].optionalValue ) {
-                    flags[ friendlyName ] = true;
-                } else {
+                } else if ( args[ argIndex ].requiredValue ) {
                     throw new Error( `Missing value for option: --${ option.name }` );
+                } else {
+                    flags[ friendlyName ] = true;
                 }
             }
 
@@ -127,17 +134,43 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                 flags[ friendlyName ] = value;
             }
 
-            function parseNext(): void {
+            /** Parse next argument for current option. */
+            function parseNext( option: IFlagOptions, args: IFlagArgument[] ): void {
 
-                if ( !option ) {
-                    throw new Error( 'Wrongly used parseNext.' );
-                }
+                const arg: IFlagArgument = args[ argIndex ];
 
-                if ( !option.args || !option.args[ argIndex ] ) {
+                if ( !arg ) {
                     throw new Error( 'Unknown option: ' + next() );
                 }
 
-                let arg: IFlagArgument = option.args[ argIndex ];
+                if ( !arg.type ) {
+                    arg.type = OptionType.BOOLEAN;
+                }
+
+                if ( option.args?.length ) {
+                    // make all value's required per default
+                    if ( ( typeof arg.optionalValue === 'undefined' || arg.optionalValue === false ) &&
+                        typeof arg.requiredValue === 'undefined'
+                    ) {
+                        arg.requiredValue = true;
+                    }
+                } else {
+                    // make non boolean value required per default
+                    if ( arg.type !== OptionType.BOOLEAN &&
+                        ( typeof arg.optionalValue === 'undefined' || arg.optionalValue === false ) &&
+                        typeof arg.requiredValue === 'undefined'
+                    ) {
+                        arg.requiredValue = true;
+                    }
+                }
+
+                if ( arg.requiredValue ) {
+                    if ( inOptionalArg ) {
+                        throw new Error( `An required argument can not follow an optional argument but found in: ${ option.name }` );
+                    }
+                } else {
+                    inOptionalArg = true;
+                }
 
                 if ( negate ) {
                     if ( arg.type !== OptionType.BOOLEAN && !arg.optionalValue ) {
@@ -147,22 +180,17 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                     return;
                 }
 
-                // make boolean value optional per default
-                if ( option.type === OptionType.BOOLEAN && typeof option.optionalValue === 'undefined' ) {
-                    option.optionalValue = true;
-                }
-
                 let result: IFlagValue | undefined;
                 let increase = false;
 
-                if ( arg.list && hasNext() ) {
+                if ( arg.list && hasNext( arg ) ) {
 
                     const parsed: IFlagValueType[] = next()
                         .split( arg.separator || ',' )
                         .map( ( nextValue: string ) => {
-                            const value = parseValue( nextValue );
+                            const value = parseValue( option, arg, nextValue );
                             if ( typeof value === 'undefined' ) {
-                                throw new Error( `List item of option --${ option?.name } must be of type ${ option?.type } but got: ${ nextValue }` );
+                                throw new Error( `List item of option --${ option?.name } must be of type ${ arg.type } but got: ${ nextValue }` );
                             }
                             return value;
                         } );
@@ -171,8 +199,8 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                         result = parsed;
                     }
                 } else {
-                    if ( hasNext() ) {
-                        result = parseValue( next() );
+                    if ( hasNext( arg ) ) {
+                        result = parseValue( option, arg, next() );
                     } else if ( arg.optionalValue && arg.type === OptionType.BOOLEAN ) {
                         result = true;
                     }
@@ -182,12 +210,12 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                     i++;
                     if ( !arg.variadic ) {
                         argIndex++;
-                    } else if ( option.args && option.args[ argIndex + 1 ] ) {
+                    } else if ( args[ argIndex + 1 ] ) {
                         throw new Error( 'An argument cannot follow an variadic argument: ' + next() );
                     }
                 }
 
-                if ( typeof result !== 'undefined' && ( ( option.args && option.args.length > 1 ) || arg.variadic ) ) {
+                if ( typeof result !== 'undefined' && ( ( args.length > 1 ) || arg.variadic ) ) {
 
                     if ( !flags[ friendlyName ] ) {
                         flags[ friendlyName ] = [];
@@ -196,31 +224,27 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                     ( flags[ friendlyName ] as IFlagValue[] ).push( result );
 
 
-                    if ( hasNext() ) {
-                        parseNext();
+                    if ( hasNext( arg ) ) {
+                        parseNext( option, args );
                     }
                 } else {
                     flags[ friendlyName ] = result;
                 }
 
-                function hasNext(): boolean {
+                /** Check if current option should have an argument. */
+                function hasNext( arg: IFlagArgument ): boolean {
 
-                    return typeof normalized[ i + 1 ] !== 'undefined' &&
-
+                    return !!(
+                        normalized[ i + 1 ] &&
+                        ( arg.optionalValue || arg.requiredValue || arg.variadic ) &&
                         ( normalized[ i + 1 ][ 0 ] !== '-' ||
                             ( arg.type === OptionType.NUMBER && !isNaN( normalized[ i + 1 ] as any ) )
                         ) &&
-
-                        // ( arg.type !== OptionType.BOOLEAN || [ 'true', 'false', '1', '0' ].indexOf( normalized[ i + 1 ] ) !== -1 ) &&
-
-                        typeof arg !== 'undefined';
+                        arg );
                 }
 
-                function parseValue( nextValue: string ): IFlagValueType {
-
-                    if ( !option ) {
-                        throw new Error( 'Wrongly used parseValue.' );
-                    }
+                /** Parse argument value.  */
+                function parseValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string ): IFlagValueType {
 
                     let result: IFlagValueType = opts.parse ?
                         opts.parse( arg.type || OptionType.STRING, option, arg, nextValue ) :

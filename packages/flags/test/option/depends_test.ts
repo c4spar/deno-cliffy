@@ -99,14 +99,17 @@ const options2 = {
     flags: [ {
         name: 'standalone',
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         standalone: true
     }, {
         name: 'flag1',
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         depends: [ 'flag2' ]
     }, {
         name: 'flag2',
         type: OptionType.BOOLEAN,
+        optionalValue: true,
         depends: [ 'flag1' ],
         default: false
     } ]

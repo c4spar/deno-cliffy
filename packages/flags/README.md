@@ -72,37 +72,38 @@ if ( flags.help ) {
 
 ### parseFlags Options
 
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| allowEmpty | `boolean` | No | Allow no arguments. Defaults to `false` |
-| stopEarly | `boolean` | No | If enabled, all values starting from the first non option argument will be added to `unknown`. |
-| flags | `IFlagOptions[]` | No | Array of flag options. |
-| parse | `function` | No | Custom type parser. |
+| Param      | Type             | Required | Description                                                                                    |
+| ---------- |:----------------:|:--------:| ---------------------------------------------------------------------------------------------- |
+| allowEmpty | `boolean`        | No       | Allow no arguments. Defaults to `false`                                                        |
+| stopEarly  | `boolean`        | No       | If enabled, all values starting from the first non option argument will be added to `unknown`. |
+| flags      | `IFlagOptions[]` | No       | Array of flag options.                                                                         |
+| parse      | `function`       | No       | Custom type parser.                                                                            |
 
 ### Flag Options
 
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| name | `string` | Yes | The name of the option. |
-| args | `IFlagArgument[]` | No | An Array of argument options. |
-| aliases | `string[]` | No | Array of option alias's. |
-| standalone | `boolean ` | No | Cannot be combined with other options. |
-| default | `any` | No | Default option value. |
-| required | `boolean ` | No | Mark option as required and throw an error if the option is missing. |
-| depends | `string[]` | No | Array of option names that depends on this option. |
-| conflicts | `string[]` | No | Array of option names that conflicts with this option. |
-| collect | `boolean` | No | Allow to call this option multiple times and add each value to an array which will be returned as result. |
-| value | `( val: any, previous?: any ) => any` | No | Custom value processing. |
+| Param      | Type                                  | Required | Description                                                                                               |
+| ---------- |:-------------------------------------:|:--------:| --------------------------------------------------------------------------------------------------------- |
+| name       | `string`                              | Yes      | The name of the option.                                                                                   |
+| args       | `IFlagArgument[]`                     | No       | An Array of argument options.                                                                             |
+| aliases    | `string[]`                            | No       | Array of option alias's.                                                                                  |
+| standalone | `boolean `                            | No       | Cannot be combined with other options.                                                                    |
+| default    | `any`                                 | No       | Default option value.                                                                                     |
+| required   | `boolean `                            | No       | Mark option as required and throw an error if the option is missing.                                      |
+| depends    | `string[]`                            | No       | Array of option names that depends on this option.                                                        |
+| conflicts  | `string[]`                            | No       | Array of option names that conflicts with this option.                                                    |
+| collect    | `boolean`                             | No       | Allow to call this option multiple times and add each value to an array which will be returned as result. |
+| value      | `( val: any, previous?: any ) => any` | No       | Custom value processing.                                                                                  |
 
 ### Argument options
 
-| Param | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
-| type | `OptionType \| string` | no | Type of the argument. |
-| optionalValue | `boolean` | no | Make argument optional. |
-| variadic | `boolean` | no | Make arguments variadic. |
-| list | `boolean` | no | Split argument by `separator`. |
-| separator | `string` | no | List separator. Defaults to `,` |
+| Param         | Type                   | Required | Description                     |
+| ------------- |:----------------------:|:--------:| ------------------------------- |
+| type          | `OptionType \| string` | no       | Type of the argument.           |
+| optionalValue | `boolean`              | no       | Make argument optional.         |
+| requiredValue | `boolean`              | no       | Make argument required.         |
+| variadic      | `boolean`              | no       | Make arguments variadic.        |
+| list          | `boolean`              | no       | Split argument by `separator`.  |
+| separator     | `string`               | no       | List separator. Defaults to `,` |
 
 ## Custom type processing
 

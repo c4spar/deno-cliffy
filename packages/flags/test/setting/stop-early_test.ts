@@ -11,15 +11,18 @@ Deno.test( 'flags stopEarly disable', () => {
         flags: [ {
             name: 'flag',
             aliases: [ 'f' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         }, {
             name: 'script-arg1',
             aliases: [ 's' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         }, {
             name: 'script-arg2',
             aliases: [ 'S' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         } ]
     } );
 
@@ -37,15 +40,18 @@ Deno.test( 'flags stopEarly enabled', () => {
         flags: [ {
             name: 'flag',
             aliases: [ 'f' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         }, {
             name: 'script-arg1',
             aliases: [ 's' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         }, {
             name: 'script-arg2',
             aliases: [ 'S' ],
-            type: OptionType.BOOLEAN
+            type: OptionType.BOOLEAN,
+            optionalValue: true
         } ]
     } );
 
@@ -64,15 +70,18 @@ Deno.test( 'flags stopEarly unknown option', () => {
             flags: [ {
                 name: 'flag',
                 aliases: [ 'f' ],
-                type: OptionType.BOOLEAN
+                type: OptionType.BOOLEAN,
+                optionalValue: true
             }, {
                 name: 'script-arg1',
                 aliases: [ 's' ],
-                type: OptionType.BOOLEAN
+                type: OptionType.BOOLEAN,
+                optionalValue: true
             }, {
                 name: 'script-arg2',
                 aliases: [ 'S' ],
-                type: OptionType.BOOLEAN
+                type: OptionType.BOOLEAN,
+                optionalValue: true
             } ]
         } ),
         Error,

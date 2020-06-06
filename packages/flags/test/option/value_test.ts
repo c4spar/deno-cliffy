@@ -3,25 +3,34 @@ import { IParseOptions } from '../../lib/types.ts';
 import { assertEquals } from '../lib/assert.ts';
 
 const options = <IParseOptions>{
-    stopEarly: false,
-    allowEmpty: false,
     flags: [ {
         name: 'flag',
         aliases: [ 'f' ],
+        optionalValue: true,
         value( value: string ): string[] {
             return [ value ];
         }
     }, {
         name: 'flag2',
-        aliases: [ 'F' ]
+        aliases: [ 'F' ],
+        optionalValue: true
     } ]
 };
 
-Deno.test( 'flags optionVariadic optional', () => {
+Deno.test( 'flags: value handler', () => {
+
+    const { flags, unknown, literal } = parseFlags( [ '-f', '-F' ], options );
+
+    assertEquals( flags, { flag: [ true ], flag2: true } );
+    assertEquals( unknown, [] );
+    assertEquals( literal, [] );
+} );
+
+Deno.test( 'flags: value handler with optional arg', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f', '1', '-F', '1' ], options );
 
-    assertEquals( flags, { flag: [ '1' ], flag2: '1' } );
+    assertEquals( flags, { flag: [ true ], flag2: true } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );
