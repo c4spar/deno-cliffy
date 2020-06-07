@@ -12,23 +12,30 @@ export function normalize( args: string[] ) {
 
         if ( inLiteral ) {
             normalized.push( arg );
+
         } else if ( arg === '--' ) {
             inLiteral = true;
             normalized.push( arg );
+
         } else if ( arg[ 0 ] === '-' ) {
+            const isLong = arg[ 1 ] === '-';
+
             if ( arg.includes( '=' ) ) {
                 const parts = arg.split( '=' );
                 const flag = parts.shift() as string;
-                if ( arg[ 1 ] === '-' ) {
+
+                if ( isLong ) {
                     normalized.push( flag );
                 } else {
-                    flag.slice( 1 ).split( '' ).forEach( val => normalized.push( `-${ val }` ) );
+                    normalizeShortFlags( flag );
                 }
                 normalized.push( parts.join( '=' ) );
-            } else if ( arg[ 1 ] === '-' ) {
+
+            } else if ( isLong ) {
                 normalized.push( arg );
+
             } else {
-                arg.slice( 1 ).split( '' ).forEach( val => normalized.push( `-${ val }` ) );
+                normalizeShortFlags( arg );
             }
         } else {
             normalized.push( arg );
@@ -36,4 +43,16 @@ export function normalize( args: string[] ) {
     }
 
     return normalized;
+
+    function normalizeShortFlags( flag: string ): void {
+
+        const flags = flag.slice( 1 ).split( '' );
+
+        if ( isNaN( flag[ flag.length - 1 ] as any ) ) {
+            flags.forEach( val => normalized.push( `-${ val }` ) );
+        } else {
+            normalized.push( `-${ flags.shift() }` );
+            normalized.push( flags.join( '' ) );
+        }
+    }
 }
