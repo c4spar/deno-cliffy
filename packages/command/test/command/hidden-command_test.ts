@@ -36,8 +36,8 @@ Deno.test( 'hidden command help', async () => {
 
   Options:
 
-    -h, --help     [arg:boolean]  - Show this help.                            
-    -V, --version  [arg:boolean]  - Show the version number for this program.  
+    -h, --help       - Show this help.                            
+    -V, --version    - Show the version number for this program.  
 
   Commands:
 

@@ -127,11 +127,14 @@ The options can be accessed as properties on the options object passed to the `.
 
 ### Common option types: boolean, number and string
 
-Each option can have multiple required and optional values. Required values are declared using angle brackets and optional values with square brackets. Each value can take a type and an action: `<name:type:action>`
+Each option can have multiple required and optional values. Required values are declared using angle brackets `<>` and
+optional values with square brackets `[]`. Types are declared after the argument name separated by colon `<name:type>`.
 
-There are three pre defined option types: `boolean`, `number` and `string`. An `boolean` value can be one of: `true`, `false`, `1` or `0`, a `number` can be any nummeric value and a `string` can be any value.
+There are three pre defined types: `boolean`, `number` and `string`. An `boolean` value can be one of: `true`, `false`,
+`1` or `0`, a `number` can be any nummeric value and a `string` can be any value.
 
-Type and action are both optional. The type defaults to `boolean` and the action to the type specific action. Action are used for shell completion and will be more explained in the [autocompletion](#autocompletion) section.
+Argument and types are both optional. If no argument is given the option is interpreted as boolean without a value. If an
+argument is given without a type, the type defaults to `string`.
 
 ```typescript
 #!/usr/bin/env -S deno run
@@ -139,7 +142,7 @@ Type and action are both optional. The type defaults to `boolean` and the action
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
-    // boolean with optional value
+    // boolean with no value
     .option( '-d, --debug', 'output extra debugging.' )
     // boolean with optional value
     .option( '-c, --cash [cash:boolean]', 'Pay with cash.' )

@@ -16,7 +16,7 @@ export class DefaultCommand<O = any, A extends Array<any> = any> extends BaseCom
 
         super();
 
-        this.option( '-h, --help [arg:boolean]', 'Show this help.', {
+        this.option( '-h, --help', 'Show this help.', {
                 standalone: true,
                 action: () => {
                     this.help();
@@ -24,18 +24,13 @@ export class DefaultCommand<O = any, A extends Array<any> = any> extends BaseCom
                 }
             } )
 
-            .option( '-V, --version [arg:boolean]', 'Show the version number for this program.', {
+            .option( '-V, --version', 'Show the version number for this program.', {
                 standalone: true,
                 action: () => {
                     this.log( this.ver );
                     Deno.exit( 0 );
                 }
             } )
-
-            // .option( '-v, --verbose [arg:number]', 'Increase debug output.', {
-            //     collect: true,
-            //     value: ( val: boolean, prev: number = 0 ) => val ? prev + 1 : prev - 1
-            // } )
 
             .command( 'help', new HelpCommand( this ) )
 

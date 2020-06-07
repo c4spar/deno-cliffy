@@ -415,10 +415,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const result = this.splitArguments( flags );
 
-        if ( !result.typeDefinition ) {
-            result.typeDefinition = '[value:boolean]';
-        }
-
         const args: IArgumentDetails[] = result.typeDefinition ? this.parseArgsDefinition( result.typeDefinition ) : [];
 
         const option: IOption = {
@@ -426,7 +422,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             description: desc,
             args,
             flags: result.args.join( ', ' ),
-            typeDefinition: result.typeDefinition || '[value:boolean]',
+            typeDefinition: result.typeDefinition,
             ...opts
         };
 
