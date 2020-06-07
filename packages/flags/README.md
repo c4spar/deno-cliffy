@@ -22,31 +22,65 @@
 </p>
 
 <p align="center">
-  <b> Command line parser for <a href="https://deno.land/">Deno</a></b></br>
+  <b> Command line arguments parser for <a href="https://deno.land/">Deno</a></b></br>
   <sub>>_ Used by cliffy's <a href="../command/">command</a> module<sub>
 </p>
 
 ## Usage
 
 ```typescript
+import { parseFlags } from 'https://deno.land/x/cliffy/flags.ts';
+
+console.log( parseFlags( Deno.args ) );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -a foo -b bar
+{ flags: { a: "foo", b: "bar" }, unknown: [], literal: [] }
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y 4 -n5 -abc --beep=boop foo bar baz
+{
+  flags: { x: "3", y: "4", n: "5", a: true, b: true, c: true, beep: "boop" },
+  unknown: [ "foo", "bar", "baz" ],
+  literal: []
+}
+```
+
+### With Options
+
+```typescript
 import { parseFlags, OptionType } from 'https://deno.land/x/cliffy/flags.ts';
 
-const { flags, literal, unknown } = parseFlags( Deno.args, {
+const result = parseFlags( Deno.args, {
     allowEmpty: true,
+    stopEarly: true,
     flags: [ {
+        name: 'help',
+        aliases: [ 'h' ],
+        // a standalone option cannot be combined with other options
+        standalone: true
+    }, {
         name: 'verbose',
         aliases: [ 'v' ],
-        type: OptionType.BOOLEAN,
         // allow to define this option multiple times on the command line
         collect: true,
         // make --verbose incremental: turn value into an number and increase the value for each --verbose option
-        value: ( val: boolean, previous: number = 0 ) => previous + 1
+        value: ( val: boolean, previous: number = 0 ) => val ? previous + 1 : 0
     }, {
-        name: 'help',
-        aliases: [ 'h' ],
+        name: 'debug',
+        aliases: [ 'd' ],
         type: OptionType.BOOLEAN,
-        // a standalone option cannot be combined with other options
-        standalone: true
+        optionalValue: true
+    }, {
+        name: 'silent',
+        aliases: [ 's' ]
+    }, {
+        name: 'amount',
+        aliases: [ 'n' ],
+        type: OptionType.NUMBER,
+        requiredValue: true
     }, {
         name: 'file',
         aliases: [ 'f' ],
@@ -56,16 +90,21 @@ const { flags, literal, unknown } = parseFlags( Deno.args, {
     }, {
         name: 'stdin',
         aliases: [ 'i' ],
-        type: OptionType.BOOLEAN,
         // stdin cannot be combined with file option
         conflicts: [ 'file' ]
     } ]
 } );
 
-if ( flags.help ) {
-    console.log( 'print help...' );
-}
+console.log( result );
+```
 
+```
+$ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./example.ts -d 1 -s foo bar baz --beep -- --boop
+{
+  flags: { verbose: 3, amount: 5, file: "./example.ts", debug: true, silent: true },
+  unknown: [ "foo", "bar", "baz", "--beep" ],
+  literal: [ "--boop" ]
+}
 ```
 
 ## Options
@@ -104,6 +143,14 @@ if ( flags.help ) {
 | variadic      | `boolean`              | no       | Make arguments variadic.        |
 | list          | `boolean`              | no       | Split argument by `separator`.  |
 | separator     | `string`               | no       | List separator. Defaults to `,` |
+
+### OptionType
+
+* `OptionType.STRING`
+
+* `OptionType.NUMBER`
+
+* `OptionType.BOOLEAN`
 
 ## Custom type processing
 
