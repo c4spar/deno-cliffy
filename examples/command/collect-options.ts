@@ -3,8 +3,7 @@
 import { Command } from '../../packages/command/lib/command.ts';
 
 const { options } = await new Command()
-    .option( '-u, --audio-codec <type:string>', 'description ...' )
-    .option( '-p, --video-codec <type:string>', 'description ...', { depends: [ 'audio-codec' ] } )
+    .option( '-c, --color <color:string>', 'read from file ...', { collect: true } )
     .parse( Deno.args );
 
 console.log( options );

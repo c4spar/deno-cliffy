@@ -26,185 +26,134 @@
   <sub>>_ Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions <sub>
 </p>
 
-### ✨ Features
-
-* ⭐️ chainable ⭐️
-* ⭐️ short and long flags ⭐️
-* ⭐️ nested sub-commands ⭐️
-* ⭐️ aliases ⭐️
-* ⭐️ depending & conflicting options ⭐️
-* ⭐️ negatable options ⭐️
-* ⭐️ type checking ⭐️
-* ⭐️ custom type's ⭐️
-* ⭐️ custom value processing ⭐️
-* ⭐️ custom error handling ⭐️
-* ⭐️ git style sub commands ⭐️
-* ⭐️ environment variable's validation ⭐️
-* ⭐️ auto generated help ⭐️
-* ⭐️ out of the box support for shell completion's ⭐️
-
-### Table of content
-
-- [Creating a program](#creating-a-program)
+- [Usage](#usage)
 - [Options](#options)
-  - [Common option types: boolean, number and string](#common-option-types-boolean-number-and-string)
+  - [Common option types: string, number and boolean](#common-option-types-string-number-and-boolean)
   - [List option types](#list-option-types)
-  - [Custom option types](#custom-option-types)
-  - [Auto completion](#auto-completion)
   - [Variadic options](#variadic-options)
   - [Default option value](#default-option-value)
   - [Required options](#required-options)
   - [Negatable options](#negatable-options)
   - [Global options](#global-options)
-  - [Options which depends on other options](#options-which-depends-on-other-options)
-  - [Options which conflicts with other options](#options-which-conflicts-with-other-options)
-  - [Custom option processing](#custom-option-processing)
-  - [Standalone options](#standalone-options)
   - [Hidden options](#hidden-options)
-  - [Specify an action for an option](#specify-an-action-for-an-option)
+  - [Standalone options](#standalone-options)
+  - [Conflicting options](#conflicting-options)
+  - [Depending options](#depending-options)
+  - [Collect options](#collect-options)
+  - [Custom option processing](#custom-option-processing)
+  - [Option action handler](#option-action-handler)
 - [Commands](#commands)
+  - [Argument syntax](#argument-syntax)
   - [Action handler](#action-handler)
-  - [Sub-commands](#sub-commands)
-  - [Specify the argument syntax](#specify-the-argument-syntax)
+  - [Executable sub-commands](#executable-sub-commands)
   - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
   - [Stop early](#stop-early)
-  - [Git-style executable sub-commands](#git-style-executable-sub-commands)
   - [Override exit handling](#override-exit-handling)
-  - [Specify environment variables](#specify-the-argument-syntax)
-  - [Specify examples](#specify-examples)
+- [Custom types](#custom-types)
+  - [Function types](#function-types)
+  - [Class types](#class-types)
+  - [Global types](#global-types)
+- [Environment variables](#environment-variables)
+- [Add examples](#add-examples)
+- [Shell completion](#shell-completion)
 - [Generic options and arguments](#generic-options-and-arguments)
-- [Default options & commands](#default-options--commands)
+- [Default options and commands](#default-options-and-commands)
   - [Version option](#version-option)
   - [Help option & command](#help-option--command)
   - [Completions command](#completions-command)
 - [License](#license)
 
-## Creating a program
+## Usage
 
-To create a program with cliffy you can import the `Command` class from the cliffy module https://deno.land/x/cliffy/mod.ts or directly from the command module https://deno.land/x/cliffy/command.ts.
+To create a program with cliffy you can import the `Command` class from the command module https://deno.land/x/cliffy/command.ts.
 
 The `Command` class is used to create a new command or sub-command.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
+    .name( 'cliffy' )
     .version( '0.1.0' )
-    .description( 'Example description ...' )
+    .description( `Command line framework for Deno` )
     .parse( Deno.args );
 ```
 
-```textile
-$ ./examples/command/creating-a-program.ts help
-
-  Usage:   creating-a-program.ts
-  Version: v0.0.1
-
-  Description:
-
-    Example description ...
-
-  Options:
-
-    -h, --help     [arg:boolean]  - Show this help.
-    -V, --version  [arg:boolean]  - Show the version number for this program.
-
-  Commands:
-
-    help         [command:string]  - Show this help.
-    completions                    - Generate shell completions for zsh and bash.
 ```
+$ deno run https://deno.land/x/cliffy/examples/command/usage.ts --help
+```
+
+![](../../assets/img/usage.png)
 
 ## Options
 
-Options are defined with the `.option()` method. Each option can have multiple short flag's (single character) and long name's, separated by a comma.
+Options are defined with the `.option()` method and can be accessed as properties on the options object which is passed to the `.action()` handler and returned by the `.parse()` method.
 
-The options can be accessed as properties on the options object passed to the `.action()` handler and return by the `.parse()` method. Multi-word options such as `--template-engine` are camel-cased, becoming `options.templateEngine` etc. Multiple short flags may be combined as a single arg, for example `-abc` is equivalent to `-a -b -c`.
+As first parameter of the `.options()` method you define the option names and arguments. Each option can have multiple short and long flag's, separated by comma. Multi-word options such as `--template-engine` are camel-cased, becoming `options.templateEngine` and multiple short flags may be combined as a single arg, for example `-abc` is equivalent to `-a -b -c` and `-n5` is equivalent to `-n 5` and `-n=5`.
 
+An option can have multiple required and optional arguments, separated by space. Required values are declared using angle brackets `<>` and optional values with square brackets `[]`.
 
-### Common option types: boolean, number and string
-
-Each option can have multiple required and optional values. Required values are declared using angle brackets `<>` and
-optional values with square brackets `[]`. Types are declared after the argument name separated by colon `<name:type>`.
-
-There are three pre defined types: `boolean`, `number` and `string`. An `boolean` value can be one of: `true`, `false`,
-`1` or `0`, a `number` can be any nummeric value and a `string` can be any value.
-
-Argument and types are both optional. If no argument is given the option is interpreted as boolean without a value. If an
-argument is given without a type, the type defaults to `string`.
+The second parameter of the `.options()` method is the help description and the thrid parameter can be an options object.
 
 ```typescript
-#!/usr/bin/env -S deno run
+import { Command } from 'https://deno.land/x/cliffy/command';
 
+const { options } = await new Command()
+    .option( '-s, --silent', 'disable output.' )
+    .option( '-d, --debug [level]', 'output extra debugging.' )
+    .option( '-p, --port <port>', 'the port number.' )
+    .option( '-h, --host [hostname]', 'the host name.', { default: 'localhost' } )
+    .parse( Deno.args );
+
+console.log( 'server running at %s:%s', options.host, options.port );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/options.ts -p 80
+server running at localhost:80
+```
+
+The `.parse()` method processes all arguments, leaving any options consumed by the command in the `options` object, all arguments in the `args` array and all literal arguments in the literal array. For all unknown options the command will throw an error message and exit the program with `Deno.exit(1)`.
+
+### Common option types: string, number and boolean
+
+Optionally you can declare a types after the argument name, separated by colon `<name:type>`. If no type is specified, the type defaults to `string`. Following types are availeble per default (*more will be added*):
+
+* **string:** can be any value
+
+* **number:** can be any nummeric value
+
+* **boolean:** can be one of: `true`, `false`, `1` or `0`,
+
+```typescript
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
-    // boolean with no value
-    .option( '-d, --debug', 'output extra debugging.' )
-    // boolean with optional value
-    .option( '-c, --cash [cash:boolean]', 'Pay with cash.' )
-    // boolean with required value
-    .option( '-s, --small <small:boolean>', 'Small pizza size.' )
-    // string with required value
+    // optional boolean value
+    .option( '-s, --small [small:boolean]', 'Small pizza size.' )
+    // required string value
     .option( '-p, --pizza-type <type:string>', 'Flavour of pizza.' )
-    // number with required value
+    // required number value
     .option( '-a, --amount <amount:number>', 'Pieces of pizza.' )
-    // parse arguments
     .parse( Deno.args );
 
-if ( options.debug ) {
-    console.log( options );
-}
-
-console.log( 'pizza details:' );
-
-if ( options.small ) {
-    console.log( '- small pizza size' );
-}
-
-if ( options.pizzaType ) {
-    console.log( `- ${ options.pizzaType }` );
-}
-
-if ( options.amount ) {
-    console.log( '- %s pieces', options.amount );
-}
+console.log( options );
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -d
-{ debug: true }
-pizza details:
-
 $ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -p
 Error: Missing value for option: --pizza-type
 
-$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -ds -p vegetarian
-{ debug: true, small: true, pizzaType: "vegetarian" }
-pizza details:
-- small pizza size
-- vegetarian
-
-$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -d --pizza-type cheese --amount 2 --notes "notes ..."
-{ debug: true, pizzaType: "cheese", amount: 2, notes: "notes ..." }
-pizza details:
-- cheese
-- 2 pieces
-- notes: notes ...
+$ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -sp vegetarian --amount 3
+{ small: true, pizzaType: "vegetarian", amount: 3 }
 ```
-
-`cmd.parse(Deno.args)` processes the arguments, leaving any options consumed by the command in the `options` object and all arguments in the `args` array. For all unknown options the command will throw an error message and exit the program with `Deno.exit(1)`.
 
 ### List option types
 
 Each type of option's can be a list of comma seperated items. The default seperator is a `,` and can be changed with the `separator` option.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
@@ -225,163 +174,11 @@ $ deno run https://deno.land/x/cliffy/examples/command/list-option-type.ts -o "1
 { otherList: [ "1", "2", "3" ] }
 ```
 
-
-### Custom option types
-
-You can register custom types with the `.type()` method. The first argument is the name of the type, the second can be either a function or an instance of `Type` and the third argument is an options object.
-
-This example shows you how to use a function as type handler.
-
-```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-import { IFlagArgument, IFlagOptions, ITypeHandler } from 'https://deno.land/x/cliffy/flags.ts';
-
-const email = (): ITypeHandler<string> => {
-
-    const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    return ( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined => {
-
-        if ( value ) {
-            if ( !emailRegex.test( value.toLowerCase() ) ) {
-                throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
-            }
-        }
-
-        return value || undefined;
-    };
-};
-
-const { options } = await new Command()
-    .type( 'email', email() )
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .parse( Deno.args );
-
-console.log( options );
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my@email.de"
-{ email: "my@email.de" }
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my @email.de"
-Option --email must be a valid email but got: my @email.de
-```
-
-This example shows you how to use a class as type handler.
-
-```typescript
-#!/usr/bin/env -S deno run
-
-import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
-import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags.ts';
-
-class EmailType extends Type<string> {
-
-    protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    parse( option: IFlagOptions, arg: IFlagArgument, value: string | false ): string | undefined {
-
-        if ( value ) {
-            if ( !this.emailRegex.test( value.toLowerCase() ) ) {
-                throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
-            }
-        }
-
-        return value || undefined;
-    }
-}
-
-await new Command()
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .type( 'email', new EmailType() )
-    .parse( Deno.args );
-
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my@email.de"
-{ email: "my@email.de" }
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my @email.de"
-Option --email must be a valid email but got: my @email.de
-```
-
-To make an type available for child commands you can set the `global` option in the options argument.
-
-```
-await new Command()
-    .type( 'email', email(), { global: true } )
-
-    .command( 'login' )
-    .description( 'Login with email.' )
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .action( console.log )
-
-    .command( 'config' )
-    .description( 'Manage config.' )
-    .option( '-a, --admin-email [value:email]', 'Get or set admin email address.' )
-    .action( console.log )
-
-    .parse( Deno.args );
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/global-custom-type.ts login --email "my@email.de"
-{ email: "my@email.de" }
-```
-
-### Auto completion
-
-Cliffy supports auto-completion out of the box for `zsh` and `bash`.
-
-> At the moment only `zsh` is supported.
-
-Some predefined types like `boolean` has predefined auto-completion. There are two ways to add auto-completion to types. One option is defining an action. An auto-completion action is declared with the `.complete()` method and can be used in the command arguments declaration and by any option. The action is added after the type separated by colon.
-
-```typescript
-import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
-
-await new Command()
-    .arguments( '[value:string:email]' )
-    .option( '-e, --email <value:string:email>', 'Your email address.' )
-    .complete( 'email', () => [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ] )
-    .parse( Deno.args );
-```
-
-Another way to add autocompletion is by creating a custom type class with a `.complete()` method.
-
-```typescript
-import { Command, StringType } from 'https://deno.land/x/cliffy/command.ts';
-
-class EmailType extends StringType {
-
-    complete(): string[] {
-        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
-    }
-}
-
-await new Command()
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .type( 'email', new EmailType() )
-    .parse( Deno.args );
-```
-
-Enabling auto completion is explained in the [completions command](#completions-command) section.
-
 ### Variadic options
 
 The last argument of an option can be variadic, and only the last argument. To make an argument variadic you append ... to the argument name. For example:
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -404,8 +201,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/variadic-options.ts -d di
 You can specify a default value for an option with an optional value.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = new Command()
@@ -428,8 +223,6 @@ cheese: mozzarella
 You may specify a required (mandatory) option.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -450,8 +243,6 @@ You can call the long name from an option with a boolean or an optional value (d
 You can specify a default value for the flag and it can be overridden on command line.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
@@ -469,19 +260,10 @@ console.log( `You ordered a pizza with ${ sauceStr } and ${ cheeseStr }` );
 $ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts
 You ordered a pizza with sauce and mozzarella cheese
 
-$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts  --cheese
-You ordered a pizza with sauce and mozzarella cheese
-
-$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts  --sauce
-You ordered a pizza with sauce and mozzarella cheese
-
-$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --cheese blue
-You ordered a pizza with sauce and blue cheese
-
 $ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --no-sauce --no-cheese
 You ordered a pizza with no sauce and no cheese
 
-$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --cheese parmesan
+$ deno run https://deno.land/x/cliffy/examples/command/negatable-options.ts --sauce --cheese parmesan
 You ordered a pizza with sauce and parmesan cheese
 ```
 
@@ -490,8 +272,6 @@ You ordered a pizza with sauce and parmesan cheese
 To share options with child commands you can use the `global` option.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -517,41 +297,45 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-options.ts command
 { global: "test" }
 ```
 
-### Options which depends on other options
+### Hidden options
 
-Some options can not be call without other options. You can specify depending options with the `depends` option.
+To exclude option's from the help and completion command's you can use the `hidden` option.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
-const { options } = await new Command()
-    .option( '-a, --audio-codec <type:string>', 'description ...' )
-    .option( '-v, --video-codec <type:string>', 'description ...', { depends: [ 'audio-codec' ] } )
+await new Command()
+    .option( '-H, --hidden [hidden:boolean]', 'Nobody knows about me!', { hidden: true } )
     .parse( Deno.args );
-
-console.log( options );
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac
-{ audioCodec: "aac" }
-
-$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -v x265
-Option --video-codec depends on option: --audio-codec
-
-$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac -v x265
-{ audioCodec: "aac", videoCodec: "x265" }
+$ deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h
 ```
 
-### Options which conflicts with other options
+### Standalone options
 
-Sometimes some options can not be called together. You can specify conflicting options with the `conflicts` option.
+Standalone options cannot be combine with any command and option. For example the `--help` and `--version` flag. You can achieve this with the `standalone` option.
 
 ```typescript
-#!/usr/bin/env -S deno run
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
+await new Command()
+    .option( '-s, --standalone [value:boolean]', 'Some standalone option.', { standalone: true } )
+    .option( '-o, --other [value:boolean]', 'Some other option.' )
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/standalone-options.ts --standalone --other
+Error: Option --standalone cannot be combined with other options.
+```
+
+### Conflicting options
+
+To define options which conflicts with other options you can use the `conflicts` option by defining an array with the names of these options.
+
+```typescript
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
@@ -569,40 +353,79 @@ $ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -f
 $ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -i
 { stdin: true }
 
-$ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -f file1 -i
-Error: Option --stdin conflicts with option: --file
-
 $ deno run https://deno.land/x/cliffy/examples/command/conflicting-options.ts -if file1
 Error: Option --stdin conflicts with option: --file
 ```
 
+### Depending options
+
+To define options which depends on other options you can use the `depends` option by defining an array with the names of these options.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+const { options } = await new Command()
+    .option( '-u, --audio-codec <type:string>', 'description ...' )
+    .option( '-p, --video-codec <type:string>', 'description ...', { depends: [ 'audio-codec' ] } )
+    .parse( Deno.args );
+
+console.log( options );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac
+{ audioCodec: "aac" }
+
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -v x265
+Option --video-codec depends on option: --audio-codec
+
+$ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a aac -v x265
+{ audioCodec: "aac", videoCodec: "x265" }
+```
+
+### Collect options
+
+An option can occur multiple times in the command line to collect multiple values. Todo this, you have to activate the `collect` option.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+const { options } = await new Command()
+    .option( '-c, --color <color:string>', 'read from file ...', { collect: true } )
+    .parse( Deno.args );
+
+console.log( options );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/collect-options.ts --color yellow --color red --color blue
+{ color: [ "yellow", "red", "blue" ] }
+```
+
 ### Custom option processing
 
-You may specify a function to do custom processing of option values. The callback function receives one parameter, the user specified parsed value (string|number|boolean) and it returns the new value for the option.
+You may specify a function to do custom processing of option values. The callback function receives one parameter, the user specified value which is already parsed into the target type and it returns the new value for the option.
 
 If collect is enabled the function receives as second parameter the previous value.
 
 This allows you to coerce the option value to the desired type, or accumulate values, or do entirely custom processing.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 const { options } = await new Command()
+    // convert value to object
     .option( '-o, --object <item:string>', 'map string to object', ( value: string ): { value: string } => {
         return { value };
     } )
+    // with collect option
     .option( '-C, --color <item:string>', 'collect colors', {
         collect: true,
         value: ( value: string, previous: string[] = [] ): string[] => {
-
             if ( [ 'blue', 'yellow', 'red' ].indexOf( value ) === -1 ) {
                 throw new Error( `Color must be one of blue, yellow or red but got: ${ value }` );
             }
-
             previous.push( value );
-
             return previous;
         }
     } )
@@ -621,49 +444,9 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom-option-processing.
 { color: [ "blue", "yellow", "red" ] }
 ```
 
-### Standalone options
-
-Standalone options cannot be combine with any command and option. For example the `--help` and `--version` flag. You can achieve this with the `standalone` option.
+### Option action handler
 
 ```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-await new Command()
-    .option( '-s, --standalone [value:boolean]', 'Some standalone option.', { standalone: true } )
-    .option( '-o, --other [value:boolean]', 'Some other option.' )
-    .parse( Deno.args );
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/standalone-options.ts --standalone --other
-Error: Option --standalone cannot be combined with other options.
-```
-
-### Hidden options
-
-To exclude option's from the help and completion command's you can use the `hidden` option.
-
-```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-await new Command()
-    .option( '-H, --hidden [hidden:boolean]', 'Nobody knows about me!', { hidden: true } )
-    .parse( Deno.args );
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h
-```
-
-### Specify an action for an option
-
-```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -687,13 +470,102 @@ Some info
 
 ## Commands
 
+You can specify (sub-) commands using the `.command()` method. There are three ways these can be implemented:
+
+* Using an action handler attached to the command.
+* Passing an `Command` instance as second parameter to the `.command()` method.
+* or as a separate executable file by passing the description as second argument to the `.command()` method.
+
+In the first parameter to `.command()` you specify the command name and any command arguments. The arguments may be `<required>` or `[optional]`, and the last argument may also be variadic.
+
+Command implemented using a `Command` instance.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .command( 'clone', new Command()
+    .arguments( '<source:string> [destination:string]' )
+    .description( 'Clone a repository into a newly created directory.' )
+    .action( ( source: string, destination: string ) => {
+        console.log( 'clone command called' );
+    } ) )
+    .parse( Deno.args );
+```
+
+Command implemented using the `.command()` method with an action handler.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .command( 'clone <source:string> [destination:string]' )
+    .description( 'Clone a repository into a newly created directory.' )
+    .action( ( source: string, destination: string ) => {
+        console.log( 'clone command called' );
+    } )
+    .parse( Deno.args );
+```
+
+Command implemented using the `.command()` method with a separate executable file (description is passed as second parameter to `.command()`)
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .command( 'start <service>', 'Start named service.' )
+    .command( 'stop [service]', 'Stop named service, or all if no name supplied.' )
+    .parse( Deno.args );
+```
+
+### Argument syntax
+
+You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+const { args } = await new Command()
+    .version( '0.1.0' )
+    .arguments( '<cmd> [env]' )
+    .parse( Deno.args );
+
+console.log( args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax.ts
+Error: Missing argument(s): cmd
+```
+
+The last argument of a command can be variadic, and only the last argument. To make an argument variadic you can append or prepand `...` to the argument name. The variadic argument is passed to the action handler as an array.  
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';  
+
+await new Command()  
+    .version( '0.1.0' )  
+    .command( 'rmdir <dirs...>' )  
+    .action( ( options: IFlags, dirs: string[] ) => {  
+        dirs.forEach( ( dir: string ) => {  
+            console.log( 'rmdir %s', dir );  
+        } );  
+    } )  
+    .parse( Deno.args );  
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax-variadic.ts rmdir dir1 dir2 dir3  
+rmdir dir1  
+rmdir dir2  
+rmdir dir3  
+```
+
 ### Action handler
 
 The action handler is called when the command is executed. It gets passed an object with all options defined by the user and additional arguments which are passed to the command.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -713,111 +585,24 @@ $ deno run https://deno.land/x/cliffy/examples/command/action-handler.ts rm dir 
 remove dir recursively
 ```
 
-### Sub-commands
+### Executable sub-commands
 
-You can specify sub-commands using the `.command()` method. There are three ways these can be implemented:
+> Work in progress
 
-* Using an action handler attached to the command.
+When `.command()` is invoked with a description argument, this tells cliffy that you're going to use separate executables for sub-commands. Cliffy will search the executables in the directory of the entry script (like `./examples/pm`) with the name program-sub-command, like `pm-install`, `pm-search`. You can specify a custom name with the `executable` configuration option.
 
-* Passing an `Command` instance as second parameter to the `.command()` method.
-
-* or as a separate executable file by passing the description as second argument to the `.command()` method.
-
-In the first parameter to `.command()` you specify the command name and any command arguments. The arguments may be `<required>` or `[optional]`, and the last argument may also be variadic.
+You handle the options for an executable (sub)command in the executable, and don't declare them at the top-level.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-// Sub-command implemented using action handler (description is supplied separately to `.command()`)
-await new Command()
-    .command( 'clone <source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
-    .action( ( source: string, destination: string ) => {
-        console.log( 'clone command called' );
-    } )
-    .parse( Deno.args );
-
-// Sub-command implemented using a command instance as second parameter.
-await new Command()
-    .command( 'clone', new Command()
-    .arguments( '<source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
-    .action( ( source: string, destination: string ) => {
-        console.log( 'clone command called' );
-    } ) )
-    .parse( Deno.args );
-
-// Command implemented using separate executable file (description is passed as second parameter to `.command()`)
-await new Command()
-    .command( 'start <service>', 'Start named service.' )
-    .command( 'stop [service]', 'Stop named service, or all if no name supplied.' )
-    .parse( Deno.args );
-```
-
-### Specify the argument syntax
-
-You can use `.arguments()` to specify the arguments for the top-level command and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
-
-* `[name:type]` optional value.
-* `<name:type>` required value.
-* `[name...:type]` optional variadic values.
-* `<name...:type>` optional variadic values with a minimum of one requried value.
-
-The name can be any name. It is only printed in the help.
-
-The type can be one of:
-
-* `string`
-* `boolean`
-* `number`
-
-or any [custom type](#custom-option-types).
-
-```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-const { options, args } = await new Command()
-    .version( '0.1.0' )
-    .arguments( '<cmd:string> [env:string] [dirs...:string]' )
-    .parse( Deno.args );
-
-console.log( 'command:', args[0] );
-console.log( 'environment:', args[1] || "no environment given");
-console.log( 'directories:', args[2] || "no directories given");
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax.ts
-Error: Missing argument(s): cmd
-```
-
-The last argument of a command can be variadic, and only the last argument. To make an argument variadic you append `...` to the argument name. The variadic argument is passed to the action handler as an array.
-
-```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
     .version( '0.1.0' )
-    .command( 'rmdir <dirs...:string>' )
-    .action( ( options: IFlags, dirs: string[] ) => {
-        dirs.forEach( ( dir: string ) => {
-            console.log( 'rmdir %s', dir );
-        } );
-    } )
+    .command( 'install [name]', 'install one or more packages' )
+    .command( 'search [query]', 'search with optional query' )
+    .command( 'update', 'update installed packages', { executable: 'myUpdateSubCommand' } )
+    .command( 'list', 'list packages installed' )
     .parse( Deno.args );
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/arguments-syntax-variadic.ts rmdir dir1 dir2 dir3
-rmdir dir1
-rmdir dir2
-rmdir dir3
 ```
 
 ### Global commands
@@ -825,8 +610,6 @@ rmdir dir3
 To share commands with child commands you can use the `.global()` method.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -857,8 +640,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-commands.ts comman
 To exclude commands's from the help and completion command's you can use the `.hidden()` method.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -876,6 +657,8 @@ $ deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h
 If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
 
 ```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
 await new Command()
     .stopEarly() // <-- enable stop early
     .option( '-d, --debug-level <level:string>', '...' )
@@ -895,33 +678,11 @@ script: server
 args: [ "-p", "80" ]
 ```
 
-### Git-style executable sub-commands
-
-When `.command()` is invoked with a description argument, this tells cliffy that you're going to use separate executables for sub-commands, much like `git(1)` and other popular tools. Cliffy will search the executables in the directory of the entry script (like `./examples/pm`) with the name program-sub-command, like `pm-install`, `pm-search`. You can specify a custom name with the `executable` configuration option.
-
-You handle the options for an executable (sub)command in the executable, and don't declare them at the top-level.
-
-```typescript
-#!/usr/bin/env -S deno run
-
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-await new Command()
-    .version( '0.1.0' )
-    .command( 'install [name]', 'install one or more packages' )
-    .command( 'search [query]', 'search with optional query' )
-    .command( 'update', 'update installed packages', { executable: 'myUpdateSubCommand' } )
-    .command( 'list', 'list packages installed' )
-    .parse( Deno.args );
-```
-
 ### Override exit handling
 
 By default cliffy calls `Deno.exit` when it detects errors. You can override this behaviour with the `.throwErrors()` method.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 try {
@@ -946,10 +707,118 @@ $ deno run https://deno.land/x/cliffy/examples/command/override-exit-handling.ts
     at <anonymous> (<anonymous>)
 ```
 
-Make sure the executables have proper modes, like `755`.
+## Custom types
 
+You can register custom types with the `.type()` method. The first argument is the name of the type, the second can be either a function or an instance of `Type` and the third argument can be an options object.
 
-### Environment variables
+### Function types
+
+This example shows you how to use a function as type handler.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags.ts';
+
+const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+function emailType( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+    if ( !emailRegex.test( value.toLowerCase() ) ) {
+        throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+    }
+    return value;
+}
+
+const { options } = await new Command()
+    .type( 'email', emailType )
+    .arguments( '[email:email]' )
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .command( 'email [email:email]' )
+    .description( 'Your email address.' )
+    .parse( Deno.args );
+
+console.log( options );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my@email.com"
+{ email: "my@email.com" }
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type.ts -e "my @email.com"
+Option --email must be a valid email but got: my @email.com
+```
+
+### Class types
+
+This example shows you how to use a class as type handler.
+
+```typescript
+import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
+import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags.ts';
+
+class EmailType extends Type<string> {
+
+    protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+
+        if ( !this.emailRegex.test( value.toLowerCase() ) ) {
+            throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+        }
+
+        return value;
+    }
+}
+
+const { options } = await new Command()
+    .type( 'email', new EmailType() )
+    .arguments( '[email:email]' )
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .command( 'email [email:email]' )
+    .description( 'Your email address.' )
+    .parse( Deno.args );
+
+console.log( options );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my@email.de"
+{ email: "my@email.de" }
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/custom-option-type-class.ts -e "my @email.de"
+Option --email must be a valid email but got: my @email.de
+```
+
+### Global types
+
+To make an type available for child commands you can set the `global` option in the options argument.
+
+```typescript
+await new Command()
+    .type( 'email', email(), { global: true } )
+
+    .command( 'login' )
+    .description( 'Login with email.' )
+    .option( '-e, --email <email:email>', 'Your email address.' )
+    .action( console.log )
+
+    .command( 'config' )
+    .description( 'Manage config.' )
+    .option( '-a, --admin-email [email:email]', 'Get or set admin email address.' )
+    .action( console.log )
+
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/global-custom-type.ts login --email "my@email.de"
+{ email: "my@email.de" }
+```
+
+## Environment variables
 
 You can define environment variables for a command that are validated when the command is executed.
 Environment variables are listed with the [help](#help-option-and-command) option and command.
@@ -961,8 +830,6 @@ To allow deno to access environment variables you have to set the `--allow-env` 
 At the moment its also required to set the `--unstable` flag because deno's permissions api is marked as unstable.
 
 ```typescript
-#!/usr/bin/env -S deno run --allow-env --unstable
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -982,13 +849,11 @@ $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/ex
 Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
 ```
 
-### Specify examples
+## Add examples
 
 You can add some examples for your command which will be printed with the [help](#help-option-and-command) option and command.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { red } from 'https://deno.land/std/fmt/colors.ts';
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
@@ -999,41 +864,59 @@ await new Command()
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
-
-  Usage:   COMMAND
-  Version: v
-
-  Description:
-
-    No description ...
-
-  Options:
-
-    -h, --help     [arg:boolean]  - Show this help.
-    -V, --version  [arg:boolean]  - Show the version number for this program.
-
-  Commands:
-
-    help         [command:command]  - Show this help or the help of a sub-command.
-    completions                     - Generate shell completions for zsh and bash.
-
-  Examples:
-
-    Example name:
-                  Description ...
-
-                  Can have mutliple lines and colors.
 ```
 
+![](../../assets/img/examples.png)
+
+## Shell completion
+
+Cliffy supports shell completion out of the box.
+
+> At the moment only `zsh` is supported but `bash` will be added.
+
+Some predefined types like `boolean` has predefined auto-completion. There are two ways to add auto-completion to types.
+One option is adding an completion action. An completion action is declared with the `.complete()` method and can be used
+in the command arguments declaration and by any option. The action is added after the type separated by colon.
+
+```typescript
+import { Command, Type } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .complete( 'email', () => [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ] )
+    .arguments( '[value:string:email]' )
+    .option( '-e, --email <value:string:email>', 'Your email address.' )
+    .parse( Deno.args );
+```
+
+Another way to add shell completion is by creating a custom type class with a `.complete()` method.
+
+```typescript
+import { Command, StringType } from 'https://deno.land/x/cliffy/command.ts';
+
+class EmailType extends StringType {
+
+    complete(): string[] {
+        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
+    }
+}
+
+await new Command()
+    .type( 'email', new EmailType() )
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .parse( Deno.args );
+```
+
+Enabling auto completion is explained in the [completions command](#completions-command) section.
+
 ## Generic options and arguments
+
+> This is an experimental feature and may change in the future!
 
 You can define an interface for your command options and a tuple for the command arguments.
 
 Here's how to do that:
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command, IParseResult } from 'https://deno.land/x/cliffy/command.ts';
 
 type Arguments = [ string, string ];
@@ -1058,7 +941,7 @@ const input: string = result.args[ 0 ];
 const output: string | undefined = result.args[ 1 ];
 ```
 
-## Default options & commands
+## Default options and commands
 
 Every instance of the `Command` class has some pre defenied options and sub-commands. If you don't need these pre defined option's and sub-command's you can use the `BaseCommand` class instedd of the `Command` class.
 
@@ -1067,14 +950,13 @@ Every instance of the `Command` class has some pre defenied options and sub-comm
 The `--version` and `-V` option flag prints the version number defined with the `version()` method. The version number will also be printed within the output of the [help](#help-option-command) option and command.
 
 ```typescript
-#!/usr/bin/env -S deno run
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
     .version( '0.1.0' )
     .parse( Deno.args );
 ```
+
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts -V
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts --version
@@ -1086,8 +968,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts --vers
 The help information is auto-generated based on the information you have defined on your program.
 
 ```typescript
-#!/usr/bin/env -S deno run --allow-env
-
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
@@ -1104,99 +984,45 @@ The `--help` and `-h` option flag and also the `help` sub-command prints the aut
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts -h
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts --help
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help
-
-  Usage:   help-option-and-command.ts
-  Version: v0.1.0
-
-  Description:
-
-    Sample description ...
-
-  Options:
-
-    -h, --help     [arg:boolean]  - Show this help.
-    -V, --version  [arg:boolean]  - Show the version number for this program.
-
-  Commands:
-
-    help         [command:string]  - Show this help or the help of a sub-command.
-    completions                    - Generate shell completions for zsh and bash.
-
-  Environment variables:
-
-    EXAMPLE_ENVIRONMENT_VARIABLE <value:boolean> - Environment variable description ...
-
-  Examples:
-
-    Some example:
-                  Example content ...
-
-                  Some more example content ...
-
 ```
 
-The `help` sub-command excepts also a name of a sub-command as argument to show the help of the sub-command. But you can also use the help flag and command directly from the sub-command.
+![](../../assets/img/help.png)
+
+The `help` sub-command excepts also the name of a sub-command as argument to show the help of the sub-command. But you can also use the help flag and command directly from the sub-command.
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help completions
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions -h
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions --help
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions help
-
-  Usage:   completions
-  Version: v0.1.0
-
-  Description:
-
-    Generate shell completions for zsh and bash.
-
-    Bash completions:
-
-    To enable bash completions for this program add following line to your ~/.bashrc.
-
-        source <(command-name completions bash)
-
-    Zsh completions:
-
-    To enable zsh completions for this program add following line to your ~/.zshrc.
-
-        source <(command-name completions zsh)
-
-  Options:
-
-    -h, --help     [arg:boolean]  - Show this help.
-    -V, --version  [arg:boolean]  - Show the version number for this program.
-
-  Commands:
-
-    help  [command:string]  - Show this help or the help of a sub-command.
-    zsh                     - Generate zsh shell completions.
-    bash                    - Generate bash shell completions.
-
 ```
 
 ### Completions command
 
-The `completions` command prints an autogenerated completion script for bash and zsh shell.
-
-To get autocompletion's to work you have to add following line to your `~/.bashrc` or `~/.zshrc` or what ever you use:
+The `completions` command prints an autogenerated completion script for shell completions.
 
 **Bash Completions**
 
-> ~/.bashrc
+> Bash completions are not supported yet but will be added.
 
-```shell script
+To enable autocompletions to your commands add the following line to your `~/.bashrc`:
+
+```shell
 source <(command-name completions bash)
 ```
 
 **Zsh Completions**
 
-> ~/.zshrc
+To enable autocompletions to your commands add the following line to your `~/.zshrc`:
 
-```shell script
+```shell
 source <(command-name completions zsh)
 ```
 
+## Credits
+
+Benjamin Fischer [@c4spar](https://github.com/c4spar)
+
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

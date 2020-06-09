@@ -7,12 +7,10 @@ class EmailType extends Type<string> {
 
     protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
 
-        if ( value ) {
-            if ( !this.emailRegex.test( value.toLowerCase() ) ) {
-                throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
-            }
+        if ( !this.emailRegex.test( value.toLowerCase() ) ) {
+            throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
         }
 
         return value;
@@ -20,8 +18,11 @@ class EmailType extends Type<string> {
 }
 
 const { options } = await new Command()
-    .option( '-e, --email <value:email>', 'Your email address.' )
     .type( 'email', new EmailType() )
+    .arguments( '[email:email]' )
+    .option( '-e, --email <value:email>', 'Your email address.' )
+    .command( 'email [email:email]' )
+    .description( 'Your email address.' )
     .parse( Deno.args );
 
 console.log( options );
