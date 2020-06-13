@@ -591,7 +591,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         const actionOption = this.findActionFlag( options );
 
         if ( actionOption && actionOption.action ) {
-            await actionOption.action( options, ...args );
+            await actionOption.action.call( this, options, ...args );
             return { options, args: args as any as A, cmd: this, literal: this.literalArgs };
         }
 

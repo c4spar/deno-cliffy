@@ -3,7 +3,7 @@ import { Type } from '../types/type.ts';
 import { BaseCommand } from './base-command.ts';
 
 /** Action handler. */
-export type IAction<O, A extends Array<any>> = ( options: O, ...args: A ) => void | Promise<void>;
+export type IAction<O, A extends Array<any>> = ( this: BaseCommand, options: O, ...args: A ) => void | Promise<void>;
 
 /** Omit key from object. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>

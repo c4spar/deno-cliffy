@@ -16,19 +16,18 @@ function createStats(): IStats {
     };
 }
 
-Deno.test( 'command optionAction action', async () => {
+Deno.test( 'flags allowEmpty enabled', async () => {
 
     const stats: IStats = createStats();
 
-    const cmd = new Command()
+    const cmd: Command = new Command()
         .throwErrors()
         .arguments( '[beep:string]' )
-        .option( '-f, --foo [value:string]', 'action ...', {
-            action: function ( options, ...args ) {
-                stats.context = this;
-                stats.options = options;
-                stats.args = args;
-            }
+        .option( '-f, --foo [value:string]', 'description ...' )
+        .action( function ( options, ...args ) {
+            stats.context = this;
+            stats.options = options;
+            stats.args = args;
         } );
 
     const { options, args } = await cmd.parse( [ '--foo', 'bar', 'beep' ] );
@@ -40,21 +39,20 @@ Deno.test( 'command optionAction action', async () => {
     assertEquals( stats.args, args );
 } );
 
-Deno.test( 'command optionAction action', async () => {
+Deno.test( 'flags allowEmpty enabled', async () => {
 
     const stats: IStats = createStats();
     let subCmd: Command;
 
-    const cmd = new Command()
+    const cmd: Command = new Command()
         .throwErrors()
         .command( 'foo', subCmd = new Command()
             .arguments( '[beep:string]' )
-            .option( '-b, --bar [value:string]', 'action ...', {
-                action: function ( options, ...args ) {
-                    stats.context = this;
-                    stats.options = options;
-                    stats.args = args;
-                }
+            .option( '-b, --bar [value:string]', 'description ...' )
+            .action( function ( options, ...args ) {
+                stats.context = this;
+                stats.options = options;
+                stats.args = args;
             } ) );
 
     const { options, args } = await cmd.parse( [ 'foo', '--bar', 'baz', 'beep' ] );
