@@ -5,5 +5,5 @@ export abstract class Type<T> {
 
     public abstract parse( option: IFlagOptions, arg: IFlagArgument, value: string ): T
 
-    public complete?( cmd: BaseCommand ): string[];
+    public complete?( cmd: BaseCommand, parent?: BaseCommand ): string[];
 }

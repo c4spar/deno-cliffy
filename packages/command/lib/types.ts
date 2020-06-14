@@ -96,7 +96,7 @@ export interface ICompleteSettings extends ICompleteOptions {
 }
 
 /** Type parser method. */
-export type ICompleteHandler = ( cmd: BaseCommand ) => string[] | Promise<string[]>;
+export type ICompleteHandler = ( cmd: BaseCommand, parent?: BaseCommand ) => string[] | Promise<string[]>;
 
 export interface IHelpCommand<O = any> extends BaseCommand<O> {
     show( name?: string ): void;
