@@ -907,10 +907,24 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      ********************************************************************************/
 
     /**
-     * Get or set command name.
+     * Get command name.
      */
     public getName(): string {
         return this._name;
+    }
+
+    /**
+     * Get parent command name.
+     */
+    public getParent(): BaseCommand | undefined {
+        return this._parent;
+    }
+
+    /**
+     * Get main command.
+     */
+    public getMainCommand(): BaseCommand {
+        return this._parent?.getMainCommand() ?? this;
     }
 
     /**
