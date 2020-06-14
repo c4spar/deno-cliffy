@@ -32,6 +32,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     // protected name: string = location.pathname.split( '/' ).pop() as string;
     protected _name: string = 'COMMAND';
     protected _parent?: BaseCommand;
+    protected _globalParent?: BaseCommand;
     protected ver: string = '0.0.0';
     protected desc: IDescription = '';
     protected fn: IAction<O, A> | undefined;
@@ -544,6 +545,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         const subCommand = this.rawArgs.length > 0 && this.getCommand( this.rawArgs[ 0 ], true );
 
         if ( subCommand ) {
+            subCommand._globalParent = this;
             return await subCommand.parse( this.rawArgs.slice( 1 ), dry );
         }
 
@@ -611,6 +613,8 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             if ( !cmd ) {
                 throw this.error( new Error( `Default command '${ this.defaultCommand }' not found.` ) );
             }
+
+            cmd._globalParent = this;
 
             try {
                 await cmd.execute( options, ...args );
@@ -821,10 +825,19 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     }
 
     /**
-     * Get parent command name.
+     * Get parent command.
      */
     public getParent(): BaseCommand | undefined {
         return this._parent;
+    }
+
+    /**
+     * Get parent command from global executed command.
+     * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
+     * this method returns always undefined.
+     */
+    public getGlobalParent(): BaseCommand | undefined {
+        return this._globalParent;
     }
 
     /**
