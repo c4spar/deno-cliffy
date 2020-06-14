@@ -18,7 +18,7 @@ export class Command<O = any, A extends Array<any> = any> extends DefaultCommand
 
         super();
 
-        this.command( 'completions', new CompletionsCommand( this ) )
+        this.command( 'completions', new CompletionsCommand() )
             .reset();
     }
 

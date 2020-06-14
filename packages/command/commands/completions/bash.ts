@@ -6,10 +6,8 @@ import { DefaultCommand } from '../../lib/default-command.ts';
  */
 export class BashCompletionsCommand extends DefaultCommand {
 
-    public constructor( protected parent: BaseCommand ) {
-
+    public constructor( _cmd?: BaseCommand ) {
         super();
-
         this.description( 'Generate bash shell completions.' )
             .action( () => {
                 throw new Error( 'Bash completions not supported at this moment.' );
@@ -20,7 +18,6 @@ export class BashCompletionsCommand extends DefaultCommand {
      * @inheritDoc
      */
     public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
-
         return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
     }
 }
