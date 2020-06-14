@@ -32,7 +32,7 @@ export class DefaultCommand<O = any, A extends Array<any> = any> extends BaseCom
                 }
             } )
 
-            .command( 'help', new HelpCommand( this ) )
+            .command( 'help', new HelpCommand() )
 
             .reset();
     }

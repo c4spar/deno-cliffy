@@ -23,7 +23,7 @@ Deno.test( 'hidden option', async () => {
 Deno.test( 'hidden option help', async () => {
 
     const cmd: Command = command();
-    const output: string = cmd.getHelpCommand().getHelp();
+    const output: string = cmd.getHelp();
 
     assertEquals( stripeColors( output ), `
   Usage:   COMMAND

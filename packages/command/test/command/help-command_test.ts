@@ -33,7 +33,7 @@ Deno.test( 'command: help command', async () => {
 
         .reset();
 
-    const output: string = cmd.getHelpCommand().getHelp();
+    const output: string = cmd.getHelp();
 
     assertEquals( stripeColors( output ), `
   Usage:   COMMAND

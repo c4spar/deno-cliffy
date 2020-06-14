@@ -2,7 +2,7 @@ const { stdout, stderr } = Deno;
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { dim, red } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
-import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
 import format from '../../x/format.ts';
 import { BooleanType } from '../types/boolean.ts';
@@ -10,7 +10,8 @@ import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
 import { ArgumentsParser } from './arguments-parser.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
+import { HelpGenerator } from './help-generator.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IOption, IParseResult, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -1415,25 +1416,16 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     }
 
     /**
-     * Execute help command.
+     * Output generated help without exiting.
      */
     public help() {
-
-        this.getHelpCommand().show();
+        Deno.stdout.writeSync( encode( this.getHelp() ) );
     }
 
-    public getHelpCommand(): IHelpCommand {
-
-        const helpCommand = this.getCommand( 'help', true );
-
-        if ( !helpCommand ) {
-            throw this.error( new Error( `No help command registered.` ), false );
-        }
-
-        if ( !isHelpCommand( helpCommand ) ) {
-            throw this.error( new Error( `The registered help command does not correctly implement interface IHelpCommand.` ), false );
-        }
-
-        return helpCommand;
+    /**
+     * Get generated help.
+     */
+    public getHelp(): string {
+        return HelpGenerator.generate( this );
     }
 }
