@@ -9,7 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IEnvVariable, IEnvVarOption, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
+import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
@@ -32,7 +32,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     protected _name: string = 'COMMAND';
     protected _parent?: BaseCommand;
     protected ver: string = '0.0.0';
-    protected desc: string = 'No description ...';
+    protected desc: IDescription = '';
     protected fn: IAction<O, A> | undefined;
     protected options: IOption<O, A>[] = [];
     protected commands: Map<string, BaseCommand> = new Map();
@@ -196,7 +196,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param description Short command description.
      */
-    public description( description: string ): this {
+    public description( description: IDescription ): this {
         this.cmd.desc = description;
         return this;
     }
@@ -988,8 +988,8 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * Get command description.
      */
     public getDescription(): string {
-
-        return this.desc;
+        // call description method only once
+        return typeof this.desc === 'function' ? this.desc = this.desc() : this.desc;
     }
 
     public getShortDescription(): string {

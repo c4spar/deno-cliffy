@@ -2,6 +2,9 @@ import { IFlagArgument, IFlagOptions, ITypeHandler, OptionType } from '../../fla
 import { Type } from '../types/type.ts';
 import { BaseCommand } from './base-command.ts';
 
+/** Description handler. */
+export type IDescription = string | ( ( this: BaseCommand ) => string );
+
 /** Action handler. */
 export type IAction<O, A extends Array<any>> = ( this: BaseCommand, options: O, ...args: A ) => void | Promise<void>;
 
