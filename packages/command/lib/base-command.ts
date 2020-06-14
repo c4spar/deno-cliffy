@@ -9,6 +9,7 @@ import { BooleanType } from '../types/boolean.ts';
 import { NumberType } from '../types/number.ts';
 import { StringType } from '../types/string.ts';
 import { Type } from '../types/type.ts';
+import { ArgumentsParser } from './arguments-parser.ts';
 import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IHelpCommand, IOption, IParseResult, isHelpCommand, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
 const permissions: any = ( Deno as any ).permissions;
@@ -64,7 +65,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             cmd = undefined;
         }
 
-        const result = this.splitArguments( nameAndArguments );
+        const result = ArgumentsParser.splitArguments( nameAndArguments );
 
         const name: string | undefined = result.args.shift();
         const aliases: string[] = result.args;
@@ -413,9 +414,9 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             return this.option( flags, desc, { value: opts } );
         }
 
-        const result = this.splitArguments( flags );
+        const result = ArgumentsParser.splitArguments( flags );
 
-        const args: IArgumentDetails[] = result.typeDefinition ? this.parseArgsDefinition( result.typeDefinition ) : [];
+        const args: IArgumentDetails[] = result.typeDefinition ? ArgumentsParser.parseArgumentsDefinition( result.typeDefinition ) : [];
 
         const option: IOption = {
             name: '',
@@ -493,7 +494,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public env( name: string, description: string, options?: IEnvVarOption ): this {
 
-        const result = this.splitArguments( name );
+        const result = ArgumentsParser.splitArguments( name );
 
         if ( !result.typeDefinition ) {
             result.typeDefinition = '<value:boolean>';
@@ -503,7 +504,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             throw this.error( new Error( `Environment variable already exists: ${ name }` ) );
         }
 
-        const details: IArgumentDetails[] = this.parseArgsDefinition( result.typeDefinition );
+        const details: IArgumentDetails[] = ArgumentsParser.parseArgumentsDefinition( result.typeDefinition );
 
         if ( details.length > 1 ) {
             throw this.error( new Error( `An environment variable can only have one value but got: ${ name }` ) );
@@ -721,39 +722,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     }
 
     /**
-     * Split arguments string into args and types: -v, --verbose [arg:boolean]
-     *
-     * @param args Arguments definition.
-     */
-    protected splitArguments( args: string ) {
-
-        // const parts = args.trim().split( /[,<\[]/g ).map( ( arg: string ) => arg.trim() );
-        // const typeParts: string[] = [];
-        //
-        // while ( parts[ parts.length - 1 ] && parts[ parts.length - 1 ].match( /[\]>]$/ ) ) {
-        //     let arg = parts.pop() as string;
-        //     const lastPart = arg.slice( 0, -1 );
-        //     arg = lastPart === ']' ? `[${ arg }` : `<${ arg }`;
-        //     typeParts.unshift( arg );
-        // }
-        //
-        // const typeDefinition: string | undefined = typeParts.join( ' ' ) || undefined;
-        //
-        // return { args: parts, typeDefinition };
-
-        const parts = args.trim().split( /[, =] */g );
-        const typeParts = [];
-
-        while ( parts[ parts.length - 1 ] && parts[ parts.length - 1 ].match( /^[<\[].+[\]>]$/ ) ) {
-            typeParts.unshift( parts.pop() );
-        }
-
-        const typeDefinition: string = typeParts.join( ' ' );
-
-        return { args: parts, typeDefinition };
-    }
-
-    /**
      * Match commands and arguments from command line arguments.
      */
     protected parseArguments( args: string[], flags: O ): A {
@@ -818,67 +786,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         }
 
         return params as A;
-    }
-
-    /**
-     * Parse command line args definition.
-     *
-     * @param argsDefinition Arguments definition: <arg1:string> [arg2:number]
-     */
-    protected parseArgsDefinition( argsDefinition: string ): IArgumentDetails[] {
-
-        const args: IArgumentDetails[] = [];
-
-        let hasOptional = false;
-        let hasVariadic = false;
-        const parts: string[] = argsDefinition.split( / +/ );
-
-        for ( const arg of parts ) {
-
-            if ( hasVariadic ) {
-                throw this.error( new Error( 'An argument can not follow an variadic argument.' ) );
-            }
-
-            const parts: string[] = arg.split( /[<\[:>\]]/ );
-            const type: OptionType | string | undefined = parts[ 2 ] ? parts[ 2 ] : OptionType.STRING;
-
-            let details: IArgumentDetails = {
-                optionalValue: arg[ 0 ] !== '<',
-                name: parts[ 1 ],
-                action: parts[ 3 ] || type,
-                variadic: false,
-                list: type ? arg.indexOf( type + '[]' ) !== -1 : false,
-                type
-            };
-
-            if ( !details.optionalValue && hasOptional ) {
-                throw this.error( new Error( 'An required argument can not follow an optional argument.' ) );
-            }
-
-            if ( arg[ 0 ] === '[' ) {
-                hasOptional = true;
-            }
-
-            if ( details.name.length > 3 ) {
-
-                const istVariadicLeft = details.name.slice( 0, 3 ) === '...';
-                const istVariadicRight = details.name.slice( -3 ) === '...';
-
-                hasVariadic = details.variadic = istVariadicLeft || istVariadicRight;
-
-                if ( istVariadicLeft ) {
-                    details.name = details.name.slice( 3 );
-                } else if ( istVariadicRight ) {
-                    details.name = details.name.slice( 0, -3 );
-                }
-            }
-
-            if ( details.name ) {
-                args.push( details );
-            }
-        }
-
-        return args;
     }
 
     /**
@@ -964,7 +871,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     public getArguments(): IArgumentDetails[] {
 
         if ( !this.args.length && this.argsDefinition ) {
-            this.args = this.parseArgsDefinition( this.argsDefinition );
+            this.args = ArgumentsParser.parseArgumentsDefinition( this.argsDefinition );
         }
 
         return this.args;

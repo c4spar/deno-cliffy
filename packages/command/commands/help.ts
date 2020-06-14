@@ -1,10 +1,11 @@
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
-import { blue, bold, dim, green, magenta, red, yellow } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
+import { blue, bold, dim, magenta, red, yellow } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
 import { IFlagOptions, IFlags } from '../../flags/lib/types.ts';
 import { Table } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
+import { ArgumentsParser } from '../lib/arguments-parser.ts';
 import { BaseCommand } from '../lib/base-command.ts';
-import { IArgumentDetails, IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
+import { IEnvVariable, IHelpCommand, IOption } from '../lib/types.ts';
 import { CommandListType } from '../types/command-list.ts';
 
 /**
@@ -17,7 +18,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         super();
 
         this
-            .type( 'command', new CommandListType( this.parent ) )
+            .type( 'command', new CommandListType() )
             .arguments( '[command:command]' )
 
             .description( 'Show this help or the help of a sub-command.' )
@@ -134,7 +135,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             return [
                 ...cmd.getOptions( false ).map( ( option: IOption ) => [
                     option.flags.split( /,? +/g ).map( flag => blue( flag ) ).join( ', ' ),
-                    this.highlight( option.typeDefinition || '' ),
+                    ArgumentsParser.highlightArguments( option.typeDefinition || '' ),
                     red( bold( '-' ) ),
                     option.description.split( '\n' ).shift() as string,
                     getHints( option )
@@ -147,7 +148,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             return [
                 ...cmd.getCommands( false ).map( ( command: BaseCommand ) => [
                     [ command.getName(), ...command.getAliases() ].map( name => blue( name ) ).join( ', ' ),
-                    this.highlight( command.getArgsDefinition() || '' ),
+                    ArgumentsParser.highlightArguments( command.getArgsDefinition() || '' ),
                     red( bold( '-' ) ),
                     command.getDescription().split( '\n' ).shift() as string
                 ] )
@@ -159,7 +160,7 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
             return [
                 ...cmd.getEnvVars( false ).map( ( envVar: IEnvVariable ) => [
                     envVar.names.map( name => blue( name ) ).join( ', ' ),
-                    this.highlightDetails( envVar.details ),
+                    ArgumentsParser.highlightArgumentDetails( envVar.details ),
                     `${ red( bold( '-' ) ) } ${ envVar.description }`
                 ] )
             ];
@@ -201,48 +202,6 @@ export class HelpCommand extends BaseCommand implements IHelpCommand {
         renderHelp();
 
         return output;
-    }
-
-    /**
-     * Colorize argument type's.
-     */
-    protected highlight( type: string = '' ): string {
-
-        if ( !type ) {
-            return type;
-        }
-
-        return this.parseArgsDefinition( type ).map( ( arg: IArgumentDetails ) => this.highlightDetails( arg ) ).join( ' ' );
-    }
-
-    /**
-     * Colorize argument type's.
-     */
-    protected highlightDetails( arg: IArgumentDetails ): string {
-
-        let str = '';
-
-        str += yellow( arg.optionalValue ? '[' : '<' );
-
-        let name = '';
-        name += arg.name;
-        if ( arg.variadic ) {
-            name += '...';
-        }
-        name = magenta( name );
-
-        str += name;
-
-        str += yellow( ':' );
-        str += red( arg.type );
-
-        if ( arg.list ) {
-            str += green( '[]' );
-        }
-
-        str += yellow( arg.optionalValue ? ']' : '>' );
-
-        return str;
     }
 }
 
