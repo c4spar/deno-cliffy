@@ -30,7 +30,7 @@ export class CompleteCommand extends DefaultCommand {
                 }
 
                 const completion: ICompleteSettings | undefined = cmd.getCompletion( action );
-                const result: string[] = await completion?.complete() ?? [];
+                const result: string[] = await completion?.complete( cmd ) ?? [];
 
                 if ( result?.length ) {
                     Deno.stdout.writeSync( encode( result.join( ' ' ) ) );

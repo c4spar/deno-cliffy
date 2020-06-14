@@ -294,7 +294,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.cmd.types.set( name, { ...options, name, handler } );
 
         if ( handler instanceof Type && typeof handler.complete !== 'undefined' ) {
-            this.complete( name, () => handler.complete?.() || [], options );
+            this.complete( name, ( cmd: BaseCommand ) => handler.complete?.( cmd ) || [], options );
         }
 
         return this;
