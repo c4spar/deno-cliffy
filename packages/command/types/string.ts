@@ -5,12 +5,6 @@ import { Type } from './type.ts';
 export class StringType extends Type<string> {
 
     public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
-
         return string( option, arg, value );
-    }
-
-    public complete(): string[] {
-
-        return [];
     }
 }

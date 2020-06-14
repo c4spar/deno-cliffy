@@ -2,7 +2,7 @@ const { stdout, stderr } = Deno;
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { dim, red } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
 import { parseFlags } from '../../flags/lib/flags.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { fill } from '../../flags/lib/utils.ts';
 import format from '../../x/format.ts';
 import { BooleanType } from '../types/boolean.ts';
@@ -294,7 +294,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.cmd.types.set( name, { ...options, name, handler } );
 
         if ( handler instanceof Type && typeof handler.complete !== 'undefined' ) {
-            this.complete( name, () => handler.complete(), options );
+            this.complete( name, () => handler.complete?.() || [], options );
         }
 
         return this;
