@@ -346,18 +346,19 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const getCompletions = ( cmd: BaseCommand | undefined, completions: ICompleteSettings[] = [], names: string[] = [] ): ICompleteSettings[] => {
 
-            if ( cmd && cmd.completions.size ) {
-
-                cmd.completions.forEach( ( completion: ICompleteSettings ) => {
-                    if (
-                        completion.global &&
-                        !this.completions.has( completion.name ) &&
-                        names.indexOf( completion.name ) === -1
-                    ) {
-                        names.push( completion.name );
-                        completions.push( completion );
-                    }
-                } );
+            if ( cmd ) {
+                if ( cmd.completions.size ) {
+                    cmd.completions.forEach( ( completion: ICompleteSettings ) => {
+                        if (
+                            completion.global &&
+                            !this.completions.has( completion.name ) &&
+                            names.indexOf( completion.name ) === -1
+                        ) {
+                            names.push( completion.name );
+                            completions.push( completion );
+                        }
+                    } );
+                }
 
                 return getCompletions( cmd._parent, completions, names );
             }
@@ -947,19 +948,20 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const getOptions = ( cmd: BaseCommand | undefined, options: IOption[] = [], names: string[] = [] ): IOption[] => {
 
-            if ( cmd && cmd.options.length ) {
-
-                cmd.options.forEach( ( option: IOption ) => {
-                    if (
-                        option.global &&
-                        !this.options.find( opt => opt.name === option.name ) &&
-                        names.indexOf( option.name ) === -1 &&
-                        ( hidden || !option.hidden )
-                    ) {
-                        names.push( option.name );
-                        options.push( option );
-                    }
-                } );
+            if ( cmd ) {
+                if ( cmd.options.length ) {
+                    cmd.options.forEach( ( option: IOption ) => {
+                        if (
+                            option.global &&
+                            !this.options.find( opt => opt.name === option.name ) &&
+                            names.indexOf( option.name ) === -1 &&
+                            ( hidden || !option.hidden )
+                        ) {
+                            names.push( option.name );
+                            options.push( option );
+                        }
+                    } );
+                }
 
                 return getOptions( cmd._parent, options, names );
             }
@@ -1067,20 +1069,21 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const getCommands = ( cmd: BaseCommand | undefined, commands: BaseCommand[] = [], names: string[] = [] ): BaseCommand[] => {
 
-            if ( cmd && cmd.commands.size ) {
-
-                cmd.commands.forEach( ( cmd: BaseCommand ) => {
-                    if (
-                        cmd.isGlobal &&
-                        this !== cmd &&
-                        !this.commands.has( cmd._name ) &&
-                        names.indexOf( cmd._name ) === -1 &&
-                        ( hidden || !cmd.isHidden )
-                    ) {
-                        names.push( cmd._name );
-                        commands.push( cmd );
-                    }
-                } );
+            if ( cmd ) {
+                if ( cmd.commands.size ) {
+                    cmd.commands.forEach( ( cmd: BaseCommand ) => {
+                        if (
+                            cmd.isGlobal &&
+                            this !== cmd &&
+                            !this.commands.has( cmd._name ) &&
+                            names.indexOf( cmd._name ) === -1 &&
+                            ( hidden || !cmd.isHidden )
+                        ) {
+                            names.push( cmd._name );
+                            commands.push( cmd );
+                        }
+                    } );
+                }
 
                 return getCommands( cmd._parent, commands, names );
             }
@@ -1163,18 +1166,19 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const getTypes = ( cmd: BaseCommand | undefined, types: ITypeSettings[] = [], names: string[] = [] ): ITypeSettings[] => {
 
-            if ( cmd && cmd.types.size ) {
-
-                cmd.types.forEach( ( type: ITypeSettings ) => {
-                    if (
-                        type.global &&
-                        !this.types.has( type.name ) &&
-                        names.indexOf( type.name ) === -1
-                    ) {
-                        names.push( type.name );
-                        types.push( type );
-                    }
-                } );
+            if ( cmd ) {
+                if ( cmd.types.size ) {
+                    cmd.types.forEach( ( type: ITypeSettings ) => {
+                        if (
+                            type.global &&
+                            !this.types.has( type.name ) &&
+                            names.indexOf( type.name ) === -1
+                        ) {
+                            names.push( type.name );
+                            types.push( type );
+                        }
+                    } );
+                }
 
                 return getTypes( cmd._parent, types, names );
             }
@@ -1239,19 +1243,20 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
         const getEnvVars = ( cmd: BaseCommand | undefined, envVars: IEnvVariable[] = [], names: string[] = [] ): IEnvVariable[] => {
 
-            if ( cmd && cmd.envVars.length ) {
-
-                cmd.envVars.forEach( ( envVar: IEnvVariable ) => {
-                    if (
-                        envVar.global &&
-                        !this.envVars.find( env => env.names[ 0 ] === envVar.names[ 0 ] ) &&
-                        names.indexOf( envVar.names[ 0 ] ) === -1 &&
-                        ( hidden || !envVar.hidden )
-                    ) {
-                        names.push( envVar.names[ 0 ] );
-                        envVars.push( envVar );
-                    }
-                } );
+            if ( cmd ) {
+                if ( cmd.envVars.length ) {
+                    cmd.envVars.forEach( ( envVar: IEnvVariable ) => {
+                        if (
+                            envVar.global &&
+                            !this.envVars.find( env => env.names[ 0 ] === envVar.names[ 0 ] ) &&
+                            names.indexOf( envVar.names[ 0 ] ) === -1 &&
+                            ( hidden || !envVar.hidden )
+                        ) {
+                            names.push( envVar.names[ 0 ] );
+                            envVars.push( envVar );
+                        }
+                    } );
+                }
 
                 return getEnvVars( cmd._parent, envVars, names );
             }
