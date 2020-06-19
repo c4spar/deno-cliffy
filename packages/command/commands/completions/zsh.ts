@@ -1,11 +1,10 @@
 import { BaseCommand } from '../../lib/base-command.ts';
-import { DefaultCommand } from '../../lib/default-command.ts';
 import { ZshCompletionsGenerator } from '../../lib/zsh-completions-generator.ts';
 
 /**
  * Generates zsh completion code.
  */
-export class ZshCompletionsCommand extends DefaultCommand {
+export class ZshCompletionsCommand extends BaseCommand {
 
     public constructor( cmd?: BaseCommand ) {
         super();
@@ -15,12 +14,5 @@ export class ZshCompletionsCommand extends DefaultCommand {
                     ZshCompletionsGenerator.generate( cmd || this.getMainCommand() )
                 ) );
             } );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
-        return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
     }
 }

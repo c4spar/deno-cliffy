@@ -1,6 +1,5 @@
 import { bold, dim, italic } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
 import { BaseCommand } from '../lib/base-command.ts';
-import { DefaultCommand } from '../lib/default-command.ts';
 import { BashCompletionsCommand } from './completions/bash.ts';
 import { CompleteCommand } from './completions/complete.ts';
 import { ZshCompletionsCommand } from './completions/zsh.ts';
@@ -8,7 +7,7 @@ import { ZshCompletionsCommand } from './completions/zsh.ts';
 /**
  * Generates source code for interactive shell completions used in multiple shell's.
  */
-export class CompletionsCommand extends DefaultCommand {
+export class CompletionsCommand extends BaseCommand {
 
     public constructor( cmd?: BaseCommand ) {
 
@@ -47,12 +46,5 @@ or create a separate file in the ${ dim( italic( 'zsh_completion.d' ) ) } direct
             .command( 'bash', new BashCompletionsCommand( cmd ) )
             .command( 'complete', new CompleteCommand( cmd ).hidden() )
             .reset();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
-        return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
     }
 }

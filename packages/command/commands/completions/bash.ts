@@ -1,10 +1,9 @@
 import { BaseCommand } from '../../lib/base-command.ts';
-import { DefaultCommand } from '../../lib/default-command.ts';
 
 /**
  * Generates bash completion code.
  */
-export class BashCompletionsCommand extends DefaultCommand {
+export class BashCompletionsCommand extends BaseCommand {
 
     public constructor( _cmd?: BaseCommand ) {
         super();
@@ -12,12 +11,5 @@ export class BashCompletionsCommand extends DefaultCommand {
             .action( () => {
                 throw new Error( 'Bash completions not supported at this moment.' );
             } );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
-        return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
     }
 }

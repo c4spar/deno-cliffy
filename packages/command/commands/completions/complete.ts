@@ -1,13 +1,12 @@
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { IFlags } from '../../../flags/lib/types.ts';
 import { BaseCommand } from '../../lib/base-command.ts';
-import { DefaultCommand } from '../../lib/default-command.ts';
 import { ICompleteSettings } from '../../lib/types.ts';
 
 /**
  * Execute complete method for specific action and command.
  */
-export class CompleteCommand extends DefaultCommand {
+export class CompleteCommand extends BaseCommand {
 
     public constructor( cmd?: BaseCommand ) {
         super();
@@ -35,12 +34,5 @@ export class CompleteCommand extends DefaultCommand {
             } )
             .default( 'help' )
             .reset();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
-        return super.command( nameAndArguments, cmd || new DefaultCommand(), override );
     }
 }

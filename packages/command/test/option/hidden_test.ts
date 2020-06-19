@@ -7,7 +7,7 @@ function command(): Command {
         .throwErrors()
         .version( '1.0.0' )
         .description( 'Test description ...' )
-        .option( '-h, --hidden <value:string>', 'Nobody knows about me!', { hidden: true } )
+        .option( '-H, --hidden <value:string>', 'Nobody knows about me!', { hidden: true } )
         .hidden();
 }
 
@@ -23,9 +23,10 @@ Deno.test( 'hidden option', async () => {
 Deno.test( 'hidden option help', async () => {
 
     const cmd: Command = command();
+    await cmd.parse( [], true );
     const output: string = cmd.getHelp();
 
-    assertEquals( stripeColors( output ), `
+    assertEquals( `
   Usage:   COMMAND
   Version: v1.0.0 
 
@@ -35,13 +36,8 @@ Deno.test( 'hidden option help', async () => {
 
   Options:
 
-    -h, --help       - Show this help.                            
-    -V, --version    - Show the version number for this program.  
+    -h, --help     - Show this help.                            
+    -V, --version  - Show the version number for this program.  
 
-  Commands:
-
-    help         [command:command]  - Show this help or the help of a sub-command.
-    completions                     - Generate shell completions for zsh and bash.
-
-` );
+`, stripeColors( output ) );
 } );
