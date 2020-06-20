@@ -149,9 +149,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * Reset internal command reference to main command.
      */
     public reset(): this {
-        this.cmd = this;
-        this.getBaseCommands( true ).forEach( cmd => cmd.reset() );
-        return this;
+        return this.cmd = this;
     }
 
     /**
@@ -237,7 +235,6 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public action( fn: IAction<O, A> ): this {
         this.cmd.fn = fn;
-        this.reset();
         return this;
     }
 
