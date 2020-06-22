@@ -1,5 +1,5 @@
 import snakeCase from '../../x/snakeCase.ts';
-import { BaseCommand } from './base-command.ts';
+import { Command } from './command.ts';
 import { IArgumentDetails, IOption } from './types.ts';
 
 interface ICompletionAction {
@@ -13,11 +13,11 @@ export class ZshCompletionsGenerator {
 
     private actions: Map<string, ICompletionAction> = new Map();
 
-    public static generate( cmd: BaseCommand ) {
+    public static generate( cmd: Command ) {
         return new ZshCompletionsGenerator( cmd ).generate();
     }
 
-    private constructor( protected cmd: BaseCommand ) {}
+    private constructor( protected cmd: Command ) {}
 
     /**
      * Generates zsh completions code.
@@ -74,7 +74,7 @@ compdef _${ snakeCase( this.cmd.getPath() ) } ${ this.cmd.getPath() }
     /**
      * Generates zsh completions method for given command and child commands.
      */
-    private generateCompletions( command: BaseCommand, path: string = '' ): string {
+    private generateCompletions( command: Command, path: string = '' ): string {
 
         if ( !command.hasCommands( false ) && !command.hasOptions( false ) && !command.hasArguments() ) {
             return '';
@@ -91,17 +91,17 @@ function _${ snakeCase( path ) }() {`
             + this.generateActions( command )
             + `\n}\n\n`
             + command.getCommands( false )
-                .filter( ( subCommand: BaseCommand ) => subCommand !== command )
-                .map( ( subCommand: BaseCommand ) => this.generateCompletions( subCommand, path ) )
+                .filter( ( subCommand: Command ) => subCommand !== command )
+                .map( ( subCommand: Command ) => this.generateCompletions( subCommand, path ) )
                 .join( '' );
     }
 
-    private generateCommandCompletions( command: BaseCommand, path: string ): string {
+    private generateCommandCompletions( command: Command, path: string ): string {
 
         const commands = command.getCommands( false );
 
         let completions: string = commands
-            .map( ( subCommand: BaseCommand ) =>
+            .map( ( subCommand: Command ) =>
                 `'${ subCommand.getName() }:${ subCommand.getShortDescription() }'` )
             .join( '\n            ' );
 
@@ -134,13 +134,13 @@ function _${ snakeCase( path ) }() {`
         return completions;
     }
 
-    private generateSubCommandCompletions( command: BaseCommand, path: string ): string {
+    private generateSubCommandCompletions( command: Command, path: string ): string {
 
         if ( command.hasCommands( false ) ) {
 
             const actions: string = command
                 .getCommands( false )
-                .map( ( command: BaseCommand ) => `${ command.getName() }) _${ snakeCase( path + ' ' + command.getName() ) } ;;` )
+                .map( ( command: Command ) => `${ command.getName() }) _${ snakeCase( path + ' ' + command.getName() ) } ;;` )
                 .join( '\n            ' );
 
             return `\n
@@ -152,7 +152,7 @@ function _${ snakeCase( path ) }() {`
         return '';
     }
 
-    private generateArgumentCompletions( command: BaseCommand, path: string ): string {
+    private generateArgumentCompletions( command: Command, path: string ): string {
 
         /* clear actions from previously parsed command. */
         this.actions.clear();
@@ -195,7 +195,7 @@ function _${ snakeCase( path ) }() {`
         return argsCommand;
     }
 
-    private generateOptions( command: BaseCommand, path: string ) {
+    private generateOptions( command: Command, path: string ) {
 
         const options: string[] = [];
         const cmdArgs: string[] = path.split( ' ' );
@@ -262,7 +262,7 @@ function _${ snakeCase( path ) }() {`
         return this.actions.get( action ) as ICompletionAction;
     }
 
-    private generateActions( command: BaseCommand ): string {
+    private generateActions( command: Command ): string {
 
         let actions: string[] = [];
 

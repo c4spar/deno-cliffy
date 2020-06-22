@@ -3,18 +3,18 @@ import { IFlagOptions } from '../../flags/lib/types.ts';
 import { Table } from '../../table/lib/table.ts';
 import format from '../../x/format.ts';
 import { ArgumentsParser } from './arguments-parser.ts';
-import { BaseCommand } from './base-command.ts';
+import { Command } from './command.ts';
 import { IEnvVariable, IExample, IOption } from './types.ts';
 
 export class HelpGenerator {
 
     private indent: number = 2;
 
-    public static generate( cmd: BaseCommand ): string {
+    public static generate( cmd: Command ): string {
         return new HelpGenerator( cmd ).generate();
     }
 
-    private constructor( protected cmd: BaseCommand ) {}
+    private constructor( protected cmd: Command ) {}
 
     private generate(): string {
 
@@ -106,7 +106,7 @@ export class HelpGenerator {
         if ( hasTypeDefinitions ) {
             return this.label( 'Commands' ) +
                 Table.from( [
-                        ...commands.map( ( command: BaseCommand ) => [
+                        ...commands.map( ( command: Command ) => [
                             [ command.getName(), ...command.getAliases() ].map( name => blue( name ) ).join( ', ' ),
                             ArgumentsParser.highlightArguments( command.getArgsDefinition() || '' ),
                             red( bold( '-' ) ) + ' ' + command.getDescription().split( '\n' ).shift() as string
@@ -119,7 +119,7 @@ export class HelpGenerator {
 
         return this.label( 'Commands' ) +
             Table.from( [
-                    ...commands.map( ( command: BaseCommand ) => [
+                    ...commands.map( ( command: Command ) => [
                         [ command.getName(), ...command.getAliases() ].map( name => blue( name ) ).join( ', ' ),
                         red( bold( '-' ) ) + ' ' + command.getDescription().split( '\n' ).shift() as string
                     ] )

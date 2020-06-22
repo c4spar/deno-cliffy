@@ -1,13 +1,13 @@
 import { IFlags } from '../../flags/lib/types.ts';
-import { BaseCommand } from '../lib/base-command.ts';
+import { Command } from '../lib/command.ts';
 import { ParentCommandListType } from '../types/parent-command-list.ts';
 
 /**
  * Generates well formatted and colored help output for specified command.
  */
-export class HelpCommand extends BaseCommand {
+export class HelpCommand extends Command {
 
-    public constructor( cmd?: BaseCommand ) {
+    public constructor( cmd?: Command ) {
         super();
         this.type( 'command', new ParentCommandListType() )
             .arguments( '[command:command]' )

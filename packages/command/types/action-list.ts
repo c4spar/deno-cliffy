@@ -1,9 +1,9 @@
-import { BaseCommand } from '../lib/base-command.ts';
+import { Command } from '../lib/command.ts';
 import { StringType } from './string.ts';
 
 export class ActionListType extends StringType {
 
-    constructor( protected cmd: BaseCommand ) {
+    constructor( protected cmd: Command ) {
         super();
     }
 

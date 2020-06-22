@@ -1,10 +1,14 @@
 import { Command } from '../../../command/lib/command.ts';
+import { CompletionsCommand } from '../../commands/completions.ts';
+import { HelpCommand } from '../../commands/help.ts';
 import { assertEquals, assertThrowsAsync } from '../lib/assert.ts';
 
 const cmd = new Command()
     .throwErrors()
     .option( '-f, --flag', 'description ...' )
-    .action( () => {} );
+    .action( () => {} )
+    .command( 'help', new HelpCommand() )
+    .command( 'completions', new CompletionsCommand() );
 
 Deno.test( 'command: types - no value short flag', async () => {
     const { options, args } = await cmd.parse( [ '-f' ] );

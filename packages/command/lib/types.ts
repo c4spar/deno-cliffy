@@ -1,12 +1,12 @@
 import { IFlagArgument, IFlagOptions, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
 import { Type } from '../types/type.ts';
-import { BaseCommand } from './base-command.ts';
+import { Command } from './command.ts';
 
 /** Description handler. */
-export type IDescription = string | ( ( this: BaseCommand ) => string );
+export type IDescription = string | ( ( this: Command ) => string );
 
 /** Action handler. */
-export type IAction<O, A extends Array<any>> = ( this: BaseCommand, options: O, ...args: A ) => void | Promise<void>;
+export type IAction<O, A extends Array<any>> = ( this: Command, options: O, ...args: A ) => void | Promise<void>;
 
 /** Omit key from object. */
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -82,7 +82,7 @@ export interface IParseResult<O = any, A extends Array<any> = any> {
     options: O;
     args: A;
     literal: string[];
-    cmd: BaseCommand<O>;
+    cmd: Command<O>;
 }
 
 export interface ICompleteOptions {
@@ -96,4 +96,4 @@ export interface ICompleteSettings extends ICompleteOptions {
 }
 
 /** Type parser method. */
-export type ICompleteHandler = ( cmd: BaseCommand, parent?: BaseCommand ) => string[] | Promise<string[]>;
+export type ICompleteHandler = ( cmd: Command, parent?: Command ) => string[] | Promise<string[]>;

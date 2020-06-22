@@ -25,5 +25,5 @@ Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'value', 'unknown' ] );
-    }, Error, 'Unknown command: unknown' );
+    }, Error, 'No arguments allowed for command: COMMAND' );
 } );

@@ -1,9 +1,8 @@
-import { BaseCommand } from '../../lib/base-command.ts';
 import { Command } from '../../lib/command.ts';
 import { assertEquals } from '../lib/assert.ts';
 
 interface IStats {
-    context: null | BaseCommand,
+    context: null | Command,
     options: any,
     args: any
 }

@@ -1,11 +1,11 @@
-import { BaseCommand } from '../../lib/base-command.ts';
+import { Command } from '../../lib/command.ts';
 
 /**
  * Generates bash completion code.
  */
-export class BashCompletionsCommand extends BaseCommand {
+export class BashCompletionsCommand extends Command {
 
-    public constructor( _cmd?: BaseCommand ) {
+    public constructor( _cmd?: Command ) {
         super();
         this.description( 'Generate bash shell completions.' )
             .action( () => {

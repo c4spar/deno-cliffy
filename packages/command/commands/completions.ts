@@ -1,5 +1,5 @@
 import { bold, dim, italic } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
-import { BaseCommand } from '../lib/base-command.ts';
+import { Command } from '../lib/command.ts';
 import { BashCompletionsCommand } from './completions/bash.ts';
 import { CompleteCommand } from './completions/complete.ts';
 import { ZshCompletionsCommand } from './completions/zsh.ts';
@@ -7,9 +7,9 @@ import { ZshCompletionsCommand } from './completions/zsh.ts';
 /**
  * Generates source code for interactive shell completions used in multiple shell's.
  */
-export class CompletionsCommand extends BaseCommand {
+export class CompletionsCommand extends Command {
 
-    public constructor( cmd?: BaseCommand ) {
+    public constructor( cmd?: Command ) {
 
         super();
 

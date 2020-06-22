@@ -1,24 +1,24 @@
 import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
 import { IFlags } from '../../../flags/lib/types.ts';
-import { BaseCommand } from '../../lib/base-command.ts';
+import { Command } from '../../lib/command.ts';
 import { ICompleteSettings } from '../../lib/types.ts';
 
 /**
  * Execute complete method for specific action and command.
  */
-export class CompleteCommand extends BaseCommand {
+export class CompleteCommand extends Command {
 
-    public constructor( cmd?: BaseCommand ) {
+    public constructor( cmd?: Command ) {
         super();
         this.description( 'Get completions for given action from given command.' )
             .arguments( '<action:action> [command...:command]' )
             .action( async ( options: IFlags, action: string, commandNames: string[] ) => {
 
-                let parent: BaseCommand | undefined;
-                let completeCommand: BaseCommand = commandNames
-                    .reduce( ( cmd: BaseCommand, name: string ): BaseCommand => {
+                let parent: Command | undefined;
+                let completeCommand: Command = commandNames
+                    .reduce( ( cmd: Command, name: string ): Command => {
                         parent = cmd;
-                        const childCmd: BaseCommand | undefined = cmd.getCommand( name, false );
+                        const childCmd: Command | undefined = cmd.getCommand( name, false );
                         if ( !childCmd ) {
                             throw new Error( `Auto-completion failed. Command not found: ${ commandNames.join( ' ' ) }` );
                         }

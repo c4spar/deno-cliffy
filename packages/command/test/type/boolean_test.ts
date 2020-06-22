@@ -3,6 +3,7 @@ import { assertEquals, assertThrowsAsync } from '../lib/assert.ts';
 
 const cmd = new Command()
     .throwErrors()
+    .name( 'test-command' )
     .option( '-f, --flag [value:boolean]', 'description ...' )
     .action( () => {} );
 
@@ -98,7 +99,7 @@ Deno.test( 'command optionStandalone flagCombineLong', async () => {
 
     await assertThrowsAsync( async () => {
         await cmd.parse( [ '-f', 'true', 'unknown' ] );
-    }, Error, 'Unknown command: unknown' );
+    }, Error, 'No arguments allowed for command: test-command' );
 } );
 
 Deno.test( 'command optionStandalone flagCombineLong', async () => {

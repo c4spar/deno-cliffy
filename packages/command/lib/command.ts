@@ -20,7 +20,7 @@ const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.
 /**
  * Base command implementation without pre configured command's and option's.
  */
-export class BaseCommand<O = any, A extends Array<any> = any> {
+export class Command<O = any, A extends Array<any> = any> {
 
     private types: ITypeMap = new Map<string, ITypeSettings>( [
         [ 'string', { name: 'string', handler: new StringType() } ],
@@ -32,18 +32,18 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     // @TODO: get script name: https://github.com/denoland/deno/pull/5034
     // private name: string = location.pathname.split( '/' ).pop() as string;
     private _name: string = 'COMMAND';
-    private _parent?: BaseCommand;
-    private _globalParent?: BaseCommand;
+    private _parent?: Command;
+    private _globalParent?: Command;
     private ver: string = '0.0.0';
     private desc: IDescription = '';
     private fn: IAction<O, A> | undefined;
     private options: IOption<O, A>[] = [];
-    private commands: Map<string, BaseCommand> = new Map();
+    private commands: Map<string, Command> = new Map();
     private examples: IExample[] = [];
     private envVars: IEnvVariable[] = [];
     private aliases: string[] = [];
     private completions: Map<string, ICompleteSettings> = new Map();
-    private cmd: BaseCommand = this;
+    private cmd: Command = this;
     private argsDefinition: string | undefined;
     private isExecutable: boolean = false;
     private throwOnError: boolean = false;
@@ -54,11 +54,12 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     private args: IArgumentDetails[] = [];
     private isHidden: boolean = false;
     private isGlobal: boolean = false;
+    private hasDefaults: Boolean = false;
 
     /**
      * Add new sub-command.
      */
-    public command( nameAndArguments: string, cmd?: BaseCommand | string, override?: boolean ): this {
+    public command( nameAndArguments: string, cmd?: Command | string, override?: boolean ): this {
 
         let executableDescription: string | undefined;
 
@@ -83,7 +84,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             this.removeCommand( name );
         }
 
-        const subCommand = ( cmd || new BaseCommand() ).reset();
+        const subCommand = ( cmd || new Command() ).reset();
 
         subCommand._name = name;
         subCommand._parent = this;
@@ -294,7 +295,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
         this.cmd.types.set( name, { ...options, name, handler } );
 
         if ( handler instanceof Type && typeof handler.complete !== 'undefined' ) {
-            this.complete( name, ( cmd: BaseCommand, parent?: BaseCommand ) => handler.complete?.( cmd, parent ) || [], options );
+            this.complete( name, ( cmd: Command, parent?: Command ) => handler.complete?.( cmd, parent ) || [], options );
         }
 
         return this;
@@ -341,7 +342,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
     public getGlobalCompletions(): ICompleteSettings[] {
 
-        const getCompletions = ( cmd: BaseCommand | undefined, completions: ICompleteSettings[] = [], names: string[] = [] ): ICompleteSettings[] => {
+        const getCompletions = ( cmd: Command | undefined, completions: ICompleteSettings[] = [], names: string[] = [] ): ICompleteSettings[] => {
 
             if ( cmd ) {
                 if ( cmd.completions.size ) {
@@ -537,7 +538,8 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      */
     public async parse( args: string[] = Deno.args, dry?: boolean ): Promise<IParseResult<O, A>> {
 
-        this.reset();
+        this.reset()
+            .registerDefaults();
 
         this.rawArgs = args;
 
@@ -581,6 +583,31 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
             return await this.execute( flags, ...params );
         }
     }
+
+    private registerDefaults(): this {
+        if ( this.getParent() || this.hasDefaults ) {
+            return this;
+        }
+        this.hasDefaults = true;
+
+        this.option( '-h, --help', 'Show this help.', {
+                standalone: true,
+                global: true,
+                action: function ( this: Command ) {
+                    this.help();
+                    Deno.exit( 0 );
+                }
+            } )
+            .option( '-V, --version', 'Show the version number for this program.', {
+                standalone: true,
+                action: () => {
+                    this.log( this.getVersion() );
+                    Deno.exit( 0 );
+                }
+            } );
+
+        return this;
+    };
 
     /**
      * Execute command.
@@ -826,7 +853,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Get parent command.
      */
-    public getParent(): BaseCommand | undefined {
+    public getParent(): Command | undefined {
         return this._parent;
     }
 
@@ -835,14 +862,14 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
      * this method returns always undefined.
      */
-    public getGlobalParent(): BaseCommand | undefined {
+    public getGlobalParent(): Command | undefined {
         return this._globalParent;
     }
 
     /**
      * Get main command.
      */
-    public getMainCommand(): BaseCommand {
+    public getMainCommand(): Command {
         return this._parent?.getMainCommand() ?? this;
     }
 
@@ -943,7 +970,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
     public getGlobalOptions( hidden?: boolean ): IOption[] {
 
-        const getOptions = ( cmd: BaseCommand | undefined, options: IOption[] = [], names: string[] = [] ): IOption[] => {
+        const getOptions = ( cmd: Command | undefined, options: IOption[] = [], names: string[] = [] ): IOption[] => {
 
             if ( cmd ) {
                 if ( cmd.options.length ) {
@@ -1052,23 +1079,23 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
     /**
      * Get sub-commands.
      */
-    public getCommands( hidden?: boolean ): BaseCommand[] {
+    public getCommands( hidden?: boolean ): Command[] {
 
         return this.getGlobalCommands( hidden ).concat( this.getBaseCommands( hidden ) );
     }
 
-    public getBaseCommands( hidden?: boolean ): BaseCommand[] {
+    public getBaseCommands( hidden?: boolean ): Command[] {
         const commands = Array.from( this.commands.values() );
         return hidden ? commands : commands.filter( cmd => !cmd.isHidden );
     }
 
-    public getGlobalCommands( hidden?: boolean ): BaseCommand[] {
+    public getGlobalCommands( hidden?: boolean ): Command[] {
 
-        const getCommands = ( cmd: BaseCommand | undefined, commands: BaseCommand[] = [], names: string[] = [] ): BaseCommand[] => {
+        const getCommands = ( cmd: Command | undefined, commands: Command[] = [], names: string[] = [] ): Command[] => {
 
             if ( cmd ) {
                 if ( cmd.commands.size ) {
-                    cmd.commands.forEach( ( cmd: BaseCommand ) => {
+                    cmd.commands.forEach( ( cmd: Command ) => {
                         if (
                             cmd.isGlobal &&
                             this !== cmd &&
@@ -1108,25 +1135,25 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      * @param name Name of the sub-command.
      * @param hidden Include hidden commands.
      */
-    public getCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
+    public getCommand<O = any>( name: string, hidden?: boolean ): Command<O> | undefined {
 
         return this.getBaseCommand( name, hidden ) ?? this.getGlobalCommand( name, hidden );
     }
 
-    public getBaseCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
+    public getBaseCommand<O = any>( name: string, hidden?: boolean ): Command<O> | undefined {
 
-        let cmd: BaseCommand | undefined = this.commands.get( name );
+        let cmd: Command | undefined = this.commands.get( name );
 
         return cmd && ( hidden || !cmd.isHidden ) ? cmd : undefined;
     }
 
-    public getGlobalCommand<O = any>( name: string, hidden?: boolean ): BaseCommand<O> | undefined {
+    public getGlobalCommand<O = any>( name: string, hidden?: boolean ): Command<O> | undefined {
 
         if ( !this._parent ) {
             return;
         }
 
-        let cmd: BaseCommand | undefined = this._parent.getBaseCommand( name, hidden );
+        let cmd: Command | undefined = this._parent.getBaseCommand( name, hidden );
 
         if ( !cmd?.isGlobal ) {
             return this._parent.getGlobalCommand( name, hidden );
@@ -1140,7 +1167,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
      *
      * @param name Name of the command.
      */
-    public removeCommand<O = any>( name: string ): BaseCommand<O> | undefined {
+    public removeCommand<O = any>( name: string ): Command<O> | undefined {
 
         const command = this.getBaseCommand( name, true );
 
@@ -1161,7 +1188,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
     public getGlobalTypes(): ITypeSettings[] {
 
-        const getTypes = ( cmd: BaseCommand | undefined, types: ITypeSettings[] = [], names: string[] = [] ): ITypeSettings[] => {
+        const getTypes = ( cmd: Command | undefined, types: ITypeSettings[] = [], names: string[] = [] ): ITypeSettings[] => {
 
             if ( cmd ) {
                 if ( cmd.types.size ) {
@@ -1238,7 +1265,7 @@ export class BaseCommand<O = any, A extends Array<any> = any> {
 
     public getGlobalEnvVars( hidden?: boolean ): IEnvVariable[] {
 
-        const getEnvVars = ( cmd: BaseCommand | undefined, envVars: IEnvVariable[] = [], names: string[] = [] ): IEnvVariable[] => {
+        const getEnvVars = ( cmd: Command | undefined, envVars: IEnvVariable[] = [], names: string[] = [] ): IEnvVariable[] => {
 
             if ( cmd ) {
                 if ( cmd.envVars.length ) {

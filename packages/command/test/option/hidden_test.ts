@@ -23,7 +23,6 @@ Deno.test( 'hidden option', async () => {
 Deno.test( 'hidden option help', async () => {
 
     const cmd: Command = command();
-    await cmd.parse( [], true );
     const output: string = cmd.getHelp();
 
     assertEquals( `

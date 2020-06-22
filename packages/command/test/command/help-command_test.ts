@@ -1,4 +1,6 @@
 import { stripeColors } from '../../../table/lib/utils.ts';
+import { CompletionsCommand } from '../../commands/completions.ts';
+import { HelpCommand } from '../../commands/help.ts';
 import { Command } from '../../lib/command.ts';
 import { assertEquals } from '../lib/assert.ts';
 
@@ -24,6 +26,9 @@ Deno.test( 'command: help command', async () => {
         .env( 'SOME_ENV_VAR=<value:number>', 'Description ...' )
         .env( 'SOME_ENV_VAR_2 <value>', 'Description 2 ...' )
 
+        .command( 'help', new HelpCommand() )
+        .command( 'completions', new CompletionsCommand() )
+
         .command( 'sub-command <input:string> <output:string>' )
         .description( 'sub command description.' )
 
@@ -35,7 +40,7 @@ Deno.test( 'command: help command', async () => {
 
     const output: string = cmd.getHelp();
 
-    assertEquals( stripeColors( output ), `
+    assertEquals( `
   Usage:   COMMAND
   Version: v1.0.0 
 
@@ -45,13 +50,13 @@ Deno.test( 'command: help command', async () => {
 
   Options:
 
-    -h, --help                     - Show this help.                            
-    -V, --version                  - Show the version number for this program.  
-    -t, --test       [val:string]  - test description                           
-    -D, --default    [val:string]  - I have a default value!                    (Default: test)
-    -r, --required   [val:string]  - I am required!                             (required)
-    -d, --depends    [val:string]  - I depend on test!                          (depends: test)
-    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)
+    -h, --help                     - Show this help.                                                                                        
+    -V, --version                  - Show the version number for this program.                                                              
+    -t, --test       [val:string]  - test description                                                                                       
+    -D, --default    [val:string]  - I have a default value!                    (Default: test)                                             
+    -r, --required   [val:string]  - I am required!                             (required)                                                  
+    -d, --depends    [val:string]  - I depend on test!                          (depends: test)                                             
+    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)                                           
     -a, --all        <val:string>  - I have many hints!                         (required, Default: test, depends: test, conflicts: depends)
 
   Commands:
@@ -65,5 +70,5 @@ Deno.test( 'command: help command', async () => {
     SOME_ENV_VAR    <value:number>  - Description ...  
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
-` );
+`, stripeColors( output ) );
 } );
