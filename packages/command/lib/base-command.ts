@@ -22,38 +22,38 @@ const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.
  */
 export class BaseCommand<O = any, A extends Array<any> = any> {
 
-    protected types: ITypeMap = new Map<string, ITypeSettings>( [
+    private types: ITypeMap = new Map<string, ITypeSettings>( [
         [ 'string', { name: 'string', handler: new StringType() } ],
         [ 'number', { name: 'number', handler: new NumberType() } ],
         [ 'boolean', { name: 'boolean', handler: new BooleanType() } ]
     ] );
-    protected rawArgs: string[] = [];
-    protected literalArgs: string[] = [];
+    private rawArgs: string[] = [];
+    private literalArgs: string[] = [];
     // @TODO: get script name: https://github.com/denoland/deno/pull/5034
-    // protected name: string = location.pathname.split( '/' ).pop() as string;
-    protected _name: string = 'COMMAND';
-    protected _parent?: BaseCommand;
-    protected _globalParent?: BaseCommand;
-    protected ver: string = '0.0.0';
-    protected desc: IDescription = '';
-    protected fn: IAction<O, A> | undefined;
-    protected options: IOption<O, A>[] = [];
-    protected commands: Map<string, BaseCommand> = new Map();
-    protected examples: IExample[] = [];
-    protected envVars: IEnvVariable[] = [];
-    protected aliases: string[] = [];
-    protected completions: Map<string, ICompleteSettings> = new Map();
-    protected cmd: BaseCommand = this;
-    protected argsDefinition: string | undefined;
-    protected isExecutable: boolean = false;
-    protected throwOnError: boolean = false;
-    protected _allowEmpty: boolean = true;
-    protected _stopEarly: boolean = false;
-    protected defaultCommand: string | undefined;
-    protected _useRawArgs: boolean = false;
-    protected args: IArgumentDetails[] = [];
-    protected isHidden: boolean = false;
-    protected isGlobal: boolean = false;
+    // private name: string = location.pathname.split( '/' ).pop() as string;
+    private _name: string = 'COMMAND';
+    private _parent?: BaseCommand;
+    private _globalParent?: BaseCommand;
+    private ver: string = '0.0.0';
+    private desc: IDescription = '';
+    private fn: IAction<O, A> | undefined;
+    private options: IOption<O, A>[] = [];
+    private commands: Map<string, BaseCommand> = new Map();
+    private examples: IExample[] = [];
+    private envVars: IEnvVariable[] = [];
+    private aliases: string[] = [];
+    private completions: Map<string, ICompleteSettings> = new Map();
+    private cmd: BaseCommand = this;
+    private argsDefinition: string | undefined;
+    private isExecutable: boolean = false;
+    private throwOnError: boolean = false;
+    private _allowEmpty: boolean = true;
+    private _stopEarly: boolean = false;
+    private defaultCommand: string | undefined;
+    private _useRawArgs: boolean = false;
+    private args: IArgumentDetails[] = [];
+    private isHidden: boolean = false;
+    private isGlobal: boolean = false;
 
     /**
      * Add new sub-command.
