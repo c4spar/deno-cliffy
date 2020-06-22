@@ -13,18 +13,18 @@ import { IParseResult } from './types.ts';
  */
 export class Command<O = any, A extends Array<any> = any> extends BaseCommand<O, A> {
 
-    #hasDefaults: Boolean = false;
+    private hasDefaults: Boolean = false;
 
     public parse( args: string[] = Deno.args, dry?: boolean ): Promise<IParseResult<O, A>> {
-        this.#registerDefaults();
+        this.registerDefaults();
         return super.parse( args, dry );
     }
 
-    #registerDefaults = (): this => {
-        if ( this._parent || this.#hasDefaults ) {
+    private registerDefaults = (): this => {
+        if ( this.getParent() || this.hasDefaults ) {
             return this;
         }
-        this.#hasDefaults = true;
+        this.hasDefaults = true;
         this.reset()
             .option( '-h, --help', 'Show this help.', {
                 standalone: true,
@@ -37,7 +37,7 @@ export class Command<O = any, A extends Array<any> = any> extends BaseCommand<O,
             .option( '-V, --version', 'Show the version number for this program.', {
                 standalone: true,
                 action: () => {
-                    this.log( this.ver );
+                    this.log( this.getVersion() );
                     Deno.exit( 0 );
                 }
             } );
