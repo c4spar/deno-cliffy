@@ -56,12 +56,14 @@
   - [Global types](#global-types)
 - [Environment variables](#environment-variables)
 - [Add examples](#add-examples)
+- [Auto generated help](#auto-generated-help)
+  - [Help option](#help-option)
+  - [Help command](#help-command)
 - [Shell completion](#shell-completion)
-- [Generic options and arguments](#generic-options-and-arguments)
-- [Default options and commands](#default-options-and-commands)
-  - [Version option](#version-option)
-  - [Help option & command](#help-option--command)
   - [Completions command](#completions-command)
+    - [Zsh Completions](#zsh-completions)
+- [Generic options and arguments](#generic-options-and-arguments)
+- [Version option](#version-option)
 - [License](#license)
 
 ## Usage
@@ -69,6 +71,8 @@
 To create a program with cliffy you can import the `Command` class from the command module https://deno.land/x/cliffy/command.ts.
 
 The `Command` class is used to create a new command or sub-command.
+The main command has two predefined options, a global `--help` option which is available on all child commands and
+a `--version` option which is only available on the main command.
 
 ```typescript
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
@@ -77,7 +81,7 @@ await new Command()
     .name( 'cliffy' )
     .version( '0.1.0' )
     .description( `Command line framework for Deno` )
-    .parse( Deno.args );
+    .parse();
 ```
 
 ```
@@ -118,11 +122,11 @@ The `.parse()` method processes all arguments, leaving any options consumed by t
 
 ### Common option types: string, number and boolean
 
-Optionally you can declare a types after the argument name, separated by colon `<name:type>`. If no type is specified, the type defaults to `string`. Following types are availeble per default (*more will be added*):
+Optionally you can declare a type after the argument name, separated by colon `<name:type>`. If no type is specified, the type defaults to `string`. Following types are availeble per default (*more will be added*):
 
 * **string:** can be any value
 
-* **number:** can be any nummeric value
+* **number:** can be any numeric value
 
 * **boolean:** can be one of: `true`, `false`, `1` or `0`,
 
@@ -868,14 +872,64 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
 ![](../../assets/img/examples.png)
 
+## Auto generated help
+
+The help information is auto-generated based on the information you have defined on your program.
+
+### Help option
+
+The `--help` and `-h` option flag prints the auto generated help.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .version( '0.1.0' )
+    .description( 'Sample description ...' )
+    .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
+    .parse( Deno.args );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts --help
+```
+
+![](../../assets/img/help.png)
+
+### Help command
+
+There is also a predefined `HelpCommand` which prints the same help output as the `--help` option.
+The help command must be registered manuelly and can be optionally registered as global command to make them also
+available on all child commands.
+
+```typescript
+import { Command, HelpCommand } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .version( '0.1.0' )
+    .description( 'Sample description ...' )
+    .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
+    .command( 'help', new HelpCommand().global() )
+    .parse( Deno.args );
+```
+
+
+The `help` command excepts the name of a sub-command as optional argument to show the help of the given sub-command.
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help completions
+$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions help
+```
+
 ## Shell completion
 
 Cliffy supports shell completion out of the box.
 
 > At the moment only `zsh` is supported but `bash` will be added.
 
-Some predefined types like `boolean` has predefined auto-completion. There are two ways to add auto-completion to types.
-One option is adding an completion action. An completion action is declared with the `.complete()` method and can be used
+There are two ways to add auto-completion to types.
+One option is adding a completion action. A completion action is declared with the `.complete()` method and can be used
 in the command arguments declaration and by any option. The action is added after the type separated by colon.
 
 ```typescript
@@ -907,6 +961,31 @@ await new Command()
 ```
 
 Enabling auto completion is explained in the [completions command](#completions-command) section.
+
+### Completions command
+
+The `CompetionsCommand` command can generate a shell completions script for your program. At the moment only `zsh`
+is supported. `bash` and more will be added.
+
+The `CompletionsCommand` is not registered per default and must be registered by your self.
+
+```typescript
+import { Command, CompletionsCommand } from 'https://deno.land/x/cliffy/command.ts';
+
+await new Command()
+    .version( '0.1.0' )
+    .description( 'Sample description ...' )
+    .command( 'completions', new CompletionsCommand() )
+    .parse( Deno.args );
+```
+
+#### Zsh Completions
+
+To enable zsh completions on your system add the following line to your `~/.zshrc`:
+
+```shell
+source <(command-name completions zsh)
+```
 
 ## Generic options and arguments
 
@@ -941,11 +1020,7 @@ const input: string = result.args[ 0 ];
 const output: string | undefined = result.args[ 1 ];
 ```
 
-## Default options and commands
-
-Every instance of the `Command` class has some pre defenied options and sub-commands. If you don't need these pre defined option's and sub-command's you can use the `BaseCommand` class instedd of the `Command` class.
-
-### Version option
+## Version option
 
 The `--version` and `-V` option flag prints the version number defined with the `version()` method. The version number will also be printed within the output of the [help](#help-option-command) option and command.
 
@@ -961,62 +1036,6 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts -V
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts --version
 0.0.1
-```
-
-### Help option & command
-
-The help information is auto-generated based on the information you have defined on your program.
-
-```typescript
-import { Command } from 'https://deno.land/x/cliffy/command.ts';
-
-await new Command()
-    .version( '0.1.0' )
-    .description( 'Sample description ...' )
-    .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
-    .example( 'Some example', 'Example content ...\n\nSome more example content ...' )
-    .parse( Deno.args );
-```
-
-The `--help` and `-h` option flag and also the `help` sub-command prints the auto generated help.
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts -h
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts --help
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help
-```
-
-![](../../assets/img/help.png)
-
-The `help` sub-command excepts also the name of a sub-command as argument to show the help of the sub-command. But you can also use the help flag and command directly from the sub-command.
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts help completions
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions -h
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions --help
-$ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions help
-```
-
-### Completions command
-
-The `completions` command prints an autogenerated completion script for shell completions.
-
-**Bash Completions**
-
-> Bash completions are not supported yet but will be added.
-
-To enable autocompletions to your commands add the following line to your `~/.bashrc`:
-
-```shell
-source <(command-name completions bash)
-```
-
-**Zsh Completions**
-
-To enable autocompletions to your commands add the following line to your `~/.zshrc`:
-
-```shell
-source <(command-name completions zsh)
 ```
 
 ## Credits
