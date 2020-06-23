@@ -3,7 +3,7 @@ import { StringType } from './string.ts';
 
 // @TODO: add exclude option
 
-export class CommandListType extends StringType {
+export class ChildCommandType extends StringType {
 
     #cmd?: Command;
 

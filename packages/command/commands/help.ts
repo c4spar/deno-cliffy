@@ -1,6 +1,6 @@
 import { IFlags } from '../../flags/lib/types.ts';
 import { Command } from '../lib/command.ts';
-import { ParentCommandListType } from '../types/parent-command-list.ts';
+import { CommandType } from '../types/command.ts';
 
 /**
  * Generates well formatted and colored help output for specified command.
@@ -9,7 +9,7 @@ export class HelpCommand extends Command {
 
     public constructor( cmd?: Command ) {
         super();
-        this.type( 'command', new ParentCommandListType() )
+        this.type( 'command', new CommandType() )
             .arguments( '[command:command]' )
             .description( 'Show this help or the help of a sub-command.' )
             .action( ( flags: IFlags, name?: string ) => {

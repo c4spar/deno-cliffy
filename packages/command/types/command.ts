@@ -1,7 +1,7 @@
 import { Command } from '../lib/command.ts';
 import { StringType } from './string.ts';
 
-export class ParentCommandListType extends StringType {
+export class CommandType extends StringType {
 
     public complete( cmd: Command, parent?: Command ): string[] {
         return parent?.getCommands( false )

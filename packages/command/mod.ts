@@ -4,7 +4,7 @@ export * from './commands/completions.ts';
 export * from './commands/help.ts';
 export * from './types/action-list.ts';
 export * from './types/boolean.ts';
-export * from './types/command-list.ts';
+export * from './types/child-command.ts';
 export * from './types/number.ts';
 export * from './types/string.ts';
 export * from './types/type.ts';
