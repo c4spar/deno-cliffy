@@ -34,6 +34,7 @@ export interface ICommandOption<O = any, A extends Array<any> = any> extends Omi
     hidden?: boolean;
     global?: boolean;
     action?: IAction<O, A>;
+    prepend?: boolean;
 }
 
 /** Command option setting's. */

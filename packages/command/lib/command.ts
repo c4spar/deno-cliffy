@@ -397,18 +397,8 @@ export class Command<O = any, A extends Array<any> = any> {
      *
      * @param flags Flags string like: -h, --help, --manual <requiredArg:string> [optionalArg: number] [...restArgs:string]
      * @param desc Flag description.
-     * @param value Custom handler for processing flag value.
+     * @param opts Flag options or custom handler for processing flag value.
      */
-    public option( flags: string, desc: string, value?: IFlagValueHandler ): this;
-
-    /**
-     * Add new option (flag).
-     *
-     * @param flags Flags string like: -h, --help, --manual <requiredArg:string> [optionalArg: number] [...restArgs:string]
-     * @param desc Flag description.
-     * @param opts Flag options.
-     */
-    public option( flags: string, desc: string, opts?: ICommandOption ): this;
     public option( flags: string, desc: string, opts?: ICommandOption | IFlagValueHandler ): this {
 
         if ( typeof opts === 'function' ) {
@@ -464,7 +454,11 @@ export class Command<O = any, A extends Array<any> = any> {
             }
         }
 
-        this.cmd.options.push( option );
+        if ( option.prepend ) {
+            this.cmd.options.unshift( option );
+        } else {
+            this.cmd.options.push( option );
+        }
 
         return this;
     }
@@ -590,18 +584,21 @@ export class Command<O = any, A extends Array<any> = any> {
         }
         this.hasDefaults = true;
 
-        this.option( '-h, --help', 'Show this help.', {
+        this.reset()
+            .option( '-V, --version', 'Show the version number for this program.', {
                 standalone: true,
-                global: true,
+                prepend: true,
                 action: function ( this: Command ) {
-                    this.help();
+                    this.log( this.getVersion() );
                     Deno.exit( 0 );
                 }
             } )
-            .option( '-V, --version', 'Show the version number for this program.', {
+            .option( '-h, --help', 'Show this help.', {
                 standalone: true,
-                action: () => {
-                    this.log( this.getVersion() );
+                global: true,
+                prepend: true,
+                action: function ( this: Command ) {
+                    this.help();
                     Deno.exit( 0 );
                 }
             } );
@@ -1455,6 +1452,7 @@ export class Command<O = any, A extends Array<any> = any> {
      * Get generated help.
      */
     public getHelp(): string {
+        this.registerDefaults();
         return HelpGenerator.generate( this );
     }
 }
