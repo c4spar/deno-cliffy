@@ -33,40 +33,40 @@
 
 ## ❯ Usage
 
-### ✏️ Single Prompt
+### Single Prompt
 
 Execute a single prompt with a single message which returns the user input.
 
 ```typescript
-const result: string = await Input.prompt('Do you prefer cats or dogs?');
+const name: string = await Input.prompt(`What's your name?`);
 ```
 
 Execute a single prompt with an options object.
 
 ```typescript
-const result: string = await Input.prompt({message: 'Do you prefer cats or dogs?'});
+const name: string = await Input.prompt({message: `What's your name?`});
 ```
 
-### 🔗 Prompt Chain
+### Prompt Chain
 
 > Work in progress
 
-### 📃 Prompt List
+### Prompt List
 
 > Work in progress
 
-### 💫 Dynamic Prompts
+### Dynamic Prompts
 
 > Work in progress
 
 ## ❯ Types
 
 * [input](#%EF%B8%8F-input)
-* [number](#1%EF%B8%8F2%EF%B8%8F3%EF%B8%8F-number)
+* [number](#-number)
 * [secret](#-secret)
 * [confirm](#-confirm)
 * [toggle](#-toggle)
-* [list](#---list)
+* [list](#-list)
 * [select](#-select)
 * [checkbox](#%EF%B8%8F-checkbox)
 
@@ -89,10 +89,16 @@ All prompts have the following base options:
 
 **Example**
 
+![](../../assets/img/prompt/input.gif)
+
 ```typescript
 import { Input } from 'https://deno.land/x/cliffy/prompt.ts';
 
-const name: string = await Input.prompt( `What's your name?` );
+const name: string = await Input.prompt( `What's your github user name?` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/input.ts
 ```
 
 **Options**
@@ -108,14 +114,20 @@ The `Input` prompt has all [base](#base-options) and the following prompt specif
 
 ***
 
-### 1️2️3️ Number
+### 💯 Number
 
 **Example**
+
+![](../../assets/img/prompt/number.gif)
 
 ```typescript
 import { Number } from 'https://deno.land/x/cliffy/prompt.ts';
 
-const age: number = await Number.prompt( 'How old are you?' );
+const age: number = await Number.prompt( `How old are you?` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/number.ts
 ```
 
 **Options**
@@ -137,10 +149,16 @@ The `Number` prompt has all [base options](#base-options) and the following prom
 
 **Example**
 
+![](../../assets/img/prompt/secret.gif)
+
 ```typescript
 import { Secret } from 'https://deno.land/x/cliffy/prompt.ts';
 
-const password: string = await Secret.prompt( 'Enter your password?' );
+const password: string = await Secret.prompt( `Enter your password` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/secret.ts
 ```
 
 **Options**
@@ -162,10 +180,16 @@ The `Secret` prompt has all [base options](#base-options) and the following prom
 
 **Example**
 
+![](../../assets/img/prompt/confirm.gif)
+
 ```typescript
 import { Confirm } from 'https://deno.land/x/cliffy/prompt.ts';
 
-const pizza: boolean = await Confirm.prompt( 'Would you like to buy a pizza?' );
+const confirmed: boolean = await Confirm.prompt( `Can you confirm?` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/confirm.ts
 ```
 
 **Options**
@@ -185,10 +209,16 @@ The `Config` prompt has all [base options](#base-options) and the following prom
 
 **Example**
 
+![](../../assets/img/prompt/toggle.gif)
+
 ```typescript
 import { Toggle } from 'https://deno.land/x/cliffy/prompt.ts';
 
-const pizza: boolean = await Toggle.prompt( 'Would you like to buy a pizza?' );
+const confirmed: boolean = await Toggle.prompt( `Can you confirm?` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/toggle.ts
 ```
 
 **Options**
@@ -204,7 +234,23 @@ The `Toggle` prompt has all [base options](#base-options) and the following prom
 
 ***
 
-### 🚃, 🚃, 🚃 List
+### 📃 List
+
+**Example**
+
+![](../../assets/img/prompt/list.gif)
+
+```typescript
+import { List } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const keywords: string[] = await List.prompt( `Enter some keywords` );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
+```
+
+The `List` prompt has all [base options](#base-options) and the following prompt specific options.
 
 **Options**
 
@@ -216,16 +262,6 @@ The `Toggle` prompt has all [base options](#base-options) and the following prom
 | minTags | `number` | No | Min number of tags. Defaults to `0`. |
 | maxTags | `number` | No | Max number of tags. Defaults to `infinity`. |
 
-**Example**
-
-The `List` prompt has all [base options](#base-options) and the following prompt specific options.
-
-```typescript
-import { List } from 'https://deno.land/x/cliffy/prompt.ts';
-
-const keywords: string[] = await List.prompt( 'Enter keywords' );
-```
-
 **↑ back to:** [Prompt types](#-types)
 
 ***
@@ -234,13 +270,26 @@ const keywords: string[] = await List.prompt( 'Enter keywords' );
 
 **Example**
 
-```typescript
-import { Select, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
+![](../../assets/img/prompt/select.gif)
 
-const pizza: string = await Select.prompt( {
-    message: 'Select your pizza?',
-    options: ['Margherita', 'Caprese', Select.Separator( 'Special' ), {name: 'Diavola', disabled: true}]
+```typescript
+import { Select } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const color: string = await Select.prompt( {
+    message: `Pick a color`,
+    options: [
+        { name: 'Red', value: '#ff0000' },
+        { name: 'Green', value: '#00ff00', disabled: true },
+        { name: 'Blue', value: '#0000ff' },
+        Select.separator( '--------' ),
+        { name: 'White', value: '#ffffff' },
+        { name: 'Black', value: '#000000' }
+    ]
 } );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/select.ts
 ```
 
 **Options**
@@ -270,13 +319,26 @@ The `Select` prompt has all [base options](#base-options) and the following prom
 
 **Example**
 
-```typescript
-import { Checkbox, Separator } from 'https://deno.land/x/cliffy/prompt.ts';
+![](../../assets/img/prompt/checkbox.gif)
 
-const pizza: string[] = await Checkbox.prompt( {
-    message: 'Select your pizza?',
-    options: [ 'Margherita', 'Caprese', Checkbox.Separator( 'Special' ), {value: 'Diavola', disabled: true}]
+```typescript
+import { Checkbox } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const colors: string[] = await Checkbox.prompt( {
+    message: `Pick a color`,
+    options: [
+        { name: 'Red', value: '#ff0000' },
+        { name: 'Green', value: '#00ff00', disabled: true },
+        { name: 'Blue', value: '#0000ff' },
+        Checkbox.separator( '--------' ),
+        { name: 'White', value: '#ffffff' },
+        { name: 'Black', value: '#000000' }
+    ]
 } );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/checkbox.ts
 ```
 
 **Options**
