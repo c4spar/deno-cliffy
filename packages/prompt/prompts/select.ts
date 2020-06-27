@@ -15,7 +15,7 @@ export interface SelectOptions extends GenericListOptions<string, string> {}
 
 export interface SelectSettings extends GenericListSettings<string, string> {}
 
-export class Select<S extends SelectSettings> extends GenericList<string, string, S> {
+export class Select extends GenericList<string, string, SelectSettings> {
 
     protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.options.findIndex( item => item.name === this.settings.default ) || 0 : 0;
 
