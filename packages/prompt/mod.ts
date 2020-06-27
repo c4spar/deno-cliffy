@@ -1,6 +1,5 @@
 export * from './lib/figures.ts';
 export * from './lib/read-line.ts';
-export * from './lib/separator.ts';
 export * from './lib/generic-prompt.ts';
 export * from './lib/generic-input.ts';
 export * from './lib/generic-list.ts';
