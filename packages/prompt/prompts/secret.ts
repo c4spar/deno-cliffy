@@ -38,7 +38,9 @@ export class Secret extends GenericInput<string, SecretSettings> {
 
     protected setPrompt( message: string ) {
 
-        this.screen.cursorHide();
+        if ( this.settings.hidden ) {
+            this.screen.cursorHide();
+        }
 
         message += ' ' + this.settings.pointer + ' ';
 
@@ -63,10 +65,10 @@ export class Secret extends GenericInput<string, SecretSettings> {
             return false;
         }
         if ( value.length < this.settings.minLength ) {
-            return `${this.settings.label} must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
+            return `${ this.settings.label } must be longer then ${ this.settings.minLength } but has a length of ${ value.length }.`;
         }
         if ( value.length > this.settings.maxLength ) {
-            return `${this.settings.label} can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
+            return `${ this.settings.label } can't be longer then ${ this.settings.maxLength } but has a length of ${ value.length }.`;
         }
         return true;
     }
