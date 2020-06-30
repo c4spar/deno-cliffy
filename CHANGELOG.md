@@ -1,4 +1,74 @@
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.2...v0.9.0) (Fri Jun 5 00:31:38 2020)
+# [v0.10.0](https://github.com/c4spar/deno-cli/compare/v0.9.0...v0.10.0) (Tue Jun 30 19:50:44 2020)
+
+### Breaking Changes
+
+* **command:** remove `BaseCommand` class (#27) ([029aac5](https://github.com/c4spar/deno-cli/commit/029aac5), [2bc4660](https://github.com/c4spar/deno-cli/commit/2bc4660))
+
+    All commands have to be created with the `Command` class for now.
+    The `help` and `completions` commands are now optional and can be registered as descripted in the example below.
+    The `--help` and `--version` option will be registered only on the main command for now. The `--help` option is a global option and available on all child-command's.
+    
+    ```typescript
+    import { Command, HelpCommand, CompletionsCommand } from 'https://deno.land/x/cliffy/command.ts';
+    
+    await new Command()
+        .command( 'help', new HelpCommand() )
+        .command( 'completions', new CompletionsCommand() )
+        .parse()
+    ```
+
+* **command:** remove optional argument from boolean flags which was registered per default (#40) ([94ea644](https://github.com/c4spar/deno-cli/commit/94ea644))
+
+    An option defined with `.option('-d, --debug', '...')` has no longer an boolean argument per default.
+    To add an boolean argument you have add the argument explicitly with `.option('-d, --debug [arg:boolean]', '...')`
+
+* **flags:** remove optional argument from boolean flags which was registered per default (#40) ([00ac846](https://github.com/c4spar/deno-cli/commit/00ac846))
+
+    A boolean flag no longer has an optional value per default. To add an optional or required value use the `optionalValue` or `requiredValue` option.
+
+### Features
+
+* **command:** add `prepend` option to `.option()` method ([5164692](https://github.com/c4spar/deno-cli/commit/5164692))
+* **command:** add `.getGlobalParent()` method ([a1d61c9](https://github.com/c4spar/deno-cli/commit/a1d61c9))
+* **command:** pass command to completion handler ([1e8d51b](https://github.com/c4spar/deno-cli/commit/1e8d51b))
+* **command:** add support for function as description parameter ([8dfe004](https://github.com/c4spar/deno-cli/commit/8dfe004))
+* **command:** add `.getParent()` and `.getMainCommand()` method's ([1a900be](https://github.com/c4spar/deno-cli/commit/1a900be))
+* **command:** make executed command accessible with `this` in action handler (#28) ([461145f](https://github.com/c4spar/deno-cli/commit/461145f))
+* **flags:** add support for shorthand flag's with value e.g. `-n5` results in `{n: 5}` but `-abc` will still result in `{a: true, b: true, c: true}` ([775c528](https://github.com/c4spar/deno-cli/commit/775c528))
+* **flags:** add support for equal sign in flags e.g. `--foo=bar` ([53ba110](https://github.com/c4spar/deno-cli/commit/53ba110))
+
+### Bug Fixes
+
+* **command:** `getGlobal*` methods does not return all globals ([c7f5a5a](https://github.com/c4spar/deno-cli/commit/c7f5a5a))
+* **prompt:** hide cursor in `Secret` prompt only if `hidden` is enabled ([5ebf343](https://github.com/c4spar/deno-cli/commit/5ebf343))
+
+### Code Refactoring
+
+* **command:** refactor help command ([6269e1b](https://github.com/c4spar/deno-cli/commit/6269e1b), [d3c2fa1](https://github.com/c4spar/deno-cli/commit/d3c2fa1))
+* **command:** remove `DefaultCommand` class (#27) ([9e3913c](https://github.com/c4spar/deno-cli/commit/9e3913c), [9cdc2d2](https://github.com/c4spar/deno-cli/commit/9cdc2d2))
+* **command:** make command properties private ([7d5e318](https://github.com/c4spar/deno-cli/commit/7d5e318))
+* **command:** don't reset child commands with `.reset()` method ([ba85b2a](https://github.com/c4spar/deno-cli/commit/ba85b2a))
+* **command:** refactor completions command ([5e07fff](https://github.com/c4spar/deno-cli/commit/5e07fff))
+* **command:** add `ArgumentsParser` util class ([c30e474](https://github.com/c4spar/deno-cli/commit/c30e474))
+* **command:** pass parent command to completion handler ([8e4167f](https://github.com/c4spar/deno-cli/commit/8e4167f))
+* **command:** make `.complete()` method optional in custom type's ([53a9af7](https://github.com/c4spar/deno-cli/commit/53a9af7))
+* **prompt:** remove generic options from `Select` prompt ([a694881](https://github.com/c4spar/deno-cli/commit/a694881))
+* **prompt:** remove unused `Separator` class ([31b41e4](https://github.com/c4spar/deno-cli/commit/31b41e4))
+
+### Chore
+
+* **ci:** update deno version to v1.1.2 ([57741b0](https://github.com/c4spar/deno-cli/commit/57741b0), [5517a7e](https://github.com/c4spar/deno-cli/commit/5517a7e))
+
+### Documentation Updates
+
+* **command:** update readme and example's ([0918d76](https://github.com/c4spar/deno-cli/commit/0918d76), [9b76c92](https://github.com/c4spar/deno-cli/commit/9b76c92), [ae371d9](https://github.com/c4spar/deno-cli/commit/ae371d9), [fe9e06c](https://github.com/c4spar/deno-cli/commit/fe9e06c), [ddd8208](https://github.com/c4spar/deno-cli/commit/ddd8208))
+* **flags:** update readme and example's ([5ed1ec7](https://github.com/c4spar/deno-cli/commit/5ed1ec7))
+* **prompt:** update readme and example's ([edfae8b](https://github.com/c4spar/deno-cli/commit/edfae8b))
+
+
+
+
+# [v0.9.0](https://github.com/c4spar/deno-cli/compare/v0.8.2...v0.9.0) (Fri Jun 5 00:31:38 2020)
 
 ### Features
 
@@ -18,7 +88,7 @@
 
 
 
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (Sat May 30 01:40:08 2020)
+# [v0.8.2](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (Sat May 30 01:40:08 2020)
 
 ### Bug Fixes
 
@@ -31,7 +101,7 @@
 
 
 
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (Fri May 29 19:22:19 2020)
+# [v0.8.1](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (Fri May 29 19:22:19 2020)
 
 ### Bug Fixes
 
@@ -40,7 +110,7 @@
 
 
 
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (Fri May 29 00:33:24 2020)
+# [v0.8.0](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (Fri May 29 00:33:24 2020)
 
 ### Features
 
@@ -57,7 +127,7 @@
 
 
 
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (Sun May 24 12:58:04 2020)
+# [v0.7.1](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (Sun May 24 12:58:04 2020)
 
 ### Bug Fixes
 
@@ -69,7 +139,7 @@
 
 
 
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (Fri May 22 01:11:03 2020)
+# [v0.7.0](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (Fri May 22 01:11:03 2020)
 
 ### Features
 
