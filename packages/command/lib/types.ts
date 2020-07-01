@@ -8,9 +8,6 @@ export type IDescription = string | ( ( this: Command ) => string );
 /** Action handler. */
 export type IAction<O, A extends Array<any>> = ( this: Command, options: O, ...args: A ) => void | Promise<void>;
 
-/** Omit key from object. */
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
 /** Argument details. */
 export interface IArgumentDetails extends IFlagArgument {
     /** Argument name. */
@@ -22,14 +19,8 @@ export interface IArgumentDetails extends IFlagArgument {
 }
 
 /** Command settings. */
-export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<Omit<Omit<Omit<Omit<Omit<Omit<IFlagOptions,
-    'name'>,
-    'args'>,
-    'type'>,
-    'optionalValue'>,
-    'aliases'>,
-    'variadic'>,
-    'list'> {
+export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<IFlagOptions,
+    'name' | 'args' | 'type' | 'optionalValue' | 'aliases' | 'variadic' | 'list'> {
     override?: boolean;
     hidden?: boolean;
     global?: boolean;
