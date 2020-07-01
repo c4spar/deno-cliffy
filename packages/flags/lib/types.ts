@@ -1,7 +1,3 @@
-export interface IGenericObject<T> {
-    [ name: string ]: T;
-}
-
 export type IType<T> = ( option: IFlagOptions, arg: IFlagArgument, value: string ) => T | undefined;
 
 export enum OptionType {
@@ -23,7 +19,7 @@ export type IFlagValue = IFlagValueType | IFlagValueType[];
 /**
  * An object which represents all flags.
  */
-export type IFlags = IGenericObject<undefined | IFlagValue | IFlagValue[]>;
+export type IFlags = Record<string, undefined | IFlagValue | IFlagValue[]>;
 
 /**
  * Parse result.

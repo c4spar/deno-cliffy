@@ -1,7 +1,7 @@
 import camelCase from '../../x/camelCase.ts';
 import paramCase from '../../x/paramCase.ts';
 import { getOption } from './flags.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagValue, IGenericObject } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
 
 // @TODO: add support for knownFlaks
 
@@ -21,7 +21,7 @@ interface IFlagOptionsMap {
  */
 export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
 
-    const defaultValues: IGenericObject<boolean> = {};
+    const defaultValues: Record<string, boolean> = {};
     // Set default value's
     for ( const option of flags ) {
         const name: string = camelCase( option.name );

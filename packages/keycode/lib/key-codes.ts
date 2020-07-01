@@ -1,8 +1,4 @@
-export interface IGenericObject<T> {
-    [ name: string ]: T;
-}
-
-export const KeyMap: IGenericObject<string> = {
+export const KeyMap: Record<string, string> = {
 
     /* xterm/gnome ESC O letter */
     'OP': 'f1',
@@ -68,7 +64,7 @@ export const KeyMap: IGenericObject<string> = {
     '[8~': 'end'
 };
 
-export const KeyMapShift: IGenericObject<string> = {
+export const KeyMapShift: Record<string, string> = {
 
     /* rxvt keys with modifiers */
     '[a': 'up',
@@ -87,7 +83,7 @@ export const KeyMapShift: IGenericObject<string> = {
     '[Z': 'tab'
 };
 
-export const KeyMapCtrl: IGenericObject<string> = {
+export const KeyMapCtrl: Record<string, string> = {
 
     /* rxvt keys with modifiers */
     'Oa': 'up',
@@ -104,7 +100,7 @@ export const KeyMapCtrl: IGenericObject<string> = {
     '[8^': 'end'
 };
 
-export const SpecialKeyMap: IGenericObject<string> = {
+export const SpecialKeyMap: Record<string, string> = {
     '\r': 'return',
     '\n': 'enter',
     '\t': 'tab',

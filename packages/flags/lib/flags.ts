@@ -1,12 +1,12 @@
 import camelCase from '../../x/camelCase.ts';
 import { normalize } from './normalize.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IGenericObject, IParseOptions, IType, OptionType } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, IType, OptionType } from './types.ts';
 import { boolean } from './types/boolean.ts';
 import { number } from './types/number.ts';
 import { string } from './types/string.ts';
 import { validateFlags } from './validate-flags.ts';
 
-const Types: IGenericObject<IType<any>> = {
+const Types: Record<string, IType<any>> = {
     [ OptionType.STRING ]: string,
     [ OptionType.NUMBER ]: number,
     [ OptionType.BOOLEAN ]: boolean
