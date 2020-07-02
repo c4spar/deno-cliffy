@@ -1,4 +1,4 @@
-import { IFlagArgument, IFlagOptions, ITypeHandler, OptionType } from '../../flags/lib/types.ts';
+import { IFlagArgument, IFlagOptions, ITypeHandler } from '../../flags/lib/types.ts';
 import { Type } from '../types/type.ts';
 import { Command } from './command.ts';
 
@@ -15,7 +15,7 @@ export interface IArgumentDetails extends IFlagArgument {
     /** Shell completion action. */
     action: string;
     /** Arguments type. */
-    type: OptionType | string;
+    type: string;
 }
 
 /** Command settings. */
