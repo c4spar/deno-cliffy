@@ -17,6 +17,12 @@ const permissions: any = ( Deno as any ).permissions;
 const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
 const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
 
+interface IDefaultOption<O = any, A extends Array<any> = any> {
+    flags: string;
+    desc?: string
+    opts?: ICommandOption<O, A>;
+}
+
 /**
  * Base command implementation without pre configured command's and option's.
  */
@@ -36,7 +42,7 @@ export class Command<O = any, A extends Array<any> = any> {
     private _globalParent?: Command;
     private ver: string = '0.0.0';
     private desc: IDescription = '';
-    private fn: IAction<O, A> | undefined;
+    private fn?: IAction<O, A>;
     private options: IOption<O, A>[] = [];
     private commands: Map<string, Command> = new Map();
     private examples: IExample[] = [];
@@ -44,17 +50,37 @@ export class Command<O = any, A extends Array<any> = any> {
     private aliases: string[] = [];
     private completions: Map<string, ICompleteSettings> = new Map();
     private cmd: Command = this;
-    private argsDefinition: string | undefined;
+    private argsDefinition?: string;
     private isExecutable: boolean = false;
     private throwOnError: boolean = false;
     private _allowEmpty: boolean = true;
     private _stopEarly: boolean = false;
-    private defaultCommand: string | undefined;
+    private defaultCommand?: string;
     private _useRawArgs: boolean = false;
     private args: IArgumentDetails[] = [];
     private isHidden: boolean = false;
     private isGlobal: boolean = false;
     private hasDefaults: Boolean = false;
+    private _versionOption?: IDefaultOption<O, A> | false;
+    private _helpOption?: IDefaultOption<O, A> | false;
+
+    public versionOption( flags: string | false, desc?: string, opts?: IAction<O, A> | ICommandOption<O, A> ): this {
+        this._versionOption = flags === false ? flags : {
+            flags,
+            desc,
+            opts: typeof opts === 'function' ? { action: opts } : opts
+        };
+        return this;
+    }
+
+    public helpOption( flags: string | false, desc?: string, opts?: IAction<O, A> | ICommandOption<O, A> ): this {
+        this._helpOption = flags === false ? flags : {
+            flags,
+            desc,
+            opts: typeof opts === 'function' ? { action: opts } : opts
+        };
+        return this;
+    }
 
     /**
      * Add new sub-command.
@@ -579,29 +605,42 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     private registerDefaults(): this {
+
         if ( this.getParent() || this.hasDefaults ) {
             return this;
         }
         this.hasDefaults = true;
 
-        this.reset()
-            .option( '-V, --version', 'Show the version number for this program.', {
-                standalone: true,
-                prepend: true,
-                action: function ( this: Command ) {
-                    this.log( this.getVersion() );
-                    Deno.exit( 0 );
-                }
-            } )
-            .option( '-h, --help', 'Show this help.', {
-                standalone: true,
-                global: true,
-                prepend: true,
-                action: function ( this: Command ) {
-                    this.help();
-                    Deno.exit( 0 );
-                }
-            } );
+        this.reset();
+
+        if ( this._versionOption !== false ) {
+            this.option(
+                this._versionOption?.flags || '-V, --version',
+                this._versionOption?.desc || 'Show the version number for this program.',
+                Object.assign( {
+                    standalone: true,
+                    prepend: true,
+                    action: async function ( this: Command ) {
+                        await Deno.stdout.writeSync( encode( this.getVersion() + '\n' ) );
+                        Deno.exit( 0 );
+                    }
+                }, this._versionOption?.opts ?? {} ) );
+        }
+
+        if ( this._helpOption !== false ) {
+            this.option(
+                this._helpOption?.flags || '-h, --help',
+                this._helpOption?.desc || 'Show this help.',
+                Object.assign( {
+                    standalone: true,
+                    global: true,
+                    prepend: true,
+                    action: function ( this: Command ) {
+                        this.help();
+                        Deno.exit( 0 );
+                    }
+                }, this._helpOption?.opts ?? {} ) );
+        }
 
         return this;
     };

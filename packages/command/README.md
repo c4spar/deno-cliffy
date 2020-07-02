@@ -874,7 +874,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
 ## Auto generated help
 
-The help information is auto-generated based on the information you have defined on your program.
+The help information is auto-generated based on the information you have defined on your command's.
 
 ### Help option
 
@@ -884,9 +884,13 @@ The `--help` and `-h` option flag prints the auto generated help.
 import { Command } from 'https://deno.land/x/cliffy/command.ts';
 
 await new Command()
+    .name( 'help-option-and-command' )
     .version( '0.1.0' )
     .description( 'Sample description ...' )
     .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
+    .example( 'Some example', 'Example content ...\n\nSome more example content ...' )
+    .command( 'help', new HelpCommand() )
+    .command( 'completions', new CompletionsCommand() )
     .parse( Deno.args );
 ```
 
@@ -896,9 +900,39 @@ $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.t
 
 ![](../../assets/img/help.png)
 
+#### Customize help option
+
+The help option is completely customizable with the `.helpOption()` method. The first argument are the flags
+followed by the description. The third argument can be an action handler or an options object.
+The second and third argument's are optional.
+
+```typescript
+await new Command()
+    .helpOption( '-i, --info', 'Print help info.', function( this: Command ) {
+        console.log( 'some help info ...', this.getHelp() );
+    } )
+    .parse( Deno.args );
+```
+
+You can also override the default options of the help option. The options are the same as for the `.option()` method.
+
+```typescript
+await new Command()
+    .helpOption( ' -x, --xhelp', 'Print help info.', { global: true } )
+    .parse( Deno.args );
+```
+
+To disable the help option you can pass false to the `.helpOption()` method.
+
+```typescript
+await new Command()
+    .helpOption( false )
+    .parse( Deno.args );
+```
+
 ### Help command
 
-There is also a predefined `HelpCommand` which prints the same help output as the `--help` option.
+There is also a predefined `HelpCommand` which prints the auto generated help.
 The help command must be registered manuelly and can be optionally registered as global command to make them also
 available on all child commands.
 
@@ -1036,6 +1070,38 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts -V
 $ deno run https://deno.land/x/cliffy/examples/command/version-options.ts --version
 0.0.1
+```
+
+### Customize version option
+
+The version option is completely customizable with the `.versionOption()` method. The first argument are the flags
+followed by the description. The third argument can be an action handler or an options object.
+The second and third argument's are optional.
+
+```typescript
+await new Command()
+    .version( '0.1.0' )
+    .versionOption( ' -x, --xversion', 'Print version info.', function( this: Command ) {
+        console.log( 'Version: %s', this.getVersion() );
+    } )
+    .parse( Deno.args );
+```
+
+You can also override the default options of the version option. The options are the same as for the `.option()` method.
+
+```typescript
+await new Command()
+    .version( '0.1.0' )
+    .versionOption( ' -x, --xversion', 'Print version info.', { global: true } )
+    .parse( Deno.args );
+```
+
+The version option can be also disable.
+
+```typescript
+await new Command()
+    .versionOption( false )
+    .parse( Deno.args );
 ```
 
 ## Credits

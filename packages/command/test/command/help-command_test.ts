@@ -4,14 +4,18 @@ import { HelpCommand } from '../../commands/help.ts';
 import { Command } from '../../lib/command.ts';
 import { assertEquals } from '../lib/assert.ts';
 
-Deno.test( 'command: help command', async () => {
-
-    const cmd: Command = new Command()
+function command( defaultOptions?: boolean ) {
+    const cmd = new Command()
         .throwErrors()
-
         .version( '1.0.0' )
-        .description( 'Test description ...' )
-        .option( '-t, --test [val:string]', 'test description' )
+        .description( 'Test description ...' );
+
+    if ( defaultOptions === false ) {
+        cmd.versionOption( false )
+            .helpOption( false );
+    }
+
+    return cmd.option( '-t, --test [val:string]', 'test description' )
         .option( '-D, --default [val:string]', 'I have a default value!', { default: 'test' } )
         .option( '-r, --required [val:string]', 'I am required!', { required: true } )
         .option( '-H, --hidden [val:string]', 'Nobody knows about me!', { hidden: true } )
@@ -37,8 +41,11 @@ Deno.test( 'command: help command', async () => {
         .hidden()
 
         .reset();
+}
 
-    const output: string = cmd.getHelp();
+Deno.test( 'command: help command', async () => {
+
+    const output: string = command().getHelp();
 
     assertEquals( `
   Usage:   COMMAND
@@ -58,6 +65,41 @@ Deno.test( 'command: help command', async () => {
     -d, --depends    [val:string]  - I depend on test!                          (depends: test)                                             
     -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)                                           
     -a, --all        <val:string>  - I have many hints!                         (required, Default: test, depends: test, conflicts: depends)
+
+  Commands:
+
+    help         [command:command]               - Show this help or the help of a sub-command.
+    completions                                  - Generate shell completions for zsh and bash.
+    sub-command  <input:string> <output:string>  - sub command description.                    
+
+  Environment variables:
+
+    SOME_ENV_VAR    <value:number>  - Description ...  
+    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
+
+`, stripeColors( output ) );
+} );
+
+Deno.test( 'command: help command', async () => {
+
+    const output: string = command( false ).getHelp();
+
+    assertEquals( `
+  Usage:   COMMAND
+  Version: v1.0.0 
+
+  Description:
+
+    Test description ...
+
+  Options:
+
+    -t, --test       [val:string]  - test description                                                                     
+    -D, --default    [val:string]  - I have a default value!  (Default: test)                                             
+    -r, --required   [val:string]  - I am required!           (required)                                                  
+    -d, --depends    [val:string]  - I depend on test!        (depends: test)                                             
+    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)                                           
+    -a, --all        <val:string>  - I have many hints!       (required, Default: test, depends: test, conflicts: depends)
 
   Commands:
 
