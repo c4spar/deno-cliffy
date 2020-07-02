@@ -491,7 +491,7 @@ await new Command()
     .command( 'clone', new Command()
     .arguments( '<source:string> [destination:string]' )
     .description( 'Clone a repository into a newly created directory.' )
-    .action( ( source: string, destination: string ) => {
+    .action( ( options: any, source: string, destination: string ) => {
         console.log( 'clone command called' );
     } ) )
     .parse( Deno.args );
@@ -505,7 +505,7 @@ import { Command } from 'https://deno.land/x/cliffy/command.ts';
 await new Command()
     .command( 'clone <source:string> [destination:string]' )
     .description( 'Clone a repository into a newly created directory.' )
-    .action( ( source: string, destination: string ) => {
+    .action( ( options: any, source: string, destination: string ) => {
         console.log( 'clone command called' );
     } )
     .parse( Deno.args );
@@ -550,7 +550,7 @@ import { Command } from 'https://deno.land/x/cliffy/command.ts';
 await new Command()  
     .version( '0.1.0' )  
     .command( 'rmdir <dirs...>' )  
-    .action( ( options: IFlags, dirs: string[] ) => {  
+    .action( ( options: any, dirs: string[] ) => {  
         dirs.forEach( ( dir: string ) => {  
             console.log( 'rmdir %s', dir );  
         } );  
@@ -575,7 +575,7 @@ import { Command } from 'https://deno.land/x/cliffy/command.ts';
 await new Command()
     .command( 'rm <dir>' )
     .option( '-r, --recursive [recursive:boolean]', 'Remove recursively' )
-    .action( ( { recursive }: IFlags, dir: string ) => {
+    .action( ( { recursive }: any, dir: string ) => {
         console.log( 'remove ' + dir + ( recursive ? ' recursively' : '' ) );
     } )
     .parse( Deno.args );
