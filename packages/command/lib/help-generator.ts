@@ -27,11 +27,15 @@ export class HelpGenerator {
     }
 
     private generateHeader(): string {
+        const rows = [
+            [ bold( 'Usage:' ), magenta( `${ this.cmd.getPath() }${ this.cmd.getArgsDefinition() ? ' ' + this.cmd.getArgsDefinition() : '' }` ) ]
+        ];
+        const version: string | undefined = this.cmd.getVersion();
+        if ( version ) {
+            rows.push( [ bold( 'Version:' ), yellow( `v${ this.cmd.getVersion() }` ) ] );
+        }
         return '\n' +
-            Table.from( [
-                    [ bold( 'Usage:' ), magenta( `${ this.cmd.getName() }${ this.cmd.getArgsDefinition() ? ' ' + this.cmd.getArgsDefinition() : '' }` ) ],
-                    [ bold( 'Version:' ), yellow( `v${ this.cmd.getVersion() }` ) ]
-                ] )
+            Table.from( rows )
                 .indent( this.indent )
                 .padding( 1 )
                 .toString() + '\n';

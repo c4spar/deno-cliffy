@@ -24,14 +24,15 @@ export class ZshCompletionsGenerator {
      */
     private generate(): string {
 
+        const version: string | undefined = this.cmd.getVersion();
+        const versionStr = version ? `# version: ${ this.cmd.getVersion() || '-' }\n#\n` : '';
+
         return `
 # compdef _${ snakeCase( this.cmd.getPath() ) } ${ this.cmd.getPath() }
 #
 # zsh completion for ${ this.cmd.getPath() }
 #
-# version: ${ this.cmd.getVersion() }
-#
-
+${versionStr}
 autoload -U is-at-least
 
 (( $+functions[__${ snakeCase( this.cmd.getName() ) }_complete] )) ||
