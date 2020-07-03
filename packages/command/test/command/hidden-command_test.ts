@@ -46,7 +46,7 @@ Deno.test( 'hidden command help', async () => {
   Commands:
 
     help         [command:command]  - Show this help or the help of a sub-command.
-    completions                     - Generate shell completions for zsh and bash.
+    completions                     - Generate shell completions.                 
 
 `, stripeColors( output ) );
 } );

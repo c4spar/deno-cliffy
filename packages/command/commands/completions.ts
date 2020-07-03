@@ -1,6 +1,6 @@
-import { bold, dim, italic } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
+import { dim, italic } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
 import { Command } from '../lib/command.ts';
-import { BashCompletionsCommand } from './completions/bash.ts';
+// import { BashCompletionsCommand } from './completions/bash.ts';
 import { CompleteCommand } from './completions/complete.ts';
 import { ZshCompletionsCommand } from './completions/zsh.ts';
 
@@ -13,37 +13,21 @@ export class CompletionsCommand extends Command {
 
         super();
 
-        this.description( () => {
+        this.description( 'Generate shell completions.' )
+            .description( () => {
                 cmd = cmd || this.getMainCommand();
-                return `Generate shell completions for zsh and bash.
+                return `Generate shell completions.
 
-${ dim( bold( 'Bash completions:' ) ) }
+To enable shell completions for this program add following line to your ${ dim( italic( '~/.bashrc' ) ) } or similar:
 
-To enable bash completions for this program add following line to your ${ dim( italic( '~/.bashrc' ) ) }:
+    ${ dim( italic( `source <(${ cmd.getPath() } completions [shell])` ) ) }
 
-    ${ dim( italic( 'source <(command-name completions bash)' ) ) }
-
-or create a separate file in the ${ dim( italic( 'bash_completion.d' ) ) } directory:
-
-    ${ dim( italic( `${ cmd.getPath() } completions bash > /usr/local/etc/bash_completion.d/${ cmd.getPath() }.bash` ) ) }
-    ${ dim( italic( `source /usr/local/etc/bash_completion.d/${ cmd.getPath() }.bash` ) ) }
-
-${ dim( bold( 'Zsh completions:' ) ) }
-
-To enable zsh completions for this program add following line to your ${ dim( italic( '~/.zshrc' ) ) }:
-
-    ${ dim( italic( 'source <(command-name completions zsh)' ) ) }
-
-or create a separate file in the ${ dim( italic( 'zsh_completion.d' ) ) } directory:
-
-    ${ dim( italic( `${ cmd.getPath() } completions zsh > /usr/local/etc/zsh_completion.d/${ cmd.getPath() }.zsh` ) ) }
-    ${ dim( italic( `source /usr/local/etc/zsh_completion.d/${ cmd.getPath() }.zsh` ) ) }
+    For mor information run ${ dim( italic( `${ cmd.getPath() } completions [shell] --help` ) ) }
 `;
             } )
-
             .default( 'help' )
             .command( 'zsh', new ZshCompletionsCommand( cmd ) )
-            .command( 'bash', new BashCompletionsCommand( cmd ) )
+            // .command( 'bash', new BashCompletionsCommand( cmd ) )
             .command( 'complete', new CompleteCommand( cmd ).hidden() )
             .reset();
     }
