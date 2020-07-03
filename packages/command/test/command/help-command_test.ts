@@ -69,7 +69,7 @@ Deno.test( 'command: help command', async () => {
   Commands:
 
     help         [command:command]               - Show this help or the help of a sub-command.
-    completions                                  - Generate shell completions for zsh and bash.
+    completions                                  - Generate shell completions.                 
     sub-command  <input:string> <output:string>  - sub command description.                    
 
   Environment variables:
@@ -104,7 +104,7 @@ Deno.test( 'command: help command', async () => {
   Commands:
 
     help         [command:command]               - Show this help or the help of a sub-command.
-    completions                                  - Generate shell completions for zsh and bash.
+    completions                                  - Generate shell completions.                 
     sub-command  <input:string> <output:string>  - sub command description.                    
 
   Environment variables:

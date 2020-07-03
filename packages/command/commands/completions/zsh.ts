@@ -1,3 +1,4 @@
+import { dim, italic } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
 import { Command } from '../../lib/command.ts';
 import { ZshCompletionsGenerator } from '../../lib/zsh-completions-generator.ts';
 
@@ -8,7 +9,14 @@ export class ZshCompletionsCommand extends Command {
 
     public constructor( cmd?: Command ) {
         super();
-        this.description( 'Generate zsh shell completions.' )
+        this.description( () => {
+                cmd = cmd || this.getMainCommand();
+                return `Generate shell completions for zsh.
+
+To enable zsh completions for this program add following line to your ${ dim( italic( '~/.zshrc' ) ) }:
+
+    ${ dim( italic( `source <(${ cmd.getPath() } completions zsh)` ) ) }`;
+            } )
             .action( () => {
                 Deno.stdout.writeSync( new TextEncoder().encode(
                     ZshCompletionsGenerator.generate( cmd || this.getMainCommand() )
