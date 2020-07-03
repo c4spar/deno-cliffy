@@ -40,7 +40,7 @@ export class Command<O = any, A extends Array<any> = any> {
     private _name: string = 'COMMAND';
     private _parent?: Command;
     private _globalParent?: Command;
-    private ver: string = '0.0.0';
+    private ver?: string;
     private desc: IDescription = '';
     private fn?: IAction<O, A>;
     private options: IOption<O, A>[] = [];
@@ -606,14 +606,14 @@ export class Command<O = any, A extends Array<any> = any> {
 
     private registerDefaults(): this {
 
-        if ( this.getParent() || this.hasDefaults ) {
+        if ( this.hasDefaults || this.getParent() ) {
             return this;
         }
         this.hasDefaults = true;
 
         this.reset();
 
-        if ( this._versionOption !== false ) {
+        if ( this.ver && this._versionOption !== false ) {
             this.option(
                 this._versionOption?.flags || '-V, --version',
                 this._versionOption?.desc || 'Show the version number for this program.',
@@ -621,7 +621,7 @@ export class Command<O = any, A extends Array<any> = any> {
                     standalone: true,
                     prepend: true,
                     action: async function ( this: Command ) {
-                        await Deno.stdout.writeSync( encode( this.getVersion() + '\n' ) );
+                        await Deno.stdout.writeSync( encode( this.ver + '\n' ) );
                         Deno.exit( 0 );
                     }
                 }, this._versionOption?.opts ?? {} ) );
@@ -962,8 +962,8 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Get command version.
      */
-    public getVersion(): string {
-        return this.ver || ( this._parent?.getVersion() ?? '' );
+    public getVersion(): string | undefined {
+        return this.ver ?? this._parent?.getVersion();
     }
 
     /**
