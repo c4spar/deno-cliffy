@@ -20,7 +20,7 @@ interface ITableSettings extends Required<ITableOptions> {
     chars: IBorder;
 }
 
-export type ITable = IRow[] | Table;
+export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
 interface ICalc {
     padding: number[],
@@ -28,7 +28,7 @@ interface ICalc {
     columns: number
 }
 
-export class Table extends Array<IRow> {
+export class Table<T extends IRow = IRow> extends Array<T> {
 
     protected options: ITableSettings = {
         padding: 0,
@@ -39,19 +39,19 @@ export class Table extends Array<IRow> {
         minCellWidth: 0
     };
 
-    public static from( rows: ITable ): Table {
-        const table = new Table( ...rows.map( cells => [ ...cells ] ) );
+    public static from<T extends IRow>( rows: ITable<T> ): Table<T> {
+        const table = new this( ...rows );
         if ( rows instanceof Table ) {
-            table.options = Object.create( rows.options );
+            table.options = Object.assign( {}, rows.options );
         }
         return table;
     }
 
-    public static render( rows: ITable ): void {
+    public static render<T extends IRow>( rows: ITable<T> ): void {
         Table.from( rows ).render();
     }
 
-    public body( rows: IRow[] ): this {
+    public body( rows: T[] ): this {
         this.length = 0;
         this.push( ...rows );
         return this;
@@ -59,6 +59,13 @@ export class Table extends Array<IRow> {
 
     public render(): void {
         Deno.stdout.writeSync( encode( this.toString() ) );
+    }
+
+    public clone(): Table {
+        const table = new Table( ...this.map( ( row: T ) =>
+            row instanceof Row ? row.clone() : Row.from( row ).clone() ) );
+        table.options = Object.assign( {}, this.options );
+        return table;
     }
 
     /**
@@ -94,7 +101,7 @@ export class Table extends Array<IRow> {
 
     protected getRows(): Row<Cell>[] {
 
-        return this.map( ( iRow: IRow ) => {
+        return this.map( ( iRow: T ) => {
 
             const row: Row = Row.from( iRow );
 

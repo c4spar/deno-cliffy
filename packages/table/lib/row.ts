@@ -1,27 +1,29 @@
-import { ICell } from './cell.ts';
+import { Cell, ICell } from './cell.ts';
 
-export type IRow<T = ICell> = T[] | Row<T>;
+export type IRow<T extends ICell = ICell> = T[] | Row<T>;
 
 export interface IRowOptions {
     indent?: number;
     border?: boolean;
 }
 
-export class Row<T = ICell> extends Array<T> {
+export class Row<T extends ICell = ICell> extends Array<T> {
 
     protected options: IRowOptions = {};
 
-    public static from<T = ICell>( row: IRow<T> ): Row<T> {
-        if ( row instanceof Row ) {
-            return row.clone();
+    public static from<T extends ICell = ICell>( cells: IRow<T> ): Row<T> {
+        const row = new this( ...cells );
+        if ( cells instanceof Row ) {
+            row.options = Object.assign( {}, cells.options );
         }
-        return new Row( ...row );
+        return row;
     }
 
-    public clone(): Row<T> {
-        const clone = new Row( ...this );
-        clone.options = Object.create( this.options );
-        return clone;
+    public clone(): Row {
+        const row = new Row( ...this.map( ( cell: T ) =>
+            cell instanceof Cell ? cell.clone() : cell ) );
+        row.options = Object.assign( {}, this.options );
+        return row;
     }
 
     /**
