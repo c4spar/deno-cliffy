@@ -37,7 +37,7 @@ export class Cell extends String {
      * Getter:
      */
 
-    public getBorder( defaultValue?: boolean ): boolean | undefined {
-        return this.options.border ?? defaultValue;
+    public getBorder(): boolean {
+        return this.options.border === true;
     }
 }

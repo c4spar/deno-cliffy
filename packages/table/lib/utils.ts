@@ -52,10 +52,10 @@ export function stripeColors( str: string ): string {
  * Get longest cell from given row index.
  *
  */
-export function longest( index: number, rows: ( string | String )[][], maxWidth?: number ): number {
+export function longest( index: number, rows: ( number | string | String )[][], maxWidth?: number ): number {
 
     return Math.max(
-        ...rows.map( row => ( row[ index ] || '' )
+        ...rows.map( row => ( row[ index ]?.toString() || '' )
             .split( '\n' )
             .map( ( r: string ) => {
                 const str = typeof maxWidth === 'undefined' ? r : consumeWords( maxWidth, r );
