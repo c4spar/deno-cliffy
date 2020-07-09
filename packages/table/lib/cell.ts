@@ -1,4 +1,4 @@
-export type ICell = string | Cell;
+export type ICell = number | string | String | Cell;
 
 export interface ICellOptions {
     border?: boolean;
@@ -8,17 +8,18 @@ export class Cell extends String {
 
     protected options: ICellOptions = {};
 
-    public static from( cell: ICell ): Cell {
-        if ( cell instanceof Cell ) {
-            return cell.clone();
+    public static from( value: ICell ): Cell {
+        const cell = new this( value );
+        if ( value instanceof Cell ) {
+            cell.options = Object.assign( {}, value.options );
         }
-        return new this( cell );
+        return cell;
     }
 
     public clone( value?: ICell ): Cell {
-        const clone = new Cell( value ?? this );
-        clone.options = Object.create( this.options );
-        return clone;
+        const cell = new Cell( value ?? this );
+        cell.options = Object.assign( {}, this.options );
+        return cell;
     }
 
     /**
