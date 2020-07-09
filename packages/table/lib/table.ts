@@ -51,6 +51,12 @@ export class Table extends Array<IRow> {
         Table.from( rows ).render();
     }
 
+    public body( rows: IRow[] ): this {
+        this.length = 0;
+        this.push( ...rows );
+        return this;
+    }
+
     public render(): void {
         Deno.stdout.writeSync( encode( this.toString() ) );
     }
