@@ -1,9 +1,11 @@
 import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
-import { border } from './border.ts';
+import { border, IBorder } from './border.ts';
 import { Cell, ICell } from './cell.ts';
 import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';
 import { IRow, Row } from './row.ts';
 import { consumeWords, longest, stripeColors } from './utils.ts';
+
+export type IBorderOptions = Partial<IBorder>;
 
 export interface ITableOptions {
     indent?: number;
@@ -11,11 +13,16 @@ export interface ITableOptions {
     maxCellWidth?: number | number[];
     minCellWidth?: number | number[];
     padding?: number | number[];
+    chars?: IBorderOptions;
+}
+
+interface ITableSettings extends Required<ITableOptions> {
+    chars: IBorder;
 }
 
 export type ITable = IRow[] | Table;
 
-export interface ICalc {
+interface ICalc {
     padding: number[],
     width: number[],
     columns: number
@@ -23,7 +30,14 @@ export interface ICalc {
 
 export class Table extends Array<IRow> {
 
-    protected options: ITableOptions = {};
+    protected options: ITableSettings = {
+        padding: 0,
+        chars: border,
+        border: false,
+        indent: 0,
+        maxCellWidth: Infinity,
+        minCellWidth: 0
+    };
 
     public static from( rows: ITable ): Table {
         const table = new Table( ...rows.map( cells => [ ...cells ] ) );
@@ -162,7 +176,7 @@ export class Table extends Array<IRow> {
 
             if ( i === 0 ) {
                 if ( cell.getBorder() ) {
-                    cells += border.left;
+                    cells += this.options.chars.left;
                 } else {
                     // cells += ' ';
                 }
@@ -176,7 +190,7 @@ export class Table extends Array<IRow> {
 
             if ( i > 0 ) {
                 if ( cell.getBorder() && ( !prev || prev.getBorder() ) ) {
-                    cells += border.middle;
+                    cells += this.options.chars.middle;
                 } else {
                     // cells += ' ';
                 }
@@ -194,7 +208,7 @@ export class Table extends Array<IRow> {
 
             if ( i === rowCount - 1 ) {
                 if ( cell.getBorder() ) {
-                    cells += border.right;
+                    cells += this.options.chars.right;
                 } else {
                     // cells += ' ';
                 }
@@ -241,10 +255,10 @@ export class Table extends Array<IRow> {
 
         for ( let i = 0; i < opts.columns; i++ ) {
             const cell: Cell = row[ i ];
-            cells.push( ( cell.getBorder() ? border.top : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
+            cells.push( ( cell.getBorder() ? this.options.chars.top : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
         }
 
-        return ' '.repeat( this.options.indent || 0 ) + border.topLeft + cells.join( border.topMid ) + ( border.topRight ) + '\n';
+        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.topLeft + cells.join( this.options.chars.topMid ) + ( this.options.chars.topRight ) + '\n';
     }
 
     protected renderBorderMidRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc ): string {
@@ -254,10 +268,10 @@ export class Table extends Array<IRow> {
         for ( let i = 0; i < opts.columns; i++ ) {
             const cell: Cell = row[ i ];
             const nextCell = nextRow && nextRow[ i ];
-            cells.push( ( cell.getBorder() && nextCell?.getBorder() !== false ? border.mid : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
+            cells.push( ( cell.getBorder() && nextCell?.getBorder() !== false ? this.options.chars.mid : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
         }
 
-        return ' '.repeat( this.options.indent || 0 ) + border.leftMid + cells.join( border.midMid ) + ( border.rightMid ) + '\n';
+        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.leftMid + cells.join( this.options.chars.midMid ) + ( this.options.chars.rightMid ) + '\n';
     }
 
     protected renderBorderBottomRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc ): string {
@@ -266,10 +280,10 @@ export class Table extends Array<IRow> {
 
         for ( let i = 0; i < opts.columns; i++ ) {
             const cell: Cell = row[ i ];
-            cells.push( ( cell.getBorder() ? border.bottom : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
+            cells.push( ( cell.getBorder() ? this.options.chars.bottom : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
         }
 
-        return ' '.repeat( this.options.indent || 0 ) + border.bottomLeft + cells.join( border.bottomMid ) + ( border.bottomRight ) + '\n';
+        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.bottomLeft + cells.join( this.options.chars.bottomMid ) + ( this.options.chars.bottomRight ) + '\n';
     }
 
     /**
@@ -308,6 +322,11 @@ export class Table extends Array<IRow> {
         if ( override || typeof this.options.border === 'undefined' ) {
             this.options.border = enable;
         }
+        return this;
+    }
+
+    public chars( chars: IBorderOptions ): this {
+        Object.assign( this.options.chars, chars );
         return this;
     }
 
