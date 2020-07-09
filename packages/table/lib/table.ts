@@ -5,7 +5,7 @@ import { CELL_PADDING, MAX_CELL_WIDTH, MIN_CELL_WIDTH } from './const.ts';
 import { IRow, Row } from './row.ts';
 import { consumeWords, longest, stripeColors } from './utils.ts';
 
-export type IBorderOptions = Partial<IBorder>;
+export interface IBorderOptions extends Partial<IBorder> {};
 
 export interface ITableOptions {
     indent?: number;
@@ -22,27 +22,34 @@ interface ITableSettings extends Required<ITableOptions> {
 
 export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
-interface ICalc {
-    padding: number[],
-    width: number[],
-    columns: number
+interface IRenderSettings {
+    padding: number[];
+    width: number[];
+    columns: number;
+    hasBorder: boolean;
+    hasHeaderBorder: boolean;
+    hasBodyBorder: boolean;
+    rows: Row<Cell>[];
+    header?: Row<Cell>;
 }
 
 export class Table<T extends IRow = IRow> extends Array<T> {
 
     protected options: ITableSettings = {
-        padding: 0,
-        chars: border,
-        border: false,
         indent: 0,
+        border: false,
         maxCellWidth: Infinity,
-        minCellWidth: 0
+        minCellWidth: 0,
+        padding: 0,
+        chars: border
     };
+    private headerRow?: Row;
 
     public static from<T extends IRow>( rows: ITable<T> ): Table<T> {
         const table = new this( ...rows );
         if ( rows instanceof Table ) {
             table.options = Object.assign( {}, rows.options );
+            table.headerRow = rows.headerRow ? Row.from( rows.headerRow ) : undefined;
         }
         return table;
     }
@@ -57,173 +64,228 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this;
     }
 
-    public render(): void {
+    public header( header: IRow ): this {
+        this.headerRow = header instanceof Row ? header : Row.from( header );
+        return this;
+    }
+
+    public render(): this {
         Deno.stdout.writeSync( encode( this.toString() ) );
+        return this;
     }
 
     public clone(): Table {
         const table = new Table( ...this.map( ( row: T ) =>
             row instanceof Row ? row.clone() : Row.from( row ).clone() ) );
         table.options = Object.assign( {}, this.options );
+        table.headerRow = this.headerRow?.clone();
         return table;
     }
 
-    /**
-     * Calc:
-     */
-
-    protected calc(): ICalc {
+    protected prepare(): IRenderSettings {
 
         const padding: number[] = [];
         const width: number[] = [];
 
-        const columns: number = Math.max( ...this.map( row => Object.keys( row ).length ) );
+        let hasBodyBorder: boolean = this.getBorder() || this.hasBodyBorder();
+        let hasHeaderBorder: boolean = this.hasHeaderBorder();
+        let hasBorder: boolean = hasHeaderBorder || hasBodyBorder;
+
+        Object.keys( this.options.chars ).forEach( ( key: string ) => {
+            if ( typeof this.options.chars[ key as keyof IBorderOptions ] !== 'string' ) {
+                this.options.chars[ key as keyof IBorderOptions ] = '';
+            }
+        } );
+
+        const allRows: IRow[] = this.slice();
+
+        if ( this.headerRow ) {
+            allRows.push( this.headerRow );
+        }
+
+        const columns: number = Math.max( ...allRows.map( cells => cells.length ) );
 
         for ( let colIndex: number = 0; colIndex < columns; colIndex++ ) {
-
-
-            let minCellWidth: number = Array.isArray( this.options.minCellWidth ) ? this.options.minCellWidth[ colIndex ] :
-                ( typeof this.options.minCellWidth === 'undefined' ? MIN_CELL_WIDTH : this.options.minCellWidth );
-
-            let maxCellWidth: number = Array.isArray( this.options.maxCellWidth ) ? this.options.maxCellWidth[ colIndex ] :
-                ( typeof this.options.maxCellWidth === 'undefined' ? MAX_CELL_WIDTH : this.options.maxCellWidth );
-
-            padding[ colIndex ] = Array.isArray( this.options.padding ) ? this.options.padding[ colIndex ] :
-                ( typeof this.options.padding === 'undefined' ? CELL_PADDING : this.options.padding );
-
-            let cellWidth: number = longest( colIndex, this, maxCellWidth );
-            // let cellWidth: number = longest( colIndex, this );
+            let minCellWidth: number = Array.isArray( this.options.minCellWidth ) ? this.options.minCellWidth[ colIndex ] : this.options.minCellWidth;
+            let maxCellWidth: number = Array.isArray( this.options.maxCellWidth ) ? this.options.maxCellWidth[ colIndex ] : this.options.maxCellWidth;
+            padding[ colIndex ] = Array.isArray( this.options.padding ) ? this.options.padding[ colIndex ] : this.options.padding;
+            let cellWidth: number = longest( colIndex, allRows, maxCellWidth );
             width[ colIndex ] = Math.min( maxCellWidth, Math.max( minCellWidth, cellWidth ) );
         }
 
-        return { padding, width, columns };
+        const rows = this.createRows( this, columns );
+        const header = this.headerRow && this.createRow( this.headerRow, columns );
+
+        return { padding, width, columns, rows, header, hasBorder, hasBodyBorder, hasHeaderBorder };
     }
 
-    protected getRows(): Row<Cell>[] {
-
-        return this.map( ( iRow: T ) => {
-
-            const row: Row = Row.from( iRow );
-
-            if ( this.options.border ) {
-                row.border( this.options.border, false );
-            }
-
-            row.forEach( ( iCell: ICell, i: number ) => {
-                const cell = Cell.from( iCell );
-                if ( row.getBorder() ) {
-                    cell.border( row.getBorder() as boolean, false );
-                }
-                row[ i ] = cell;
-            } );
-
-            return row as Row<Cell>;
-        } );
+    protected createRows( rows: IRow[], columns: number ): Row<Cell>[] {
+        return rows.map( row => this.createRow( row, columns ) );
     }
 
-    /**
-     * Render:
-     */
+    protected createRow( iRow: IRow, columns: number ): Row<Cell> {
+
+        const row: Row = Row.from( iRow );
+
+        if ( this.options.border ) {
+            row.border( this.options.border, false );
+        }
+
+        for ( let i = 0; i < columns; i++ ) {
+            row[ i ] = this.createCell( row[ i ] || new Cell(), row );
+        }
+
+        return row as Row<Cell>;
+    }
+
+    protected createCell( iCell: ICell, row: Row ): Cell {
+        const cell = Cell.from( iCell );
+        if ( row.getBorder() ) {
+            cell.border( row.getBorder(), false );
+        }
+        return cell;
+    }
 
     public toString(): string {
 
-        const calc: ICalc = this.calc();
-        const rows: Row<Cell>[] = this.getRows();
+        const opts: IRenderSettings = this.prepare();
+        const rows: Row<Cell>[] = opts.rows;
 
-        return this.renderRows( calc, rows );
-    }
-
-    protected renderRows( opts: ICalc, rows: Row<Cell>[], _rowGroupIndex: number = 0 ) {
+        if ( !rows.length ) {
+            return '';
+        }
 
         let result: string = '';
 
-        result += this.renderRow( rows[ _rowGroupIndex ], rows[ _rowGroupIndex - 1 ], rows[ _rowGroupIndex + 1 ], opts, _rowGroupIndex );
+        if ( opts.header ) {
+            result += this.renderHeader( opts, opts.header );
+        }
 
-        if ( _rowGroupIndex < this.length - 1 ) {
-            result += this.renderRows( opts, rows, ++_rowGroupIndex );
+        result += this.renderBody( opts, rows );
+
+        return result;
+    }
+
+    protected renderHeader( opts: IRenderSettings, header: Row<Cell> ) {
+
+        let result: string = '';
+
+        if ( opts.hasHeaderBorder ) {
+            result += this.renderBorderRow( undefined, header, opts );
+        }
+
+        result += this.renderRows( opts, [ header ] );
+
+        if ( opts.hasHeaderBorder && ( !opts.hasBodyBorder || !opts.rows[ 0 ].hasBorder() ) ) {
+            result += this.renderBorderRow( header, opts.rows[ 0 ], opts );
         }
 
         return result;
     }
 
-    protected renderRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc, _rowGroupIndex: number = 0, _rowIndex: number = 0 ): string {
+    protected renderBody( opts: IRenderSettings, rows: Row<Cell>[] ): string {
 
         let result: string = '';
+        const lastRow: Row<Cell> = rows[ rows.length - 1 ];
+        const firstRow: Row<Cell> = rows[ 0 ];
 
-        if ( row.getBorder() && _rowGroupIndex === 0 && _rowIndex === 0 ) {
-            result += this.renderBorderTopRow( row, prevRow, nextRow, opts );
+        // border top row
+        if ( firstRow.hasBorder() ) {
+            result += this.renderBorderRow( opts.header, firstRow, opts );
         }
+
+        // rows
+        result += this.renderRows( opts, rows );
+
+        // border bottom row
+        if ( lastRow.hasBorder() ) {
+            result += this.renderBorderRow( lastRow, undefined, opts );
+        }
+
+        return result;
+    }
+
+    protected renderRows( opts: IRenderSettings, rows: Row<Cell>[], index: number = 0 ): string {
+
+        let result: string = '';
+        const row: Row<Cell> = rows[ index ];
+        const prevRow: Row<Cell> | undefined = rows[ index - 1 ];
+        const nextRow: Row<Cell> | undefined = rows[ index + 1 ];
+
+        result += this.renderRow( row, prevRow, nextRow, opts );
+
+        // border mid row
+        if ( opts.hasBodyBorder && index < rows.length - 1 ) {
+            result += this.renderBorderRow( row, nextRow, opts );
+        }
+
+        if ( index < rows.length - 1 ) {
+            result += this.renderRows( opts, rows, ++index );
+        }
+
+        return result;
+    }
+
+    protected renderRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: IRenderSettings ): string {
+
+        let result: string = '';
 
         const { cells, isMultilineRow } = this.renderCells( row, opts );
 
         result += cells;
 
-        if ( isMultilineRow ) {
-            result += this.renderRow( row, prevRow, nextRow, opts, _rowGroupIndex, ++_rowIndex );
-        } else if ( _rowGroupIndex < this.length - 1 ) {
-            if ( row.getBorder() ) {
-                result += this.renderBorderMidRow( row, prevRow, nextRow, opts );
-            }
-        } else if ( _rowGroupIndex === this.length - 1 ) {
-            if ( row.getBorder() ) {
-                result += this.renderBorderBottomRow( row, prevRow, nextRow, opts );
-            }
-        } else {
-            throw new Error( `Invalid row index: ${ _rowGroupIndex }` );
+        if ( isMultilineRow ) { // skip border
+            result += this.renderRow( row, prevRow, nextRow, opts );
         }
 
         return result;
     }
 
-    protected renderCells( row: Row<Cell>, opts: ICalc ) {
+    protected renderCells( row: Row<Cell>, opts: IRenderSettings ) {
 
         let cells: string = ' '.repeat( this.options.indent || 0 );
         let isMultilineRow: boolean = false;
 
-        const rowCount = row.length;
         let prev: Cell | undefined;
 
-        for ( let i = 0; i < rowCount; i++ ) {
+        for ( let i = 0; i < opts.columns; i++ ) {
 
             const cell: Cell = row[ i ];
 
             if ( i === 0 ) {
                 if ( cell.getBorder() ) {
                     cells += this.options.chars.left;
-                } else {
-                    // cells += ' ';
+                } else if ( opts.hasBorder ) {
+                    cells += ' ';
+                }
+            } else {
+                if ( cell.getBorder() || prev?.getBorder() ) {
+                    cells += this.options.chars.middle;
+                } else if ( opts.hasBorder ) {
+                    cells += ' ';
                 }
             }
 
             const { current, next } = this.renderCell( cell, opts.width[ i ] );
 
-            // it's required to call explicilty .length because next is a String class and not a string type.
             next.length && ( isMultilineRow = true );
             row[ i ] = next;
 
-            if ( i > 0 ) {
-                if ( cell.getBorder() && ( !prev || prev.getBorder() ) ) {
-                    cells += this.options.chars.middle;
-                } else {
-                    // cells += ' ';
-                }
-            }
-
-            if ( cell.getBorder() ) {
+            if ( opts.hasBorder ) {
                 cells += ' '.repeat( opts.padding[ i ] );
             }
 
             cells += current;
 
-            if ( cell.getBorder() || i < rowCount - 1 ) {
+            if ( opts.hasBorder || i < opts.columns - 1 ) {
                 cells += ' '.repeat( opts.padding[ i ] );
             }
 
-            if ( i === rowCount - 1 ) {
+            if ( i === opts.columns - 1 ) {
                 if ( cell.getBorder() ) {
                     cells += this.options.chars.right;
-                } else {
-                    // cells += ' ';
+                } else if ( opts.hasBorder ) {
+                    cells += ' ';
                 }
             }
 
@@ -258,45 +320,98 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         };
     }
 
-    /**
-     * Border:
-     */
-
-    protected renderBorderTopRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc ): string {
+    protected renderBorderRow( prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: IRenderSettings ): string {
 
         let cells = [];
 
         for ( let i = 0; i < opts.columns; i++ ) {
-            const cell: Cell = row[ i ];
-            cells.push( ( cell.getBorder() ? this.options.chars.top : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
+            // a1 | b1
+            // -------
+            // a2 | b2
+            const a1: Cell | undefined = prevRow?.[ i - 1 ];
+            const a2: Cell | undefined = nextRow?.[ i - 1 ];
+            const b1: Cell | undefined = prevRow?.[ i ];
+            const b2: Cell | undefined = nextRow?.[ i ];
+
+            const a1Border: boolean = !!a1?.getBorder();
+            const a2Border: boolean = !!a2?.getBorder();
+            const b1Border: boolean = !!b1?.getBorder();
+            const b2Border: boolean = !!b2?.getBorder();
+
+            if ( i === 0 ) {
+
+                if ( b1Border && b2Border ) {
+                    cells.push( this.options.chars.leftMid );
+                } else if ( b1Border ) {
+                    cells.push( this.options.chars.bottomLeft );
+                } else if ( b2Border ) {
+                    cells.push( this.options.chars.topLeft );
+                } else {
+                    cells.push( ' ' );
+                }
+
+            } else if ( i < opts.columns ) {
+
+                if ( ( a1Border && b2Border ) ||
+                    ( b1Border && a2Border ) ||
+                    ( b2Border && a1Border ) ||
+                    ( a2Border && b1Border ) ) {
+                    cells.push( this.options.chars.midMid );
+
+                } else if ( a1Border && b1Border ) {
+                    cells.push( this.options.chars.bottomMid );
+                } else if ( b1Border && b2Border ) {
+                    cells.push( this.options.chars.leftMid );
+                } else if ( b2Border && a2Border ) {
+                    cells.push( this.options.chars.topMid );
+                } else if ( a2Border && a1Border ) {
+                    cells.push( this.options.chars.rightMid );
+
+                } else if ( a1Border ) {
+                    cells.push( this.options.chars.bottomRight );
+                } else if ( b1Border ) {
+                    cells.push( this.options.chars.bottomLeft );
+                } else if ( a2Border ) {
+                    cells.push( this.options.chars.topRight );
+                } else if ( b2Border ) {
+                    cells.push( this.options.chars.topLeft );
+
+                } else {
+                    cells.push( ' ' );
+                }
+            }
+
+            const length = opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ];
+            if ( b1Border && b2Border ) {
+                cells.push( this.options.chars.mid.repeat( length ) );
+            } else if ( b1Border ) {
+                cells.push( this.options.chars.bottom.repeat( length ) );
+            } else if ( b2Border ) {
+                cells.push( this.options.chars.top.repeat( length ) );
+            } else {
+                cells.push( ' '.repeat( length ) );
+            }
+
+            if ( i === opts.columns - 1 ) {
+                if ( b1Border && b2Border ) {
+                    cells.push( this.options.chars.rightMid );
+                } else if ( b1Border ) {
+                    cells.push( this.options.chars.bottomRight );
+                } else if ( b2Border ) {
+                    cells.push( this.options.chars.topRight );
+                } else {
+                    cells.push( ' ' );
+                }
+            }
         }
 
-        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.topLeft + cells.join( this.options.chars.topMid ) + ( this.options.chars.topRight ) + '\n';
-    }
+        const result: string = cells.join( '' );
 
-    protected renderBorderMidRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc ): string {
-
-        let cells = [];
-
-        for ( let i = 0; i < opts.columns; i++ ) {
-            const cell: Cell = row[ i ];
-            const nextCell = nextRow && nextRow[ i ];
-            cells.push( ( cell.getBorder() && nextCell?.getBorder() !== false ? this.options.chars.mid : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
+        if ( !result.length ) {
+            return result;
         }
 
-        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.leftMid + cells.join( this.options.chars.midMid ) + ( this.options.chars.rightMid ) + '\n';
-    }
-
-    protected renderBorderBottomRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: ICalc ): string {
-
-        let cells = [];
-
-        for ( let i = 0; i < opts.columns; i++ ) {
-            const cell: Cell = row[ i ];
-            cells.push( ( cell.getBorder() ? this.options.chars.bottom : ' ' ).repeat( opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ] ) );
-        }
-
-        return ' '.repeat( this.options.indent || 0 ) + this.options.chars.bottomLeft + cells.join( this.options.chars.bottomMid ) + ( this.options.chars.bottomRight ) + '\n';
+        return ' '.repeat( this.options.indent ) + result + '\n';
     }
 
     /**
@@ -347,23 +462,45 @@ export class Table<T extends IRow = IRow> extends Array<T> {
      * Getter:
      */
 
-    public getIndent( defaultValue?: number ): number | undefined {
-        return this.options.indent ?? defaultValue;
+    public getHeader(): IRow | undefined {
+        return this.headerRow;
     }
 
-    public getMaxCellWidth( defaultValue?: number | number[] ): number | number[] | undefined {
-        return this.options.maxCellWidth ?? defaultValue;
+    public getBody(): T[] {
+        return this.slice();
     }
 
-    public getMinCellWidth( defaultValue?: number | number[] ): number | number[] | undefined {
-        return this.options.minCellWidth ?? defaultValue;
+    public getIndent(): number {
+        return this.options.indent;
     }
 
-    public getPadding( defaultValue?: number | number[] ): number | number[] | undefined {
-        return this.options.padding ?? defaultValue;
+    public getBorder(): boolean {
+        return this.options.border === true;
     }
 
-    public getBorder( defaultValue?: boolean ): boolean | undefined {
-        return this.options.border ?? defaultValue;
+    public getMaxCellWidth(): number | number[] {
+        return this.options.maxCellWidth;
+    }
+
+    public getMinCellWidth(): number | number[] {
+        return this.options.minCellWidth;
+    }
+
+    public getPadding(): number | number[] {
+        return this.options.padding;
+    }
+
+    public hasHeaderBorder(): boolean {
+        return this.headerRow instanceof Row && this.headerRow.hasBorder();
+    }
+
+    public hasBodyBorder(): boolean {
+        return this.getBorder() || this.some( row =>
+            row instanceof Row ? row.hasBorder() : row.some( cell =>
+                cell instanceof Cell ? cell.getBorder : false ) );
+    }
+
+    public hasBorder(): boolean {
+        return this.getBorder() || this.hasHeaderBorder() || this.hasBodyBorder();
     }
 }

@@ -41,7 +41,11 @@ export class Row<T extends ICell = ICell> extends Array<T> {
      * Getter:
      */
 
-    public getBorder( defaultValue?: boolean ): boolean | undefined {
-        return this.options.border ?? defaultValue;
+    public getBorder(): boolean {
+        return this.options.border === true;
+    }
+
+    public hasBorder(): boolean {
+        return this.getBorder() || this.some( cell => cell instanceof Cell && cell.getBorder() );
     }
 }
