@@ -2,7 +2,7 @@ import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
 import { border, IBorder } from './border.ts';
 import { Cell } from './cell.ts';
 import { TableLayout } from './layout.ts';
-import { IRow, Row } from './row.ts';
+import { IDataRow, IRow, Row } from './row.ts';
 
 export interface IBorderOptions extends Partial<IBorder> {}
 
@@ -42,8 +42,18 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return table;
     }
 
+    public static fromJson( rows: IDataRow[] ): Table {
+        return new this().fromJson( rows );
+    }
+
     public static render<T extends IRow>( rows: ITable<T> ): void {
         Table.from( rows ).render();
+    }
+
+    public fromJson( rows: IDataRow[] ): this {
+        this.header( Object.keys( rows[ 0 ] ) );
+        this.body( rows.map( row => Object.values( row ) as T ) );
+        return this;
     }
 
     public header( header: IRow ): this {
