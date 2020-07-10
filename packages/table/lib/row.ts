@@ -1,6 +1,7 @@
 import { Cell, ICell } from './cell.ts';
 
 export type IRow<T extends ICell = ICell> = T[] | Row<T>;
+export type IDataRow = Record<string, string | number>;
 
 export interface IRowOptions {
     indent?: number;
