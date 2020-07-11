@@ -4,6 +4,8 @@
  * @param length    Max length of all words.
  * @param content   The text content.
  */
+import { Cell, ICell } from './cell.ts';
+
 export function consumeWords( length: number, content: string ): string {
 
     let consumed = '';
@@ -52,10 +54,13 @@ export function stripeColors( str: string ): string {
  * Get longest cell from given row index.
  *
  */
-export function longest( index: number, rows: ( number | string | String )[][], maxWidth?: number ): number {
+export function longest( index: number, rows: ICell[][], maxWidth?: number ): number {
 
     return Math.max(
-        ...rows.map( row => ( row[ index ]?.toString() || '' )
+        ...rows.map( row => (
+                row[ index ] instanceof Cell && ( row[ index ] as Cell ).getColSpan() > 1 ? '' :
+                    ( row[ index ]?.toString() || '' )
+            )
             .split( '\n' )
             .map( ( r: string ) => {
                 const str = typeof maxWidth === 'undefined' ? r : consumeWords( maxWidth, r );
