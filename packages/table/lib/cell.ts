@@ -2,6 +2,7 @@ export type ICell = number | string | String | Cell;
 
 export interface ICellOptions {
     border?: boolean;
+    colSpan?: number;
 }
 
 export class Cell extends String {
@@ -33,11 +34,22 @@ export class Cell extends String {
         return this;
     }
 
+    public colSpan( span: number, override: boolean = true ): this {
+        if ( override || typeof this.options.colSpan === 'undefined' ) {
+            this.options.colSpan = span;
+        }
+        return this;
+    }
+
     /**
      * Getter:
      */
 
     public getBorder(): boolean {
         return this.options.border === true;
+    }
+
+    public getColSpan(): number {
+        return typeof this.options.colSpan === 'number' && this.options.colSpan > 0 ? this.options.colSpan : 1;
     }
 }

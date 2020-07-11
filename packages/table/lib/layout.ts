@@ -34,7 +34,7 @@ export class TableLayout {
         } );
 
         const allRows: IRow[] = this.table.slice();
-        const headerRow: IRow| undefined = this.table.getHeader();
+        const headerRow: IRow | undefined = this.table.getHeader();
 
         if ( headerRow ) {
             allRows.push( headerRow );
@@ -68,8 +68,16 @@ export class TableLayout {
             row.border( this.options.border, false );
         }
 
+        let colSpan: number = 1;
         for ( let i = 0; i < columns; i++ ) {
-            row[ i ] = this.createCell( row[ i ] || new Cell(), row );
+            if ( colSpan > 1 ) {
+                colSpan--;
+                row.splice( i - 1, 0, row[ i - 1 ] );
+                continue;
+            }
+            const cell = this.createCell( row[ i ] || new Cell(), row );
+            colSpan = cell.getColSpan();
+            row[ i ] = cell;
         }
 
         return row as Row<Cell>;
@@ -184,10 +192,17 @@ export class TableLayout {
         let isMultilineRow: boolean = false;
 
         let prev: Cell | undefined;
+        let colSpan: number = 1;
 
         for ( let i = 0; i < opts.columns; i++ ) {
 
+            if ( colSpan > 1 ) {
+                colSpan--;
+                continue;
+            }
+
             const cell: Cell = row[ i ];
+            colSpan = cell.getColSpan();
 
             if ( i === 0 ) {
                 if ( cell.getBorder() ) {
@@ -203,7 +218,19 @@ export class TableLayout {
                 }
             }
 
-            const { current, next } = this.renderCell( cell, opts.width[ i ] );
+            let maxLength: number = opts.width[ i ];
+            if ( colSpan > 1 ) {
+                for ( let o = 1; o < colSpan; o++ ) {
+                    // add padding and with of next cell
+                    maxLength += opts.width[ i + o ] + opts.padding[ i + o ];
+                    if ( opts.hasBorder ) {
+                        // add padding again and border with
+                        maxLength += opts.padding[ i + o ] + 1;
+                    }
+                }
+            }
+
+            const { current, next } = this.renderCell( cell, maxLength );
 
             next.length && ( isMultilineRow = true );
             row[ i ] = next;
@@ -218,17 +245,16 @@ export class TableLayout {
                 cells += ' '.repeat( opts.padding[ i ] );
             }
 
-            if ( i === opts.columns - 1 ) {
-                if ( cell.getBorder() ) {
-                    cells += this.options.chars.right;
-                } else if ( opts.hasBorder ) {
-                    cells += ' ';
-                }
-            }
-
             prev = cell;
         }
 
+        if ( opts.columns > 0 ) {
+            if ( row[ opts.columns - 1 ].getBorder() ) {
+                cells += this.options.chars.right;
+            } else if ( opts.hasBorder ) {
+                cells += ' ';
+            }
+        }
 
         cells += '\n';
 
@@ -261,10 +287,10 @@ export class TableLayout {
 
         let cells = [];
 
+        // a1 | b1
+        // -------
+        // a2 | b2
         for ( let i = 0; i < opts.columns; i++ ) {
-            // a1 | b1
-            // -------
-            // a2 | b2
             const a1: Cell | undefined = prevRow?.[ i - 1 ];
             const a2: Cell | undefined = nextRow?.[ i - 1 ];
             const b1: Cell | undefined = prevRow?.[ i ];
@@ -289,18 +315,38 @@ export class TableLayout {
 
             } else if ( i < opts.columns ) {
 
-                if ( ( a1Border && b2Border ) ||
-                    ( b1Border && a2Border ) ||
-                    ( b2Border && a1Border ) ||
-                    ( a2Border && b1Border ) ) {
-                    cells.push( this.options.chars.midMid );
+                const hasColSpan = ( cell: Cell | undefined ): boolean => ( cell?.getColSpan() ?? 1 ) > 1;
+                const a1ColSpan: boolean = hasColSpan( a1 );
+                const a2ColSpan: boolean = hasColSpan( a2 );
+                const b1ColSpan: boolean = hasColSpan( b1 );
+                const b2ColSpan: boolean = hasColSpan( b2 );
+
+                if ( ( a1Border && b2Border ) || ( b1Border && a2Border ) ) {
+
+                    if ( ( a1ColSpan && b1ColSpan && a1ColSpan && b1ColSpan ) && ( a1Border && b2Border && b1Border && a2Border ) ) {
+                        cells.push( this.options.chars.mid );
+                    } else if ( a1ColSpan && b1ColSpan ) {
+                        cells.push( this.options.chars.topMid );
+                    } else if ( a2ColSpan && b2ColSpan ) {
+                        cells.push( this.options.chars.bottomMid );
+                    } else {
+                        cells.push( this.options.chars.midMid );
+                    }
 
                 } else if ( a1Border && b1Border ) {
-                    cells.push( this.options.chars.bottomMid );
+                    if ( a1ColSpan && b1ColSpan ) {
+                        cells.push( this.options.chars.bottom );
+                    } else {
+                        cells.push( this.options.chars.bottomMid );
+                    }
                 } else if ( b1Border && b2Border ) {
                     cells.push( this.options.chars.leftMid );
                 } else if ( b2Border && a2Border ) {
-                    cells.push( this.options.chars.topMid );
+                    if ( a2ColSpan && b2ColSpan ) {
+                        cells.push( this.options.chars.top );
+                    } else {
+                        cells.push( this.options.chars.topMid );
+                    }
                 } else if ( a2Border && a1Border ) {
                     cells.push( this.options.chars.rightMid );
 
