@@ -11,21 +11,21 @@ interface IRenderSettings {
     hasHeaderBorder: boolean;
     hasBodyBorder: boolean;
     rows: Row<Cell>[];
-    header?: Row<Cell>;
 }
 
 export class TableLayout {
 
-    public constructor( private table: Table, private options: ITableSettings ) {}
+    public constructor(
+        private table: Table,
+        private options: ITableSettings
+    ) {}
 
-    protected prepare(): IRenderSettings {
+    public toString(): string {
+        const opts: IRenderSettings = this.createLayout();
+        return opts.rows.length ? this.renderRows( opts ) : '';
+    }
 
-        const padding: number[] = [];
-        const width: number[] = [];
-
-        let hasBodyBorder: boolean = this.table.getBorder() || this.table.hasBodyBorder();
-        let hasHeaderBorder: boolean = this.table.hasHeaderBorder();
-        let hasBorder: boolean = hasHeaderBorder || hasBodyBorder;
+    protected createLayout(): IRenderSettings {
 
         Object.keys( this.options.chars ).forEach( ( key: string ) => {
             if ( typeof this.options.chars[ key as keyof IBorderOptions ] !== 'string' ) {
@@ -33,235 +33,219 @@ export class TableLayout {
             }
         } );
 
-        const allRows: IRow[] = this.table.slice();
-        const headerRow: IRow | undefined = this.table.getHeader();
+        const hasBodyBorder: boolean = this.table.getBorder() || this.table.hasBodyBorder();
+        const hasHeaderBorder: boolean = this.table.hasHeaderBorder();
+        const hasBorder: boolean = hasHeaderBorder || hasBodyBorder;
 
-        if ( headerRow ) {
-            allRows.push( headerRow );
+        const header: Row | undefined = this.table.getHeader();
+        const rows: Row<Cell>[] = this.spanRows( header ? [ header, ...this.table ] : this.table.slice() );
+        const columns: number = Math.max( ...rows.map( row => row.length ) );
+        for ( const row of rows ) {
+            const length: number = row.length;
+            if ( length < columns ) {
+                const diff = columns - length;
+                for ( let i = 0; i < diff; i++ ) {
+                    row.push( this.createCell( null, row ) );
+                }
+            }
         }
 
-        const columns: number = Math.max( ...allRows.map( cells => cells.length ) );
-
+        const padding: number[] = [];
+        const width: number[] = [];
         for ( let colIndex: number = 0; colIndex < columns; colIndex++ ) {
-            let minCellWidth: number = Array.isArray( this.options.minCellWidth ) ? this.options.minCellWidth[ colIndex ] : this.options.minCellWidth;
-            let maxCellWidth: number = Array.isArray( this.options.maxCellWidth ) ? this.options.maxCellWidth[ colIndex ] : this.options.maxCellWidth;
-            padding[ colIndex ] = Array.isArray( this.options.padding ) ? this.options.padding[ colIndex ] : this.options.padding;
-            let cellWidth: number = longest( colIndex, allRows, maxCellWidth );
+            const minCellWidth: number = Array.isArray( this.options.minCellWidth ) ? this.options.minCellWidth[ colIndex ] : this.options.minCellWidth;
+            const maxCellWidth: number = Array.isArray( this.options.maxCellWidth ) ? this.options.maxCellWidth[ colIndex ] : this.options.maxCellWidth;
+            const cellWidth: number = longest( colIndex, rows, maxCellWidth );
             width[ colIndex ] = Math.min( maxCellWidth, Math.max( minCellWidth, cellWidth ) );
+            padding[ colIndex ] = Array.isArray( this.options.padding ) ? this.options.padding[ colIndex ] : this.options.padding;
         }
 
-        const rows = this.createRows( this.table, columns );
-        const header = headerRow && this.createRow( headerRow, columns );
-
-        return { padding, width, columns, rows, header, hasBorder, hasBodyBorder, hasHeaderBorder };
+        return { padding, width, rows, columns, hasBorder, hasBodyBorder, hasHeaderBorder };
     }
 
-    protected createRows( rows: IRow[], columns: number ): Row<Cell>[] {
-        return rows.map( row => this.createRow( row, columns ) );
-    }
+    protected spanRows( _rows: IRow[], rowIndex: number = 0, colIndex: number = 0, rowSpan: number[] = [], colSpan: number = 1 ): Row<Cell>[] {
 
-    protected createRow( iRow: IRow, columns: number ): Row<Cell> {
+        const rows: Row<Cell>[] = _rows as Row<Cell>[];
 
-        const row: Row = Row.from( iRow );
-
-        if ( this.options.border ) {
-            row.border( this.options.border, false );
+        if ( rowIndex >= rows.length && rowSpan.every( span => span === 1 ) ) {
+            return rows;
+        } else if ( rows[ rowIndex ] && colIndex >= rows[ rowIndex ].length && colIndex >= rowSpan.length && colSpan === 1 ) {
+            return this.spanRows( rows, ++rowIndex, 0, rowSpan, 1 );
         }
+
+        if ( colSpan > 1 ) {
+            colSpan--;
+            rowSpan[ colIndex ] = rowSpan[ colIndex - 1 ];
+            rows[ rowIndex ].splice( colIndex - 1, 0, rows[ rowIndex ][ colIndex - 1 ] );
+            return this.spanRows( rows, rowIndex, ++colIndex, rowSpan, colSpan );
+        }
+
+        if ( colIndex === 0 ) {
+            rows[ rowIndex ] = this.createRow( rows[ rowIndex ] || [] );
+        }
+
+        if ( rowSpan[ colIndex ] > 1 ) {
+            rowSpan[ colIndex ]--;
+            rows[ rowIndex ].splice( colIndex, 0, rows[ rowIndex - 1 ][ colIndex ] );
+            return this.spanRows( rows, rowIndex, ++colIndex, rowSpan, colSpan );
+        }
+
+        rows[ rowIndex ][ colIndex ] = this.createCell( rows[ rowIndex ][ colIndex ] || null, rows[ rowIndex ] );
+
+        colSpan = rows[ rowIndex ][ colIndex ].getColSpan();
+        rowSpan[ colIndex ] = rows[ rowIndex ][ colIndex ].getRowSpan();
+
+        return this.spanRows( rows, rowIndex, ++colIndex, rowSpan, colSpan );
+    }
+
+    protected createRow( row: IRow ): Row<Cell> {
+        return Row.from( row ).border( this.table.getBorder(), false ) as Row<Cell>;
+    }
+
+    protected createCell( cell: ICell | null, row: Row ): Cell {
+        return Cell.from( cell ?? '' ).border( row.getBorder(), false );
+    }
+
+    protected renderRows( opts: IRenderSettings ): string {
+
+        let result: string = '';
+        const rowSpan: number[] = new Array( opts.columns ).fill( 1 );
+
+        for ( let rowIndex = 0; rowIndex < opts.rows.length; rowIndex++ ) {
+            result += this.renderRow( rowSpan, rowIndex, opts );
+        }
+
+        return result;
+    }
+
+    protected renderRow( rowSpan: number[], rowIndex: number, opts: IRenderSettings, inMultiline?: boolean ): string {
+
+        const row: Row<Cell> = opts.rows[ rowIndex ];
+        const prevRow: Row<Cell> | undefined = opts.rows[ rowIndex - 1 ];
+        const nextRow: Row<Cell> | undefined = opts.rows[ rowIndex + 1 ];
+        let result: string = '';
 
         let colSpan: number = 1;
-        for ( let i = 0; i < columns; i++ ) {
-            if ( colSpan > 1 ) {
-                colSpan--;
-                row.splice( i - 1, 0, row[ i - 1 ] );
-                continue;
-            }
-            const cell = this.createCell( row[ i ] || new Cell(), row );
-            colSpan = cell.getColSpan();
-            row[ i ] = cell;
-        }
-
-        return row as Row<Cell>;
-    }
-
-    protected createCell( iCell: ICell, row: Row ): Cell {
-        const cell = Cell.from( iCell );
-        if ( row.getBorder() ) {
-            cell.border( row.getBorder(), false );
-        }
-        return cell;
-    }
-
-    public toString(): string {
-
-        const opts: IRenderSettings = this.prepare();
-        const rows: Row<Cell>[] = opts.rows;
-
-        if ( !rows.length ) {
-            return '';
-        }
-
-        let result: string = '';
-
-        if ( opts.header ) {
-            result += this.renderHeader( opts, opts.header );
-        }
-
-        result += this.renderBody( opts, rows );
-
-        return result;
-    }
-
-    protected renderHeader( opts: IRenderSettings, header: Row<Cell> ) {
-
-        let result: string = '';
-
-        if ( opts.hasHeaderBorder ) {
-            result += this.renderBorderRow( undefined, header, opts );
-        }
-
-        result += this.renderRows( opts, [ header ] );
-
-        if ( opts.hasHeaderBorder && ( !opts.hasBodyBorder || !opts.rows[ 0 ].hasBorder() ) ) {
-            result += this.renderBorderRow( header, opts.rows[ 0 ], opts );
-        }
-
-        return result;
-    }
-
-    protected renderBody( opts: IRenderSettings, rows: Row<Cell>[] ): string {
-
-        let result: string = '';
-        const lastRow: Row<Cell> = rows[ rows.length - 1 ];
-        const firstRow: Row<Cell> = rows[ 0 ];
 
         // border top row
-        if ( firstRow.hasBorder() ) {
-            result += this.renderBorderRow( opts.header, firstRow, opts );
+        if ( !inMultiline && rowIndex === 0 && row.hasBorder() ) {
+            result += this.renderBorderRow( undefined, row, rowSpan, opts );
         }
 
-        // rows
-        result += this.renderRows( opts, rows );
-
-        // border bottom row
-        if ( lastRow.hasBorder() ) {
-            result += this.renderBorderRow( lastRow, undefined, opts );
-        }
-
-        return result;
-    }
-
-    protected renderRows( opts: IRenderSettings, rows: Row<Cell>[], index: number = 0 ): string {
-
-        let result: string = '';
-        const row: Row<Cell> = rows[ index ];
-        const prevRow: Row<Cell> | undefined = rows[ index - 1 ];
-        const nextRow: Row<Cell> | undefined = rows[ index + 1 ];
-
-        result += this.renderRow( row, prevRow, nextRow, opts );
-
-        // border mid row
-        if ( opts.hasBodyBorder && index < rows.length - 1 ) {
-            result += this.renderBorderRow( row, nextRow, opts );
-        }
-
-        if ( index < rows.length - 1 ) {
-            result += this.renderRows( opts, rows, ++index );
-        }
-
-        return result;
-    }
-
-    protected renderRow( row: Row<Cell>, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: IRenderSettings ): string {
-
-        let result: string = '';
-
-        const { cells, isMultilineRow } = this.renderCells( row, opts );
-
-        result += cells;
-
-        if ( isMultilineRow ) { // skip border
-            result += this.renderRow( row, prevRow, nextRow, opts );
-        }
-
-        return result;
-    }
-
-    protected renderCells( row: Row<Cell>, opts: IRenderSettings ) {
-
-        let cells: string = ' '.repeat( this.options.indent || 0 );
         let isMultilineRow: boolean = false;
 
-        let prev: Cell | undefined;
-        let colSpan: number = 1;
+        result += ' '.repeat( this.options.indent || 0 );
 
-        for ( let i = 0; i < opts.columns; i++ ) {
+        for ( let colIndex = 0; colIndex < opts.columns; colIndex++ ) {
 
             if ( colSpan > 1 ) {
                 colSpan--;
+                rowSpan[ colIndex ] = rowSpan[ colIndex - 1 ];
                 continue;
             }
 
-            const cell: Cell = row[ i ];
-            colSpan = cell.getColSpan();
+            result += this.renderCell( colIndex, row, prevRow, rowSpan, opts );
 
-            if ( i === 0 ) {
-                if ( cell.getBorder() ) {
-                    cells += this.options.chars.left;
-                } else if ( opts.hasBorder ) {
-                    cells += ' ';
+            if ( rowSpan[ colIndex ] > 1 ) {
+                if ( !inMultiline ) {
+                    rowSpan[ colIndex ]--;
                 }
-            } else {
-                if ( cell.getBorder() || prev?.getBorder() ) {
-                    cells += this.options.chars.middle;
-                } else if ( opts.hasBorder ) {
-                    cells += ' ';
-                }
+            } else if ( !prevRow || prevRow[ colIndex ] !== row[ colIndex ] ) {
+                rowSpan[ colIndex ] = row[ colIndex ].getRowSpan();
             }
 
-            let maxLength: number = opts.width[ i ];
-            if ( colSpan > 1 ) {
-                for ( let o = 1; o < colSpan; o++ ) {
-                    // add padding and with of next cell
-                    maxLength += opts.width[ i + o ] + opts.padding[ i + o ];
-                    if ( opts.hasBorder ) {
-                        // add padding again and border with
-                        maxLength += opts.padding[ i + o ] + 1;
-                    }
-                }
+            colSpan = row[ colIndex ].getColSpan();
+
+            if ( rowSpan[ colIndex ] === 1 && row[ colIndex ].length ) {
+                isMultilineRow = true;
             }
 
-            const { current, next } = this.renderCell( cell, maxLength );
-
-            next.length && ( isMultilineRow = true );
-            row[ i ] = next;
-
-            if ( opts.hasBorder ) {
-                cells += ' '.repeat( opts.padding[ i ] );
-            }
-
-            cells += current;
-
-            if ( opts.hasBorder || i < opts.columns - 1 ) {
-                cells += ' '.repeat( opts.padding[ i ] );
-            }
-
-            prev = cell;
         }
 
         if ( opts.columns > 0 ) {
             if ( row[ opts.columns - 1 ].getBorder() ) {
-                cells += this.options.chars.right;
+                result += this.options.chars.right;
             } else if ( opts.hasBorder ) {
-                cells += ' ';
+                result += ' ';
             }
         }
 
-        cells += '\n';
+        result += '\n';
 
-        return { cells, isMultilineRow };
+        if ( isMultilineRow ) { // skip border
+            return result + this.renderRow( rowSpan, rowIndex, opts, isMultilineRow );
+        }
+
+        // border mid row
+        if ( ( rowIndex === 0 && opts.hasHeaderBorder ) ||
+            ( rowIndex < opts.rows.length - 1 && opts.hasBodyBorder )
+        ) {
+            result += this.renderBorderRow( row, nextRow, rowSpan, opts );
+        }
+
+        // border bottom row
+        if ( rowIndex === opts.rows.length - 1 && row.hasBorder() ) {
+            result += this.renderBorderRow( row, undefined, rowSpan, opts );
+        }
+
+        return result;
     }
 
-    protected renderCell( cell: Cell, maxLength: number ): { current: string, next: Cell } {
+    protected renderCell( colIndex: number, row: Row<Cell>, prevRow: Row<Cell> | undefined, rowSpan: number[], opts: IRenderSettings, noBorder?: boolean ): string {
+
+        let result: string = '';
+        const prevCell: Cell | undefined = row[ colIndex - 1 ];
+
+        const cell: Cell = row[ colIndex ];
+
+        if ( !noBorder ) {
+            if ( colIndex === 0 ) {
+                if ( cell.getBorder() ) {
+                    result += this.options.chars.left;
+                } else if ( opts.hasBorder ) {
+                    result += ' ';
+                }
+            } else {
+                if ( cell.getBorder() || prevCell?.getBorder() ) {
+                    result += this.options.chars.middle;
+                } else if ( opts.hasBorder ) {
+                    result += ' ';
+                }
+            }
+        }
+
+        let maxLength: number = opts.width[ colIndex ];
+
+        const colSpan: number = cell.getColSpan();
+        if ( colSpan > 1 ) {
+            for ( let o = 1; o < colSpan; o++ ) {
+                // add padding and with of next cell
+                maxLength += opts.width[ colIndex + o ] + opts.padding[ colIndex + o ];
+                if ( opts.hasBorder ) {
+                    // add padding again and border with
+                    maxLength += opts.padding[ colIndex + o ] + 1;
+                }
+            }
+        }
+
+        const { current, next } = this.renderCellValue( cell, maxLength );
+
+        row[ colIndex ].setValue( next );
+
+        if ( opts.hasBorder ) {
+            result += ' '.repeat( opts.padding[ colIndex ] );
+        }
+
+        result += current;
+
+        if ( opts.hasBorder || colIndex < opts.columns - 1 ) {
+            result += ' '.repeat( opts.padding[ colIndex ] );
+        }
+
+        return result;
+    }
+
+    protected renderCellValue( cell: Cell, maxLength: number ): { current: string, next: Cell } {
 
         const length: number = Math.min( maxLength, stripeColors( cell.toString() ).length );
         let words: string = consumeWords( length, cell.toString() );
@@ -273,7 +257,7 @@ export class TableLayout {
         }
 
         // get next content and remove leading space if breakWord is not true
-        const next = cell.slice( words.length + ( breakWord ? 0 : 1 ) );
+        const next = cell.toString().slice( words.length + ( breakWord ? 0 : 1 ) );
         const fillLength = maxLength - stripeColors( words ).length;
         const current = words + ' '.repeat( fillLength );
 
@@ -283,117 +267,174 @@ export class TableLayout {
         };
     }
 
-    protected renderBorderRow( prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, opts: IRenderSettings ): string {
+    protected renderBorderRow( prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, rowSpan: number[], opts: IRenderSettings ): string {
 
-        let cells = [];
+        let result = '';
+
+        let colSpan: number = 1;
+        for ( let colIndex = 0; colIndex < opts.columns; colIndex++ ) {
+            if ( rowSpan[ colIndex ] > 1 ) {
+                if ( !nextRow ) {
+                    throw new Error( 'invalid layout' );
+                }
+                if ( colSpan > 1 ) {
+                    colSpan--;
+                    continue;
+                }
+            }
+            result += this.renderBorderCell( colIndex, prevRow, nextRow, rowSpan, opts );
+            colSpan = nextRow?.[ colIndex ].getColSpan() ?? 1;
+        }
+
+        return result.length ? ' '.repeat( this.options.indent ) + result + '\n' : '';
+    }
+
+    protected renderBorderCell( colIndex: number, prevRow: Row<Cell> | undefined, nextRow: Row<Cell> | undefined, rowSpan: number[], opts: IRenderSettings ): string {
 
         // a1 | b1
         // -------
         // a2 | b2
-        for ( let i = 0; i < opts.columns; i++ ) {
-            const a1: Cell | undefined = prevRow?.[ i - 1 ];
-            const a2: Cell | undefined = nextRow?.[ i - 1 ];
-            const b1: Cell | undefined = prevRow?.[ i ];
-            const b2: Cell | undefined = nextRow?.[ i ];
 
-            const a1Border: boolean = !!a1?.getBorder();
-            const a2Border: boolean = !!a2?.getBorder();
-            const b1Border: boolean = !!b1?.getBorder();
-            const b2Border: boolean = !!b2?.getBorder();
+        const a1: Cell | undefined = prevRow?.[ colIndex - 1 ];
+        const a2: Cell | undefined = nextRow?.[ colIndex - 1 ];
+        const b1: Cell | undefined = prevRow?.[ colIndex ];
+        const b2: Cell | undefined = nextRow?.[ colIndex ];
 
-            if ( i === 0 ) {
+        const a1Border: boolean = !!a1?.getBorder();
+        const a2Border: boolean = !!a2?.getBorder();
+        const b1Border: boolean = !!b1?.getBorder();
+        const b2Border: boolean = !!b2?.getBorder();
 
-                if ( b1Border && b2Border ) {
-                    cells.push( this.options.chars.leftMid );
-                } else if ( b1Border ) {
-                    cells.push( this.options.chars.bottomLeft );
-                } else if ( b2Border ) {
-                    cells.push( this.options.chars.topLeft );
+        const hasColSpan = ( cell: Cell | undefined ): boolean => ( cell?.getColSpan() ?? 1 ) > 1;
+        const hasRowSpan = ( cell: Cell | undefined ): boolean => ( cell?.getRowSpan() ?? 1 ) > 1;
+
+        let result = '';
+
+        if ( colIndex === 0 ) {
+
+            if ( rowSpan[ colIndex ] > 1 ) {
+                if ( b1Border ) {
+                    result += this.options.chars.left;
                 } else {
-                    cells.push( ' ' );
+                    result += ' ';
                 }
+            } else if ( b1Border && b2Border ) {
+                result += this.options.chars.leftMid;
+            } else if ( b1Border ) {
+                result += this.options.chars.bottomLeft;
+            } else if ( b2Border ) {
+                result += this.options.chars.topLeft;
+            } else {
+                result += ' ';
+            }
 
-            } else if ( i < opts.columns ) {
+        } else if ( colIndex < opts.columns ) {
 
-                const hasColSpan = ( cell: Cell | undefined ): boolean => ( cell?.getColSpan() ?? 1 ) > 1;
+            if ( ( a1Border && b2Border ) || ( b1Border && a2Border ) ) {
+
                 const a1ColSpan: boolean = hasColSpan( a1 );
                 const a2ColSpan: boolean = hasColSpan( a2 );
                 const b1ColSpan: boolean = hasColSpan( b1 );
                 const b2ColSpan: boolean = hasColSpan( b2 );
 
-                if ( ( a1Border && b2Border ) || ( b1Border && a2Border ) ) {
+                const a1RowSpan: boolean = hasRowSpan( a1 );
+                const a2RowSpan: boolean = hasRowSpan( a2 );
+                const b1RowSpan: boolean = hasRowSpan( b1 );
+                const b2RowSpan: boolean = hasRowSpan( b2 );
 
-                    if ( ( a1ColSpan && b1ColSpan && a1ColSpan && b1ColSpan ) && ( a1Border && b2Border && b1Border && a2Border ) ) {
-                        cells.push( this.options.chars.mid );
-                    } else if ( a1ColSpan && b1ColSpan ) {
-                        cells.push( this.options.chars.topMid );
-                    } else if ( a2ColSpan && b2ColSpan ) {
-                        cells.push( this.options.chars.bottomMid );
-                    } else {
-                        cells.push( this.options.chars.midMid );
-                    }
+                const hasAllBorder = a1Border && b2Border && b1Border && a2Border;
+                const hasAllRowSpan = a1RowSpan && b1RowSpan && a2RowSpan && b2RowSpan;
+                const hasAllColSpan = a1ColSpan && b1ColSpan && a2ColSpan && b2ColSpan;
 
-                } else if ( a1Border && b1Border ) {
-                    if ( a1ColSpan && b1ColSpan ) {
-                        cells.push( this.options.chars.bottom );
-                    } else {
-                        cells.push( this.options.chars.bottomMid );
-                    }
-                } else if ( b1Border && b2Border ) {
-                    cells.push( this.options.chars.leftMid );
-                } else if ( b2Border && a2Border ) {
-                    if ( a2ColSpan && b2ColSpan ) {
-                        cells.push( this.options.chars.top );
-                    } else {
-                        cells.push( this.options.chars.topMid );
-                    }
-                } else if ( a2Border && a1Border ) {
-                    cells.push( this.options.chars.rightMid );
-
-                } else if ( a1Border ) {
-                    cells.push( this.options.chars.bottomRight );
-                } else if ( b1Border ) {
-                    cells.push( this.options.chars.bottomLeft );
-                } else if ( a2Border ) {
-                    cells.push( this.options.chars.topRight );
-                } else if ( b2Border ) {
-                    cells.push( this.options.chars.topLeft );
-
+                if ( hasAllRowSpan && hasAllBorder ) {
+                    result += this.options.chars.middle;
+                } else if ( hasAllColSpan && hasAllBorder && a1 === b1 && a2 === b2 ) {
+                    result += this.options.chars.mid;
+                } else if ( a1ColSpan && b1ColSpan && a1 === b1 ) {
+                    result += this.options.chars.topMid;
+                } else if ( a2ColSpan && b2ColSpan && a2 === b2 ) {
+                    result += this.options.chars.bottomMid;
+                } else if ( a1RowSpan && a2RowSpan && a1 === a2 ) {
+                    result += this.options.chars.leftMid;
+                } else if ( b1RowSpan && b2RowSpan && b1 === b2 ) {
+                    result += this.options.chars.rightMid;
                 } else {
-                    cells.push( ' ' );
+                    result += this.options.chars.midMid;
                 }
-            }
 
-            const length = opts.padding[ i ] + opts.width[ i ] + opts.padding[ i ];
-            if ( b1Border && b2Border ) {
-                cells.push( this.options.chars.mid.repeat( length ) );
+            } else if ( a1Border && b1Border ) {
+                if ( hasColSpan( a1 ) && hasColSpan( b1 ) && a1 === b1 ) {
+                    result += this.options.chars.bottom;
+                } else {
+                    result += this.options.chars.bottomMid;
+                }
+            } else if ( b1Border && b2Border ) {
+                if ( rowSpan[ colIndex ] > 1 ) {
+                    result += this.options.chars.left;
+                } else {
+                    result += this.options.chars.leftMid;
+                }
+            } else if ( b2Border && a2Border ) {
+                if ( hasColSpan( a2 ) && hasColSpan( b2 ) && a2 === b2 ) {
+                    result += this.options.chars.top;
+                } else {
+                    result += this.options.chars.topMid;
+                }
+            } else if ( a1Border && a2Border ) {
+                if ( hasRowSpan( a1 ) && a1 === a2 ) {
+                    result += this.options.chars.right;
+                } else {
+                    result += this.options.chars.rightMid;
+                }
+
+            } else if ( a1Border ) {
+                result += this.options.chars.bottomRight;
             } else if ( b1Border ) {
-                cells.push( this.options.chars.bottom.repeat( length ) );
+                result += this.options.chars.bottomLeft;
+            } else if ( a2Border ) {
+                result += this.options.chars.topRight;
             } else if ( b2Border ) {
-                cells.push( this.options.chars.top.repeat( length ) );
+                result += this.options.chars.topLeft;
+
             } else {
-                cells.push( ' '.repeat( length ) );
+                result += ' ';
             }
+        }
 
-            if ( i === opts.columns - 1 ) {
-                if ( b1Border && b2Border ) {
-                    cells.push( this.options.chars.rightMid );
-                } else if ( b1Border ) {
-                    cells.push( this.options.chars.bottomRight );
-                } else if ( b2Border ) {
-                    cells.push( this.options.chars.topRight );
+        const length = opts.padding[ colIndex ] + opts.width[ colIndex ] + opts.padding[ colIndex ];
+
+        if ( rowSpan[ colIndex ] > 1 && nextRow ) {
+            result += this.renderCell( colIndex, nextRow, prevRow, rowSpan, opts, true );
+            if ( nextRow[ colIndex ] === nextRow[ nextRow.length - 1 ] ) {
+                if ( b1Border ) {
+                    result += this.options.chars.right;
                 } else {
-                    cells.push( ' ' );
+                    result += ' ';
                 }
+                return result;
+            }
+        } else if ( b1Border && b2Border ) {
+            result += this.options.chars.mid.repeat( length );
+        } else if ( b1Border ) {
+            result += this.options.chars.bottom.repeat( length );
+        } else if ( b2Border ) {
+            result += this.options.chars.top.repeat( length );
+        } else {
+            result += ' '.repeat( length );
+        }
+
+        if ( colIndex === opts.columns - 1 ) {
+            if ( b1Border && b2Border ) {
+                result += this.options.chars.rightMid;
+            } else if ( b1Border ) {
+                result += this.options.chars.bottomRight;
+            } else if ( b2Border ) {
+                result += this.options.chars.topRight;
+            } else {
+                result += ' ';
             }
         }
 
-        const result: string = cells.join( '' );
-
-        if ( !result.length ) {
-            return result;
-        }
-
-        return ' '.repeat( this.options.indent ) + result + '\n';
+        return result;
     }
 }

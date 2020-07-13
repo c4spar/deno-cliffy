@@ -124,7 +124,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this;
     }
 
-    public getHeader(): IRow | undefined {
+    public getHeader(): Row | undefined {
         return this.headerRow;
     }
 
