@@ -1,0 +1,19 @@
+name: cliffy
+description: Command line framework for Deno
+stable: false
+version: 0.11.0
+repository: https://github.com/c4spar/deno-cliffy/
+files:
+  - assets/**/*
+  - examples/**/*
+  - packages/**/*
+  - ansi-escape.ts
+  - CHANGELOG.md
+  - command.ts
+  - flags.ts
+  - keycode.ts
+  - LICENSE
+  - mod.ts
+  - prompt.ts
+  - README.md
+  - table.ts
