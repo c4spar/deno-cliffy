@@ -1,4 +1,31 @@
-# [v0.10.0](https://github.com/c4spar/deno-cli/compare/v0.9.0...v0.10.0) (Tue Jun 30 19:50:44 2020)
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.10.0...v0.11.0) (2020-07-14)
+
+### Features
+
+* **command:** add `.versionOption()` and `.helpOption()` method's ([85d66b9](https://github.com/c4spar/deno-cli/commit/85d66b9))
+
+### Code Refactoring
+
+* remove `IGenericObject` interface ([e3c8660](https://github.com/c4spar/deno-cli/commit/e3c8660))
+* **command:** remove `OptionType` type from `IArgumentDetails` ([c8dc229](https://github.com/c4spar/deno-cli/commit/c8dc229))
+* **command:** refactor `ICommandOption` interface ([88263b5](https://github.com/c4spar/deno-cli/commit/88263b5))
+
+### Chore
+
+* **deno:** update deno/std to v0.61.0 and deno ci version to v1.2.0 (#45) ([f23da64](https://github.com/c4spar/deno-cli/commit/f23da64))
+* **nest:** add `egg.yaml` config ([f8447cc](https://github.com/c4spar/deno-cli/commit/f8447cc))
+
+### Unit/Integration Tests
+
+* **command:** fix depends test ([9ec513c](https://github.com/c4spar/deno-cli/commit/9ec513c))
+
+### Documentation Updates
+
+* **command:** fix options type in action handler example's (#44) ([d661cc4](https://github.com/c4spar/deno-cli/commit/d661cc4))
+
+
+
+# [v0.10.0](https://github.com/c4spar/deno-cli/compare/v0.9.0...v0.10.0) (2020-06-30)
 
 ### Breaking Changes
 
@@ -68,7 +95,7 @@
 
 
 
-# [v0.9.0](https://github.com/c4spar/deno-cli/compare/v0.8.2...v0.9.0) (Fri Jun 5 00:31:38 2020)
+# [v0.9.0](https://github.com/c4spar/deno-cli/compare/v0.8.2...v0.9.0) (2020-06-05)
 
 ### Features
 
@@ -88,7 +115,7 @@
 
 
 
-# [v0.8.2](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (Sat May 30 01:40:08 2020)
+# [v0.8.2](https://github.com/c4spar/deno-cli/compare/v0.8.1...v0.8.2) (2020-05-30)
 
 ### Bug Fixes
 
@@ -101,7 +128,7 @@
 
 
 
-# [v0.8.1](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (Fri May 29 19:22:19 2020)
+# [v0.8.1](https://github.com/c4spar/deno-cli/compare/v0.8.0...v0.8.1) (2020-05-29)
 
 ### Bug Fixes
 
@@ -110,7 +137,7 @@
 
 
 
-# [v0.8.0](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (Fri May 29 00:33:24 2020)
+# [v0.8.0](https://github.com/c4spar/deno-cli/compare/v0.7.1...v0.8.0) (2020-05-29)
 
 ### Features
 
@@ -127,7 +154,7 @@
 
 
 
-# [v0.7.1](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (Sun May 24 12:58:04 2020)
+# [v0.7.1](https://github.com/c4spar/deno-cli/compare/v0.7.0...v0.7.1) (2020-05-24)
 
 ### Bug Fixes
 
@@ -139,7 +166,7 @@
 
 
 
-# [v0.7.0](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (Fri May 22 01:11:03 2020)
+# [v0.7.0](https://github.com/c4spar/deno-cli/compare/v0.6.1...v0.7.0) (2020-05-22)
 
 ### Features
 
@@ -186,7 +213,7 @@
 
 
 
-# [v0.6.1](https://github.com/c4spar/deno-cli/compare/v0.6.0...v0.6.1) (Tue May 12 22:42:37 2020)
+# [v0.6.1](https://github.com/c4spar/deno-cli/compare/v0.6.0...v0.6.1) (2020-05-12)
 
 ### Bug Fixes
 
@@ -194,7 +221,7 @@
 
 
 
-# [v0.6.0](https://github.com/c4spar/deno-cli/compare/v0.5.1...v0.6.0) (Mon May 11 01:33:23 2020)
+# [v0.6.0](https://github.com/c4spar/deno-cli/compare/v0.5.1...v0.6.0) (2020-05-11)
 
 ### Code Refactoring
 
@@ -215,7 +242,7 @@
 
 
 
-# [v0.5.1](https://github.com/c4spar/deno-cli/compare/v0.5.0...v0.5.1) (Sun May 3 21:09:49 2020)
+# [v0.5.1](https://github.com/c4spar/deno-cli/compare/v0.5.0...v0.5.1) (2020-05-03)
 
 ### Bug Fixes
 
@@ -223,7 +250,7 @@
 
 
 
-# [v0.5.0](https://github.com/c4spar/deno-cli/compare/v0.4.0...v0.5.0) (Sun May 3 02:11:43 2020)
+# [v0.5.0](https://github.com/c4spar/deno-cli/compare/v0.4.0...v0.5.0) (2020-05-03)
 
 ### Features
 
@@ -256,7 +283,7 @@
 
 
 
-# [v0.4.0](https://github.com/c4spar/deno-cli/compare/v0.3.0...v0.4.0) (Sat Apr 4 23:34:06 2020)
+# [v0.4.0](https://github.com/c4spar/deno-cli/compare/v0.3.0...v0.4.0) (2020-04-04)
 
 ### Features
 
@@ -314,7 +341,7 @@
 
 
 
-# [v0.3.0](https://github.com/c4spar/deno-cli/compare/v0.2.0...v0.3.0) (Tue Mar 31 17:49:50 2020)
+# [v0.3.0](https://github.com/c4spar/deno-cli/compare/v0.2.0...v0.3.0) (2020-03-31)
 
 ### Features
 
@@ -340,7 +367,7 @@
 
 
 
-# [v0.2.0](https://github.com/c4spar/deno-cli/compare/v0.1.0...v0.2.0) (Mon Mar 23 00:36:36 2020)
+# [v0.2.0](https://github.com/c4spar/deno-cli/compare/v0.1.0...v0.2.0) (2020-03-23)
 
 ### Features
 
