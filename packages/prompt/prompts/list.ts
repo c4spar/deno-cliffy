@@ -1,5 +1,5 @@
-import { encode } from 'https://deno.land/std@v0.52.0/encoding/utf8.ts';
-import { blue, underline } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
+import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
+import { blue, underline } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
