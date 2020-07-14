@@ -1,4 +1,4 @@
-import { blue, bold, dim, yellow } from 'https://deno.land/std@v0.52.0/fmt/colors.ts';
+import { blue, bold, dim, yellow } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
