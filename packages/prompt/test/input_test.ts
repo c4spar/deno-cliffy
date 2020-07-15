@@ -11,12 +11,23 @@ Deno.test( 'prompt input: value', async () => {
 
 Deno.test( 'prompt input: validate option', async () => {
     console.log();
-    Input.inject( 'a'.repeat( 9 ) );
+    Input.inject( 'foo' );
     const result: string | undefined = await Input.prompt( {
         message: 'message',
         validate: value => value.length < 10
     } );
-    assertEquals( result, 'a'.repeat( 9 ) );
+    assertEquals( result, 'foo' );
+} );
+
+Deno.test( 'prompt input: default value', async () => {
+    console.log();
+    Input.inject( '' );
+    const result: string | undefined = await Input.prompt( {
+        message: 'message',
+        default: 'default',
+        validate: value => value.length < 10
+    } );
+    assertEquals( result, 'default' );
 } );
 
 Deno.test( 'prompt input: empty value', async () => {

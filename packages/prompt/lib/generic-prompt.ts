@@ -148,15 +148,15 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
     }
 
     protected transformValue( value: V ): T | undefined {
-
-        if ( !value && typeof this.settings.default !== 'undefined' ) {
-            return this.settings.default;
-        }
-
         return this.settings.transform ? this.settings.transform( value ) : this.transform( value );
     }
 
     protected async validateValue( value: V ): Promise<boolean> {
+
+        if ( !value && typeof this.settings.default !== 'undefined' ) {
+            this.value = this.settings.default;
+            return true;
+        }
 
         const validation = await ( this.settings.validate ? this.settings.validate( value ) : this.validate( value ) );
 
