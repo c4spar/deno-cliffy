@@ -1,3 +1,11 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.11.0...v0.11.1) (Wed Jul 15 19:05:33 2020)
+
+### Bug Fixes
+
+* **prompt:** fix default value (#48) ([805f5a1](https://github.com/c4spar/deno-cli/commit/805f5a1))
+
+
+
 # [Changelog](https://github.com/c4spar/deno-cli/compare/v0.10.0...v0.11.0) (2020-07-14)
 
 ### Features
