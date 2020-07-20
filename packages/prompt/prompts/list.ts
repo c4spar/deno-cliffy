@@ -2,24 +2,26 @@ import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
 import { blue, underline } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
 
-// @TODO: add minLength option to list prompt
-// @TODO: add maxLength option to list prompt
+export interface ListKeys extends GenericInputKeys {}
+
 export interface ListOptions extends GenericInputPromptOptions<string[]> {
     separator?: string;
     minLength?: number;
     maxLength?: number;
     minTags?: number;
     maxTags?: number;
+    keys?: ListKeys;
 }
 
-export interface ListSettings extends GenericInputPromptSettings<string[]> {
+interface ListSettings extends GenericInputPromptSettings<string[]> {
     separator: string;
     minLength: number;
     maxLength: number;
     minTags: number;
     maxTags: number;
+    keys?: ListKeys;
 }
 
 export class List extends GenericInput<string[], ListSettings> {

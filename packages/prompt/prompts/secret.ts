@@ -2,20 +2,24 @@ import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
 import { blue, green, underline } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+
+export interface SecretKeys extends GenericInputKeys {}
 
 export interface SecretOptions extends GenericInputPromptOptions<string> {
     label?: string;
     hidden?: boolean;
     minLength?: number;
     maxLength?: number;
+    keys?: SecretKeys;
 }
 
-export interface SecretSettings extends GenericInputPromptSettings<string> {
+interface SecretSettings extends GenericInputPromptSettings<string> {
     label: string;
     hidden: boolean;
     minLength: number;
     maxLength: number;
+    keys?: SecretKeys;
 }
 
 export class Secret extends GenericInput<string, SecretSettings> {

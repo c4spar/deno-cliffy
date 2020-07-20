@@ -1,15 +1,19 @@
 import { blue, bold, dim, yellow } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+
+export interface ConfirmKeys extends GenericInputKeys {}
 
 export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
     active?: string;
     inactive?: string;
+    keys?: ConfirmKeys;
 }
 
-export interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
+interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
     active: string;
     inactive: string;
+    keys?: ConfirmKeys;
 }
 
 export class Confirm extends GenericInput<boolean, ConfirmSettings> {

@@ -3,14 +3,24 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from '../lib/generic-prompt.ts';
 
+export interface ToggleKeys {
+    active?: string[];
+    inactive?: string[];
+    submit?: string[];
+}
+
+interface ToggleKeysSettings extends Required<ToggleKeys> {}
+
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
     active?: string;
     inactive?: string;
+    keys?: ToggleKeys;
 }
 
-export interface ToggleSettings extends GenericPromptSettings<boolean, string> {
+interface ToggleSettings extends GenericPromptSettings<boolean, string> {
     active: string;
     inactive: string;
+    keys: ToggleKeysSettings;
 }
 
 export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
@@ -27,7 +37,13 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
             pointer: blue( Figures.POINTER_SMALL ),
             active: 'Yes',
             inactive: 'No',
-            ...options
+            ...options,
+            keys: {
+                active: [ 'right', 'y', 'j', 's', 'o' ],
+                inactive: [ 'left', 'n' ],
+                submit: [ 'enter', 'return' ],
+                ...( options.keys ?? {} )
+            }
         } ).prompt();
     }
 
@@ -55,31 +71,25 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
-        switch ( event.name ) {
+        switch ( true ) {
 
-            case 'c':
+            case event.name === 'c':
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
                 break;
 
-            case this.settings.inactive[ 0 ].toLowerCase():
-            case 'n': // no nein non
-            case 'left':
+            case event.sequence === this.settings.inactive[ 0 ].toLowerCase():
+            case this.isKey( this.settings.keys, 'inactive', event ):
                 this.selectInactive();
                 break;
 
-            case this.settings.active[ 0 ].toLowerCase():
-            case 'y': // yes
-            case 'j': // ja
-            case 's': // si
-            case 'o': // oui
-            case 'right':
+            case event.sequence === this.settings.active[ 0 ].toLowerCase():
+            case this.isKey( this.settings.keys, 'active', event ):
                 this.selectActive();
                 break;
 
-            case 'return':
-            case 'enter':
+            case this.isKey( this.settings.keys, 'submit', event ):
                 return true;
         }
 

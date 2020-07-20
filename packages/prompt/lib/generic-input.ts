@@ -4,9 +4,21 @@ import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { stripeColors } from '../../table/lib/utils.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from './generic-prompt.ts';
 
-export interface GenericInputPromptOptions<T> extends GenericPromptOptions<T, string> {}
+export interface GenericInputKeys {
+    moveCursorLeft?: string[];
+    moveCursorRight?: string[];
+    deleteCharLeft?: string[];
+    deleteCharRight?: string[];
+    submit?: string[];
+}
 
-export interface GenericInputPromptSettings<T> extends GenericPromptSettings<T, string> {}
+export interface GenericInputPromptOptions<T> extends GenericPromptOptions<T, string> {
+    keys?: GenericInputKeys;
+}
+
+export interface GenericInputPromptSettings<T> extends GenericPromptSettings<T, string> {
+    keys?: GenericInputKeys;
+}
 
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> extends GenericPrompt<T, string, S> {
 
@@ -15,6 +27,20 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
 
     public static inject( value: string ): void {
         GenericPrompt.inject( value );
+    }
+
+    protected constructor( settings: S ) {
+        super( {
+            ...settings,
+            keys: {
+                moveCursorLeft: [ 'left' ],
+                moveCursorRight: [ 'right' ],
+                deleteCharLeft: [ 'backspace' ],
+                deleteCharRight: [ 'delete' ],
+                submit: [ 'enter', 'return' ],
+                ...( settings.keys ?? {} )
+            }
+        } );
     }
 
     protected setPrompt( message: string ) {
@@ -32,9 +58,9 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
-        switch ( event.name ) {
+        switch ( true ) {
 
-            case 'c':
+            case event.name === 'c':
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
@@ -43,30 +69,29 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
                 }
                 break;
 
-            case 'up': // scroll history?
-                break;
+            // case 'up': // scroll history?
+            //     break;
+            //
+            // case 'down':  // scroll history?
+            //     break;
 
-            case 'down':  // scroll history?
-                break;
-
-            case 'left':
+            case this.isKey( this.settings.keys, 'moveCursorLeft', event ):
                 this.moveCursorLeft();
                 break;
 
-            case 'right':
+            case this.isKey( this.settings.keys, 'moveCursorRight', event ):
                 this.moveCursorRight();
                 break;
 
-            case 'delete':
+            case this.isKey( this.settings.keys, 'deleteCharRight', event ):
                 this.deleteCharRight();
                 break;
 
-            case 'backspace':
+            case this.isKey( this.settings.keys, 'deleteCharLeft', event ):
                 this.deleteChar();
                 break;
 
-            case 'return':
-            case 'enter':
+            case this.isKey( this.settings.keys, 'submit', event ):
                 return true;
 
             default:

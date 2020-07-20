@@ -171,6 +171,14 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         return !this.lastError;
     }
 
+    protected isKey<K extends any, N extends keyof K>( keys: K | undefined, name: N, event: KeyEvent ): boolean {
+        const keyNames: any | undefined = keys?.[ name ];
+        return typeof keyNames !== 'undefined' && (
+            ( typeof event.name !== 'undefined' && keyNames.indexOf( event.name ) !== -1 ) ||
+            ( typeof event.sequence !== 'undefined' && keyNames.indexOf( event.sequence ) !== -1 )
+        );
+    }
+
     protected write( ...args: any[] ) {
         Deno.stdout.writeSync( encode( format( ...args ) ) );
     }
