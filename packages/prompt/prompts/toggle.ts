@@ -1,19 +1,21 @@
 import { blue, dim, underline } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from '../lib/generic-prompt.ts';
 
-export interface ToggleOptions extends GenericInputPromptOptions<boolean> {
+export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
     active?: string;
     inactive?: string;
 }
 
-export interface ToggleSettings extends GenericInputPromptSettings<boolean> {
+export interface ToggleSettings extends GenericPromptSettings<boolean, string> {
     active: string;
     inactive: string;
 }
 
-export class Toggle extends GenericInput<boolean, ToggleSettings> {
+export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
+
+    protected status: string = typeof this.settings.default !== 'undefined' ? this.format( this.settings.default ) : '';
 
     public static async prompt( options: string | ToggleOptions ): Promise<boolean> {
 
@@ -33,9 +35,9 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
 
         message += ` ${ this.settings.pointer } `;
 
-        if ( this.input === this.settings.active ) {
+        if ( this.status === this.settings.active ) {
             message += `${ dim( `${ this.settings.inactive } /` ) } ${ underline( this.settings.active ) }`;
-        } else if ( this.input === this.settings.inactive ) {
+        } else if ( this.status === this.settings.inactive ) {
             message += `${ underline( this.settings.inactive ) } ${ dim( `/ ${ this.settings.active }` ) }`;
         } else {
             message += dim( `${ this.settings.inactive } / ${ this.settings.active }` );
@@ -85,11 +87,11 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
     }
 
     protected selectActive() {
-        this.input = this.settings.active;
+        this.status = this.settings.active;
     }
 
     protected selectInactive() {
-        this.input = this.settings.inactive;
+        this.status = this.settings.inactive;
     }
 
     protected validate( value: string ): boolean | string {
@@ -108,5 +110,9 @@ export class Toggle extends GenericInput<boolean, ToggleSettings> {
 
     protected format( value: boolean ): string {
         return value ? this.settings.active : this.settings.inactive;
+    }
+
+    protected getValue(): string {
+        return this.status;
     }
 }
