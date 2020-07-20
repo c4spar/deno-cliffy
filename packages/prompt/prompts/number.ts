@@ -1,20 +1,32 @@
 import { blue } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+
+export interface NumberKeys extends GenericInputKeys {
+    increaseValue?: string[];
+    decreaseValue?: string[];
+}
+
+interface NumberKeysSettings extends GenericInputKeys {
+    increaseValue: string[];
+    decreaseValue: string[];
+}
 
 export interface NumberOptions extends GenericInputPromptOptions<number> {
     min?: number;
     max?: number;
     float?: boolean;
     round?: number;
+    keys?: NumberKeys;
 }
 
-export interface NumberSettings extends GenericInputPromptSettings<number> {
+interface NumberSettings extends GenericInputPromptSettings<number> {
     min: number;
     max: number;
     float: boolean;
     round: number;
+    keys: NumberKeysSettings;
 }
 
 export class Number extends GenericInput<number, NumberSettings> {
@@ -31,46 +43,50 @@ export class Number extends GenericInput<number, NumberSettings> {
             max: Infinity,
             float: false,
             round: 2,
-            ...options
+            ...options,
+            keys: {
+                increaseValue: [ 'up' ],
+                decreaseValue: [ 'down' ],
+                ...( options.keys ?? {} )
+            }
         } ).prompt();
     }
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
-        switch ( event.name ) {
+        switch ( true ) {
 
-            case 'c':
+            case event.name === 'c':
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
                 break;
 
-            case 'up':
+            case this.isKey( this.settings.keys, 'increaseValue', event ):
                 this.increaseValue();
                 break;
 
-            case 'down':
+            case this.isKey( this.settings.keys, 'decreaseValue', event ):
                 this.decreaseValue();
                 break;
 
-            case 'left':
+            case this.isKey( this.settings.keys, 'moveCursorLeft', event ):
                 this.moveCursorLeft();
                 break;
 
-            case 'right':
+            case this.isKey( this.settings.keys, 'moveCursorRight', event ):
                 this.moveCursorRight();
                 break;
 
-            case 'delete':
+            case this.isKey( this.settings.keys, 'deleteCharRight', event ):
                 this.deleteCharRight();
                 break;
 
-            case 'backspace':
+            case this.isKey( this.settings.keys, 'deleteCharLeft', event ):
                 this.deleteChar();
                 break;
 
-            case 'return':
-            case 'enter':
+            case this.isKey( this.settings.keys, 'submit', event ):
                 return true;
 
             default:

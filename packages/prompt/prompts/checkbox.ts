@@ -14,23 +14,34 @@ export interface CheckboxOptionSettings extends GenericListOptionSettings {
     icon: boolean;
 }
 
+export interface CheckboxKeys {
+    previous?: string[];
+    next?: string[];
+    submit?: string[];
+    check?: string[];
+}
+
+interface CheckboxKeysSettings extends Required<CheckboxKeys> {}
+
 export type CheckboxValueOptions = ( string | CheckboxOption )[];
 export type CheckboxValueSettings = CheckboxOptionSettings[];
 
 export interface CheckboxOptions extends GenericListOptions<string[], string[]> {
+    options: CheckboxValueOptions;
     check?: string;
     uncheck?: string;
     minOptions?: number;
     maxOptions?: number;
-    options: CheckboxValueOptions;
+    keys?: CheckboxKeys;
 }
 
-export interface CheckboxSettings extends GenericListSettings<string[], string[]> {
+interface CheckboxSettings extends GenericListSettings<string[], string[]> {
+    options: CheckboxValueSettings;
     check: string;
     uncheck: string;
     minOptions: number;
     maxOptions: number;
-    options: CheckboxValueSettings;
+    keys: CheckboxKeysSettings;
 }
 
 export class Checkbox extends GenericList<string[], string[], CheckboxSettings> {
@@ -54,6 +65,13 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             check: green( Figures.TICK ),
             uncheck: red( Figures.CROSS ),
             ...options,
+            keys: {
+                previous: [ 'up' ],
+                next: [ 'down' ],
+                submit: [ 'return', 'enter' ],
+                check: [ 'space' ],
+                ...( options.keys ?? {} )
+            },
             options: values
         } ).prompt();
     }
@@ -79,29 +97,28 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
-        switch ( event.name ) {
+        switch ( true ) {
 
-            case 'c':
+            case event.name === 'c':
                 // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
                 break;
 
-            case 'up':
+            case this.isKey( this.settings.keys, 'previous', event ):
                 await this.selectPrevious();
                 break;
 
-            case 'down':
+            case this.isKey( this.settings.keys, 'next', event ):
                 await this.selectNext();
                 break;
 
-            case 'space':
+            case this.isKey( this.settings.keys, 'check', event ):
                 this.checkValue();
                 break;
 
-            case 'return':
-            case 'enter':
+            case this.isKey( this.settings.keys, 'submit', event ):
                 return true;
         }
 

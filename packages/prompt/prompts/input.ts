@@ -1,15 +1,19 @@
 import { blue } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
 import { Figures } from '../lib/figures.ts';
-import { GenericInput, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
+
+export interface InputKeys extends GenericInputKeys {}
 
 export interface InputOptions extends GenericInputPromptOptions<string> {
     minLength?: number;
     maxLength?: number;
+    keys?: InputKeys;
 }
 
-export interface InputSettings extends GenericInputPromptSettings<string> {
+interface InputSettings extends GenericInputPromptSettings<string> {
     minLength: number;
     maxLength: number;
+    keys?: InputKeys;
 }
 
 export class Input extends GenericInput<string, InputSettings> {

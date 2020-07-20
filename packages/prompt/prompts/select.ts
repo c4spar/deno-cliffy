@@ -11,9 +11,21 @@ export interface SelectOptionSettings extends GenericListOptionSettings {}
 export type SelectValueOptions = ( string | SelectOption )[];
 export type SelectValueSettings = SelectOptionSettings[];
 
-export interface SelectOptions extends GenericListOptions<string, string> {}
+export interface SelectKeys {
+    previous?: string[];
+    next?: string[];
+    submit?: string[];
+}
 
-export interface SelectSettings extends GenericListSettings<string, string> {}
+interface SelectKeysSettings extends Required<SelectKeys> {}
+
+export interface SelectOptions extends GenericListOptions<string, string> {
+    keys?: SelectKeys;
+}
+
+interface SelectSettings extends GenericListSettings<string, string> {
+    keys: SelectKeysSettings;
+}
 
 export class Select extends GenericList<string, string, SelectSettings> {
 
@@ -34,6 +46,12 @@ export class Select extends GenericList<string, string, SelectSettings> {
             indent: ' ',
             maxRows: 10,
             ...options,
+            keys: {
+                previous: [ 'up' ],
+                next: [ 'down' ],
+                submit: [ 'return', 'enter' ],
+                ...( options.keys ?? {} )
+            },
             options: values
         } ).prompt();
     }
@@ -48,24 +66,23 @@ export class Select extends GenericList<string, string, SelectSettings> {
 
     protected async handleEvent( event: KeyEvent ): Promise<boolean> {
 
-        switch ( event.name ) {
+        switch ( true ) {
 
-            case 'c':
+            case event.name === 'c':
                 if ( event.ctrl ) {
                     return Deno.exit( 0 );
                 }
                 break;
 
-            case 'up':
+            case this.isKey( this.settings.keys, 'previous', event ):
                 await this.selectPrevious();
                 break;
 
-            case 'down':
+            case this.isKey( this.settings.keys, 'next', event ):
                 await this.selectNext();
                 break;
 
-            case 'return':
-            case 'enter':
+            case this.isKey( this.settings.keys, 'submit', event ):
                 return true;
         }
 

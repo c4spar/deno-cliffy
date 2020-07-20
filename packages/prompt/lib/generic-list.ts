@@ -16,17 +16,17 @@ export type GenericListValueOptions = ( string | GenericListOption )[];
 export type GenericListValueSettings = GenericListOptionSettings[];
 
 export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
+    options: GenericListValueOptions;
     indent?: string;
     listPointer?: string;
     maxRows?: number;
-    options: GenericListValueOptions;
 }
 
 export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
+    options: GenericListValueSettings;
     indent: string;
     listPointer: string;
     maxRows: number;
-    options: GenericListValueSettings;
 }
 
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> extends GenericPrompt<T, V, S> {
@@ -41,8 +41,8 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     protected static mapValues( optValues: GenericListValueOptions ): GenericListOption[] {
 
         return Object.values( optValues )
-                     .map( ( item: string | GenericListOption ) =>
-                         typeof item === 'string' ? { value: item } : item );
+            .map( ( item: string | GenericListOption ) =>
+                typeof item === 'string' ? { value: item } : item );
     }
 
     protected static mapItem( item: GenericListOption ): GenericListOptionSettings {
