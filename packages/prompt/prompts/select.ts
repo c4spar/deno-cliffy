@@ -47,8 +47,8 @@ export class Select extends GenericList<string, string, SelectSettings> {
             maxRows: 10,
             ...options,
             keys: {
-                previous: [ 'up' ],
-                next: [ 'down' ],
+                previous: [ 'up', 'u' ],
+                next: [ 'down', 'd' ],
                 submit: [ 'return', 'enter' ],
                 ...( options.keys ?? {} )
             },

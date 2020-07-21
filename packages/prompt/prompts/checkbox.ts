@@ -66,8 +66,8 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             uncheck: red( Figures.CROSS ),
             ...options,
             keys: {
-                previous: [ 'up' ],
-                next: [ 'down' ],
+                previous: [ 'up', 'u' ],
+                next: [ 'down', 'd' ],
                 submit: [ 'return', 'enter' ],
                 check: [ 'space' ],
                 ...( options.keys ?? {} )

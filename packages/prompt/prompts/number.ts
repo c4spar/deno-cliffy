@@ -45,8 +45,8 @@ export class Number extends GenericInput<number, NumberSettings> {
             round: 2,
             ...options,
             keys: {
-                increaseValue: [ 'up' ],
-                decreaseValue: [ 'down' ],
+                increaseValue: [ 'up', 'u', '+' ],
+                decreaseValue: [ 'down', 'd', '-' ],
                 ...( options.keys ?? {} )
             }
         } ).prompt();
