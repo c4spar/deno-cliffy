@@ -75,6 +75,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
             case event.name === 'c':
                 if ( event.ctrl ) {
+                    this.screen.cursorShow();
                     return Deno.exit( 0 );
                 }
                 break;

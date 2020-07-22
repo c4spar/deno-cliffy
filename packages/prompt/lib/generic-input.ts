@@ -62,6 +62,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
 
             case event.name === 'c':
                 if ( event.ctrl ) {
+                    this.screen.cursorShow();
                     return Deno.exit( 0 );
                 }
                 if ( event.sequence ) {
