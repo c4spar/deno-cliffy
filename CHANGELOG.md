@@ -1,4 +1,17 @@
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.11.0...v0.11.1) (Wed Jul 15 19:05:33 2020)
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.11.1...v0.11.2) (2020-07-22)
+
+### Features
+
+* **prompt:** add support for custom keys ([5df1f95](https://github.com/c4spar/deno-cli/commit/5df1f95))
+
+### Code Refactoring
+
+* **prompt:** add fallback keys for unsupported keys on windows (#47) ([71f54f5](https://github.com/c4spar/deno-cli/commit/71f54f5))
+* **prompt:** extend Toggle prompt from GenericPrompt (#50) ([cfe2064](https://github.com/c4spar/deno-cli/commit/cfe2064))
+
+
+
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.11.0...v0.11.1) (2020-07-15)
 
 ### Bug Fixes
 
