@@ -84,13 +84,6 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this;
     }
 
-    public indent( width: number, override: boolean = true ): this {
-        if ( override || typeof this.options.indent === 'undefined' ) {
-            this.options.indent = width;
-        }
-        return this;
-    }
-
     public maxCellWidth( width: number | number[], override: boolean = true ): this {
         if ( override || typeof this.options.maxCellWidth === 'undefined' ) {
             this.options.maxCellWidth = width;
@@ -101,6 +94,13 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     public minCellWidth( width: number | number[], override: boolean = true ): this {
         if ( override || typeof this.options.minCellWidth === 'undefined' ) {
             this.options.minCellWidth = width;
+        }
+        return this;
+    }
+
+    public indent( width: number, override: boolean = true ): this {
+        if ( override || typeof this.options.indent === 'undefined' ) {
+            this.options.indent = width;
         }
         return this;
     }
@@ -132,14 +132,6 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this.slice();
     }
 
-    public getIndent(): number {
-        return this.options.indent;
-    }
-
-    public getBorder(): boolean {
-        return this.options.border === true;
-    }
-
     public getMaxCellWidth(): number | number[] {
         return this.options.maxCellWidth;
     }
@@ -148,21 +140,35 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this.options.minCellWidth;
     }
 
+    public getIndent(): number {
+        return this.options.indent;
+    }
+
     public getPadding(): number | number[] {
         return this.options.padding;
     }
 
+    public getBorder(): boolean {
+        return this.options.border === true;
+    }
+
     public hasHeaderBorder(): boolean {
-        return this.headerRow instanceof Row && this.headerRow.hasBorder();
+        return this.getBorder() || (
+            this.headerRow instanceof Row && this.headerRow.hasBorder()
+        );
     }
 
     public hasBodyBorder(): boolean {
-        return this.getBorder() || this.some( row =>
-            row instanceof Row ? row.hasBorder() : row.some( cell =>
-                cell instanceof Cell ? cell.getBorder : false ) );
+        return this.getBorder() ||
+            this.some( row =>
+                row instanceof Row ? row.hasBorder() :
+                    row.some( cell =>
+                        cell instanceof Cell ? cell.getBorder : false
+                    )
+            );
     }
 
     public hasBorder(): boolean {
-        return this.getBorder() || this.hasHeaderBorder() || this.hasBodyBorder();
+        return this.hasHeaderBorder() || this.hasBodyBorder();
     }
 }
