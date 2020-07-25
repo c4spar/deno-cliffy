@@ -17,19 +17,13 @@ export class HelpGenerator {
     private constructor( protected cmd: Command ) {}
 
     private generate(): string {
-
-        let help: string = '';
-
-        help += this.generateHeader();
-        help += this.generateDescription();
-        help += this.generateOptions();
-        help += this.generateCommands();
-        help += this.generateEnvironmentVariables();
-        help += this.generateExamples();
-
-        help += '\n';
-
-        return help;
+        return this.generateHeader() +
+            this.generateDescription() +
+            this.generateOptions() +
+            this.generateCommands() +
+            this.generateEnvironmentVariables() +
+            this.generateExamples() +
+            '\n';
     }
 
     private generateHeader(): string {
@@ -40,7 +34,7 @@ export class HelpGenerator {
                 ] )
                 .indent( this.indent )
                 .padding( 1 )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateDescription(): string {
@@ -54,7 +48,7 @@ export class HelpGenerator {
                 .indent( this.indent * 2 )
                 .maxCellWidth( 140 )
                 .padding( 1 )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateOptions(): string {
@@ -78,7 +72,7 @@ export class HelpGenerator {
                     .padding( [ 2, 2, 2 ] )
                     .indent( this.indent * 2 )
                     .maxCellWidth( [ 60, 60, 80, 60 ] )
-                    .toString();
+                    .toString() + '\n';
         }
 
         return this.label( 'Options' ) +
@@ -92,7 +86,7 @@ export class HelpGenerator {
                 .padding( [ 2, 2 ] )
                 .indent( this.indent * 2 )
                 .maxCellWidth( [ 60, 80, 60 ] )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateCommands(): string {
@@ -114,7 +108,7 @@ export class HelpGenerator {
                     ] )
                     .padding( [ 2, 2, 2 ] )
                     .indent( this.indent * 2 )
-                    .toString();
+                    .toString() + '\n';
         }
 
         return this.label( 'Commands' ) +
@@ -126,7 +120,7 @@ export class HelpGenerator {
                 ] )
                 .padding( [ 2, 2 ] )
                 .indent( this.indent * 2 )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateEnvironmentVariables(): string {
@@ -144,7 +138,7 @@ export class HelpGenerator {
                 ] )
                 .padding( 2 )
                 .indent( this.indent * 2 )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateExamples(): string {
@@ -160,7 +154,7 @@ export class HelpGenerator {
                 .padding( 1 )
                 .indent( this.indent * 2 )
                 .maxCellWidth( 150 )
-                .toString();
+                .toString() + '\n';
     }
 
     private generateHints( option: IFlagOptions ): string {

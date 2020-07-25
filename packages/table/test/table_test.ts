@@ -13,8 +13,7 @@ Deno.test( 'simple table', () => {
         `
 cell1 cell2 cell3
 cell1 cell2 cell3
-cell1 cell2 cell3
-`.slice( 1 ) );
+cell1 cell2 cell3`.slice( 1 ) );
 } );
 
 Deno.test( 'simple table with word break', () => {
@@ -37,8 +36,7 @@ cell cell cell
 cell cell cell
 1    2    3   
           cell
-          3   
-`.slice( 1 ) );
+          3   `.slice( 1 ) );
 } );
 
 Deno.test( 'simple border table', () => {
@@ -57,8 +55,7 @@ Deno.test( 'simple border table', () => {
 │ cell1 │ cell2 │ cell3 │
 ├───────┼───────┼───────┤
 │ cell1 │ cell2 │ cell3 │
-└───────┴───────┴───────┘
-`.slice( 1 ) );
+└───────┴───────┴───────┘`.slice( 1 ) );
 } );
 
 Deno.test( 'simple nested table', () => {
@@ -141,8 +138,7 @@ cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3
 cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3
 cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3
 cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3
-cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3
-`.slice( 1 ) );
+cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3`.slice( 1 ) );
 } );
 
 Deno.test( 'simple nested border table', () => {
@@ -246,8 +242,7 @@ Deno.test( 'simple nested border table', () => {
 │cell1│cell2│cell3│ │cell1│cell2│cell3│ │cell1│cell2│cell3│
 ├─────┼─────┼─────┤ ├─────┼─────┼─────┤ ├─────┼─────┼─────┤
 │cell1│cell2│cell3│ │cell1│cell2│cell3│ │cell1│cell2│cell3│
-└─────┴─────┴─────┘ └─────┴─────┴─────┘ └─────┴─────┴─────┘
-`.slice( 1 ) );
+└─────┴─────┴─────┘ └─────┴─────┴─────┘ └─────┴─────┴─────┘`.slice( 1 ) );
 } );
 
 Deno.test( 'multiline table', () => {
@@ -289,8 +284,7 @@ cell1           cell2             At vero eos et
                                   sanctus est   
                                   Lorem ipsum   
                                   dolor sit     
-                                  amet.         
-`.slice( 1 ) );
+                                  amet.         `.slice( 1 ) );
 } );
 
 Deno.test( 'multiline border table', () => {
@@ -337,8 +331,7 @@ Deno.test( 'multiline border table', () => {
 │               │                 │Lorem ipsum   │
 │               │                 │dolor sit     │
 │               │                 │amet.         │
-└───────────────┴─────────────────┴──────────────┘
-`.slice( 1 ) );
+└───────────────┴─────────────────┴──────────────┘`.slice( 1 ) );
 } );
 
 Deno.test( 'nested multiline border table', () => {
@@ -438,8 +431,7 @@ sed diam nonumy cell2 cell3      cell1 cell2 accusam et justo  cell1           c
 eirmod tempor                                duo.              Stet clita kasd cell2 cell3  
 invidunt ut                      cell1 cell2 cell3             gubergren, no                
 labore.                                                        sea takimata.                
-cell1           cell2 cell3                                                                 
-`.slice( 1 ) );
+cell1           cell2 cell3                                                                 `.slice( 1 ) );
 } );
 
 Deno.test( 'nested multiline border table', () => {
@@ -560,8 +552,7 @@ Deno.test( 'nested multiline border table', () => {
 │labore.        │     │     │      │cell1│cell2│cell3           │  │gubergren, no  │     │     │  
 ├───────────────┼─────┼─────┤      └─────┴─────┴────────────────┘  │sea takimata.  │     │     │  
 │cell1          │cell2│cell3│                                      └───────────────┴─────┴─────┘  
-└───────────────┴─────┴─────┘                                                                     
-`.slice( 1 ) );
+└───────────────┴─────┴─────┘                                                                     `.slice( 1 ) );
 } );
 
 Deno.test( 'table with padding', () => {
@@ -592,6 +583,5 @@ cell1               cell2                 At vero eos et
                                           accusam et    
                                           justo duo     
                                           dolores et ea 
-                                          rebum.        
-`.slice( 1 ) );
+                                          rebum.        `.slice( 1 ) );
 } );

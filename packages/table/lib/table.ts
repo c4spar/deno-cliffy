@@ -80,7 +80,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     }
 
     public render(): this {
-        Deno.stdout.writeSync( encode( this.toString() ) );
+        Deno.stdout.writeSync( encode( this.toString() + '\n' ) );
         return this;
     }
 
