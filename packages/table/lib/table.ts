@@ -28,7 +28,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         border: false,
         maxCellWidth: Infinity,
         minCellWidth: 0,
-        padding: 0,
+        padding: 1,
         chars: border
     };
     private headerRow?: Row;
