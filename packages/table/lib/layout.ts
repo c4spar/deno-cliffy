@@ -115,7 +115,7 @@ export class TableLayout {
             result += this.renderRow( rowSpan, rowIndex, opts );
         }
 
-        return result;
+        return result.slice( 0, -1 );
     }
 
     protected renderRow( rowSpan: number[], rowIndex: number, opts: IRenderSettings, inMultiline?: boolean ): string {
