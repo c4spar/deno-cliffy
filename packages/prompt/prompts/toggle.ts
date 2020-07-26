@@ -1,4 +1,4 @@
-import { blue, dim, underline } from 'https://deno.land/std@v0.61.0/fmt/colors.ts';
+import { blue, dim, underline } from 'https://deno.land/std@v0.62.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericPrompt, GenericPromptOptions, GenericPromptSettings } from '../lib/generic-prompt.ts';

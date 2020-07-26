@@ -1,4 +1,4 @@
-import { encode } from 'https://deno.land/std@v0.61.0/encoding/utf8.ts';
+import { encode } from 'https://deno.land/std@v0.62.0/encoding/utf8.ts';
 import { border, IBorder } from './border.ts';
 import { Cell } from './cell.ts';
 import { TableLayout } from './layout.ts';
