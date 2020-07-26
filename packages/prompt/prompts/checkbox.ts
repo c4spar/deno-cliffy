@@ -188,6 +188,6 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
     }
 
     protected format( value: string[] ): string {
-        return value.join( ', ' );
+        return value.map( val => this.getOptionByValue( val )?.name ?? val ).join( ', ' );
     }
 }
