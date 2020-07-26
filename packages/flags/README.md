@@ -174,4 +174,4 @@ parseFlags( Deno.args, {
 
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

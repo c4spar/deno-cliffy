@@ -164,7 +164,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/header-and-body.ts
 
 ### Table Options
 
-To customize the table, the table class provides a few chainable option methods. To see a list of all available options go to the [API section](#api).
+To customize the table, the table class provides a few chainable option methods. To see a list of all available options go to the [Talbe](#table) API section.
 
 ```typescript
 new Table()
@@ -189,7 +189,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/table-options.ts
 
 ### Row's and Cell's
 
-It is also possible to customize single rows and cell. To do this you can use the `Row` and `Cell` class. The `Row` class is also an `Array` class like the `Table` class. To see a list of all available options go to the [API section](#api).
+It is also possible to customize single rows and cell. To do this you can use the `Row` and `Cell` class. The `Row` class is also an `Array` class like the `Table` class. To see a list of all available options go to the [Row](#row) or [Cell](#cell) API section.
 
 ```typescript
 import { Table, Row, Cell } from 'https://deno.land/x/cliffy@<version>/table.ts';
@@ -495,4 +495,4 @@ Get cell row span.
 
 ## ❯ License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

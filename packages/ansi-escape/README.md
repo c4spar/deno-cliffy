@@ -51,4 +51,4 @@ AnsiEscape.from( Deno.stdout )
 
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

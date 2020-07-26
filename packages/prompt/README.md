@@ -370,4 +370,4 @@ The `Checkbox` prompt has all [base options](#base-options) and the following pr
 
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

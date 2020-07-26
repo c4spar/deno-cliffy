@@ -84,4 +84,4 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read-key.ts
 
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)
