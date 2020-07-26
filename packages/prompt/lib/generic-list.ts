@@ -123,4 +123,8 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> ext
     protected height() {
         return Math.min( this.settings.options.length, this.settings.maxRows || this.settings.options.length );
     }
+
+    protected getOptionByValue( value: string ) {
+        return this.settings.options.find( option => option.value === value );
+    }
 }

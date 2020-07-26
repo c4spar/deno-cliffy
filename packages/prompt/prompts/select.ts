@@ -119,6 +119,6 @@ export class Select extends GenericList<string, string, SelectSettings> {
     }
 
     protected format( value: string ): string {
-        return value;
+        return this.getOptionByValue( value )?.name ?? value;
     }
 }
