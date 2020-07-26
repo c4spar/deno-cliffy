@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img alt="Licence" src="../../assets/img/table/random-table.gif"/>
+  <img alt="table" src="../../assets/img/table/random-table.gif"/>
 </p>
 
 ## ❯ Content
