@@ -1,4 +1,4 @@
-#!/usr/bin/env -S RUST_BACKTRACE=1 deno
+#!/usr/bin/env -S deno run --unstable
 
 import { KeyCode } from '../../packages/keycode/lib/key-code.ts';
 
@@ -6,11 +6,11 @@ async function read(): Promise<void> {
 
     const buffer = new Uint8Array( 8 );
 
-    Deno.setRaw( 0, true );
+    Deno.setRaw( Deno.stdin.rid, true );
     const nread = await Deno.stdin.read( buffer );
-    Deno.setRaw( 0, false );
+    Deno.setRaw( Deno.stdin.rid, false );
 
-    if ( nread === Deno.EOF ) {
+    if ( nread === null ) {
         return;
     }
 
@@ -27,5 +27,7 @@ async function read(): Promise<void> {
 
     await read();
 }
+
+console.log('Hit ctrl + c to exit.');
 
 await read();
