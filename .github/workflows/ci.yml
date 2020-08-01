@@ -28,7 +28,7 @@ jobs:
         run: deno -V
 
       - name: Run command test's
-        run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/option && deno test packages/command/test/type
+        run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/{option,type}
 
       - name: Run flags test's
         run: deno test packages/flags
