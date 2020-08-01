@@ -1,3 +1,48 @@
+# [v0.12.0](https://github.com/c4spar/deno-cli/compare/v0.11.2...v0.12.0) (2020-08-01)
+
+### Features
+
+* **table:** add support for `rowSpan` ([9c05cc3](https://github.com/c4spar/deno-cli/commit/9c05cc3))
+* **table:** add support for `colSpan` ([bb6cae9](https://github.com/c4spar/deno-cli/commit/bb6cae9))
+* **table:** add `.fromJson()` method ([4be3edd](https://github.com/c4spar/deno-cli/commit/4be3edd))
+* **table:** add support for enabling and disabling border per row and cell ([d62182d](https://github.com/c4spar/deno-cli/commit/d62182d))
+* **table:** add `.body()` method to `Table` ([2526ff2](https://github.com/c4spar/deno-cli/commit/2526ff2))
+* **table:** make border chars customizable ([866b71e](https://github.com/c4spar/deno-cli/commit/866b71e))
+
+### Bug Fixes
+
+* **keycode:** `KeyCode.parse(data)` captures only the first character (#54) ([f153909](https://github.com/c4spar/deno-cli/commit/f153909))
+* **prompt:** pasting clipboard into prompt returns corrupted data (#54) ([5de866c](https://github.com/c4spar/deno-cli/commit/5de866c))
+* **prompt:** show option name instead of value as result with select and checkbox prompt (#53) ([1d81235](https://github.com/c4spar/deno-cli/commit/1d81235))
+* **prompt:** cursor not visible after exiting with `ctrl + c` ([110a07e](https://github.com/c4spar/deno-cli/commit/110a07e))
+* **table:** remove trailing line break from `.toString()` method ([3af8850](https://github.com/c4spar/deno-cli/commit/3af8850))
+
+### Code Refactoring
+
+* **table:** set default table padding to `1` ([a6e6aa3](https://github.com/c4spar/deno-cli/commit/a6e6aa3))
+* **table:** reformat table ([16ae13d](https://github.com/c4spar/deno-cli/commit/16ae13d))
+* **table:** add `TableLayout` class ([699c0d1](https://github.com/c4spar/deno-cli/commit/699c0d1))
+* **table:** refactor `.from()` and `.clone()` method's ([ddee9d7](https://github.com/c4spar/deno-cli/commit/ddee9d7))
+
+### Chore
+
+* **ci:** update deno version to v1.2.2 ([3dd48e0](https://github.com/c4spar/deno-cli/commit/3dd48e0), [90f670a](https://github.com/c4spar/deno-cli/commit/90f670a))
+* **nest:** update version to v0.12.0 ([6e212a2](https://github.com/c4spar/deno-cli/commit/6e212a2))
+* **deno**: update deno/std version to v0.63.0 ([82c3eae](https://github.com/c4spar/deno-cli/commit/82c3eae), [adc84c4](https://github.com/c4spar/deno-cli/commit/adc84c4))
+
+### Unit/Integration Tests
+
+* **table:** add colspan and rowspan test's ([d8df570](https://github.com/c4spar/deno-cli/commit/d8df570))
+
+### Documentation Updates
+
+* fix license link ([96988d2](https://github.com/c4spar/deno-cli/commit/96988d2))
+* **changelog:** fix changelog versions ([6e71754](https://github.com/c4spar/deno-cli/commit/6e71754))
+* **keycode:** update keycode example ([ae01931](https://github.com/c4spar/deno-cli/commit/ae01931))
+* **table:** update readme and examples ([e837b71](https://github.com/c4spar/deno-cli/commit/e837b71), [df18516](https://github.com/c4spar/deno-cli/commit/df18516))
+
+
+
 # [v0.11.2](https://github.com/c4spar/deno-cli/compare/v0.11.1...v0.11.2) (2020-07-22)
 
 ### Features
