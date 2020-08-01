@@ -132,13 +132,17 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
             return this.validateValue( value );
         }
 
-        const event: KeyEvent | undefined = await readKeySync();
+        const events: KeyEvent[] = await readKeySync();
 
-        if ( !event ) {
+        if ( !events.length ) {
             return false;
         }
 
-        const done: boolean = await this.handleEvent( event );
+        let done: boolean = false;
+
+        for ( const event of events ) {
+            done = await this.handleEvent( event );
+        }
 
         if ( done ) {
             return this.validateValue( this.getValue() );
