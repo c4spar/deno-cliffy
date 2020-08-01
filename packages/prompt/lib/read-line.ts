@@ -11,9 +11,9 @@ export async function readCharSync(): Promise<Uint8Array | undefined> {
 
     const buffer = new Uint8Array( 8 );
 
-    Deno.setRaw( 0, true );
+    Deno.setRaw( Deno.stdin.rid, true );
     const nread: number | null = await Deno.stdin.read( buffer );
-    Deno.setRaw( 0, false );
+    Deno.setRaw( Deno.stdin.rid, false );
 
     if ( nread === null ) {
         return;
@@ -22,9 +22,9 @@ export async function readCharSync(): Promise<Uint8Array | undefined> {
     return buffer.subarray( 0, nread );
 }
 
-export async function readKeySync(): Promise<KeyEvent | undefined> {
+export async function readKeySync(): Promise<KeyEvent[]> {
 
     const data = await readCharSync();
 
-    return data && KeyCode.parse( data );
+    return data ? KeyCode.parse( data ) : [];
 }
