@@ -14,7 +14,7 @@ const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.
 
 export class KeyCode {
 
-    public static parse( data: Uint8Array | string ): KeyEvent | undefined {
+    public static parse( data: Uint8Array | string ): KeyEvent[] {
 
         try {
             return this.parseEscapeSequence( data );
@@ -24,7 +24,7 @@ export class KeyCode {
             }
         }
 
-        return;
+        return [];
     }
 
     /**
@@ -54,196 +54,207 @@ export class KeyCode {
      *               (right_alt * 8)
      * - two leading ESCs apparently mean the same as one leading ESC
      */
-    protected static parseEscapeSequence( data: Uint8Array | string ): KeyEvent {
+    protected static parseEscapeSequence( data: Uint8Array | string ): KeyEvent[] {
 
         let index = -1;
-
+        const keys: KeyEvent[] = [];
+        const input: string = data instanceof Uint8Array ? decode( data ) : data;
+        const hasNext = () => input.length - 1 >= index + 1;
         const next = () => input[ ++index ];
 
-        let input: string = data instanceof Uint8Array ? decode( data ) : data;
-        let ch: string = next();
-        let s: string = ch;
-        let escaped: boolean = false;
+        parseNext();
 
-        const key: IKey = {
-            name: undefined,
-            sequence: undefined,
-            ctrl: false,
-            meta: false,
-            shift: false
-        };
+        return keys;
 
-        if ( ch === kEscape ) {
-            escaped = true;
-            s += ( ch = next() );
+        function parseNext() {
+            let ch: string = next();
+            let s: string = ch;
+            let escaped: boolean = false;
+
+            const key: IKey = {
+                name: undefined,
+                sequence: undefined,
+                ctrl: false,
+                meta: false,
+                shift: false
+            };
 
             if ( ch === kEscape ) {
+                escaped = true;
                 s += ( ch = next() );
+
+                if ( ch === kEscape ) {
+                    s += ( ch = next() );
+                }
             }
-        }
 
-        if ( escaped && ( ch === 'O' || ch === '[' ) ) {
-            // ANSI escape sequence
-            let code: string = ch;
-            let modifier: number = 0;
+            if ( escaped && ( ch === 'O' || ch === '[' ) ) {
+                // ANSI escape sequence
+                let code: string = ch;
+                let modifier: number = 0;
 
-            if ( ch === 'O' ) {
-                // ESC O letter
-                // ESC O modifier letter
-                s += ( ch = next() );
-
-                if ( ch >= '0' && ch <= '9' ) {
-                    modifier = ( ( ch as any ) >> 0 ) - 1;
-                    s += ( ch = next() );
-                }
-
-                code += ch;
-            } else if ( ch === '[' ) {
-                // ESC [ letter
-                // ESC [ modifier letter
-                // ESC [ [ modifier letter
-                // ESC [ [ num char
-                s += ( ch = next() );
-
-                if ( ch === '[' ) {
-                    // \x1b[[A
-                    //      ^--- escape codes might have a second bracket
-                    code += ch;
-                    s += ( ch = next() );
-                }
-
-                /*
-                 * Here and later we try to buffer just enough data to get
-                 * a complete ascii sequence.
-                 *
-                 * We have basically two classes of ascii characters to process:
-                 *
-                 *
-                 * 1. `\x1b[24;5~` should be parsed as { code: '[24~', modifier: 5 }
-                 *
-                 * This particular example is featuring Ctrl+F12 in xterm.
-                 *
-                 *  - `;5` part is optional, e.g. it could be `\x1b[24~`
-                 *  - first part can contain one or two digits
-                 *
-                 * So the generic regexp is like /^\d\d?(;\d)?[~^$]$/
-                 *
-                 *
-                 * 2. `\x1b[1;5H` should be parsed as { code: '[H', modifier: 5 }
-                 *
-                 * This particular example is featuring Ctrl+Home in xterm.
-                 *
-                 *  - `1;5` part is optional, e.g. it could be `\x1b[H`
-                 *  - `1;` part is optional, e.g. it could be `\x1b[5H`
-                 *
-                 * So the generic regexp is like /^((\d;)?\d)?[A-Za-z]$/
-                 *
-                 */
-                const cmdStart: number = s.length - 1;
-
-                // Skip one or two leading digits
-                if ( ch >= '0' && ch <= '9' ) {
+                if ( ch === 'O' ) {
+                    // ESC O letter
+                    // ESC O modifier letter
                     s += ( ch = next() );
 
                     if ( ch >= '0' && ch <= '9' ) {
+                        modifier = ( ( ch as any ) >> 0 ) - 1;
                         s += ( ch = next() );
                     }
-                }
 
-                // skip modifier
-                if ( ch === ';' ) {
+                    code += ch;
+                } else if ( ch === '[' ) {
+                    // ESC [ letter
+                    // ESC [ modifier letter
+                    // ESC [ [ modifier letter
+                    // ESC [ [ num char
                     s += ( ch = next() );
 
+                    if ( ch === '[' ) {
+                        // \x1b[[A
+                        //      ^--- escape codes might have a second bracket
+                        code += ch;
+                        s += ( ch = next() );
+                    }
+
+                    /*
+                     * Here and later we try to buffer just enough data to get
+                     * a complete ascii sequence.
+                     *
+                     * We have basically two classes of ascii characters to process:
+                     *
+                     *
+                     * 1. `\x1b[24;5~` should be parsed as { code: '[24~', modifier: 5 }
+                     *
+                     * This particular example is featuring Ctrl+F12 in xterm.
+                     *
+                     *  - `;5` part is optional, e.g. it could be `\x1b[24~`
+                     *  - first part can contain one or two digits
+                     *
+                     * So the generic regexp is like /^\d\d?(;\d)?[~^$]$/
+                     *
+                     *
+                     * 2. `\x1b[1;5H` should be parsed as { code: '[H', modifier: 5 }
+                     *
+                     * This particular example is featuring Ctrl+Home in xterm.
+                     *
+                     *  - `1;5` part is optional, e.g. it could be `\x1b[H`
+                     *  - `1;` part is optional, e.g. it could be `\x1b[5H`
+                     *
+                     * So the generic regexp is like /^((\d;)?\d)?[A-Za-z]$/
+                     *
+                     */
+                    const cmdStart: number = s.length - 1;
+
+                    // Skip one or two leading digits
                     if ( ch >= '0' && ch <= '9' ) {
-                        s += next();
+                        s += ( ch = next() );
+
+                        if ( ch >= '0' && ch <= '9' ) {
+                            s += ( ch = next() );
+                        }
+                    }
+
+                    // skip modifier
+                    if ( ch === ';' ) {
+                        s += ( ch = next() );
+
+                        if ( ch >= '0' && ch <= '9' ) {
+                            s += next();
+                        }
+                    }
+
+                    /*
+                     * We buffered enough data, now trying to extract code
+                     * and modifier from it
+                     */
+                    const cmd: string = s.slice( cmdStart );
+                    let match: RegExpMatchArray | null;
+
+                    if ( ( match = cmd.match( /^(\d\d?)(;(\d))?([~^$])$/ ) ) ) {
+                        code += match[ 1 ] + match[ 4 ];
+                        modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
+                    } else if ( ( match = cmd.match( /^((\d;)?(\d))?([A-Za-z])$/ ) ) ) {
+                        code += match[ 4 ];
+                        modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
+                    } else {
+                        code += cmd;
                     }
                 }
 
-                /*
-                 * We buffered enough data, now trying to extract code
-                 * and modifier from it
-                 */
-                const cmd: string = s.slice( cmdStart );
-                let match: RegExpMatchArray | null;
+                // Parse the key modifier
+                key.ctrl = !!( modifier & 4 );
+                key.meta = !!( modifier & 10 );
+                key.shift = !!( modifier & 1 );
 
-                if ( ( match = cmd.match( /^(\d\d?)(;(\d))?([~^$])$/ ) ) ) {
-                    code += match[ 1 ] + match[ 4 ];
-                    modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
-                } else if ( ( match = cmd.match( /^((\d;)?(\d))?([A-Za-z])$/ ) ) ) {
-                    code += match[ 4 ];
-                    modifier = ( ( match[ 3 ] as any ) || 1 ) - 1;
+                // Parse the key itself
+                if ( code in KeyMap ) {
+                    key.name = KeyMap[ code ];
+                } else if ( code in KeyMapShift ) {
+                    key.name = KeyMapShift[ code ];
+                    key.shift = true;
+                } else if ( code in KeyMapCtrl ) {
+                    key.name = KeyMapCtrl[ code ];
+                    key.ctrl = true;
                 } else {
-                    code += cmd;
+                    key.name = 'undefined';
                 }
-            }
 
-            // Parse the key modifier
-            key.ctrl = !!( modifier & 4 );
-            key.meta = !!( modifier & 10 );
-            key.shift = !!( modifier & 1 );
-
-            // Parse the key itself
-            if ( code in KeyMap ) {
-                key.name = KeyMap[ code ];
-            } else if ( code in KeyMapShift ) {
-                key.name = KeyMapShift[ code ];
-                key.shift = true;
-            } else if ( code in KeyMapCtrl ) {
-                key.name = KeyMapCtrl[ code ];
+            } else if ( ch === '\r' ) {
+                // carriage return
+                key.name = 'return';
+            } else if ( ch === '\n' ) {
+                // Enter, should have been called linefeed
+                key.name = 'enter';
+            } else if ( ch === '\t' ) {
+                // tab
+                key.name = 'tab';
+            } else if ( ch === '\b' || ch === '\x7f' ) {
+                // backspace or ctrl+h
+                key.name = 'backspace';
+                key.meta = escaped;
+            } else if ( ch === kEscape ) {
+                // escape key
+                key.name = 'escape';
+                key.meta = escaped;
+            } else if ( ch === ' ' ) {
+                key.name = 'space';
+                key.meta = escaped;
+            } else if ( !escaped && ch <= '\x1a' ) {
+                // ctrl+letter
+                key.name = String.fromCharCode( ch.charCodeAt( 0 ) + 'a'.charCodeAt( 0 ) - 1 );
                 key.ctrl = true;
-            } else {
-                key.name = 'undefined';
+            } else if ( /^[0-9A-Za-z]$/.test( ch ) ) {
+                // Letter, number, shift+letter
+                key.name = ch.toLowerCase();
+                key.shift = /^[A-Z]$/.test( ch );
+                key.meta = escaped;
+            } else if ( escaped ) {
+                // Escape sequence timeout
+                key.name = ch.length ? undefined : 'escape';
+                key.meta = true;
             }
 
-        } else if ( ch === '\r' ) {
-            // carriage return
-            key.name = 'return';
-        } else if ( ch === '\n' ) {
-            // Enter, should have been called linefeed
-            key.name = 'enter';
-        } else if ( ch === '\t' ) {
-            // tab
-            key.name = 'tab';
-        } else if ( ch === '\b' || ch === '\x7f' ) {
-            // backspace or ctrl+h
-            key.name = 'backspace';
-            key.meta = escaped;
-        } else if ( ch === kEscape ) {
-            // escape key
-            key.name = 'escape';
-            key.meta = escaped;
-        } else if ( ch === ' ' ) {
-            key.name = 'space';
-            key.meta = escaped;
-        } else if ( !escaped && ch <= '\x1a' ) {
-            // ctrl+letter
-            key.name = String.fromCharCode( ch.charCodeAt( 0 ) + 'a'.charCodeAt( 0 ) - 1 );
-            key.ctrl = true;
-        } else if ( /^[0-9A-Za-z]$/.test( ch ) ) {
-            // Letter, number, shift+letter
-            key.name = ch.toLowerCase();
-            key.shift = /^[A-Z]$/.test( ch );
-            key.meta = escaped;
-        } else if ( escaped ) {
-            // Escape sequence timeout
-            key.name = ch.length ? undefined : 'escape';
-            key.meta = true;
-        }
-
-        key.sequence = s;
-
-        if ( s.length !== 0 && ( key.name !== undefined || escaped ) ) {
-            /* Named character or sequence */
-            key.sequence = escaped ? undefined : s;
-            return KeyEvent.from( key );
-        } else if ( charLengthAt( s, 0 ) === s.length ) {
-            /* Single unnamed character, e.g. "." */
             key.sequence = s;
-            return KeyEvent.from( key );
-        }
 
-        /* Unrecognized or broken escape sequence. */
-        throw new Error( 'Unrecognized or broken escape sequence' );
+            if ( s.length !== 0 && ( key.name !== undefined || escaped ) ) {
+                /* Named character or sequence */
+                key.sequence = escaped ? undefined : s;
+                keys.push( KeyEvent.from( key ) );
+            } else if ( charLengthAt( s, 0 ) === s.length ) {
+                /* Single unnamed character, e.g. "." */
+                key.sequence = s;
+                keys.push( KeyEvent.from( key ) );
+            } else {
+                /* Unrecognized or broken escape sequence. */
+                throw new Error( 'Unrecognized or broken escape sequence' );
+            }
+
+            if ( hasNext() ) {
+                parseNext();
+            }
+        }
     }
 }
 
