@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        deno_version: [ 'v1.2.0', 'v1.2.1' ]
+        deno_version: [ 'v1.2.0', 'v1.2.2' ]
 
     steps:
       - name: Configure git
