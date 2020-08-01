@@ -1,4 +1,4 @@
-import { encode } from 'https://deno.land/std@v0.62.0/encoding/utf8.ts';
+import { encode } from 'https://deno.land/std@v0.63.0/encoding/utf8.ts';
 import { cursor, erase, image, ImageOptions, link, scroll } from './csi.ts';
 
 export class AnsiEscape {

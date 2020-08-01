@@ -1,4 +1,4 @@
-import { green, magenta, red, yellow } from 'https://deno.land/std@v0.62.0/fmt/colors.ts';
+import { green, magenta, red, yellow } from 'https://deno.land/std@v0.63.0/fmt/colors.ts';
 import { OptionType } from '../../flags/lib/types.ts';
 import { IArgumentDetails } from './types.ts';
 

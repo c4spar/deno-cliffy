@@ -1,4 +1,4 @@
-import { bold, red } from 'https://deno.land/std@v0.62.0/fmt/colors.ts';
+import { bold, red } from 'https://deno.land/std@v0.63.0/fmt/colors.ts';
 import { Checkbox } from '../prompts/checkbox.ts';
 import { assertEquals, assertThrowsAsync } from './lib/assert.ts';
 

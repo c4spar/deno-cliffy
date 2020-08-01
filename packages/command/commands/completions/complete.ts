@@ -1,4 +1,4 @@
-import { encode } from 'https://deno.land/std@v0.62.0/encoding/utf8.ts';
+import { encode } from 'https://deno.land/std@v0.63.0/encoding/utf8.ts';
 import { IFlags } from '../../../flags/lib/types.ts';
 import { Command } from '../../lib/command.ts';
 import { ICompleteSettings } from '../../lib/types.ts';
