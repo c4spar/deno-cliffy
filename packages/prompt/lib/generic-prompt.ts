@@ -38,12 +38,9 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
 
     public async prompt(): Promise<T> {
         try {
-            const result: T = await this.execute();
+            return await this.execute();
+        } finally {
             this.screen.cursorShow();
-            return result;
-        } catch ( e ) {
-            this.screen.cursorShow();
-            throw e;
         }
     }
 
