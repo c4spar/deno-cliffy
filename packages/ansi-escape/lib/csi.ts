@@ -104,9 +104,9 @@ export const link = ( text: string, url: string ) => [
 ].join( '' );
 
 export interface ImageOptions {
-    width?: number,
-    height?: number,
-    preserveAspectRatio?: boolean
+    width?: number;
+    height?: number;
+    preserveAspectRatio?: boolean;
 }
 
 /** Render image. */
