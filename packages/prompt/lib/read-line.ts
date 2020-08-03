@@ -1,5 +1,5 @@
-import { decode } from 'https://deno.land/std@v0.63.0/encoding/utf8.ts';
-import { BufReader } from 'https://deno.land/std@v0.63.0/io/bufio.ts';
+import { decode } from 'https://deno.land/std@0.63.0/encoding/utf8.ts';
+import { BufReader } from 'https://deno.land/std@0.63.0/io/bufio.ts';
 import { KeyCode, KeyEvent } from '../../keycode/mod.ts';
 
 export async function readLineSync(): Promise<string | undefined> {
