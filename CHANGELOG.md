@@ -1,3 +1,11 @@
+# [v0.12.1](https://github.com/c4spar/deno-cli/compare/v0.12.0...v0.12.1) (2020-08-03)
+
+### Bug Fixes
+
+* remove "v" prefix from deno std url (#57) ([10c951a](https://github.com/c4spar/deno-cli/commit/10c951a))
+
+
+
 # [v0.12.0](https://github.com/c4spar/deno-cli/compare/v0.11.2...v0.12.0) (2020-08-01)
 
 ### Features
