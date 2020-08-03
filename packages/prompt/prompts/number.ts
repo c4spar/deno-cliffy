@@ -1,4 +1,4 @@
-import { blue } from 'https://deno.land/std@v0.63.0/fmt/colors.ts';
+import { blue } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import { Figures } from '../lib/figures.ts';
 import { GenericInput, GenericInputKeys, GenericInputPromptOptions, GenericInputPromptSettings } from '../lib/generic-input.ts';
