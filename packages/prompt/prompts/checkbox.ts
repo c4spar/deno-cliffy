@@ -51,10 +51,6 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
     }
 
     public static async prompt( options: CheckboxOptions ): Promise<string[]> {
-
-        const items: CheckboxOption[] = this.mapValues( options.options );
-        const values: CheckboxValueSettings = items.map( item => this.mapItem( item, options.default ) );
-
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
             listPointer: blue( Figures.POINTER ),
@@ -72,7 +68,7 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
                 check: [ 'space' ],
                 ...( options.keys ?? {} )
             },
-            options: values
+            options: Checkbox.mapOptions( options )
         } ).prompt();
     }
 
@@ -81,6 +77,11 @@ export class Checkbox extends GenericList<string[], string[], CheckboxSettings> 
             ...super.separator(),
             icon: false
         };
+    }
+
+    protected static mapOptions( options: CheckboxOptions ): CheckboxValueSettings {
+        return this.mapValues( options.options )
+            .map( ( item ) => this.mapItem( item, options.default ) );
     }
 
     protected static mapValues( optValues: CheckboxValueOptions ): CheckboxOption[] {

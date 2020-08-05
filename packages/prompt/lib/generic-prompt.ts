@@ -21,8 +21,13 @@ export interface GenericPromptSettings<T, V> extends GenericPromptOptions<T, V> 
     pointer: string;
 }
 
-export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>> {
+export interface StaticGenericPrompt<T, V, O extends GenericPromptOptions<T, V>, S extends GenericPromptSettings<T, V>, P extends GenericPrompt<T, V, S>, > {
+    inject?( value: T ): void;
 
+    prompt( options: O ): Promise<T>;
+}
+
+export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>, > {
     protected static injectedValue: any | undefined;
 
     protected screen = AnsiEscape.from( Deno.stdout );
@@ -34,7 +39,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>>
         GenericPrompt.injectedValue = value;
     }
 
-    protected constructor( protected settings: S ) {}
+    protected constructor( protected readonly settings: S ) {}
 
     public async prompt(): Promise<T> {
         try {

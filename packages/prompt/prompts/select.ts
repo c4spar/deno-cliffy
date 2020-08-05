@@ -20,26 +20,26 @@ export interface SelectKeys {
 interface SelectKeysSettings extends Required<SelectKeys> {}
 
 export interface SelectOptions extends GenericListOptions<string, string> {
+    options: SelectValueOptions;
     keys?: SelectKeys;
 }
 
-interface SelectSettings extends GenericListSettings<string, string> {
+export interface SelectSettings extends GenericListSettings<string, string> {
+    options: SelectValueSettings;
     keys: SelectKeysSettings;
 }
 
 export class Select extends GenericList<string, string, SelectSettings> {
 
-    protected selected: number = typeof this.settings.default !== 'undefined' ? this.settings.options.findIndex( item => item.name === this.settings.default ) || 0 : 0;
+    protected selected: number = typeof this.settings.default !== 'undefined'
+        ? this.settings.options.findIndex( ( item ) => item.name === this.settings.default ) || 0
+        : 0;
 
     public static inject( value: string ): void {
         GenericPrompt.inject( value );
     }
 
     public static async prompt( options: SelectOptions ): Promise<string> {
-
-        const items: SelectOption[] = this.mapValues( options.options );
-        const values: SelectValueSettings = items.map( item => this.mapItem( item ) );
-
         return new this( {
             pointer: blue( Figures.POINTER_SMALL ),
             listPointer: blue( Figures.POINTER ),
@@ -52,8 +52,12 @@ export class Select extends GenericList<string, string, SelectSettings> {
                 submit: [ 'return', 'enter' ],
                 ...( options.keys ?? {} )
             },
-            options: values
+            options: Select.mapOptions( options )
         } ).prompt();
+    }
+
+    protected static mapOptions( options: SelectOptions ): SelectValueSettings {
+        return this.mapValues( options.options ).map( ( item ) => this.mapItem( item ) );
     }
 
     protected static mapValues( optValues: SelectValueOptions ): SelectOption[] {
