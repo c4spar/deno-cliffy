@@ -1,10 +1,10 @@
 import { encode } from 'https://deno.land/std@0.63.0/encoding/utf8.ts';
 import { blue, bold, dim, green, red, yellow } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
 import { AnsiEscape } from '../../ansi-escape/lib/ansi-escape.ts';
+import { KeyCode } from '../../keycode/lib/key-code.ts';
 import { KeyEvent } from '../../keycode/lib/key-event.ts';
 import format from '../../x/format.ts';
 import { Figures } from './figures.ts';
-import { readKeySync } from './read-line.ts';
 
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
@@ -134,7 +134,7 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>,
             return this.validateValue( value );
         }
 
-        const events: KeyEvent[] = await readKeySync();
+        const events: KeyEvent[] = await this.readKey();
 
         if ( !events.length ) {
             return false;
@@ -151,6 +151,28 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>,
         }
 
         return false;
+    }
+
+    protected async readKey(): Promise<KeyEvent[]> {
+
+        const data: Uint8Array = await this.readChar();
+
+        return data.length ? KeyCode.parse( data ) : [];
+    }
+
+    protected async readChar(): Promise<Uint8Array> {
+
+        const buffer = new Uint8Array( 8 );
+
+        Deno.setRaw( Deno.stdin.rid, true );
+        const nread: number | null = await Deno.stdin.read( buffer );
+        Deno.setRaw( Deno.stdin.rid, false );
+
+        if ( nread === null ) {
+            return buffer;
+        }
+
+        return buffer.subarray( 0, nread );
     }
 
     protected transformValue( value: V ): T | undefined {
