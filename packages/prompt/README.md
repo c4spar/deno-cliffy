@@ -22,42 +22,251 @@
 </p>
 
 <p align="center">
-  <b> Create beautiful interactive prompts</b></br>
-  <sub>>_ Input, Number, Confirm, Toggle, List, Select, Checkbox and many more...<sub>
+  <b>Interactive prompt's for Deno with intelligent type interface </b></br>
+</p>
+
+<p align="center">
+  <img alt="prompt" src="../../assets/img/prompt/prompt-list.gif"/>
 </p>
 
 ## ❯ Content
 
+* [Install](#-install)
 * [Usage](#-usage)
+    * [Single Prompt](#single-prompt)
+    * [Prompt List](#prompt-list)
+    * [Dynamic Prompts](#dynamic-prompts)
+    * [Custom Prompts](#custom-prompts)
+* [API](#-api)
 * [Types](#-types)
+
+## ❯ Install
+
+This module can be imported directly from the repo and from following registries.
+
+Deno Registry
+
+```typescript
+import { prompt } from 'https://deno.land/x/cliffy@<version>/prompt.ts';
+```
+
+Nest Registry
+
+```typescript
+import { prompt } from 'https://x.nest.land/cliffy@<version>/prompt.ts';
+```
+
+Github
+
+```typescript
+import { prompt } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/prompt.ts';
+```
 
 ## ❯ Usage
 
 ### Single Prompt
+Each prompt type is usable as standalone module and can be imported directly from the prompt specific module or from the main prompt module.
+Each prompt has a static prompt method which accepts a prompt message or an options object and returns the prompt result.
 
-Execute a single prompt with a single message which returns the user input.
+Execute a single prompt with a single message.
 
 ```typescript
-const name: string = await Input.prompt(`What's your name?`);
+import { Input } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const name: string = await Input.prompt( `What's your name?` );
 ```
 
 Execute a single prompt with an options object.
 
 ```typescript
-const name: string = await Input.prompt({message: `What's your name?`});
+import { Input } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const name: string = await Input.prompt( { message: `Choose a username?`, minLength: 8 } );
 ```
-
-### Prompt Chain
-
-> Work in progress
 
 ### Prompt List
 
-> Work in progress
+To execute a list of prompts you can use the `prompt()` method. The prompt method accapts an array of [prompt options](#-types) combined with a `name` and `type` property. **Make sure to give each prompt a unique name to prevent overwriting values!**
+
+Unlike npm's inquerer, the `type` property accepts a prompt object and not the name of the prompt. This makes it possible to extract the options and return types of each prompt to get typed options for any prompt and a **typed result object**. This works also with [custom prompts](#custom-prompts) which are easily implemented. Another advantage is that you only import the modules that you really need.
+
+```typescript
+import { prompt, Input, Number, Confirm, Checkbox } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const result = await prompt( [ {
+    name: 'name',
+    message: `What's your name?`,
+    type: Input
+}, {
+    name: 'age',
+    message: 'How old are you?',
+    type: Number
+}, {
+    name: 'like',
+    message: `Do you like animal's?`,
+    type: Confirm
+}, {
+    name: 'animals',
+    message: `Select some animal's`,
+    type: Checkbox,
+    options: [ 'dog', 'cat', 'snake' ]
+} ] );
+
+console.log( result );
+
+// if ( result.foo ) {} // error: Property 'foo' does not exist
+// if ( result.name && isNaN( result.name ) ) {} // error: Argument of type 'string' is not assignable to parameter of type 'number'.
+// if ( result.age && isNaN( result.age ) ) {} // no error: age is of type number
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt-list.ts
+```
 
 ### Dynamic Prompts
 
-> Work in progress
+You can dynamicly control the flow of the prompt list with the `before` and `after` callbacks which works like a middleware function. The first argument is the `result` object and the second argument a `next()` method. The next method calls the next prompt in the list if no argument is passed to it. To jump to a specific prompt pass the name or the index of the prompt to the next method. To skip the next prompt pass true to it. To skip all other prompts simple omit the next call.
+
+```typescript
+import { prompt, Number, Confirm, Checkbox } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const result = await prompt( [ {
+    name: 'animals',
+    message: `Select some animal's`,
+    type: Checkbox,
+    options: [ 'dog', 'cat', 'snake' ]
+}, {
+    name: 'like',
+    message: `Do you like animal's?`,
+    type: Confirm,
+    after: async ( { like }, next ) => { // executed after like prompt
+        if ( like ) {
+            await next(); // run age prompt
+        } else {
+            await next( 'like' ); // run like prompt again
+        }
+    }
+}, {
+    name: 'age',
+    message: 'How old are you?',
+    type: Number,
+    before: async ( { animals }, next ) => { // executed before age prompt
+        if ( animals?.length === 3 ) {
+            await next(); // run age prompt
+        } else {
+            await next( 'animals' ); // begin from start
+        }
+    }
+} ] );
+
+console.log( result );
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/dynamic-prompts.ts
+```
+
+### Custom Prompts
+
+A prompt is nothing more than an object with a prompt method. You can use a plain object or a class with a static prompt method.
+The prompt method accepts an options object as argument and the return value will be stored in the results object.
+Be shure to define an options and return type for your custom prompt method. Cliffy extracts the type of the options and return value to get **typed options** and a **typed result object** also for custom prompts.
+
+```typescript
+import { BufReader } from 'https://deno.land/std/io/bufio.ts';
+import { AnsiEscape } from 'https://deno.land/x/cliffy/ansi-escape.ts';
+import { prompt, Input, Figures } from 'https://deno.land/x/cliffy/prompt.ts';
+
+const result = await prompt( [ {
+    name: 'text',
+    message: `Enter some text`,
+    // build-in prompt
+    type: Input
+}, {
+    name: 'customText',
+    message: `Enter more text`,
+    // using an object/method as custom prompt
+    type: {
+        async prompt( options: { message: string } ): Promise<string> {
+
+            const message = ` ? ${ options.message } ${ Figures.POINTER_SMALL } `;
+            await Deno.stdout.write( new TextEncoder().encode( message ) );
+
+            const result = await new BufReader( Deno.stdin ).readLine();
+
+            return result ? new TextDecoder().decode( result.line ) : '';
+        }
+    }
+}, {
+    name: 'customNumber',
+    message: `Enter a number`,
+    // using a class as custom prompt
+    type: class CustomPrompt {
+        static async prompt( options: { message: string }, error?: string ): Promise<number> {
+
+            const screen = AnsiEscape.from( Deno.stdout );
+
+            const message = ` ? ${ options.message } ${ Figures.POINTER_SMALL } `;
+            await Deno.stdout.write( new TextEncoder().encode( message ) );
+
+            if ( error ) {
+                screen.cursorSave();
+                await Deno.stdout.write( new TextEncoder().encode( '\n ' + error ) );
+                screen.cursorRestore();
+            }
+
+            const readLineResult = await new BufReader( Deno.stdin ).readLine();
+            const result: number = Number( readLineResult ? new TextDecoder().decode( readLineResult.line ) : null );
+
+            if ( isNaN( result ) ) {
+                screen.cursorLeft()
+                    .cursorUp()
+                    .eraseDown();
+
+                return this.prompt( options, `${ result } is not a number.` );
+            }
+
+            return result;
+        }
+    }
+} ] );
+
+console.log( result );
+
+// if ( result.foo ) {} // error: Property 'foo' does not exist
+// if ( result.customText && isNaN( result.customText ) ) {} // error: Argument of type 'string' is not assignable to parameter of type 'number'.
+// if ( result.customNumber && isNaN( result.customNumber ) ) {} // no error: customNumber is of type number
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom-prompts.ts
+```
+
+## ❯ API
+
+### prompt(prompts, options)
+
+Execute a list of prompts.
+
+An prompt object has following options and all type specific options. See the list of [prompt types](#-types) for all available options.
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| name | `string` | Yes | The response will be saved under this key/property in the returned response object. |
+| type | `string` | Yes | Defines the type of prompt to display. See the list of [prompt types](#-types) for valid values. |
+| before | `(result, next) => Promise<void>` | No | `next()`execute's the next prompt in the list (for the before callback it's the current prompt). To change the index to a specific prompt you can pass the name or index of the prompt to the `next()` method. To skip this prompt you can pass `true` to the `next()` method. If `next()` isn't called all other prompts will be skipped. |
+| after | `(result, next) => Promise<void>` | No | Same as `before` but will be executed *after* the prompt. |
+
+The prompt method has also following global options.
+
+| Param | Type | Required | Description |
+| ----- | :--: | :--: | ----------- |
+| before | `(result, next) => Promise<void>` | No | Same as above but will be executed before every prompt. |
+| after | `(result, next) => Promise<void>` | No | Same as above but will be executed after every prompt. |
+
+### Prompt.prompt(options)
+
+For all available options see [prompt types](#-types).
 
 ## ❯ Types
 

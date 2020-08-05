@@ -29,7 +29,7 @@ export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
     maxRows: number;
 }
 
-export abstract class GenericList<T, V, S extends GenericListSettings<T, V>> extends GenericPrompt<T, V, S> {
+export abstract class GenericList<T, V, S extends GenericListSettings<T, V>, > extends GenericPrompt<T, V, S> {
 
     protected index: number = 0;
     protected selected: number = 0;

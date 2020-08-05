@@ -20,7 +20,7 @@ export interface GenericInputPromptSettings<T> extends GenericPromptSettings<T, 
     keys?: GenericInputKeys;
 }
 
-export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> extends GenericPrompt<T, string, S> {
+export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>, > extends GenericPrompt<T, string, S> {
 
     protected input: string = '';
     protected index: number = 0;
@@ -73,7 +73,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>> e
             // case 'up': // scroll history?
             //     break;
             //
-            // case 'down':  // scroll history?
+            // case 'down': // scroll history?
             //     break;
 
             case this.isKey( this.settings.keys, 'moveCursorLeft', event ):
