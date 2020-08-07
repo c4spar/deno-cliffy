@@ -1,4 +1,4 @@
-import camelCase from '../x/camelCase.ts';
+import { paramCaseToCamelCase } from './_utils.ts';
 import { normalize } from './normalize.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, IType, OptionType } from './types.ts';
 import { boolean } from './types/boolean.ts';
@@ -94,7 +94,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                 throw new Error( `Missing name for option: ${ current }` );
             }
 
-            const friendlyName: string = camelCase( option.name );
+            const friendlyName: string = paramCaseToCamelCase( option.name );
 
             if ( typeof flags[ friendlyName ] !== 'undefined' && !option.collect ) {
                 throw new Error( `Duplicate option: ${ current }` );

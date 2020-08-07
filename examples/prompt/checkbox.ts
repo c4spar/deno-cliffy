@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { Checkbox } from '../../prompt/mod.ts';
+import { Checkbox } from '../../prompt/checkbox.ts';
 
 const colors: string[] = await Checkbox.prompt( {
     message: `Pick a color`,
