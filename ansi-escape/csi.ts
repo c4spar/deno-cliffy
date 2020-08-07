@@ -8,14 +8,14 @@ const SEP = ';';
 
 export const cursor = {
     /** Move cursor to x, y, counting from the top left corner. */
-    to( x: number, y?: number ) {
+    to( x: number, y?: number ): string {
         if ( typeof y !== 'number' ) {
             return `${ CSI }${ x }G`;
         }
         return `${ CSI }${ y };${ x }H`;
     },
     /** Move cursor by offset. */
-    move( x: number, y: number ) {
+    move( x: number, y: number ): string {
         let ret = '';
 
         if ( x < 0 ) {
@@ -33,17 +33,17 @@ export const cursor = {
         return ret;
     },
     /** Move cursor up by n lines. */
-    up: ( count: number = 1 ) => `${ CSI }${ count }A`,
+    up: ( count: number = 1 ): string => `${ CSI }${ count }A`,
     /** Move cursor down by n lines. */
-    down: ( count: number = 1 ) => `${ CSI }${ count }B`,
+    down: ( count: number = 1 ): string => `${ CSI }${ count }B`,
     /** Move cursor right by n lines. */
-    forward: ( count: number = 1 ) => `${ CSI }${ count }C`,
+    forward: ( count: number = 1 ): string => `${ CSI }${ count }C`,
     /** Move cursor left by n lines. */
-    backward: ( count: number = 1 ) => `${ CSI }${ count }D`,
+    backward: ( count: number = 1 ): string => `${ CSI }${ count }D`,
     /** Move cursor to the beginning of the line n lines down. */
-    nextLine: ( count: number = 1 ) => `${ CSI }E`.repeat( count ),
+    nextLine: ( count: number = 1 ): string => `${ CSI }E`.repeat( count ),
     /** Move cursor to the beginning of the line n lines up. */
-    prevLine: ( count: number = 1 ) => `${ CSI }F`.repeat( count ),
+    prevLine: ( count: number = 1 ): string => `${ CSI }F`.repeat( count ),
     /** Move cursor to first column of current row. */
     left: `${ CSI }G`,
     /** Hide cursor. */
@@ -58,18 +58,18 @@ export const cursor = {
 
 export const scroll = {
     /** Scroll window up by n lines. */
-    up: ( count: number = 1 ) => `${ CSI }S`.repeat( count ),
+    up: ( count: number = 1 ): string => `${ CSI }S`.repeat( count ),
     /** Scroll window down by n lines. */
-    down: ( count: number = 1 ) => `${ CSI }T`.repeat( count )
+    down: ( count: number = 1 ): string => `${ CSI }T`.repeat( count )
 };
 
 export const erase = {
     /** Clear screen. */
     screen: `${ CSI }2J`,
     /** Clear screen up. */
-    up: ( count: number = 1 ) => `${ CSI }1J`.repeat( count ),
+    up: ( count: number = 1 ): string => `${ CSI }1J`.repeat( count ),
     /** Clear screen down. */
-    down: ( count: number = 1 ) => `${ CSI }0J`.repeat( count ),
+    down: ( count: number = 1 ): string => `${ CSI }0J`.repeat( count ),
     /** Clear current line. */
     line: `${ CSI }2K`,
     /** Clear to line end. */
@@ -77,7 +77,7 @@ export const erase = {
     /** Clear to line start. */
     lineStart: `${ CSI }1K`,
     /** Clear n line's up. */
-    lines( count: number ) {
+    lines( count: number ): string {
         let clear = '';
         for ( let i = 0; i < count; i++ ) {
             clear += this.line + ( i < count - 1 ? cursor.up() : '' );
@@ -88,7 +88,7 @@ export const erase = {
 };
 
 /** Render link. */
-export const link = ( text: string, url: string ) => [
+export const link = ( text: string, url: string ): string => [
     OSC,
     '8',
     SEP,
@@ -110,8 +110,7 @@ export interface ImageOptions {
 }
 
 /** Render image. */
-export const image = ( buffer: Uint8Array, options?: ImageOptions ) => {
-
+export const image = ( buffer: Uint8Array, options?: ImageOptions ): string => {
     let ret = `${ OSC }1337;File=inline=1`;
 
     if ( options?.width ) {
