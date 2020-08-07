@@ -1,14 +1,14 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { rgb24 } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
-import { prompt } from '../../packages/prompt/lib/prompt.ts';
-import { Checkbox } from '../../packages/prompt/prompts/checkbox.ts';
-import { Input } from '../../packages/prompt/prompts/input.ts';
-import { List } from '../../packages/prompt/prompts/list.ts';
-import { Number } from '../../packages/prompt/prompts/number.ts';
-import { Secret } from '../../packages/prompt/prompts/secret.ts';
-import { Select } from '../../packages/prompt/prompts/select.ts';
-import { Toggle } from '../../packages/prompt/prompts/toggle.ts';
+import { prompt } from '../../prompt/prompt.ts';
+import { Checkbox } from '../../prompt/checkbox.ts';
+import { Input } from '../../prompt/input.ts';
+import { List } from '../../prompt/list.ts';
+import { Number } from '../../prompt/number.ts';
+import { Secret } from '../../prompt/secret.ts';
+import { Select } from '../../prompt/select.ts';
+import { Toggle } from '../../prompt/toggle.ts';
 
 const colors: Record<string, number> = {
     alloyOrange: 0xC46210,

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { Cell } from '../../packages/table/lib/cell.ts';
-import { Table } from '../../packages/table/lib/table.ts';
+import { Cell } from '../../table/cell.ts';
+import { Table } from '../../table/table.ts';
 
 Table.from( [
         [ Cell.from( 'Row 1 & 2 Column 1' ).rowSpan( 2 ), 'Row 1 Column 2', 'Row 1 Column 3' ],

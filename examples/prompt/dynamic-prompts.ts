@@ -1,9 +1,9 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { prompt } from '../../packages/prompt/lib/prompt.ts';
-import { Checkbox } from '../../packages/prompt/prompts/checkbox.ts';
-import { Confirm } from '../../packages/prompt/prompts/confirm.ts';
-import { Number } from '../../packages/prompt/prompts/number.ts';
+import { prompt } from '../../prompt/prompt.ts';
+import { Checkbox } from '../../prompt/checkbox.ts';
+import { Confirm } from '../../prompt/confirm.ts';
+import { Number } from '../../prompt/number.ts';
 
 const result = await prompt( [ {
     name: 'animals',

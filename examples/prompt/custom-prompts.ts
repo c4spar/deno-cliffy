@@ -1,10 +1,10 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { BufReader } from 'https://deno.land/std@0.63.0/io/bufio.ts';
-import { AnsiEscape } from '../../packages/ansi-escape/lib/ansi-escape.ts';
-import { Figures } from '../../packages/prompt/lib/figures.ts';
-import { prompt } from '../../packages/prompt/lib/prompt.ts';
-import { Input } from '../../packages/prompt/prompts/input.ts';
+import { AnsiEscape } from '../../ansi-escape/ansi-escape.ts';
+import { Figures } from '../../prompt/figures.ts';
+import { prompt } from '../../prompt/prompt.ts';
+import { Input } from '../../prompt/input.ts';
 
 const result = await prompt( [ {
     name: 'text',

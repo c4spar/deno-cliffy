@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
-import { Cell } from '../../packages/table/lib/cell.ts';
-import { Row } from '../../packages/table/lib/row.ts';
-import { Table } from '../../packages/table/lib/table.ts';
+import { Cell } from '../../table/cell.ts';
+import { Row } from '../../table/row.ts';
+import { Table } from '../../table/table.ts';
 
 new Table()
     .header( Row.from( [ 'Heading 1', 'Heading 2', 'Heading 3' ] ).border( true ) )

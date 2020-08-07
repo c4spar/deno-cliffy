@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { List } from '../../packages/prompt/mod.ts';
+import { List } from '../../prompt/list.ts';
 
 const keywords: string[] = await List.prompt( `Enter some keywords` );
 

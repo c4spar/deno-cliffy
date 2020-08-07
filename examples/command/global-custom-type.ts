@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from '../../packages/command/lib/command.ts';
-import { IFlagArgument, IFlagOptions } from '../../packages/flags/lib/types.ts';
+import { Command } from '../../command/command.ts';
+import { IFlagArgument, IFlagOptions } from '../../flags/types.ts';
 
 const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 

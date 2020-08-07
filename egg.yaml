@@ -4,16 +4,16 @@ stable: false
 version: 0.12.1
 repository: https://github.com/c4spar/deno-cliffy/
 files:
-  - assets/**/*
+  - ansi-escape/**/*
+  - command/**/*
   - examples/**/*
-  - packages/**/*
-  - ansi-escape.ts
+  - flags/**/*
+  - keycode/**/*
+  - prompt/**/*
+  - table/**/*
+  - x/**/*
   - CHANGELOG.md
-  - command.ts
-  - flags.ts
-  - keycode.ts
+  - dev_deps.ts
   - LICENSE
   - mod.ts
-  - prompt.ts
   - README.md
-  - table.ts

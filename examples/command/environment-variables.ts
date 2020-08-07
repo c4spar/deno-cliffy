@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-env --unstable
 
-import { Command } from '../../packages/command/lib/command.ts';
+import { Command } from '../../command/command.ts';
 
 await new Command()
     .env( 'SOME_ENV_VAR=<value:number>', 'Description ...', { global: true, hidden: false } )

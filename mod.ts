@@ -1,6 +1,6 @@
-export * from './ansi-escape.ts';
-export * from './command.ts';
-export * from './flags.ts';
-export { KeyCode, IKey, KeyEvent } from './keycode.ts';
-export * from './prompt.ts';
-export * from './table.ts';
+export * from './ansi-escape/mod.ts';
+export * from './command/mod.ts';
+export * from './flags/mod.ts';
+export * from './keycode/mod.ts';
+export * from './prompt/mod.ts';
+export * from './table/mod.ts';

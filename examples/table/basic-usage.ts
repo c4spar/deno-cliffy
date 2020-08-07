@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Table } from '../../packages/table/lib/table.ts';
+import { Table } from '../../table/table.ts';
 
 const table: Table = new Table(
     [ 'Row 1 Column 1', 'Row 1 Column 2', 'Row 1 Column 3' ],

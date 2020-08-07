@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command, StringType } from '../../command.ts';
+import { Command, StringType } from '../../command/mod.ts';
 
 class EmailType extends StringType {
 

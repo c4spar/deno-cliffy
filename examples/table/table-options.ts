@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Table } from '../../packages/table/lib/table.ts';
+import { Table } from '../../table/table.ts';
 
 new Table()
     .header( [ 'Heading 1', 'Heading 2', 'Heading 3' ] )
