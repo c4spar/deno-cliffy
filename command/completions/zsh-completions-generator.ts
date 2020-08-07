@@ -1,4 +1,3 @@
-import snakeCase from '../../x/snakeCase.ts';
 import { Command } from '../command.ts';
 import { IArgumentDetails, IOption } from '../types.ts';
 
@@ -28,15 +27,15 @@ export class ZshCompletionsGenerator {
         const versionStr = version ? `# version: ${ this.cmd.getVersion() || '-' }\n#\n` : '';
 
         return `
-# compdef _${ snakeCase( this.cmd.getPath() ) } ${ this.cmd.getPath() }
+# compdef _${ replaceSpecialChars( this.cmd.getPath() ) } ${ this.cmd.getPath() }
 #
 # zsh completion for ${ this.cmd.getPath() }
 #
 ${versionStr}
 autoload -U is-at-least
 
-(( $+functions[__${ snakeCase( this.cmd.getName() ) }_complete] )) ||
-function __${ snakeCase( this.cmd.getName() ) }_complete {
+(( $+functions[__${ replaceSpecialChars( this.cmd.getName() ) }_complete] )) ||
+function __${ replaceSpecialChars( this.cmd.getName() ) }_complete {
     local name="$1"; shift
     local action="$1"; shift
     integer ret=1
@@ -57,9 +56,9 @@ function __${ snakeCase( this.cmd.getName() ) }_complete {
 
 ${ this.generateCompletions( this.cmd ).trim() }
 
-# _${ snakeCase( this.cmd.getPath() ) } "\${@}"
+# _${ replaceSpecialChars( this.cmd.getPath() ) } "\${@}"
 
-compdef _${ snakeCase( this.cmd.getPath() ) } ${ this.cmd.getPath() }
+compdef _${ replaceSpecialChars( this.cmd.getPath() ) } ${ this.cmd.getPath() }
 
 #
 # Local Variables:
@@ -83,8 +82,8 @@ compdef _${ snakeCase( this.cmd.getPath() ) } ${ this.cmd.getPath() }
 
         path = ( path ? path + ' ' : '' ) + command.getName();
 
-        return `(( $+functions[_${ snakeCase( path ) }] )) ||
-function _${ snakeCase( path ) }() {`
+        return `(( $+functions[_${ replaceSpecialChars( path ) }] )) ||
+function _${ replaceSpecialChars( path ) }() {`
             + ( !command.getParent() ? `\n\n    local context state state_descr line\n    typeset -A opt_args` : '' )
             + this.generateCommandCompletions( command, path )
             + this.generateSubCommandCompletions( command, path )
@@ -124,7 +123,7 @@ function _${ snakeCase( path ) }() {`
             const action = this.addAction( arg, completionsPath );
 
             if ( action ) {
-                completions += `\n        __${ snakeCase( this.cmd.getName() ) }_complete ${ action.arg.name } ${ action.arg.action } ${ action.cmd }`;
+                completions += `\n        __${ replaceSpecialChars( this.cmd.getName() ) }_complete ${ action.arg.name } ${ action.arg.action } ${ action.cmd }`;
             }
         }
 
@@ -141,7 +140,7 @@ function _${ snakeCase( path ) }() {`
 
             const actions: string = command
                 .getCommands( false )
-                .map( ( command: Command ) => `${ command.getName() }) _${ snakeCase( path + ' ' + command.getName() ) } ;;` )
+                .map( ( command: Command ) => `${ command.getName() }) _${ replaceSpecialChars( path + ' ' + command.getName() ) } ;;` )
                 .join( '\n            ' );
 
             return `\n
@@ -272,7 +271,7 @@ function _${ snakeCase( path ) }() {`
             actions = Array
                 .from( this.actions )
                 .map( ( [ name, action ] ) =>
-                    `${ name }) __${ snakeCase( this.cmd.getName() ) }_complete ${ action.arg.name } ${ action.arg.action } ${ action.cmd } ;;` );
+                    `${ name }) __${ replaceSpecialChars( this.cmd.getName() ) }_complete ${ action.arg.name } ${ action.arg.action } ${ action.cmd } ;;` );
         }
 
         if ( command.hasCommands( false ) ) {
@@ -285,4 +284,8 @@ function _${ snakeCase( path ) }() {`
 
         return '';
     }
+}
+
+function replaceSpecialChars( str: string ): string {
+    return str.replace( /[^a-zA-Z0-9]/g, '_' );
 }

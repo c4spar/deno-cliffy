@@ -1,5 +1,4 @@
-import camelCase from '../x/camelCase.ts';
-import paramCase from '../x/paramCase.ts';
+import { camelCaseToParamCase, paramCaseToCamelCase } from './_utils.ts';
 import { getOption } from './flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
 
@@ -23,7 +22,8 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
     const defaultValues: Record<string, boolean> = {};
     // Set default value's
     for ( const option of flags ) {
-        const name: string = camelCase( option.name );
+        const name: string = paramCaseToCamelCase( option.name );
+        // console.log('option.name:', option.name, name);
         if ( typeof values[ name ] === 'undefined' && typeof option.default !== 'undefined' ) {
             values[ name ] = typeof option.default === 'function' ? option.default() : option.default;
             defaultValues[ name ] = true;
@@ -36,7 +36,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         return;
     }
 
-    const options: IFlagOptionsMap[] = keys.map( name => ( { name, option: getOption( flags, paramCase( name ) ) } ) );
+    const options: IFlagOptionsMap[] = keys.map( name => ( { name, option: getOption( flags, camelCaseToParamCase( name ) ) } ) );
 
     for ( const { name, option } of options ) {
 
@@ -87,7 +87,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         } );
 
         function isset( flag: string ): boolean {
-            const name = camelCase( flag );
+            const name = paramCaseToCamelCase( flag );
             // return typeof values[ name ] !== 'undefined' && values[ name ] !== false;
             return typeof values[ name ] !== 'undefined';
         }
@@ -95,7 +95,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
     for ( const option of flags ) {
 
-        if ( option.required && !( camelCase( option.name ) in values ) ) {
+        if ( option.required && !( paramCaseToCamelCase( option.name ) in values ) ) {
 
             if ( (
                     !option.conflicts ||
