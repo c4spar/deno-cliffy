@@ -23,23 +23,23 @@
 
 <p align="center">
   <b>Command line framework for Deno</b></br>
-  <sub>>_ A collection of modules for creating interactive command line tools.<sub>
+  <sub>>_ A collection of modules for creating interactive command line tools.</sub>
 </p>
 
 <p align="center" style="color: #856404; background-color: #fff3cd; border-color: #ffeeba; padding: .75rem 1.25rem; margin-bottom: 1rem; border-radius: .25rem;">
     <b>WARNING:</b> This project is still under development. Not all features are fully implemented and it's possible to get some breaking changes if you upgrade to a newer version. If you find a bug or have a feature request feel free to create an issue.
 </p>
 
-## Packages
+## Modules
 
-* **[ansi-escape](packages/ansi-escape/):** Show, hide and move cli cursor, erase output and scroll window.
+* **[ansi-escape](ansi-escape/):** Show, hide and move cli cursor, erase output and scroll window.
 
-* **[command](packages/command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions (inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
+* **[command](command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions (inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
 
-* **[flags](packages/flags/):** Parse command line arguments.
+* **[flags](flags/):** Parse command line arguments.
 
-* **[keycode](packages/keycode/):** Parse ANSI key codes.
+* **[keycode](keycode/):** Parse ANSI key codes.
 
-* **[prompt](packages/prompt/):** Create interactive prompts like: checkbox, confirm, input, number, select, etc...
+* **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm, input, number, select, etc...
 
-* **[table](packages/table/):** Create cli table's with border, padding, nested table's, etc...
+* **[table](table/):** Create cli table's with border, padding, nested table's, etc...

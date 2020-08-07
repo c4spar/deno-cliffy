@@ -1,5 +1,5 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags } from '../../packages/flags/lib/flags.ts';
+import { parseFlags } from '../../flags/flags.ts';
 
 console.log( parseFlags( Deno.args ) );

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from '../../packages/command/lib/command.ts';
+import { Command } from '../../command/command.ts';
 
 const { options } = await new Command()
     .option( '-o, --object <item:string>', 'map string to object', ( value: string ): { value: string } => {

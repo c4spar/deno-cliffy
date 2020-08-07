@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags } from '../../packages/flags/lib/flags.ts';
-import { OptionType } from '../../packages/flags/lib/types.ts';
+import { parseFlags } from '../../flags/flags.ts';
+import { OptionType } from '../../flags/types.ts';
 
 
 const result = parseFlags( Deno.args, {

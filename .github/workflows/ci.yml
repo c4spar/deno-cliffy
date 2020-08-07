@@ -28,16 +28,16 @@ jobs:
         run: deno -V
 
       - name: Run command test's
-        run: deno test packages/command/test/command --unstable --allow-env && deno test packages/command/test/option && deno test packages/command/test/type
+        run: deno test command/test/command --allow-env --unstable && deno test command/test/option && deno test command/test/type
 
       - name: Run flags test's
-        run: deno test packages/flags
+        run: deno test flags
 
       - name: Run keycode test's
-        run: deno test packages/keycode
+        run: deno test keycode
 
       - name: Run prompt test's
-        run: deno test packages/prompt --unstable
+        run: deno test prompt --unstable
 
       - name: Run table test's
-        run: deno test packages/table
+        run: deno test table

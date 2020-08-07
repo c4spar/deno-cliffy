@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyCode } from '../../packages/keycode/lib/key-code.ts';
+import { KeyCode } from '../../keycode/key-code.ts';
 
 async function read(): Promise<void> {
 
@@ -16,9 +16,9 @@ async function read(): Promise<void> {
 
     const data = buffer.subarray( 0, nread );
 
-    const event = KeyCode.parse( data );
+    const [ event ] = KeyCode.parse( data );
 
-    if ( event && event.name === 'c' && event.ctrl ) {
+    if ( event?.name === 'c' && event.ctrl ) {
         console.log( 'exit' );
         return;
     }

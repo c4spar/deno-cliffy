@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from '../../packages/command/lib/command.ts';
-import { IParseResult } from '../../packages/command/lib/types.ts';
+import { Command } from '../../command/command.ts';
+import { IParseResult } from '../../command/types.ts';
 
 // define your argument types
 type Arguments = [ string, string ];

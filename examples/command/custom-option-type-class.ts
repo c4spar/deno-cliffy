@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { Command, Type } from '../../command.ts';
-import { IFlagArgument, IFlagOptions } from '../../flags.ts';
+import { Command, Type } from '../../command/mod.ts';
+import { IFlagArgument, IFlagOptions } from '../../flags/types.ts';
 
 class EmailType extends Type<string> {
 

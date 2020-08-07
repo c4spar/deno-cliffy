@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { Select } from '../../packages/prompt/mod.ts';
+import { Select } from '../../prompt/select.ts';
 
 const color: string = await Select.prompt( {
     message: `Pick a color`,
