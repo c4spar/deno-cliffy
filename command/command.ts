@@ -1,6 +1,5 @@
 import { parseFlags } from '../flags/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler } from '../flags/types.ts';
-import format from '../x/format.ts';
 import { dim, red } from './deps.ts';
 import { BooleanType } from './types/boolean.ts';
 import { NumberType } from './types/number.ts';
@@ -1428,7 +1427,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
         showHelp && this.help();
 
-        const message = ' '.repeat( 2 ) + red( format( `[ERROR:${ this._name }]`, CLIFFY_DEBUG ? error : error.message ) ) + '\n\n';
+        const message = ' '.repeat( 2 ) + red( CLIFFY_DEBUG && error.stack ? error.stack : `${ error.name }: ${ error.message }` ) + '\n\n';
 
         Deno.stderr.writeSync( new TextEncoder().encode( message ) );
 
