@@ -1,4 +1,3 @@
-const { stdout, stderr } = Deno;
 import { parseFlags } from '../flags/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler } from '../flags/types.ts';
 import format from '../x/format.ts';
@@ -1413,50 +1412,6 @@ export class Command<O = any, A extends Array<any> = any> {
         return this.literalArgs;
     }
 
-    /********************************************************************************
-     **** HELPER ********************************************************************
-     ********************************************************************************/
-
-    /**
-     * Write line to stdout without line break.
-     *
-     * @param args Data to write to stdout.
-     */
-    public write( ...args: any[] ) {
-
-        stdout.writeSync( new TextEncoder().encode( ' '.repeat( 2 ) + format( ...args ) ) );
-    }
-
-    /**
-     * Write line to stderr without line break.
-     *
-     * @param args Data to write to stdout.
-     */
-    public writeError( ...args: any[] ) {
-
-        stderr.writeSync( new TextEncoder().encode( ' '.repeat( 2 ) + red( format( `[ERROR:${ this._name }]`, ...args ) ) ) );
-    }
-
-    /**
-     * Write line to stdout.
-     *
-     * @param args Data to write to stdout.
-     */
-    public log( ...args: any[] ) {
-
-        this.write( ...args, '\n' );
-    }
-
-    /**
-     * Write line to stderr.
-     *
-     * @param args Data to write to stderr.
-     */
-    public logError( ...args: any[] ) {
-
-        this.writeError( ...args, '\n' );
-    }
-
     /**
      * Handle error. If `.throwErrors()` was called all error's will be thrown, otherwise `Deno.exit(1)` will be called.
      *
@@ -1472,8 +1427,10 @@ export class Command<O = any, A extends Array<any> = any> {
         const CLIFFY_DEBUG: boolean = hasEnvPermissions ? !!Deno.env.get( 'CLIFFY_DEBUG' ) : false;
 
         showHelp && this.help();
-        this.logError( CLIFFY_DEBUG ? error : error.message );
-        this.log();
+
+        const message = ' '.repeat( 2 ) + red( format( `[ERROR:${ this._name }]`, CLIFFY_DEBUG ? error : error.message ) ) + '\n\n';
+
+        Deno.stderr.writeSync( new TextEncoder().encode( message ) );
 
         Deno.exit( 1 );
     }
