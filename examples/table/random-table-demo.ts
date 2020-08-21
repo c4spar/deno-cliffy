@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { blue, bold, cyan, dim, green, italic, magenta, strikethrough, underline, yellow } from 'https://deno.land/std@0.63.0/fmt/colors.ts';
+import { blue, bold, cyan, dim, green, italic, magenta, strikethrough, underline, yellow } from 'https://deno.land/std@0.66.0/fmt/colors.ts';
 import { AnsiEscape } from '../../ansi-escape/ansi-escape.ts';
 import { Cell, ICell } from '../../table/cell.ts';
 import { Table } from '../../table/table.ts';
