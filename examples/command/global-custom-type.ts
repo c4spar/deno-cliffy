@@ -17,13 +17,11 @@ function emailType( option: IFlagOptions, arg: IFlagArgument, value: string ): s
 await new Command()
     .type( 'email', emailType, { global: true } )
 
-    .command( 'login' )
-    .description( 'Login with email.' )
+    .command( 'login', 'Login with email.' )
     .option( '-e, --email <email:email>', 'Your email address.' )
     .action( console.log )
 
-    .command( 'config' )
-    .description( 'Manage config.' )
+    .command( 'config', 'Manage config.' )
     .option( '-a, --admin-email [email:email]', 'Get or set admin email address.' )
     .action( console.log )
 

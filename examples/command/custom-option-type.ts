@@ -18,8 +18,7 @@ const { options } = await new Command()
     .type( 'email', emailType )
     .arguments( '[email:email]' )
     .option( '-e, --email <value:email>', 'Your email address.' )
-    .command( 'email [email:email]' )
-    .description( 'Your email address.' )
+    .command( 'email [email:email]', 'Your email address.' )
     .parse( Deno.args );
 
 console.log( options );

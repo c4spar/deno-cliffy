@@ -474,51 +474,81 @@ Some info
 
 ## Commands
 
-You can specify (sub-) commands using the `.command()` method. There are three ways these can be implemented:
-
-* Using an action handler attached to the command.
-* Passing an `Command` instance as second parameter to the `.command()` method.
-* or as a separate executable file by passing the description as second argument to the `.command()` method.
-
-In the first parameter to `.command()` you specify the command name and any command arguments. The arguments may be `<required>` or `[optional]`, and the last argument may also be variadic.
-
-Command implemented using a `Command` instance.
+The command class operates as a factory class. It has an internal command pointer which point per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
 
 ```typescript
 import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 
 await new Command()
-    .command( 'clone', new Command()
-    .arguments( '<source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
-    .action( ( options: any, source: string, destination: string ) => {
-        console.log( 'clone command called' );
-    } ) )
+    .description( 'Main command.' )
+    .option( '-a', 'Main command option.' )
+
+    .command( 'command1 <file|dir>' )
+    .description( 'Command1 description.' )
+    .option( '-b', 'Command1 option.' )
+
+    .command( 'command2', new Command() )
+    .description( 'Command2 description.' )
+    .option( '-c', 'Command2 option.' )
+
+    .reset() // reset command pointer
+
+    .option( '-e', 'Second main command option.' )
+
     .parse( Deno.args );
 ```
 
-Command implemented using the `.command()` method with an action handler.
+There are three ways to specify sub-commands with the `.command()` method:
+
+* Using an action handler attached to the command.
+* Passing an `Command` instance as second argument to the `.command()` method.
+* or by calling the `.executable()` method to execute a separate executable file.
+
+In the first parameter to `.command()` you specify the command name and any command arguments. The arguments may be `<required>` or `[optional]` and the last argument may also be variadic. The second argumend of the `.command()` method is optional and can be eather the command description or an instance of a `Command` class. The description can be also defined with the `.description()` method.
+
+Sub-command implemented using the `.command()` method with an action handler.
 
 ```typescript
 import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 
 await new Command()
-    .command( 'clone <source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
+    .command( 'clone <source:string> [destination:string]', 'Clone a repository into a newly created directory.' )
     .action( ( options: any, source: string, destination: string ) => {
         console.log( 'clone command called' );
     } )
     .parse( Deno.args );
 ```
 
-Command implemented using the `.command()` method with a separate executable file (description is passed as second parameter to `.command()`)
+Sub-command implemented using a `Command` instance.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+
+const clone = new Command()
+    .arguments( '<source:string> [destination:string]' )
+    .description( 'Clone a repository into a newly created directory.' )
+    .action( ( options: any, source: string, destination: string ) => {
+        console.log( 'clone command called' );
+    } );
+
+await new Command()
+    .command( 'clone', clone )
+    .parse( Deno.args );
+```
+
+Sub-command implemented using a separate executable file.
 
 ```typescript
 import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 
 await new Command()
     .command( 'start <service>', 'Start named service.' )
-    .command( 'stop [service]', 'Stop named service, or all if no name supplied.' )
+    .executable()
+    .command( 'stop [service]', new Command()
+        .description('Stop named service, or all if no name supplied.')
+        .executable()
+    )
+
     .parse( Deno.args );
 ```
 
@@ -593,7 +623,7 @@ remove dir recursively
 
 > Work in progress
 
-When `.command()` is invoked with a description argument, this tells cliffy that you're going to use separate executables for sub-commands. Cliffy will search the executables in the directory of the entry script (like `./examples/pm`) with the name program-sub-command, like `pm-install`, `pm-search`. You can specify a custom name with the `executable` configuration option.
+When `.executable()` is invoked on a sub-command, this tells cliffy you're going to use a separate executable file for the sub-command. Cliffy will search the executable in the directory of the entry script with the name program-sub-command, like `pm-install`, `pm-search`. If no command was found cliffy looks for a globally installed command.
 
 You handle the options for an executable (sub)command in the executable, and don't declare them at the top-level.
 
@@ -602,10 +632,10 @@ import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 
 await new Command()
     .version( '0.1.0' )
-    .command( 'install [name]', 'install one or more packages' )
-    .command( 'search [query]', 'search with optional query' )
-    .command( 'update', 'update installed packages', { executable: 'myUpdateSubCommand' } )
-    .command( 'list', 'list packages installed' )
+    .command( 'install [name]', 'install one or more packages' ).executable()
+    .command( 'search [query]', 'search with optional query' ).executable()
+    .command( 'update', 'update installed packages' ).executable()
+    .command( 'list', 'list packages installed' ).executable()
     .parse( Deno.args );
 ```
 
@@ -619,8 +649,7 @@ import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 await new Command()
     .version( '0.1.0' )
 
-    .command( 'global [val:string]' )
-    .description( 'global ...' )
+    .command( 'global [val:string]' ), 'global ...' )
     .global()
     .action( console.log )
 
@@ -736,8 +765,7 @@ const { options } = await new Command()
     .type( 'email', emailType )
     .arguments( '[email:email]' )
     .option( '-e, --email <value:email>', 'Your email address.' )
-    .command( 'email [email:email]' )
-    .description( 'Your email address.' )
+    .command( 'email [email:email]', 'Your email address.' )
     .parse( Deno.args );
 
 console.log( options );
@@ -779,8 +807,7 @@ const { options } = await new Command()
     .type( 'email', new EmailType() )
     .arguments( '[email:email]' )
     .option( '-e, --email <value:email>', 'Your email address.' )
-    .command( 'email [email:email]' )
-    .description( 'Your email address.' )
+    .command( 'email [email:email]', 'Your email address.' )
     .parse( Deno.args );
 
 console.log( options );
@@ -804,13 +831,11 @@ To make an type available for child commands you can set the `global` option in 
 await new Command()
     .type( 'email', email(), { global: true } )
 
-    .command( 'login' )
-    .description( 'Login with email.' )
+    .command( 'login', 'Login with email.' )
     .option( '-e, --email <email:email>', 'Your email address.' )
     .action( console.log )
 
-    .command( 'config' )
-    .description( 'Manage config.' )
+    .command( 'config', 'Manage config.' )
     .option( '-a, --admin-email [email:email]', 'Get or set admin email address.' )
     .action( console.log )
 
@@ -838,8 +863,7 @@ import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
 
 await new Command()
     .env( 'SOME_ENV_VAR=<value:number>', 'Description ...', { global: true, hidden: false } )
-    .command( 'hello' )
-    .description( 'world ...' )
+    .command( 'hello', 'world ...' )
     .parse( Deno.args );
 
 console.log( Deno.env.get( 'SOME_ENV_VAR' ) );
@@ -881,23 +905,9 @@ The help information is auto-generated based on the information you have defined
 The `--help` and `-h` option flag prints the auto generated help.
 
 ```typescript
-import {
-    Command
-} from 'https://deno.land/x/cliffy/command/command.ts';
-
-import {
-    CompletionsCommand
-} from 'https://deno.land/x/cliffy/command/completions-command.ts';
-} from 'https://deno.land/x/cliffy/command/completions/mod.ts';
-} from 'https://deno.land/x/cliffy/command/commands/mod.ts';
-} from 'https://deno.land/x/cliffy/command/commands/completions/mod.ts';
-} from 'https://deno.land/x/cliffy/command/commands/completions/zsh.ts';
-} from 'https://deno.land/x/cliffy/command/commands/completions/zsh/mod.ts';
-
-import {
-    CompletionsCommand
-} from 'https://deno.land/x/cliffy/command/help-command.ts';
-} from 'https://deno.land/x/cliffy/command/help/mod.ts';
+import { Command } from 'https://deno.land/x/cliffy/command/command.ts';
+import { CompletionsCommand } from 'https://deno.land/x/cliffy/command/completions/mod.ts';
+import { CompletionsCommand } from 'https://deno.land/x/cliffy/command/help/mod.ts';
 
 await new Command()
     .name( 'help-option-and-command' )

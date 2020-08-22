@@ -5,7 +5,7 @@ import { IFlags } from '../../flags/types.ts';
 
 await new Command()
     .version( '0.1.0' )
-    .command( 'rmdir <dirs...:string>' )
+    .command( 'rmdir <dirs...:string>', 'Remove directories.' )
     .action( ( options: IFlags, dirs: string[] ) => {
         dirs.forEach( ( dir: string ) => {
             console.log( 'rmdir %s', dir );
