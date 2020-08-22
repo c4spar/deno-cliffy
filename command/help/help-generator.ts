@@ -1,6 +1,5 @@
 import { IFlagOptions } from '../../flags/types.ts';
 import { Table } from '../../table/table.ts';
-import format from '../../x/format.ts';
 import { ArgumentsParser } from '../_arguments-parser.ts';
 import { Command } from '../command.ts';
 import { blue, bold, dim, magenta, red, yellow } from '../deps.ts';
@@ -165,7 +164,7 @@ export class HelpGenerator {
         const hints = [];
 
         option.required && hints.push( yellow( `required` ) );
-        typeof option.default !== 'undefined' && hints.push( blue( bold( `Default: ` ) ) + blue( format( option.default ) ) );
+        typeof option.default !== 'undefined' && hints.push( blue( bold( `Default: ` ) ) + blue( Deno.inspect( option.default, { depth: 1 } ) ) );
         option.depends && option.depends.length && hints.push( red( bold( `depends: ` ) ) + option.depends.map( depends => red( depends ) ).join( ', ' ) );
         option.conflicts && option.conflicts.length && hints.push( red( bold( `conflicts: ` ) ) + option.conflicts.map( conflict => red( conflict ) ).join( ', ' ) );
 
@@ -176,14 +175,10 @@ export class HelpGenerator {
         return '';
     }
 
-    private line( ...args: any[] ) {
-        return ( args.length ? ' '.repeat( this.indent ) + format( ...args ) : '' ) + '\n';
-    }
-
     private label( label: string ) {
         return '\n' +
-            this.line( bold( `${ label }:` ) ) +
-            '\n';
+            ' '.repeat( this.indent ) + bold( `${ label }:` ) +
+            '\n\n';
     }
 }
 

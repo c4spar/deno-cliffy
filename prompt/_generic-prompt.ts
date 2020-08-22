@@ -1,7 +1,6 @@
 import { AnsiEscape } from '../ansi-escape/ansi-escape.ts';
 import { KeyCode } from '../keycode/key-code.ts';
 import { KeyEvent } from '../keycode/key-event.ts';
-import format from '../x/format.ts';
 import { blue, bold, dim, green, red, yellow } from './deps.ts';
 import { Figures } from './figures.ts';
 
@@ -206,12 +205,12 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>,
         );
     }
 
-    protected write( ...args: any[] ) {
-        Deno.stdout.writeSync( new TextEncoder().encode( format( ...args ) ) );
+    protected write( value: string ) {
+        Deno.stdout.writeSync( new TextEncoder().encode( value ) );
     }
 
-    protected writeLine( ...args: any[] ) {
-        Deno.stdout.writeSync( new TextEncoder().encode( format( ...args ) + '\n' ) );
+    protected writeLine( value?: string ) {
+        Deno.stdout.writeSync( new TextEncoder().encode( ( value ?? '' ) + '\n' ) );
     }
 
     protected preBufferEmptyLines( message: string ) {
@@ -220,18 +219,18 @@ export abstract class GenericPrompt<T, V, S extends GenericPromptSettings<T, V>,
         this.screen.cursorUp( linesCount );
     }
 
-    protected error( ...args: any[] ) {
+    protected error( message: string ) {
         if ( typeof GenericPrompt.injectedValue !== 'undefined' ) {
-            throw new Error( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) );
+            throw new Error( red( bold( ` ${ Figures.CROSS } ` ) + message ) );
         }
-        this.write( red( bold( ` ${ Figures.CROSS } ` ) + format( ...args ) ) );
+        this.write( red( bold( ` ${ Figures.CROSS } ` ) + message ) );
     }
 
-    protected message( ...args: any[] ) {
-        this.write( blue( ` ${ Figures.POINTER } ` ) + format( ...args ) );
+    protected message( message: string ) {
+        this.write( blue( ` ${ Figures.POINTER } ` ) + message );
     }
 
-    protected hint( ...args: any[] ) {
-        this.write( dim( blue( ` ${ Figures.POINTER } ` ) + format( ...args ) ) );
+    protected hint( hint: string ) {
+        this.write( dim( blue( ` ${ Figures.POINTER } ` ) + hint ) );
     }
 }
