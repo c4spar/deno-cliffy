@@ -4,8 +4,7 @@ import { Command } from '../../command/command.ts';
 
 // Sub-command implemented using action handler (description is supplied separately to `.command()`)
 await new Command()
-    .command( 'clone <source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
+    .command( 'clone <source:string> [destination:string]', 'Clone a repository into a newly created directory.' )
     .action( ( source: string, destination: string ) => {
         console.log( 'clone command called' );
     } )
@@ -23,6 +22,6 @@ await new Command()
 
 // Command implemented using separate executable file (description is passes as second parameter to `.command()`)
 await new Command()
-    .command( 'start <service>', 'Start named service.' )
-    .command( 'stop [service]', 'Stop named service, or all if no name supplied.' )
+    .command( 'start <service>', 'Start named service.' ).executable()
+    .command( 'stop [service]', 'Stop named service, or all if no name supplied.' ).executable()
     .parse( Deno.args );

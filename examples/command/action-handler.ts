@@ -4,7 +4,7 @@ import { Command } from '../../command/command.ts';
 import { IFlags } from '../../flags/types.ts';
 
 await new Command()
-    .command( 'rm <dir>' )
+    .command( 'rm <dir>', 'Remove directory.' )
     .option( '-r, --recursive [recursive:boolean]', 'Remove recursively' )
     .action( ( { recursive }: IFlags, dir: string ) => {
         console.log( 'remove ' + dir + ( recursive ? ' recursively' : '' ) );

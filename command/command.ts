@@ -1,6 +1,6 @@
 import { parseFlags } from '../flags/flags.ts';
 import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler } from '../flags/types.ts';
-import { dim, red } from './deps.ts';
+import { existsSync, red } from './deps.ts';
 import { BooleanType } from './types/boolean.ts';
 import { NumberType } from './types/number.ts';
 import { StringType } from './types/string.ts';
@@ -9,9 +9,40 @@ import { ArgumentsParser } from './_arguments-parser.ts';
 import { HelpGenerator } from './help/help-generator.ts';
 import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IOption, IParseResult, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
 
-const permissions: any = ( Deno as any ).permissions;
-const envPermissionStatus: any = permissions && permissions.query && await permissions.query( { name: 'env' } );
-const hasEnvPermissions: boolean = !!envPermissionStatus && envPermissionStatus.state === 'granted';
+type PermissionName =
+    | "run"
+    | "read"
+    | "write"
+    | "net"
+    | "env"
+    | "plugin"
+    | "hrtime";
+
+async function hasPermission( permission: PermissionName ): Promise<boolean> {
+    try {
+        return ( await ( Deno as any ).permissions?.query?.( { name: permission } ) )?.state === 'granted';
+    } catch {
+        return false;
+    }
+}
+
+async function hasPermissions<K extends PermissionName>( names: K[] ): Promise<Record<K, boolean>> {
+    const permissions: Record<K, boolean> = {} as any;
+    await Promise.all( names.map( ( name: K ) =>
+        hasPermission( name ).then( hasPermission =>
+            permissions[ name ] = hasPermission ) ) );
+    return permissions as any;
+}
+
+const permissions = await hasPermissions( [
+    'env',
+    'hrtime',
+    'net',
+    'plugin',
+    'read',
+    'run',
+    'write'
+] );
 
 interface IDefaultOption<O = any, A extends Array<any> = any> {
     flags: string;
@@ -81,14 +112,9 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Add new sub-command.
      */
-    public command( nameAndArguments: string, cmd?: Command | string, override?: boolean ): this {
-
-        let executableDescription: string | undefined;
-
-        if ( typeof cmd === 'string' ) {
-            executableDescription = cmd;
-            cmd = undefined;
-        }
+    public command( name: string, desc?: string, override?: boolean ): this;
+    public command( name: string, cmd?: Command, override?: boolean ): this;
+    public command( nameAndArguments: string, cmdOrDescription?: Command | string, override?: boolean ): this {
 
         const result = ArgumentsParser.splitArguments( nameAndArguments );
 
@@ -106,27 +132,37 @@ export class Command<O = any, A extends Array<any> = any> {
             this.removeCommand( name );
         }
 
-        const subCommand = ( cmd || new Command() ).reset();
+        let description: string | undefined;
+        let cmd: Command;
 
-        subCommand._name = name;
-        subCommand._parent = this;
+        if ( typeof cmdOrDescription === 'string' ) {
+            description = cmdOrDescription;
+        }
 
-        if ( executableDescription ) {
-            subCommand.isExecutable = true;
-            subCommand.description( executableDescription );
+        if ( cmdOrDescription instanceof Command ) {
+            cmd = cmdOrDescription.reset();
+        } else {
+            cmd = new Command();
+        }
+
+        cmd._name = name;
+        cmd._parent = this;
+
+        if ( description ) {
+            cmd.description( description );
         }
 
         if ( result.typeDefinition ) {
-            subCommand.arguments( result.typeDefinition );
+            cmd.arguments( result.typeDefinition );
         }
 
-        // if ( name === '*' && !subCommand.isExecutable ) {
-        //     subCommand.isExecutable = true;
+        // if ( name === '*' && !cmd.isExecutable ) {
+        //     cmd.isExecutable = true;
         // }
 
-        aliases.forEach( alias => subCommand.aliases.push( alias ) );
+        aliases.forEach( alias => cmd.aliases.push( alias ) );
 
-        this.commands.set( name, subCommand );
+        this.commands.set( name, cmd );
 
         this.select( name );
 
@@ -238,6 +274,14 @@ export class Command<O = any, A extends Array<any> = any> {
      */
     public global(): this {
         this.cmd.isGlobal = true;
+        return this;
+    }
+
+    /**
+     * Make command executable.
+     */
+    public executable(): this {
+        this.cmd.isExecutable = true;
         return this;
     }
 
@@ -691,36 +735,82 @@ export class Command<O = any, A extends Array<any> = any> {
      */
     protected async executeExecutable( args: string[] ) {
 
+        const unstable: boolean = !!( Deno as any ).permissions;
+
+        if ( !permissions.read ) {
+            await ( Deno as any ).permissions?.request( { name: 'read' } );
+        }
+        if ( !permissions.run ) {
+            await ( Deno as any ).permissions?.request( { name: 'run' } );
+        }
+
         const [ main, ...names ] = this.getPath().split( ' ' );
 
         names.unshift( main.replace( /\.ts$/, '' ) );
 
-        const executable = names.join( '-' );
+        const executableName = names.join( '-' );
+        const files: string[] = [];
 
-        try {
-            // @TODO: create getEnv() method which should return all known environment variables and pass it to Deno.run({env})
-            await Deno.run( {
-                cmd: [ executable, ...args ]
-            } );
-            return;
-        } catch ( e ) {
-            if ( !e.message.match( /No such file or directory/ ) ) {
-                throw e;
-            }
+        const parts: string[] = ( Deno as any ).mainModule.replace( /^file:\/\//g, '' ).split( '/' );
+        parts.pop();
+        const path: string = parts.join( '/' );
+        files.push(
+            path + '/' + executableName,
+            path + '/' + executableName + '.ts'
+        );
+
+        files.push(
+            executableName,
+            executableName + '.ts'
+        );
+
+        const denoOpts = [];
+
+        if ( unstable ) {
+            denoOpts.push( '--unstable' );
         }
 
-        try {
-            await Deno.run( {
-                cmd: [ executable + '.ts', ...args ]
+        denoOpts.push(
+            '--allow-read',
+            '--allow-run'
+        );
+
+        ( Object.keys( permissions ) as PermissionName[] )
+            .forEach( ( name: PermissionName ) => {
+                if ( name === 'read' || name === 'run' ) {
+                    return;
+                }
+                if ( permissions[ name ] ) {
+                    denoOpts.push( `--allow-${ name }` );
+                }
             } );
-            return;
-        } catch ( e ) {
-            if ( !e.message.match( /No such file or directory/ ) ) {
-                throw e;
+
+        for ( const file of files ) {
+
+            if ( !existsSync( file ) ) {
+                continue;
             }
+
+            const cmd = [ 'deno', 'run', ...denoOpts, file, ...args ];
+
+            // @TODO: pass env vars to Deno.run({env})
+            const process: Deno.Process = Deno.run( {
+                cmd: cmd,
+                env: {
+                    CLIFFY_DEBUG: isDebug() ? 'true' : 'false'
+                }
+            } );
+
+            const status: Deno.ProcessStatus = await process.status();
+
+            if ( !status.success ) {
+                Deno.exit( status.code );
+            }
+
+            return;
         }
 
-        throw this.error( new Error( `Sub-command executable not found: ${ executable }${ dim( '(.ts)' ) }` ) );
+        throw this.error( new Error( `Sub-command executable not found: ${ executableName }:\n    - ` + files.join( '\n    - ' ) ) );
     }
 
     /**
@@ -761,26 +851,28 @@ export class Command<O = any, A extends Array<any> = any> {
      */
     protected validateEnvVars() {
 
+        if ( !permissions.env ) {
+            return;
+        }
+
         const envVars = this.getEnvVars( true );
 
         if ( !envVars.length ) {
             return;
         }
 
-        if ( hasEnvPermissions ) {
-            envVars.forEach( ( env: IEnvVariable ) => {
-                const name = env.names.find( name => !!Deno.env.get( name ) );
-                if ( name ) {
-                    const value: string | undefined = Deno.env.get( name );
-                    try {
-                        // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
-                        this.parseType( env.type, { name }, env, value || '' );
-                    } catch ( e ) {
-                        throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
-                    }
+        envVars.forEach( ( env: IEnvVariable ) => {
+            const name = env.names.find( name => !!Deno.env.get( name ) );
+            if ( name ) {
+                const value: string | undefined = Deno.env.get( name );
+                try {
+                    // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
+                    this.parseType( env.type, { name }, env, value || '' );
+                } catch ( e ) {
+                    throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
                 }
-            } );
-        }
+            }
+        } );
     }
 
     /**
@@ -1423,11 +1515,9 @@ export class Command<O = any, A extends Array<any> = any> {
             return error;
         }
 
-        const CLIFFY_DEBUG: boolean = hasEnvPermissions ? !!Deno.env.get( 'CLIFFY_DEBUG' ) : false;
-
         showHelp && this.help();
 
-        const message = ' '.repeat( 2 ) + red( CLIFFY_DEBUG && error.stack ? error.stack : `${ error.name }: ${ error.message }` ) + '\n\n';
+        const message = ' '.repeat( 2 ) + red( isDebug() && error.stack ? error.stack : `${ error.name }: ${ error.message }` ) + '\n\n';
 
         Deno.stderr.writeSync( new TextEncoder().encode( message ) );
 
@@ -1448,4 +1538,12 @@ export class Command<O = any, A extends Array<any> = any> {
         this.registerDefaults();
         return HelpGenerator.generate( this );
     }
+}
+
+function isDebug(): boolean {
+    if ( !permissions.env ) {
+        return false;
+    }
+    const debug: string | undefined = Deno.env.get( 'CLIFFY_DEBUG' );
+    return debug === 'true' || debug === '1';
 }

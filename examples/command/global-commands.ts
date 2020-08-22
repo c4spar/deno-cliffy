@@ -5,8 +5,7 @@ import { Command } from '../../command/command.ts';
 await new Command()
     .version( '0.1.0' )
 
-    .command( 'global [val:string]' )
-    .description( 'global ...' )
+    .command( 'global [val:string]', 'global ...' )
     .global()
     .action( console.log )
 
