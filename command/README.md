@@ -26,8 +26,11 @@
   <sub>>_ Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions </sub>
 </p>
 
-- [Usage](#usage)
-- [Options](#options)
+## ❯ Content
+
+- [Install](#-install)
+- [Usage](#-usage)
+- [Options](#-options)
   - [Common option types: string, number and boolean](#common-option-types-string-number-and-boolean)
   - [List option types](#list-option-types)
   - [Variadic options](#variadic-options)
@@ -42,7 +45,7 @@
   - [Collect options](#collect-options)
   - [Custom option processing](#custom-option-processing)
   - [Option action handler](#option-action-handler)
-- [Commands](#commands)
+- [Commands](#-commands)
   - [Argument syntax](#argument-syntax)
   - [Action handler](#action-handler)
   - [Executable sub-commands](#executable-sub-commands)
@@ -50,23 +53,45 @@
   - [Hidden commands](#hidden-commands)
   - [Stop early](#stop-early)
   - [Override exit handling](#override-exit-handling)
-- [Custom types](#custom-types)
+- [Custom types](#-custom-types)
   - [Function types](#function-types)
   - [Class types](#class-types)
   - [Global types](#global-types)
-- [Environment variables](#environment-variables)
-- [Add examples](#add-examples)
-- [Auto generated help](#auto-generated-help)
+- [Environment variables](#-environment-variables)
+- [Add examples](#-add-examples)
+- [Auto generated help](#-auto-generated-help)
   - [Help option](#help-option)
   - [Help command](#help-command)
-- [Shell completion](#shell-completion)
+- [Shell completion](#-shell-completion)
   - [Completions command](#completions-command)
     - [Zsh Completions](#zsh-completions)
-- [Generic options and arguments](#generic-options-and-arguments)
-- [Version option](#version-option)
-- [License](#license)
+- [Generic options and arguments](#-generic-options-and-arguments)
+- [Version option](#-version-option)
+- [License](#-license)
 
-## Usage
+## ❯ Install
+
+This module can be imported directly from the repo and from following registries.
+
+Deno Registry
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy@<version>/command/mod.ts';
+```
+
+Nest Registry
+
+```typescript
+import { Command } from 'https://x.nest.land/cliffy@<version>/command/mod.ts';
+```
+
+Github
+
+```typescript
+import { Command } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/command/mod.ts';
+```
+
+## ❯ Usage
 
 To create a program with cliffy you can import the `Command` class from the main module `https://deno.land/x/cliffy/command/mod.ts` or directly from the command module `https://deno.land/x/cliffy/command/command.ts`.
 
@@ -90,7 +115,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/usage.ts --help
 
 ![](assets/img/usage.png)
 
-## Options
+## ❯ Options
 
 Options are defined with the `.option()` method and can be accessed as properties on the options object which is passed to the `.action()` handler and returned by the `.parse()` method.
 
@@ -472,7 +497,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/action-options.ts -i
 Some info
 ```
 
-## Commands
+## ❯ Commands
 
 The command class operates as a factory class. It has an internal command pointer which point per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
 
@@ -740,7 +765,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/override-exit-handling.ts
     at <anonymous> (<anonymous>)
 ```
 
-## Custom types
+## ❯ Custom types
 
 You can register custom types with the `.type()` method. The first argument is the name of the type, the second can be either a function or an instance of `Type` and the third argument can be an options object.
 
@@ -847,7 +872,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-custom-type.ts log
 { email: "my@email.de" }
 ```
 
-## Environment variables
+## ❯ Environment variables
 
 You can define environment variables for a command that are validated when the command is executed.
 Environment variables are listed with the [help](#help-option-and-command) option and command.
@@ -877,7 +902,7 @@ $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/ex
 Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
 ```
 
-## Add examples
+## ❯ Add examples
 
 You can add some examples for your command which will be printed with the [help](#help-option-and-command) option and command.
 
@@ -896,7 +921,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
 ![](assets/img/examples.png)
 
-## Auto generated help
+## ❯ Auto generated help
 
 The help information is auto-generated based on the information you have defined on your command's.
 
@@ -982,7 +1007,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.t
 $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.ts completions help
 ```
 
-## Shell completion
+## ❯ Shell completion
 
 Cliffy supports shell completion out of the box.
 
@@ -1047,7 +1072,7 @@ To enable zsh completions on your system add the following line to your `~/.zshr
 source <(command-name completions zsh)
 ```
 
-## Generic options and arguments
+## ❯ Generic options and arguments
 
 > This is an experimental feature and may change in the future!
 
@@ -1080,7 +1105,7 @@ const input: string = result.args[ 0 ];
 const output: string | undefined = result.args[ 1 ];
 ```
 
-## Version option
+## ❯ Version option
 
 The `--version` and `-V` option flag prints the version number defined with the `version()` method. The version number will also be printed within the output of the [help](#help-option-command) option and command.
 
@@ -1130,10 +1155,10 @@ await new Command()
     .parse( Deno.args );
 ```
 
-## Credits
+## ❯ Credits
 
 Benjamin Fischer [@c4spar](https://github.com/c4spar)
 
-## License
+## ❯ License
 
 [MIT](../LICENSE)

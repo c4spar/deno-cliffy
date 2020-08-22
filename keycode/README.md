@@ -26,7 +26,38 @@
   <sub>>_ Used by cliffy's <a href="../prompt/">prompt</a> module.</sub>
 </p>
 
-## Usage
+## ❯ Content
+
+- [Install](#-install)
+- [Usage](#-usage)
+- [API](#-api)
+    - [KeyCode](#keycode)
+    - [KeyEvent](#keyevent)
+- [License](#-license)
+
+## ❯ Install
+
+This module can be imported directly from the repo and from following registries.
+
+Deno Registry
+
+```typescript
+import { KeyCode } from 'https://deno.land/x/cliffy@<version>/keycode/mod.ts';
+```
+
+Nest Registry
+
+```typescript
+import { KeyCode } from 'https://x.nest.land/cliffy@<version>/keycode/mod.ts';
+```
+
+Github
+
+```typescript
+import { KeyCode } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keycode/mod.ts';
+```
+
+## ❯ Usage
 
 ```typescript
 import { KeyCode } from 'https://deno.land/x/cliffy/keycode/mod.ts';
@@ -66,7 +97,7 @@ await read();
 $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read-key.ts
 ```
 
-## Documentation
+## ❯ API
 
 ### KeyCode
 
@@ -80,6 +111,6 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read-key.ts
 * meta: boolean
 * shift: boolean
 
-## License
+## ❯ License
 
 [MIT](../../LICENSE)

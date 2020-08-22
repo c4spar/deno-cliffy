@@ -26,7 +26,35 @@
   <sub>>_ Used by cliffy's <a href="../prompt/">prompt</a> module</sub>
 </p>
 
-## Usage
+## ❯ Content
+
+- [Install](#-install)
+- [Usage](#-usage)
+- [License](#-license)
+
+## ❯ Install
+
+This module can be imported directly from the repo and from following registries.
+
+Deno Registry
+
+```typescript
+import { AnsiEscape } from 'https://deno.land/x/cliffy@<version>/ansi-escape/mod.ts';
+```
+
+Nest Registry
+
+```typescript
+import { AnsiEscape } from 'https://x.nest.land/cliffy@<version>/ansi-escape/mod.ts';
+```
+
+Github
+
+```typescript
+import { AnsiEscape } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi-escape/mod.ts';
+```
+
+## ❯ Usage
 
 ```typescript
 #!/usr/bin/env -S deno run
@@ -49,6 +77,6 @@ AnsiEscape.from( Deno.stdout )
     // ...
 ```
 
-## License
+## ❯ License
 
 [MIT](../LICENSE)
