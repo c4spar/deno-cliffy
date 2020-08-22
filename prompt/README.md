@@ -31,14 +31,15 @@
 
 ## ❯ Content
 
-* [Install](#-install)
-* [Usage](#-usage)
-    * [Single Prompt](#single-prompt)
-    * [Prompt List](#prompt-list)
-    * [Dynamic Prompts](#dynamic-prompts)
-    * [Custom Prompts](#custom-prompts)
-* [API](#-api)
-* [Types](#-types)
+- [Install](#-install)
+- [Usage](#-usage)
+    - [Single Prompt](#single-prompt)
+    - [Prompt List](#prompt-list)
+    - [Dynamic Prompts](#dynamic-prompts)
+    - [Custom Prompts](#custom-prompts)
+- [API](#-api)
+- [Types](#-types)
+- [License](#-license)
 
 ## ❯ Install
 
@@ -577,6 +578,6 @@ The `Checkbox` prompt has all [base options](#base-options) and the following pr
 
 **↑ back to:** [Prompt types](#-types)
 
-## License
+## ❯ License
 
 [MIT](../LICENSE)

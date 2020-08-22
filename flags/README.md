@@ -26,7 +26,37 @@
   <sub>>_ Used by cliffy's <a href="../../command/">command</a> module</sub>
 </p>
 
-## Usage
+## ❯ Content
+
+- [Install](#-install)
+- [Usage](#-usage)
+- [Options](#-options)
+- [Custom type processing](#-custom-type-processing)
+- [License](#-license)
+
+## ❯ Install
+
+This module can be imported directly from the repo and from following registries.
+
+Deno Registry
+
+```typescript
+import { parseFlags } from 'https://deno.land/x/cliffy@<version>/flags/mod.ts';
+```
+
+Nest Registry
+
+```typescript
+import { parseFlags } from 'https://x.nest.land/cliffy@<version>/flags/mod.ts';
+```
+
+Github
+
+```typescript
+import { parseFlags } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/flags/mod.ts';
+```
+
+## ❯ Usage
 
 ```typescript
 import { parseFlags } from 'https://deno.land/x/cliffy/flags/mod.ts';
@@ -107,7 +137,7 @@ $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./ex
 }
 ```
 
-## Options
+## ❯ Options
 
 ### parseFlags Options
 
@@ -152,7 +182,7 @@ $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./ex
 
 * `OptionType.BOOLEAN`
 
-## Custom type processing
+## ❯ Custom type processing
 
 ```typescript
 import { parseFlags, IFlagOptions, IFlagArgument } from 'https://deno.land/x/cliffy/flags/mod.ts';
@@ -172,6 +202,6 @@ parseFlags( Deno.args, {
 } );
 ```
 
-## License
+## ❯ License
 
 [MIT](../LICENSE)
