@@ -46,16 +46,16 @@
         * [.clone()](#clone)
         * [.toString()](#tostring)
         * [.render()](#render)
-        * [.minCellWidth(width,override)](#mincellwidthwidthoverride)
-        * [.maxCellWidth(width,override)](#maxcellwidthwidthoverride)
+        * [.minColWidth(width,override)](#mincolwidthwidthoverride)
+        * [.maxColWidth(width,override)](#maxcolwidthwidthoverride)
         * [.indent(width,override)](#indentwidthoverride)
         * [.padding(padding,override)](#paddingpaddingoverride)
         * [.border(enable,override)](#borderenableoverride)
         * [.chars(chars)](#charschars)
         * [.getHeader()](#getheader)
         * [.getBody()](#getbody)
-        * [.getMinCellWidth()](#getmincellwidth)
-        * [.getMaxCellWidth()](#getmaxcellwidth)
+        * [.getMinColWidth()](#getmincolwidth)
+        * [.getMaxColWidth()](#getmaxcolwidth)
         * [.getIndent()](#getindent)
         * [.getPadding()](#getpadding)
         * [.getBorder()](#getborder)
@@ -174,7 +174,7 @@ new Table()
         [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
         [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
     ] )
-    .maxCellWidth( 10 )
+    .maxColWidth( 10 )
     .padding( 1 )
     .indent( 2 )
     .border( true )
@@ -275,24 +275,24 @@ Outputs the result of the `.toString()` method with `Deno.stdout.writeSnyc()`.
 
 *Return type*: `this`
 
-#### .minCellWidth(width,override)
+#### .minColWidth(width,override)
 
 Set min column with.
 
 | Argument | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| width | `number | Array<number>` | Yes | Min column with. To give all columns the same min width pass a number to `.minCellWidth()`, to give each column an indiviuel min width you can pass an `Array<number>` to `.minCellWidth()`. |
+| width | `number | Array<number>` | Yes | Min column with. To give all columns the same min width pass a number to `.minColWidth()`, to give each column an indiviuel min width you can pass an `Array<number>` to `.minColWidth()`. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
 *Return type*: `this`
 
-#### .maxCellWidth(width,override)
+#### .maxColWidth(width,override)
 
 Set max column with.
 
 | Argument | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
-| width | `number | Array<number>` | Yes | Max column with. To give all columns the same max width pass a number to `. maxCellWidth()`, to give each column an indiviuel max width you can pass an `Array<number>` to `. maxCellWidth()`. |
+| width | `number | Array<number>` | Yes | Max column with. To give all columns the same max width pass a number to `. maxColWidth()`, to give each column an indiviuel max width you can pass an `Array<number>` to `. maxColWidth()`. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
 *Return type*: `this`
@@ -375,13 +375,13 @@ Returns all body rows.
 
 *Return type*: `IRow[]`
 
-#### .getMinCellWidth()
+#### .getMinColWidth()
 
 Get min columns width.
 
 *Return type*: `number | number[]`
 
-#### .getMaxCellWidth()
+#### .getMaxColWidth()
 
 Get max columns width.
 

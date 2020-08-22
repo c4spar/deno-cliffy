@@ -9,7 +9,7 @@ new Table()
         [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
         [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
     ] )
-    .maxCellWidth( 10 )
+    .maxColWidth( 10 )
     .padding( 1 )
     .indent( 2 )
     .border( true )

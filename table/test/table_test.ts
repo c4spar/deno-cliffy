@@ -23,7 +23,7 @@ Deno.test( 'simple table with word break', () => {
                 [ 'cell1', 'cell2', 'cell3' ],
                 [ 'cell1', 'cell2', 'cell3 cell3' ]
             ] )
-            .maxCellWidth( 4 )
+            .maxColWidth( 4 )
             .padding( 1 )
             .toString(),
         `
@@ -253,7 +253,7 @@ Deno.test( 'multiline table', () => {
                  [ 'cell1', 'cell2', 'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' ]
              ] )
              .padding( 1 )
-             .maxCellWidth( 20 )
+             .maxColWidth( 20 )
              .toString(),
         `
 Stet clita kasd cell2             cell3         
@@ -295,7 +295,7 @@ Deno.test( 'multiline border table', () => {
                  [ 'cell1', 'cell2', 'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' ]
              ] )
              .padding( 0 )
-             .maxCellWidth( 20 )
+             .maxColWidth( 20 )
              .border( true )
              .toString(),
         `
@@ -343,7 +343,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -351,7 +351,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -359,7 +359,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString()
              ], [
                  Table.from( [
@@ -368,7 +368,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -376,7 +376,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'Stet clita kasd gubergren, no sea takimata.', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -384,7 +384,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'sanctus est Lorem ipsum dolor sit.' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString()
              ], [
                  Table.from( [
@@ -393,7 +393,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -401,7 +401,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString(),
                  Table.from( [
                           [ 'cell1', 'cell2', 'cell3' ],
@@ -409,7 +409,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'Stet clita kasd gubergren, no sea takimata.', 'cell2', 'cell3' ]
                       ] )
                       .padding( 1 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .toString()
              ] ] )
              .padding( 1 )
@@ -443,7 +443,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -452,7 +452,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -461,7 +461,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString()
              ], [
@@ -471,7 +471,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -480,7 +480,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'Stet clita kasd gubergren, no sea takimata.', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -489,7 +489,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'sanctus est Lorem ipsum dolor sit.' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString()
              ], [
@@ -499,7 +499,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -508,7 +508,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'cell1', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString(),
                  Table.from( [
@@ -517,7 +517,7 @@ Deno.test( 'nested multiline border table', () => {
                           [ 'Stet clita kasd gubergren, no sea takimata.', 'cell2', 'cell3' ]
                       ] )
                       .padding( 0 )
-                      .maxCellWidth( 20 )
+                      .maxColWidth( 20 )
                       .border( true )
                       .toString()
              ] ] )
@@ -563,7 +563,7 @@ Deno.test( 'table with padding', () => {
                  [ 'cell1', 'cell2', 'At vero eos et accusam et justo duo dolores et ea rebum.' ]
              ] )
              .padding( 5 )
-             .maxCellWidth( 20 )
+             .maxColWidth( 20 )
              .toString(),
         `
 Stet clita kasd     cell2                 cell3         

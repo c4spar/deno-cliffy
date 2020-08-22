@@ -8,8 +8,8 @@ export interface IBorderOptions extends Partial<IBorder> {}
 export interface ITableOptions {
     indent?: number;
     border?: boolean;
-    maxCellWidth?: number | number[];
-    minCellWidth?: number | number[];
+    maxColWidth?: number | number[];
+    minColWidth?: number | number[];
     padding?: number | number[];
     chars?: IBorderOptions;
 }
@@ -25,8 +25,8 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     protected options: ITableSettings = {
         indent: 0,
         border: false,
-        maxCellWidth: Infinity,
-        minCellWidth: 0,
+        maxColWidth: Infinity,
+        minColWidth: 0,
         padding: 1,
         chars: border
     };
@@ -83,16 +83,16 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this;
     }
 
-    public maxCellWidth( width: number | number[], override: boolean = true ): this {
-        if ( override || typeof this.options.maxCellWidth === 'undefined' ) {
-            this.options.maxCellWidth = width;
+    public maxColWidth( width: number | number[], override: boolean = true ): this {
+        if ( override || typeof this.options.maxColWidth === 'undefined' ) {
+            this.options.maxColWidth = width;
         }
         return this;
     }
 
-    public minCellWidth( width: number | number[], override: boolean = true ): this {
-        if ( override || typeof this.options.minCellWidth === 'undefined' ) {
-            this.options.minCellWidth = width;
+    public minColWidth( width: number | number[], override: boolean = true ): this {
+        if ( override || typeof this.options.minColWidth === 'undefined' ) {
+            this.options.minColWidth = width;
         }
         return this;
     }
@@ -131,12 +131,12 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         return this.slice();
     }
 
-    public getMaxCellWidth(): number | number[] {
-        return this.options.maxCellWidth;
+    public getMaxColWidth(): number | number[] {
+        return this.options.maxColWidth;
     }
 
-    public getMinCellWidth(): number | number[] {
-        return this.options.minCellWidth;
+    public getMinColWidth(): number | number[] {
+        return this.options.minColWidth;
     }
 
     public getIndent(): number {
