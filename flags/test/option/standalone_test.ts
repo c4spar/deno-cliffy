@@ -15,6 +15,11 @@ const options = <IParseOptions>{
         name: 'all',
         aliases: [ 'a' ],
         type: OptionType.BOOLEAN
+    }, {
+        name: 'foo-bar',
+        aliases: [ 'f' ],
+        type: OptionType.NUMBER,
+        default: 3
     } ]
 };
 
@@ -22,7 +27,7 @@ Deno.test( 'flags optionStandalone flag', () => {
 
     const { flags, unknown, literal } = parseFlags( [ '-f' ], options );
 
-    assertEquals( flags, { flag: true } );
+    assertEquals( flags, { flag: true, fooBar: 3 } );
     assertEquals( unknown, [] );
     assertEquals( literal, [] );
 } );

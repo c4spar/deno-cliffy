@@ -23,10 +23,9 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
     // Set default value's
     for ( const option of flags ) {
         const name: string = paramCaseToCamelCase( option.name );
-        // console.log('option.name:', option.name, name);
         if ( typeof values[ name ] === 'undefined' && typeof option.default !== 'undefined' ) {
             values[ name ] = typeof option.default === 'function' ? option.default() : option.default;
-            defaultValues[ name ] = true;
+            defaultValues[ option.name ] = true;
         }
     }
 
@@ -36,7 +35,10 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         return;
     }
 
-    const options: IFlagOptionsMap[] = keys.map( name => ( { name, option: getOption( flags, camelCaseToParamCase( name ) ) } ) );
+    const options: IFlagOptionsMap[] = keys.map( name => ( {
+        name,
+        option: getOption( flags, camelCaseToParamCase( name ) )
+    } ) );
 
     for ( const { name, option } of options ) {
 
@@ -66,7 +68,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
         } );
 
         option.depends?.forEach( ( flag: string ) => {
-            // dont't throw an error if the value is coming from the default option.
+            // don't throw an error if the value is coming from the default option.
             if ( !isset( flag ) && !defaultValues[ option.name ] ) {
                 throw new Error( `Option --${ option.name } depends on option: --${ flag }` );
             }
