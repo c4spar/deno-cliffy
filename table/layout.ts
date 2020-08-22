@@ -53,10 +53,10 @@ export class TableLayout {
         const padding: number[] = [];
         const width: number[] = [];
         for ( let colIndex: number = 0; colIndex < columns; colIndex++ ) {
-            const minCellWidth: number = Array.isArray( this.options.minCellWidth ) ? this.options.minCellWidth[ colIndex ] : this.options.minCellWidth;
-            const maxCellWidth: number = Array.isArray( this.options.maxCellWidth ) ? this.options.maxCellWidth[ colIndex ] : this.options.maxCellWidth;
-            const cellWidth: number = longest( colIndex, rows, maxCellWidth );
-            width[ colIndex ] = Math.min( maxCellWidth, Math.max( minCellWidth, cellWidth ) );
+            const minColWidth: number = Array.isArray( this.options.minColWidth ) ? this.options.minColWidth[ colIndex ] : this.options.minColWidth;
+            const maxColWidth: number = Array.isArray( this.options.maxColWidth ) ? this.options.maxColWidth[ colIndex ] : this.options.maxColWidth;
+            const colWidth: number = longest( colIndex, rows, maxColWidth );
+            width[ colIndex ] = Math.min( maxColWidth, Math.max( minColWidth, colWidth ) );
             padding[ colIndex ] = Array.isArray( this.options.padding ) ? this.options.padding[ colIndex ] : this.options.padding;
         }
 

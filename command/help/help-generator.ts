@@ -49,7 +49,7 @@ export class HelpGenerator {
                     [ this.cmd.getDescription() ]
                 ] )
                 .indent( this.indent * 2 )
-                .maxCellWidth( 140 )
+                .maxColWidth( 140 )
                 .padding( 1 )
                 .toString() + '\n';
     }
@@ -74,7 +74,7 @@ export class HelpGenerator {
                     ] )
                     .padding( [ 2, 2, 2 ] )
                     .indent( this.indent * 2 )
-                    .maxCellWidth( [ 60, 60, 80, 60 ] )
+                    .maxColWidth( [ 60, 60, 80, 60 ] )
                     .toString() + '\n';
         }
 
@@ -88,7 +88,7 @@ export class HelpGenerator {
                 ] )
                 .padding( [ 2, 2 ] )
                 .indent( this.indent * 2 )
-                .maxCellWidth( [ 60, 80, 60 ] )
+                .maxColWidth( [ 60, 80, 60 ] )
                 .toString() + '\n';
     }
 
@@ -156,7 +156,7 @@ export class HelpGenerator {
                 ] ) )
                 .padding( 1 )
                 .indent( this.indent * 2 )
-                .maxCellWidth( 150 )
+                .maxColWidth( 150 )
                 .toString() + '\n';
     }
 
