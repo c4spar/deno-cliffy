@@ -285,7 +285,7 @@ export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextVa
 }
 
 /**
- * Find option by name.
+ * Find option by flag, name or alias.
  *
  * @param flags Source option's array.
  * @param name  Name of the option.
