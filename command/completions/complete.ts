@@ -1,6 +1,6 @@
 import { IFlags } from '../../flags/types.ts';
 import { Command } from '../command.ts';
-import { ICompleteSettings } from '../types.ts';
+import { ICompletion } from '../types.ts';
 
 /**
  * Execute complete method for specific action and command.
@@ -24,7 +24,7 @@ export class CompleteCommand extends Command {
                         return childCmd;
                     }, cmd || this.getMainCommand() );
 
-                const completion: ICompleteSettings | undefined = completeCommand.getCompletion( action );
+                const completion: ICompletion | undefined = completeCommand.getCompletion( action );
                 const result: string[] = await completion?.complete( completeCommand, parent ) ?? [];
 
                 if ( result?.length ) {

@@ -1,8 +1,8 @@
 import { Command } from '../command.ts';
-import { IArgumentDetails, IOption } from '../types.ts';
+import { IArgument, IOption } from '../types.ts';
 
 interface ICompletionAction {
-    arg: IArgumentDetails;
+    arg: IArgument;
     label: string;
     name: string;
     cmd: string;
@@ -118,7 +118,7 @@ function _${ replaceSpecialChars( path ) }() {`
 
             const completionsPath: string = path.split( ' ' ).slice( 1 ).join( ' ' );
 
-            const arg: IArgumentDetails = command.getArguments()[ 0 ];
+            const arg: IArgument = command.getArguments()[ 0 ];
 
             const action = this.addAction( arg, completionsPath );
 
@@ -246,7 +246,7 @@ function _${ replaceSpecialChars( path ) }() {`
         }
     }
 
-    private addAction( arg: IArgumentDetails, cmd: string ): ICompletionAction {
+    private addAction( arg: IArgument, cmd: string ): ICompletionAction {
 
         const action = `${ arg.name }-${ arg.action }`;
 

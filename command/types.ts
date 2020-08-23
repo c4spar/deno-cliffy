@@ -2,14 +2,16 @@ import { IFlagArgument, IFlagOptions, ITypeHandler } from '../flags/types.ts';
 import { Type } from './type.ts';
 import { Command } from './command.ts';
 
+/* COMMAND TYPES */
+
 /** Description handler. */
 export type IDescription = string | ( ( this: Command ) => string );
 
-/** Action handler. */
+/** Action handler for commands and options. */
 export type IAction<O, A extends Array<any>> = ( this: Command, options: O, ...args: A ) => void | Promise<void>;
 
 /** Argument details. */
-export interface IArgumentDetails extends IFlagArgument {
+export interface IArgument extends IFlagArgument {
     /** Argument name. */
     name: string;
     /** Shell completion action. */
@@ -18,7 +20,17 @@ export interface IArgumentDetails extends IFlagArgument {
     type: string;
 }
 
-/** Command settings. */
+/** Result of `cmd.parse()` method. */
+export interface IParseResult<O = any, A extends Array<any> = any> {
+    options: O;
+    args: A;
+    literal: string[];
+    cmd: Command<O>;
+}
+
+/* OPTION TYPES */
+
+/** Command option options. */
 export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<IFlagOptions,
     'name' | 'args' | 'type' | 'optionalValue' | 'aliases' | 'variadic' | 'list'> {
     override?: boolean;
@@ -28,61 +40,62 @@ export interface ICommandOption<O = any, A extends Array<any> = any> extends Omi
     prepend?: boolean;
 }
 
-/** Command option setting's. */
+/** Command option settings. */
 export interface IOption<O = any, A extends Array<any> = any> extends ICommandOption<O, A>, IFlagOptions {
     description: string,
     flags: string;
     typeDefinition?: string;
-    args: IArgumentDetails[];
+    args: IArgument[];
 }
 
-export interface IEnvVarOption {
+/* ENV VARS TYPES */
+
+/** Environment variable options */
+export interface IEnvVarOptions {
     hidden?: boolean;
     global?: boolean;
 }
 
-/** Environment variable setting's. */
-export interface IEnvVariable extends IEnvVarOption {
+/** Environment variable settings. */
+export interface IEnvVar extends IEnvVarOptions {
     names: string[];
     description: string;
     type: string;
-    details: IArgumentDetails;
+    details: IArgument;
 }
 
-/** Type option's. */
-export interface ITypeOption {
+/* TYPE TYPES */
+
+/** Type options. */
+export interface ITypeOptions {
     override?: boolean;
     global?: boolean;
 }
 
-/** Type option's. */
-export interface ITypeSettings extends ITypeOption {
+/** Type settings. */
+export interface IType extends ITypeOptions {
     name: string;
     handler: Type<any> | ITypeHandler<any>;
 }
 
-export type ITypeMap = Map<string, ITypeSettings>;
+/* EXAMPLE TYPES */
 
-/** Example setting's. */
+/** Example settings. */
 export interface IExample {
     name: string;
     description: string;
 }
 
-/** Result of `cmd.parse()`. */
-export interface IParseResult<O = any, A extends Array<any> = any> {
-    options: O;
-    args: A;
-    literal: string[];
-    cmd: Command<O>;
-}
+/* COMPLETION TYPES */
 
+/** Completion options. */
 export interface ICompleteOptions {
     override?: boolean;
     global?: boolean;
 }
 
-export interface ICompleteSettings extends ICompleteOptions {
+/** Completion settings. */
+export interface ICompletion extends ICompleteOptions {
     name: string;
     complete: ICompleteHandler;
 }

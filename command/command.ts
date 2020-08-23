@@ -7,16 +7,16 @@ import { StringType } from './types/string.ts';
 import { Type } from './type.ts';
 import { ArgumentsParser } from './_arguments-parser.ts';
 import { HelpGenerator } from './help/help-generator.ts';
-import { IAction, IArgumentDetails, ICommandOption, ICompleteHandler, ICompleteOptions, ICompleteSettings, IDescription, IEnvVariable, IEnvVarOption, IExample, IOption, IParseResult, ITypeMap, ITypeOption, ITypeSettings } from './types.ts';
+import { IAction, IArgument, ICommandOption, ICompleteHandler, ICompleteOptions, ICompletion, IDescription, IEnvVar, IEnvVarOptions, IExample, IOption, IParseResult, ITypeOptions, IType } from './types.ts';
 
 type PermissionName =
-    | "run"
-    | "read"
-    | "write"
-    | "net"
-    | "env"
-    | "plugin"
-    | "hrtime";
+    | 'run'
+    | 'read'
+    | 'write'
+    | 'net'
+    | 'env'
+    | 'plugin'
+    | 'hrtime';
 
 async function hasPermission( permission: PermissionName ): Promise<boolean> {
     try {
@@ -50,12 +50,14 @@ interface IDefaultOption<O = any, A extends Array<any> = any> {
     opts?: ICommandOption<O, A>;
 }
 
+type ITypeMap = Map<string, IType>;
+
 /**
  * Base command implementation without pre configured command's and option's.
  */
 export class Command<O = any, A extends Array<any> = any> {
 
-    private types: ITypeMap = new Map<string, ITypeSettings>( [
+    private types: ITypeMap = new Map<string, IType>( [
         [ 'string', { name: 'string', handler: new StringType() } ],
         [ 'number', { name: 'number', handler: new NumberType() } ],
         [ 'boolean', { name: 'boolean', handler: new BooleanType() } ]
@@ -73,9 +75,9 @@ export class Command<O = any, A extends Array<any> = any> {
     private options: IOption<O, A>[] = [];
     private commands: Map<string, Command> = new Map();
     private examples: IExample[] = [];
-    private envVars: IEnvVariable[] = [];
+    private envVars: IEnvVar[] = [];
     private aliases: string[] = [];
-    private completions: Map<string, ICompleteSettings> = new Map();
+    private completions: Map<string, ICompletion> = new Map();
     private cmd: Command = this;
     private argsDefinition?: string;
     private isExecutable: boolean = false;
@@ -84,7 +86,7 @@ export class Command<O = any, A extends Array<any> = any> {
     private _stopEarly: boolean = false;
     private defaultCommand?: string;
     private _useRawArgs: boolean = false;
-    private args: IArgumentDetails[] = [];
+    private args: IArgument[] = [];
     private isHidden: boolean = false;
     private isGlobal: boolean = false;
     private hasDefaults: Boolean = false;
@@ -352,7 +354,7 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Register command specific custom type.
      */
-    public type( name: string, handler: Type<any> | ITypeHandler<any>, options?: ITypeOption ): this {
+    public type( name: string, handler: Type<any> | ITypeHandler<any>, options?: ITypeOptions ): this {
 
         if ( this.cmd.types.get( name ) && !options?.override ) {
             throw this.error( new Error( `Type '${ name }' already exists.` ) );
@@ -402,17 +404,17 @@ export class Command<O = any, A extends Array<any> = any> {
         return this.getGlobalCompletions().concat( this.getBaseCompletions() );
     }
 
-    public getBaseCompletions(): ICompleteSettings[] {
+    public getBaseCompletions(): ICompletion[] {
         return Array.from( this.completions.values() );
     }
 
-    public getGlobalCompletions(): ICompleteSettings[] {
+    public getGlobalCompletions(): ICompletion[] {
 
-        const getCompletions = ( cmd: Command | undefined, completions: ICompleteSettings[] = [], names: string[] = [] ): ICompleteSettings[] => {
+        const getCompletions = ( cmd: Command | undefined, completions: ICompletion[] = [], names: string[] = [] ): ICompletion[] => {
 
             if ( cmd ) {
                 if ( cmd.completions.size ) {
-                    cmd.completions.forEach( ( completion: ICompleteSettings ) => {
+                    cmd.completions.forEach( ( completion: ICompletion ) => {
                         if (
                             completion.global &&
                             !this.completions.has( completion.name ) &&
@@ -438,18 +440,18 @@ export class Command<O = any, A extends Array<any> = any> {
         return this.getBaseCompletion( name ) ?? this.getGlobalCompletion( name );
     }
 
-    public getBaseCompletion( name: string ): ICompleteSettings | undefined {
+    public getBaseCompletion( name: string ): ICompletion | undefined {
 
         return this.completions.get( name );
     }
 
-    public getGlobalCompletion( name: string ): ICompleteSettings | undefined {
+    public getGlobalCompletion( name: string ): ICompletion | undefined {
 
         if ( !this._parent ) {
             return;
         }
 
-        let completion: ICompleteSettings | undefined = this._parent.getBaseCompletion( name );
+        let completion: ICompletion | undefined = this._parent.getBaseCompletion( name );
 
         if ( !completion?.global ) {
             return this._parent.getGlobalCompletion( name );
@@ -473,7 +475,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
         const result = ArgumentsParser.splitArguments( flags );
 
-        const args: IArgumentDetails[] = result.typeDefinition ? ArgumentsParser.parseArgumentsDefinition( result.typeDefinition ) : [];
+        const args: IArgument[] = result.typeDefinition ? ArgumentsParser.parseArgumentsDefinition( result.typeDefinition ) : [];
 
         const option: IOption = {
             name: '',
@@ -553,7 +555,7 @@ export class Command<O = any, A extends Array<any> = any> {
      * @param description   The description of the environment variable.
      * @param options       Environment variable options.
      */
-    public env( name: string, description: string, options?: IEnvVarOption ): this {
+    public env( name: string, description: string, options?: IEnvVarOptions ): this {
 
         const result = ArgumentsParser.splitArguments( name );
 
@@ -565,7 +567,7 @@ export class Command<O = any, A extends Array<any> = any> {
             throw this.error( new Error( `Environment variable already exists: ${ name }` ) );
         }
 
-        const details: IArgumentDetails[] = ArgumentsParser.parseArgumentsDefinition( result.typeDefinition );
+        const details: IArgument[] = ArgumentsParser.parseArgumentsDefinition( result.typeDefinition );
 
         if ( details.length > 1 ) {
             throw this.error( new Error( `An environment variable can only have one value but got: ${ name }` ) );
@@ -579,7 +581,7 @@ export class Command<O = any, A extends Array<any> = any> {
             names: result.args,
             description,
             type: details[ 0 ].type,
-            details: details.shift() as IArgumentDetails,
+            details: details.shift() as IArgument,
             ...options
         } );
 
@@ -836,14 +838,14 @@ export class Command<O = any, A extends Array<any> = any> {
 
     protected parseType( name: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {
 
-        const type: ITypeSettings | undefined = this.getType( name );
+        const typeSettings: IType | undefined = this.getType( name );
 
-        if ( !type ) {
+        if ( !typeSettings ) {
             throw this.error( new Error( `No type registered with name: ${ name }` ) );
         }
 
         // @TODO: pass only name & value to .parse() method
-        return type.handler instanceof Type ? type.handler.parse( option, arg, nextValue ) : type.handler( option, arg, nextValue );
+        return typeSettings.handler instanceof Type ? typeSettings.handler.parse( option, arg, nextValue ) : typeSettings.handler( option, arg, nextValue );
     }
 
     /**
@@ -861,7 +863,7 @@ export class Command<O = any, A extends Array<any> = any> {
             return;
         }
 
-        envVars.forEach( ( env: IEnvVariable ) => {
+        envVars.forEach( ( env: IEnvVar ) => {
             const name = env.names.find( name => !!Deno.env.get( name ) );
             if ( name ) {
                 const value: string | undefined = Deno.env.get( name );
@@ -1023,7 +1025,7 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Get argument.
      */
-    public getArgument( name: string ): IArgumentDetails | undefined {
+    public getArgument( name: string ): IArgument | undefined {
 
         return this.getArguments().find( arg => arg.name === name );
     }
@@ -1031,7 +1033,7 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Get arguments.
      */
-    public getArguments(): IArgumentDetails[] {
+    public getArguments(): IArgument[] {
 
         if ( !this.args.length && this.argsDefinition ) {
             this.args = ArgumentsParser.parseArgumentsDefinition( this.argsDefinition );
@@ -1302,21 +1304,21 @@ export class Command<O = any, A extends Array<any> = any> {
         return command;
     }
 
-    public getTypes(): ITypeSettings[] {
+    public getTypes(): IType[] {
         return this.getGlobalTypes().concat( this.getBaseTypes() );
     }
 
-    public getBaseTypes(): ITypeSettings[] {
+    public getBaseTypes(): IType[] {
         return Array.from( this.types.values() );
     }
 
-    public getGlobalTypes(): ITypeSettings[] {
+    public getGlobalTypes(): IType[] {
 
-        const getTypes = ( cmd: Command | undefined, types: ITypeSettings[] = [], names: string[] = [] ): ITypeSettings[] => {
+        const getTypes = ( cmd: Command | undefined, types: IType[] = [], names: string[] = [] ): IType[] => {
 
             if ( cmd ) {
                 if ( cmd.types.size ) {
-                    cmd.types.forEach( ( type: ITypeSettings ) => {
+                    cmd.types.forEach( ( type: IType ) => {
                         if (
                             type.global &&
                             !this.types.has( type.name ) &&
@@ -1337,23 +1339,23 @@ export class Command<O = any, A extends Array<any> = any> {
         return getTypes( this._parent );
     }
 
-    protected getType( name: string ): ITypeSettings | undefined {
+    protected getType( name: string ): IType | undefined {
 
         return this.getBaseType( name ) ?? this.getGlobalType( name );
     }
 
-    protected getBaseType( name: string ): ITypeSettings | undefined {
+    protected getBaseType( name: string ): IType | undefined {
 
         return this.types.get( name );
     }
 
-    protected getGlobalType( name: string ): ITypeSettings | undefined {
+    protected getGlobalType( name: string ): IType | undefined {
 
         if ( !this._parent ) {
             return;
         }
 
-        let cmd: ITypeSettings | undefined = this._parent.getBaseType( name );
+        let cmd: IType | undefined = this._parent.getBaseType( name );
 
         if ( !cmd?.global ) {
             return this._parent.getGlobalType( name );
@@ -1373,12 +1375,12 @@ export class Command<O = any, A extends Array<any> = any> {
     /**
      * Get environment variables.
      */
-    public getEnvVars( hidden?: boolean ): IEnvVariable[] {
+    public getEnvVars( hidden?: boolean ): IEnvVar[] {
 
         return this.getGlobalEnvVars( hidden ).concat( this.getBaseEnvVars( hidden ) );
     }
 
-    public getBaseEnvVars( hidden?: boolean ): IEnvVariable[] {
+    public getBaseEnvVars( hidden?: boolean ): IEnvVar[] {
 
         if ( !this.envVars.length ) {
             return [];
@@ -1387,13 +1389,13 @@ export class Command<O = any, A extends Array<any> = any> {
         return hidden ? this.envVars.slice( 0 ) : this.envVars.filter( env => !env.hidden );
     }
 
-    public getGlobalEnvVars( hidden?: boolean ): IEnvVariable[] {
+    public getGlobalEnvVars( hidden?: boolean ): IEnvVar[] {
 
-        const getEnvVars = ( cmd: Command | undefined, envVars: IEnvVariable[] = [], names: string[] = [] ): IEnvVariable[] => {
+        const getEnvVars = ( cmd: Command | undefined, envVars: IEnvVar[] = [], names: string[] = [] ): IEnvVar[] => {
 
             if ( cmd ) {
                 if ( cmd.envVars.length ) {
-                    cmd.envVars.forEach( ( envVar: IEnvVariable ) => {
+                    cmd.envVars.forEach( ( envVar: IEnvVar ) => {
                         if (
                             envVar.global &&
                             !this.envVars.find( env => env.names[ 0 ] === envVar.names[ 0 ] ) &&
@@ -1432,25 +1434,25 @@ export class Command<O = any, A extends Array<any> = any> {
      * @param name Name of the environment variable.
      * @param hidden Include hidden environment variable.
      */
-    public getEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
+    public getEnvVar( name: string, hidden?: boolean ): IEnvVar | undefined {
 
         return this.getBaseEnvVar( name, hidden ) ?? this.getGlobalEnvVar( name, hidden );
     }
 
-    public getBaseEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
+    public getBaseEnvVar( name: string, hidden?: boolean ): IEnvVar | undefined {
 
-        const envVar: IEnvVariable | undefined = this.envVars.find( env => env.names.indexOf( name ) !== -1 );
+        const envVar: IEnvVar | undefined = this.envVars.find( env => env.names.indexOf( name ) !== -1 );
 
         return envVar && ( hidden || !envVar.hidden ) ? envVar : undefined;
     }
 
-    public getGlobalEnvVar( name: string, hidden?: boolean ): IEnvVariable | undefined {
+    public getGlobalEnvVar( name: string, hidden?: boolean ): IEnvVar | undefined {
 
         if ( !this._parent ) {
             return;
         }
 
-        let envVar: IEnvVariable | undefined = this._parent.getBaseEnvVar( name, hidden );
+        let envVar: IEnvVar | undefined = this._parent.getBaseEnvVar( name, hidden );
 
         if ( !envVar?.global ) {
             return this._parent.getGlobalEnvVar( name, hidden );

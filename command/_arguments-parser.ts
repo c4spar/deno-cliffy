@@ -1,6 +1,6 @@
 import { OptionType } from '../flags/types.ts';
 import { green, magenta, red, yellow } from './deps.ts';
-import { IArgumentDetails } from './types.ts';
+import { IArgument } from './types.ts';
 
 export class ArgumentsParser {
 
@@ -21,9 +21,9 @@ export class ArgumentsParser {
         return { args: parts, typeDefinition };
     }
 
-    public static parseArgumentsDefinition( argsDefinition: string ): IArgumentDetails[] {
+    public static parseArgumentsDefinition( argsDefinition: string ): IArgument[] {
 
-        const argumentDetails: IArgumentDetails[] = [];
+        const argumentDetails: IArgument[] = [];
 
         let hasOptional = false;
         let hasVariadic = false;
@@ -38,7 +38,7 @@ export class ArgumentsParser {
             const parts: string[] = arg.split( this.ARGUMENT_DETAILS_REGEX );
             const type: string | undefined = parts[ 2 ] || OptionType.STRING;
 
-            let details: IArgumentDetails = {
+            let details: IArgument = {
                 optionalValue: arg[ 0 ] !== '<',
                 name: parts[ 1 ],
                 action: parts[ 3 ] || type,
@@ -84,10 +84,10 @@ export class ArgumentsParser {
         }
 
         return this.parseArgumentsDefinition( argsDefinition )
-            .map( ( arg: IArgumentDetails ) => this.highlightArgumentDetails( arg ) ).join( ' ' );
+            .map( ( arg: IArgument ) => this.highlightArgumentDetails( arg ) ).join( ' ' );
     }
 
-    public static highlightArgumentDetails( arg: IArgumentDetails ): string {
+    public static highlightArgumentDetails( arg: IArgument ): string {
 
         let str = '';
 
