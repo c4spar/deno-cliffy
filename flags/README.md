@@ -185,16 +185,16 @@ $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./ex
 ## ❯ Custom type processing
 
 ```typescript
-import { parseFlags, IFlagOptions, IFlagArgument } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { parseFlags, IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
 
 parseFlags( Deno.args, {
-    parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => {
+    parse: ( { label, name, value, type }: IType ) => {
         switch ( type ) {
             case 'float':
-                if ( isNaN( nextValue as any ) ) {
-                    throw new Error( `Option --${ option.name } must be of type number but got: ${ nextValue }` );
+                if ( isNaN( Number( value ) ) ) {
+                    throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
                 }
-                return parseFloat( nextValue );
+                return parseFloat( value );
             default:
                 throw new Error( `Unknown type: ${ type }` );
         }

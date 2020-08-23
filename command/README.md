@@ -775,13 +775,13 @@ This example shows you how to use a function as type handler.
 
 ```typescript
 import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
-import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
 
 const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-function emailType( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+function emailType( { label, name, value }: IType ): string {
     if ( !emailRegex.test( value.toLowerCase() ) ) {
-        throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+        throw new Error( `${label} ${ name } must be a valid email but got: ${ value }` );
     }
     return value;
 }
@@ -812,16 +812,16 @@ This example shows you how to use a class as type handler.
 
 ```typescript
 import { Command, Type } from 'https://deno.land/x/cliffy/command/mod.ts';
-import { IFlagArgument, IFlagOptions } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
 
 class EmailType extends Type<string> {
 
     protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+    public parse( { label, name, value }: IType ): string {
 
         if ( !this.emailRegex.test( value.toLowerCase() ) ) {
-            throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+            throw new Error( `${label} ${ name } must be a valid email but got: ${ value }` );
         }
 
         return value;

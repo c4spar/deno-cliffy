@@ -1,9 +1,7 @@
-export type IType<T> = ( option: IFlagOptions, arg: IFlagArgument, value: string ) => T | undefined;
-
 /** Parse settings. */
 export interface IParseOptions {
     flags?: IFlagOptions[];
-    parse?: IParseType; // *
+    parse?: ITypeHandler;
     knownFlaks?: IFlags;
     stopEarly?: boolean;
     allowEmpty?: boolean;
@@ -52,9 +50,6 @@ export type IFlagValueType = string | boolean | number;
 /** Flag value handler for custom value processing. */
 export type IFlagValueHandler = ( val: any, previous?: any ) => any;
 
-/** Custom argument type parser. */
-export type IParseType<T = any> = ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => T;
-
 /** An object which represents all flags. */
 export type IFlags = Record<string, undefined | IFlagValue | IFlagValue[]>;
 
@@ -65,5 +60,12 @@ export interface IFlagsResult<O = any> {
     literal: string[];
 }
 
-/** Type parser method. */
-export type ITypeHandler<T> = ( option: IFlagOptions, arg: IFlagArgument, nextValue: string ) => T;
+export interface ITypeInfo {
+    label: string;
+    type: string;
+    name: string;
+    value: string;
+}
+
+/** Custom type handler/parser. */
+export type ITypeHandler<T = any> = ( type: ITypeInfo ) => T;

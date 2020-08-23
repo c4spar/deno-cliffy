@@ -1,9 +1,9 @@
-import { IFlagArgument, IFlagOptions, ITypeHandler } from '../types.ts';
+import { ITypeInfo, ITypeHandler } from '../types.ts';
 
-export const number: ITypeHandler<number> = ( option: IFlagOptions, arg: IFlagArgument, value: string ): number => {
+export const number: ITypeHandler<number> = ( { label, name, value, type }: ITypeInfo ): number => {
 
-    if ( isNaN( value as any ) ) {
-        throw new Error( `Option --${ option.name } must be of type number but got: ${ value }` );
+    if ( isNaN( Number( value ) ) ) {
+        throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
     }
 
     return parseFloat( value );

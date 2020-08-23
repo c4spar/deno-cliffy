@@ -1,6 +1,6 @@
-import { IFlagArgument, IFlagOptions, ITypeHandler } from '../types.ts';
+import { ITypeInfo, ITypeHandler } from '../types.ts';
 
-export const boolean: ITypeHandler<boolean> = ( option: IFlagOptions, arg: IFlagArgument, value: string ): boolean => {
+export const boolean: ITypeHandler<boolean> = ( { label, name, value, type }: ITypeInfo ): boolean => {
 
     if ( ~[ '1', 'true' ].indexOf( value ) ) {
         return true;
@@ -10,5 +10,5 @@ export const boolean: ITypeHandler<boolean> = ( option: IFlagOptions, arg: IFlag
         return false;
     }
 
-    throw new Error( `Option --${ option.name } must be of type boolean but got: ${ value }` );
+    throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
 };

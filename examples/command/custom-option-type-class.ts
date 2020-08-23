@@ -1,16 +1,16 @@
 #!/usr/bin/env -S deno run
 
 import { Command, Type } from '../../command/mod.ts';
-import { IFlagArgument, IFlagOptions } from '../../flags/types.ts';
+import { ITypeInfo } from '../../flags/types.ts';
 
 class EmailType extends Type<string> {
 
     protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    public parse( option: IFlagOptions, arg: IFlagArgument, value: string ): string {
+    public parse( { label, name, value }: ITypeInfo ): string {
 
         if ( !this.emailRegex.test( value.toLowerCase() ) ) {
-            throw new Error( `Option --${ option.name } must be a valid email but got: ${ value }` );
+            throw new Error( `${ label } ${ name } must be a valid email but got: ${ value }` );
         }
 
         return value;

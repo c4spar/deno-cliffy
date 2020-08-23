@@ -1,5 +1,5 @@
 import { parseFlags } from '../flags/flags.ts';
-import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeHandler } from '../flags/types.ts';
+import { IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeInfo, ITypeHandler } from '../flags/types.ts';
 import { existsSync, red } from './deps.ts';
 import { BooleanType } from './types/boolean.ts';
 import { NumberType } from './types/number.ts';
@@ -828,24 +828,22 @@ export class Command<O = any, A extends Array<any> = any> {
                 // knownFlaks,
                 allowEmpty: this._allowEmpty,
                 flags: this.getOptions( true ),
-                parse: ( type: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ) =>
-                    this.parseType( type, option, arg, nextValue )
+                parse: ( type: ITypeInfo ) => this.parseType( type )
             } );
         } catch ( e ) {
             throw this.error( e );
         }
     }
 
-    protected parseType( name: string, option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {
+    protected parseType( type: ITypeInfo ): any {
 
-        const typeSettings: IType | undefined = this.getType( name );
+        const typeSettings: IType | undefined = this.getType( type.type );
 
         if ( !typeSettings ) {
-            throw this.error( new Error( `No type registered with name: ${ name }` ) );
+            throw this.error( new Error( `No type registered with name: ${ type.type }` ) );
         }
 
-        // @TODO: pass only name & value to .parse() method
-        return typeSettings.handler instanceof Type ? typeSettings.handler.parse( option, arg, nextValue ) : typeSettings.handler( option, arg, nextValue );
+        return typeSettings.handler instanceof Type ? typeSettings.handler.parse( type ) : typeSettings.handler( type );
     }
 
     /**
@@ -868,8 +866,13 @@ export class Command<O = any, A extends Array<any> = any> {
             if ( name ) {
                 const value: string | undefined = Deno.env.get( name );
                 try {
-                    // @TODO: optimize handling for environment variable error message: parseFlag & parseEnv ?
-                    this.parseType( env.type, { name }, env, value || '' );
+                    // @TODO: optimize handling for environment variable error message: parseFlag/parseEnv?
+                    this.parseType( {
+                        label: 'Environment variable',
+                        type: env.type,
+                        name,
+                        value: value || ''
+                    } );
                 } catch ( e ) {
                     throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
                 }
@@ -1007,7 +1010,7 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     /**
-     * Get full command path of all parent command names's and current command name.
+     * Get full command path of all parent command names and current command name.
      */
     public getPath(): string {
 
