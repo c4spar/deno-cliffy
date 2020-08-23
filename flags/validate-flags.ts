@@ -1,4 +1,4 @@
-import { camelCaseToParamCase, paramCaseToCamelCase } from './_utils.ts';
+import { paramCaseToCamelCase } from './_utils.ts';
 import { getOption } from './flags.ts';
 import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
 
@@ -20,9 +20,11 @@ interface IFlagOptionsMap {
 export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
 
     const defaultValues: Record<string, boolean> = {};
+    const optionNames: Record<string, string> = {};
     // Set default value's
     for ( const option of flags ) {
         const name: string = paramCaseToCamelCase( option.name );
+        optionNames[ name ] = option.name;
         if ( typeof values[ name ] === 'undefined' && typeof option.default !== 'undefined' ) {
             values[ name ] = typeof option.default === 'function' ? option.default() : option.default;
             defaultValues[ option.name ] = true;
@@ -37,7 +39,7 @@ export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks
 
     const options: IFlagOptionsMap[] = keys.map( name => ( {
         name,
-        option: getOption( flags, camelCaseToParamCase( name ) )
+        option: getOption( flags, optionNames[ name ] )
     } ) );
 
     for ( const { name, option } of options ) {
