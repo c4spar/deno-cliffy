@@ -1,11 +1,11 @@
 import { assertEquals } from '../../../dev_deps.ts';
-import { IFlagArgument, IFlagOptions } from '../../../flags/types.ts';
+import { ITypeInfo } from '../../../flags/types.ts';
 import { Command } from '../../command.ts';
 
 const cmd = new Command()
     .version( '0.1.0' )
     .option( '-b, --base', 'Only available on this command.' )
-    .type( 'custom', ( option: IFlagOptions, arg: IFlagArgument, value: string ) => value.toUpperCase(), { global: true } )
+    .type( 'custom', ( { value }: ITypeInfo ) => value.toUpperCase(), { global: true } )
     .option( '-g, --global [val:custom]', 'Available on all command\'s.', { global: true } )
     .command( 'sub-command', new Command()
         .option( '-l, --level2 [val:custom]', 'Only available on this command.' )

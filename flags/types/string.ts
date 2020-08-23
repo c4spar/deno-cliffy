@@ -1,6 +1,6 @@
-import { IFlagArgument, IFlagOptions, ITypeHandler } from '../types.ts';
+import { ITypeInfo, ITypeHandler } from '../types.ts';
 
-export const string: ITypeHandler<string> = ( option: IFlagOptions, arg: IFlagArgument, value: string ): string => {
+export const string: ITypeHandler<string> = ( { value }: ITypeInfo ): string => {
 
     return value;
 };

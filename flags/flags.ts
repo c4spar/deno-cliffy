@@ -1,12 +1,12 @@
 import { paramCaseToCamelCase } from './_utils.ts';
 import { normalize } from './normalize.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, IType, OptionType } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, ITypeHandler, OptionType } from './types.ts';
 import { boolean } from './types/boolean.ts';
 import { number } from './types/number.ts';
 import { string } from './types/string.ts';
 import { validateFlags } from './validate-flags.ts';
 
-const Types: Record<string, IType<any>> = {
+const Types: Record<string, ITypeHandler<any>> = {
     [ OptionType.STRING ]: string,
     [ OptionType.NUMBER ]: number,
     [ OptionType.BOOLEAN ]: boolean
@@ -244,11 +244,16 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
                 }
 
                 /** Parse argument value.  */
-                function parseValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string ): IFlagValueType {
-
+                function parseValue( option: IFlagOptions, arg: IFlagArgument, value: string ): IFlagValueType {
+                    const type: string = arg.type || OptionType.STRING;
                     let result: IFlagValueType = opts.parse ?
-                        opts.parse( arg.type || OptionType.STRING, option, arg, nextValue ) :
-                        parseFlagValue( option, arg, nextValue );
+                        opts.parse( {
+                            label: 'Option',
+                            type,
+                            name: `--${ option.name }`,
+                            value
+                        } ) :
+                        parseFlagValue( option, arg, value );
 
                     if ( typeof result !== 'undefined' ) {
                         increase = true;
@@ -273,15 +278,21 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     return { flags: flags as any as O, unknown, literal };
 }
 
-export function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, nextValue: string ): any {
+function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, value: string ): any {
 
-    const type = Types[ arg.type || OptionType.STRING ];
+    const type: string = arg.type || OptionType.STRING;
+    const parseType = Types[ type ];
 
-    if ( !type ) {
-        throw new Error( `Unknown type ${ arg.type }` );
+    if ( !parseType ) {
+        throw new Error( `Unknown type ${ type }` );
     }
 
-    return type( option, arg, nextValue );
+    return parseType( {
+        label: 'Option',
+        type,
+        name: `--${ option.name }`,
+        value
+    } );
 }
 
 /**
