@@ -3,7 +3,7 @@ import { Table } from '../../table/table.ts';
 import { ArgumentsParser } from '../_arguments-parser.ts';
 import { Command } from '../command.ts';
 import { blue, bold, dim, magenta, red, yellow } from '../deps.ts';
-import { IEnvVariable, IExample, IOption } from '../types.ts';
+import { IEnvVar, IExample, IOption } from '../types.ts';
 
 export class HelpGenerator {
 
@@ -133,7 +133,7 @@ export class HelpGenerator {
         }
         return this.label( 'Environment variables' ) +
             Table.from( [
-                    ...envVars.map( ( envVar: IEnvVariable ) => [
+                    ...envVars.map( ( envVar: IEnvVar ) => [
                         envVar.names.map( ( name: string ) => blue( name ) ).join( ', ' ),
                         ArgumentsParser.highlightArgumentDetails( envVar.details ),
                         `${ red( bold( '-' ) ) } ${ envVar.description }`
