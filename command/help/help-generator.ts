@@ -1,4 +1,3 @@
-import { IFlagOptions } from '../../flags/types.ts';
 import { Table } from '../../table/table.ts';
 import { ArgumentsParser } from '../_arguments-parser.ts';
 import { Command } from '../command.ts';
@@ -145,7 +144,7 @@ export class HelpGenerator {
     }
 
     private generateExamples(): string {
-        const examples = this.cmd.getExamples();
+        const examples = this.cmd.getExamples();///Users/psychedelix/workspace/deno/deno-cliffy/command/test/option/action_test.ts
         if ( !examples.length ) {
             return '';
         }
@@ -160,7 +159,7 @@ export class HelpGenerator {
                 .toString() + '\n';
     }
 
-    private generateHints( option: IFlagOptions ): string {
+    private generateHints( option: IOption ): string {
         const hints = [];
 
         option.required && hints.push( yellow( `required` ) );

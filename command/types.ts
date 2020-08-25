@@ -1,6 +1,13 @@
-import { IFlagArgument, IFlagOptions, ITypeHandler } from '../flags/types.ts';
+import { IDefaultValue, IFlagArgument, IFlagOptions, ITypeInfo, IFlagValueHandler, ITypeHandler } from '../flags/types.ts';
 import { Type } from './type.ts';
 import { Command } from './command.ts';
+
+export {
+    IDefaultValue,
+    IFlagValueHandler,
+    ITypeHandler,
+    ITypeInfo
+};
 
 /* COMMAND TYPES */
 
@@ -30,9 +37,10 @@ export interface IParseResult<O = any, A extends Array<any> = any> {
 
 /* OPTION TYPES */
 
+type ExcludedCommandOptions = 'name' | 'args' | 'type' | 'optionalValue' | 'aliases' | 'variadic' | 'list';
+
 /** Command option options. */
-export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<IFlagOptions,
-    'name' | 'args' | 'type' | 'optionalValue' | 'aliases' | 'variadic' | 'list'> {
+export interface ICommandOption<O = any, A extends Array<any> = any> extends Omit<IFlagOptions, ExcludedCommandOptions> {
     override?: boolean;
     hidden?: boolean;
     global?: boolean;

@@ -1,4 +1,3 @@
-import { IFlags } from '../../flags/types.ts';
 import { Command } from '../command.ts';
 import { CommandType } from '../types/command.ts';
 
@@ -12,7 +11,7 @@ export class HelpCommand extends Command {
         this.type( 'command', new CommandType() )
             .arguments( '[command:command]' )
             .description( 'Show this help or the help of a sub-command.' )
-            .action( ( flags: IFlags, name?: string ) => {
+            .action( ( _, name?: string ) => {
                 if ( !cmd ) {
                     cmd = name ? this.getGlobalParent()?.getBaseCommand( name ) : this.getGlobalParent();
                 }

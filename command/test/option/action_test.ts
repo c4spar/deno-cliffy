@@ -23,7 +23,7 @@ Deno.test( 'command optionAction action', async () => {
         .throwErrors()
         .arguments( '[beep:string]' )
         .option( '-f, --foo [value:string]', 'action ...', {
-            action: function ( options, ...args ) {
+            action: function ( options: any, ...args: any[] ) {
                 stats.context = this;
                 stats.options = options;
                 stats.args = args;
@@ -49,7 +49,7 @@ Deno.test( 'command optionAction action', async () => {
         .command( 'foo', subCmd = new Command()
             .arguments( '[beep:string]' )
             .option( '-b, --bar [value:string]', 'action ...', {
-                action: function ( options, ...args ) {
+                action: function ( options: any, ...args: any[] ) {
                     stats.context = this;
                     stats.options = options;
                     stats.args = args;

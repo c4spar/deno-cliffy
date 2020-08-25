@@ -1,6 +1,6 @@
 import { paramCaseToCamelCase } from './_utils.ts';
 import { getOption } from './flags.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagValue } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlagValue } from './types.ts';
 
 // @TODO: add support for knownFlaks
 
@@ -17,7 +17,7 @@ interface IFlagOptionsMap {
  * @param knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
  */
-export function validateFlags( flags: IFlagOptions[], values: IFlags, knownFlaks?: IFlags, allowEmpty?: boolean ): void {
+export function validateFlags( flags: IFlagOptions[], values: Record<string, unknown>, knownFlaks?: Record<string, unknown>, allowEmpty?: boolean ): void {
 
     const defaultValues: Record<string, boolean> = {};
     const optionNames: Record<string, string> = {};

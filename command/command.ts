@@ -1,5 +1,5 @@
 import { parseFlags } from '../flags/flags.ts';
-import { IFlagsResult, IFlagValue, IFlagValueHandler, IFlagValueType, ITypeInfo, ITypeHandler } from '../flags/types.ts';
+import { IFlagsResult } from '../flags/types.ts';
 import { existsSync, red } from './deps.ts';
 import { BooleanType } from './types/boolean.ts';
 import { NumberType } from './types/number.ts';
@@ -7,7 +7,7 @@ import { StringType } from './types/string.ts';
 import { Type } from './type.ts';
 import { ArgumentsParser } from './_arguments-parser.ts';
 import { HelpGenerator } from './help/help-generator.ts';
-import { IAction, IArgument, ICommandOption, ICompleteHandler, ICompleteOptions, ICompletion, IDescription, IEnvVar, IEnvVarOptions, IExample, IOption, IParseResult, ITypeOptions, IType } from './types.ts';
+import { IAction, IArgument, ICommandOption, ICompleteHandler, ICompleteOptions, ICompletion, IDescription, IEnvVar, IEnvVarOptions, IExample, IOption, IParseResult, ITypeOptions, IType, ITypeInfo, ITypeHandler, IFlagValueHandler } from './types.ts';
 
 type PermissionName =
     | 'run'
@@ -618,12 +618,12 @@ export class Command<O = any, A extends Array<any> = any> {
                 await this.executeExecutable( this.rawArgs );
             }
 
-            return { options: {} as O, args: this.rawArgs as any as A, cmd: this, literal: this.literalArgs };
+            return { options: {} as O, args: this.rawArgs as A, cmd: this, literal: this.literalArgs };
 
         } else if ( this._useRawArgs ) {
 
             if ( dry ) {
-                return { options: {} as O, args: this.rawArgs as any as A, cmd: this, literal: this.literalArgs };
+                return { options: {} as O, args: this.rawArgs as A, cmd: this, literal: this.literalArgs };
             }
 
             return await this.execute( {} as O, ...this.rawArgs as A );
@@ -639,7 +639,7 @@ export class Command<O = any, A extends Array<any> = any> {
             this.validateEnvVars();
 
             if ( dry ) {
-                return { options: flags, args: params as any as A, cmd: this, literal: this.literalArgs };
+                return { options: flags, args: params, cmd: this, literal: this.literalArgs };
             }
 
             return await this.execute( flags, ...params );
@@ -699,7 +699,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
         if ( actionOption && actionOption.action ) {
             await actionOption.action.call( this, options, ...args );
-            return { options, args: args as any as A, cmd: this, literal: this.literalArgs };
+            return { options, args, cmd: this, literal: this.literalArgs };
         }
 
         if ( this.fn ) {
@@ -727,7 +727,7 @@ export class Command<O = any, A extends Array<any> = any> {
             }
         }
 
-        return { options, args: args as any as A, cmd: this, literal: this.literalArgs };
+        return { options, args, cmd: this, literal: this.literalArgs };
     }
 
     /**
@@ -864,18 +864,12 @@ export class Command<O = any, A extends Array<any> = any> {
         envVars.forEach( ( env: IEnvVar ) => {
             const name = env.names.find( name => !!Deno.env.get( name ) );
             if ( name ) {
-                const value: string | undefined = Deno.env.get( name );
-                try {
-                    // @TODO: optimize handling for environment variable error message: parseFlag/parseEnv?
-                    this.parseType( {
-                        label: 'Environment variable',
-                        type: env.type,
-                        name,
-                        value: value || ''
-                    } );
-                } catch ( e ) {
-                    throw new Error( `Environment variable '${ name }' must be of type ${ env.type } but got: ${ value }` );
-                }
+                this.parseType( {
+                    label: 'Environment variable',
+                    type: env.type,
+                    name,
+                    value: Deno.env.get( name ) ?? ''
+                } );
             }
         } );
     }
@@ -885,7 +879,7 @@ export class Command<O = any, A extends Array<any> = any> {
      */
     protected parseArguments( args: string[], flags: O ): A {
 
-        const params: IFlagValue[] = [];
+        const params: Array<string | Array<string>> = [];
 
         // remove array reference
         args = args.slice( 0 );
@@ -896,7 +890,7 @@ export class Command<O = any, A extends Array<any> = any> {
                 if ( this.hasCommands( true ) ) {
                     throw this.error( new Error( `Unknown command: ${ args.join( ' ' ) }` ) );
                 } else {
-                    throw this.error( new Error( `No arguments allowed for command: ${ this._name }` ) );
+                    throw this.error( new Error( `No arguments allowed for command: ${ this.getPath() }` ) );
                 }
             }
 
@@ -916,31 +910,30 @@ export class Command<O = any, A extends Array<any> = any> {
                         throw this.error( new Error( 'Missing argument(s): ' + required.join( ', ' ) ) );
                     }
                 }
+            } else {
 
-                return params as A;
-            }
+                for ( const expectedArg of this.getArguments() ) {
 
-            for ( const expectedArg of this.getArguments() ) {
+                    if ( !expectedArg.optionalValue && !args.length ) {
+                        throw this.error( new Error( `Missing argument: ${ expectedArg.name }` ) );
+                    }
 
-                if ( !expectedArg.optionalValue && !args.length ) {
-                    throw this.error( new Error( `Missing argument: ${ expectedArg.name }` ) );
+                    let arg: undefined | string | string[];
+
+                    if ( expectedArg.variadic ) {
+                        arg = args.splice( 0, args.length );
+                    } else {
+                        arg = args.shift();
+                    }
+
+                    if ( arg ) {
+                        params.push( arg );
+                    }
                 }
 
-                let arg: IFlagValue;
-
-                if ( expectedArg.variadic ) {
-                    arg = args.splice( 0, args.length ) as IFlagValueType[];
-                } else {
-                    arg = args.shift() as IFlagValue;
+                if ( args.length ) {
+                    throw this.error( new Error( `To many arguments: ${ args.join( ' ' ) }` ) );
                 }
-
-                if ( arg ) {
-                    params.push( arg );
-                }
-            }
-
-            if ( args.length ) {
-                throw this.error( new Error( `To many arguments: ${ args.join( ' ' ) }` ) );
             }
         }
 

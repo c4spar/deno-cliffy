@@ -1,5 +1,5 @@
-import { ITypeInfo } from '../flags/types.ts';
 import { Command } from './command.ts';
+import { ITypeInfo } from './types.ts';
 
 export abstract class Type<T> {
 

@@ -1,6 +1,6 @@
 import { assertEquals, assertThrowsAsync } from '../../../dev_deps.ts';
 import { Command } from '../../command.ts';
-import { ITypeHandler, ITypeInfo } from '../../../flags/types.ts';
+import { ITypeInfo, ITypeHandler } from '../../types.ts';
 
 const email = (): ITypeHandler<string> => {
 

@@ -1,4 +1,3 @@
-import { IFlags } from '../../flags/types.ts';
 import { Command } from '../command.ts';
 import { ICompletion } from '../types.ts';
 
@@ -11,7 +10,7 @@ export class CompleteCommand extends Command {
         super();
         this.description( 'Get completions for given action from given command.' )
             .arguments( '<action:action> [command...:command]' )
-            .action( async ( options: IFlags, action: string, commandNames: string[] ) => {
+            .action( async ( _, action: string, commandNames: string[] ) => {
 
                 let parent: Command | undefined;
                 let completeCommand: Command = commandNames
