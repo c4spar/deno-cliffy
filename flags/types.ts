@@ -1,8 +1,8 @@
 /** Parse settings. */
 export interface IParseOptions {
     flags?: IFlagOptions[];
-    parse?: ITypeHandler;
-    knownFlaks?: IFlags;
+    parse?: ITypeHandler<unknown>;
+    knownFlaks?: Record<string, unknown>;
     stopEarly?: boolean;
     allowEmpty?: boolean;
 }
@@ -47,14 +47,11 @@ export type IFlagValue = IFlagValueType | IFlagValueType[];
 /** Flag value type. */
 export type IFlagValueType = string | boolean | number;
 
-/** Flag value handler for custom value processing. */
+/** Value handler for custom value processing. */
 export type IFlagValueHandler = ( val: any, previous?: any ) => any;
 
-/** An object which represents all flags. */
-export type IFlags = Record<string, undefined | IFlagValue | IFlagValue[]>;
-
 /** Result of the parseFlags method. */
-export interface IFlagsResult<O = any> {
+export interface IFlagsResult<O extends Record<string, any> = Record<string, any>> {
     flags: O;
     unknown: string[];
     literal: string[];

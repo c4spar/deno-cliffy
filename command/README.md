@@ -899,7 +899,7 @@ $ SOME_ENV_VAR=1 deno run --allow-env --unstable https://deno.land/x/cliffy/exam
 1
 
 $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment-variables.ts
-Error: Environment variable 'SOME_ENV_VAR' must be of type number but got: abc
+Error: Environment variable SOME_ENV_VAR must be of type number but got: abc
 ```
 
 ## ❯ Add examples

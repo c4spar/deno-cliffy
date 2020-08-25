@@ -29,7 +29,7 @@ Deno.test( 'command environment variable invalid number', async () => {
 
     await assertThrowsAsync( async () => {
         await command().parse( [] );
-    }, Error, 'Environment variable \'SOME_ENV_VAR\' must be of type number but got: 1a' );
+    }, Error, 'Environment variable SOME_ENV_VAR must be of type number but got: 1a' );
 
     Deno.env.set( 'SOME_ENV_VAR', '' );
 } );
@@ -53,7 +53,7 @@ Deno.test( 'command environment variable invalid boolean', async () => {
 
     await assertThrowsAsync( async () => {
         await command().parse( [] );
-    }, Error, 'Environment variable \'SOME_OTHER_ENV_VAR\' must be of type boolean but got: 2' );
+    }, Error, 'Environment variable SOME_OTHER_ENV_VAR must be of type boolean but got: 2' );
 
     Deno.env.set( 'SOME_ENV_VAR', '' );
 } );

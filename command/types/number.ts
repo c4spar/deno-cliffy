@@ -1,6 +1,6 @@
-import { ITypeInfo } from '../../flags/types.ts';
 import { number } from '../../flags/types/number.ts';
 import { Type } from '../type.ts';
+import { ITypeInfo } from '../types.ts';
 
 export class NumberType extends Type<number> {
 

@@ -1,6 +1,6 @@
 import { assertEquals } from '../../../dev_deps.ts';
-import { ITypeInfo } from '../../../flags/types.ts';
 import { Command } from '../../command.ts';
+import { ITypeInfo } from '../../types.ts';
 
 const cmd = new Command()
     .version( '0.1.0' )

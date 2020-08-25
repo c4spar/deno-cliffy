@@ -1,12 +1,12 @@
 import { paramCaseToCamelCase } from './_utils.ts';
 import { normalize } from './normalize.ts';
-import { IFlagArgument, IFlagOptions, IFlags, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, ITypeHandler, OptionType } from './types.ts';
+import { IFlagArgument, IFlagOptions, IFlagsResult, IFlagValue, IFlagValueType, IParseOptions, ITypeHandler, OptionType } from './types.ts';
 import { boolean } from './types/boolean.ts';
 import { number } from './types/number.ts';
 import { string } from './types/string.ts';
 import { validateFlags } from './validate-flags.ts';
 
-const Types: Record<string, ITypeHandler<any>> = {
+const Types: Record<string, ITypeHandler<unknown>> = {
     [ OptionType.STRING ]: string,
     [ OptionType.NUMBER ]: number,
     [ OptionType.BOOLEAN ]: boolean
@@ -18,7 +18,7 @@ const Types: Record<string, ITypeHandler<any>> = {
  * @param args  Command line arguments e.g: `Deno.args`
  * @param opts  Parse options.
  */
-export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ): IFlagsResult<O> {
+export function parseFlags<O extends Record<string, any> = Record<string, any>>( args: string[], opts: IParseOptions = {} ): IFlagsResult<O> {
 
     !opts.flags && ( opts.flags = [] );
 
@@ -27,7 +27,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
     let inLiteral = false;
     let negate = false;
 
-    const flags: IFlags = {};
+    const flags: Record<string, unknown> = {};
     const literal: string[] = [];
     const unknown: string[] = [];
     let stopEarly: boolean = false;
@@ -129,7 +129,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
             if ( typeof option.value !== 'undefined' ) {
                 flags[ friendlyName ] = option.value( flags[ friendlyName ], previous );
             } else if ( option.collect ) {
-                const value = ( previous || [] ) as IFlagValue[];
+                const value: IFlagValue[] = Array.isArray( previous ) ? previous : [];
                 value.push( flags[ friendlyName ] as IFlagValue );
                 flags[ friendlyName ] = value;
             }
@@ -275,7 +275,7 @@ export function parseFlags<O = any>( args: string[], opts: IParseOptions = {} ):
         validateFlags( opts.flags, flags, opts.knownFlaks, opts.allowEmpty );
     }
 
-    return { flags: flags as any as O, unknown, literal };
+    return { flags: flags as O, unknown, literal };
 }
 
 function parseFlagValue( option: IFlagOptions, arg: IFlagArgument, value: string ): any {
