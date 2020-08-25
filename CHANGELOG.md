@@ -1,3 +1,111 @@
+# [v0.13.0](https://github.com/c4spar/deno-cli/compare/v0.12.1...v0.13.0) (2020-08-25)
+
+### Features
+
+* **prompt:** add support for prompt list and dynamic prompts ([6968c1d](https://github.com/c4spar/deno-cli/commit/6968c1d))
+
+### Bug Fixes
+
+* **flags:** standalone parameter incompatible with dashed parameter which has a default value ([1aa9b55](https://github.com/c4spar/deno-cli/commit/1aa9b55))
+* **prompt:** cursor not visible after error ([1de8a84](https://github.com/c4spar/deno-cli/commit/1de8a84))
+
+### Performance Improvements
+
+* **command,flags:** implement simple camel-case and remove param-case and snake-case methods to improve performance ([20dc077](https://github.com/c4spar/deno-cli/commit/20dc077), [4587284](https://github.com/c4spar/deno-cli/commit/4587284))
+
+### Code Refactoring
+
+* remove format utils method ([2496431](https://github.com/c4spar/deno-cli/commit/2496431))
+* refactor project structure for url friendly imports ([8b5fbdd](https://github.com/c4spar/deno-cli/commit/8b5fbdd))
+* **ansi-escape:** add return types ([2bb165c](https://github.com/c4spar/deno-cli/commit/2bb165c))
+* **command:** re-export flag types in command module and some refactorings ([05b3c9e](https://github.com/c4spar/deno-cli/commit/05b3c9e))
+* **command:** refactor error message ([6f6e750](https://github.com/c4spar/deno-cli/commit/6f6e750))
+* **command:** remove some helper methods: write, writeError, log, logError from command class ([88bdc95](https://github.com/c4spar/deno-cli/commit/88bdc95))
+* **command:** refactor completions command description and disable unimplemented bash completions command ([a181cbb](https://github.com/c4spar/deno-cli/commit/a181cbb))
+* **command:** add version option only if version is set ([32e6687](https://github.com/c4spar/deno-cli/commit/32e6687))
+* **prompt:** remove read-line module and move methods to generic prompt class ([dd1de10](https://github.com/c4spar/deno-cli/commit/dd1de10))
+
+### Style
+
+* **ansi-escape:** add semicolons ([7ed6424](https://github.com/c4spar/deno-cli/commit/7ed6424))
+
+### Chore
+
+* **ci:** update deno version to v1.3.1 (#62) ([1cff32b](https://github.com/c4spar/deno-cli/commit/1cff32b))
+* **deno:** update deno/std to v0.66.0 (#63) ([5c27a4b](https://github.com/c4spar/deno-cli/commit/5c27a4b))
+
+### Documentation Updates
+
+* update readmes (#67) ([811e310](https://github.com/c4spar/deno-cli/commit/811e310))
+* **command:** update examples ([f42d15f](https://github.com/c4spar/deno-cli/commit/f42d15f))
+
+### BREAKING CHANGES
+
+* **command:** refactor external sub-commands (#66) ([6181747](https://github.com/c4spar/deno-cli/commit/6181747))
+
+    Following line no longer registers an external command.
+
+    ```typescript
+    new Command()
+        .command( 'sub-command', 'description...' ) //
+
+    // is same as
+    new Command()
+        .command( 'sub-command' )
+        .description( 'description...' )
+    ```
+
+    To register an external command you have to use the `.external()` method for now.
+
+    ```typescript
+    new Command()
+        .command( 'sub-command', 'description...' )
+        .external()
+
+    // is same as
+    new Command()
+        .command( 'sub-command' )
+        .description( 'description...' )
+        .external()
+    ```
+
+* **command,flags:** refactor type handler ([bf12441](https://github.com/c4spar/deno-cli/commit/bf12441))
+
+    To make types compatible with environment variable and arguments the arguments of the type handler has changed from:
+    
+    ```typescript
+    const myType: ITypeHandler<number> = ( option: IFlagOptions, arg: IFlagArgument, value: string ): number => {};
+    ```
+    
+    to:
+    
+    ```typescript
+    const myType: ITypeHandler<number> = ( { label, name, value, type }: ITypeInfo ): number => {};
+    ```
+    
+    This makes it possible to write a single error messages for different contexts.
+    
+    ```typescript
+    throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
+    ```
+    
+    For options the error message will be: `Option --my-option must be of type number but got: abc`
+    For environment variables the error message will be: `Environment variable MY_ENV_VAR must be of type number but got: abc`
+    For arguments the error message will be: `Argument my-argument must be of type number but got: abc`
+
+* **command,flags:** rename some types ([0645313](https://github.com/c4spar/deno-cli/commit/0645313))
+
+    - ICompletionSettings -> ICompletion
+    - IArgumentDetails -> IArgument
+    - ITypeOption -> ITypeOptions
+    - ITypeSettings -> ITypeInfo
+    - IEnvVariable -> IEnvVar
+    - IEnvVarOption -> IEnvVarOptions
+
+* **table:** rename min/maxCellWidth to min/maxColWidth (#65) ([c75b94c](https://github.com/c4spar/deno-cli/commit/c75b94c))
+
+
+
 # [v0.12.1](https://github.com/c4spar/deno-cli/compare/v0.12.0...v0.12.1) (2020-08-03)
 
 ### Bug Fixes
