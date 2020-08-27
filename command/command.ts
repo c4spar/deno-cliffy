@@ -932,7 +932,7 @@ export class Command<O = any, A extends Array<any> = any> {
                 }
 
                 if ( args.length ) {
-                    throw this.error( new Error( `To many arguments: ${ args.join( ' ' ) }` ) );
+                    throw this.error( new Error( `Too many arguments: ${ args.join( ' ' ) }` ) );
                 }
             }
         }
