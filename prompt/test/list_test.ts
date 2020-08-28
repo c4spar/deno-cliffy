@@ -42,6 +42,7 @@ Deno.test("prompt list: empty value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       List.inject(null as any);
       await List.prompt({
         message: "message",
@@ -138,6 +139,7 @@ Deno.test("prompt list: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       List.inject(null as any);
       await List.prompt("message");
     },

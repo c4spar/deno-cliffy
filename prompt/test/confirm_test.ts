@@ -65,6 +65,7 @@ Deno.test("prompt confirm: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Confirm.inject(null as any);
       await Confirm.prompt("message");
     },

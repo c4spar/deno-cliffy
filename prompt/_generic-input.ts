@@ -27,8 +27,8 @@ export interface GenericInputPromptSettings<T>
 
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
-  protected input: string = "";
-  protected index: number = 0;
+  protected input = "";
+  protected index = 0;
 
   public static inject(value: string): void {
     GenericPrompt.inject(value);

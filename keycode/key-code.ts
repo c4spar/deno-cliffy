@@ -4,7 +4,9 @@ import { IKey, KeyEvent } from "./key-event.ts";
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = "\x1b";
 
+// deno-lint-ignore no-explicit-any
 const permissions: any = (Deno as any).permissions;
+// deno-lint-ignore no-explicit-any
 const envPermissionStatus: any = permissions && permissions.query &&
   await permissions.query({ name: "env" });
 const hasEnvPermissions: boolean = !!envPermissionStatus &&
@@ -69,7 +71,7 @@ export class KeyCode {
     function parseNext() {
       let ch: string = next();
       let s: string = ch;
-      let escaped: boolean = false;
+      let escaped = false;
 
       const key: IKey = {
         name: undefined,
@@ -91,7 +93,7 @@ export class KeyCode {
       if (escaped && (ch === "O" || ch === "[")) {
         // ANSI escape sequence
         let code: string = ch;
-        let modifier: number = 0;
+        let modifier = 0;
 
         if (ch === "O") {
           // ESC O letter
@@ -99,7 +101,7 @@ export class KeyCode {
           s += (ch = next());
 
           if (ch >= "0" && ch <= "9") {
-            modifier = ((ch as any) >> 0) - 1;
+            modifier = (Number(ch) >> 0) - 1;
             s += (ch = next());
           }
 
@@ -174,10 +176,10 @@ export class KeyCode {
 
           if ((match = cmd.match(/^(\d\d?)(;(\d))?([~^$])$/))) {
             code += match[1] + match[4];
-            modifier = ((match[3] as any) || 1) - 1;
+            modifier = (Number(match[3]) || 1) - 1;
           } else if ((match = cmd.match(/^((\d;)?(\d))?([A-Za-z])$/))) {
             code += match[4];
-            modifier = ((match[3] as any) || 1) - 1;
+            modifier = (Number(match[3]) || 1) - 1;
           } else {
             code += cmd;
           }

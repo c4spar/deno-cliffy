@@ -3,8 +3,8 @@ import { Command } from "../../command.ts";
 
 interface IStats {
   context: null | Command;
-  options: any;
-  args: any;
+  options: unknown;
+  args: unknown;
 }
 
 function createStats(): IStats {
@@ -22,7 +22,7 @@ Deno.test("command optionAction action", async () => {
     .throwErrors()
     .arguments("[beep:string]")
     .option("-f, --foo [value:string]", "action ...", {
-      action: function (options: any, ...args: any[]) {
+      action: function (options, ...args) {
         stats.context = this;
         stats.options = options;
         stats.args = args;
@@ -49,7 +49,7 @@ Deno.test("command optionAction action", async () => {
       subCmd = new Command()
         .arguments("[beep:string]")
         .option("-b, --bar [value:string]", "action ...", {
-          action: function (options: any, ...args: any[]) {
+          action: function (options, ...args) {
             stats.context = this;
             stats.options = options;
             stats.args = args;

@@ -3,7 +3,7 @@
 import { Command, ITypeInfo, Type } from "../../command/mod.ts";
 
 class EmailType extends Type<string> {
-  protected emailRegex: RegExp =
+  protected emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   public parse({ label, name, value }: ITypeInfo): string {

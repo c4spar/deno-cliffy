@@ -10,9 +10,9 @@ import {
 } from "./_generic-list.ts";
 import { GenericPrompt } from "./_generic-prompt.ts";
 
-export interface SelectOption extends GenericListOption {}
+export type SelectOption = GenericListOption;
 
-export interface SelectOptionSettings extends GenericListOptionSettings {}
+export type SelectOptionSettings = GenericListOptionSettings;
 
 export type SelectValueOptions = (string | SelectOption)[];
 export type SelectValueSettings = SelectOptionSettings[];
@@ -23,7 +23,7 @@ export interface SelectKeys {
   submit?: string[];
 }
 
-interface SelectKeysSettings extends Required<SelectKeys> {}
+type SelectKeysSettings = Required<SelectKeys>;
 
 export interface SelectOptions extends GenericListOptions<string, string> {
   options: SelectValueOptions;

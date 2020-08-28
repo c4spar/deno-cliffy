@@ -1,3 +1,5 @@
+// deno-lint-ignore-file
+
 import { AnsiEscape } from "../ansi-escape/ansi-escape.ts";
 import {
   GenericPrompt,
@@ -1982,7 +1984,7 @@ class PromptList {
   private result: Record<string, any> = {};
   private index: number = -1;
   private names: string[] = this.prompts.map((prompt) => prompt.name);
-  private isInBeforeHook: boolean = false;
+  private isInBeforeHook = false;
 
   private get prompt(): PromptOptions<string, any, any> {
     return this.prompts[this.index];

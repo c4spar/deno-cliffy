@@ -13,7 +13,7 @@ export interface ToggleKeys {
   submit?: string[];
 }
 
-interface ToggleKeysSettings extends Required<ToggleKeys> {}
+type ToggleKeysSettings = Required<ToggleKeys>;
 
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
   active?: string;

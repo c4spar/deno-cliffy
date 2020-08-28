@@ -31,7 +31,7 @@ export class Row<T extends ICell = ICell> extends Array<T> {
      * Setter:
      */
 
-  public border(enable: boolean, override: boolean = true): this {
+  public border(enable: boolean, override = true): this {
     if (override || typeof this.options.border === "undefined") {
       this.options.border = enable;
     }

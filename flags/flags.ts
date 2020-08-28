@@ -4,8 +4,6 @@ import {
   IFlagArgument,
   IFlagOptions,
   IFlagsResult,
-  IFlagValue,
-  IFlagValueType,
   IParseOptions,
   ITypeHandler,
   OptionType,
@@ -27,6 +25,7 @@ const Types: Record<string, ITypeHandler<unknown>> = {
  * @param args  Command line arguments e.g: `Deno.args`
  * @param opts  Parse options.
  */
+// deno-lint-ignore no-explicit-any
 export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   args: string[],
   opts: IParseOptions = {},
@@ -41,7 +40,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   const flags: Record<string, unknown> = {};
   const literal: string[] = [];
   const unknown: string[] = [];
-  let stopEarly: boolean = false;
+  let stopEarly = false;
 
   opts.flags.forEach((opt) => {
     opt.depends?.forEach((flag) => {
@@ -138,8 +137,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       if (typeof option.value !== "undefined") {
         flags[friendlyName] = option.value(flags[friendlyName], previous);
       } else if (option.collect) {
-        const value: IFlagValue[] = Array.isArray(previous) ? previous : [];
-        value.push(flags[friendlyName] as IFlagValue);
+        const value: unknown[] = Array.isArray(previous) ? previous : [];
+        value.push(flags[friendlyName]);
         flags[friendlyName] = value;
       }
 
@@ -196,11 +195,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           return;
         }
 
-        let result: IFlagValue | undefined;
+        let result: unknown;
         let increase = false;
 
         if (arg.list && hasNext(arg)) {
-          const parsed: IFlagValueType[] = next()
+          const parsed: unknown[] = next()
             .split(arg.separator || ",")
             .map((nextValue: string) => {
               const value = parseValue(option, arg, nextValue);
@@ -242,7 +241,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             flags[friendlyName] = [];
           }
 
-          (flags[friendlyName] as IFlagValue[]).push(result);
+          (flags[friendlyName] as Array<unknown>).push(result);
 
           if (hasNext(arg)) {
             parseNext(option, args);
@@ -258,7 +257,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             (arg.optionalValue || arg.requiredValue || arg.variadic) &&
             (normalized[i + 1][0] !== "-" ||
               (arg.type === OptionType.NUMBER &&
-                !isNaN(normalized[i + 1] as any))) &&
+                !isNaN(Number(normalized[i + 1])))) &&
             arg
           );
         }
@@ -268,9 +267,9 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           option: IFlagOptions,
           arg: IFlagArgument,
           value: string,
-        ): IFlagValueType {
+        ): unknown {
           const type: string = arg.type || OptionType.STRING;
-          let result: IFlagValueType = opts.parse
+          let result: unknown = opts.parse
             ? opts.parse({
               label: "Option",
               type,
@@ -305,7 +304,7 @@ function parseFlagValue(
   option: IFlagOptions,
   arg: IFlagArgument,
   value: string,
-): any {
+): unknown {
   const type: string = arg.type || OptionType.STRING;
   const parseType = Types[type];
 

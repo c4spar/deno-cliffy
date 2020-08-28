@@ -60,6 +60,7 @@ Deno.test("prompt secret: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Secret.inject(null as any);
       await Secret.prompt("message");
     },

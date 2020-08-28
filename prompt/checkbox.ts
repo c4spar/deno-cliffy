@@ -27,7 +27,7 @@ export interface CheckboxKeys {
   check?: string[];
 }
 
-interface CheckboxKeysSettings extends Required<CheckboxKeys> {}
+type CheckboxKeysSettings = Required<CheckboxKeys>;
 
 export type CheckboxValueOptions = (string | CheckboxOption)[];
 export type CheckboxValueSettings = CheckboxOptionSettings[];
@@ -79,7 +79,7 @@ export class Checkbox
     }).prompt();
   }
 
-  public static separator(label: string = "------------"): CheckboxOption {
+  public static separator(label = "------------"): CheckboxOption {
     return {
       ...super.separator(),
       icon: false,

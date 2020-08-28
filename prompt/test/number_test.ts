@@ -55,6 +55,7 @@ Deno.test("prompt number: invalid value", async () => {
 Deno.test("prompt number: null value", async () => {
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Number.inject(null as any);
       await Number.prompt("message");
     },

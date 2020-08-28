@@ -51,6 +51,7 @@ Deno.test("prompt toggle: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Toggle.inject(null as any);
       await Toggle.prompt("message");
     },

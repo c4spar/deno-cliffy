@@ -74,7 +74,7 @@ compdef _${replaceSpecialChars(this.cmd.getPath())} ${this.cmd.getPath()}
   /**
      * Generates zsh completions method for given command and child commands.
      */
-  private generateCompletions(command: Command, path: string = ""): string {
+  private generateCompletions(command: Command, path = ""): string {
     if (
       !command.hasCommands(false) && !command.hasOptions(false) &&
       !command.hasArguments()
@@ -239,7 +239,7 @@ function _${replaceSpecialChars(path)}() {` +
       ...option.flags.split(/[, ] */g),
     ];
 
-    let args: string = "";
+    let args = "";
     for (const arg of option.args) {
       const action = this.addAction(arg, completionsPath);
 

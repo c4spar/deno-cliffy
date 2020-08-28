@@ -5,8 +5,8 @@ import { Confirm } from "../confirm.ts";
 import { Number } from "../number.ts";
 
 Deno.test("prompt list", async () => {
-  let beforeCalled: number = 0;
-  let afterCalled: number = 0;
+  let beforeCalled = 0;
+  let afterCalled = 0;
   const expectedResult = {
     animals: ["dog", "snake"],
     like: true,

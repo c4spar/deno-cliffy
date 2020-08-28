@@ -5,7 +5,7 @@ import { blue, bold, dim, magenta, red, yellow } from "../deps.ts";
 import { IEnvVar, IExample, IOption } from "../types.ts";
 
 export class HelpGenerator {
-  private indent: number = 2;
+  private indent = 2;
 
   public static generate(cmd: Command): string {
     return new HelpGenerator(cmd).generate();

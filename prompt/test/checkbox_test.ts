@@ -44,6 +44,7 @@ Deno.test("prompt checkbox: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Checkbox.inject(null as any);
       await Checkbox.prompt({
         message: "message",

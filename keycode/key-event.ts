@@ -10,9 +10,9 @@ export class KeyEvent {
   protected constructor(
     public readonly name: string | undefined,
     public readonly sequence: string | undefined,
-    public readonly ctrl: boolean = false,
-    public readonly meta: boolean = false,
-    public readonly shift: boolean = false,
+    public readonly ctrl = false,
+    public readonly meta = false,
+    public readonly shift = false,
   ) {}
 
   public static from(key: IKey): KeyEvent {

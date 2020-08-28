@@ -22,6 +22,7 @@ export {
 export type IDescription = string | ((this: Command) => string);
 
 /** Action handler for commands and options. */
+// deno-lint-ignore no-explicit-any
 export type IAction<O, A extends Array<any>> = (
   this: Command,
   options: O,
@@ -39,6 +40,7 @@ export interface IArgument extends IFlagArgument {
 }
 
 /** Result of `cmd.parse()` method. */
+// deno-lint-ignore no-explicit-any
 export interface IParseResult<O = any, A extends Array<any> = any> {
   options: O;
   args: A;
@@ -58,6 +60,7 @@ type ExcludedCommandOptions =
   | "list";
 
 /** Command option options. */
+// deno-lint-ignore no-explicit-any
 export interface ICommandOption<O = any, A extends Array<any> = any>
   extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
@@ -68,6 +71,7 @@ export interface ICommandOption<O = any, A extends Array<any> = any>
 }
 
 /** Command option settings. */
+// deno-lint-ignore no-explicit-any
 export interface IOption<O = any, A extends Array<any> = any>
   extends ICommandOption<O, A>, IFlagOptions {
   description: string;
@@ -103,7 +107,7 @@ export interface ITypeOptions {
 /** Type settings. */
 export interface IType extends ITypeOptions {
   name: string;
-  handler: Type<any> | ITypeHandler<any>;
+  handler: Type<unknown> | ITypeHandler<unknown>;
 }
 
 /* EXAMPLE TYPES */
