@@ -50,6 +50,7 @@ Deno.test("prompt select: invalid value", async () => {
 Deno.test("prompt select: null value", async () => {
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Select.inject(null as any);
       await Select.prompt({
         message: "message",

@@ -38,6 +38,7 @@ type PermissionName =
 
 async function hasPermission(permission: PermissionName): Promise<boolean> {
   try {
+    // deno-lint-ignore no-explicit-any
     return (await (Deno as any).permissions?.query?.({ name: permission }))
       ?.state === "granted";
   } catch {
@@ -48,7 +49,7 @@ async function hasPermission(permission: PermissionName): Promise<boolean> {
 async function hasPermissions<K extends PermissionName>(
   names: K[],
 ): Promise<Record<K, boolean>> {
-  const permissions: Record<K, boolean> = {} as any;
+  const permissions: Record<string, boolean> = {};
   await Promise.all(
     names.map((name: K) =>
       hasPermission(name).then((hasPermission) =>
@@ -56,7 +57,7 @@ async function hasPermissions<K extends PermissionName>(
       )
     ),
   );
-  return permissions as any;
+  return permissions as Record<K, boolean>;
 }
 
 const permissions = await hasPermissions([
@@ -69,6 +70,7 @@ const permissions = await hasPermissions([
   "write",
 ]);
 
+// deno-lint-ignore no-explicit-any
 interface IDefaultOption<O = any, A extends Array<any> = any> {
   flags: string;
   desc?: string;
@@ -80,6 +82,7 @@ type ITypeMap = Map<string, IType>;
 /**
  * Base command implementation without pre configured command's and option's.
  */
+// deno-lint-ignore no-explicit-any
 export class Command<O = any, A extends Array<any> = any> {
   private types: ITypeMap = new Map<string, IType>([
     ["string", { name: "string", handler: new StringType() }],
@@ -90,7 +93,7 @@ export class Command<O = any, A extends Array<any> = any> {
   private literalArgs: string[] = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
-  private _name: string = "COMMAND";
+  private _name = "COMMAND";
   private _parent?: Command;
   private _globalParent?: Command;
   private ver?: string;
@@ -104,15 +107,15 @@ export class Command<O = any, A extends Array<any> = any> {
   private completions: Map<string, ICompletion> = new Map();
   private cmd: Command = this;
   private argsDefinition?: string;
-  private isExecutable: boolean = false;
-  private throwOnError: boolean = false;
-  private _allowEmpty: boolean = true;
-  private _stopEarly: boolean = false;
+  private isExecutable = false;
+  private throwOnError = false;
+  private _allowEmpty = true;
+  private _stopEarly = false;
   private defaultCommand?: string;
-  private _useRawArgs: boolean = false;
+  private _useRawArgs = false;
   private args: IArgument[] = [];
-  private isHidden: boolean = false;
-  private isGlobal: boolean = false;
+  private isHidden = false;
+  private isGlobal = false;
   private hasDefaults: Boolean = false;
   private _versionOption?: IDefaultOption<O, A> | false;
   private _helpOption?: IDefaultOption<O, A> | false;
@@ -346,7 +349,7 @@ export class Command<O = any, A extends Array<any> = any> {
    *
    * @param allowEmpty
    */
-  public allowEmpty(allowEmpty: boolean = true): this {
+  public allowEmpty(allowEmpty = true): this {
     this.cmd._allowEmpty = allowEmpty;
     return this;
   }
@@ -363,7 +366,7 @@ export class Command<O = any, A extends Array<any> = any> {
    *
    * @param stopEarly
    */
-  public stopEarly(stopEarly: boolean = true): this {
+  public stopEarly(stopEarly = true): this {
     this.cmd._stopEarly = stopEarly;
     return this;
   }
@@ -372,7 +375,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * Disable parsing arguments. If enabled the raw arguments will be passed to the action handler.
    * This has no effect for parent or child commands. Only for the command on which this method was called.
    */
-  public useRawArgs(useRawArgs: boolean = true): this {
+  public useRawArgs(useRawArgs = true): this {
     this.cmd._useRawArgs = useRawArgs;
     return this;
   }
@@ -390,7 +393,7 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   public type(
     name: string,
-    handler: Type<any> | ITypeHandler<any>,
+    handler: Type<unknown> | ITypeHandler<unknown>,
     options?: ITypeOptions,
   ): this {
     if (this.cmd.types.get(name) && !options?.override) {
@@ -821,12 +824,15 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected async executeExecutable(args: string[]) {
+    // deno-lint-ignore no-explicit-any
     const unstable: boolean = !!(Deno as any).permissions;
 
     if (!permissions.read) {
+      // deno-lint-ignore no-explicit-any
       await (Deno as any).permissions?.request({ name: "read" });
     }
     if (!permissions.run) {
+      // deno-lint-ignore no-explicit-any
       await (Deno as any).permissions?.request({ name: "run" });
     }
 
@@ -837,6 +843,7 @@ export class Command<O = any, A extends Array<any> = any> {
     const executableName = names.join("-");
     const files: string[] = [];
 
+    // deno-lint-ignore no-explicit-any
     const parts: string[] = (Deno as any).mainModule.replace(/^file:\/\//g, "")
       .split("/");
     parts.pop();
@@ -921,7 +928,7 @@ export class Command<O = any, A extends Array<any> = any> {
     }
   }
 
-  protected parseType(type: ITypeInfo): any {
+  protected parseType(type: ITypeInfo): unknown {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
@@ -964,7 +971,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * Match commands and arguments from command line arguments.
    */
   protected parseArguments(args: string[], flags: O): A {
-    const params: Array<string | Array<string>> = [];
+    const params: Array<unknown> = [];
 
     // remove array reference
     args = args.slice(0);
@@ -1005,7 +1012,7 @@ export class Command<O = any, A extends Array<any> = any> {
             );
           }
 
-          let arg: undefined | string | string[];
+          let arg: unknown;
 
           if (expectedArg.variadic) {
             arg = args.splice(0, args.length)
@@ -1350,6 +1357,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param name Name of the sub-command.
    * @param hidden Include hidden commands.
    */
+  // deno-lint-ignore no-explicit-any
   public getCommand<O = any>(
     name: string,
     hidden?: boolean,
@@ -1358,6 +1366,7 @@ export class Command<O = any, A extends Array<any> = any> {
       this.getGlobalCommand(name, hidden);
   }
 
+  // deno-lint-ignore no-explicit-any
   public getBaseCommand<O = any>(
     name: string,
     hidden?: boolean,
@@ -1367,6 +1376,7 @@ export class Command<O = any, A extends Array<any> = any> {
     return cmd && (hidden || !cmd.isHidden) ? cmd : undefined;
   }
 
+  // deno-lint-ignore no-explicit-any
   public getGlobalCommand<O = any>(
     name: string,
     hidden?: boolean,
@@ -1389,6 +1399,7 @@ export class Command<O = any, A extends Array<any> = any> {
    *
    * @param name Name of the command.
    */
+  // deno-lint-ignore no-explicit-any
   public removeCommand<O = any>(name: string): Command<O> | undefined {
     const command = this.getBaseCommand(name, true);
 
@@ -1601,7 +1612,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param error Error to handle.
    * @param showHelp Show help.
    */
-  public error(error: Error, showHelp: boolean = true): Error {
+  public error(error: Error, showHelp = true): Error {
     if (this.shouldThrowErrors()) {
       return error;
     }

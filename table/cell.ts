@@ -43,21 +43,21 @@ export class Cell {
    * Setter:
    */
 
-  public border(enable: boolean, override: boolean = true): this {
+  public border(enable: boolean, override = true): this {
     if (override || typeof this.options.border === "undefined") {
       this.options.border = enable;
     }
     return this;
   }
 
-  public colSpan(span: number, override: boolean = true): this {
+  public colSpan(span: number, override = true): this {
     if (override || typeof this.options.colSpan === "undefined") {
       this.options.colSpan = span;
     }
     return this;
   }
 
-  public rowSpan(span: number, override: boolean = true): this {
+  public rowSpan(span: number, override = true): this {
     if (override || typeof this.options.rowSpan === "undefined") {
       this.options.rowSpan = span;
     }

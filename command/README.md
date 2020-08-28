@@ -813,7 +813,7 @@ This example shows you how to use a function as type handler.
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
 
-const emailRegex: RegExp =
+const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 function emailType({ label, name, value }: ITypeInfo): string {
@@ -851,7 +851,7 @@ import { Command, Type } from "https://deno.land/x/cliffy/command/mod.ts";
 import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
 
 class EmailType extends Type<string> {
-  protected emailRegex: RegExp =
+  protected emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
   public parse({ label, name, value }: ITypeInfo): string {

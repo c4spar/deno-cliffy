@@ -71,6 +71,7 @@ Deno.test("prompt input: null value", async () => {
   console.log();
   await assertThrowsAsync(
     async () => {
+      // deno-lint-ignore no-explicit-any
       Input.inject(null as any);
       await Input.prompt("message");
     },

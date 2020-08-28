@@ -1,4 +1,5 @@
 import { KeyEvent } from "../keycode/key-event.ts";
+import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
@@ -198,5 +199,5 @@ export class Number extends GenericInput<number, NumberSettings> {
 }
 
 function isNumeric(value: string | number): value is (number | string) {
-  return typeof value === "number" || (!!value && !isNaN(value as any));
+  return typeof value === "number" || (!!value && !isNaN(parseNumber(value)));
 }

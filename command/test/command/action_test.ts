@@ -3,8 +3,8 @@ import { Command } from "../../command.ts";
 
 interface IStats {
   context: null | Command;
-  options: any;
-  args: any;
+  options: unknown;
+  args: unknown;
 }
 
 function createStats(): IStats {

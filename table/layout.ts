@@ -53,7 +53,7 @@ export class TableLayout {
 
     const padding: number[] = [];
     const width: number[] = [];
-    for (let colIndex: number = 0; colIndex < columns; colIndex++) {
+    for (let colIndex = 0; colIndex < columns; colIndex++) {
       const minColWidth: number = Array.isArray(this.options.minColWidth)
         ? this.options.minColWidth[colIndex]
         : this.options.minColWidth;
@@ -80,10 +80,10 @@ export class TableLayout {
 
   protected spanRows(
     _rows: IRow[],
-    rowIndex: number = 0,
-    colIndex: number = 0,
+    rowIndex = 0,
+    colIndex = 0,
     rowSpan: number[] = [],
-    colSpan: number = 1,
+    colSpan = 1,
   ): Row<Cell>[] {
     const rows: Row<Cell>[] = _rows as Row<Cell>[];
 
@@ -133,7 +133,7 @@ export class TableLayout {
   }
 
   protected renderRows(opts: IRenderSettings): string {
-    let result: string = "";
+    let result = "";
     const rowSpan: number[] = new Array(opts.columns).fill(1);
 
     for (let rowIndex = 0; rowIndex < opts.rows.length; rowIndex++) {
@@ -152,16 +152,16 @@ export class TableLayout {
     const row: Row<Cell> = opts.rows[rowIndex];
     const prevRow: Row<Cell> | undefined = opts.rows[rowIndex - 1];
     const nextRow: Row<Cell> | undefined = opts.rows[rowIndex + 1];
-    let result: string = "";
+    let result = "";
 
-    let colSpan: number = 1;
+    let colSpan = 1;
 
     // border top row
     if (!inMultiline && rowIndex === 0 && row.hasBorder()) {
       result += this.renderBorderRow(undefined, row, rowSpan, opts);
     }
 
-    let isMultilineRow: boolean = false;
+    let isMultilineRow = false;
 
     result += " ".repeat(this.options.indent || 0);
 
@@ -227,7 +227,7 @@ export class TableLayout {
     opts: IRenderSettings,
     noBorder?: boolean,
   ): string {
-    let result: string = "";
+    let result = "";
     const prevCell: Cell | undefined = row[colIndex - 1];
 
     const cell: Cell = row[colIndex];
@@ -314,7 +314,7 @@ export class TableLayout {
   ): string {
     let result = "";
 
-    let colSpan: number = 1;
+    let colSpan = 1;
     for (let colIndex = 0; colIndex < opts.columns; colIndex++) {
       if (rowSpan[colIndex] > 1) {
         if (!nextRow) {

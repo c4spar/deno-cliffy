@@ -35,10 +35,10 @@ export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
 
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   extends GenericPrompt<T, V, S> {
-  protected index: number = 0;
-  protected selected: number = 0;
+  protected index = 0;
+  protected selected = 0;
 
-  public static separator(label: string = "------------"): GenericListOption {
+  public static separator(label = "------------"): GenericListOption {
     return { value: label, disabled: true };
   }
 

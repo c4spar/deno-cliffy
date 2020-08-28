@@ -37,7 +37,7 @@ export function consumeWords(length: number, content: string): string {
   return consumed;
 }
 
-const COLOR_REGEX: RegExp = /(\x1b|\e|\033)\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]/g;
+const COLOR_REGEX = /(\x1b|\e|\033)\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]/g;
 
 /**
  * Remove color codes from string.

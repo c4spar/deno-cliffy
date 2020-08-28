@@ -2,7 +2,7 @@
 
 import { Command, ITypeInfo } from "../../command/mod.ts";
 
-const emailRegex: RegExp =
+const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 function emailType({ label, name, value }: ITypeInfo): string {

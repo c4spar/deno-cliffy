@@ -15,8 +15,8 @@ export class AnsiEscape {
   }
 
   /**
-     * Cursor
-     */
+   * Cursor
+   */
 
   /** Move cursor to x, y, counting from the top left corner. */
   public cursorTo(x: number, y?: number): this {
@@ -31,37 +31,37 @@ export class AnsiEscape {
   }
 
   /** Move cursor up by n lines. */
-  public cursorUp(count: number = 1): this {
+  public cursorUp(count = 1): this {
     this.write(cursor.up(count));
     return this;
   }
 
   /** Move cursor down by n lines. */
-  public cursorDown(count: number = 1): this {
+  public cursorDown(count = 1): this {
     this.write(cursor.down(count));
     return this;
   }
 
   /** Move cursor right by n lines. */
-  public cursorForward(count: number = 1): this {
+  public cursorForward(count = 1): this {
     this.write(cursor.forward(count));
     return this;
   }
 
   /** Move cursor left by n lines. */
-  public cursorBackward(count: number = 1): this {
+  public cursorBackward(count = 1): this {
     this.write(cursor.backward(count));
     return this;
   }
 
   /** Move cursor to the beginning of the line n lines down. */
-  public cursorNextLine(count: number = 1): this {
+  public cursorNextLine(count = 1): this {
     this.write(cursor.nextLine(count));
     return this;
   }
 
   /** Move cursor to the beginning of the line n lines up. */
-  public cursorPrevLine(count: number = 1): this {
+  public cursorPrevLine(count = 1): this {
     this.write(cursor.prevLine(count));
     return this;
   }
@@ -97,24 +97,24 @@ export class AnsiEscape {
   }
 
   /**
-     * Scroll
-     */
+   * Scroll
+   */
 
   /** Scroll window up by n lines. */
-  public scrollUp(count: number = 1): this {
+  public scrollUp(count = 1): this {
     this.write(scroll.up(count));
     return this;
   }
 
   /** Scroll window down by n lines. */
-  public scrollDown(count: number = 1): this {
+  public scrollDown(count = 1): this {
     this.write(scroll.down(count));
     return this;
   }
 
   /**
-     * Erase
-     */
+   * Erase
+   */
 
   /** Clear screen. */
   public eraseScreen(): this {
@@ -123,13 +123,13 @@ export class AnsiEscape {
   }
 
   /** Clear screen up. */
-  public eraseUp(count: number = 1): this {
+  public eraseUp(count = 1): this {
     this.write(erase.up(count));
     return this;
   }
 
   /** Clear screen down. */
-  public eraseDown(count: number = 1): this {
+  public eraseDown(count = 1): this {
     this.write(erase.down(count));
     return this;
   }
@@ -159,8 +159,8 @@ export class AnsiEscape {
   }
 
   /**
-     * Style
-     */
+   * Style
+   */
 
   /** Render link. */
   public link(text: string, url: string): this {

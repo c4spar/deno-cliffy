@@ -7,7 +7,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic-input.ts";
 
-export interface InputKeys extends GenericInputKeys {}
+export type InputKeys = GenericInputKeys;
 
 export interface InputOptions extends GenericInputPromptOptions<string> {
   minLength?: number;

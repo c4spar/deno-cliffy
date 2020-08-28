@@ -1,6 +1,6 @@
 import { paramCaseToCamelCase } from "./_utils.ts";
 import { getOption } from "./flags.ts";
-import { IFlagArgument, IFlagOptions, IFlagValue } from "./types.ts";
+import { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
 
@@ -97,7 +97,8 @@ export function validateFlags(
         arg.requiredValue &&
         (
           typeof values[name] === "undefined" ||
-          (isArray && typeof (values[name] as IFlagValue[])[i] === "undefined")
+          (isArray &&
+            typeof (values[name] as Array<unknown>)[i] === "undefined")
         )
       ) {
         throw new Error(`Missing value for option: --${option.name}`);
@@ -125,8 +126,6 @@ export function validateFlags(
         throw new Error(`Missing required option: --${option.name}`);
       }
     }
-
-    // console.log( 'args:', JSON.stringify( option.args, null, 2 ) );
   }
 
   if (keys.length === 0 && !allowEmpty) {

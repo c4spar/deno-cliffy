@@ -4,7 +4,9 @@ import { Command } from "../../command.ts";
 const version = "1.0.0";
 const description = "Test description ...";
 
-function command(states: any = {}): Command {
+type States = Record<string, boolean>;
+
+function command(states: States = {}): Command {
   return new Command()
     .throwErrors()
     .version(version)
@@ -32,7 +34,7 @@ function command(states: any = {}): Command {
 }
 
 Deno.test("command subCommand", async () => {
-  const stats: any = {};
+  const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command", "input-path", "output-path"],
@@ -47,7 +49,7 @@ Deno.test("command subCommand", async () => {
 });
 
 Deno.test("command subCommand2", async () => {
-  const stats: any = {};
+  const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command2", "input-path", "output-path"],
@@ -62,7 +64,7 @@ Deno.test("command subCommand2", async () => {
 });
 
 Deno.test("command subCommand3", async () => {
-  const stats: any = {};
+  const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command2", "sub-command3", "input-path", "output-path"],

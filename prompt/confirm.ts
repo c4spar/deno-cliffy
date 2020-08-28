@@ -7,7 +7,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic-input.ts";
 
-export interface ConfirmKeys extends GenericInputKeys {}
+export type ConfirmKeys = GenericInputKeys;
 
 export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
   active?: string;

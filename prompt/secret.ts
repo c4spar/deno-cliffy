@@ -8,7 +8,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic-input.ts";
 
-export interface SecretKeys extends GenericInputKeys {}
+export type SecretKeys = GenericInputKeys;
 
 export interface SecretOptions extends GenericInputPromptOptions<string> {
   label?: string;

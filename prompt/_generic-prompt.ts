@@ -37,13 +37,15 @@ export abstract class GenericPrompt<
   V,
   S extends GenericPromptSettings<T, V>,
 > {
+  // deno-lint-ignore no-explicit-any
   protected static injectedValue: any | undefined;
 
   protected screen = AnsiEscape.from(Deno.stdout);
   protected lastError: string | undefined;
-  protected isRunning: boolean = false;
+  protected isRunning = false;
   protected value: T | undefined;
 
+  // deno-lint-ignore no-explicit-any
   public static inject(value: any): void {
     GenericPrompt.injectedValue = value;
   }
@@ -148,7 +150,7 @@ export abstract class GenericPrompt<
       return false;
     }
 
-    let done: boolean = false;
+    let done = false;
 
     for (const event of events) {
       done = await this.handleEvent(event);
@@ -209,12 +211,14 @@ export abstract class GenericPrompt<
     return !this.lastError;
   }
 
+  // deno-lint-ignore no-explicit-any
   protected isKey<K extends any, N extends keyof K>(
     keys: K | undefined,
     name: N,
     event: KeyEvent,
   ): boolean {
-    const keyNames: any | undefined = keys?.[name];
+    // deno-lint-ignore no-explicit-any
+    const keyNames: Array<unknown> | undefined = keys?.[name] as any;
     return typeof keyNames !== "undefined" && (
       (typeof event.name !== "undefined" &&
         keyNames.indexOf(event.name) !== -1) ||

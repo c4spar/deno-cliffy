@@ -3,7 +3,7 @@ import { Cell } from "./cell.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
 
-export interface IBorderOptions extends Partial<IBorder> {}
+export type IBorderOptions = Partial<IBorder>;
 
 export interface ITableOptions {
   indent?: number;
@@ -85,35 +85,35 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
-  public maxColWidth(width: number | number[], override: boolean = true): this {
+  public maxColWidth(width: number | number[], override = true): this {
     if (override || typeof this.options.maxColWidth === "undefined") {
       this.options.maxColWidth = width;
     }
     return this;
   }
 
-  public minColWidth(width: number | number[], override: boolean = true): this {
+  public minColWidth(width: number | number[], override = true): this {
     if (override || typeof this.options.minColWidth === "undefined") {
       this.options.minColWidth = width;
     }
     return this;
   }
 
-  public indent(width: number, override: boolean = true): this {
+  public indent(width: number, override = true): this {
     if (override || typeof this.options.indent === "undefined") {
       this.options.indent = width;
     }
     return this;
   }
 
-  public padding(padding: number | number[], override: boolean = true): this {
+  public padding(padding: number | number[], override = true): this {
     if (override || typeof this.options.padding === "undefined") {
       this.options.padding = padding;
     }
     return this;
   }
 
-  public border(enable: boolean, override: boolean = true): this {
+  public border(enable: boolean, override = true): this {
     if (override || typeof this.options.border === "undefined") {
       this.options.border = enable;
     }

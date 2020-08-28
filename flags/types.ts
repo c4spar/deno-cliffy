@@ -39,19 +39,15 @@ export enum OptionType {
 }
 
 /** Default flag value */
-export type IDefaultValue = IFlagValue | (() => undefined | IFlagValue);
-
-/**  */
-export type IFlagValue = IFlagValueType | IFlagValueType[];
-
-/** Flag value type. */
-export type IFlagValueType = string | boolean | number;
+export type IDefaultValue = unknown | (() => unknown);
 
 /** Value handler for custom value processing. */
+// deno-lint-ignore no-explicit-any
 export type IFlagValueHandler = (val: any, previous?: any) => any;
 
 /** Result of the parseFlags method. */
 export interface IFlagsResult<
+  // deno-lint-ignore no-explicit-any
   O extends Record<string, any> = Record<string, any>,
 > {
   flags: O;
@@ -67,4 +63,5 @@ export interface ITypeInfo {
 }
 
 /** Custom type handler/parser. */
+// deno-lint-ignore no-explicit-any
 export type ITypeHandler<T = any> = (type: ITypeInfo) => T;

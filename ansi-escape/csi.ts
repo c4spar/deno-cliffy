@@ -33,17 +33,17 @@ export const cursor = {
     return ret;
   },
   /** Move cursor up by n lines. */
-  up: (count: number = 1): string => `${CSI}${count}A`,
+  up: (count = 1): string => `${CSI}${count}A`,
   /** Move cursor down by n lines. */
-  down: (count: number = 1): string => `${CSI}${count}B`,
+  down: (count = 1): string => `${CSI}${count}B`,
   /** Move cursor right by n lines. */
-  forward: (count: number = 1): string => `${CSI}${count}C`,
+  forward: (count = 1): string => `${CSI}${count}C`,
   /** Move cursor left by n lines. */
-  backward: (count: number = 1): string => `${CSI}${count}D`,
+  backward: (count = 1): string => `${CSI}${count}D`,
   /** Move cursor to the beginning of the line n lines down. */
-  nextLine: (count: number = 1): string => `${CSI}E`.repeat(count),
+  nextLine: (count = 1): string => `${CSI}E`.repeat(count),
   /** Move cursor to the beginning of the line n lines up. */
-  prevLine: (count: number = 1): string => `${CSI}F`.repeat(count),
+  prevLine: (count = 1): string => `${CSI}F`.repeat(count),
   /** Move cursor to first column of current row. */
   left: `${CSI}G`,
   /** Hide cursor. */
@@ -58,18 +58,18 @@ export const cursor = {
 
 export const scroll = {
   /** Scroll window up by n lines. */
-  up: (count: number = 1): string => `${CSI}S`.repeat(count),
+  up: (count = 1): string => `${CSI}S`.repeat(count),
   /** Scroll window down by n lines. */
-  down: (count: number = 1): string => `${CSI}T`.repeat(count),
+  down: (count = 1): string => `${CSI}T`.repeat(count),
 };
 
 export const erase = {
   /** Clear screen. */
   screen: `${CSI}2J`,
   /** Clear screen up. */
-  up: (count: number = 1): string => `${CSI}1J`.repeat(count),
+  up: (count = 1): string => `${CSI}1J`.repeat(count),
   /** Clear screen down. */
-  down: (count: number = 1): string => `${CSI}0J`.repeat(count),
+  down: (count = 1): string => `${CSI}0J`.repeat(count),
   /** Clear current line. */
   line: `${CSI}2K`,
   /** Clear to line end. */

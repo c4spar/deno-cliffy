@@ -41,7 +41,7 @@ export function normalize(args: string[]) {
   function normalizeShortFlags(flag: string): void {
     const flags = flag.slice(1).split("");
 
-    if (isNaN(flag[flag.length - 1] as any)) {
+    if (isNaN(Number(flag[flag.length - 1]))) {
       flags.forEach((val) => normalized.push(`-${val}`));
     } else {
       normalized.push(`-${flags.shift()}`);
