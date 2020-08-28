@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+
+  stable:
+    name: Deno Stable
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest, windows-latest, ubuntu-latest]
+        deno_version: [ v1.2.0, v1.3.1 ]
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denolib/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.deno_version }}
+
+      - name: Run command tests
+        run: >
+          deno test command/test/command --allow-env --unstable &&
+          deno test command/test/option &&
+          deno test command/test/type
+
+      - name: Run flags tests
+        run: deno test flags
+
+      - name: Run keycode tests
+        run: deno test keycode
+
+      - name: Run prompt tests
+        run: deno test prompt --unstable
+
+      - name: Run table tests
+        run: deno test table
+
+  nightly:
+    name: Deno Nightly
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest, windows-latest, ubuntu-latest]
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: nightly
+
+      - name: Run command tests
+        run: >
+          deno test command/test/command --allow-env --unstable &&
+          deno test command/test/option &&
+          deno test command/test/type
+
+      - name: Run flags tests
+        run: deno test flags
+
+      - name: Run keycode tests
+        run: deno test keycode
+
+      - name: Run prompt tests
+        run: deno test prompt --unstable
+
+      - name: Run table tests
+        run: deno test table

@@ -1,0 +1,20 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Lint source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@master
+
+      - name: Setup Deno
+        uses: denolib/setup-deno@master
+
+      - name: Check formatting
+        run: deno fmt --check
+
+#      - name: Run linter
+#        run: deno lint --unstable
