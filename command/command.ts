@@ -921,9 +921,20 @@ export class Command<O = any, A extends Array<any> = any> {
                     let arg: undefined | string | string[];
 
                     if ( expectedArg.variadic ) {
-                        arg = args.splice( 0, args.length );
+                        arg = args.splice( 0, args.length )
+                            .map( value => this.parseType( {
+                                label: 'Argument',
+                                type: expectedArg.type,
+                                name: expectedArg.name,
+                                value
+                            } ) );
                     } else {
-                        arg = args.shift();
+                        arg = this.parseType( {
+                            label: 'Argument',
+                            type: expectedArg.type,
+                            name: expectedArg.name,
+                            value: args.shift() ?? ''
+                        } );
                     }
 
                     if ( arg ) {

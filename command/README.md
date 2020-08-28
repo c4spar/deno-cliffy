@@ -620,6 +620,20 @@ rmdir dir2
 rmdir dir3  
 ```
 
+You can also use types for arguments same as for options and environment variables. Custom types are also supported.
+
+```typescript
+import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';  
+
+await new Command()  
+    .version( '0.1.0' )  
+    .command( 'rmdir <dir:string>' )  
+    .action( ( options: any, dir: string ) => {  
+        console.log( 'rmdir %s', dir );  
+    } )  
+    .parse( Deno.args );  
+```
+
 ### Action handler
 
 The action handler is called when the command is executed. It gets passed an object with all options defined by the user and additional arguments which are passed to the command.
