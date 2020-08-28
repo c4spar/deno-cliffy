@@ -16,5 +16,5 @@ jobs:
       - name: Check formatting
         run: deno fmt --check
 
-#      - name: Run linter
-#        run: deno lint --unstable
+      - name: Run linter
+        run: deno lint --unstable
