@@ -67,6 +67,7 @@
     - [Zsh Completions](#zsh-completions)
 - [Generic options and arguments](#-generic-options-and-arguments)
 - [Version option](#-version-option)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
@@ -1211,9 +1212,9 @@ await new Command()
   .parse(Deno.args);
 ```
 
-## ❯ Credits
+## ❯ Contributing
 
-Benjamin Fischer [@c4spar](https://github.com/c4spar)
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

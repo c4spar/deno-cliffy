@@ -28,7 +28,7 @@
 
 > This project is still under development. Expect breaking changes. If you find a bug or have a feature request feel free to create an issue.
 
-## Modules
+## ❯ Modules
 
 * **[ansi-escape](ansi-escape/):** Show, hide and move cli cursor, erase output and scroll window.
 
@@ -41,3 +41,11 @@
 * **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm, input, number, select, etc...
 
 * **[table](table/):** Create cli table's with border, padding, nested table's, etc...
+
+## ❯ Contributing
+
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](CONTRIBUTING.md).
+
+## ❯ License
+
+[MIT](LICENSE)

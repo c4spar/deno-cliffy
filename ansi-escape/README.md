@@ -30,6 +30,7 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
@@ -74,6 +75,10 @@ AnsiEscape.from(Deno.stdout)
   .scrollDown()
     // ...
 ```
+
+## ❯ Contributing
+
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

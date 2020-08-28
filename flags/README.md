@@ -32,6 +32,7 @@
 - [Usage](#-usage)
 - [Options](#-options)
 - [Custom type processing](#-custom-type-processing)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
@@ -217,6 +218,10 @@ $ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts
 $ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts --foo abc
 error: Uncaught Error: Option --foo must be of type float but got: abc
 ```
+
+## ❯ Contributing
+
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

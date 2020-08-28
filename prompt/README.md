@@ -39,6 +39,7 @@
     - [Custom Prompts](#custom-prompts)
 - [API](#-api)
 - [Types](#-types)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
@@ -580,6 +581,10 @@ The `Checkbox` prompt has all [base options](#base-options) and the following pr
 | icon | `boolean` | No | Show or hide item icon. Defaults to `true`. |
 
 **↑ back to:** [Prompt types](#-types)
+
+## ❯ Contributing
+
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 
