@@ -40,6 +40,7 @@
     - [Row's and Cell's](#rows-and-cells)
     - [Colspan and Rowspan](#colspan-and-rowspan)
 - [API](#-api)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
@@ -505,6 +506,10 @@ Get cell column span.
 Get cell row span.
 
 *Return type*: `number`
+
+## ❯ Contributing
+
+Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 
