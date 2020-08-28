@@ -26,9 +26,7 @@
   <sub>>_ A collection of modules for creating interactive command line tools.</sub>
 </p>
 
-<p align="center" style="color: #856404; background-color: #fff3cd; border-color: #ffeeba; padding: .75rem 1.25rem; margin-bottom: 1rem; border-radius: .25rem;">
-    <b>WARNING:</b> This project is still under development. Not all features are fully implemented and it's possible to get some breaking changes if you upgrade to a newer version. If you find a bug or have a feature request feel free to create an issue.
-</p>
+> This project is still under development. Expect breaking changes. If you find a bug or have a feature request feel free to create an issue.
 
 ## Modules
 

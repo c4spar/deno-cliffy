@@ -1,6 +1,5 @@
-import { ITypeInfo, ITypeHandler } from '../types.ts';
+import { ITypeInfo, ITypeHandler } from "../types.ts";
 
-export const string: ITypeHandler<string> = ( { value }: ITypeInfo ): string => {
-
-    return value;
+export const string: ITypeHandler<string> = ({ value }: ITypeInfo): string => {
+  return value;
 };

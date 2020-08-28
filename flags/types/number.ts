@@ -1,10 +1,13 @@
-import { ITypeInfo, ITypeHandler } from '../types.ts';
+import { ITypeInfo, ITypeHandler } from "../types.ts";
 
-export const number: ITypeHandler<number> = ( { label, name, value, type }: ITypeInfo ): number => {
+export const number: ITypeHandler<number> = (
+  { label, name, value, type }: ITypeInfo,
+): number => {
+  if (isNaN(Number(value))) {
+    throw new Error(
+      `${label} ${name} must be of type ${type} but got: ${value}`,
+    );
+  }
 
-    if ( isNaN( Number( value ) ) ) {
-        throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
-    }
-
-    return parseFloat( value );
+  return parseFloat(value);
 };

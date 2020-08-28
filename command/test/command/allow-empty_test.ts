@@ -1,40 +1,41 @@
-import { assertEquals, assertThrowsAsync } from '../../../dev_deps.ts';
-import { Command } from '../../command.ts';
+import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { Command } from "../../command.ts";
 
-Deno.test( 'flags allowEmpty enabled', async () => {
+Deno.test("flags allowEmpty enabled", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .allowEmpty(true)
+    .option("-f, --flag [value:boolean]", "description ...")
+    .action(() => {})
+    .parse(["-f"]);
 
-    const { options, args } = await new Command()
-        .throwErrors()
-        .allowEmpty( true )
-        .option( '-f, --flag [value:boolean]', 'description ...' )
-        .action( () => {} )
-        .parse( [ '-f' ] );
+  assertEquals(options, { flag: true });
+  assertEquals(args, []);
+});
 
-    assertEquals( options, { flag: true } );
-    assertEquals( args, [] );
-} );
+Deno.test("flags allowEmpty disabledNoFlags", async () => {
+  const { options, args } = await new Command()
+    .throwErrors()
+    .allowEmpty(true)
+    .action(() => {})
+    .parse([]);
 
-Deno.test( 'flags allowEmpty disabledNoFlags', async () => {
+  assertEquals(options, {});
+  assertEquals(args, []);
+});
 
-    const { options, args } = await new Command()
-        .throwErrors()
-        .allowEmpty( true )
-        .action( () => {} )
-        .parse( [] );
+Deno.test("flags allowEmpty disabled", async () => {
+  const cmd = new Command()
+    .throwErrors()
+    .allowEmpty(false)
+    .option("-f, --flag [value:boolean]", "description ...")
+    .action(() => {});
 
-    assertEquals( options, {} );
-    assertEquals( args, [] );
-} );
-
-Deno.test( 'flags allowEmpty disabled', async () => {
-
-    const cmd = new Command()
-        .throwErrors()
-        .allowEmpty( false )
-        .option( '-f, --flag [value:boolean]', 'description ...' )
-        .action( () => {} );
-
-    await assertThrowsAsync( async () => {
-        await cmd.parse( [] );
-    }, Error, 'No arguments.' );
-} );
+  await assertThrowsAsync(
+    async () => {
+      await cmd.parse([]);
+    },
+    Error,
+    "No arguments.",
+  );
+});

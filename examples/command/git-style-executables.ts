@@ -1,11 +1,10 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from '../../command/command.ts';
+import { Command } from "../../command/command.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .command( 'install [name]', 'install one or more packages' ).executable()
-    .command( 'search [query]', 'search with optional query' ).executable()
-    .command( 'update', 'update installed packages' ).executable()
-    .command( 'list', 'list packages installed' ).executable()
-    .parse( Deno.args );
+  .command("install [name]", "install one or more packages").executable()
+  .command("search [query]", "search with optional query").executable()
+  .command("update", "update installed packages").executable()
+  .command("list", "list packages installed").executable()
+  .parse(Deno.args);

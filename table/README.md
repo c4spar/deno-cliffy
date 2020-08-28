@@ -49,19 +49,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { Table } from 'https://deno.land/x/cliffy@<version>/table/mod.ts';
+import { Table } from "https://deno.land/x/cliffy@<version>/table/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { Table } from 'https://x.nest.land/cliffy@<version>/table/mod.ts';
+import { Table } from "https://x.nest.land/cliffy@<version>/table/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { Table } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/table/mod.ts';
+import { Table } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/table/mod.ts";
 ```
 
 ## ❯ Usage
@@ -73,12 +73,12 @@ The example below will output a simple table with three rows and without any sty
 
 ```typescript
 const table: Table = new Table(
-    [ 'Row 1 Column 1', 'Row 1 Column 2', 'Row 1 Column 3' ],
-    [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
-    [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
+  ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+  ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+  ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
 );
 
-console.log( table.toString() );
+console.log(table.toString());
 // You can also use table.render() as shorthand which uses Deno.stdout.writeSync() under the hood.
 ```
 
@@ -93,12 +93,12 @@ $ deno run https://deno.land/x/cliffy/examples/table/basic-usage.ts
 Since the `Table` class is an `Array`, you can call all the methods of the array class like `.from()`, `.sort()`, `.push()`, `.unshift()` and friends.
 
 ```typescript
-const table: Table = Table.from( [
-    [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
-    [ 'Row 1 Column 1', 'Row 1 Column 2', 'Row 1 Column 3' ],
-] );
+const table: Table = Table.from([
+  ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+  ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+]);
 
-table.push( [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ] );
+table.push(["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]);
 table.sort();
 table.render();
 ```
@@ -116,13 +116,13 @@ The `.body()` method adds an array of rows to the table and removes all existing
 
 ```typescript
 new Table()
-    .header( [ 'Heading 1', 'Heading 2', 'Heading 3' ] )
-    .body( [
-        [ 'Row 1 Column 1', 'Row 1 Column 2', 'Row 1 Column 3' ],
-        [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
-        [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
-    ] )
-    .render();
+  .header(["Heading 1", "Heading 2", "Heading 3"])
+  .body([
+    ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+    ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+  ])
+  .render();
 ```
 
 ```
@@ -137,17 +137,17 @@ To customize the table, the table class provides a few chainable option methods.
 
 ```typescript
 new Table()
-    .header( [ 'Heading 1', 'Heading 2', 'Heading 3' ] )
-    .body( [
-        [ 'Row 1 Column 1', 'Row 1 Column 2', 'Row 1 Column 3' ],
-        [ 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ],
-        [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
-    ] )
-    .maxColWidth( 10 )
-    .padding( 1 )
-    .indent( 2 )
-    .border( true )
-    .render();
+  .header(["Heading 1", "Heading 2", "Heading 3"])
+  .body([
+    ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+    ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+  ])
+  .maxColWidth(10)
+  .padding(1)
+  .indent(2)
+  .border(true)
+  .render();
 ```
 
 ```
@@ -161,16 +161,20 @@ $ deno run https://deno.land/x/cliffy/examples/table/table-options.ts
 It is also possible to customize single rows and cell. To do this you can use the `Row` and `Cell` class. The `Row` class is also an `Array` class like the `Table` class. To see a list of all available options go to the [Row](#row) or [Cell](#cell) API section.
 
 ```typescript
-import { Table, Row, Cell } from 'https://deno.land/x/cliffy@<version>/table/mod.ts';
+import { Table, Row, Cell } from "https://deno.land/x/cliffy@<version>/table/mod.ts";
 
 new Table()
-    .header( Row.from( [ 'Heading 1', 'Heading 2', 'Heading 3' ] ).border( true ) )
-    .body( [
-        [ 'Row 1 Column 1', Cell.from( 'Row 1 Column 2' ).border( true ), 'Row 1 Column 3' ],
-        new Row( 'Row 2 Column 1', 'Row 2 Column 2', 'Row 2 Column 3' ).border( true ),
-        [ 'Row 3 Column 1', 'Row 3 Column 2', 'Row 3 Column 3' ]
-    ] )
-    .render();
+  .header(Row.from(["Heading 1", "Heading 2", "Heading 3"]).border(true))
+  .body([
+    [
+      "Row 1 Column 1",
+      Cell.from("Row 1 Column 2").border(true),
+      "Row 1 Column 3",
+    ],
+    new Row("Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3").border(true),
+    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+  ])
+  .render();
 ```
 
 ```
@@ -184,16 +188,24 @@ $ deno run https://deno.land/x/cliffy/examples/table/rows-and-cells.ts
 Colspan and rowspan allows a single table cell to span the width/height of more than one column and/or row.
 
 ```typescript
-Table.from( [
-        [ Cell.from( 'Row 1 & 2 Column 1' ).rowSpan( 2 ), 'Row 1 Column 2', 'Row 1 Column 3' ],
-        [ Cell.from( 'Row 2 Column 2 & 3' ).colSpan( 2 ) ],
-        [ Cell.from( 'Row 3 & 4 Column 1' ).rowSpan( 2 ), 'Row 3 Column 2', 'Row 3 Column 3' ],
-        [ Cell.from( 'Row 4 Column 2 & 3' ).colSpan( 2 ) ],
-        [ 'Row 5 Column 1', Cell.from( 'Row 5 & 6 Column 2 & 3' ).rowSpan( 2 ).colSpan( 2 ) ],
-        [ 'Row 6 Column 1' ]
-    ] )
-    .border( true )
-    .render();
+Table.from([
+  [
+    Cell.from("Row 1 & 2 Column 1").rowSpan(2),
+    "Row 1 Column 2",
+    "Row 1 Column 3",
+  ],
+  [Cell.from("Row 2 Column 2 & 3").colSpan(2)],
+  [
+    Cell.from("Row 3 & 4 Column 1").rowSpan(2),
+    "Row 3 Column 2",
+    "Row 3 Column 3",
+  ],
+  [Cell.from("Row 4 Column 2 & 3").colSpan(2)],
+  ["Row 5 Column 1", Cell.from("Row 5 & 6 Column 2 & 3").rowSpan(2).colSpan(2)],
+  ["Row 6 Column 1"],
+])
+  .border(true)
+  .render();
 ```
 
 ```
@@ -229,7 +241,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan-and-rowspan.ts
     - [.getBorder()](#getborder-1)
 - [Cell](#cell)
     - [.clone()](#clone-2)
-    - [.border(enable,override)](#borderenableoverride-2)
+    - [.border(enable,override)](#borderenableoverride-2)`
     - [.colSpan(span,override)](#colspanspanoverride)
     - [.rowSpan(span,override)](#rowspanspanoverride)
     - [.getBorder()](#getborder-2)
@@ -344,21 +356,21 @@ Here is an example of the default border characters:
 
 ```typescript
 {
-    top: '─',
-    topMid: '┬',
-    topLeft: '┌',
-    topRight: '┐',
-    bottom: '─',
-    bottomMid: '┴',
-    bottomLeft: '└',
-    bottomRight: '┘',
-    left: '│',
-    leftMid: '├',
-    mid: '─',
-    midMid: '┼',
-    right: '│',
-    rightMid: '┤',
-    middle: '│'
+    top: "─",
+    topMid: "┬",
+    topLeft: "┌",
+    topRight: "┐",
+    bottom: "─",
+    bottomMid: "┴",
+    bottomLeft: "└",
+    bottomRight: "┘",
+    left: "│",
+    leftMid: "├",
+    mid: "─",
+    midMid: "┼",
+    right: "│",
+    rightMid: "┤",
+    middle: "│"
 }
 ```
 

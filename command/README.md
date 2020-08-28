@@ -76,19 +76,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy@<version>/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy@<version>/command/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { Command } from 'https://x.nest.land/cliffy@<version>/command/mod.ts';
+import { Command } from "https://x.nest.land/cliffy@<version>/command/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { Command } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/command/mod.ts';
+import { Command } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/command/mod.ts";
 ```
 
 ## ❯ Usage
@@ -100,13 +100,13 @@ The main command has two predefined options, a global `--help` option which is a
 a `--version` option which is only available on the main command.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .name( 'cliffy' )
-    .version( '0.1.0' )
-    .description( `Command line framework for Deno` )
-    .parse();
+  .name("cliffy")
+  .version("0.1.0")
+  .description("Command line framework for Deno")
+  .parse(Deno.args);
 ```
 
 ```
@@ -126,16 +126,17 @@ An option can have multiple required and optional arguments, separated by space.
 The second parameter of the `.options()` method is the help description and the thrid parameter can be an options object.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command';
+import { Command } from "https://deno.land/x/cliffy/command";
 
 const { options } = await new Command()
-    .option( '-s, --silent', 'disable output.' )
-    .option( '-d, --debug [level]', 'output extra debugging.' )
-    .option( '-p, --port <port>', 'the port number.' )
-    .option( '-h, --host [hostname]', 'the host name.', { default: 'localhost' } )
-    .parse( Deno.args );
+  .option("-s, --silent", "disable output.")
+  .option("-d, --debug [level]", "output extra debugging.")
+  .option("-p, --port <port>", "the port number.")
+  .option("-h, --host [hostname]", "the host name.", { default: "localhost" })
+  .option("-a, --allow [hostname]", "the host name.", { default: "localhost" })
+  .parse(Deno.args);
 
-console.log( 'server running at %s:%s', options.host, options.port );
+console.log("server running at %s:%s", options.host, options.port);
 ```
 
 ```
@@ -156,18 +157,18 @@ Optionally you can declare a type after the argument name, separated by colon `<
 * **boolean:** can be one of: `true`, `false`, `1` or `0`,
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    // optional boolean value
-    .option( '-s, --small [small:boolean]', 'Small pizza size.' )
-    // required string value
-    .option( '-p, --pizza-type <type:string>', 'Flavour of pizza.' )
-    // required number value
-    .option( '-a, --amount <amount:number>', 'Pieces of pizza.' )
-    .parse( Deno.args );
+  // optional boolean value
+  .option("-s, --small [small:boolean]", "Small pizza size.")
+  // required string value
+  .option("-p, --pizza-type <type>", "Flavour of pizza.")
+  // required number value
+  .option("-a, --amount <amount:number>", "Pieces of pizza.")
+  .parse(Deno.args);
 
-console.log( options );
+console.log(options);
 ```
 
 ```
@@ -183,16 +184,20 @@ $ deno run https://deno.land/x/cliffy/examples/command/common-option-types.ts -s
 Each type of option's can be a list of comma seperated items. The default seperator is a `,` and can be changed with the `separator` option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    // comma separated list
-    .option( '-l, --list <items:number[]>', 'comma separated list of numbers.' )
-    // space separated list
-    .option( '-o, --other-list <items:string[]>', 'space separated list of strings.', { separator: ' ' } )
-    .parse( Deno.args );
+  // comma separated list
+  .option("-l, --list <items:number[]>", "comma separated list of numbers.")
+  // space separated list
+  .option(
+    "-o, --other-list <items:string[]>",
+    "space separated list of strings.",
+    { separator: " " },
+  )
+  .parse(Deno.args);
 
-console.log( options );
+console.log(options);
 ```
 
 ```
@@ -208,14 +213,14 @@ $ deno run https://deno.land/x/cliffy/examples/command/list-option-type.ts -o "1
 The last argument of an option can be variadic, and only the last argument. To make an argument variadic you append ... to the argument name. For example:
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-await new Command()
-    .version( '0.1.0' )
-    .option( '-d, --dir  [otherDirs...:string]' )
-    .parse( Deno.args );
+const { options } = await new Command()
+  .version("0.1.0")
+  .option("-d, --dir [otherDirs...:string]", "Variadic option.")
+  .parse(Deno.args);
 
-console.log( options );
+console.log(options);
 ```
 
 The variadic option is returned as an array.
@@ -230,13 +235,15 @@ $ deno run https://deno.land/x/cliffy/examples/command/variadic-options.ts -d di
 You can specify a default value for an option with an optional value.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-const { options } = new Command()
-    .option( '-c, --cheese [type:string]', 'add the specified type of cheese', { default: 'blue' } )
-    .parse( Deno.args );
+const { options } = await new Command()
+  .option("-c, --cheese [type:string]", "add the specified type of cheese", {
+    default: "blue",
+  })
+  .parse(Deno.args);
 
-console.log( `cheese: ${options.cheese}` );
+console.log(`cheese: ${options.cheese}`);
 ```
 
 ```
@@ -252,12 +259,14 @@ cheese: mozzarella
 You may specify a required (mandatory) option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .allowEmpty( false )
-    .option( '-c, --cheese [type:string]', 'pizza must have cheese', { required: true } )
-    .parse( Deno.args );
+  .allowEmpty(false)
+  .option("-c, --cheese [type:string]", "pizza must have cheese", {
+    required: true,
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -272,17 +281,23 @@ You can call the long name from an option with a boolean or an optional value (d
 You can specify a default value for the flag and it can be overridden on command line.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    .option( '--sauce [sauce:boolean]', 'Remove sauce', { default: true } )
-    .option( '--cheese [flavour:string]', 'cheese flavour', { default: 'mozzarella' } )
-    .parse( Deno.args );
+  .option("--sauce [sauce:boolean]", "Remove sauce", {
+    default: true,
+  })
+  .option("--cheese [flavour:string]", "cheese flavour", {
+    default: "mozzarella",
+  })
+  .parse(Deno.args);
 
-const sauceStr = options.sauce ? 'sauce' : 'no sauce';
-const cheeseStr = ( options.cheese === false ) ? 'no cheese' : `${ options.cheese } cheese`;
+const sauceStr = options.sauce ? "sauce" : "no sauce";
+const cheeseStr = options.cheese === false
+  ? "no cheese"
+  : `${options.cheese} cheese`;
 
-console.log( `You ordered a pizza with ${ sauceStr } and ${ cheeseStr }` );
+console.log(`You ordered a pizza with ${sauceStr} and ${cheeseStr}`);
 ```
 
 ```
@@ -301,24 +316,29 @@ You ordered a pizza with sauce and parmesan cheese
 To share options with child commands you can use the `global` option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .option( '-l, --local [val:string]', 'Only available on this command.' )
-    .option( '-g, --global [val:string]', 'Available on this and all nested child command\'s.', { global: true } )
-    .action( console.log )
-
-    .command( 'command1', new Command()
-        .description( 'Some sub command.' )
-        .action( console.log )
-
-        .command( 'command2', new Command()
-            .description( 'Some nested sub command.' )
-            .action( console.log )
-        )
-    )
-    .parse( Deno.args );
+  .option("-l, --local [val:string]", "Only available on this command.")
+  .option(
+    "-g, --global [val:string]",
+    "Available on this and all nested child command's.",
+    { global: true },
+  )
+  .action(console.log)
+  .command(
+    "command1",
+    new Command()
+      .description("Some sub command.")
+      .action(console.log)
+      .command(
+        "command2",
+        new Command()
+          .description("Some nested sub command.")
+          .action(console.log),
+      ),
+  )
+  .parse(Deno.args);
 ```
 
 ```
@@ -331,11 +351,13 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-options.ts command
 To exclude option's from the help and completion command's you can use the `hidden` option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .option( '-H, --hidden [hidden:boolean]', 'Nobody knows about me!', { hidden: true } )
-    .parse( Deno.args );
+  .option("-H, --hidden [hidden:boolean]", "Nobody knows about me!", {
+    hidden: true,
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -347,12 +369,14 @@ $ deno run https://deno.land/x/cliffy/examples/command/hidden-options.ts -h
 Standalone options cannot be combine with any command and option. For example the `--help` and `--version` flag. You can achieve this with the `standalone` option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .option( '-s, --standalone [value:boolean]', 'Some standalone option.', { standalone: true } )
-    .option( '-o, --other [value:boolean]', 'Some other option.' )
-    .parse( Deno.args );
+  .option("-s, --standalone [value:boolean]", "Some standalone option.", {
+    standalone: true,
+  })
+  .option("-o, --other [value:boolean]", "Some other option.")
+  .parse(Deno.args);
 ```
 
 ```
@@ -365,14 +389,16 @@ Error: Option --standalone cannot be combined with other options.
 To define options which conflicts with other options you can use the `conflicts` option by defining an array with the names of these options.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    .option( '-f, --file <file:string>', 'read from file ...' )
-    .option( '-i, --stdin [stdin:boolean]', 'read from stdin ...', { conflicts: [ 'file' ] } )
-    .parse( Deno.args );
+  .option("-f, --file <file:string>", "read from file ...")
+  .option("-i, --stdin [stdin:boolean]", "read from stdin ...", {
+    conflicts: ["file"],
+  })
+  .parse(Deno.args);
 
-console.log( options );
+console.log(options);
 ```
 
 ```
@@ -391,14 +417,14 @@ Error: Option --stdin conflicts with option: --file
 To define options which depends on other options you can use the `depends` option by defining an array with the names of these options.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    .option( '-u, --audio-codec <type:string>', 'description ...' )
-    .option( '-p, --video-codec <type:string>', 'description ...', { depends: [ 'audio-codec' ] } )
-    .parse( Deno.args );
-
-console.log( options );
+  .option("-u, --audio-codec <type:string>", "description ...")
+  .option("-p, --video-codec <type:string>", "description ...", {
+    depends: ["audio-codec"],
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -417,11 +443,11 @@ $ deno run https://deno.land/x/cliffy/examples/command/depending-options.ts -a a
 An option can occur multiple times in the command line to collect multiple values. Todo this, you have to activate the `collect` option.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    .option( '-c, --color <color:string>', 'read from file ...', { collect: true } )
-    .parse( Deno.args );
+  .option("-c, --color <color:string>", "read from file ...", { collect: true })
+  .parse(Deno.args);
 
 console.log( options );
 ```
@@ -440,27 +466,29 @@ If collect is enabled the function receives as second parameter the previous val
 This allows you to coerce the option value to the desired type, or accumulate values, or do entirely custom processing.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-    // convert value to object
-    .option( '-o, --object <item:string>', 'map string to object', ( value: string ): { value: string } => {
-        return { value };
-    } )
-    // with collect option
-    .option( '-C, --color <item:string>', 'collect colors', {
-        collect: true,
-        value: ( value: string, previous: string[] = [] ): string[] => {
-            if ( [ 'blue', 'yellow', 'red' ].indexOf( value ) === -1 ) {
-                throw new Error( `Color must be one of blue, yellow or red but got: ${ value }` );
-            }
-            previous.push( value );
-            return previous;
-        }
-    } )
-    .parse( Deno.args );
-
-console.log( options );
+  .option(
+    "-o, --object <item:string>",
+    "map string to object",
+    (value: string): { value: string } => {
+      return { value };
+    },
+  )
+  .option("-C, --color <item:string>", "collect colors", {
+    collect: true,
+    value: (value: string, previous: string[] = []): string[] => {
+      if (["blue", "yellow", "red"].indexOf(value) === -1) {
+        throw new Error(
+          `Color must be one of blue, yellow or red but got: ${value}`,
+        );
+      }
+      previous.push(value);
+      return previous;
+    },
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -476,20 +504,20 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom-option-processing.
 ### Option action handler
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .option( '-i, --info [arg:boolean]', 'Print some info.', {
-        standalone: true,
-        action: () => {
-            console.log( 'Some info' );
-            Deno.exit( 0 );
-        }
-    } )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .option("-i, --info [arg:boolean]", "Print some info.", {
+    standalone: true,
+    action: () => {
+      console.log("Some info");
+      Deno.exit(0);
+    },
+  })
+  .parse(Deno.args);
 
-console.log('not executed');
+console.log("not executed");
 ```
 
 ```
@@ -502,25 +530,24 @@ Some info
 The command class operates as a factory class. It has an internal command pointer which point per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .description( 'Main command.' )
-    .option( '-a', 'Main command option.' )
+  .description("Main command.")
+  .option("-a", "Main command option.")
 
-    .command( 'command1 <file|dir>' )
-    .description( 'Command1 description.' )
-    .option( '-b', 'Command1 option.' )
+  .command("command1 <file|dir>")
+  .description("Command1 description.")
+  .option("-b", "Command1 option.")
 
-    .command( 'command2', new Command() )
-    .description( 'Command2 description.' )
-    .option( '-c', 'Command2 option.' )
+  .command("command2", new Command())
+  .description("Command2 description.")
+  .option("-c", "Command2 option.")
 
-    .reset() // reset command pointer
+  .reset() // reset command pointer
 
-    .option( '-e', 'Second main command option.' )
-
-    .parse( Deno.args );
+  .option("-e", "Second main command option.")
+  .parse(Deno.args);
 ```
 
 There are three ways to specify sub-commands with the `.command()` method:
@@ -534,47 +561,53 @@ In the first parameter to `.command()` you specify the command name and any comm
 Sub-command implemented using the `.command()` method with an action handler.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .command( 'clone <source:string> [destination:string]', 'Clone a repository into a newly created directory.' )
-    .action( ( options: any, source: string, destination: string ) => {
-        console.log( 'clone command called' );
-    } )
-    .parse( Deno.args );
+  .command(
+    "clone <source:string> [destination:string]",
+    "Clone a repository into a newly created directory.",
+  )
+  .action((options: any, source: string, destination: string) => {
+    console.log("clone command called");
+  })
+  .parse(Deno.args);
 ```
 
 Sub-command implemented using a `Command` instance.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const clone = new Command()
-    .arguments( '<source:string> [destination:string]' )
-    .description( 'Clone a repository into a newly created directory.' )
-    .action( ( options: any, source: string, destination: string ) => {
-        console.log( 'clone command called' );
-    } );
+  .arguments("<source:string> [destination:string]")
+  .description("Clone a repository into a newly created directory.")
+  .action((options: any, source: string, destination: string) => {
+    console.log("clone command called");
+  });
 
 await new Command()
-    .command( 'clone', clone )
-    .parse( Deno.args );
+  .command("clone", clone)
+  .parse(Deno.args);
+
 ```
 
 Sub-command implemented using a separate executable file.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .command( 'start <service>', 'Start named service.' )
-    .executable()
-    .command( 'stop [service]', new Command()
-        .description('Stop named service, or all if no name supplied.')
-        .executable()
-    )
+  .command("start <service>", "Start named service.")
+  .executable()
+  .command(
+    "stop [service]",
+    new Command()
+      .description("Stop named service, or all if no name supplied.")
+      .executable(),
+  )
+  .parse(Deno.args);
 
-    .parse( Deno.args );
 ```
 
 ### Argument syntax
@@ -582,14 +615,11 @@ await new Command()
 You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { args } = await new Command()
-    .version( '0.1.0' )
-    .arguments( '<cmd> [env]' )
-    .parse( Deno.args );
-
-console.log( args );
+  .arguments("<cmd> [env]")
+  .parse(Deno.args);
 ```
 
 ```
@@ -600,17 +630,16 @@ Error: Missing argument(s): cmd
 The last argument of a command can be variadic, and only the last argument. To make an argument variadic you can append or prepand `...` to the argument name. The variadic argument is passed to the action handler as an array.  
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';  
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";  
 
-await new Command()  
-    .version( '0.1.0' )  
-    .command( 'rmdir <dirs...>' )  
-    .action( ( options: any, dirs: string[] ) => {  
-        dirs.forEach( ( dir: string ) => {  
-            console.log( 'rmdir %s', dir );  
-        } );  
-    } )  
-    .parse( Deno.args );  
+await new Command()
+  .command("rmdir <dirs...:string>", "Remove directories.")
+  .action((_, dirs: string[]) => {
+    dirs.forEach((dir: string) => {
+      console.log("rmdir %s", dir);
+    });
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -623,15 +652,14 @@ rmdir dir3
 You can also use types for arguments same as for options and environment variables. Custom types are also supported.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';  
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";  
 
-await new Command()  
-    .version( '0.1.0' )  
-    .command( 'rmdir <dir:string>' )  
-    .action( ( options: any, dir: string ) => {  
-        console.log( 'rmdir %s', dir );  
-    } )  
-    .parse( Deno.args );  
+await new Command()
+  .command("rmdir <dir:string>")
+  .action((options: any, dir: string) => {
+    console.log("rmdir %s", dir);
+  })
+  .parse(Deno.args);
 ```
 
 ### Action handler
@@ -639,15 +667,15 @@ await new Command()
 The action handler is called when the command is executed. It gets passed an object with all options defined by the user and additional arguments which are passed to the command.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .command( 'rm <dir>' )
-    .option( '-r, --recursive [recursive:boolean]', 'Remove recursively' )
-    .action( ( { recursive }: any, dir: string ) => {
-        console.log( 'remove ' + dir + ( recursive ? ' recursively' : '' ) );
-    } )
-    .parse( Deno.args );
+  .command("rm <dir>", "Remove directory.")
+  .option("-r, --recursive [recursive:boolean]", "Remove recursively")
+  .action(({ recursive }: any, dir: string) => {
+    console.log("remove " + dir + (recursive ? " recursively" : ""));
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -667,15 +695,14 @@ When `.executable()` is invoked on a sub-command, this tells cliffy you're going
 You handle the options for an executable (sub)command in the executable, and don't declare them at the top-level.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .command( 'install [name]', 'install one or more packages' ).executable()
-    .command( 'search [query]', 'search with optional query' ).executable()
-    .command( 'update', 'update installed packages' ).executable()
-    .command( 'list', 'list packages installed' ).executable()
-    .parse( Deno.args );
+  .command("install [name]", "install one or more packages").executable()
+  .command("search [query]", "search with optional query").executable()
+  .command("update", "update installed packages").executable()
+  .command("list", "list packages installed").executable()
+  .parse(Deno.args);
 ```
 
 ### Global commands
@@ -683,23 +710,23 @@ await new Command()
 To share commands with child commands you can use the `.global()` method.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-
-    .command( 'global [val:string]' ), 'global ...' )
-    .global()
-    .action( console.log )
-
-    .command( 'command1', new Command()
-        .description( 'Some sub command.' )
-
-        .command( 'command2', new Command()
-            .description( 'Some nested sub command.' )
-        )
-    )
-    .parse( Deno.args );
+  .command("global [val:string]", "global ...")
+  .global()
+  .action(console.log)
+  .command(
+    "command1",
+    new Command()
+      .description("Some sub command.")
+      .command(
+        "command2",
+        new Command()
+          .description("Some nested sub command."),
+      ),
+  )
+  .parse(Deno.args);
 ```
 
 ```
@@ -712,12 +739,12 @@ $ deno run https://deno.land/x/cliffy/examples/command/global-commands.ts comman
 To exclude commands's from the help and completion command's you can use the `.hidden()` method.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .command( 'top-secret', 'Nobody knows about me!' )
-    .hidden()
-    .parse( Deno.args );
+  .command("top-secret", "Nobody knows about me!")
+  .hidden()
+  .parse(Deno.args);
 ```
 
 ```
@@ -729,18 +756,18 @@ $ deno run https://deno.land/x/cliffy/examples/command/hidden-commands.ts -h
 If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .stopEarly() // <-- enable stop early
-    .option( '-d, --debug-level <level:string>', '...' )
-    .arguments( '[script:string] [...args:number]' )
-    .action( ( options: any, script: string, args: string[] ) => {
-        console.log( 'options:', options );
-        console.log( 'script:', script );
-        console.log( 'args:', args );
-    } )
-    .parse( Deno.args );
+  .stopEarly() // <-- enable stop early
+  .option("-d, --debug-level <level:string>", "Debug level.")
+  .arguments("[script:string] [...args:number]")
+  .action((options: any, script: string, args: string[]) => {
+    console.log("options:", options);
+    console.log("script:", script);
+    console.log("args:", args);
+  })
+  .parse(Deno.args);
 ```
 
 ```
@@ -755,28 +782,22 @@ args: [ "-p", "80" ]
 By default cliffy calls `Deno.exit` when it detects errors. You can override this behaviour with the `.throwErrors()` method.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 try {
-    await new Command()
-        .throwErrors()
-        .version( '0.1.0' )
-        .option( '-p, --pizza-type <type>', 'Flavour of pizza.' )
-        .parse( Deno.args );
-} catch ( err ) {
-    // custom processing...
-    console.error( '[CUSTOM_ERROR]', err );
+  await new Command()
+    .throwErrors()
+    .option("-p, --pizza-type <type>", "Flavour of pizza.")
+    .parse(Deno.args);
+} catch (err) {
+  // custom processing...
+  console.error("[CUSTOM_ERROR]", err);
 }
 ```
 
 ```textile
 $ deno run https://deno.land/x/cliffy/examples/command/override-exit-handling.ts -t
 [CUSTOM_ERROR] Error: Unknown option: -t
-    at parseFlags (https://deno.land/x/cliffy/flags/lib/flags/mod.ts:82:27)
-    at Command.parseFlags (https://deno.land/x/cliffy/command/lib/base-command.ts:581:20)
-    at Command.parse (https://deno.land/x/cliffy/command/lib/base-command.ts:479:45)
-    at https://deno.land/x/cliffy/examples/command/override-exit-handling.ts:11:10
-    at <anonymous> (<anonymous>)
 ```
 
 ## ❯ Custom types
@@ -788,26 +809,26 @@ You can register custom types with the `.type()` method. The first argument is t
 This example shows you how to use a function as type handler.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
-import { IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
 
-const emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const emailRegex: RegExp =
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-function emailType( { label, name, value }: IType ): string {
-    if ( !emailRegex.test( value.toLowerCase() ) ) {
-        throw new Error( `${label} ${ name } must be a valid email but got: ${ value }` );
-    }
-    return value;
+function emailType({ label, name, value }: ITypeInfo): string {
+  if (!emailRegex.test(value.toLowerCase())) {
+    throw new Error(`${label} ${name} must be a valid email but got: ${value}`);
+  }
+
+  return value;
 }
 
 const { options } = await new Command()
-    .type( 'email', emailType )
-    .arguments( '[email:email]' )
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .command( 'email [email:email]', 'Your email address.' )
-    .parse( Deno.args );
-
-console.log( options );
+  .type("email", emailType)
+  .arguments("[email:email]")
+  .option("-e, --email <value:email>", "Your email address.")
+  .command("email [email:email]", "Your email address.")
+  .parse(Deno.args);
 ```
 
 ```
@@ -825,31 +846,30 @@ Option --email must be a valid email but got: my @email.com
 This example shows you how to use a class as type handler.
 
 ```typescript
-import { Command, Type } from 'https://deno.land/x/cliffy/command/mod.ts';
-import { IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { Command, Type } from "https://deno.land/x/cliffy/command/mod.ts";
+import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
 
 class EmailType extends Type<string> {
+  protected emailRegex: RegExp =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    protected emailRegex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    public parse( { label, name, value }: IType ): string {
-
-        if ( !this.emailRegex.test( value.toLowerCase() ) ) {
-            throw new Error( `${label} ${ name } must be a valid email but got: ${ value }` );
-        }
-
-        return value;
+  public parse({ label, name, value }: ITypeInfo): string {
+    if (!this.emailRegex.test(value.toLowerCase())) {
+      throw new Error(
+        `${label} ${name} must be a valid email but got: ${value}`,
+      );
     }
+
+    return value;
+  }
 }
 
 const { options } = await new Command()
-    .type( 'email', new EmailType() )
-    .arguments( '[email:email]' )
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .command( 'email [email:email]', 'Your email address.' )
-    .parse( Deno.args );
-
-console.log( options );
+  .type("email", new EmailType())
+  .arguments("[email:email]")
+  .option("-e, --email <value:email>", "Your email address.")
+  .command("email [email:email]", "Your email address.")
+  .parse(Deno.args);
 ```
 
 ```
@@ -868,17 +888,17 @@ To make an type available for child commands you can set the `global` option in 
 
 ```typescript
 await new Command()
-    .type( 'email', email(), { global: true } )
+  .type("email", new EmailType(), { global: true })
 
-    .command( 'login', 'Login with email.' )
-    .option( '-e, --email <email:email>', 'Your email address.' )
-    .action( console.log )
+  .command("login", "Login with email.")
+  .option("-e, --email <email:email>", "Your email address.")
+  .action(console.log)
 
-    .command( 'config', 'Manage config.' )
-    .option( '-a, --admin-email [email:email]', 'Get or set admin email address.' )
-    .action( console.log )
+  .command("config", "Manage config.")
+  .option("-a, --admin-email [email:email]", "Get or set admin email address.")
+  .action(console.log)
 
-    .parse( Deno.args );
+  .parse(Deno.args);
 ```
 
 ```
@@ -898,14 +918,17 @@ To allow deno to access environment variables you have to set the `--allow-env` 
 At the moment its also required to set the `--unstable` flag because deno's permissions api is marked as unstable.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .env( 'SOME_ENV_VAR=<value:number>', 'Description ...', { global: true, hidden: false } )
-    .command( 'hello', 'world ...' )
-    .parse( Deno.args );
+  .env("SOME_ENV_VAR=<value:number>", "Description ...", {
+    global: true,
+    hidden: false,
+  })
+  .command("hello", "world ...")
+  .parse(Deno.args);
 
-console.log( Deno.env.get( 'SOME_ENV_VAR' ) );
+console.log(Deno.env.get("SOME_ENV_VAR"));
 ```
 
 ```
@@ -921,12 +944,16 @@ Error: Environment variable SOME_ENV_VAR must be of type number but got: abc
 You can add some examples for your command which will be printed with the [help](#help-option-and-command) option and command.
 
 ```typescript
-import { red } from 'https://deno.land/std/fmt/colors.ts';
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { red } from "https://deno.land/std/fmt/colors.ts";
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .examples( 'example name', `Description ...\n\n Can have mutliple lines and ${ red( 'colors' ) }.` )
-    .parse( Deno.args );
+  .name("examples")
+  .example(
+    "example name",
+    `Description ...\n\nCan have mutliple lines and ${red("colors")}.`,
+  )
+  .parse(Deno.args);
 ```
 
 ```
@@ -944,19 +971,25 @@ The help information is auto-generated based on the information you have defined
 The `--help` and `-h` option flag prints the auto generated help.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/command.ts';
-import { CompletionsCommand } from 'https://deno.land/x/cliffy/command/completions/mod.ts';
-import { CompletionsCommand } from 'https://deno.land/x/cliffy/command/help/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/command.ts";
+import { CompletionsCommand } from "https://deno.land/x/cliffy/command/completions/mod.ts";
+import { CompletionsCommand } from "https://deno.land/x/cliffy/command/help/mod.ts";
 
 await new Command()
-    .name( 'help-option-and-command' )
-    .version( '0.1.0' )
-    .description( 'Sample description ...' )
-    .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
-    .example( 'Some example', 'Example content ...\n\nSome more example content ...' )
-    .command( 'help', new HelpCommand() )
-    .command( 'completions', new CompletionsCommand() )
-    .parse( Deno.args );
+  .name("help-option-and-command")
+  .version("0.1.0")
+  .description("Sample description ...")
+  .env(
+    "EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>",
+    "Environment variable description ...",
+  )
+  .example(
+    "Some example",
+    "Example content ...\n\nSome more example content ...",
+  )
+  .command("help", new HelpCommand())
+  .command("completions", new CompletionsCommand())
+  .parse(Deno.args);
 ```
 
 ```
@@ -973,26 +1006,26 @@ The second and third argument's are optional.
 
 ```typescript
 await new Command()
-    .helpOption( '-i, --info', 'Print help info.', function( this: Command ) {
-        console.log( 'some help info ...', this.getHelp() );
-    } )
-    .parse( Deno.args );
+  .helpOption("-i, --info", "Print help info.", function (this: Command) {
+    console.log("some help info ...", this.getHelp());
+  })
+  .parse(Deno.args);
 ```
 
 You can also override the default options of the help option. The options are the same as for the `.option()` method.
 
 ```typescript
 await new Command()
-    .helpOption( ' -x, --xhelp', 'Print help info.', { global: true } )
-    .parse( Deno.args );
+  .helpOption(" -x, --xhelp", "Print help info.", { global: true })
+  .parse(Deno.args);
 ```
 
 To disable the help option you can pass false to the `.helpOption()` method.
 
 ```typescript
 await new Command()
-    .helpOption( false )
-    .parse( Deno.args );
+  .helpOption(false)
+  .parse(Deno.args);
 ```
 
 ### Help command
@@ -1002,14 +1035,17 @@ The help command must be registered manuelly and can be optionally registered as
 available on all child commands.
 
 ```typescript
-import { Command, HelpCommand } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command, HelpCommand } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .description( 'Sample description ...' )
-    .env( 'EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>', 'Environment variable description ...' )
-    .command( 'help', new HelpCommand().global() )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .description("Sample description ...")
+  .env(
+    "EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>",
+    "Environment variable description ...",
+  )
+  .command("help", new HelpCommand().global())
+  .parse(Deno.args);
 ```
 
 
@@ -1032,31 +1068,31 @@ One option is adding a completion action. A completion action is declared with t
 in the command arguments declaration and by any option. The action is added after the type separated by colon.
 
 ```typescript
-import { Command, Type } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command, Type } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .complete( 'email', () => [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ] )
-    .arguments( '[value:string:email]' )
-    .option( '-e, --email <value:string:email>', 'Your email address.' )
-    .parse( Deno.args );
+  .complete("email", () => ["aaa@example.com", "bbb@example.com"])
+  .arguments("[value:string:email]")
+  .option("-e, --email <value:string:email>", "Your email address.")
+  .parse(Deno.args);
 ```
 
 Another way to add shell completion is by creating a custom type class with a `.complete()` method.
 
 ```typescript
-import { Command, StringType } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command, StringType } from "https://deno.land/x/cliffy/command/mod.ts";
 
 class EmailType extends StringType {
-
-    complete(): string[] {
-        return [ 'aaa@example.com', 'bbb@example.com', 'ccc@example.com' ];
-    }
+  complete(): string[] {
+    return ["aaa@example.com", "bbb@example.com", "ccc@example.com"];
+  }
 }
 
 await new Command()
-    .type( 'email', new EmailType() )
-    .option( '-e, --email <value:email>', 'Your email address.' )
-    .parse( Deno.args );
+  .type("email", new EmailType())
+  .option("-e, --email <value:email>", "Your email address.")
+  .parse(Deno.args);
+
 ```
 
 Enabling auto completion is explained in the [completions command](#completions-command) section.
@@ -1069,13 +1105,11 @@ is supported. `bash` and more will be added.
 The `CompletionsCommand` is not registered per default and must be registered by your self.
 
 ```typescript
-import { Command, CompletionsCommand } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command, CompletionsCommand } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .description( 'Sample description ...' )
-    .command( 'completions', new CompletionsCommand() )
-    .parse( Deno.args );
+  .command("completions", new CompletionsCommand())
+  .parse(Deno.args);
 ```
 
 #### Zsh Completions
@@ -1095,28 +1129,32 @@ You can define an interface for your command options and a tuple for the command
 Here's how to do that:
 
 ```typescript
-import { Command, IParseResult } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command, IParseResult } from "https://deno.land/x/cliffy/command/mod.ts";
 
-type Arguments = [ string, string ];
+// define your argument types
+type Arguments = [string, string];
 
+// define your option types
 interface Options {
-    name: string;
-    age: number;
-    email?: string;
+  name: string;
+  age: number;
+  email?: string;
 }
 
-const result: IParseResult<Options, Arguments> = await new Command<Options, Arguments>()
-    .version( '0.1.0' )
-    .arguments( '<input:string> [output:string]' )
-    .option( '-n, --name <name:string>', 'description ...', { required: true } )
-    .option( '-a, --age <age:number>', 'description ...', { required: true } )
-    .option( '-e, --email <email:string>', 'description ...' )
-    .action( ( options: Options, input: string, output?: string ) => {} )
-    .parse( Deno.args );
+const result: IParseResult<Options, Arguments> = await new Command<
+  Options,
+  Arguments
+>()
+  .arguments("<input:string> [output:string]")
+  .option("-n, --name <name:string>", "description ...", { required: true })
+  .option("-a, --age <age:number>", "description ...", { required: true })
+  .option("-e, --email <email:string>", "description ...")
+  .action((options: Options, input: string, output?: string) => {})
+  .parse(Deno.args);
 
 const options: Options = result.options;
-const input: string = result.args[ 0 ];
-const output: string | undefined = result.args[ 1 ];
+const input: string = result.args[0];
+const output: string | undefined = result.args[1];
 ```
 
 ## ❯ Version option
@@ -1124,11 +1162,11 @@ const output: string | undefined = result.args[ 1 ];
 The `--version` and `-V` option flag prints the version number defined with the `version()` method. The version number will also be printed within the output of the [help](#help-option-command) option and command.
 
 ```typescript
-import { Command } from 'https://deno.land/x/cliffy/command/mod.ts';
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
-    .version( '0.1.0' )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .parse(Deno.args);
 ```
 
 ```
@@ -1145,28 +1183,32 @@ The second and third argument's are optional.
 
 ```typescript
 await new Command()
-    .version( '0.1.0' )
-    .versionOption( ' -x, --xversion', 'Print version info.', function( this: Command ) {
-        console.log( 'Version: %s', this.getVersion() );
-    } )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .versionOption(
+    " -x, --xversion",
+    "Print version info.",
+    function (this: Command) {
+      console.log("Version: %s", this.getVersion());
+    },
+  )
+  .parse(Deno.args);
 ```
 
 You can also override the default options of the version option. The options are the same as for the `.option()` method.
 
 ```typescript
 await new Command()
-    .version( '0.1.0' )
-    .versionOption( ' -x, --xversion', 'Print version info.', { global: true } )
-    .parse( Deno.args );
+  .version("0.1.0")
+  .versionOption(" -x, --xversion", "Print version info.", { global: true })
+  .parse(Deno.args);
 ```
 
 The version option can be also disable.
 
 ```typescript
 await new Command()
-    .versionOption( false )
-    .parse( Deno.args );
+  .versionOption(false)
+  .parse(Deno.args);
 ```
 
 ## ❯ Credits
