@@ -41,27 +41,27 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { parseFlags } from 'https://deno.land/x/cliffy@<version>/flags/mod.ts';
+import { parseFlags } from "https://deno.land/x/cliffy@<version>/flags/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { parseFlags } from 'https://x.nest.land/cliffy@<version>/flags/mod.ts';
+import { parseFlags } from "https://x.nest.land/cliffy@<version>/flags/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { parseFlags } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/flags/mod.ts';
+import { parseFlags } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/flags/mod.ts";
 ```
 
 ## ❯ Usage
 
 ```typescript
-import { parseFlags } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { parseFlags } from "https://deno.land/x/cliffy/flags/mod.ts";
 
-console.log( parseFlags( Deno.args ) );
+console.log(parseFlags(Deno.args));
 ```
 
 ```
@@ -81,51 +81,51 @@ $ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y 4 -n5 -abc
 ### With Options
 
 ```typescript
-import { parseFlags, OptionType } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { parseFlags, OptionType } from "https://deno.land/x/cliffy/flags/mod.ts";
 
-const result = parseFlags( Deno.args, {
-    allowEmpty: true,
-    stopEarly: true,
-    flags: [ {
-        name: 'help',
-        aliases: [ 'h' ],
-        // a standalone option cannot be combined with other options
-        standalone: true
-    }, {
-        name: 'verbose',
-        aliases: [ 'v' ],
-        // allow to define this option multiple times on the command line
-        collect: true,
-        // make --verbose incremental: turn value into an number and increase the value for each --verbose option
-        value: ( val: boolean, previous: number = 0 ) => val ? previous + 1 : 0
-    }, {
-        name: 'debug',
-        aliases: [ 'd' ],
-        type: OptionType.BOOLEAN,
-        optionalValue: true
-    }, {
-        name: 'silent',
-        aliases: [ 's' ]
-    }, {
-        name: 'amount',
-        aliases: [ 'n' ],
-        type: OptionType.NUMBER,
-        requiredValue: true
-    }, {
-        name: 'file',
-        aliases: [ 'f' ],
-        type: OptionType.STRING,
-        // file cannot be combined with stdin option
-        conflicts: [ 'stdin' ]
-    }, {
-        name: 'stdin',
-        aliases: [ 'i' ],
-        // stdin cannot be combined with file option
-        conflicts: [ 'file' ]
-    } ]
-} );
+const result = parseFlags(Deno.args, {
+  allowEmpty: true,
+  stopEarly: true,
+  flags: [{
+    name: "help",
+    aliases: ["h"],
+    // a standalone option cannot be combined with other options
+    standalone: true,
+  }, {
+    name: "verbose",
+    aliases: ["v"],
+    // allow to define this option multiple times on the command line
+    collect: true,
+    // make --verbose incremental: turn value into an number and increase the value for each --verbose option
+    value: (val: boolean, previous: number = 0) => val ? previous + 1 : 0,
+  }, {
+    name: "debug",
+    aliases: ["d"],
+    type: OptionType.BOOLEAN,
+    optionalValue: true,
+  }, {
+    name: "silent",
+    aliases: ["s"],
+  }, {
+    name: "amount",
+    aliases: ["n"],
+    type: OptionType.NUMBER,
+    requiredValue: true,
+  }, {
+    name: "file",
+    aliases: ["f"],
+    type: OptionType.STRING,
+    // file cannot be combined with stdin option
+    conflicts: ["stdin"],
+  }, {
+    name: "stdin",
+    aliases: ["i"],
+    // stdin cannot be combined with file option
+    conflicts: ["file"],
+  }],
+});
 
-console.log( result );
+console.log(result);
 ```
 
 ```
@@ -185,21 +185,37 @@ $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./ex
 ## ❯ Custom type processing
 
 ```typescript
-import { parseFlags, IType } from 'https://deno.land/x/cliffy/flags/mod.ts';
+import { parseFlags, ITypeInfo } from "https://deno.land/x/cliffy/flags/mod.ts";
 
-parseFlags( Deno.args, {
-    parse: ( { label, name, value, type }: IType ) => {
-        switch ( type ) {
-            case 'float':
-                if ( isNaN( Number( value ) ) ) {
-                    throw new Error( `${ label } ${ name } must be of type ${ type } but got: ${ value }` );
-                }
-                return parseFloat( value );
-            default:
-                throw new Error( `Unknown type: ${ type }` );
+parseFlags(Deno.args, {
+  flags: [{
+    name: "foo",
+    type: "float"
+  }],
+  parse: ({ label, name, value, type }: ITypeInfo) => {
+    switch (type) {
+      case "float":
+        if (isNaN(Number(value))) {
+          throw new Error(
+            `${label} ${name} must be of type ${type} but got: ${value}`,
+          );
         }
+        return parseFloat(value);
+      default:
+        throw new Error(`Unknown type: ${type}`);
     }
-} );
+  },
+});
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts --foo 1.2
+{ flags: { foo: 1.2 }, unknown: [], literal: [] }
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts --foo abc
+error: Uncaught Error: Option --foo must be of type float but got: abc
 ```
 
 ## ❯ License

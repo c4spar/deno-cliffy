@@ -39,41 +39,39 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { AnsiEscape } from 'https://deno.land/x/cliffy@<version>/ansi-escape/mod.ts';
+import { AnsiEscape } from "https://deno.land/x/cliffy@<version>/ansi-escape/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { AnsiEscape } from 'https://x.nest.land/cliffy@<version>/ansi-escape/mod.ts';
+import { AnsiEscape } from "https://x.nest.land/cliffy@<version>/ansi-escape/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { AnsiEscape } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi-escape/mod.ts';
+import { AnsiEscape } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi-escape/mod.ts";
 ```
 
 ## ❯ Usage
 
 ```typescript
-#!/usr/bin/env -S deno run
+import { AnsiEscape } from "https://deno.land/x/cliffy/ansi-escape/mod.ts";
 
-import { AnsiEscape } from 'https://deno.land/x/cliffy/ansi-escape/mod.ts';
-
-AnsiEscape.from( Deno.stdout )
-    // Hide cursor:
-    .cursorHide()
-    // Show cursor:
-    .cursorShow()
-    // Erase current line:
-    .eraseLine()
-    // Erase three line's up:
-    .eraseLines( 3 )
-    // Scroll two line's up:
-    .scrollUp( 2 )
-    // Scroll one line down:
-    .scrollDown()
+AnsiEscape.from(Deno.stdout)
+  // Hide cursor:
+  .cursorHide()
+  // Show cursor:
+  .cursorShow()
+  // Erase current line:
+  .eraseLine()
+  // Erase three line's up:
+  .eraseLines(3)
+  // Scroll two line's up:
+  .scrollUp(2)
+  // Scroll one line down:
+  .scrollDown()
     // ...
 ```
 

@@ -1,118 +1,118 @@
-import { OptionType } from '../flags/types.ts';
-import { green, magenta, red, yellow } from './deps.ts';
-import { IArgument } from './types.ts';
+import { OptionType } from "../flags/types.ts";
+import { green, magenta, red, yellow } from "./deps.ts";
+import { IArgument } from "./types.ts";
 
 export class ArgumentsParser {
+  private static readonly ARGUMENT_REGEX = /^[<\[].+[\]>]$/;
+  private static readonly ARGUMENT_DETAILS_REGEX = /[<\[:>\]]/;
 
-    private static readonly ARGUMENT_REGEX = /^[<\[].+[\]>]$/;
-    private static readonly ARGUMENT_DETAILS_REGEX = /[<\[:>\]]/;
+  public static splitArguments(
+    args: string,
+  ): { args: string[]; typeDefinition: string } {
+    const parts = args.trim().split(/[, =] */g);
+    const typeParts = [];
 
-    public static splitArguments( args: string ): { args: string[], typeDefinition: string } {
-
-        const parts = args.trim().split( /[, =] */g );
-        const typeParts = [];
-
-        while ( parts[ parts.length - 1 ] && this.ARGUMENT_REGEX.test( parts[ parts.length - 1 ] ) ) {
-            typeParts.unshift( parts.pop() );
-        }
-
-        const typeDefinition: string = typeParts.join( ' ' );
-
-        return { args: parts, typeDefinition };
+    while (
+      parts[parts.length - 1] &&
+      this.ARGUMENT_REGEX.test(parts[parts.length - 1])
+    ) {
+      typeParts.unshift(parts.pop());
     }
 
-    public static parseArgumentsDefinition( argsDefinition: string ): IArgument[] {
+    const typeDefinition: string = typeParts.join(" ");
 
-        const argumentDetails: IArgument[] = [];
+    return { args: parts, typeDefinition };
+  }
 
-        let hasOptional = false;
-        let hasVariadic = false;
-        const parts: string[] = argsDefinition.split( / +/ );
+  public static parseArgumentsDefinition(argsDefinition: string): IArgument[] {
+    const argumentDetails: IArgument[] = [];
 
-        for ( const arg of parts ) {
+    let hasOptional = false;
+    let hasVariadic = false;
+    const parts: string[] = argsDefinition.split(/ +/);
 
-            if ( hasVariadic ) {
-                throw new Error( 'An argument can not follow an variadic argument.' );
-            }
+    for (const arg of parts) {
+      if (hasVariadic) {
+        throw new Error("An argument can not follow an variadic argument.");
+      }
 
-            const parts: string[] = arg.split( this.ARGUMENT_DETAILS_REGEX );
-            const type: string | undefined = parts[ 2 ] || OptionType.STRING;
+      const parts: string[] = arg.split(this.ARGUMENT_DETAILS_REGEX);
+      const type: string | undefined = parts[2] || OptionType.STRING;
 
-            let details: IArgument = {
-                optionalValue: arg[ 0 ] !== '<',
-                name: parts[ 1 ],
-                action: parts[ 3 ] || type,
-                variadic: false,
-                list: type ? arg.indexOf( type + '[]' ) !== -1 : false,
-                type
-            };
+      let details: IArgument = {
+        optionalValue: arg[0] !== "<",
+        name: parts[1],
+        action: parts[3] || type,
+        variadic: false,
+        list: type ? arg.indexOf(type + "[]") !== -1 : false,
+        type,
+      };
 
-            if ( !details.optionalValue && hasOptional ) {
-                throw new Error( 'An required argument can not follow an optional argument.' );
-            }
+      if (!details.optionalValue && hasOptional) {
+        throw new Error(
+          "An required argument can not follow an optional argument.",
+        );
+      }
 
-            if ( arg[ 0 ] === '[' ) {
-                hasOptional = true;
-            }
+      if (arg[0] === "[") {
+        hasOptional = true;
+      }
 
-            if ( details.name.length > 3 ) {
+      if (details.name.length > 3) {
+        const istVariadicLeft = details.name.slice(0, 3) === "...";
+        const istVariadicRight = details.name.slice(-3) === "...";
 
-                const istVariadicLeft = details.name.slice( 0, 3 ) === '...';
-                const istVariadicRight = details.name.slice( -3 ) === '...';
+        hasVariadic = details.variadic = istVariadicLeft || istVariadicRight;
 
-                hasVariadic = details.variadic = istVariadicLeft || istVariadicRight;
-
-                if ( istVariadicLeft ) {
-                    details.name = details.name.slice( 3 );
-                } else if ( istVariadicRight ) {
-                    details.name = details.name.slice( 0, -3 );
-                }
-            }
-
-            if ( details.name ) {
-                argumentDetails.push( details );
-            }
+        if (istVariadicLeft) {
+          details.name = details.name.slice(3);
+        } else if (istVariadicRight) {
+          details.name = details.name.slice(0, -3);
         }
+      }
 
-        return argumentDetails;
+      if (details.name) {
+        argumentDetails.push(details);
+      }
     }
 
-    public static highlightArguments( argsDefinition: string ) {
+    return argumentDetails;
+  }
 
-        if ( !argsDefinition ) {
-            return '';
-        }
-
-        return this.parseArgumentsDefinition( argsDefinition )
-            .map( ( arg: IArgument ) => this.highlightArgumentDetails( arg ) ).join( ' ' );
+  public static highlightArguments(argsDefinition: string) {
+    if (!argsDefinition) {
+      return "";
     }
 
-    public static highlightArgumentDetails( arg: IArgument ): string {
+    return this.parseArgumentsDefinition(argsDefinition)
+      .map((arg: IArgument) => this.highlightArgumentDetails(arg)).join(" ");
+  }
 
-        let str = '';
+  public static highlightArgumentDetails(arg: IArgument): string {
+    let str = "";
 
-        str += yellow( arg.optionalValue ? '[' : '<' );
+    str += yellow(arg.optionalValue ? "[" : "<");
 
-        let name = '';
-        name += arg.name;
-        if ( arg.variadic ) {
-            name += '...';
-        }
-        name = magenta( name );
-
-        str += name;
-
-        // if ( arg.name !== arg.type ) {
-        str += yellow( ':' );
-        str += red( arg.type );
-        // }
-
-        if ( arg.list ) {
-            str += green( '[]' );
-        }
-
-        str += yellow( arg.optionalValue ? ']' : '>' );
-
-        return str;
+    let name = "";
+    name += arg.name;
+    if (arg.variadic) {
+      name += "...";
     }
+    name = magenta(name);
+
+    str += name;
+
+    // if ( arg.name !== arg.type ) {
+    str += yellow(":");
+    str += red(arg.type);
+    // }
+
+    if (arg.list) {
+      str += green("[]");
+    }
+
+    str += yellow(arg.optionalValue ? "]" : ">");
+
+    return str;
+  }
 }

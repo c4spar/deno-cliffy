@@ -1,20 +1,23 @@
-import { assertEquals, assertThrowsAsync } from '../../../dev_deps.ts';
-import { Command } from '../../command.ts';
+import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { Command } from "../../command.ts";
 
 function command(): Command {
-    return new Command()
-        .throwErrors()
-        .option( '-f, --flag1', 'flag 1' )
-        .option( '-F, --flag2 <val:string>', 'flag 2', { depends: [ 'flag1' ], default: 'example' } );
+  return new Command()
+    .throwErrors()
+    .option("-f, --flag1", "flag 1")
+    .option(
+      "-F, --flag2 <val:string>",
+      "flag 2",
+      { depends: ["flag1"], default: "example" },
+    );
 }
 
-Deno.test( 'command depends option with default value: should accept no arguments', async () => {
+Deno.test("command depends option with default value: should accept no arguments", async () => {
+  const { options, args } = await command().parse([]);
 
-    const { options, args } = await command().parse( [] );
-
-    assertEquals( options, { flag2: 'example' } );
-    assertEquals( args, [] );
-} );
+  assertEquals(options, { flag2: "example" });
+  assertEquals(args, []);
+});
 
 // disabled because the -h flag call's Deno.exit() and stops the test's.
 // Deno.test( 'command depends option with default value: should accept -h', async () => {
@@ -25,25 +28,28 @@ Deno.test( 'command depends option with default value: should accept no argument
 //     assertEquals( args, [] );
 // } );
 
-Deno.test( 'command depends option with default value: should accept --flag1', async () => {
+Deno.test("command depends option with default value: should accept --flag1", async () => {
+  const { options, args } = await command().parse(["--flag1"]);
 
-    const { options, args } = await command().parse( [ '--flag1' ] );
+  assertEquals(options, { flag1: true, flag2: "example" });
+  assertEquals(args, []);
+});
 
-    assertEquals( options, { flag1: true, flag2: 'example' } );
-    assertEquals( args, [] );
-} );
+Deno.test("command depends option with default value: should accept --flag1 --flag2 test", async () => {
+  const { options, args } = await command().parse(
+    ["--flag1", "--flag2", "test"],
+  );
 
-Deno.test( 'command depends option with default value: should accept --flag1 --flag2 test', async () => {
+  assertEquals(options, { flag1: true, flag2: "test" });
+  assertEquals(args, []);
+});
 
-    const { options, args } = await command().parse( [ '--flag1', '--flag2', 'test' ] );
-
-    assertEquals( options, { flag1: true, flag2: 'test' } );
-    assertEquals( args, [] );
-} );
-
-Deno.test( 'command depends option with default value: should not accept --flag2 test', async () => {
-
-    await assertThrowsAsync( async () => {
-        await command().parse( [ '--flag2', 'test' ] );
-    }, Error, 'Option --flag2 depends on option: --flag1' );
-} );
+Deno.test("command depends option with default value: should not accept --flag2 test", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await command().parse(["--flag2", "test"]);
+    },
+    Error,
+    "Option --flag2 depends on option: --flag1",
+  );
+});

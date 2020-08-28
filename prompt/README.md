@@ -48,19 +48,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { prompt } from 'https://deno.land/x/cliffy@<version>/prompt/mod.ts';
+import { prompt } from "https://deno.land/x/cliffy@<version>/prompt/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { prompt } from 'https://x.nest.land/cliffy@<version>/prompt/mod.ts';
+import { prompt } from "https://x.nest.land/cliffy@<version>/prompt/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { prompt } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/prompt/mod.ts';
+import { prompt } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/prompt/mod.ts";
 ```
 
 ## ❯ Usage
@@ -72,7 +72,7 @@ Each prompt has a static prompt method which accepts a prompt message or an opti
 Execute a single prompt with a single message.
 
 ```typescript
-import { Input } from 'https://deno.land/x/cliffy/prompt/mod.ts';
+import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const name: string = await Input.prompt( `What's your name?` );
 ```
@@ -80,7 +80,7 @@ const name: string = await Input.prompt( `What's your name?` );
 Execute a single prompt with an options object.
 
 ```typescript
-import { Input } from 'https://deno.land/x/cliffy/prompt/mod.ts';
+import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const name: string = await Input.prompt( { message: `Choose a username?`, minLength: 8 } );
 ```
@@ -92,28 +92,28 @@ To execute a list of prompts you can use the `prompt()` method. The prompt metho
 Unlike npm's inquerer, the `type` property accepts a prompt object and not the name of the prompt. This makes it possible to extract the options and return types of each prompt to get typed options for any prompt and a **typed result object**. This works also with [custom prompts](#custom-prompts) which are easily implemented. Another advantage is that you only import the modules that you really need.
 
 ```typescript
-import { prompt, Input, Number, Confirm, Checkbox } from 'https://deno.land/x/cliffy/prompt/mod.ts';
+import { prompt, Input, Number, Confirm, Checkbox } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const result = await prompt( [ {
-    name: 'name',
-    message: `What's your name?`,
-    type: Input
+const result = await prompt([{
+  name: "name",
+  message: "What's your name?",
+  type: Input,
 }, {
-    name: 'age',
-    message: 'How old are you?',
-    type: Number
+  name: "age",
+  message: "How old are you?",
+  type: Number,
 }, {
-    name: 'like',
-    message: `Do you like animal's?`,
-    type: Confirm
+  name: "like",
+  message: "Do you like animal's?",
+  type: Confirm,
 }, {
-    name: 'animals',
-    message: `Select some animal's`,
-    type: Checkbox,
-    options: [ 'dog', 'cat', 'snake' ]
-} ] );
+  name: "animals",
+  message: "Select some animal's",
+  type: Checkbox,
+  options: ["dog", "cat", "snake"],
+}]);
 
-console.log( result );
+console.log(result);
 
 // if ( result.foo ) {} // error: Property 'foo' does not exist
 // if ( result.name && isNaN( result.name ) ) {} // error: Argument of type 'string' is not assignable to parameter of type 'number'.
@@ -129,38 +129,38 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt-list.ts
 You can dynamicly control the flow of the prompt list with the `before` and `after` callbacks which works like a middleware function. The first argument is the `result` object and the second argument a `next()` method. The next method calls the next prompt in the list if no argument is passed to it. To jump to a specific prompt pass the name or the index of the prompt to the next method. To skip the next prompt pass true to it. To skip all other prompts simple omit the next call.
 
 ```typescript
-import { prompt, Number, Confirm, Checkbox } from 'https://deno.land/x/cliffy/prompt/mod.ts';
+import { prompt, Number, Confirm, Checkbox } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const result = await prompt( [ {
-    name: 'animals',
-    message: `Select some animal's`,
-    type: Checkbox,
-    options: [ 'dog', 'cat', 'snake' ]
+const result = await prompt([{
+  name: "animals",
+  message: "Select some animal's",
+  type: Checkbox,
+  options: ["dog", "cat", "snake"],
 }, {
-    name: 'like',
-    message: `Do you like animal's?`,
-    type: Confirm,
-    after: async ( { like }, next ) => { // executed after like prompt
-        if ( like ) {
-            await next(); // run age prompt
-        } else {
-            await next( 'like' ); // run like prompt again
-        }
+  name: "like",
+  message: "Do you like animal's?",
+  type: Confirm,
+  after: async ({ like }, next) => { // executed after like prompt
+    if (like) {
+      await next(); // run age prompt
+    } else {
+      await next("like"); // run like prompt again
     }
+  },
 }, {
-    name: 'age',
-    message: 'How old are you?',
-    type: Number,
-    before: async ( { animals }, next ) => { // executed before age prompt
-        if ( animals?.length === 3 ) {
-            await next(); // run age prompt
-        } else {
-            await next( 'animals' ); // begin from start
-        }
+  name: "age",
+  message: "How old are you?",
+  type: Number,
+  before: async ({ animals }, next) => { // executed before age prompt
+    if (animals?.length === 3) {
+      await next(); // run age prompt
+    } else {
+      await next("animals"); // begin from start
     }
-} ] );
+  },
+}]);
 
-console.log( result );
+console.log(result);
 ```
 
 ```
@@ -174,65 +174,68 @@ The prompt method accepts an options object as argument and the return value wil
 Be shure to define an options and return type for your custom prompt method. Cliffy extracts the type of the options and return value to get **typed options** and a **typed result object** also for custom prompts.
 
 ```typescript
-import { BufReader } from 'https://deno.land/std/io/bufio.ts';
-import { AnsiEscape } from 'https://deno.land/x/cliffy/ansi-escape/mod.ts';
-import { prompt, Input, Figures } from 'https://deno.land/x/cliffy/prompt/mod.ts';
+import { BufReader } from "https://deno.land/std/io/bufio.ts";
+import { AnsiEscape } from "https://deno.land/x/cliffy/ansi-escape/mod.ts";
+import { prompt, Input, Figures } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const result = await prompt( [ {
-    name: 'text',
-    message: `Enter some text`,
-    // build-in prompt
-    type: Input
+const result = await prompt([{
+  name: "text",
+  message: "Enter some text",
+  // build-in prompt
+  type: Input,
 }, {
-    name: 'customText',
-    message: `Enter more text`,
-    // using an object/method as custom prompt
-    type: {
-        async prompt( options: { message: string } ): Promise<string> {
+  name: "customText",
+  message: "Enter more text",
+  // using an object/method as custom prompt
+  type: {
+    async prompt(options: { message: string }): Promise<string> {
+      const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
+      await Deno.stdout.write(new TextEncoder().encode(message));
 
-            const message = ` ? ${ options.message } ${ Figures.POINTER_SMALL } `;
-            await Deno.stdout.write( new TextEncoder().encode( message ) );
+      const result = await new BufReader(Deno.stdin).readLine();
 
-            const result = await new BufReader( Deno.stdin ).readLine();
-
-            return result ? new TextDecoder().decode( result.line ) : '';
-        }
-    }
+      return result ? new TextDecoder().decode(result.line) : "";
+    },
+  },
 }, {
-    name: 'customNumber',
-    message: `Enter a number`,
-    // using a class as custom prompt
-    type: class CustomPrompt {
-        static async prompt( options: { message: string }, error?: string ): Promise<number> {
+  name: "customNumber",
+  message: "Enter a number",
+  // using a class as custom prompt
+  type: class CustomPrompt {
+    static async prompt(
+      options: { message: string },
+      error?: string,
+    ): Promise<number> {
+      const screen = AnsiEscape.from(Deno.stdout);
 
-            const screen = AnsiEscape.from( Deno.stdout );
+      const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
+      await Deno.stdout.write(new TextEncoder().encode(message));
 
-            const message = ` ? ${ options.message } ${ Figures.POINTER_SMALL } `;
-            await Deno.stdout.write( new TextEncoder().encode( message ) );
+      if (error) {
+        screen.cursorSave();
+        await Deno.stdout.write(new TextEncoder().encode("\n " + error));
+        screen.cursorRestore();
+      }
 
-            if ( error ) {
-                screen.cursorSave();
-                await Deno.stdout.write( new TextEncoder().encode( '\n ' + error ) );
-                screen.cursorRestore();
-            }
+      const readLineResult = await new BufReader(Deno.stdin).readLine();
+      const result: number = Number(
+        readLineResult ? new TextDecoder().decode(readLineResult.line) : null,
+      );
 
-            const readLineResult = await new BufReader( Deno.stdin ).readLine();
-            const result: number = Number( readLineResult ? new TextDecoder().decode( readLineResult.line ) : null );
+      if (isNaN(result)) {
+        screen.cursorLeft()
+          .cursorUp()
+          .eraseDown();
 
-            if ( isNaN( result ) ) {
-                screen.cursorLeft()
-                    .cursorUp()
-                    .eraseDown();
+        return this.prompt(options, `${result} is not a number.`);
+      }
 
-                return this.prompt( options, `${ result } is not a number.` );
-            }
-
-            return result;
-        }
+      return result;
     }
-} ] );
+  },
+}]);
 
-console.log( result );
+console.log(result);
 
 // if ( result.foo ) {} // error: Property 'foo' does not exist
 // if ( result.customText && isNaN( result.customText ) ) {} // error: Argument of type 'string' is not assignable to parameter of type 'number'.
@@ -302,9 +305,9 @@ All prompts have the following base options:
 ![](assets/img/input.gif)
 
 ```typescript
-import { Input } from 'https://deno.land/x/cliffy/prompt/input.ts';
+import { Input } from "https://deno.land/x/cliffy/prompt/input.ts";
 
-const name: string = await Input.prompt( `What's your github user name?` );
+const name: string = await Input.prompt("What's your github user name?");
 ```
 
 ```
@@ -331,9 +334,9 @@ The `Input` prompt has all [base](#base-options) and the following prompt specif
 ![](assets/img/number.gif)
 
 ```typescript
-import { Number } from 'https://deno.land/x/cliffy/prompt/number.ts';
+import { Number } from "https://deno.land/x/cliffy/prompt/number.ts";
 
-const age: number = await Number.prompt( `How old are you?` );
+const age: number = await Number.prompt("How old are you?");
 ```
 
 ```
@@ -362,9 +365,9 @@ The `Number` prompt has all [base options](#base-options) and the following prom
 ![](assets/img/secret.gif)
 
 ```typescript
-import { Secret } from 'https://deno.land/x/cliffy/prompt/secret.ts';
+import { Secret } from "https://deno.land/x/cliffy/prompt/secret.ts";
 
-const password: string = await Secret.prompt( `Enter your password` );
+const password: string = await Secret.prompt("Enter your password");
 ```
 
 ```
@@ -393,9 +396,9 @@ The `Secret` prompt has all [base options](#base-options) and the following prom
 ![](assets/img/confirm.gif)
 
 ```typescript
-import { Confirm } from 'https://deno.land/x/cliffy/prompt/confirm.ts';
+import { Confirm } from "https://deno.land/x/cliffy/prompt/confirm.ts";
 
-const confirmed: boolean = await Confirm.prompt( `Can you confirm?` );
+const confirmed: boolean = await Confirm.prompt("Can you confirm?");
 ```
 
 ```
@@ -422,9 +425,9 @@ The `Config` prompt has all [base options](#base-options) and the following prom
 ![](assets/img/toggle.gif)
 
 ```typescript
-import { Toggle } from 'https://deno.land/x/cliffy/prompt/toggle.ts';
+import { Toggle } from "https://deno.land/x/cliffy/prompt/toggle.ts";
 
-const confirmed: boolean = await Toggle.prompt( `Can you confirm?` );
+const confirmed: boolean = await Toggle.prompt("Can you confirm?");
 ```
 
 ```
@@ -451,9 +454,9 @@ The `Toggle` prompt has all [base options](#base-options) and the following prom
 ![](assets/img/list.gif)
 
 ```typescript
-import { List } from 'https://deno.land/x/cliffy/prompt/list.ts';
+import { List } from "https://deno.land/x/cliffy/prompt/list.ts";
 
-const keywords: string[] = await List.prompt( `Enter some keywords` );
+const keywords: string[] = await List.prompt("Enter some keywords");
 ```
 
 ```
@@ -483,19 +486,19 @@ The `List` prompt has all [base options](#base-options) and the following prompt
 ![](assets/img/select.gif)
 
 ```typescript
-import { Select } from 'https://deno.land/x/cliffy/prompt/select.ts';
+import { Select } from "https://deno.land/x/cliffy/prompt/select.ts";
 
-const color: string = await Select.prompt( {
-    message: `Pick a color`,
-    options: [
-        { name: 'Red', value: '#ff0000' },
-        { name: 'Green', value: '#00ff00', disabled: true },
-        { name: 'Blue', value: '#0000ff' },
-        Select.separator( '--------' ),
-        { name: 'White', value: '#ffffff' },
-        { name: 'Black', value: '#000000' }
-    ]
-} );
+const color: string = await Select.prompt({
+  message: "Pick a color",
+  options: [
+    { name: "Red", value: "#ff0000" },
+    { name: "Green", value: "#00ff00", disabled: true },
+    { name: "Blue", value: "#0000ff" },
+    Select.separator("--------"),
+    { name: "White", value: "#ffffff" },
+    { name: "Black", value: "#000000" },
+  ],
+});
 ```
 
 ```
@@ -532,19 +535,19 @@ The `Select` prompt has all [base options](#base-options) and the following prom
 ![](assets/img/checkbox.gif)
 
 ```typescript
-import { Checkbox } from 'https://deno.land/x/cliffy/prompt/checkbox.ts';
+import { Checkbox } from "https://deno.land/x/cliffy/prompt/checkbox.ts";
 
-const colors: string[] = await Checkbox.prompt( {
-    message: `Pick a color`,
-    options: [
-        { name: 'Red', value: '#ff0000' },
-        { name: 'Green', value: '#00ff00', disabled: true },
-        { name: 'Blue', value: '#0000ff' },
-        Checkbox.separator( '--------' ),
-        { name: 'White', value: '#ffffff' },
-        { name: 'Black', value: '#000000' }
-    ]
-} );
+const colors: string[] = await Checkbox.prompt({
+  message: "Pick a color",
+  options: [
+    { name: "Red", value: "#ff0000" },
+    { name: "Green", value: "#00ff00", disabled: true },
+    { name: "Blue", value: "#0000ff" },
+    Checkbox.separator("--------"),
+    { name: "White", value: "#ffffff" },
+    { name: "Black", value: "#000000" },
+  ],
+});
 ```
 
 ```

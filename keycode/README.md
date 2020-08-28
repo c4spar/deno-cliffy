@@ -42,53 +42,52 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { KeyCode } from 'https://deno.land/x/cliffy@<version>/keycode/mod.ts';
+import { KeyCode } from "https://deno.land/x/cliffy@<version>/keycode/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { KeyCode } from 'https://x.nest.land/cliffy@<version>/keycode/mod.ts';
+import { KeyCode } from "https://x.nest.land/cliffy@<version>/keycode/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { KeyCode } from 'https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keycode/mod.ts';
+import { KeyCode } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keycode/mod.ts";
 ```
 
 ## ❯ Usage
 
 ```typescript
-import { KeyCode } from 'https://deno.land/x/cliffy/keycode/mod.ts';
+import { KeyCode } from "https://deno.land/x/cliffy/keycode/mod.ts";
 
 async function read(): Promise<void> {
+  const buffer = new Uint8Array(8);
 
-    const buffer = new Uint8Array( 8 );
+  Deno.setRaw(Deno.stdin.rid, true);
+  const nread = await Deno.stdin.read(buffer);
+  Deno.setRaw(Deno.stdin.rid, false);
 
-    Deno.setRaw( Deno.stdin.rid, true );
-    const nread = await Deno.stdin.read( buffer );
-    Deno.setRaw( Deno.stdin.rid, false );
+  if (nread === null) {
+    return;
+  }
 
-    if ( nread === null ) {
-        return;
-    }
+  const data = buffer.subarray(0, nread);
 
-    const data = buffer.subarray( 0, nread );
+  const [event] = KeyCode.parse(data);
 
-    const [ event ] = KeyCode.parse( data );
+  if (event?.name === "c" && event.ctrl) {
+    console.log("exit");
+    return;
+  }
 
-    if ( event?.name === 'c' && event.ctrl ) {
-        console.log( 'exit' );
-        return;
-    }
+  console.log(event);
 
-    console.log( event );
-
-    await read();
+  await read();
 }
 
-console.log('Hit ctrl + c to exit.');
+console.log("Hit ctrl + c to exit.");
 
 await read();
 ```
