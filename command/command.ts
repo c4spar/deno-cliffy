@@ -144,8 +144,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Add new sub-command.
-     */
+   * Add new sub-command.
+   */
   public command(name: string, desc?: string, override?: boolean): this;
   public command(name: string, cmd?: Command, override?: boolean): this;
   public command(
@@ -221,10 +221,10 @@ export class Command<O = any, A extends Array<any> = any> {
   // }
 
   /**
-     * Add new command alias.
-     *
-     * @param alias Alias name
-     */
+   * Add new command alias.
+   *
+   * @param alias Alias name
+   */
   public alias(alias: string): this {
     if (this.cmd === this) {
       throw this.error(
@@ -242,17 +242,17 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Reset internal command reference to main command.
-     */
+   * Reset internal command reference to main command.
+   */
   public reset(): this {
     return this.cmd = this;
   }
 
   /**
-     * Reset internal command reference to child command with given name.
-     *
-     * @param name Sub-command name.
-     */
+   * Reset internal command reference to child command with given name.
+   *
+   * @param name Sub-command name.
+   */
   public select(name: string): this {
     const cmd = this.getBaseCommand(name, true);
 
@@ -266,128 +266,128 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /********************************************************************************
-     **** SUB HANDLER ***************************************************************
-     ********************************************************************************/
+   **** SUB HANDLER ***************************************************************
+   ********************************************************************************/
 
   /**
-     * Get or set command name.
-     */
+   * Get or set command name.
+   */
   public name(name: string): this {
     this.cmd._name = name;
     return this;
   }
 
   /**
-     * Set command version.
-     *
-     * @param version Semantic version string.
-     */
+   * Set command version.
+   *
+   * @param version Semantic version string.
+   */
   public version(version: string): this {
     this.cmd.ver = version;
     return this;
   }
 
   /**
-     * Set command description.
-     *
-     * @param description Short command description.
-     */
+   * Set command description.
+   *
+   * @param description Short command description.
+   */
   public description(description: IDescription): this {
     this.cmd.desc = description;
     return this;
   }
 
   /**
-     * Hide command from help, completions, etc.
-     */
+   * Hide command from help, completions, etc.
+   */
   public hidden(): this {
     this.cmd.isHidden = true;
     return this;
   }
 
   /**
-     * Make command globally available.
-     */
+   * Make command globally available.
+   */
   public global(): this {
     this.cmd.isGlobal = true;
     return this;
   }
 
   /**
-     * Make command executable.
-     */
+   * Make command executable.
+   */
   public executable(): this {
     this.cmd.isExecutable = true;
     return this;
   }
 
   /**
-     * Set command arguments.
-     *
-     * @param args Define required and optional commands like: <requiredArg:string> [optionalArg: number] [...restArgs:string]
-     */
+   * Set command arguments.
+   *
+   * @param args Define required and optional commands like: <requiredArg:string> [optionalArg: number] [...restArgs:string]
+   */
   public arguments(args: string): this {
     this.cmd.argsDefinition = args;
     return this;
   }
 
   /**
-     * Set command handler.
-     *
-     * @param fn Callback method.
-     */
+   * Set command handler.
+   *
+   * @param fn Callback method.
+   */
   public action(fn: IAction<O, A>): this {
     this.cmd.fn = fn;
     return this;
   }
 
   /**
-     * Don't throw an error if the command was called without arguments.
-     *
-     * @param allowEmpty
-     */
+   * Don't throw an error if the command was called without arguments.
+   *
+   * @param allowEmpty
+   */
   public allowEmpty(allowEmpty: boolean = true): this {
     this.cmd._allowEmpty = allowEmpty;
     return this;
   }
 
   /**
-     * If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
-     *
-     * For example:
-     *     `command --debug-level warning server --port 80`
-     *
-     * Will result in:
-     *     - options: `{debugLevel: 'warning'}`
-     *     - args: `['server', '--port', '80']`
-     *
-     * @param stopEarly
-     */
+   * If enabled, all arguments starting from the first non option argument will be interpreted as raw argument.
+   *
+   * For example:
+   *     `command --debug-level warning server --port 80`
+   *
+   * Will result in:
+   *     - options: `{debugLevel: 'warning'}`
+   *     - args: `['server', '--port', '80']`
+   *
+   * @param stopEarly
+   */
   public stopEarly(stopEarly: boolean = true): this {
     this.cmd._stopEarly = stopEarly;
     return this;
   }
 
   /**
-     * Disable parsing arguments. If enabled the raw arguments will be passed to the action handler.
-     * This has no effect for parent or child commands. Only for the command on which this method was called.
-     */
+   * Disable parsing arguments. If enabled the raw arguments will be passed to the action handler.
+   * This has no effect for parent or child commands. Only for the command on which this method was called.
+   */
   public useRawArgs(useRawArgs: boolean = true): this {
     this.cmd._useRawArgs = useRawArgs;
     return this;
   }
 
   /**
-     * Set default command. The default command will be called if no action handler is registered.
-     */
+   * Set default command. The default command will be called if no action handler is registered.
+   */
   public default(name: string): this {
     this.cmd.defaultCommand = name;
     return this;
   }
 
   /**
-     * Register command specific custom type.
-     */
+   * Register command specific custom type.
+   */
   public type(
     name: string,
     handler: Type<any> | ITypeHandler<any>,
@@ -412,8 +412,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Register command specific custom type.
-     */
+   * Register command specific custom type.
+   */
   public complete(
     name: string,
     complete: ICompleteHandler,
@@ -433,9 +433,9 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Throw error's instead of calling `Deno.exit()` to handle error's manually.
-     * This has no effect for parent commands. Only for the command on which this method was called and all child commands.
-     */
+   * Throw error's instead of calling `Deno.exit()` to handle error's manually.
+   * This has no effect for parent commands. Only for the command on which this method was called and all child commands.
+   */
   public throwErrors(): this {
     this.cmd.throwOnError = true;
     return this;
@@ -507,12 +507,12 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Add new option (flag).
-     *
-     * @param flags Flags string like: -h, --help, --manual <requiredArg:string> [optionalArg: number] [...restArgs:string]
-     * @param desc Flag description.
-     * @param opts Flag options or custom handler for processing flag value.
-     */
+   * Add new option (flag).
+   *
+   * @param flags Flags string like: -h, --help, --manual <requiredArg:string> [optionalArg: number] [...restArgs:string]
+   * @param desc Flag description.
+   * @param opts Flag options or custom handler for processing flag value.
+   */
   public option(
     flags: string,
     desc: string,
@@ -584,11 +584,11 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Add new command example.
-     *
-     * @param name          Name of the example.
-     * @param description   The content of the example.
-     */
+   * Add new command example.
+   *
+   * @param name          Name of the example.
+   * @param description   The content of the example.
+   */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
       throw this.error(new Error("Example already exists."));
@@ -600,12 +600,12 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Add new environment variable.
-     *
-     * @param name          Name of the environment variable.
-     * @param description   The description of the environment variable.
-     * @param options       Environment variable options.
-     */
+   * Add new environment variable.
+   *
+   * @param name          Name of the environment variable.
+   * @param description   The description of the environment variable.
+   * @param options       Environment variable options.
+   */
   public env(
     name: string,
     description: string,
@@ -659,15 +659,15 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /********************************************************************************
-     **** MAIN HANDLER **************************************************************
-     ********************************************************************************/
+   **** MAIN HANDLER **************************************************************
+   ********************************************************************************/
 
   /**
-     * Parse command line arguments and execute matched command.
-     *
-     * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
-     * @param dry Execute command after parsed.
-     */
+   * Parse command line arguments and execute matched command.
+   *
+   * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
+   * @param dry Execute command after parsed.
+   */
   public async parse(
     args: string[] = Deno.args,
     dry?: boolean,
@@ -772,13 +772,14 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     return this;
-  } /**
-     * Execute command.
-     *
-     * @param options A map of options.
-     * @param args Command arguments.
-     */
+  }
 
+  /**
+   * Execute command.
+   *
+   * @param options A map of options.
+   * @param args Command arguments.
+   */
   protected async execute(options: O, ...args: A): Promise<IParseResult<O, A>> {
     const actionOption = this.findActionFlag(options);
 
@@ -815,10 +816,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Execute external sub-command.
-     *
-     * @param args Raw command line arguments.
-     */
+   * Execute external sub-command.
+   *
+   * @param args Raw command line arguments.
+   */
   protected async executeExecutable(args: string[]) {
     const unstable: boolean = !!(Deno as any).permissions;
 
@@ -903,10 +904,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Parse command line args.
-     *
-     * @param args          Command line args.
-     */
+   * Parse command line args.
+   *
+   * @param args          Command line args.
+   */
   protected parseFlags(args: string[]): IFlagsResult<O> {
     try {
       return parseFlags<O>(args, {
@@ -933,8 +934,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Validate environment variables.
-     */
+   * Validate environment variables.
+   */
   protected validateEnvVars() {
     if (!permissions.env) {
       return;
@@ -960,8 +961,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Match commands and arguments from command line arguments.
-     */
+   * Match commands and arguments from command line arguments.
+   */
   protected parseArguments(args: string[], flags: O): A {
     const params: Array<string | Array<string>> = [];
 
@@ -1040,10 +1041,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Execute help command if help flag is set.
-     *
-     * @param flags Command options.
-     */
+   * Execute help command if help flag is set.
+   *
+   * @param flags Command options.
+   */
   protected findActionFlag(flags: O): IOption | undefined {
     const flagNames = Object.keys(flags);
 
@@ -1059,19 +1060,19 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /********************************************************************************
-     **** GETTER ********************************************************************
-     ********************************************************************************/
+   **** GETTER ********************************************************************
+   ********************************************************************************/
 
   /**
-     * Get command name.
-     */
+   * Get command name.
+   */
   public getName(): string {
     return this._name;
   }
 
   /**
-     * Get parent command.
-     */
+   * Get parent command.
+   */
   public getParent(): Command | undefined {
     return this._parent;
   }
@@ -1086,22 +1087,22 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Get main command.
-     */
+   * Get main command.
+   */
   public getMainCommand(): Command {
     return this._parent?.getMainCommand() ?? this;
   }
 
   /**
-     * Get command name aliases.
-     */
+   * Get command name aliases.
+   */
   public getAliases(): string[] {
     return this.aliases;
   }
 
   /**
-     * Get full command path of all parent command names and current command name.
-     */
+   * Get full command path of all parent command names and current command name.
+   */
   public getPath(): string {
     return this._parent
       ? this._parent.getPath() + " " + this._name
@@ -1109,22 +1110,22 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Get arguments definition.
-     */
+   * Get arguments definition.
+   */
   public getArgsDefinition(): string | undefined {
     return this.argsDefinition;
   }
 
   /**
-     * Get argument.
-     */
+   * Get argument.
+   */
   public getArgument(name: string): IArgument | undefined {
     return this.getArguments().find((arg) => arg.name === name);
   }
 
   /**
-     * Get arguments.
-     */
+   * Get arguments.
+   */
   public getArguments(): IArgument[] {
     if (!this.args.length && this.argsDefinition) {
       this.args = ArgumentsParser.parseArgumentsDefinition(this.argsDefinition);
@@ -1134,22 +1135,22 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Check if command has arguments.
-     */
+   * Check if command has arguments.
+   */
   public hasArguments() {
     return !!this.argsDefinition;
   }
 
   /**
-     * Get command version.
-     */
+   * Get command version.
+   */
   public getVersion(): string | undefined {
     return this.ver ?? this._parent?.getVersion();
   }
 
   /**
-     * Get command description.
-     */
+   * Get command description.
+   */
   public getDescription(): string {
     // call description method only once
     return typeof this.desc === "function"
@@ -1165,8 +1166,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has options or not.
-     */
+   * Checks whether the command has options or not.
+   */
   public hasOptions(hidden?: boolean): boolean {
     return this.getOptions(hidden).length > 0;
   }
@@ -1216,32 +1217,32 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has an option with given name or not.
-     *
-     * @param name Name of the option. Must be in param-case.
-     * @param hidden Include hidden options.
-     */
+   * Checks whether the command has an option with given name or not.
+   *
+   * @param name Name of the option. Must be in param-case.
+   * @param hidden Include hidden options.
+   */
   public hasOption(name: string, hidden?: boolean): boolean {
     return !!this.getOption(name, hidden);
   }
 
   /**
-     * Get option by name.
-     *
-     * @param name Name of the option. Must be in param-case.
-     * @param hidden Include hidden options.
-     */
+   * Get option by name.
+   *
+   * @param name Name of the option. Must be in param-case.
+   * @param hidden Include hidden options.
+   */
   public getOption(name: string, hidden?: boolean): IOption | undefined {
     return this.getBaseOption(name, hidden) ??
       this.getGlobalOption(name, hidden);
   }
 
   /**
-     * Get base option by name.
-     *
-     * @param name Name of the option. Must be in param-case.
-     * @param hidden Include hidden options.
-     */
+   * Get base option by name.
+   *
+   * @param name Name of the option. Must be in param-case.
+   * @param hidden Include hidden options.
+   */
   public getBaseOption(name: string, hidden?: boolean): IOption | undefined {
     const option = this.options.find((option) => option.name === name);
 
@@ -1249,11 +1250,11 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Get global option from parent command's by name.
-     *
-     * @param name Name of the option. Must be in param-case.
-     * @param hidden Include hidden options.
-     */
+   * Get global option from parent command's by name.
+   *
+   * @param name Name of the option. Must be in param-case.
+   * @param hidden Include hidden options.
+   */
   public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
     if (!this._parent) {
       return;
@@ -1269,10 +1270,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Remove option by name.
-     *
-     * @param name Name of the option. Must be in param-case.
-     */
+   * Remove option by name.
+   *
+   * @param name Name of the option. Must be in param-case.
+   */
   public removeOption(name: string): IOption | undefined {
     const index = this.options.findIndex((option) => option.name === name);
 
@@ -1284,15 +1285,15 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has sub-commands or not.
-     */
+   * Checks whether the command has sub-commands or not.
+   */
   public hasCommands(hidden?: boolean): boolean {
     return this.getCommands(hidden).length > 0;
   }
 
   /**
-     * Get sub-commands.
-     */
+   * Get sub-commands.
+   */
   public getCommands(hidden?: boolean): Command[] {
     return this.getGlobalCommands(hidden).concat(this.getBaseCommands(hidden));
   }
@@ -1334,21 +1335,21 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has a sub-command with given name or not.
-     *
-     * @param name Name of the command.
-     * @param hidden Include hidden commands.
-     */
+   * Checks whether the command has a sub-command with given name or not.
+   *
+   * @param name Name of the command.
+   * @param hidden Include hidden commands.
+   */
   public hasCommand(name: string, hidden?: boolean): boolean {
     return !!this.getCommand(name, hidden);
   }
 
   /**
-     * Get sub-command with given name.
-     *
-     * @param name Name of the sub-command.
-     * @param hidden Include hidden commands.
-     */
+   * Get sub-command with given name.
+   *
+   * @param name Name of the sub-command.
+   * @param hidden Include hidden commands.
+   */
   public getCommand<O = any>(
     name: string,
     hidden?: boolean,
@@ -1384,10 +1385,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Remove sub-command with given name.
-     *
-     * @param name Name of the command.
-     */
+   * Remove sub-command with given name.
+   *
+   * @param name Name of the command.
+   */
   public removeCommand<O = any>(name: string): Command<O> | undefined {
     const command = this.getBaseCommand(name, true);
 
@@ -1458,15 +1459,15 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has environment variables or not.
-     */
+   * Checks whether the command has environment variables or not.
+   */
   public hasEnvVars(hidden?: boolean): boolean {
     return this.getEnvVars(hidden).length > 0;
   }
 
   /**
-     * Get environment variables.
-     */
+   * Get environment variables.
+   */
   public getEnvVars(hidden?: boolean): IEnvVar[] {
     return this.getGlobalEnvVars(hidden).concat(this.getBaseEnvVars(hidden));
   }
@@ -1512,21 +1513,21 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has an environment variable with given name or not.
-     *
-     * @param name Name of the environment variable.
-     * @param hidden Include hidden environment variable.
-     */
+   * Checks whether the command has an environment variable with given name or not.
+   *
+   * @param name Name of the environment variable.
+   * @param hidden Include hidden environment variable.
+   */
   public hasEnvVar(name: string, hidden?: boolean): boolean {
     return !!this.getEnvVar(name, hidden);
   }
 
   /**
-     * Get environment variable with given name.
-     *
-     * @param name Name of the environment variable.
-     * @param hidden Include hidden environment variable.
-     */
+   * Get environment variable with given name.
+   *
+   * @param name Name of the environment variable.
+   * @param hidden Include hidden environment variable.
+   */
   public getEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
     return this.getBaseEnvVar(name, hidden) ??
       this.getGlobalEnvVar(name, hidden);
@@ -1555,33 +1556,33 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Checks whether the command has examples or not.
-     */
+   * Checks whether the command has examples or not.
+   */
   public hasExamples(): boolean {
     return this.examples.length > 0;
   }
 
   /**
-     * Get examples.
-     */
+   * Get examples.
+   */
   public getExamples(): IExample[] {
     return this.examples;
   }
 
   /**
-     * Checks whether the command has an example with given name or not.
-     *
-     * @param name Name of the example.
-     */
+   * Checks whether the command has an example with given name or not.
+   *
+   * @param name Name of the example.
+   */
   public hasExample(name: string): boolean {
     return !!this.getExample(name);
   }
 
   /**
-     * Get example with given name.
-     *
-     * @param name Name of the example.
-     */
+   * Get example with given name.
+   *
+   * @param name Name of the example.
+   */
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
   }
@@ -1595,11 +1596,11 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Handle error. If `.throwErrors()` was called all error's will be thrown, otherwise `Deno.exit(1)` will be called.
-     *
-     * @param error Error to handle.
-     * @param showHelp Show help.
-     */
+   * Handle error. If `.throwErrors()` was called all error's will be thrown, otherwise `Deno.exit(1)` will be called.
+   *
+   * @param error Error to handle.
+   * @param showHelp Show help.
+   */
   public error(error: Error, showHelp: boolean = true): Error {
     if (this.shouldThrowErrors()) {
       return error;
@@ -1619,15 +1620,15 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Output generated help without exiting.
-     */
+   * Output generated help without exiting.
+   */
   public help() {
     Deno.stdout.writeSync(new TextEncoder().encode(this.getHelp()));
   }
 
   /**
-     * Get generated help.
-     */
+   * Get generated help.
+   */
   public getHelp(): string {
     this.registerDefaults();
     return HelpGenerator.generate(this);
