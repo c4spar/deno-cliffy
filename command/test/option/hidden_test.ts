@@ -1,5 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
-import { stripeColors } from "../../../table/utils.ts";
+import { assertEquals, stripColor } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 function command(): Command {
@@ -42,6 +41,6 @@ Deno.test("hidden option help", async () => {
     -V, --version  - Show the version number for this program.  
 
 `,
-    stripeColors(output),
+    stripColor(output),
   );
 });

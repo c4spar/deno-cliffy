@@ -1,5 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
-import { stripeColors } from "../../../table/utils.ts";
+import { assertEquals, stripColor } from "../../../dev_deps.ts";
 import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
@@ -90,7 +89,7 @@ Deno.test("command: help command", async () => {
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
 `,
-    stripeColors(output),
+    stripColor(output),
   );
 });
 
@@ -127,6 +126,6 @@ Deno.test("command: help command", async () => {
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
 `,
-    stripeColors(output),
+    stripColor(output),
   );
 });

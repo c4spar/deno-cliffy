@@ -1,5 +1,4 @@
-import { stripeColors } from "../table/utils.ts";
-import { blue, green, underline } from "./deps.ts";
+import { blue, green, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -49,7 +48,7 @@ export class Secret extends GenericInput<string, SecretSettings> {
 
     message += " " + this.settings.pointer + " ";
 
-    const length = new TextEncoder().encode(stripeColors(message)).length;
+    const length = new TextEncoder().encode(stripColor(message)).length;
 
     const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
 

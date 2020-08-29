@@ -1,7 +1,8 @@
 import { Cell, ICell } from "./cell.ts";
+import { stripColor } from "./deps.ts";
 import { IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
-import { consumeWords, longest, stripeColors } from "./utils.ts";
+import { consumeWords, longest } from "./utils.ts";
 
 interface IRenderSettings {
   padding: number[];
@@ -285,19 +286,19 @@ export class TableLayout {
   ): { current: string; next: Cell } {
     const length: number = Math.min(
       maxLength,
-      stripeColors(cell.toString()).length,
+      stripColor(cell.toString()).length,
     );
     let words: string = consumeWords(length, cell.toString());
 
     // break word if word is longer than max length
-    const breakWord = stripeColors(words).length > length;
+    const breakWord = stripColor(words).length > length;
     if (breakWord) {
       words = words.slice(0, length);
     }
 
     // get next content and remove leading space if breakWord is not true
     const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
-    const fillLength = maxLength - stripeColors(words).length;
+    const fillLength = maxLength - stripColor(words).length;
     const current = words + " ".repeat(fillLength);
 
     return {

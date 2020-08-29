@@ -1,11 +1,10 @@
 import { KeyEvent } from "../keycode/key-event.ts";
-import { stripeColors } from "../table/utils.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic-prompt.ts";
-import { underline } from "./deps.ts";
+import { stripColor, underline } from "./deps.ts";
 
 export interface GenericInputKeys {
   moveCursorLeft?: string[];
@@ -51,7 +50,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   protected setPrompt(message: string) {
     message += " " + this.settings.pointer + " ";
 
-    const length = new TextEncoder().encode(stripeColors(message)).length;
+    const length = new TextEncoder().encode(stripColor(message)).length;
 
     message += underline(this.input);
 

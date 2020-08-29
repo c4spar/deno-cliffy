@@ -5,6 +5,7 @@
  * @param content   The text content.
  */
 import { Cell, ICell } from "./cell.ts";
+import { stripColor } from "./deps.ts";
 
 export function consumeWords(length: number, content: string): string {
   let consumed = "";
@@ -20,8 +21,8 @@ export function consumeWords(length: number, content: string): string {
 
     // consume minimum one word
     if (consumed) {
-      const nextLength = stripeColors(word).length;
-      const consumedLength = stripeColors(consumed).length;
+      const nextLength = stripColor(word).length;
+      const consumedLength = stripColor(consumed).length;
       if (consumedLength + nextLength >= length) {
         break;
       }
@@ -35,17 +36,6 @@ export function consumeWords(length: number, content: string): string {
   }
 
   return consumed;
-}
-
-const COLOR_REGEX = /(\x1b|\e|\033)\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]/g;
-
-/**
- * Remove color codes from string.
- *
- * @param str
- */
-export function stripeColors(str: string): string {
-  return str.replace(COLOR_REGEX, "");
 }
 
 /**
@@ -69,7 +59,7 @@ export function longest(
           const str = typeof maxWidth === "undefined"
             ? r
             : consumeWords(maxWidth, r);
-          return stripeColors(str).length || 0;
+          return stripColor(str).length || 0;
         })
     ).flat(),
   );
