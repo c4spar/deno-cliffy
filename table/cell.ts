@@ -1,3 +1,4 @@
+// deno-lint-ignore ban-types
 export type ICell = number | string | String | Cell;
 
 export interface ICellOptions {

@@ -116,7 +116,7 @@ export class Command<O = any, A extends Array<any> = any> {
   private args: IArgument[] = [];
   private isHidden = false;
   private isGlobal = false;
-  private hasDefaults: Boolean = false;
+  private hasDefaults = false;
   private _versionOption?: IDefaultOption<O, A> | false;
   private _helpOption?: IDefaultOption<O, A> | false;
 
