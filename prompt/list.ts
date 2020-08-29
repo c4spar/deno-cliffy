@@ -1,5 +1,4 @@
-import { stripeColors } from "../table/utils.ts";
-import { blue, underline } from "./deps.ts";
+import { blue, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -48,7 +47,7 @@ export class List extends GenericInput<string[], ListSettings> {
   protected setPrompt(message: string) {
     message += " " + this.settings.pointer + " ";
 
-    const length = new TextEncoder().encode(stripeColors(message)).length;
+    const length = new TextEncoder().encode(stripColor(message)).length;
 
     const oldInput: string = this.input;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());

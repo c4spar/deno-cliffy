@@ -1,5 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
-import { stripeColors } from "../../../table/utils.ts";
+import { assertEquals, stripColor } from "../../../dev_deps.ts";
 import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
@@ -50,6 +49,6 @@ Deno.test("hidden command help", async () => {
     completions                     - Generate shell completions.                 
 
 `,
-    stripeColors(output),
+    stripColor(output),
   );
 });
