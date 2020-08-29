@@ -34,7 +34,6 @@ export class CompleteCommand extends Command {
           Deno.stdout.writeSync(new TextEncoder().encode(result.join(" ")));
         }
       })
-      .default("help")
       .reset();
   }
 }
