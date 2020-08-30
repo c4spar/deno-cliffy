@@ -8,7 +8,7 @@ export class CompleteCommand extends Command {
   public constructor(cmd?: Command) {
     super();
     this.description("Get completions for given action from given command.")
-      .arguments("<action:action> [command...:command]")
+      .arguments("<action:string> [command...:string]")
       .action(async (_, action: string, commandNames: string[]) => {
         let parent: Command | undefined;
         let completeCommand: Command = commandNames
