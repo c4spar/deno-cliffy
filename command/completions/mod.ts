@@ -1,6 +1,6 @@
 import { Command } from "../command.ts";
 import { dim, italic } from "../deps.ts";
-// import { BashCompletionsCommand } from './completions/bash.ts';
+import { BashCompletionsCommand } from "./bash.ts";
 import { CompleteCommand } from "./complete.ts";
 import { ZshCompletionsCommand } from "./zsh.ts";
 
@@ -29,7 +29,7 @@ To enable shell completions for this program add following line to your ${
       })
       .action(() => this.help())
       .command("zsh", new ZshCompletionsCommand(cmd))
-      // .command( 'bash', new BashCompletionsCommand( cmd ) )
+      .command("bash", new BashCompletionsCommand(cmd))
       .command("complete", new CompleteCommand(cmd).hidden())
       .reset();
   }
