@@ -1,4 +1,5 @@
 import { Command } from "../command.ts";
+import { IArgument } from "../types.ts";
 
 export class BashCompletionsGenerator {
   public static generate(cmd: Command) {
@@ -93,6 +94,9 @@ ${childCommandCompletions}`;
       )
       .flat();
 
+    const completionsPath: string = ~path.indexOf(" ")
+      ? " " + path.split(" ").slice(1).join(" ")
+      : "";
     const options = command.getOptions(false);
     let opts = "";
     if (options.length) {
@@ -102,23 +106,28 @@ ${childCommandCompletions}`;
           .split(",")
           .map((flag) => flag.trim())
           .join("|");
-        const completionsPath: string = ~path.indexOf(" ")
-          ? " " + path.split(" ").slice(1).join(" ")
-          : "";
         const completionsCmd = option.args.length
           ? `\$(${this.cmd.getName()} completions complete ${
             option.args[0].action
           }${completionsPath})`
           : "";
-        // @TODO: add support for multiple arguments
+        // @TODO: add support for multiple option arguments
         opts += `
       ${flags}) opts="${completionsCmd}" ;;`;
       }
       opts += "\n    esac";
     }
 
+    // @TODO: add support for multiple command arguments
+    const args: IArgument[] = command.getArguments();
+    const commandArgs: string = args.length
+      ? ` \$(${this.cmd.getName()} completions complete ${
+        args[0].action
+      }${completionsPath})`
+      : "";
+
     return `  __${replaceSpecialChars(path)}() {
-    opts="${[...flags, ...commandNames].join(" ")}"
+    opts="${[...flags, ...commandNames].join(" ")}${commandArgs}"
     if [[ \${cur} == -* || \${COMP_CWORD} -eq ${index} ]] ; then
       return 0
     fi
