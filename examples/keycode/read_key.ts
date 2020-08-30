@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyCode } from "../../keycode/key-code.ts";
+import { KeyCode } from "../../keycode/key_code.ts";
 
 async function read(): Promise<void> {
   const buffer = new Uint8Array(8);

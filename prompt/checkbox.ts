@@ -7,8 +7,8 @@ import {
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
-} from "./_generic-list.ts";
-import { GenericPrompt } from "./_generic-prompt.ts";
+} from "./_generic_list.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
 
 export interface CheckboxOption extends GenericListOption {
   checked?: boolean;

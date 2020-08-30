@@ -1,11 +1,11 @@
 // deno-lint-ignore-file
 
-import { AnsiEscape } from "../ansi-escape/ansi-escape.ts";
+import { AnsiEscape } from "../ansi_escape/ansi_escape.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
   StaticGenericPrompt,
-} from "./_generic-prompt.ts";
+} from "./_generic_prompt.ts";
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 type AwaitedReturnType<T extends (...args: any[]) => any> = Awaited<

@@ -210,12 +210,12 @@ parseFlags(Deno.args, {
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts --foo 1.2
+$ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts --foo 1.2
 { flags: { foo: 1.2 }, unknown: [], literal: [] }
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/flags/custom-option-processing.ts --foo abc
+$ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts --foo abc
 error: Uncaught Error: Option --foo must be of type float but got: abc
 ```
 

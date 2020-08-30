@@ -5,7 +5,7 @@ import {
   GenericInputKeys,
   GenericInputPromptOptions,
   GenericInputPromptSettings,
-} from "./_generic-input.ts";
+} from "./_generic_input.ts";
 
 export type SecretKeys = GenericInputKeys;
 

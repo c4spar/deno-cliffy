@@ -4,7 +4,7 @@ stable: false
 version: 0.14.1
 repository: https://github.com/c4spar/deno-cliffy/
 files:
-  - ansi-escape/**/*
+  - ansi_escape/**/*
   - command/**/*
   - examples/**/*
   - flags/**/*
