@@ -232,7 +232,10 @@ function _${replaceSpecialChars(path)}() {` +
     excludedOptions: string[],
   ): string {
     let excludedFlags = option.conflicts?.length
-      ? [...excludedOptions, ...option.conflicts]
+      ? [
+        ...excludedOptions,
+        ...option.conflicts.map((opt) => "--" + opt.replace(/^--/, "")),
+      ]
       : excludedOptions;
     excludedFlags = option.collect ? excludedFlags : [
       ...excludedFlags,
