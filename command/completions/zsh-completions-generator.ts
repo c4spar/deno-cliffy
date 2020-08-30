@@ -17,9 +17,7 @@ export class ZshCompletionsGenerator {
 
   private constructor(protected cmd: Command) {}
 
-  /**
-     * Generates zsh completions code.
-     */
+  /** Generates zsh completions code. */
   private generate(): string {
     const version: string | undefined = this.cmd.getVersion();
     const versionStr = version
@@ -71,9 +69,7 @@ compdef _${replaceSpecialChars(this.cmd.getPath())} ${this.cmd.getPath()}
 `.trim();
   }
 
-  /**
-     * Generates zsh completions method for given command and child commands.
-     */
+  /** Generates zsh completions method for given command and child commands. */
   private generateCompletions(command: Command, path = ""): string {
     if (
       !command.hasCommands(false) && !command.hasOptions(false) &&
@@ -231,6 +227,7 @@ function _${replaceSpecialChars(path)}() {` +
     completionsPath: string,
     excludedOptions: string[],
   ): string {
+    const flags = option.flags.split(/[, ] */g);
     let excludedFlags = option.conflicts?.length
       ? [
         ...excludedOptions,
@@ -257,7 +254,6 @@ function _${replaceSpecialChars(path)}() {` +
       "\n",
     ).shift();
     const collect: string = option.collect ? "*" : "";
-    const flags: string = option.flags.replace(/ +/g, "");
 
     if (option.standalone) {
       return `'(- *)'{${collect}${flags}}'[${description}]${args}'`;
@@ -265,7 +261,11 @@ function _${replaceSpecialChars(path)}() {` +
       const excluded: string = excludedFlags.length
         ? `'(${excludedFlags.join(" ")})'`
         : "";
-      return `${excluded}{${collect}${flags}}'[${description}]${args}'`;
+      if (collect || flags.length > 1) {
+        return `${excluded}{${collect}${flags}}'[${description}]${args}'`;
+      } else {
+        return `${excluded}${flags}'[${description}]${args}'`;
+      }
     }
   }
 
