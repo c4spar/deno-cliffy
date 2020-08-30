@@ -32,7 +32,7 @@ _${replaceSpecialChars(path)}() {
       -*) ;;
       *) 
         cmd_tmp="\${cmd}_\${word//[^[:alnum:]]/_}"
-        if type \${cmd_tmp} &>/dev/null; then
+        if type "\${cmd_tmp}" &>/dev/null; then
           cmd="\${cmd_tmp}"
         else
           break
@@ -41,9 +41,16 @@ _${replaceSpecialChars(path)}() {
   done
   
   \${cmd}
+
+  if [[ -n "\${opts}" ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=($(compgen -W "\${opts}" -- "\${cur}"))
+  else
+    # shellcheck disable=SC2207
+    COMPREPLY=($(compgen -f "\${cur}"))
+  fi
   
-  # shellcheck disable=SC2207
-  COMPREPLY=($(compgen -W "\${opts}" -- "\${cur}"))
+  return 0
 }
 
 complete -F _${replaceSpecialChars(path)} -o bashdefault -o default ${path}
@@ -91,17 +98,21 @@ ${childCommandCompletions}`;
     if (options.length) {
       opts = 'case "${prev}" in';
       for (const option of options) {
+        const flags: string = option.flags
+          .split(",")
+          .map((flag) => flag.trim())
+          .join("|");
+        const completionsPath: string = ~path.indexOf(" ")
+          ? " " + path.split(" ").slice(1).join(" ")
+          : "";
+        const completionsCmd = option.args.length
+          ? `\$(${this.cmd.getName()} completions complete ${
+            option.args[0].action
+          }${completionsPath})`
+          : "";
+        // @TODO: add support for multiple arguments
         opts += `
-      ${
-          option.flags
-            .split(",")
-            .map((flag) => flag.trim())
-            .join("|")
-        })
-        # shellcheck disable=SC2207
-        COMPREPLY=($(compgen -f "\${cur}"))
-        return 0
-        ;;`;
+      ${flags}) opts="${completionsCmd}" ;;`;
       }
       opts += "\n    esac";
     }
@@ -109,8 +120,6 @@ ${childCommandCompletions}`;
     return `  __${replaceSpecialChars(path)}() {
     opts="${[...flags, ...commandNames].join(" ")}"
     if [[ \${cur} == -* || \${COMP_CWORD} -eq ${index} ]] ; then
-      # shellcheck disable=SC2207
-      COMPREPLY=( $(compgen -W "\${opts}" -- "\${cur}") )
       return 0
     fi
     ${opts}
