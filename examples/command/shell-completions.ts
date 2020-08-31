@@ -13,7 +13,7 @@ await new Command()
   .option(
     "-v, --verbose <verbosity:number:verbose>",
     "Increase verbosity.",
-    { global: true, value: (cur, prev: number = 0) => prev + cur },
+    { global: true, value: (cur, prev = 0) => prev + cur },
   )
   .option(
     "-s, --silent <val:string:my-type>",
