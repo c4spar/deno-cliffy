@@ -28,7 +28,7 @@ await new Command()
   .command("country <country:string:country>", "Select a country.")
   .complete("country", () => ["germany", "spain", "indonesia"])
   .action((_, country: string) => console.log(country))
-  // country command
+  // car command
   .command(
     "car",
     new Command()
