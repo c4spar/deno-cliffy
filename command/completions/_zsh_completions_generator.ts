@@ -37,12 +37,13 @@ function __${replaceSpecialChars(name)}_complete {
     local action="$1"; shift
     integer ret=1
     local -a values
-    local expl
+    local expl lines
     _tags "$name"
     while _tags; do
         if _requested "$name"; then
-            # shellcheck disable=SC2207
-            values=( \$( ${name} completions complete "\${action}" "\${@}") )
+            # shellcheck disable=SC2034
+            lines="$(${name} completions complete -l "\${action}" "\${@}")"
+            values=("\${(ps:\\n:)lines}")
             if (( \${#values[@]} )); then
                 while _next_label "$name" expl "$action"; do
                     compadd -S '' "\${expl[@]}" "\${values[@]}"
