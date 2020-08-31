@@ -18,3 +18,9 @@ jobs:
 
       - name: Run linter
         run: deno lint --unstable
+
+      - name: Run bash check
+        run: shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions bash)
+
+      - name: Run zsh check
+        run: shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions zsh)
