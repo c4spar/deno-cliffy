@@ -20,7 +20,7 @@ jobs:
         run: deno lint --unstable
 
       - name: Setup shellcheck
-        run: apt-get install shellcheck && shellcheck --version
+        run: sudo apt-get install shellcheck && shellcheck --version
 
       - name: Run bash check
         run: shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions bash)
