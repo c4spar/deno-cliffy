@@ -20,7 +20,15 @@ jobs:
         run: deno lint --unstable
 
       - name: Setup shellcheck
-        run: sudo apt-get install shellcheck && shellcheck --version
+        run: >
+          sudo apt-get install cabal-install &&
+          cabal update &&
+          git clone https://github.com/koalaman/shellcheck &&
+          cd shellcheck &&
+          cabal install &&
+          cd .. &&
+          rm -rf shellcheck &&
+          shellcheck --version
 
       - name: Run bash check
         run: shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions bash)
