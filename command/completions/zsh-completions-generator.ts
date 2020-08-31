@@ -19,21 +19,20 @@ export class ZshCompletionsGenerator {
 
   /** Generates zsh completions code. */
   private generate(): string {
-    const version: string | undefined = this.cmd.getVersion();
-    const versionStr = version
-      ? `# version: ${this.cmd.getVersion() || "-"}\n#\n`
+    const path = this.cmd.getPath();
+    const name = this.cmd.getName();
+    const version: string | undefined = this.cmd.getVersion()
+      ? ` v${this.cmd.getVersion()}`
       : "";
 
-    return `
-# compdef _${replaceSpecialChars(this.cmd.getPath())} ${this.cmd.getPath()}
-#
-# zsh completion for ${this.cmd.getPath()}
-#
-${versionStr}
+    return `#!/usr/bin/env zsh
+# zsh completion support for ${path}${version}
+
 autoload -U is-at-least
 
-(( $+functions[__${replaceSpecialChars(this.cmd.getName())}_complete] )) ||
-function __${replaceSpecialChars(this.cmd.getName())}_complete {
+# shellcheck disable=SC2154
+(( $+functions[__${replaceSpecialChars(name)}_complete] )) ||
+function __${replaceSpecialChars(name)}_complete {
     local name="$1"; shift
     local action="$1"; shift
     integer ret=1
@@ -42,10 +41,11 @@ function __${replaceSpecialChars(this.cmd.getName())}_complete {
     _tags "$name"
     while _tags; do
         if _requested "$name"; then
-            values=( \$( ${this.cmd.getName()} completions complete $action $@) )
+            # shellcheck disable=SC2207
+            values=( \$( ${name} completions complete "\${action}" "\${@}") )
             if (( \${#values[@]} )); then
                 while _next_label "$name" expl "$action"; do
-                    compadd -S '' "\$expl[@]" $values[@]
+                    compadd -S '' "\${expl[@]}" "\${values[@]}"
                 done
             fi
         fi
@@ -54,9 +54,9 @@ function __${replaceSpecialChars(this.cmd.getName())}_complete {
 
 ${this.generateCompletions(this.cmd).trim()}
 
-# _${replaceSpecialChars(this.cmd.getPath())} "\${@}"
+# _${replaceSpecialChars(path)} "\${@}"
 
-compdef _${replaceSpecialChars(this.cmd.getPath())} ${this.cmd.getPath()}
+compdef _${replaceSpecialChars(path)} ${path}
 
 #
 # Local Variables:
@@ -80,10 +80,16 @@ compdef _${replaceSpecialChars(this.cmd.getPath())} ${this.cmd.getPath()}
 
     path = (path ? path + " " : "") + command.getName();
 
-    return `(( $+functions[_${replaceSpecialChars(path)}] )) ||
+    return `# shellcheck disable=SC2154
+(( $+functions[_${replaceSpecialChars(path)}] )) ||
 function _${replaceSpecialChars(path)}() {` +
       (!command.getParent()
-        ? `\n\n    local context state state_descr line\n    typeset -A opt_args`
+        ? `
+
+    # shellcheck disable=SC2034
+    local context state state_descr line
+    # shellcheck disable=SC2034
+    typeset -A opt_args`
         : "") +
       this.generateCommandCompletions(command, path) +
       this.generateSubCommandCompletions(command, path) +
@@ -110,6 +116,7 @@ function _${replaceSpecialChars(path)}() {` +
     if (completions) {
       completions = `
         local -a commands
+        # shellcheck disable=SC2034
         commands=(
             ${completions}
         )
@@ -153,7 +160,7 @@ function _${replaceSpecialChars(path)}() {` +
 
       return `\n
     function _command_args() {
-        case "$words[1]" in\n            ${actions}\n        esac
+        case "\${words[1]}" in\n            ${actions}\n        esac
     }`;
     }
 
