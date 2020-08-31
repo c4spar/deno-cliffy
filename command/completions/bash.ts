@@ -1,5 +1,6 @@
 import { Command } from "../command.ts";
 import { dim, italic } from "../deps.ts";
+import { BashCompletionsGenerator } from "./bash-completions-generator.ts";
 
 /**
  * Generates bash completion code.
@@ -18,7 +19,9 @@ To enable bash completions for this program add following line to your ${
     ${dim(italic(`source <(${cmd.getPath()} completions bash)`))}`;
     })
       .action(() => {
-        throw new Error("Bash completions not supported at this moment.");
+        Deno.stdout.writeSync(new TextEncoder().encode(
+          BashCompletionsGenerator.generate(cmd || this.getMainCommand()),
+        ));
       });
   }
 }

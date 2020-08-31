@@ -64,6 +64,7 @@
   - [Help command](#help-command)
 - [Shell completion](#-shell-completion)
   - [Completions command](#completions-command)
+    - [Bash Completions](#bash-completions)
     - [Zsh Completions](#zsh-completions)
 - [Generic options and arguments](#-generic-options-and-arguments)
 - [Version option](#-version-option)
@@ -1062,7 +1063,10 @@ $ deno run https://deno.land/x/cliffy/examples/command/help-option-and-command.t
 
 Cliffy supports shell completion out of the box.
 
-> At the moment only `zsh` is supported but `bash` will be added.
+**Currently supported shells**
+
+* bash
+* zsh
 
 There are two ways to add auto-completion to types.
 One option is adding a completion action. A completion action is declared with the `.complete()` method and can be used
@@ -1100,10 +1104,7 @@ Enabling auto completion is explained in the [completions command](#completions-
 
 ### Completions command
 
-The `CompetionsCommand` command can generate a shell completions script for your program. At the moment only `zsh`
-is supported. `bash` and more will be added.
-
-The `CompletionsCommand` is not registered per default and must be registered by your self.
+The `CompetionsCommand` command generates the shell completions script for your program. To do so, you have to register the completions command on your programm.
 
 ```typescript
 import { Command, CompletionsCommand } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1111,6 +1112,16 @@ import { Command, CompletionsCommand } from "https://deno.land/x/cliffy/command/
 await new Command()
   .command("completions", new CompletionsCommand())
   .parse(Deno.args);
+```
+
+By calling `command-name completions <shell>`, the command will output the completions script to the stdout.
+
+#### Bash Completions
+
+To enable bash completions on your system add the following line to your `~/.bashrc`:
+
+```shell
+source <(command-name completions bash)
 ```
 
 #### Zsh Completions
