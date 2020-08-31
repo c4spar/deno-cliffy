@@ -7,20 +7,47 @@ await new Command()
   .throwErrors()
   .name("cliffy")
   .version("0.1.0")
-  .complete("my-type", () => ["foo", "bar"], { global: true })
-  .complete("my-second-type", () => ["beep", "boop"], { global: true })
-  .option("-t, --test <val:string:my-type>", "test description...")
-  .command("cmd1 <arg1:string:my-type>", "cmd1 ...")
-  .command("cmd2 <arg1:string:my-second-type>", "cmd2 ...")
+  // completions
+  .complete("verbose", () => ["1", "2", "3"], { global: true })
+  // options
+  .option(
+    "-v, --verbose <verbosity:number:verbose>",
+    "Increase verbosity.",
+    { global: true, value: (cur, prev: number = 0) => prev + cur },
+  )
+  .option(
+    "-s, --silent <val:string:my-type>",
+    "Disable output.",
+    { global: true },
+  )
+  // animal command
+  .command("animal <animal:string:animal>", "Select an animal.")
+  .complete("animal", () => ["dog", "cat", "dino"])
+  .action((_, animal: string) => console.log(animal))
+  // country command
+  .command("country <country:string:country>", "Select a country.")
+  .complete("country", () => ["germany", "spain", "indonesia"])
+  .action((_, country: string) => console.log(country))
+  // country command
   .command(
-    "cmd3",
+    "car",
     new Command()
-      .description("cmd3 ...")
+      .description("Select a car.")
+      .complete("color", () => ["Black", "Red", "Yellow"])
       .option(
-        "-o, --other <val1:string:my-type> <val2:string:my-second-type>",
+        "-c, --color <color:string:color>",
         "other description...",
+        { global: true },
       )
-      .command("cmd4 <arg1:string:my-type> <arg2:string:my-second-type>"),
+      .command("audi <model:string:audi>")
+      .complete("audi", () => ["R8", "R7"])
+      .action(({ color }, model: string) => console.log({ color, model }))
+      .command("bmw <model:string:bmw>")
+      .complete("bmw", () => ["8er", "7er"])
+      .action(({ color }, model: string) => console.log({ color, model }))
+      .command("porsche <model:string:porsche>")
+      .complete("porsche", () => ["911 GT3 RS", "718 Spyder"])
+      .action(({ color }, model: string) => console.log({ color, model })),
   )
   .command("completions", new CompletionsCommand())
   .parse();
