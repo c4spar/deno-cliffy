@@ -15,7 +15,8 @@ export class BashCompletionsGenerator {
       ? ` v${this.cmd.getVersion()}`
       : "";
 
-    return `# bash completion support for ${path}${version}
+    return `#!/usr/bin/env bash
+# bash completion support for ${path}${version}
 
 _${replaceSpecialChars(path)}() {
   local word cur prev opts

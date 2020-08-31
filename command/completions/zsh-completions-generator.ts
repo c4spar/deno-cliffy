@@ -25,7 +25,8 @@ export class ZshCompletionsGenerator {
       ? ` v${this.cmd.getVersion()}`
       : "";
 
-    return `# zsh completion support for ${path}${version}
+    return `#!/usr/bin/env zsh
+# zsh completion support for ${path}${version}
 
 autoload -U is-at-least
 
