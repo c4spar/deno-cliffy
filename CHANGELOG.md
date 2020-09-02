@@ -1,3 +1,43 @@
+# [v0.14.0](https://github.com/c4spar/deno-cli/compare/v0.13.0...v0.14.0) (2020-09-02)
+
+### Features
+
+* **command:** add bash completions support (#78) ([09c0fc2](https://github.com/c4spar/deno-cli/commit/09c0fc2))
+* **command:** implement argument types validation (#70) ([01acb53](https://github.com/c4spar/deno-cli/commit/01acb53))
+
+### Bug Fixes
+
+* **command:** fix complete command error "No type registered with name: action" (#77) ([f2c6bea](https://github.com/c4spar/deno-cli/commit/f2c6bea))
+* **command:** fix shell completion bug which occurs when an option has only one flag ([9fbef68](https://github.com/c4spar/deno-cli/commit/9fbef68))
+* **command:** fix shell completion bug which occurs when the conflicts option is defined without dashes ([2dfa8b1](https://github.com/c4spar/deno-cli/commit/2dfa8b1))
+* **command:** default command 'help' not found error on completions command ([580bacd](https://github.com/c4spar/deno-cli/commit/580bacd))
+* **command:** fix typo in error message ([2fa9d29](https://github.com/c4spar/deno-cli/commit/2fa9d29))
+
+### Code Refactoring
+
+* use stripColor from deno/std ([56bcc89](https://github.com/c4spar/deno-cli/commit/56bcc89))
+
+### Style
+
+* **command:** fix jsdoc formatting ([230cac7](https://github.com/c4spar/deno-cli/commit/230cac7))
+
+### Chore
+
+* fix test workflow name ([0e683c1](https://github.com/c4spar/deno-cli/commit/0e683c1))
+* use deno fmt for code formatting (#71) ([e7dd856](https://github.com/c4spar/deno-cli/commit/e7dd856))
+* **ci:** run shellcheck on bash/zsh completion scripts (#79) ([40f2dc9](https://github.com/c4spar/deno-cli/commit/40f2dc9))
+* **ci:** add deno lint step ([e48f293](https://github.com/c4spar/deno-cli/commit/e48f293))
+* **ci:** split workflows, add nightly test and lint workflow (#72) ([d13af64](https://github.com/c4spar/deno-cli/commit/d13af64))
+* **ci:** update deno version to v1.3.2 ([a8d6a60](https://github.com/c4spar/deno-cli/commit/a8d6a60))
+* **lint:** fix lint errors ([25d8e24](https://github.com/c4spar/deno-cli/commit/25d8e24), [92c84ac](https://github.com/c4spar/deno-cli/commit/92c84ac))
+* **upgrade:** deno/std v0.67.0 ([43204a5](https://github.com/c4spar/deno-cli/commit/43204a5))
+
+### Documentation Updates
+
+* add contribution guidelines (#73) ([afe47ff](https://github.com/c4spar/deno-cli/commit/afe47ff))
+
+
+
 # [v0.13.0](https://github.com/c4spar/deno-cli/compare/v0.12.1...v0.13.0) (2020-08-25)
 
 ### Features
