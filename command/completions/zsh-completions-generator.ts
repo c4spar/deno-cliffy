@@ -259,9 +259,18 @@ function _${replaceSpecialChars(path)}() {` +
       }
     }
 
-    const description: string | undefined = option.description.trim().split(
-      "\n",
-    ).shift();
+    let description: string = option.description
+      .trim()
+      .split("\n")
+      .shift() as string;
+
+    // escape brackets and quotes
+    description = description
+      .replace(/\[/g, "\\[")
+      .replace(/]/g, "\\]")
+      .replace(/"/g, '\\"')
+      .replace(/'/g, "'\"'\"'");
+
     const collect: string = option.collect ? "*" : "";
 
     if (option.standalone) {
