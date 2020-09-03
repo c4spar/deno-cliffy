@@ -86,10 +86,7 @@ function _${replaceSpecialChars(path)}() {` +
       (!command.getParent()
         ? `
 
-    # shellcheck disable=SC2034
-    local context state state_descr line
-    # shellcheck disable=SC2034
-    typeset -A opt_args`
+    local state`
         : "") +
       this.generateCommandCompletions(command, path) +
       this.generateSubCommandCompletions(command, path) +
@@ -130,7 +127,7 @@ function _${replaceSpecialChars(path)}() {` +
 
       const action = this.addAction(arg, completionsPath);
 
-      if (action) {
+      if (action && command.getCompletion(action.name)) {
         completions += `\n        __${
           replaceSpecialChars(this.cmd.getName())
         }_complete ${action.arg.name} ${action.arg.action} ${action.cmd}`;
@@ -182,7 +179,12 @@ function _${replaceSpecialChars(path)}() {` +
       argsCommand += ` \\\n        ${options.join(" \\\n        ")}`;
     }
 
-    if (command.hasCommands(false) || command.hasArguments()) {
+    if (
+      command.hasCommands(false) || (
+        command.getArguments()
+          .filter((arg) => command.getCompletion(arg.name)).length
+      )
+    ) {
       argsCommand += ` \\\n        '${++argIndex}: :_commands'`;
     }
 
