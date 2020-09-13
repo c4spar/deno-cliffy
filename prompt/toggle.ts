@@ -122,7 +122,6 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
       case this.settings.inactive:
         return false;
     }
-    return;
   }
 
   protected format(value: boolean): string {
