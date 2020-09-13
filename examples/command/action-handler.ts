@@ -5,8 +5,7 @@ import { Command } from "../../command/mod.ts";
 await new Command()
   .command("rm <dir>", "Remove directory.")
   .option("-r, --recursive [recursive:boolean]", "Remove recursively")
-  // deno-lint-ignore no-explicit-any
-  .action(({ recursive }: any, dir: string) => {
+  .action(({ recursive }, dir: string) => {
     console.log("remove " + dir + (recursive ? " recursively" : ""));
   })
   .parse(Deno.args);
