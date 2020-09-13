@@ -122,12 +122,10 @@ function _${replaceSpecialChars(path)}() {` +
 
     if (command.hasArguments()) {
       const completionsPath: string = path.split(" ").slice(1).join(" ");
-
+      // @TODO: support multiple arguments zsh completions
       const arg: IArgument = command.getArguments()[0];
-
       const action = this.addAction(arg, completionsPath);
-
-      if (action && command.getCompletion(action.name)) {
+      if (action && command.getCompletion(arg.action)) {
         completions += `\n        __${
           replaceSpecialChars(this.cmd.getName())
         }_complete ${action.arg.name} ${action.arg.action} ${action.cmd}`;
@@ -182,7 +180,7 @@ function _${replaceSpecialChars(path)}() {` +
     if (
       command.hasCommands(false) || (
         command.getArguments()
-          .filter((arg) => command.getCompletion(arg.name)).length
+          .filter((arg) => command.getCompletion(arg.action)).length
       )
     ) {
       argsCommand += ` \\\n        '${++argIndex}: :_commands'`;
