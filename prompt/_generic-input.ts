@@ -1,4 +1,4 @@
-import { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key-event.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,

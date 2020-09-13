@@ -1,5 +1,5 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
-import { ITypeInfo } from "../../../flags/types.ts";
+import type { ITypeInfo } from "../../../flags/types.ts";
 import { Command } from "../../command.ts";
 
 function cmd() {

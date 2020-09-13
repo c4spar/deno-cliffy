@@ -1,4 +1,4 @@
-import {
+import type {
   IDefaultValue,
   IFlagArgument,
   IFlagOptions,
@@ -6,10 +6,10 @@ import {
   IFlagValueHandler,
   ITypeHandler,
 } from "../flags/types.ts";
-import { Type } from "./type.ts";
-import { Command } from "./command.ts";
+import type { Type } from "./type.ts";
+import type { Command } from "./command.ts";
 
-export {
+export type {
   IDefaultValue,
   IFlagValueHandler,
   ITypeHandler,

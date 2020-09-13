@@ -1,13 +1,13 @@
 import { paramCaseToCamelCase } from "./_utils.ts";
 import { normalize } from "./normalize.ts";
-import {
+import type {
   IFlagArgument,
   IFlagOptions,
   IFlagsResult,
   IParseOptions,
   ITypeHandler,
-  OptionType,
 } from "./types.ts";
+import { OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";

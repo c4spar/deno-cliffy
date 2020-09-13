@@ -1,5 +1,5 @@
 import { parseFlags } from "../flags/flags.ts";
-import { IFlagsResult } from "../flags/types.ts";
+import type { IFlagsResult } from "../flags/types.ts";
 import { existsSync, red } from "./deps.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
@@ -7,7 +7,7 @@ import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
 import { ArgumentsParser } from "./_arguments-parser.ts";
 import { HelpGenerator } from "./help/help-generator.ts";
-import {
+import type {
   IAction,
   IArgument,
   ICommandOption,

@@ -1,6 +1,6 @@
 import { paramCaseToCamelCase } from "./_utils.ts";
 import { getOption } from "./flags.ts";
-import { IFlagArgument, IFlagOptions } from "./types.ts";
+import type { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
 

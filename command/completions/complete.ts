@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { ICompletion } from "../types.ts";
+import type { ICompletion } from "../types.ts";
 
 /**
  * Execute complete method for specific action and command.
