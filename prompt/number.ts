@@ -1,4 +1,4 @@
-import { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key-event.ts";
 import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";

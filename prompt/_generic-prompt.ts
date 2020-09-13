@@ -1,6 +1,6 @@
 import { AnsiEscape } from "../ansi-escape/ansi-escape.ts";
 import { KeyCode } from "../keycode/key-code.ts";
-import { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key-event.ts";
 import { blue, bold, dim, green, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 

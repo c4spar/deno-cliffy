@@ -1,4 +1,4 @@
-import { ITypeInfo, ITypeHandler } from "../types.ts";
+import type { ITypeInfo, ITypeHandler } from "../types.ts";
 
 export const boolean: ITypeHandler<boolean> = (
   { label, name, value, type }: ITypeInfo,

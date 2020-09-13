@@ -1,6 +1,6 @@
 import { OptionType } from "../flags/types.ts";
 import { green, magenta, red, yellow } from "./deps.ts";
-import { IArgument } from "./types.ts";
+import type { IArgument } from "./types.ts";
 
 export class ArgumentsParser {
   private static readonly ARGUMENT_REGEX = /^[<\[].+[\]>]$/;

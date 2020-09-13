@@ -1,5 +1,5 @@
-import { Command } from "../command.ts";
-import { IArgument, IOption } from "../types.ts";
+import type { Command } from "../command.ts";
+import type { IArgument, IOption } from "../types.ts";
 
 interface ICompletionAction {
   arg: IArgument;

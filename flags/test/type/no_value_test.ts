@@ -1,6 +1,6 @@
 import { assertEquals } from "../../../dev_deps.ts";
 import { parseFlags } from "../../flags.ts";
-import { IParseOptions } from "../../types.ts";
+import type { IParseOptions } from "../../types.ts";
 
 const options = <IParseOptions> {
   flags: [{

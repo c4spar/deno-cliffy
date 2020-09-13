@@ -1,5 +1,5 @@
 import { boolean } from "../../flags/types/boolean.ts";
-import { ITypeInfo } from "../types.ts";
+import type { ITypeInfo } from "../types.ts";
 import { Type } from "../type.ts";
 
 export class BooleanType extends Type<boolean> {

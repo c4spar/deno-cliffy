@@ -1,4 +1,4 @@
-import { KeyEvent } from "../keycode/mod.ts";
+import type { KeyEvent } from "../keycode/mod.ts";
 import { blue, dim, green, red } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {

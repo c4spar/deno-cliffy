@@ -1,5 +1,5 @@
-import { Command } from "../command.ts";
-import { IArgument } from "../types.ts";
+import type { Command } from "../command.ts";
+import type { IArgument } from "../types.ts";
 
 export class BashCompletionsGenerator {
   public static generate(cmd: Command) {

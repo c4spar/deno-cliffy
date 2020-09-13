@@ -1,4 +1,4 @@
-import { Command } from "../command.ts";
+import type { Command } from "../command.ts";
 import { StringType } from "./string.ts";
 
 export class ChildCommandType extends StringType {

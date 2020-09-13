@@ -1,8 +1,8 @@
 import { Table } from "../../table/table.ts";
 import { ArgumentsParser } from "../_arguments-parser.ts";
-import { Command } from "../command.ts";
+import type { Command } from "../command.ts";
 import { blue, bold, dim, magenta, red, yellow } from "../deps.ts";
-import { IEnvVar, IExample, IOption } from "../types.ts";
+import type { IEnvVar, IExample, IOption } from "../types.ts";
 
 export class HelpGenerator {
   private indent = 2;
