@@ -1,3 +1,19 @@
+# [v0.14.1](https://github.com/c4spar/deno-cli/compare/v0.14.0...v0.14.1) (2020-10-13)
+
+### Bug Fixes
+
+* **command:** quotes and brackets in option description breaks shell-completion (#82) ([7907413](https://github.com/c4spar/deno-cli/commit/7907413))
+* **command:** only generate argument completions for types that have completions (#81) ([1998108](https://github.com/c4spar/deno-cli/commit/1998108), [8040abf](https://github.com/c4spar/deno-cli/commit/8040abf))
+
+### Chore
+
+* **ci:** update deno version to v1.4.0 ([e1515b9](https://github.com/c4spar/deno-cli/commit/e1515b9), [1e15d43](https://github.com/c4spar/deno-cli/commit/1e15d43))
+* **lint:** fix lint errors ([2dd4be9](https://github.com/c4spar/deno-cli/commit/2dd4be9))
+* **ts:** use import/export type for types ([fbcff11](https://github.com/c4spar/deno-cli/commit/fbcff11))
+* **upgrade:** deno/std v0.69.0 ([bfadcc1](https://github.com/c4spar/deno-cli/commit/bfadcc1), [9bdd341](https://github.com/c4spar/deno-cli/commit/9bdd341))
+
+
+
 # [v0.14.0](https://github.com/c4spar/deno-cli/compare/v0.13.0...v0.14.0) (2020-09-02)
 
 ### Features
