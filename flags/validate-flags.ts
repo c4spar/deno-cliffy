@@ -76,7 +76,7 @@ export function validateFlags(
     }
 
     option.conflicts?.forEach((flag: string) => {
-      if (isset(flag)) {
+      if (isset(flag, values)) {
         throw new Error(
           `Option --${option.name} conflicts with option: --${flag}`,
         );
@@ -85,7 +85,7 @@ export function validateFlags(
 
     option.depends?.forEach((flag: string) => {
       // don't throw an error if the value is coming from the default option.
-      if (!isset(flag) && !defaultValues[option.name]) {
+      if (!isset(flag, values) && !defaultValues[option.name]) {
         throw new Error(`Option --${option.name} depends on option: --${flag}`);
       }
     });
@@ -104,12 +104,6 @@ export function validateFlags(
         throw new Error(`Missing value for option: --${option.name}`);
       }
     });
-
-    function isset(flag: string): boolean {
-      const name = paramCaseToCamelCase(flag);
-      // return typeof values[ name ] !== 'undefined' && values[ name ] !== false;
-      return typeof values[name] !== "undefined";
-    }
   }
 
   for (const option of flags) {
@@ -131,4 +125,10 @@ export function validateFlags(
   if (keys.length === 0 && !allowEmpty) {
     throw new Error("No arguments.");
   }
+}
+
+function isset(flag: string, values: Record<string, unknown>): boolean {
+  const name = paramCaseToCamelCase(flag);
+  // return typeof values[ name ] !== 'undefined' && values[ name ] !== false;
+  return typeof values[name] !== "undefined";
 }
