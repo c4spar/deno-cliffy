@@ -1,19 +1,19 @@
-name: Test
+name: Nightly Test
 
 on:
-  push:
-  pull_request:
+  schedule:
+    - cron: 0 0 * * *
 
 jobs:
 
-  stable:
-    name: Deno Stable
+  nightly:
+    name: Deno Nightly
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno_version: [ v1.2.0, v1.4.1 ]
+        deno_version: [ nightly ]
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
