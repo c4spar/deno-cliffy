@@ -1,20 +1,20 @@
-import { assertEquals, stripColor } from "../../../dev_deps.ts";
+import { assertEquals, gt, lt, stripColor } from "../../../dev_deps.ts";
 import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
 
-function command(defaultOptions?: boolean) {
+function command(defaultOptions?: boolean, hintOption?: boolean) {
   const cmd = new Command()
     .throwErrors()
     .version("1.0.0")
     .description("Test description ...");
 
-  if (defaultOptions === false) {
+  if (!defaultOptions) {
     cmd.versionOption(false)
       .helpOption(false);
   }
 
-  return cmd.option("-t, --test [val:string]", "test description")
+  cmd.option("-t, --test [val:string]", "test description")
     .option(
       "-D, --default [val:string]",
       "I have a default value!",
@@ -35,13 +35,19 @@ function command(defaultOptions?: boolean) {
       "-c, --conflicts [val:string]",
       "I conflict with test!",
       { conflicts: ["test"] },
-    )
-    .option("-a, --all <val:string>", "I have many hints!", {
-      default: "test",
-      required: true,
-      depends: ["test"],
-      conflicts: ["depends"],
-    })
+    );
+
+  if (hintOption) {
+    cmd
+      .option("-a, --all <val:string>", "I have many hints!", {
+        default: "test",
+        required: true,
+        depends: ["test"],
+        conflicts: ["depends"],
+      });
+  }
+
+  cmd
     .env("SOME_ENV_VAR=<value:number>", "Description ...")
     .env("SOME_ENV_VAR_2 <value>", "Description 2 ...")
     .command("help", new HelpCommand())
@@ -52,13 +58,19 @@ function command(defaultOptions?: boolean) {
     .description("Nobody knows about me!")
     .hidden()
     .reset();
+
+  return cmd;
 }
 
-Deno.test("command: help command", async () => {
-  const output: string = command().getHelp();
+Deno.test({
+  name: "command: help command with line break (deno <= v1.4.0)",
+  ignore: gt(Deno.version.deno, "1.4.0"),
+  async fn() {
+    const output: string = command(true, false).getHelp();
 
-  assertEquals(
-    `
+    assertEquals(
+      stripColor(output),
+      `
   Usage:   COMMAND
   Version: v1.0.0 
 
@@ -68,14 +80,13 @@ Deno.test("command: help command", async () => {
 
   Options:
 
-    -h, --help                     - Show this help.                                                                                        
-    -V, --version                  - Show the version number for this program.                                                              
-    -t, --test       [val:string]  - test description                                                                                       
-    -D, --default    [val:string]  - I have a default value!                    (Default: test)                                             
-    -r, --required   [val:string]  - I am required!                             (required)                                                  
-    -d, --depends    [val:string]  - I depend on test!                          (depends: test)                                             
-    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)                                           
-    -a, --all        <val:string>  - I have many hints!                         (required, Default: test, depends: test, conflicts: depends)
+    -h, --help                     - Show this help.                                             
+    -V, --version                  - Show the version number for this program.                   
+    -t, --test       [val:string]  - test description                                            
+    -D, --default    [val:string]  - I have a default value!                    (Default: test)  
+    -r, --required   [val:string]  - I am required!                             (required)       
+    -d, --depends    [val:string]  - I depend on test!                          (depends: test)  
+    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)
 
   Commands:
 
@@ -89,15 +100,20 @@ Deno.test("command: help command", async () => {
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
 `,
-    stripColor(output),
-  );
+    );
+  },
 });
 
-Deno.test("command: help command", async () => {
-  const output: string = command(false).getHelp();
+Deno.test({
+  name:
+    "command: help command with line break but without default options (deno <= v1.4.0)",
+  ignore: gt(Deno.version.deno, "1.4.0"),
+  async fn() {
+    const output: string = command(false, false).getHelp();
 
-  assertEquals(
-    `
+    assertEquals(
+      stripColor(output),
+      `
   Usage:   COMMAND
   Version: v1.0.0 
 
@@ -107,12 +123,11 @@ Deno.test("command: help command", async () => {
 
   Options:
 
-    -t, --test       [val:string]  - test description                                                                     
-    -D, --default    [val:string]  - I have a default value!  (Default: test)                                             
-    -r, --required   [val:string]  - I am required!           (required)                                                  
-    -d, --depends    [val:string]  - I depend on test!        (depends: test)                                             
-    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)                                           
-    -a, --all        <val:string>  - I have many hints!       (required, Default: test, depends: test, conflicts: depends)
+    -t, --test       [val:string]  - test description                          
+    -D, --default    [val:string]  - I have a default value!  (Default: test)  
+    -r, --required   [val:string]  - I am required!           (required)       
+    -d, --depends    [val:string]  - I depend on test!        (depends: test)  
+    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)
 
   Commands:
 
@@ -126,6 +141,93 @@ Deno.test("command: help command", async () => {
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
 
 `,
-    stripColor(output),
-  );
+    );
+  },
+});
+
+Deno.test({
+  name: "command: help command with line break (deno >= v1.4.1)",
+  ignore: lt(Deno.version.deno, "1.4.1"),
+  async fn() {
+    const output: string = command(true, true).getHelp();
+
+    assertEquals(
+      stripColor(output),
+      `
+  Usage:   COMMAND
+  Version: v1.0.0 
+
+  Description:
+
+    Test description ...
+
+  Options:
+
+    -h, --help                     - Show this help.                                                                                 
+    -V, --version                  - Show the version number for this program.                                                       
+    -t, --test       [val:string]  - test description                                                                                
+    -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                    
+    -r, --required   [val:string]  - I am required!                             (required)                                           
+    -d, --depends    [val:string]  - I depend on test!                          (depends: test)                                      
+    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)                                    
+    -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", depends: test, conflicts:
+                                                                                depends)                                             
+
+  Commands:
+
+    help         [command:command]               - Show this help or the help of a sub-command.
+    completions                                  - Generate shell completions.                 
+    sub-command  <input:string> <output:string>  - sub command description.                    
+
+  Environment variables:
+
+    SOME_ENV_VAR    <value:number>  - Description ...  
+    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
+
+`,
+    );
+  },
+});
+
+Deno.test({
+  name:
+    "command: help command with line break but without default options (deno >= v1.4.1)",
+  ignore: lt(Deno.version.deno, "1.4.1"),
+  async fn() {
+    const output: string = command(false, true).getHelp();
+
+    assertEquals(
+      stripColor(output),
+      `
+  Usage:   COMMAND
+  Version: v1.0.0 
+
+  Description:
+
+    Test description ...
+
+  Options:
+
+    -t, --test       [val:string]  - test description                                                              
+    -D, --default    [val:string]  - I have a default value!  (Default: "test")                                    
+    -r, --required   [val:string]  - I am required!           (required)                                           
+    -d, --depends    [val:string]  - I depend on test!        (depends: test)                                      
+    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)                                    
+    -a, --all        <val:string>  - I have many hints!       (required, Default: "test", depends: test, conflicts:
+                                                              depends)                                             
+
+  Commands:
+
+    help         [command:command]               - Show this help or the help of a sub-command.
+    completions                                  - Generate shell completions.                 
+    sub-command  <input:string> <output:string>  - sub command description.                    
+
+  Environment variables:
+
+    SOME_ENV_VAR    <value:number>  - Description ...  
+    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
+
+`,
+    );
+  },
 });
