@@ -11,3 +11,8 @@ export {
   red,
   stripColor,
 } from "https://deno.land/std@0.69.0/fmt/colors.ts";
+
+export {
+  lt,
+  gt,
+} from "https://deno.land/x/semver@v1.0.0/mod.ts";
