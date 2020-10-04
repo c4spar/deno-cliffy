@@ -83,7 +83,7 @@ Execute a single prompt with an options object.
 ```typescript
 import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const name: string = await Input.prompt( { message: `Choose a username?`, minLength: 8 } );
+const name: string = await Input.prompt( { message: `Choose a username`, minLength: 8 } );
 ```
 
 ### Prompt List
