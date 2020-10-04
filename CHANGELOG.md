@@ -1,4 +1,28 @@
-# [v0.14.1](https://github.com/c4spar/deno-cli/compare/v0.14.0...v0.14.1) (2020-10-13)
+# [v0.14.2](https://github.com/c4spar/deno-cli/compare/v0.14.2...v0.14.1) (2020-10-05)
+
+### Features
+
+* **command:** add fish completions support (#91) ([7e94214](https://github.com/c4spar/deno-cli/commit/7e94214), [5aaf108](https://github.com/c4spar/deno-cli/commit/5aaf108), [19e43db](https://github.com/c4spar/deno-cli/commit/19e43db))
+
+### Bug Fixes
+
+* **command:** spaces not supported in bash completions (#94) ([95b29b2](https://github.com/c4spar/deno-cli/commit/95b29b2))
+* **command:** spaces not supported in zsh completions (#93) ([e9805b6](https://github.com/c4spar/deno-cli/commit/e9805b6))
+* **command:** prompt method not exported from prompt/mod.ts ([cd0d122](https://github.com/c4spar/deno-cli/commit/cd0d122))
+
+### Code Refactoring
+
+* use underscore in file names (#92) ([357db7f](https://github.com/c4spar/deno-cli/commit/357db7f))
+* **command:** indent zsh completions script with 2 spaces ([310bc00](https://github.com/c4spar/deno-cli/commit/310bc00))
+
+### Chore
+
+* **ci:** add separate workflows for test and nightly-test ([d8ecece](https://github.com/c4spar/deno-cli/commit/d8ecece))
+* **ci:** update deno version to v1.4.4 ([20c45f3](https://github.com/c4spar/deno-cli/commit/20c45f3), [689fe20](https://github.com/c4spar/deno-cli/commit/689fe20))
+* **upgrade:** deno/std v0.73.0 ([bfad89b](https://github.com/c4spar/deno-cli/commit/bfad89b), [5dbe353](https://github.com/c4spar/deno-cli/commit/5dbe353))
+
+
+# [v0.14.1](https://github.com/c4spar/deno-cli/compare/v0.14.0...v0.14.1) (2020-09-13)
 
 ### Bug Fixes
 
