@@ -10,14 +10,16 @@ interface CompleteOptions {
   arguments?: string;
 }
 
+/** Fish completions generator. */
 export class FishCompletionsGenerator {
+  /** Generates fish completions script for given command. */
   public static generate(cmd: Command) {
     return new FishCompletionsGenerator(cmd).generate();
   }
 
   private constructor(protected cmd: Command) {}
 
-  /** Generates fish completions code. */
+  /** Generates fish completions script. */
   private generate(): string {
     const path = this.cmd.getPath();
     const version: string | undefined = this.cmd.getVersion()
@@ -53,7 +55,6 @@ ${this.generateCompletions(this.cmd).trim()}
 `;
   }
 
-  /** Generates fish completions method for given command and child commands. */
   private generateCompletions(command: Command): string {
     const parent: Command | undefined = command.getParent();
     let result = ``;
