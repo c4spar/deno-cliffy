@@ -19,37 +19,54 @@ export class BashCompletionsGenerator {
 # bash completion support for ${path}${version}
 
 _${replaceSpecialChars(path)}() {
-  local word cur prev opts
+  local word cur prev
+  local -a opts
   COMPREPLY=()
   cur="\${COMP_WORDS[COMP_CWORD]}"
   prev="\${COMP_WORDS[COMP_CWORD-1]}"
   cmd="_"
-  opts=""
+  opts=()
+  
+  _${replaceSpecialChars(this.cmd.getName())}_complete() {
+    local action="$1"; shift
+    mapfile -t values < <( ${this.cmd.getName()} completions complete -l "\${action}" "\${@}" )
+    for i in "\${values[@]}"; do
+      opts+=("$i")
+    done
+  }
 
   ${this.generateCompletions(this.cmd).trim()}
   
-  for word in "\${COMP_WORDS[@]}"
-  do
+  for word in "\${COMP_WORDS[@]}"; do
     case "\${word}" in
       -*) ;;
       *) 
         cmd_tmp="\${cmd}_\${word//[^[:alnum:]]/_}"
         if type "\${cmd_tmp}" &>/dev/null; then
           cmd="\${cmd_tmp}"
-        else
-          break
         fi
     esac
   done
   
   \${cmd}
 
-  if [[ -n "\${opts}" ]]; then
-    # shellcheck disable=SC2207
-    COMPREPLY=($(compgen -W "\${opts}" -- "\${cur}"))
-  else
+  if [[ \${#opts[@]} -eq 0 ]]; then
     # shellcheck disable=SC2207
     COMPREPLY=($(compgen -f "\${cur}"))
+    return 0
+  fi
+
+  local values
+  values="$( printf "\\n%s" "\${opts[@]}" )"
+  local IFS=$'\\n'
+  # shellcheck disable=SC2207
+  local result=($(compgen -W "\${values[@]}" -- "\${cur}"))
+  if [[ \${#result[@]} -eq 0 ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=($(compgen -f "\${cur}"))
+  else
+    # shellcheck disable=SC2207
+    COMPREPLY=($(printf '%q\\n' "\${result[@]}"))
   fi
   
   return 0
@@ -84,56 +101,104 @@ ${childCommandCompletions}`;
     path: string,
     index: number,
   ): string {
-    const commandNames: string[] = command.getCommands(false)
-      .map((subCommand: Command) => subCommand.getName());
+    const flags: string[] = this.getFlags(command);
 
-    const flags: string[] = command.getOptions(false)
+    const childCommandNames: string[] = command.getCommands(false)
+      .map((childCommand: Command) => childCommand.getName());
+
+    const completionsPath: string = ~path.indexOf(" ")
+      ? " " + path.split(" ").slice(1).join(" ")
+      : "";
+
+    const optionArguments = this.generateOptionArguments(
+      command,
+      completionsPath,
+    );
+
+    const completionsCmd: string = this.generateCommandCompletionsCommand(
+      command.getArguments(),
+      completionsPath,
+    );
+
+    return `  __${replaceSpecialChars(path)}() {
+    opts=(${[...flags, ...childCommandNames].join(" ")})
+    ${completionsCmd}
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq ${index} ]] ; then
+      return 0
+    fi
+    ${optionArguments}
+  }`;
+  }
+
+  private getFlags(command: Command): string[] {
+    return command.getOptions(false)
       .map((option) =>
         option.flags
           .split(",")
           .map((flag) => flag.trim())
       )
       .flat();
+  }
 
-    const completionsPath: string = ~path.indexOf(" ")
-      ? " " + path.split(" ").slice(1).join(" ")
-      : "";
+  private generateOptionArguments(
+    command: Command,
+    completionsPath: string,
+  ): string {
+    let opts: string = "";
     const options = command.getOptions(false);
-    let opts = "";
     if (options.length) {
-      opts = 'case "${prev}" in';
+      opts += 'case "${prev}" in';
       for (const option of options) {
         const flags: string = option.flags
           .split(",")
           .map((flag) => flag.trim())
           .join("|");
-        const completionsCmd = option.args.length
-          ? `\$(${this.cmd.getName()} completions complete ${
-            option.args[0].action
-          }${completionsPath})`
-          : "";
-        // @TODO: add support for multiple option arguments
-        opts += `
-      ${flags}) opts="${completionsCmd}" ;;`;
+
+        const completionsCmd: string = this.generateOptionCompletionsCommand(
+          option.args,
+          completionsPath,
+          { standalone: option.standalone },
+        );
+
+        opts += `\n      ${flags}) ${completionsCmd} ;;`;
       }
       opts += "\n    esac";
     }
 
-    // @TODO: add support for multiple command arguments
-    const args: IArgument[] = command.getArguments();
-    const commandArgs: string = args.length
-      ? ` \$(${this.cmd.getName()} completions complete ${
-        args[0].action
-      }${completionsPath})`
-      : "";
+    return opts;
+  }
 
-    return `  __${replaceSpecialChars(path)}() {
-    opts="${[...flags, ...commandNames].join(" ")}${commandArgs}"
-    if [[ \${cur} == -* || \${COMP_CWORD} -eq ${index} ]] ; then
-      return 0
-    fi
-    ${opts}
-  }`;
+  private generateCommandCompletionsCommand(
+    args: IArgument[],
+    path: string,
+  ) {
+    if (args.length) {
+      // @TODO: add support for multiple arguments
+      return `_${replaceSpecialChars(this.cmd.getName())}_complete ${
+        args[0].action
+      }${path}`;
+    }
+
+    return "";
+  }
+
+  private generateOptionCompletionsCommand(
+    args: IArgument[],
+    path: string,
+    opts?: { standalone?: boolean },
+  ) {
+    if (args.length) {
+      // @TODO: add support for multiple arguments
+      return `opts=(); _${replaceSpecialChars(this.cmd.getName())}_complete ${
+        args[0].action
+      }${path}`;
+    }
+
+    if (opts?.standalone) {
+      return "opts=()";
+    }
+
+    return "";
   }
 }
 
