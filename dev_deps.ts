@@ -4,12 +4,12 @@ export {
   assertStrictEquals,
   assertThrows,
   assertThrowsAsync,
-} from "https://deno.land/std@0.70.0/testing/asserts.ts";
+} from "https://deno.land/std@0.73.0/testing/asserts.ts";
 
 export {
   bold,
   red,
   stripColor,
-} from "https://deno.land/std@0.70.0/fmt/colors.ts";
+} from "https://deno.land/std@0.73.0/fmt/colors.ts";
 
 export { gt, lt } from "https://deno.land/x/semver@v1.0.0/mod.ts";
