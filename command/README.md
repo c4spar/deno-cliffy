@@ -65,6 +65,7 @@
 - [Shell completion](#-shell-completion)
   - [Completions command](#completions-command)
     - [Bash Completions](#bash-completions)
+    - [Fish Completions](#fish-completions)
     - [Zsh Completions](#zsh-completions)
 - [Generic options and arguments](#-generic-options-and-arguments)
 - [Version option](#-version-option)
@@ -1066,6 +1067,7 @@ Cliffy supports shell completion out of the box.
 **Currently supported shells**
 
 * bash
+* fish
 * zsh
 
 There are two ways to add auto-completion to types.
@@ -1118,17 +1120,25 @@ By calling `command-name completions <shell>`, the command will output the compl
 
 #### Bash Completions
 
-To enable bash completions on your system add the following line to your `~/.bashrc`:
+To enable bash completions for your program add the following line to your `~/.bashrc`:
 
 ```shell
 source <(command-name completions bash)
 ```
 
+#### Fish Completions
+
+To enable fish completions for your program add the following line to your `~/.config/fish/config.fish`:
+
+```shell script
+source (command-name completions fish | psub)
+```
+
 #### Zsh Completions
 
-To enable zsh completions on your system add the following line to your `~/.zshrc`:
+To enable zsh completions for your program add the following line to your `~/.zshrc`:
 
-```shell
+```shell script
 source <(command-name completions zsh)
 ```
 
