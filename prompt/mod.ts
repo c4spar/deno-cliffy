@@ -11,3 +11,5 @@ export * from "./number.ts";
 export * from "./secret.ts";
 export * from "./select.ts";
 export * from "./toggle.ts";
+
+export * from "./prompt.ts";
