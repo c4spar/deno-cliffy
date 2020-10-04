@@ -33,24 +33,24 @@ autoload -U is-at-least
 # shellcheck disable=SC2154
 (( $+functions[__${replaceSpecialChars(name)}_complete] )) ||
 function __${replaceSpecialChars(name)}_complete {
-    local name="$1"; shift
-    local action="$1"; shift
-    integer ret=1
-    local -a values
-    local expl lines
-    _tags "$name"
-    while _tags; do
-        if _requested "$name"; then
-            # shellcheck disable=SC2034
-            lines="$(${name} completions complete -l "\${action}" "\${@}")"
-            values=("\${(ps:\\n:)lines}")
-            if (( \${#values[@]} )); then
-                while _next_label "$name" expl "$action"; do
-                    compadd -S '' "\${expl[@]}" "\${values[@]}"
-                done
-            fi
-        fi
-    done
+  local name="$1"; shift
+  local action="$1"; shift
+  integer ret=1
+  local -a values
+  local expl lines
+  _tags "$name"
+  while _tags; do
+    if _requested "$name"; then
+      # shellcheck disable=SC2034
+      lines="$(${name} completions complete "\${action}" "\${@}")"
+      values=("\${(ps:\\n:)lines}")
+      if (( \${#values[@]} )); then
+        while _next_label "$name" expl "$action"; do
+          compadd -S '' "\${expl[@]}" "\${values[@]}"
+        done
+      fi
+    fi
+  done
 }
 
 ${this.generateCompletions(this.cmd).trim()}
@@ -59,15 +59,7 @@ ${this.generateCompletions(this.cmd).trim()}
 
 compdef _${replaceSpecialChars(path)} ${path}
 
-#
-# Local Variables:
-# mode: Shell-Script
-# sh-indentation: 4
-# indent-tabs-mode: nil
-# sh-basic-offset: 4
-# End:
-# vim: ft=zsh sw=4 ts=4 et
-`.trim();
+`;
   }
 
   /** Generates zsh completions method for given command and child commands. */
@@ -86,8 +78,7 @@ compdef _${replaceSpecialChars(path)} ${path}
 function _${replaceSpecialChars(path)}() {` +
       (!command.getParent()
         ? `
-
-    local state`
+  local state`
         : "") +
       this.generateCommandCompletions(command, path) +
       this.generateSubCommandCompletions(command, path) +
@@ -109,16 +100,16 @@ function _${replaceSpecialChars(path)}() {` +
       .map((subCommand: Command) =>
         `'${subCommand.getName()}:${subCommand.getShortDescription()}'`
       )
-      .join("\n            ");
+      .join("\n      ");
 
     if (completions) {
       completions = `
-        local -a commands
-        # shellcheck disable=SC2034
-        commands=(
-            ${completions}
-        )
-        _describe 'command' commands`;
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      ${completions}
+    )
+    _describe 'command' commands`;
     }
 
     if (command.hasArguments()) {
@@ -127,14 +118,14 @@ function _${replaceSpecialChars(path)}() {` +
       const arg: IArgument = command.getArguments()[0];
       const action = this.addAction(arg, completionsPath);
       if (action && command.getCompletion(arg.action)) {
-        completions += `\n        __${
+        completions += `\n    __${
           replaceSpecialChars(this.cmd.getName())
         }_complete ${action.arg.name} ${action.arg.action} ${action.cmd}`;
       }
     }
 
     if (completions) {
-      completions = `\n\n    function _commands() {${completions}\n    }`;
+      completions = `\n\n  function _commands() {${completions}\n  }`;
     }
 
     return completions;
@@ -152,12 +143,12 @@ function _${replaceSpecialChars(path)}() {` +
             replaceSpecialChars(path + " " + command.getName())
           } ;;`
         )
-        .join("\n            ");
+        .join("\n      ");
 
       return `\n
-    function _command_args() {
-        case "\${words[1]}" in\n            ${actions}\n        esac
-    }`;
+  function _command_args() {
+    case "\${words[1]}" in\n      ${actions}\n    esac
+  }`;
     }
 
     return "";
@@ -172,10 +163,10 @@ function _${replaceSpecialChars(path)}() {` +
     let argIndex = 0;
     // @TODO: add stop early option: -A "-*"
     // http://zsh.sourceforge.net/Doc/Release/Completion-System.html
-    let argsCommand = "\n\n    _arguments -w -s -S -C";
+    let argsCommand = "\n\n  _arguments -w -s -S -C";
 
     if (command.hasOptions()) {
-      argsCommand += ` \\\n        ${options.join(" \\\n        ")}`;
+      argsCommand += ` \\\n    ${options.join(" \\\n    ")}`;
     }
 
     if (
@@ -184,7 +175,7 @@ function _${replaceSpecialChars(path)}() {` +
           .filter((arg) => command.getCompletion(arg.action)).length
       )
     ) {
-      argsCommand += ` \\\n        '${++argIndex}: :_commands'`;
+      argsCommand += ` \\\n    '${++argIndex}: :_commands'`;
     }
 
     if (command.hasArguments() || command.hasCommands(false)) {
@@ -200,10 +191,10 @@ function _${replaceSpecialChars(path)}() {` +
         );
       }
 
-      argsCommand += args.map((arg: string) => `\\\n        '${arg}'`).join("");
+      argsCommand += args.map((arg: string) => `\\\n    '${arg}'`).join("");
 
       if (command.hasCommands(false)) {
-        argsCommand += ` \\\n        '*:: :->command_args'`;
+        argsCommand += ` \\\n    '*:: :->command_args'`;
       }
     }
 
@@ -319,9 +310,7 @@ function _${replaceSpecialChars(path)}() {` +
     }
 
     if (actions.length) {
-      return `\n\n    case "$state" in\n        ${
-        actions.join("\n        ")
-      }\n    esac`;
+      return `\n\n  case "$state" in\n    ${actions.join("\n    ")}\n  esac`;
     }
 
     return "";
