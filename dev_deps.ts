@@ -12,7 +12,4 @@ export {
   stripColor,
 } from "https://deno.land/std@0.70.0/fmt/colors.ts";
 
-export {
-  lt,
-  gt,
-} from "https://deno.land/x/semver@v1.0.0/mod.ts";
+export { gt, lt } from "https://deno.land/x/semver@v1.0.0/mod.ts";

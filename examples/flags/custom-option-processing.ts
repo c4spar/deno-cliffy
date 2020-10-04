@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags, ITypeInfo } from "../../flags/mod.ts";
+import { ITypeInfo, parseFlags } from "../../flags/mod.ts";
 
 const result = parseFlags(Deno.args, {
   flags: [{

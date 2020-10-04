@@ -1,4 +1,4 @@
-import type { ITypeInfo, ITypeHandler } from "../types.ts";
+import type { ITypeHandler, ITypeInfo } from "../types.ts";
 
 export const number: ITypeHandler<number> = (
   { label, name, value, type }: ITypeInfo,

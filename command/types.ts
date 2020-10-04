@@ -2,19 +2,14 @@ import type {
   IDefaultValue,
   IFlagArgument,
   IFlagOptions,
-  ITypeInfo,
   IFlagValueHandler,
   ITypeHandler,
+  ITypeInfo,
 } from "../flags/types.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 
-export type {
-  IDefaultValue,
-  IFlagValueHandler,
-  ITypeHandler,
-  ITypeInfo,
-};
+export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
 /* COMMAND TYPES */
 

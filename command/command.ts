@@ -18,13 +18,13 @@ import type {
   IEnvVar,
   IEnvVarOptions,
   IExample,
+  IFlagValueHandler,
   IOption,
   IParseResult,
-  ITypeOptions,
   IType,
-  ITypeInfo,
   ITypeHandler,
-  IFlagValueHandler,
+  ITypeInfo,
+  ITypeOptions,
 } from "./types.ts";
 
 type PermissionName =
