@@ -5,8 +5,8 @@ import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
-import { ArgumentsParser } from "./_arguments-parser.ts";
-import { HelpGenerator } from "./help/help-generator.ts";
+import { ArgumentsParser } from "./_arguments_parser.ts";
+import { HelpGenerator } from "./help/_help_generator.ts";
 import type {
   IAction,
   IArgument,

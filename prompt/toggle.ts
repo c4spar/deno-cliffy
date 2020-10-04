@@ -1,11 +1,11 @@
-import type { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
   GenericPromptSettings,
-} from "./_generic-prompt.ts";
+} from "./_generic_prompt.ts";
 
 export interface ToggleKeys {
   active?: string[];

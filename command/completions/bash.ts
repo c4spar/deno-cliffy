@@ -1,6 +1,6 @@
 import { Command } from "../command.ts";
 import { dim, italic } from "../deps.ts";
-import { BashCompletionsGenerator } from "./bash-completions-generator.ts";
+import { BashCompletionsGenerator } from "./_bash_completions_generator.ts";
 
 /**
  * Generates bash completion code.

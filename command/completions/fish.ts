@@ -1,6 +1,6 @@
 import { Command } from "../command.ts";
 import { dim, italic } from "../deps.ts";
-import { FishCompletionsGenerator } from "./fish-completions-generator.ts";
+import { FishCompletionsGenerator } from "./_fish_completions_generator.ts";
 
 /**
  * Generate fish completion script.

@@ -94,7 +94,7 @@ await read();
 ```
 
 ```
-$ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read-key.ts
+$ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
 ```
 
 ## ❯ API

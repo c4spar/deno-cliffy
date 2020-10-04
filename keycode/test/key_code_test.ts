@@ -1,12 +1,12 @@
 import { assertEquals } from "../../dev_deps.ts";
-import { KeyCode } from "../key-code.ts";
+import { KeyCode } from "../key_code.ts";
 import {
   KeyMap,
   KeyMapCtrl,
   KeyMapShift,
   SpecialKeyMap,
-} from "../key-codes.ts";
-import type { IKey, KeyEvent } from "../key-event.ts";
+} from "../key_codes.ts";
+import type { IKey, KeyEvent } from "../key_event.ts";
 
 export const ESC = "\x1B";
 

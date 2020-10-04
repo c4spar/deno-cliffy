@@ -2,7 +2,7 @@ import {
   GenericPrompt,
   GenericPromptOptions,
   GenericPromptSettings,
-} from "./_generic-prompt.ts";
+} from "./_generic_prompt.ts";
 
 export interface GenericListOption {
   value: string;

@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img alt="table" src="assets/img/random-table.gif"/>
+  <img alt="table" src="assets/img/random_table.gif"/>
 </p>
 
 ## ❯ Content
@@ -84,10 +84,10 @@ console.log(table.toString());
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/basic-usage.ts
+$ deno run https://deno.land/x/cliffy/examples/table/basic_usage.ts
 ```
 
-![](assets/img/basic-usage.png)
+![](assets/img/basic_usage.png)
 
 ### Using as Array
 
@@ -105,10 +105,10 @@ table.render();
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/using-as-array.ts
+$ deno run https://deno.land/x/cliffy/examples/table/using_as_array.ts
 ```
 
-![](assets/img/using-as-array.png)
+![](assets/img/using_as_array.png)
 
 ### Header and Body
 
@@ -127,10 +127,10 @@ new Table()
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/header-and-body.ts
+$ deno run https://deno.land/x/cliffy/examples/table/header_and_body.ts
 ```
 
-![](assets/img/header-and-body.png)
+![](assets/img/header_and_body.png)
 
 ### Table Options
 
@@ -152,10 +152,10 @@ new Table()
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/table-options.ts
+$ deno run https://deno.land/x/cliffy/examples/table/table_options.ts
 ```
 
-![](assets/img/table-options.png)
+![](assets/img/table_options.png)
 
 ### Row's and Cell's
 
@@ -179,10 +179,10 @@ new Table()
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/rows-and-cells.ts
+$ deno run https://deno.land/x/cliffy/examples/table/rows_and_cells.ts
 ```
 
-![](assets/img/rows-and-cells.png)
+![](assets/img/rows_and_cells.png)
 
 ### Colspan and Rowspan
 
@@ -210,10 +210,10 @@ Table.from([
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/table/colspan-and-rowspan.ts
+$ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 ```
 
-![](assets/img/colspan-and-rowspan.png)
+![](assets/img/colspan_and_rowspan.png)
 
 ## ❯ API
 

@@ -1,7 +1,7 @@
 export * from "./figures.ts";
-export * from "./_generic-prompt.ts";
-export * from "./_generic-input.ts";
-export * from "./_generic-list.ts";
+export * from "./_generic_prompt.ts";
+export * from "./_generic_input.ts";
+export * from "./_generic_list.ts";
 
 export * from "./checkbox.ts";
 export * from "./confirm.ts";

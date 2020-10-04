@@ -1,5 +1,5 @@
-import { KeyMap, KeyMapCtrl, KeyMapShift } from "./key-codes.ts";
-import { IKey, KeyEvent } from "./key-event.ts";
+import { KeyMap, KeyMapCtrl, KeyMapShift } from "./key_codes.ts";
+import { IKey, KeyEvent } from "./key_event.ts";
 
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = "\x1b";

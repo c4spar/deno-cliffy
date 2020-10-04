@@ -1,9 +1,9 @@
-import type { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key_event.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
   GenericPromptSettings,
-} from "./_generic-prompt.ts";
+} from "./_generic_prompt.ts";
 import { stripColor, underline } from "./deps.ts";
 
 export interface GenericInputKeys {

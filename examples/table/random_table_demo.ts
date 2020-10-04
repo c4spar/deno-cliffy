@@ -12,7 +12,7 @@ import {
   underline,
   yellow,
 } from "https://deno.land/std@0.70.0/fmt/colors.ts";
-import { AnsiEscape } from "../../ansi-escape/ansi-escape.ts";
+import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
 import { Cell, ICell } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
 

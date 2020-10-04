@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, dim } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
@@ -7,8 +7,8 @@ import {
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
-} from "./_generic-list.ts";
-import { GenericPrompt } from "./_generic-prompt.ts";
+} from "./_generic_list.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
 
 export type SelectOption = GenericListOption;
 

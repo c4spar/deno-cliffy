@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img alt="prompt" src="assets/img/prompt-list.gif"/>
+  <img alt="prompt" src="assets/img/prompt_list.gif"/>
 </p>
 
 ## ❯ Content
@@ -122,7 +122,7 @@ console.log(result);
 ```
 
 ```
-$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt-list.ts
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt_list.ts
 ```
 
 ### Dynamic Prompts
@@ -165,7 +165,7 @@ console.log(result);
 ```
 
 ```
-$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/dynamic-prompts.ts
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/dynamic_prompts.ts
 ```
 
 ### Custom Prompts
@@ -176,7 +176,7 @@ Be shure to define an options and return type for your custom prompt method. Cli
 
 ```typescript
 import { BufReader } from "https://deno.land/std/io/bufio.ts";
-import { AnsiEscape } from "https://deno.land/x/cliffy/ansi-escape/mod.ts";
+import { AnsiEscape } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
 import { prompt, Input, Figures } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const result = await prompt([{
@@ -244,7 +244,7 @@ console.log(result);
 ```
 
 ```
-$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom-prompts.ts
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom_prompts.ts
 ```
 
 ## ❯ API

@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key-event.ts";
+import type { KeyEvent } from "../keycode/key_event.ts";
 import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
@@ -7,7 +7,7 @@ import {
   GenericInputKeys,
   GenericInputPromptOptions,
   GenericInputPromptSettings,
-} from "./_generic-input.ts";
+} from "./_generic_input.ts";
 
 export interface NumberKeys extends GenericInputKeys {
   increaseValue?: string[];

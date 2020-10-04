@@ -1,5 +1,5 @@
 import { Table } from "../../table/table.ts";
-import { ArgumentsParser } from "../_arguments-parser.ts";
+import { ArgumentsParser } from "../_arguments_parser.ts";
 import type { Command } from "../command.ts";
 import { blue, bold, dim, magenta, red, yellow } from "../deps.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
