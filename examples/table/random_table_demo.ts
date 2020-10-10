@@ -11,7 +11,7 @@ import {
   strikethrough,
   underline,
   yellow,
-} from "https://deno.land/std@0.73.0/fmt/colors.ts";
+} from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
 import { Cell, ICell } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
