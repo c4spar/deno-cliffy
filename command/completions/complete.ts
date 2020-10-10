@@ -20,7 +20,7 @@ export class CompleteCommand extends Command {
         ) => {
           let parent: Command | undefined;
           // deno-lint-ignore no-undef
-          let completeCommand: Command = commandNames
+          const completeCommand: Command = commandNames
             .reduce((cmd: Command, name: string): Command => {
               parent = cmd;
               const childCmd: Command | undefined = cmd.getCommand(name, false);

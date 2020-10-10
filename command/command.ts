@@ -498,7 +498,7 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    let completion: ICompletion | undefined = this._parent.getBaseCompletion(
+    const completion: ICompletion | undefined = this._parent.getBaseCompletion(
       name,
     );
 
@@ -1267,7 +1267,10 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    let option: IOption | undefined = this._parent.getBaseOption(name, hidden);
+    const option: IOption | undefined = this._parent.getBaseOption(
+      name,
+      hidden,
+    );
 
     if (!option || !option.global) {
       return this._parent.getGlobalOption(name, hidden);
@@ -1371,7 +1374,7 @@ export class Command<O = any, A extends Array<any> = any> {
     name: string,
     hidden?: boolean,
   ): Command<O> | undefined {
-    let cmd: Command | undefined = this.commands.get(name);
+    const cmd: Command | undefined = this.commands.get(name);
 
     return cmd && (hidden || !cmd.isHidden) ? cmd : undefined;
   }
@@ -1385,7 +1388,7 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    let cmd: Command | undefined = this._parent.getBaseCommand(name, hidden);
+    const cmd: Command | undefined = this._parent.getBaseCommand(name, hidden);
 
     if (!cmd?.isGlobal) {
       return this._parent.getGlobalCommand(name, hidden);
@@ -1460,7 +1463,7 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    let cmd: IType | undefined = this._parent.getBaseType(name);
+    const cmd: IType | undefined = this._parent.getBaseType(name);
 
     if (!cmd?.global) {
       return this._parent.getGlobalType(name);
@@ -1557,7 +1560,10 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    let envVar: IEnvVar | undefined = this._parent.getBaseEnvVar(name, hidden);
+    const envVar: IEnvVar | undefined = this._parent.getBaseEnvVar(
+      name,
+      hidden,
+    );
 
     if (!envVar?.global) {
       return this._parent.getGlobalEnvVar(name, hidden);

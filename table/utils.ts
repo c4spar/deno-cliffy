@@ -13,7 +13,7 @@ export function consumeWords(length: number, content: string): string {
 
   for (let i = 0; i < words.length; i++) {
     let word: string = words[i];
-    let hasLineBreak = word.indexOf("\n") !== -1;
+    const hasLineBreak = word.indexOf("\n") !== -1;
 
     if (hasLineBreak) {
       word = word.split("\n").shift() as string;
