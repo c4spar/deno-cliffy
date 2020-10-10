@@ -9,10 +9,9 @@ export class CompleteCommand extends Command {
     super();
     this.description("Get completions for given action from given command.")
       .arguments("<action:string> [command...:string]")
-      .option("-l, --list", "Use line break as value separator.")
       .action(
         async (
-          { list }: { list?: boolean },
+          _,
           // deno-lint-ignore no-undef
           action: string,
           // deno-lint-ignore no-undef
@@ -42,9 +41,7 @@ export class CompleteCommand extends Command {
             await completion?.complete(completeCommand, parent) ?? [];
 
           if (result?.length) {
-            Deno.stdout.writeSync(new TextEncoder().encode(result.join(
-              list ? "\n" : " ",
-            )));
+            Deno.stdout.writeSync(new TextEncoder().encode(result.join("\n")));
           }
         },
       )

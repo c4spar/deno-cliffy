@@ -29,7 +29,7 @@ _${replaceSpecialChars(path)}() {
   
   _${replaceSpecialChars(this.cmd.getName())}_complete() {
     local action="$1"; shift
-    mapfile -t values < <( ${this.cmd.getName()} completions complete -l "\${action}" "\${@}" )
+    mapfile -t values < <( ${this.cmd.getName()} completions complete "\${action}" "\${@}" )
     for i in "\${values[@]}"; do
       opts+=("$i")
     done
