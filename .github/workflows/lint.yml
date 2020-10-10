@@ -3,15 +3,20 @@ name: Lint
 on: [push, pull_request]
 
 jobs:
-  build:
+
+  lint:
     name: Lint source
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
 
       - name: Setup Deno
         uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
 
       - name: Setup shellcheck
         run: >
