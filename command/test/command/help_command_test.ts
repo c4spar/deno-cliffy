@@ -3,6 +3,8 @@ import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
 
+const isNightly: boolean = Deno.version.deno.match(/nightly/) !== null;
+
 function command(defaultOptions?: boolean, hintOption?: boolean) {
   const cmd = new Command()
     .throwErrors()
@@ -64,7 +66,7 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
 
 Deno.test({
   name: "command: help command with line break (deno <= v1.4.0)",
-  ignore: gt(Deno.version.deno, "1.4.0"),
+  ignore: isNightly || gt(Deno.version.deno, "1.4.0"),
   async fn() {
     const output: string = command(true, false).getHelp();
 
@@ -107,7 +109,7 @@ Deno.test({
 Deno.test({
   name:
     "command: help command with line break but without default options (deno <= v1.4.0)",
-  ignore: gt(Deno.version.deno, "1.4.0"),
+  ignore: isNightly || gt(Deno.version.deno, "1.4.0"),
   async fn() {
     const output: string = command(false, false).getHelp();
 
@@ -147,7 +149,7 @@ Deno.test({
 
 Deno.test({
   name: "command: help command with line break (deno >= v1.4.1)",
-  ignore: lt(Deno.version.deno, "1.4.1"),
+  ignore: !isNightly && lt(Deno.version.deno, "1.4.1"),
   async fn() {
     const output: string = command(true, true).getHelp();
 
@@ -192,7 +194,7 @@ Deno.test({
 Deno.test({
   name:
     "command: help command with line break but without default options (deno >= v1.4.1)",
-  ignore: lt(Deno.version.deno, "1.4.1"),
+  ignore: !isNightly && lt(Deno.version.deno, "1.4.1"),
   async fn() {
     const output: string = command(false, true).getHelp();
 
