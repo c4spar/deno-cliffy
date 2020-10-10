@@ -12,13 +12,10 @@ export class CompleteCommand extends Command {
       .action(
         async (
           _,
-          // deno-lint-ignore no-undef
           action: string,
-          // deno-lint-ignore no-undef
           commandNames: string[],
         ) => {
           let parent: Command | undefined;
-          // deno-lint-ignore no-undef
           const completeCommand: Command = commandNames
             .reduce((cmd: Command, name: string): Command => {
               parent = cmd;
@@ -26,7 +23,6 @@ export class CompleteCommand extends Command {
               if (!childCmd) {
                 throw new Error(
                   `Auto-completion failed. Command not found: ${
-                    // deno-lint-ignore no-undef
                     commandNames.join(" ")
                   }`,
                 );
@@ -35,7 +31,6 @@ export class CompleteCommand extends Command {
             }, cmd || this.getMainCommand());
 
           const completion: ICompletion | undefined = completeCommand
-            // deno-lint-ignore no-undef
             .getCompletion(action);
           const result: string[] =
             await completion?.complete(completeCommand, parent) ?? [];
