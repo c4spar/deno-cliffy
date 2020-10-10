@@ -270,7 +270,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           value: string,
         ): unknown {
           const type: string = arg.type || OptionType.STRING;
-          let result: unknown = opts.parse
+          const result: unknown = opts.parse
             ? opts.parse({
               label: "Option",
               type,

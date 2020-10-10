@@ -39,7 +39,7 @@ export class ArgumentsParser {
       const parts: string[] = arg.split(this.ARGUMENT_DETAILS_REGEX);
       const type: string | undefined = parts[2] || OptionType.STRING;
 
-      let details: IArgument = {
+      const details: IArgument = {
         optionalValue: arg[0] !== "<",
         name: parts[1],
         action: parts[3] || type,
