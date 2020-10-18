@@ -13,7 +13,7 @@ export function normalize(args: string[]) {
     } else if (arg === "--") {
       inLiteral = true;
       normalized.push(arg);
-    } else if (arg[0] === "-") {
+    } else if (arg.length > 1 && arg[0] === "-") {
       const isLong = arg[1] === "-";
 
       if (arg.includes("=")) {
