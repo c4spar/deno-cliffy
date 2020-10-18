@@ -11,8 +11,9 @@ function cmd() {
           `${label} ${name} must be a valid ${type} but got: ${value}`,
         );
       }
+      return value;
     })
-    .arguments("[foo:string] [bar:number] [baz:boolean] [color:color]");
+    .arguments("<foo:string> [bar:number] [baz:boolean] [color:color]");
 }
 
 Deno.test("'-' as argument", async () => {
@@ -24,7 +25,7 @@ Deno.test("'-' as argument", async () => {
 
 Deno.test("valid command argument types", async () => {
   const { args } = await cmd().parse(["abc", "123", "true", "red"]);
-  assertEquals(args, ["abc", 123, true]);
+  assertEquals(args, ["abc", 123, true, "red"]);
 });
 
 Deno.test("invalid number command argument type", async () => {
@@ -34,6 +35,16 @@ Deno.test("invalid number command argument type", async () => {
     },
     Error,
     "Argument bar must be of type number but got: xyz",
+  );
+});
+
+Deno.test("missing command arguments", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await cmd().parse();
+    },
+    Error,
+    "Missing argument(s): foo",
   );
 });
 
