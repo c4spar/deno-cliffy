@@ -15,6 +15,13 @@ function cmd() {
     .arguments("[foo:string] [bar:number] [baz:boolean] [color:color]");
 }
 
+Deno.test("'-' as argument", async () => {
+  const { args } = await new Command()
+    .arguments("<input:string>")
+    .parse(["-"]);
+  assertEquals(args, ["-"]);
+});
+
 Deno.test("valid command argument types", async () => {
   const { args } = await cmd().parse(["abc", "123", "true", "red"]);
   assertEquals(args, ["abc", 123, true]);
