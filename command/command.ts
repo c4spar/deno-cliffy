@@ -1006,7 +1006,10 @@ export class Command<O = any, A extends Array<any> = any> {
         }
       } else {
         for (const expectedArg of this.getArguments()) {
-          if (!expectedArg.optionalValue && !args.length) {
+          if (!args.length) {
+            if (expectedArg.optionalValue) {
+              break;
+            }
             throw this.error(
               new Error(`Missing argument: ${expectedArg.name}`),
             );
@@ -1029,7 +1032,7 @@ export class Command<O = any, A extends Array<any> = any> {
               label: "Argument",
               type: expectedArg.type,
               name: expectedArg.name,
-              value: args.shift() ?? "",
+              value: args.shift() as string,
             });
           }
 
@@ -1085,10 +1088,10 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-     * Get parent command from global executed command.
-     * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
-     * this method returns always undefined.
-     */
+   * Get parent command from global executed command.
+   * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
+   * this method returns always undefined.
+   */
   public getGlobalParent(): Command | undefined {
     return this._globalParent;
   }
