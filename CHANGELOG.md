@@ -1,3 +1,21 @@
+# [v0.14.3](https://github.com/c4spar/deno-cli/compare/v0.14.2...v0.14.3) (2020-10-18)
+
+### Bug Fixes
+
+* **command:** optional arguments are validated even if they are not specified on the command line (#101) ([e3d61d7](https://github.com/c4spar/deno-cli/commit/e3d61d7))
+* **command:** zsh completion values not separated by new line (#98) ([a89ccc6](https://github.com/c4spar/deno-cli/commit/a89ccc6))
+* **flags,command:** single dash not supported in arguments (#100) ([5b30372](https://github.com/c4spar/deno-cli/commit/5b30372))
+
+### Chore
+
+* fix nightly tests (#97) ([e0093b7](https://github.com/c4spar/deno-cli/commit/e0093b7))
+* **ci:** set deno version to v1.x ([c01396c](https://github.com/c4spar/deno-cli/commit/c01396c))
+* **egg:** use unstable instead of deprecated stale option ([1e579b2](https://github.com/c4spar/deno-cli/commit/1e579b2))
+* **lint:** fix lint errors ([2ca7bb6](https://github.com/c4spar/deno-cli/commit/2ca7bb6))
+* **upgrade:** deno/std v0.74.0 ([32f01e0](https://github.com/c4spar/deno-cli/commit/32f01e0))
+
+
+
 # [v0.14.2](https://github.com/c4spar/deno-cli/compare/v0.14.2...v0.14.1) (2020-10-05)
 
 ### Features
