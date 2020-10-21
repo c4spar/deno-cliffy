@@ -3,17 +3,13 @@
 import { Command } from "../../command/command.ts";
 
 const { options } = await new Command()
-  .option("--sauce [sauce:boolean]", "Remove sauce", {
-    default: true,
-  })
-  .option("--cheese [flavour:string]", "cheese flavour", {
-    default: "mozzarella",
-  })
+  // default value will be automatically set to true if no --check option exists
+  .option("--no-check", "No check.")
+  .option("--color <color:string>", "Color name.", { default: "yellow" })
+  .option("--no-color", "No color.")
+  // no default value
+  .option("--remote <url:string>", "Remote url.")
+  .option("--no-remote", "No remote.")
   .parse(Deno.args);
 
-const sauceStr = options.sauce ? "sauce" : "no sauce";
-const cheeseStr = options.cheese === false
-  ? "no cheese"
-  : `${options.cheese} cheese`;
-
-console.log(`You ordered a pizza with ${sauceStr} and ${cheeseStr}`);
+console.log(options);

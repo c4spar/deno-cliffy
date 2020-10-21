@@ -11,6 +11,8 @@ const options = <IParseOptions> {
     type: OptionType.STRING,
     optionalValue: true,
   }, {
+    name: "no-flag",
+  }, {
     name: "string",
     aliases: ["s"],
     type: OptionType.STRING,
@@ -56,14 +58,6 @@ Deno.test("flags optionCollect flagTrueLongFalse", () => {
 Deno.test("flags optionCollect flagTrueNoFlag", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--no-flag"], options),
-    Error,
-    "Duplicate option: --no-flag",
-  );
-});
-
-Deno.test("flags optionCollect flagTrueNoFlagTrue", () => {
-  assertThrows(
-    () => parseFlags(["-f", "true", "--no-flag", "true"], options),
     Error,
     "Duplicate option: --no-flag",
   );

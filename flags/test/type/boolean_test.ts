@@ -11,6 +11,8 @@ const options = {
     type: OptionType.BOOLEAN,
     optionalValue: true,
     standalone: true,
+  }, {
+    name: "no-flag",
   }],
 };
 
