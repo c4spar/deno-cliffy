@@ -1,3 +1,12 @@
+# [v0.15.0](https://github.com/c4spar/deno-cli/compare/v0.14.3...v0.15.0) (2020-10-24)
+
+### Features
+
+* **flags,command:** add support for dotted options (#104) ([9cd1191](https://github.com/c4spar/deno-cli/commit/9cd1191))
+* **flags,command:** improve support for negatable options (#103) ([220dcea](https://github.com/c4spar/deno-cli/commit/220dcea))
+
+
+
 # [v0.14.3](https://github.com/c4spar/deno-cli/compare/v0.14.2...v0.14.3) (2020-10-18)
 
 ### Bug Fixes
