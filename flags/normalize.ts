@@ -15,6 +15,7 @@ export function normalize(args: string[]) {
       normalized.push(arg);
     } else if (arg.length > 1 && arg[0] === "-") {
       const isLong = arg[1] === "-";
+      const isDotted = !isLong && arg[2] === ".";
 
       if (arg.includes("=")) {
         const parts = arg.split("=");
@@ -26,7 +27,7 @@ export function normalize(args: string[]) {
           normalizeShortFlags(flag);
         }
         normalized.push(parts.join("="));
-      } else if (isLong) {
+      } else if (isLong || isDotted) {
         normalized.push(arg);
       } else {
         normalizeShortFlags(arg);

@@ -71,11 +71,20 @@ $ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -a foo -b bar
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y 4 -n5 -abc --beep=boop foo bar baz
+$ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
 {
-  flags: { x: "3", y: "4", n: "5", a: true, b: true, c: true, beep: "boop" },
+  flags: {
+    x: "3",
+    y: { z: true },
+    n: "5",
+    a: true,
+    b: true,
+    c: true,
+    beep: "boop",
+    deno: { land: true }
+  },
   unknown: [ "foo", "bar", "baz" ],
-  literal: []
+  literal: [ "--cliffy" ]
 }
 ```
 

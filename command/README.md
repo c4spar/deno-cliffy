@@ -34,6 +34,7 @@
   - [Common option types: string, number and boolean](#common-option-types-string-number-and-boolean)
   - [List option types](#list-option-types)
   - [Variadic options](#variadic-options)
+  - [Dotted options](#dotted-options)
   - [Default option value](#default-option-value)
   - [Required options](#required-options)
   - [Negatable options](#negatable-options)
@@ -231,6 +232,39 @@ The variadic option is returned as an array.
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/variadic_options.ts -d dir1 dir2 dir3
 { dir: [ "dir1", "dir2", "dir3" ] }
+```
+
+### Dotted options
+
+Dotted options allows you to group your options together in nested objects.
+There is no limit for the level of nested objects.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const { options } = await new Command()
+  .option(
+    "-b.a, --bitrate.audio, --audio-bitrate <bitrate:number>",
+    "Audio bitrate",
+  )
+  .option(
+    "-b.v, --bitrate.video, --video-bitrate <bitrate:number>",
+    "Video bitrate",
+  )
+  .parse();
+
+console.log(options);
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/dotted_options.ts -b.a 300 -b.v 900
+{ bitrate: { audio: 300, video: 900 } }
+
+$ deno run https://deno.land/x/cliffy/examples/command/dotted_options.ts --bitrate.audio 300 --bitrate.video 900
+{ bitrate: { audio: 300, video: 900 } }
+
+$ deno run https://deno.land/x/cliffy/examples/command/dotted_options.ts --audio-bitrate 300 --video-bitrate 900
+{ bitrate: { audio: 300, video: 900 } }
 ```
 
 ### Default option value
