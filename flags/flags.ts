@@ -305,7 +305,34 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     );
   }
 
-  return { flags: flags as O, unknown, literal };
+  // convert dotted option keys into nested objects
+  const result = Object.keys(flags)
+    .reduce((result: Record<string, unknown>, key: string) => {
+      if (~key.indexOf(".")) {
+        key.split(".").reduce(
+          (
+            // deno-lint-ignore no-explicit-any
+            result: Record<string, any>,
+            subKey: string,
+            index: number,
+            parts: string[],
+          ) => {
+            if (index === parts.length - 1) {
+              result[subKey] = flags[key];
+            } else {
+              result[subKey] = result[subKey] ?? {};
+            }
+            return result[subKey];
+          },
+          result,
+        );
+      } else {
+        result[key] = flags[key];
+      }
+      return result;
+    }, {});
+
+  return { flags: result as O, unknown, literal };
 }
 
 function parseFlagValue(
