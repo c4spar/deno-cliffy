@@ -5,6 +5,7 @@ const cmd = new Command()
   .throwErrors()
   .name("test-command")
   .option("-f, --flag [value:boolean]", "description ...")
+  .option("--no-flag", "description ...")
   .action(() => {});
 
 Deno.test("command typeString flag", async () => {

@@ -16,26 +16,52 @@ interface IFlagOptionsMap {
  * @param values        Flag to validate.
  * @param knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
+ * @param optionNames   Mapped option names of negatable options.
  */
 export function validateFlags(
   flags: IFlagOptions[],
   values: Record<string, unknown>,
   knownFlaks?: Record<string, unknown>,
   allowEmpty?: boolean,
+  optionNames: Record<string, string> = {},
 ): void {
   const defaultValues: Record<string, boolean> = {};
-  const optionNames: Record<string, string> = {};
+
   // Set default value's
   for (const option of flags) {
-    const name: string = paramCaseToCamelCase(option.name);
-    optionNames[name] = option.name;
+    let name: string | undefined;
+    let defaultValue: unknown = undefined;
+
+    // if --no-[flag] is present set --[flag] default value to true
+    if (option.name.startsWith("no-")) {
+      const propName = option.name.replace(/^no-/, "");
+      if (propName in values) {
+        continue;
+      }
+      const positiveOption = getOption(flags, propName);
+      if (positiveOption) {
+        continue;
+      }
+      name = paramCaseToCamelCase(propName);
+      defaultValue = true;
+    }
+
+    if (!name) {
+      name = paramCaseToCamelCase(option.name);
+    }
+
+    if (!(name in optionNames)) {
+      optionNames[name] = option.name;
+    }
+
     if (
       typeof values[name] === "undefined" &&
-      typeof option.default !== "undefined"
+      (typeof option.default !== "undefined" ||
+        typeof defaultValue !== "undefined")
     ) {
       values[name] = typeof option.default === "function"
         ? option.default()
-        : option.default;
+        : (option.default ?? defaultValue);
       defaultValues[option.name] = true;
     }
   }

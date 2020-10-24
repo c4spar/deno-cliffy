@@ -279,39 +279,35 @@ Missing required option: --cheese
 
 ### Negatable options
 
-You can call the long name from an option with a boolean or an optional value (declared using square brackets) with a leading `--no-` to set the option value to false when used.
+You can specify a boolean option long name with a leading `no-` to set the option value to false when used.
+Defined alone this also makes the option true by default.
 
-You can specify a default value for the flag and it can be overridden on command line.
+If you define `--foo`, adding `--no-foo` does not change the default value from what it would otherwise be.
+
+You can specify a default value for a flag and it can be overridden on command line.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
-  .option("--sauce [sauce:boolean]", "Remove sauce", {
-    default: true,
-  })
-  .option("--cheese [flavour:string]", "cheese flavour", {
-    default: "mozzarella",
-  })
+  // default value will be automatically set to true if no --check option exists
+  .option("--no-check", "No check.")
+  .option("--color <color:string>", "Color name.", { default: "yellow" })
+  .option("--no-color", "No color.")
+  // no default value
+  .option("--remote <url:string>", "Remote url.")
+  .option("--no-remote", "No remote.")
   .parse(Deno.args);
 
-const sauceStr = options.sauce ? "sauce" : "no sauce";
-const cheeseStr = options.cheese === false
-  ? "no cheese"
-  : `${options.cheese} cheese`;
-
-console.log(`You ordered a pizza with ${sauceStr} and ${cheeseStr}`);
+console.log(options);
 ```
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/negatable_options.ts
-You ordered a pizza with sauce and mozzarella cheese
+{ check: true, color: "yellow" }
 
-$ deno run https://deno.land/x/cliffy/examples/command/negatable_options.ts --no-sauce --no-cheese
-You ordered a pizza with no sauce and no cheese
-
-$ deno run https://deno.land/x/cliffy/examples/command/negatable_options.ts --sauce --cheese parmesan
-You ordered a pizza with sauce and parmesan cheese
+$ deno run https://deno.land/x/cliffy/examples/command/negatable_options.ts --no-check --no-color --no-remote
+{ check: false, color: false, remote: false }
 ```
 
 ### Global options

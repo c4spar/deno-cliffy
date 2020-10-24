@@ -38,6 +38,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   let negate = false;
 
   const flags: Record<string, unknown> = {};
+  const optionNames: Record<string, string> = {};
   const literal: string[] = [];
   const unknown: string[] = [];
   let stopEarly = false;
@@ -79,11 +80,13 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         throw new Error(`Invalid flag name: ${current}`);
       }
 
-      negate = current.indexOf("--no-") === 0;
+      negate = current.startsWith("--no-");
 
-      const name = current.replace(/^-+(no-)?/, "");
-
-      option = getOption(opts.flags, name);
+      option = getOption(opts.flags, current);
+      // if (option && negate) {
+      //   const positiveName: string = current.replace(/^-+(no-)?/, "");
+      //   option = getOption(opts.flags, positiveName) ?? option;
+      // }
 
       if (!option) {
         if (opts.flags.length) {
@@ -91,7 +94,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
 
         option = {
-          name,
+          name: current.replace(/^-+/, ""),
           optionalValue: true,
           type: OptionType.STRING,
         };
@@ -101,9 +104,10 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         throw new Error(`Missing name for option: ${current}`);
       }
 
-      const friendlyName: string = paramCaseToCamelCase(option.name);
+      const positiveName: string = option.name.replace(/^no-?/, "");
+      const propName: string = paramCaseToCamelCase(positiveName);
 
-      if (typeof flags[friendlyName] !== "undefined" && !option.collect) {
+      if (typeof flags[propName] !== "undefined" && !option.collect) {
         throw new Error(`Duplicate option: ${current}`);
       }
 
@@ -118,29 +122,31 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       let argIndex = 0;
       let inOptionalArg = false;
-      const previous = flags[friendlyName];
+      const previous = flags[propName];
 
       parseNext(option, args);
 
-      if (typeof flags[friendlyName] === "undefined") {
+      if (typeof flags[propName] === "undefined") {
         if (typeof option.default !== "undefined") {
-          flags[friendlyName] = typeof option.default === "function"
+          flags[propName] = typeof option.default === "function"
             ? option.default()
             : option.default;
         } else if (args[argIndex].requiredValue) {
           throw new Error(`Missing value for option: --${option.name}`);
         } else {
-          flags[friendlyName] = true;
+          flags[propName] = true;
         }
       }
 
       if (typeof option.value !== "undefined") {
-        flags[friendlyName] = option.value(flags[friendlyName], previous);
+        flags[propName] = option.value(flags[propName], previous);
       } else if (option.collect) {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
-        value.push(flags[friendlyName]);
-        flags[friendlyName] = value;
+        value.push(flags[propName]);
+        flags[propName] = value;
       }
+
+      optionNames[propName] = option.name;
 
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
@@ -187,12 +193,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
 
         if (negate) {
-          if (arg.type !== OptionType.BOOLEAN && !arg.optionalValue) {
-            throw new Error(
-              `Negate not supported by --${option.name}. Only optional option or options of type boolean can be negated.`,
-            );
-          }
-          flags[friendlyName] = false;
+          flags[propName] = false;
           return;
         }
 
@@ -238,17 +239,17 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         if (
           typeof result !== "undefined" && ((args.length > 1) || arg.variadic)
         ) {
-          if (!flags[friendlyName]) {
-            flags[friendlyName] = [];
+          if (!flags[propName]) {
+            flags[propName] = [];
           }
 
-          (flags[friendlyName] as Array<unknown>).push(result);
+          (flags[propName] as Array<unknown>).push(result);
 
           if (hasNext(arg)) {
             parseNext(option, args);
           }
         } else {
-          flags[friendlyName] = result;
+          flags[propName] = result;
         }
 
         /** Check if current option should have an argument. */
@@ -295,7 +296,13 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   }
 
   if (opts.flags && opts.flags.length) {
-    validateFlags(opts.flags, flags, opts.knownFlaks, opts.allowEmpty);
+    validateFlags(
+      opts.flags,
+      flags,
+      opts.knownFlaks,
+      opts.allowEmpty,
+      optionNames,
+    );
   }
 
   return { flags: flags as O, unknown, literal };

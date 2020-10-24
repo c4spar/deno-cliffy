@@ -4,6 +4,7 @@ import { Command } from "../../command.ts";
 const cmd = new Command()
   .throwErrors()
   .option("-f, --flag [value:boolean]", "description ...")
+  .option("--no-flag", "description ...")
   .action(() => {});
 
 Deno.test("command optionDuplicate flag", async () => {

@@ -111,6 +111,10 @@ const options2 = {
     optionalValue: true,
     depends: ["flag1"],
     default: false,
+  }, {
+    name: "no-flag1",
+  }, {
+    name: "no-flag2",
   }],
 };
 
@@ -130,9 +134,9 @@ Deno.test("flags depends: should accept --standalone", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags depends: should not accept --no-flag2", () => {
+Deno.test("flags depends: should not accept --flag2", () => {
   assertThrows(
-    () => parseFlags(["--no-flag2"], options2),
+    () => parseFlags(["--flag2"], options2),
     Error,
     "Option --flag2 depends on option: --flag1",
   );

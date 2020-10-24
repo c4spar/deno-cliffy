@@ -3,7 +3,9 @@ import { Command } from "../../command.ts";
 
 const cmd = new Command()
   .throwErrors()
-  .option("-f, --flag [value:number]", "description ...").action(() => {});
+  .option("-f, --flag [value:number]", "description ...")
+  .option("--no-flag", "description ...")
+  .action(() => {});
 
 Deno.test("command typeString flag", async () => {
   const { options, args } = await cmd.parse(["-f"]);
