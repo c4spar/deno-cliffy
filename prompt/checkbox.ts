@@ -117,7 +117,7 @@ export class Checkbox
         // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
         if (event.ctrl) {
           this.screen.cursorShow();
-          return Deno.exit(0);
+          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
         }
         break;
 

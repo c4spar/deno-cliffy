@@ -80,7 +80,7 @@ export class Select extends GenericList<string, string, SelectSettings> {
       case event.name === "c":
         if (event.ctrl) {
           this.screen.cursorShow();
-          return Deno.exit(0);
+          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
         }
         break;
 
