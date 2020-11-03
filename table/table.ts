@@ -21,7 +21,7 @@ export interface ITableSettings extends Required<ITableOptions> {
 export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
 export class Table<T extends IRow = IRow> extends Array<T> {
-  protected static _chars: IBorder = border;
+  protected static _chars: IBorder = Object.assign({}, border);
   protected options: ITableSettings = {
     indent: 0,
     border: false,
