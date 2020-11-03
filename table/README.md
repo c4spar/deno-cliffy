@@ -346,7 +346,8 @@ Enable table border. Doesn't override row and cell settings.
 
 #### .chars(chars)
 
-Override default border characters. Doesn't ovrride child settings.
+Override default border characters. Doesn't override row and cell settings.
+To change the default border characters globally you can use the static `Table.chars(chars)` method.
 
 | Argument | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |
