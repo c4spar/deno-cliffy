@@ -21,13 +21,14 @@ export interface ITableSettings extends Required<ITableOptions> {
 export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
 export class Table<T extends IRow = IRow> extends Array<T> {
+  protected static _chars: IBorder = Object.assign({}, border);
   protected options: ITableSettings = {
     indent: 0,
     border: false,
     maxColWidth: Infinity,
     minColWidth: 0,
     padding: 1,
-    chars: border,
+    chars: Object.assign({}, Table._chars),
   };
   private headerRow?: Row;
 
@@ -42,6 +43,12 @@ export class Table<T extends IRow = IRow> extends Array<T> {
 
   public static fromJson(rows: IDataRow[]): Table {
     return new this().fromJson(rows);
+  }
+
+  /** Set global default border characters. */
+  public static chars(chars: IBorderOptions): typeof Table {
+    Object.assign(this._chars, chars);
+    return this;
   }
 
   public static render<T extends IRow>(rows: ITable<T>): void {
