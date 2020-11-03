@@ -75,7 +75,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   public clone(): Table {
     const table = new Table(
       ...this.map((row: T) =>
-        row instanceof Row ? row.clone() : Row.from(row).clone(),
+        row instanceof Row ? row.clone() : Row.from(row).clone()
       ),
     );
     table.options = Object.assign({}, this.options);
@@ -171,7 +171,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
-          : row.some((cell) => cell instanceof Cell ? cell.getBorder : false),
+          : row.some((cell) => cell instanceof Cell ? cell.getBorder : false)
       );
   }
 
