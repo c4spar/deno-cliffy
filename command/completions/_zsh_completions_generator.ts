@@ -8,9 +8,11 @@ interface ICompletionAction {
   cmd: string;
 }
 
+/** Generates zsh completions script. */
 export class ZshCompletionsGenerator {
   private actions: Map<string, ICompletionAction> = new Map();
 
+  /** Generates zsh completions script for given command. */
   public static generate(cmd: Command) {
     return new ZshCompletionsGenerator(cmd).generate();
   }

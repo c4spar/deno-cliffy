@@ -1,9 +1,7 @@
 import { Command } from "../command.ts";
 import type { ICompletion } from "../types.ts";
 
-/**
- * Execute complete method for specific action and command.
- */
+/** Execute auto completion method of command and action. */
 export class CompleteCommand extends Command {
   public constructor(cmd?: Command) {
     super();

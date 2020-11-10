@@ -2,13 +2,29 @@ import { OptionType } from "../flags/types.ts";
 import { green, magenta, red, yellow } from "./deps.ts";
 import type { IArgument } from "./types.ts";
 
+/** Arguments parser helper class. */
 export class ArgumentsParser {
   private static readonly ARGUMENT_REGEX = /^[<\[].+[\]>]$/;
   private static readonly ARGUMENT_DETAILS_REGEX = /[<\[:>\]]/;
 
+  /**
+   * Split options and arguments.
+   * @param args Arguments definition: `--color, -c <color1:string> <color2:string>`
+   *
+   * For example: `-c, --color <color1:string> <color2:string>`
+   *
+   * Will result in:
+   * ```
+   * {
+   *   flags: [ "-c", "--color" ],
+   *   typeDefinition: "<color1:string> <color2:string>"
+   * }
+   * ```
+   */
   public static splitArguments(
     args: string,
-  ): { args: string[]; typeDefinition: string } {
+  ): { flags: string[]; typeDefinition: string } {
+    console.log("splitArguments:", args);
     const parts = args.trim().split(/[, =] */g);
     const typeParts = [];
 
@@ -21,9 +37,15 @@ export class ArgumentsParser {
 
     const typeDefinition: string = typeParts.join(" ");
 
-    return { args: parts, typeDefinition };
+    const result = { flags: parts, typeDefinition };
+    console.log("result:", result);
+    return result;
   }
 
+  /**
+   * Parse arguments string.
+   * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
+   */
   public static parseArgumentsDefinition(argsDefinition: string): IArgument[] {
     const argumentDetails: IArgument[] = [];
 
@@ -79,6 +101,10 @@ export class ArgumentsParser {
     return argumentDetails;
   }
 
+  /**
+   * Colorize arguments string.
+   * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
+   */
   public static highlightArguments(argsDefinition: string) {
     if (!argsDefinition) {
       return "";
@@ -88,6 +114,10 @@ export class ArgumentsParser {
       .map((arg: IArgument) => this.highlightArgumentDetails(arg)).join(" ");
   }
 
+  /**
+   * Colorize argument string.
+   * @param arg Argument details.
+   */
   public static highlightArgumentDetails(arg: IArgument): string {
     let str = "";
 

@@ -560,7 +560,7 @@ Some info
 
 ## ❯ Commands
 
-The command class operates as a factory class. It has an internal command pointer which point per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
+The command class acts like as a factory class. It has an internal command pointer that points per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
