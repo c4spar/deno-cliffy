@@ -4,6 +4,7 @@ import { IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
 import { consumeWords, longest } from "./utils.ts";
 
+/** Layout render settings. */
 interface IRenderSettings {
   padding: number[];
   width: number[];
@@ -14,17 +15,29 @@ interface IRenderSettings {
   rows: Row<Cell>[];
 }
 
+/** Table layout renderer. */
 export class TableLayout {
+  /**
+   * Table layout constructor.
+   * @param table   Table instance.
+   * @param options Render options.
+   */
   public constructor(
     private table: Table,
     private options: ITableSettings,
   ) {}
 
+  /** Generate table string. */
   public toString(): string {
     const opts: IRenderSettings = this.createLayout();
     return opts.rows.length ? this.renderRows(opts) : "";
   }
 
+  /**
+   * Generates table layout including row and col span, converts all none
+   * Cell/Row values to Cell's and Row's and returns the layout rendering
+   * settings.
+   */
   protected createLayout(): IRenderSettings {
     Object.keys(this.options.chars).forEach((key: string) => {
       if (typeof this.options.chars[key as keyof IBorderOptions] !== "string") {
@@ -79,6 +92,16 @@ export class TableLayout {
     };
   }
 
+  /**
+   * Fills rows and cols by specified row/col span with a reference of the
+   * original cell.
+   *
+   * @param _rows     All table rows.
+   * @param rowIndex  Current row index.
+   * @param colIndex  Current col index.
+   * @param rowSpan   Current row span.
+   * @param colSpan   Current col span.
+   */
   protected spanRows(
     _rows: IRow[],
     rowIndex = 0,
@@ -125,14 +148,27 @@ export class TableLayout {
     return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
   }
 
+  /**
+   * Create a new row from existing row or cell array.
+   * @param row Original row.
+   */
   protected createRow(row: IRow): Row<Cell> {
     return Row.from(row).border(this.table.getBorder(), false) as Row<Cell>;
   }
 
+  /**
+   * Create a new cell from existing cell or cell value.
+   * @param cell  Original cell.
+   * @param row   Parent row.
+   */
   protected createCell(cell: ICell | null, row: Row): Cell {
     return Cell.from(cell ?? "").border(row.getBorder(), false);
   }
 
+  /**
+   * Render table layout.
+   * @param opts Render options.
+   */
   protected renderRows(opts: IRenderSettings): string {
     let result = "";
     const rowSpan: number[] = new Array(opts.columns).fill(1);
@@ -144,11 +180,18 @@ export class TableLayout {
     return result.slice(0, -1);
   }
 
+  /**
+   * Render row.
+   * @param rowSpan     Current row span.
+   * @param rowIndex    Current row index.
+   * @param opts        Render options.
+   * @param isMultiline Is multiline row.
+   */
   protected renderRow(
     rowSpan: number[],
     rowIndex: number,
     opts: IRenderSettings,
-    inMultiline?: boolean,
+    isMultiline?: boolean,
   ): string {
     const row: Row<Cell> = opts.rows[rowIndex];
     const prevRow: Row<Cell> | undefined = opts.rows[rowIndex - 1];
@@ -158,7 +201,7 @@ export class TableLayout {
     let colSpan = 1;
 
     // border top row
-    if (!inMultiline && rowIndex === 0 && row.hasBorder()) {
+    if (!isMultiline && rowIndex === 0 && row.hasBorder()) {
       result += this.renderBorderRow(undefined, row, rowSpan, opts);
     }
 
@@ -176,7 +219,7 @@ export class TableLayout {
       result += this.renderCell(colIndex, row, prevRow, rowSpan, opts);
 
       if (rowSpan[colIndex] > 1) {
-        if (!inMultiline) {
+        if (!isMultiline) {
           rowSpan[colIndex]--;
         }
       } else if (!prevRow || prevRow[colIndex] !== row[colIndex]) {
@@ -220,6 +263,15 @@ export class TableLayout {
     return result;
   }
 
+  /**
+   * Render cell.
+   * @param colIndex  Current col index.
+   * @param row       Current row.
+   * @param prevRow   Previous row.
+   * @param rowSpan   Current row span.
+   * @param opts      Render options.
+   * @param noBorder  Disable border.
+   */
   protected renderCell(
     colIndex: number,
     row: Row<Cell>,
@@ -280,6 +332,12 @@ export class TableLayout {
     return result;
   }
 
+  /**
+   * Render specified length of cell. Returns the rendered value and a new cell
+   * with the rest value.
+   * @param cell      Cell to render.
+   * @param maxLength Max length of content to render.
+   */
   protected renderCellValue(
     cell: Cell,
     maxLength: number,
@@ -307,6 +365,13 @@ export class TableLayout {
     };
   }
 
+  /**
+   * Render border row.
+   * @param prevRow Previous row.
+   * @param nextRow Next row.
+   * @param rowSpan Current row span.
+   * @param opts    Render options.
+   */
   protected renderBorderRow(
     prevRow: Row<Cell> | undefined,
     nextRow: Row<Cell> | undefined,
@@ -339,6 +404,14 @@ export class TableLayout {
     return result.length ? " ".repeat(this.options.indent) + result + "\n" : "";
   }
 
+  /**
+   * Render border cell.
+   * @param colIndex  Current index.
+   * @param prevRow   Previous row.
+   * @param nextRow   Next row.
+   * @param rowSpan   Current row span.
+   * @param opts      Render options.
+   */
   protected renderBorderCell(
     colIndex: number,
     prevRow: Row<Cell> | undefined,
