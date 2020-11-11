@@ -1,4 +1,4 @@
-/** Parse settings. */
+/** Parser options. */
 export interface IParseOptions {
   flags?: IFlagOptions[];
   parse?: ITypeHandler<unknown>;
@@ -7,7 +7,7 @@ export interface IParseOptions {
   allowEmpty?: boolean;
 }
 
-/** Flag settings. */
+/** Flag options. */
 export interface IFlagOptions extends IFlagArgument {
   name: string;
   args?: IFlagArgument[];
@@ -55,6 +55,7 @@ export interface IFlagsResult<
   literal: string[];
 }
 
+/** Type details. */
 export interface ITypeInfo {
   label: string;
   type: string;
