@@ -1,20 +1,23 @@
 <h1 align="center">Cliffy ❯ Table </h1>
 
 <p align="center">
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
-  </a>
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github&color=blue" />
-  </a>
-  <a href="https://deno.land/">
-    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
-  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
   </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github&color=orange" />
+  </a>
+  <a href="https://deno.land/">
+    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-brightgreen?logo=deno" />
+  </a>
+  <a href="https://doc.deno.land/https/deno.land/x/cliffy/table/mod.ts">
+    <img alt="doc" src="https://img.shields.io/badge/deno-doc-blue?logo=deno" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Atable">
-    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:table?label=issues&logo=github">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:table?label=issues&logo=github&color=yellow">
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
