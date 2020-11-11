@@ -7,8 +7,10 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** List key options. */
 export type ListKeys = GenericInputKeys;
 
+/** List prompt options. */
 export interface ListOptions extends GenericInputPromptOptions<string[]> {
   separator?: string;
   minLength?: number;
@@ -18,6 +20,7 @@ export interface ListOptions extends GenericInputPromptOptions<string[]> {
   keys?: ListKeys;
 }
 
+/** List prompt settings. */
 interface ListSettings extends GenericInputPromptSettings<string[]> {
   separator: string;
   minLength: number;
@@ -27,7 +30,9 @@ interface ListSettings extends GenericInputPromptSettings<string[]> {
   keys?: ListKeys;
 }
 
+/** List prompt representation. */
 export class List extends GenericInput<string[], ListSettings> {
+  /** Execute the prompt and show cursor on end. */
   public static async prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
       options = { message: options };
@@ -44,6 +49,10 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
+  /**
+   * Set prompt message.
+   * @param message Prompt message.
+   */
   protected setPrompt(message: string) {
     message += " " + this.settings.pointer + " ";
 
@@ -67,12 +76,14 @@ export class List extends GenericInput<string[], ListSettings> {
     this.screen.cursorTo(length - 1 + this.index);
   }
 
-  protected regexp() {
+  /** Create list regex.*/
+  protected regexp(): RegExp {
     return new RegExp(
       this.settings.separator === " " ? ` +` : ` *${this.settings.separator} *`,
     );
   }
 
+  /** Add char. */
   protected addChar(char: string): void {
     switch (char) {
       case this.settings.separator:
@@ -88,6 +99,7 @@ export class List extends GenericInput<string[], ListSettings> {
     }
   }
 
+  /** Delete char left. */
   protected deleteChar(): void {
     if (this.input[this.index - 1] === " ") {
       super.deleteChar();
@@ -95,6 +107,11 @@ export class List extends GenericInput<string[], ListSettings> {
     super.deleteChar();
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (typeof value !== "string") {
       return false;
@@ -121,10 +138,19 @@ export class List extends GenericInput<string[], ListSettings> {
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): string[] {
     return value.trim().split(this.regexp());
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string[]): string {
     return value.join(`, `);
   }

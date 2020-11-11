@@ -4,8 +4,10 @@ import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, bold, dim, green, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
+/** Prompt validation return tape. */
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
+/** Generic prompt options. */
 export interface GenericPromptOptions<T, V> {
   message: string;
   default?: T;
@@ -15,11 +17,13 @@ export interface GenericPromptOptions<T, V> {
   pointer?: string;
 }
 
+/** Generic prompt settings. */
 export interface GenericPromptSettings<T, V>
   extends GenericPromptOptions<T, V> {
   pointer: string;
 }
 
+/** Static generic prompt interface. */
 export interface StaticGenericPrompt<
   T,
   V,
@@ -32,6 +36,7 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
+/** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
   V,
@@ -45,6 +50,10 @@ export abstract class GenericPrompt<
   protected isRunning = false;
   protected value: T | undefined;
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
   // deno-lint-ignore no-explicit-any
   public static inject(value: any): void {
     GenericPrompt.injectedValue = value;
@@ -52,6 +61,7 @@ export abstract class GenericPrompt<
 
   protected constructor(protected readonly settings: S) {}
 
+  /** Execute the prompt and show cursor on end. */
   public async prompt(): Promise<T> {
     try {
       return await this.execute();
@@ -60,24 +70,49 @@ export abstract class GenericPrompt<
     }
   }
 
+  /**
+   * Set prompt message.
+   * @param message Prompt message.
+   */
   protected abstract setPrompt(message: string): void | Promise<void>;
 
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
   protected abstract async handleEvent(event: KeyEvent): Promise<boolean>;
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected abstract transform(value: V): T | undefined;
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected abstract validate(value: V): ValidateResult;
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected abstract format(value: T): string;
 
+  /** Get input value. */
   protected abstract getValue(): V;
 
+  /** Clear prompt output. */
   protected clear() {
     this.screen
       .cursorLeft()
       .eraseDown();
   }
 
+  /** Execute the prompt. */
   protected async execute(): Promise<T> {
     if (this.lastError || this.isRunning) {
       this.clear();
@@ -122,6 +157,7 @@ export abstract class GenericPrompt<
     return this.value;
   }
 
+  /** Get prompt message. */
   protected getMessage(): string | Promise<string> {
     let message = ` ${yellow("?")} ${bold(this.settings.message)}`;
 
@@ -132,12 +168,14 @@ export abstract class GenericPrompt<
     return message;
   }
 
+  /** Get prompt success message. */
   protected async getSuccessMessage(value: T) {
     return `${await this.getMessage()} ${this.settings.pointer} ${
       green(this.format(value))
     }`;
   }
 
+  /** Read user input from stdin, handle events and validate user input. */
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
       const value: V = GenericPrompt.injectedValue;
@@ -163,12 +201,14 @@ export abstract class GenericPrompt<
     return false;
   }
 
+  /** Read user input from stdin and pars ansi codes. */
   protected async readKey(): Promise<KeyEvent[]> {
     const data: Uint8Array = await this.readChar();
 
     return data.length ? KeyCode.parse(data) : [];
   }
 
+  /** Read user input from stdin. */
   protected async readChar(): Promise<Uint8Array> {
     const buffer = new Uint8Array(8);
 
@@ -183,12 +223,25 @@ export abstract class GenericPrompt<
     return buffer.subarray(0, nread);
   }
 
+  /**
+   * Map input value to output value. If a custom transform handler ist set, the
+   * custom handler will be executed, otherwise the default transform handler
+   * from the prompt will be executed.
+   * @param value The value to transform.
+   */
   protected transformValue(value: V): T | undefined {
     return this.settings.transform
       ? this.settings.transform(value)
       : this.transform(value);
   }
 
+  /**
+   * Map input value to output value. If a default value is set, the default
+   * will be used as value without any validation. If a custom validation
+   * handler ist set, the custom handler will be executed, otherwise the default
+   * validation handler from the prompt will be executed.
+   * @param value
+   */
   protected async validateValue(value: V): Promise<boolean> {
     if (!value && typeof this.settings.default !== "undefined") {
       this.value = this.settings.default;
@@ -211,6 +264,12 @@ export abstract class GenericPrompt<
     return !this.lastError;
   }
 
+  /**
+   * Check if key event has given name or sequence.
+   * @param keys  Key map.
+   * @param name  Key name.
+   * @param event Key event.
+   */
   // deno-lint-ignore no-explicit-any
   protected isKey<K extends any, N extends keyof K>(
     keys: K | undefined,
@@ -227,20 +286,39 @@ export abstract class GenericPrompt<
     );
   }
 
+  /**
+   * Write to stdout.
+   * @param value String value.
+   */
   protected write(value: string) {
     Deno.stdout.writeSync(new TextEncoder().encode(value));
   }
 
+  /**
+   * Write line to stdout.
+   * @param value Line.
+   * @protected
+   */
   protected writeLine(value?: string) {
     Deno.stdout.writeSync(new TextEncoder().encode((value ?? "") + "\n"));
   }
 
+  /**
+   * Renders empty lines to stdout to save space at the bottom of the terminal
+   * screen for the prompt message. This is required for multi-line prompts.
+   * @param message Prompt message.
+   */
   protected preBufferEmptyLines(message: string) {
     const linesCount: number = message.split("\n").length;
     this.write("\n".repeat(linesCount));
     this.screen.cursorUp(linesCount);
   }
 
+  /**
+   * Write prompt error message. If a prompt value is injected an error is
+   * thrown.
+   * @param message Error message.
+   */
   protected error(message: string) {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
       throw new Error(red(bold(` ${Figures.CROSS} `) + message));
@@ -248,11 +326,19 @@ export abstract class GenericPrompt<
     this.write(red(bold(` ${Figures.CROSS} `) + message));
   }
 
+  /**
+   * Write message to stdout with blue pointer icon.
+   * @param message Message.
+   */
   protected message(message: string) {
     this.write(blue(` ${Figures.POINTER} `) + message);
   }
 
-  protected hint(hint: string) {
-    this.write(dim(blue(` ${Figures.POINTER} `) + hint));
+  /**
+   * Write dimmed message to stdout with blue pointer icon.
+   * @param message Message.
+   */
+  protected hint(message: string) {
+    this.write(dim(blue(` ${Figures.POINTER} `) + message));
   }
 }

@@ -6,6 +6,7 @@ import {
 } from "./_generic_prompt.ts";
 import { stripColor, underline } from "./deps.ts";
 
+/** Input keys options. */
 export interface GenericInputKeys {
   moveCursorLeft?: string[];
   moveCursorRight?: string[];
@@ -14,25 +15,36 @@ export interface GenericInputKeys {
   submit?: string[];
 }
 
+/** Generic input prompt options. */
 export interface GenericInputPromptOptions<T>
   extends GenericPromptOptions<T, string> {
   keys?: GenericInputKeys;
 }
 
+/** Generic input prompt settings. */
 export interface GenericInputPromptSettings<T>
   extends GenericPromptSettings<T, string> {
   keys?: GenericInputKeys;
 }
 
+/** Generic input prompt representation. */
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
   protected input = "";
   protected index = 0;
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
+  /**
+   * Prompt constructor.
+   * @param settings Prompt settings.
+   */
   protected constructor(settings: S) {
     super({
       ...settings,
@@ -47,6 +59,10 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     });
   }
 
+  /**
+   * Set prompt message.
+   * @param message Prompt message.
+   */
   protected setPrompt(message: string) {
     message += " " + this.settings.pointer + " ";
 
@@ -59,6 +75,10 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     this.screen.cursorTo(length - 1 + this.index);
   }
 
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
   protected async handleEvent(event: KeyEvent): Promise<boolean> {
     switch (true) {
       case event.name === "c":
@@ -106,18 +126,24 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     return false;
   }
 
+  /**
+   * Add character to current input.
+   * @param char Char to add.
+   */
   protected addChar(char: string): void {
     this.input = this.input.slice(0, this.index) + char +
       this.input.slice(this.index);
     this.index++;
   }
 
+  /** Move prompt cursor left. */
   protected moveCursorLeft(): void {
     if (this.index > 0) {
       this.index--;
     }
   }
 
+  /** Move prompt cursor right. */
   protected moveCursorRight(): void {
     if (this.index < this.input.length) {
       const index = this.input.indexOf(" ", this.index);
@@ -125,6 +151,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
+  /** Delete char left. */
   protected deleteChar(): void {
     if (this.index > 0) {
       this.index--;
@@ -134,6 +161,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
+  /** Delete char right. */
   protected deleteCharRight(): void {
     if (this.index < this.input.length) {
       this.input = this.input.slice(0, this.index) +
@@ -141,6 +169,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
+  /** Get input input. */
   protected getValue(): string {
     return this.input;
   }

@@ -4,12 +4,14 @@ import {
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
 
+/** Generic list option options. */
 export interface GenericListOption {
   value: string;
   name?: string;
   disabled?: boolean;
 }
 
+/** Generic list option settings. */
 export interface GenericListOptionSettings extends GenericListOption {
   name: string;
   value: string;
@@ -19,6 +21,7 @@ export interface GenericListOptionSettings extends GenericListOption {
 export type GenericListValueOptions = (string | GenericListOption)[];
 export type GenericListValueSettings = GenericListOptionSettings[];
 
+/** Generic list prompt options. */
 export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
   options: GenericListValueOptions;
   indent?: string;
@@ -26,6 +29,7 @@ export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
   maxRows?: number;
 }
 
+/** Generic list prompt settings. */
 export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
   options: GenericListValueSettings;
   indent: string;
@@ -33,15 +37,24 @@ export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
   maxRows: number;
 }
 
+/** Generic list prompt representation. */
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   extends GenericPrompt<T, V, S> {
   protected index = 0;
   protected selected = 0;
 
+  /**
+   * Create list separator.
+   * @param label Separator label.
+   */
   public static separator(label = "------------"): GenericListOption {
     return { value: label, disabled: true };
   }
 
+  /**
+   * Map string option values to options.
+   * @param optValues List options.
+   */
   protected static mapValues(
     optValues: GenericListValueOptions,
   ): GenericListOption[] {
@@ -51,6 +64,10 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       );
   }
 
+  /**
+   * Set list option defaults.
+   * @param item List option.
+   */
   protected static mapItem(item: GenericListOption): GenericListOptionSettings {
     return {
       value: item.value,
@@ -59,25 +76,32 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
-  protected setPrompt(message: string) {
+  /**
+   * Set prompt message.
+   * @param message Prompt message.
+   */
+  protected setPrompt(message: string): void {
     this.writeLine(message);
 
     this.writeListItems();
   }
 
-  protected clear() {
+  /** Clear prompt output. */
+  protected clear(): void {
     // clear list
     this.screen.eraseLines(this.height() + 2);
     // clear message and reset cursor
     super.clear();
   }
 
+  /** Read user input. */
   protected async read(): Promise<boolean> {
     this.screen.cursorHide();
 
     return super.read();
   }
 
+  /** Select previous option. */
   protected async selectPrevious(): Promise<void> {
     if (this.selected > 0) {
       this.selected--;
@@ -96,6 +120,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     }
   }
 
+  /** Select next option. */
   protected async selectNext(): Promise<void> {
     if (this.selected < this.settings.options.length - 1) {
       this.selected++;
@@ -113,25 +138,38 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     }
   }
 
-  protected writeListItems() {
+  /** Render options. */
+  protected writeListItems(): void {
     for (let i = this.index; i < this.index + this.height(); i++) {
       this.writeListItem(this.settings.options[i], this.selected === i);
     }
   }
 
+  /**
+   * Render option.
+   * @param item        Option.
+   * @param isSelected  Set to true if option is selected.
+   */
   protected abstract writeListItem(
     item: GenericListOptionSettings,
     isSelected?: boolean,
   ): void;
 
-  protected height() {
+  /** Get options row height. */
+  protected height(): number {
     return Math.min(
       this.settings.options.length,
       this.settings.maxRows || this.settings.options.length,
     );
   }
 
-  protected getOptionByValue(value: string) {
+  /**
+   * Find option by value.
+   * @param value Value of the option.
+   */
+  protected getOptionByValue(
+    value: string,
+  ): GenericListOptionSettings | undefined {
     return this.settings.options.find((option) => option.value === value);
   }
 }

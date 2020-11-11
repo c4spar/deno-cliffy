@@ -7,8 +7,10 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** Secret key options. */
 export type SecretKeys = GenericInputKeys;
 
+/** Secret prompt options. */
 export interface SecretOptions extends GenericInputPromptOptions<string> {
   label?: string;
   hidden?: boolean;
@@ -17,6 +19,7 @@ export interface SecretOptions extends GenericInputPromptOptions<string> {
   keys?: SecretKeys;
 }
 
+/** Secret prompt settings. */
 interface SecretSettings extends GenericInputPromptSettings<string> {
   label: string;
   hidden: boolean;
@@ -25,7 +28,9 @@ interface SecretSettings extends GenericInputPromptSettings<string> {
   keys?: SecretKeys;
 }
 
+/** Secret prompt representation. */
 export class Secret extends GenericInput<string, SecretSettings> {
+  /** Execute the prompt and show cursor on end. */
   public static async prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
@@ -41,6 +46,10 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
+  /**
+   * Set prompt message.
+   * @param message Prompt message.
+   */
   protected setPrompt(message: string) {
     if (this.settings.hidden) {
       this.screen.cursorHide();
@@ -59,6 +68,7 @@ export class Secret extends GenericInput<string, SecretSettings> {
     this.screen.cursorTo(length - 1 + this.index);
   }
 
+  /** Get prompt success message. */
   protected async getSuccessMessage(value: string) {
     value = this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
     return `${await this.getMessage()} ${this.settings.pointer} ${
@@ -66,6 +76,11 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }`;
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (typeof value !== "string") {
       return false;
@@ -79,10 +94,19 @@ export class Secret extends GenericInput<string, SecretSettings> {
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): string | undefined {
     return value;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string): string {
     return value;
   }

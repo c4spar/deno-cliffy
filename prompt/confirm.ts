@@ -9,19 +9,23 @@ import {
 
 export type ConfirmKeys = GenericInputKeys;
 
+/** Confirm prompt options. */
 export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt settings. */
 interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
   active: string;
   inactive: string;
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt representation. */
 export class Confirm extends GenericInput<boolean, ConfirmSettings> {
+  /** Execute the prompt and show cursor on end. */
   public static async prompt(
     options: string | ConfirmOptions,
   ): Promise<boolean> {
@@ -37,6 +41,7 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }).prompt();
   }
 
+  /** Get prompt message */
   protected getMessage(): string {
     let message = ` ${yellow("?")} ${bold(this.settings.message)} `;
 
@@ -63,6 +68,11 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     return message;
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       [
@@ -73,6 +83,11 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         ].indexOf(value.toLowerCase()) !== -1;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): boolean | undefined {
     switch (value.toLowerCase()) {
       case this.settings.active[0].toLowerCase():
@@ -85,6 +100,10 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     return;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: boolean): string {
     return value ? this.settings.active : this.settings.inactive;
   }
