@@ -65,12 +65,12 @@ export const cursor = {
    */
   down: (count = 1): string => `${CSI}${count}B`,
   /**
-   * Move cursor right by n lines.
+   * Move cursor forward by n lines.
    * @param count Number of lines.
    */
   forward: (count = 1): string => `${CSI}${count}C`,
   /**
-   * Move cursor left by n lines.
+   * Move cursor backward by n lines.
    * @param count Number of lines.
    */
   backward: (count = 1): string => `${CSI}${count}D`,

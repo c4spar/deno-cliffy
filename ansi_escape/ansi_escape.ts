@@ -1,4 +1,12 @@
-import { cursor, erase, image, ImageOptions, link, scroll } from "./csi.ts";
+import {
+  BEL,
+  cursor,
+  erase,
+  image,
+  ImageOptions,
+  link,
+  scroll,
+} from "./csi.ts";
 
 /** AnsiEscape representation. */
 export class AnsiEscape {
@@ -16,6 +24,11 @@ export class AnsiEscape {
   protected write(code: string): this {
     this.file.writeSync(new TextEncoder().encode(code));
     return this;
+  }
+
+  /** Ring audio bell. */
+  public beep(): this {
+    return this.write(BEL);
   }
 
   /**
@@ -57,7 +70,7 @@ export class AnsiEscape {
   }
 
   /**
-   * Move cursor right by n lines.
+   * Move cursor forward by n lines.
    * @param count Number of lines.
    */
   public cursorForward(count = 1): this {
@@ -65,7 +78,7 @@ export class AnsiEscape {
   }
 
   /**
-   * Move cursor left by n lines.
+   * Move cursor backward by n lines.
    * @param count Number of lines.
    */
   public cursorBackward(count = 1): this {
