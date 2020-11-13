@@ -26,10 +26,6 @@
   <sub>>_ A collection of modules for creating interactive command line tools.</sub>
 </p>
 
-<a href="https://github.com/c4spar/deno-cliffy/releases">
-  <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github&color=orange" />
-</a>
-
 > This project is still under development. Expect breaking changes. If you find a bug or have a feature request feel free to create an issue.
 
 ## ❯ Modules
