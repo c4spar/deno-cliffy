@@ -1,20 +1,42 @@
 import { encodeBase64 } from "./deps.ts";
 
+/** Escape sequence: `\x1B` */
 export const ESC = "\x1B";
+/** Control sequence intro: `\x1B[` */
 export const CSI = `${ESC}[`;
+/** Operating system command: `\x1B]` */
 export const OSC = `${ESC}]`;
+/** Ring audio bell: `\u0007` */
 export const BEL = "\u0007";
 const SEP = ";";
 
+/**
+ * Cursor handler.
+ * ```
+ * await Deno.stdout.write(
+ *   new TextEncoder().encode(
+ *     cursor.to(0, 0),
+ *   ),
+ * );
+ * ```
+ */
 export const cursor = {
-  /** Move cursor to x, y, counting from the top left corner. */
+  /**
+   * Move cursor to x, y, counting from the top left corner.
+   * @param x Position left.
+   * @param y Position top.
+   */
   to(x: number, y?: number): string {
     if (typeof y !== "number") {
       return `${CSI}${x}G`;
     }
     return `${CSI}${y};${x}H`;
   },
-  /** Move cursor by offset. */
+  /**
+   * Move cursor by offset.
+   * @param x Offset left.
+   * @param y Offset top.
+   */
   move(x: number, y: number): string {
     let ret = "";
 
@@ -32,17 +54,35 @@ export const cursor = {
 
     return ret;
   },
-  /** Move cursor up by n lines. */
+  /**
+   * Move cursor up by n lines.
+   * @param count Number of lines.
+   */
   up: (count = 1): string => `${CSI}${count}A`,
-  /** Move cursor down by n lines. */
+  /**
+   * Move cursor down by n lines.
+   * @param count Number of lines.
+   */
   down: (count = 1): string => `${CSI}${count}B`,
-  /** Move cursor right by n lines. */
+  /**
+   * Move cursor right by n lines.
+   * @param count Number of lines.
+   */
   forward: (count = 1): string => `${CSI}${count}C`,
-  /** Move cursor left by n lines. */
+  /**
+   * Move cursor left by n lines.
+   * @param count Number of lines.
+   */
   backward: (count = 1): string => `${CSI}${count}D`,
-  /** Move cursor to the beginning of the line n lines down. */
+  /**
+   * Move cursor to the beginning of the line n lines down.
+   * @param count Number of lines.
+   */
   nextLine: (count = 1): string => `${CSI}E`.repeat(count),
-  /** Move cursor to the beginning of the line n lines up. */
+  /**
+   * Move cursor to the beginning of the line n lines up.
+   * @param count Number of lines.
+   */
   prevLine: (count = 1): string => `${CSI}F`.repeat(count),
   /** Move cursor to first column of current row. */
   left: `${CSI}G`,
@@ -56,19 +96,51 @@ export const cursor = {
   restore: `${ESC}8`,
 };
 
+/**
+ * Scroll handler.
+ * ```
+ * await Deno.stdout.write(
+ *   new TextEncoder().encode(
+ *     scroll.up(10),
+ *   ),
+ * );
+ * ```
+ */
 export const scroll = {
-  /** Scroll window up by n lines. */
+  /**
+   * Scroll window up by n lines.
+   * @param count Number of lines.
+   */
   up: (count = 1): string => `${CSI}S`.repeat(count),
-  /** Scroll window down by n lines. */
+  /**
+   * Scroll window down by n lines.
+   * @param count Number of lines.
+   */
   down: (count = 1): string => `${CSI}T`.repeat(count),
 };
 
+/**
+ * Erase handler.
+ * ```
+ * await Deno.stdout.write(
+ *   new TextEncoder().encode(
+ *     erase.up(3),
+ *   ),
+ * );
+ * ```
+ */
 export const erase = {
   /** Clear screen. */
   screen: `${CSI}2J`,
-  /** Clear screen up. */
+  /**
+   * Clear screen up.
+   * @param count Number of lines.
+   */
   up: (count = 1): string => `${CSI}1J`.repeat(count),
-  /** Clear screen down. */
+  /**
+   * Clear screen down.
+   * @param count Number of lines.
+   */
   down: (count = 1): string => `${CSI}0J`.repeat(count),
   /** Clear current line. */
   line: `${CSI}2K`,
@@ -76,7 +148,10 @@ export const erase = {
   lineEnd: `${CSI}0K`,
   /** Clear to line start. */
   lineStart: `${CSI}1K`,
-  /** Clear n line's up. */
+  /**
+   * Clear n line's up.
+   * @param count Number of lines.
+   */
   lines(count: number): string {
     let clear = "";
     for (let i = 0; i < count; i++) {
@@ -87,7 +162,16 @@ export const erase = {
   },
 };
 
-/** Render link. */
+/**
+ * Create link.
+ * @param text Link text.
+ * @param url Link url.
+ * ```
+ * console.log(
+ *   link("Click me.", "https://deno.land"),
+ * );
+ * ```
+ */
 export const link = (text: string, url: string): string =>
   [
     OSC,
@@ -104,14 +188,29 @@ export const link = (text: string, url: string): string =>
     BEL,
   ].join("");
 
+/** Image options. */
 export interface ImageOptions {
   width?: number;
   height?: number;
   preserveAspectRatio?: boolean;
 }
 
-/** Render image. */
-export const image = (buffer: Uint8Array, options?: ImageOptions): string => {
+/**
+ * Create image.
+ * @param buffer  Image buffer.
+ * @param options Image options.
+ * ```
+ * const response = await fetch("https://deno.land/images/hashrock_simple.png");
+ * const imageBuffer: ArrayBuffer = await response.arrayBuffer();
+ * console.log(
+ *   image(imageBuffer),
+ * );
+ * ```
+ */
+export const image = (
+  buffer: string | ArrayBuffer,
+  options?: ImageOptions,
+): string => {
   let ret = `${OSC}1337;File=inline=1`;
 
   if (options?.width) {

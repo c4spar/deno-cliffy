@@ -21,9 +21,28 @@ const Types: Record<string, ITypeHandler<unknown>> = {
 
 /**
  * Parse command line arguments.
- *
  * @param args  Command line arguments e.g: `Deno.args`
  * @param opts  Parse options.
+ * ```
+ * // example.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
+ * parseFlags(Deno.args);
+ * ```
+ * ```
+ * {
+ *   flags: {
+ *     x: "3",
+ *     y: { z: true },
+ *     n: "5",
+ *     a: true,
+ *     b: true,
+ *     c: true,
+ *     beep: "boop",
+ *     deno: { land: true }
+ *   },
+ *   unknown: [ "foo", "bar", "baz" ],
+ *   literal: [ "--cliffy" ]
+ * }
+ * ```
  */
 // deno-lint-ignore no-explicit-any
 export function parseFlags<O extends Record<string, any> = Record<string, any>>(

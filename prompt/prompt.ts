@@ -43,6 +43,7 @@ interface PromptListOptions<R, N extends keyof R = keyof R> {
   after?: (name: N, opts: R, next: Next<Exclude<N, symbol>>) => Promise<void>;
 }
 
+/** Global prompt options. */
 export interface GlobalPromptOptions<R, N extends keyof R = keyof R>
   extends PromptListOptions<R, N> {
   initial?: N extends symbol ? never : N;
@@ -1967,6 +1968,11 @@ export function prompt<
   PromptOptions<N0, G0, R>,
 ], options?: GlobalPromptOptions<R>): Promise<R>;
 
+/**
+ * Run a list of prompts.
+ * @param prompts Array of prompt options.
+ * @param options Global prompt options.
+ */
 export function prompt(
   prompts: PromptOptions<string, any, any>[],
   options?: GlobalPromptOptions<any>,
@@ -1976,7 +1982,11 @@ export function prompt(
 
 let injected: Record<string, any> = {};
 
-export function inject(values: Record<string, any>) {
+/**
+ * Inject prompt values. Can be used for unit tests or pre selections.
+ * @param values Input values object.
+ */
+export function inject(values: Record<string, any>): void {
   injected = values;
 }
 
@@ -2052,7 +2062,7 @@ class PromptList {
     }
   }
 
-  private async runBeforeHook(run: () => Promise<void>) {
+  private async runBeforeHook(run: () => Promise<void>): Promise<void> {
     this.isInBeforeHook = true;
 
     const next = async (name?: string | number | true | null) => {
@@ -2087,7 +2097,7 @@ class PromptList {
     await run();
   }
 
-  private async runPrompt() {
+  private async runPrompt(): Promise<void> {
     const prompt: StaticGenericPrompt<any, any, any, any, any> =
       this.prompt.type;
 
@@ -2106,7 +2116,7 @@ class PromptList {
     }
   }
 
-  private async runAfterHook() {
+  private async runAfterHook(): Promise<void> {
     if (this.options?.after) {
       await this.options.after(this.prompt.name, this.result, async (name) => {
         if (name) {

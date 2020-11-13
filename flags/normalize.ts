@@ -1,6 +1,5 @@
 /**
  * Normalize command line arguments.
- *
  * @param args Command line arguments e.g: `Deno.args`
  */
 export function normalize(args: string[]) {
@@ -39,6 +38,10 @@ export function normalize(args: string[]) {
 
   return normalized;
 
+  /**
+   * Normalize short flags.
+   * @param flag Flag string: `-abc`
+   */
   function normalizeShortFlags(flag: string): void {
     const flags = flag.slice(1).split("");
 

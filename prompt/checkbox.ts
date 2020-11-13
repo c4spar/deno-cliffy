@@ -10,16 +10,7 @@ import {
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
-export interface CheckboxOption extends GenericListOption {
-  checked?: boolean;
-  icon?: boolean;
-}
-
-export interface CheckboxOptionSettings extends GenericListOptionSettings {
-  checked: boolean;
-  icon: boolean;
-}
-
+/** Checkbox key options. */
 export interface CheckboxKeys {
   previous?: string[];
   next?: string[];
@@ -27,11 +18,27 @@ export interface CheckboxKeys {
   check?: string[];
 }
 
+/** Checkbox key settings. */
 type CheckboxKeysSettings = Required<CheckboxKeys>;
 
+/** Checkbox option options. */
+export interface CheckboxOption extends GenericListOption {
+  checked?: boolean;
+  icon?: boolean;
+}
+
+/** Checkbox option settings. */
+export interface CheckboxOptionSettings extends GenericListOptionSettings {
+  checked: boolean;
+  icon: boolean;
+}
+
+/** Checkbox options type. */
 export type CheckboxValueOptions = (string | CheckboxOption)[];
+/** Checkbox option settings type. */
 export type CheckboxValueSettings = CheckboxOptionSettings[];
 
+/** Checkbox prompt options. */
 export interface CheckboxOptions
   extends GenericListOptions<string[], string[]> {
   options: CheckboxValueOptions;
@@ -42,6 +49,7 @@ export interface CheckboxOptions
   keys?: CheckboxKeys;
 }
 
+/** Checkbox prompt settings. */
 interface CheckboxSettings extends GenericListSettings<string[], string[]> {
   options: CheckboxValueSettings;
   check: string;
@@ -51,12 +59,18 @@ interface CheckboxSettings extends GenericListSettings<string[], string[]> {
   keys: CheckboxKeysSettings;
 }
 
+/** Checkbox prompt representation. */
 export class Checkbox
   extends GenericList<string[], string[], CheckboxSettings> {
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Array of input values.
+   */
   public static inject(value: string[]): void {
     GenericPrompt.inject(value);
   }
 
+  /** Execute the prompt and show cursor on end. */
   public static async prompt(options: CheckboxOptions): Promise<string[]> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
@@ -79,6 +93,10 @@ export class Checkbox
     }).prompt();
   }
 
+  /**
+   * Create list separator.
+   * @param label Separator label.
+   */
   public static separator(label = "------------"): CheckboxOption {
     return {
       ...super.separator(),
@@ -86,17 +104,30 @@ export class Checkbox
     };
   }
 
+  /**
+   * Map string option values to options and set option defaults.
+   * @param options Checkbox options.
+   */
   protected static mapOptions(options: CheckboxOptions): CheckboxValueSettings {
     return this.mapValues(options.options)
       .map((item) => this.mapItem(item, options.default));
   }
 
+  /**
+   * Map string option values to options.
+   * @param optValues Checkbox option.
+   */
   protected static mapValues(
     optValues: CheckboxValueOptions,
   ): CheckboxOption[] {
     return super.mapValues(optValues) as CheckboxOption[];
   }
 
+  /**
+   * Set checkbox option defaults.
+   * @param item      Checkbox option.
+   * @param defaults  Checkbox defaults.
+   */
   protected static mapItem(
     item: CheckboxOption,
     defaults?: string[],
@@ -111,6 +142,10 @@ export class Checkbox
     };
   }
 
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
   protected async handleEvent(event: KeyEvent): Promise<boolean> {
     switch (true) {
       case event.name === "c":
@@ -140,18 +175,28 @@ export class Checkbox
     return false;
   }
 
-  protected checkValue() {
+  /** Check selected option. */
+  protected checkValue(): void {
     const item = this.settings.options[this.selected];
     item.checked = !item.checked;
   }
 
+  /** Get value of checked options. */
   protected getValue(): string[] {
     return this.settings.options
       .filter((item) => item.checked)
       .map((item) => item.value);
   }
 
-  protected writeListItem(item: CheckboxOptionSettings, isSelected?: boolean) {
+  /**
+   * Render checkbox option.
+   * @param item        Checkbox option settings.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected writeListItem(
+    item: CheckboxOptionSettings,
+    isSelected?: boolean,
+  ): void {
     let line = this.settings.indent;
 
     // pointer
@@ -177,6 +222,11 @@ export class Checkbox
     this.writeLine(line);
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string[]): boolean | string {
     const isValidValue = Array.isArray(value) &&
       value.every((val) =>
@@ -199,10 +249,19 @@ export class Checkbox
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string[]): string[] {
     return value.map((val) => val.trim());
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string[]): string {
     return value.map((val) => this.getOptionByValue(val)?.name ?? val).join(
       ", ",

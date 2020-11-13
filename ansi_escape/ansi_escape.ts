@@ -1,5 +1,6 @@
 import { cursor, erase, image, ImageOptions, link, scroll } from "./csi.ts";
 
+/** AnsiEscape representation. */
 export class AnsiEscape {
   /** Create instance from file. */
   public static from(file: Deno.WriterSync): AnsiEscape {
@@ -8,8 +9,11 @@ export class AnsiEscape {
 
   protected constructor(protected file: Deno.WriterSync) {}
 
-  /** Write to file. */
-  public write(code: string): this {
+  /**
+   * Write to file.
+   * @param code Value.
+   */
+  protected write(code: string): this {
     this.file.writeSync(new TextEncoder().encode(code));
     return this;
   }
@@ -18,98 +22,115 @@ export class AnsiEscape {
    * Cursor
    */
 
-  /** Move cursor to x, y, counting from the top left corner. */
+  /**
+   * Move cursor to x, y, counting from the top left corner.
+   * @param x Position left.
+   * @param y Position top.
+   */
   public cursorTo(x: number, y?: number): this {
-    this.write(cursor.to(x, y));
-    return this;
+    return this.write(cursor.to(x, y));
   }
 
-  /** Move cursor by offset. */
+  /**
+   * Move cursor by offset.
+   * @param x Offset left.
+   * @param y Offset top.
+   */
   public cursorMove(x: number, y: number): this {
-    this.write(cursor.move(x, y));
-    return this;
+    return this.write(cursor.move(x, y));
   }
 
-  /** Move cursor up by n lines. */
+  /**
+   * Move cursor up by n lines.
+   * @param count Number of lines.
+   */
   public cursorUp(count = 1): this {
-    this.write(cursor.up(count));
-    return this;
+    return this.write(cursor.up(count));
   }
 
-  /** Move cursor down by n lines. */
+  /**
+   * Move cursor down by n lines.
+   * @param count Number of lines.
+   */
   public cursorDown(count = 1): this {
-    this.write(cursor.down(count));
-    return this;
+    return this.write(cursor.down(count));
   }
 
-  /** Move cursor right by n lines. */
+  /**
+   * Move cursor right by n lines.
+   * @param count Number of lines.
+   */
   public cursorForward(count = 1): this {
-    this.write(cursor.forward(count));
-    return this;
+    return this.write(cursor.forward(count));
   }
 
-  /** Move cursor left by n lines. */
+  /**
+   * Move cursor left by n lines.
+   * @param count Number of lines.
+   */
   public cursorBackward(count = 1): this {
-    this.write(cursor.backward(count));
-    return this;
+    return this.write(cursor.backward(count));
   }
 
-  /** Move cursor to the beginning of the line n lines down. */
+  /**
+   * Move cursor to the beginning of the line n lines down.
+   * @param count Number of lines.
+   */
   public cursorNextLine(count = 1): this {
-    this.write(cursor.nextLine(count));
-    return this;
+    return this.write(cursor.nextLine(count));
   }
 
-  /** Move cursor to the beginning of the line n lines up. */
+  /**
+   * Move cursor to the beginning of the line n lines up.
+   * @param count Number of lines.
+   */
   public cursorPrevLine(count = 1): this {
-    this.write(cursor.prevLine(count));
-    return this;
+    return this.write(cursor.prevLine(count));
   }
 
   /** Move cursor to first column of current row. */
   public cursorLeft(): this {
-    this.write(cursor.left);
-    return this;
+    return this.write(cursor.left);
   }
 
   /** Hide cursor. */
   public cursorHide(): this {
-    this.write(cursor.hide);
-    return this;
+    return this.write(cursor.hide);
   }
 
   /** Show cursor. */
   public cursorShow(): this {
-    this.write(cursor.show);
-    return this;
+    return this.write(cursor.show);
   }
 
   /** Save cursor. */
   public cursorSave(): this {
-    this.write(cursor.save);
-    return this;
+    return this.write(cursor.save);
   }
 
   /** Restore cursor. */
   public cursorRestore(): this {
-    this.write(cursor.restore);
-    return this;
+    return this.write(cursor.restore);
   }
 
   /**
    * Scroll
    */
 
-  /** Scroll window up by n lines. */
+  /**
+   * Scroll window up by n lines.
+   * @param count Number of lines.
+   */
   public scrollUp(count = 1): this {
-    this.write(scroll.up(count));
-    return this;
+    return this.write(scroll.up(count));
   }
 
-  /** Scroll window down by n lines. */
+  /**
+   * Scroll window down by n lines.
+   * @param count Number of lines.
+   */
   public scrollDown(count = 1): this {
-    this.write(scroll.down(count));
-    return this;
+    return this.write(scroll.down(count));
   }
 
   /**
@@ -118,59 +139,67 @@ export class AnsiEscape {
 
   /** Clear screen. */
   public eraseScreen(): this {
-    this.write(erase.screen);
-    return this;
+    return this.write(erase.screen);
   }
 
-  /** Clear screen up. */
+  /**
+   * Clear screen up.
+   * @param count Number of lines.
+   */
   public eraseUp(count = 1): this {
-    this.write(erase.up(count));
-    return this;
+    return this.write(erase.up(count));
   }
 
-  /** Clear screen down. */
+  /**
+   * Clear screen down.
+   * @param count Number of lines.
+   */
   public eraseDown(count = 1): this {
-    this.write(erase.down(count));
-    return this;
+    return this.write(erase.down(count));
   }
 
   /** Clear current line. */
   public eraseLine(): this {
-    this.write(erase.line);
-    return this;
+    return this.write(erase.line);
   }
 
   /** Clear to line end. */
   public eraseLineEnd(): this {
-    this.write(erase.lineEnd);
-    return this;
+    return this.write(erase.lineEnd);
   }
 
   /** Clear to line start. */
   public eraseLineStart(): this {
-    this.write(erase.lineStart);
-    return this;
+    return this.write(erase.lineStart);
   }
 
-  /** Clear n line's up. */
+  /**
+   * Clear n line's up.
+   * @param count Number of lines.
+   */
   public eraseLines(count: number): this {
-    this.write(erase.lines(count));
-    return this;
+    return this.write(erase.lines(count));
   }
 
   /**
    * Style
    */
 
-  /** Render link. */
+  /**
+   * Render link.
+   * @param text Link text.
+   * @param url Link url.
+   */
   public link(text: string, url: string): this {
-    this.write(link(text, url));
-    return this;
+    return this.write(link(text, url));
   }
 
-  /** Render image. */
+  /**
+   * Render image.
+   * @param buffer  Image buffer.
+   * @param options Image options.
+   */
   public image(buffer: Uint8Array, options?: ImageOptions): this {
-    this.write(image(buffer, options));
-    return this;
+    return this.write(image(buffer, options));
   }
 }

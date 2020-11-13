@@ -15,7 +15,21 @@ const hasEnvPermissions: boolean = !!envPermissionStatus &&
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 // https://github.com/nodejs/node/blob/v13.13.0/lib/internal/readline/utils.js
 
+/** KeyCode representation. */
 export class KeyCode {
+  /**
+   * Parse ansi escape sequence.
+   * @param data Ansi escape sequence.
+   * ```
+   * KeyCode.parse("\x04\x18");
+   * ```
+   * ```
+   * [
+   *   KeyEvent { name: "d", sequence: "\x04", ctrl: true, meta: false, shift: false },
+   *   KeyEvent { name: "x", sequence: "\x18", ctrl: true, meta: false, shift: false },
+   * ]
+   * ```
+   */
   public static parse(data: Uint8Array | string): KeyEvent[] {
     try {
       return this.parseEscapeSequence(data);
@@ -29,32 +43,32 @@ export class KeyCode {
   }
 
   /**
-     * Some patterns seen in terminal key escape codes, derived from combos seen
-     * at http://www.midnight-commander.org/browser/lib/tty/key.c
-     *
-     * ESC letter
-     * ESC [ letter
-     * ESC [ modifier letter
-     * ESC [ 1 ; modifier letter
-     * ESC [ num char
-     * ESC [ num ; modifier char
-     * ESC O letter
-     * ESC O modifier letter
-     * ESC O 1 ; modifier letter
-     * ESC N letter
-     * ESC [ [ num ; modifier char
-     * ESC [ [ 1 ; modifier letter
-     * ESC ESC [ num char
-     * ESC ESC O letter
-     *
-     * - char is usually ~ but $ and ^ also happen with rxvt
-     * - modifier is 1 +
-     *               (shift     * 1) +
-     *               (left_alt  * 2) +
-     *               (ctrl      * 4) +
-     *               (right_alt * 8)
-     * - two leading ESCs apparently mean the same as one leading ESC
-     */
+   * Some patterns seen in terminal key escape codes, derived from combos seen
+   * at http://www.midnight-commander.org/browser/lib/tty/key.c
+   *
+   * ESC letter
+   * ESC [ letter
+   * ESC [ modifier letter
+   * ESC [ 1 ; modifier letter
+   * ESC [ num char
+   * ESC [ num ; modifier char
+   * ESC O letter
+   * ESC O modifier letter
+   * ESC O 1 ; modifier letter
+   * ESC N letter
+   * ESC [ [ num ; modifier char
+   * ESC [ [ 1 ; modifier letter
+   * ESC ESC [ num char
+   * ESC ESC O letter
+   *
+   * - char is usually ~ but $ and ^ also happen with rxvt
+   * - modifier is 1 +
+   *               (shift     * 1) +
+   *               (left_alt  * 2) +
+   *               (ctrl      * 4) +
+   *               (right_alt * 8)
+   * - two leading ESCs apparently mean the same as one leading ESC
+   */
   protected static parseEscapeSequence(data: Uint8Array | string): KeyEvent[] {
     let index = -1;
     const keys: KeyEvent[] = [];

@@ -28,4 +28,5 @@ const win = {
   POINTER: ">",
 };
 
+/** Prompt icons. */
 export const Figures = Deno.build.os === "windows" ? win : main;

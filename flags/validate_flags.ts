@@ -4,13 +4,14 @@ import type { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
 
+/** Flag option map. */
 interface IFlagOptionsMap {
   name: string;
   option?: IFlagOptions;
 }
 
 /**
- * Validate flags.
+ * Flags post validation. Validations that are not already done by the parser.
  *
  * @param flags         Available flag options.
  * @param values        Flag to validate.
@@ -153,6 +154,11 @@ export function validateFlags(
   }
 }
 
+/**
+ * Check if value exists for flag.
+ * @param flag    Flag name.
+ * @param values  Parsed values.
+ */
 function isset(flag: string, values: Record<string, unknown>): boolean {
   const name = paramCaseToCamelCase(flag);
   // return typeof values[ name ] !== 'undefined' && values[ name ] !== false;

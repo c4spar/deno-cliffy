@@ -9,16 +9,19 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** Number key options. */
 export interface NumberKeys extends GenericInputKeys {
   increaseValue?: string[];
   decreaseValue?: string[];
 }
 
+/** Number key settings. */
 interface NumberKeysSettings extends GenericInputKeys {
   increaseValue: string[];
   decreaseValue: string[];
 }
 
+/** Number prompt options. */
 export interface NumberOptions extends GenericInputPromptOptions<number> {
   min?: number;
   max?: number;
@@ -27,6 +30,7 @@ export interface NumberOptions extends GenericInputPromptOptions<number> {
   keys?: NumberKeys;
 }
 
+/** Number prompt settings. */
 interface NumberSettings extends GenericInputPromptSettings<number> {
   min: number;
   max: number;
@@ -35,7 +39,9 @@ interface NumberSettings extends GenericInputPromptSettings<number> {
   keys: NumberKeysSettings;
 }
 
+/** Number prompt representation. */
 export class Number extends GenericInput<number, NumberSettings> {
+  /** Execute the prompt and show cursor on end. */
   public static async prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
       options = { message: options };
@@ -56,6 +62,10 @@ export class Number extends GenericInput<number, NumberSettings> {
     }).prompt();
   }
 
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
   protected async handleEvent(event: KeyEvent): Promise<boolean> {
     switch (true) {
       case event.name === "c":
@@ -102,6 +112,17 @@ export class Number extends GenericInput<number, NumberSettings> {
     return false;
   }
 
+  /** Increase input number. */
+  public increaseValue() {
+    this.manipulateIndex(false);
+  }
+
+  /** Decrease input number. */
+  public decreaseValue() {
+    this.manipulateIndex(true);
+  }
+
+  /** Decrease/increase input number. */
   protected manipulateIndex(decrease?: boolean) {
     if (this.input[this.index] === "-") {
       this.index++;
@@ -144,14 +165,10 @@ export class Number extends GenericInput<number, NumberSettings> {
     this.index = Math.max(0, Math.min(this.index, this.input.length - 1));
   }
 
-  public increaseValue() {
-    this.manipulateIndex(false);
-  }
-
-  public decreaseValue() {
-    this.manipulateIndex(true);
-  }
-
+  /**
+   * Add char to input.
+   * @param char Char.
+   */
   protected addChar(char: string): void {
     if (isNumeric(char)) {
       super.addChar(char);
@@ -165,6 +182,11 @@ export class Number extends GenericInput<number, NumberSettings> {
     }
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (!isNumeric(value)) {
       return false;
@@ -183,6 +205,11 @@ export class Number extends GenericInput<number, NumberSettings> {
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): number | undefined {
     const val: number = parseFloat(value);
 
@@ -193,6 +220,10 @@ export class Number extends GenericInput<number, NumberSettings> {
     return val;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: number): string {
     return value.toString();
   }
