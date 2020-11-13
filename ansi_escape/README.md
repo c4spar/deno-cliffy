@@ -43,40 +43,82 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { AnsiEscape } from "https://deno.land/x/cliffy@<version>/ansi_escape/mod.ts";
+import { tty } from "https://deno.land/x/cliffy@<version>/ansi_escape/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { AnsiEscape } from "https://x.nest.land/cliffy@<version>/ansi_escape/mod.ts";
+import { tty } from "https://x.nest.land/cliffy@<version>/ansi_escape/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { AnsiEscape } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi_escape/mod.ts";
+import { tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi_escape/mod.ts";
 ```
 
 ## ❯ Usage
 
+### tty
+
+Yu can use the predefined tty variable:
+
+```typescript
+import { tty } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
+
+tty
+  // Hide cursor.
+  .cursorHide()
+  // Show cursor.
+  .cursorShow()
+  // Save cursor position.
+  .cursorSave()
+  // Hide cursor position.
+  .cursorRestore()
+  // Erase current line.
+  .eraseLine()
+  // Erase three line's up.
+  .eraseLines(3)
+  // Scroll two line's up.
+  .scrollUp(2)
+  // Scroll one line down.
+  .scrollDown()
+  // ...
+```
+
+### AnsiEscape
+
 ```typescript
 import { AnsiEscape } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
 
-AnsiEscape.from(Deno.stdout)
-  // Hide cursor:
+const tty: AnsiEscape = AnsiEscape.from(Deno.stdout)
   .cursorHide()
-  // Show cursor:
   .cursorShow()
-  // Erase current line:
-  .eraseLine()
-  // Erase three line's up:
-  .eraseLines(3)
-  // Scroll two line's up:
-  .scrollUp(2)
-  // Scroll one line down:
-  .scrollDown()
-    // ...
+  // ...
+```
+
+### Custom
+
+```typescript
+import { cursor, erase, image, link } from "../../ansi_escape/csi.ts";
+
+const response = await fetch("https://deno.land/images/hashrock_simple.png");
+const imageBuffer: ArrayBuffer = await response.arrayBuffer();
+
+Deno.stdout.writeSync(
+  new TextEncoder().encode(
+    cursor.to(0, 0) +
+    erase.down() +
+    image(imageBuffer, {
+      width: 29,
+      preserveAspectRatio: true,
+    }) +
+    "\n          " +
+    link("Deno Land", "https://deno.land") +
+    "\n",
+  ),
+);
 ```
 
 ## ❯ Contributing
