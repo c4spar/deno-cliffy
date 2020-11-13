@@ -24,7 +24,6 @@ export class ArgumentsParser {
   public static splitArguments(
     args: string,
   ): { flags: string[]; typeDefinition: string } {
-    console.log("splitArguments:", args);
     const parts = args.trim().split(/[, =] */g);
     const typeParts = [];
 
@@ -37,9 +36,7 @@ export class ArgumentsParser {
 
     const typeDefinition: string = typeParts.join(" ");
 
-    const result = { flags: parts, typeDefinition };
-    console.log("result:", result);
-    return result;
+    return { flags: parts, typeDefinition };
   }
 
   /**
