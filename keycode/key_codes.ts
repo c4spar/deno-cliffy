@@ -1,6 +1,12 @@
 /** Base key mapping. */
 export const KeyMap: Record<string, string> = {
-  /* xterm/gnome ESC O letter */
+  /* xterm/gnome ESC [ letter (with modifier) */
+  "[P": "f1",
+  "[Q": "f2",
+  "[R": "f3",
+  "[S": "f4",
+
+  /* xterm/gnome ESC O letter (without modifier) */
   "OP": "f1",
   "OQ": "f2",
   "OR": "f3",
