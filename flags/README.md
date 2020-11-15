@@ -1,6 +1,6 @@
 <h1 align="center">Cliffy ❯ Flags </h1>
 
-<p align="center">
+<p align="center" class="badges-container">
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
     <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
   </a>

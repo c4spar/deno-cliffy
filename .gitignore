@@ -1,5 +1,6 @@
 .idea/
 .vscode/
+.vercel
 
 # Files that help ensure VSCode can work but we don't want checked into the repo
 node_modules
@@ -11,3 +12,9 @@ yarn.lock
 # MacOS generated files
 .DS_Store
 .DS_Store?
+
+# Docs
+docs/fonts/cliffy.css
+docs/fonts/cliffy.html
+docs/fonts/cliffy.json
+docs/fonts/cliffy.ts
