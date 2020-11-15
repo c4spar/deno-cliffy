@@ -8,7 +8,7 @@ import {
 } from "../key_codes.ts";
 import type { IKey, KeyEvent } from "../key_event.ts";
 
-export const ESC = "\x1B";
+const ESC = "\x1B";
 
 const defaults = <IKey> {
   sequence: undefined,
