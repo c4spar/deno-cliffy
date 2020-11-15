@@ -6,7 +6,7 @@ First off, thank you for considering contributing to cliffy. Here are a few thin
 
 - ❓ Ask general support questions on [StackOverflow](https://stackoverflow.com/questions/tagged/cliffy) (using the `cliffy` tag) or in the [chat](https://discord.gg/nktwtG).  
 - 👨‍💻 Use [issues](https://github.com/c4spar/deno-cliffy/issues/new) to report bugs, request new features and discuss your contributions.  
-- 💬 Discuss topics in the [chat](https://discord.gg/nktwtG).
+- 💬 Discuss topics in the [chat](https://discord.gg/V8XpuHdzz2).
 
 ### Contributing to development
 
