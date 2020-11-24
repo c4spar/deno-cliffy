@@ -95,45 +95,44 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   /** Read user input. */
-  protected async read(): Promise<boolean> {
+  protected read(): Promise<boolean> {
     this.screen.cursorHide();
-
     return super.read();
   }
 
   /** Select previous option. */
-  protected async selectPrevious(): Promise<void> {
+  protected selectPrevious(): void {
     if (this.selected > 0) {
       this.selected--;
       if (this.selected < this.index) {
         this.index--;
       }
       if (this.settings.options[this.selected].disabled) {
-        return this.selectPrevious();
+        this.selectPrevious();
       }
     } else {
       this.selected = this.settings.options.length - 1;
       this.index = this.settings.options.length - this.height();
       if (this.settings.options[this.selected].disabled) {
-        return this.selectPrevious();
+        this.selectPrevious();
       }
     }
   }
 
   /** Select next option. */
-  protected async selectNext(): Promise<void> {
+  protected selectNext(): void {
     if (this.selected < this.settings.options.length - 1) {
       this.selected++;
       if (this.selected >= this.index + this.height()) {
         this.index++;
       }
       if (this.settings.options[this.selected].disabled) {
-        return this.selectNext();
+        this.selectNext();
       }
     } else {
       this.selected = this.index = 0;
       if (this.settings.options[this.selected].disabled) {
-        return this.selectNext();
+        this.selectNext();
       }
     }
   }

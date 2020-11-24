@@ -38,7 +38,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     : "";
 
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(
+  public static prompt(
     options: string | ToggleOptions,
   ): Promise<boolean> {
     if (typeof options === "string") {
@@ -82,9 +82,8 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
   }
 
   /** Read user input from stdin, handle events and validate user input. */
-  protected async read(): Promise<boolean> {
+  protected read(): Promise<boolean> {
     this.screen.cursorHide();
-
     return super.read();
   }
 
@@ -92,7 +91,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
+  protected handleEvent(event: KeyEvent): boolean {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {

@@ -33,7 +33,7 @@ interface ListSettings extends GenericInputPromptSettings<string[]> {
 /** List prompt representation. */
 export class List extends GenericInput<string[], ListSettings> {
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(options: string | ListOptions): Promise<string[]> {
+  public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
       options = { message: options };
     }

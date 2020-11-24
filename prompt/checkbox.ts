@@ -71,7 +71,7 @@ export class Checkbox
   }
 
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(options: CheckboxOptions): Promise<string[]> {
+  public static prompt(options: CheckboxOptions): Promise<string[]> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       listPointer: blue(Figures.POINTER),
@@ -146,7 +146,7 @@ export class Checkbox
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
+  protected handleEvent(event: KeyEvent): boolean {
     switch (true) {
       case event.name === "c":
         // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
@@ -157,11 +157,11 @@ export class Checkbox
         break;
 
       case this.isKey(this.settings.keys, "previous", event):
-        await this.selectPrevious();
+        this.selectPrevious();
         break;
 
       case this.isKey(this.settings.keys, "next", event):
-        await this.selectNext();
+        this.selectNext();
         break;
 
       case this.isKey(this.settings.keys, "check", event):

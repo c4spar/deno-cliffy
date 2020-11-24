@@ -813,7 +813,7 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   protected async executeExecutable(args: string[]) {
     // deno-lint-ignore no-explicit-any
-    const unstable: boolean = !!(Deno as any).permissions;
+    const unstable = !!(Deno as any).permissions;
 
     if (!permissions.read) {
       // deno-lint-ignore no-explicit-any
@@ -982,7 +982,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
         if (required.length) {
           const flagNames: string[] = Object.keys(flags);
-          const hasStandaloneOption: boolean = !!flagNames.find((name) =>
+          const hasStandaloneOption = !!flagNames.find((name) =>
             this.getOption(name, true)?.standalone
           );
 

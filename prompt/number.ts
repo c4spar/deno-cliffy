@@ -42,7 +42,7 @@ interface NumberSettings extends GenericInputPromptSettings<number> {
 /** Number prompt representation. */
 export class Number extends GenericInput<number, NumberSettings> {
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(options: string | NumberOptions): Promise<number> {
+  public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
       options = { message: options };
     }
@@ -66,7 +66,7 @@ export class Number extends GenericInput<number, NumberSettings> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
+  protected handleEvent(event: KeyEvent): boolean {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {

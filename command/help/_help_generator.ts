@@ -71,7 +71,7 @@ export class HelpGenerator {
       return "";
     }
 
-    const hasTypeDefinitions: boolean = !!options.find((option) =>
+    const hasTypeDefinitions = !!options.find((option) =>
       !!option.typeDefinition
     );
 
@@ -115,7 +115,7 @@ export class HelpGenerator {
       return "";
     }
 
-    const hasTypeDefinitions: boolean = !!commands.find((command) =>
+    const hasTypeDefinitions = !!commands.find((command) =>
       !!command.getArgsDefinition()
     );
 

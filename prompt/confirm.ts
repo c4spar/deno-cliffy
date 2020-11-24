@@ -26,7 +26,7 @@ interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
 /** Confirm prompt representation. */
 export class Confirm extends GenericInput<boolean, ConfirmSettings> {
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(
+  public static prompt(
     options: string | ConfirmOptions,
   ): Promise<boolean> {
     if (typeof options === "string") {

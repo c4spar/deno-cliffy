@@ -428,10 +428,10 @@ export class TableLayout {
     const b1: Cell | undefined = prevRow?.[colIndex];
     const b2: Cell | undefined = nextRow?.[colIndex];
 
-    const a1Border: boolean = !!a1?.getBorder();
-    const a2Border: boolean = !!a2?.getBorder();
-    const b1Border: boolean = !!b1?.getBorder();
-    const b2Border: boolean = !!b2?.getBorder();
+    const a1Border = !!a1?.getBorder();
+    const a2Border = !!a2?.getBorder();
+    const b1Border = !!b1?.getBorder();
+    const b2Border = !!b2?.getBorder();
 
     const hasColSpan = (cell: Cell | undefined): boolean =>
       (cell?.getColSpan() ?? 1) > 1;

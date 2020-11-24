@@ -25,7 +25,7 @@ Deno.test("hidden command", async () => {
   assertEquals(args[1], "output-path");
 });
 
-Deno.test("hidden command help", async () => {
+Deno.test("hidden command help", () => {
   const cmd: Command = command();
   const output: string = cmd.getHelp();
 
