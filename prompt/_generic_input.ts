@@ -66,13 +66,13 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   protected setPrompt(message: string) {
     message += " " + this.settings.pointer + " ";
 
-    const length = new TextEncoder().encode(stripColor(message)).length;
+    const length = stripColor(message).length;
 
     message += underline(this.input);
 
     this.write(message);
 
-    this.screen.cursorTo(length - 1 + this.index);
+    this.screen.cursorTo(length + this.index + 1);
   }
 
   /**
@@ -146,7 +146,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   /** Move prompt cursor right. */
   protected moveCursorRight(): void {
     if (this.index < this.input.length) {
-      const index = this.input.indexOf(" ", this.index);
       this.index++;
     }
   }
