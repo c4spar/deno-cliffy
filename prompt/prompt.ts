@@ -25,8 +25,14 @@ type PromptOptions<
   & {
     name: N0;
     type: G0;
-    before?: (opts: R, next: Next<Exclude<keyof R, symbol>>) => Promise<void>;
-    after?: (opts: R, next: Next<Exclude<keyof R, symbol>>) => Promise<void>;
+    before?: (
+      opts: R,
+      next: Next<Exclude<keyof R, symbol>>,
+    ) => void | Promise<void>;
+    after?: (
+      opts: R,
+      next: Next<Exclude<keyof R, symbol>>,
+    ) => void | Promise<void>;
   }
   // exclude none options parameter
   & (U extends GenericPromptOptions<any, any> ? U : {});
@@ -39,8 +45,16 @@ type PromptResult<
 };
 
 interface PromptListOptions<R, N extends keyof R = keyof R> {
-  before?: (name: N, opts: R, next: Next<Exclude<N, symbol>>) => Promise<void>;
-  after?: (name: N, opts: R, next: Next<Exclude<N, symbol>>) => Promise<void>;
+  before?: (
+    name: N,
+    opts: R,
+    next: Next<Exclude<N, symbol>>,
+  ) => void | Promise<void>;
+  after?: (
+    name: N,
+    opts: R,
+    next: Next<Exclude<N, symbol>>,
+  ) => void | Promise<void>;
 }
 
 /** Global prompt options. */

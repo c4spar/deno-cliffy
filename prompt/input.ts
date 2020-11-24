@@ -26,7 +26,7 @@ interface InputSettings extends GenericInputPromptSettings<string> {
 /** Input prompt representation. */
 export class Input extends GenericInput<string, InputSettings> {
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(options: string | InputOptions): Promise<string> {
+  public static prompt(options: string | InputOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
     }

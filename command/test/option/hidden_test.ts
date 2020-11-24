@@ -22,7 +22,7 @@ Deno.test("hidden option", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("hidden option help", async () => {
+Deno.test("hidden option help", () => {
   const cmd: Command = command();
   const output: string = cmd.getHelp();
 

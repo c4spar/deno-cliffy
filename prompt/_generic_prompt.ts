@@ -80,7 +80,7 @@ export abstract class GenericPrompt<
    * Handle user input event.
    * @param event Key event.
    */
-  protected abstract async handleEvent(event: KeyEvent): Promise<boolean>;
+  protected abstract handleEvent(event: KeyEvent): boolean | Promise<boolean>;
 
   /**
    * Map input value to output value.

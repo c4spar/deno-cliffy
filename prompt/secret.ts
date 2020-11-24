@@ -31,7 +31,7 @@ interface SecretSettings extends GenericInputPromptSettings<string> {
 /** Secret prompt representation. */
 export class Secret extends GenericInput<string, SecretSettings> {
   /** Execute the prompt and show cursor on end. */
-  public static async prompt(options: string | SecretOptions): Promise<string> {
+  public static prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
     }

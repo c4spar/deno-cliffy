@@ -79,7 +79,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
+  protected handleEvent(event: KeyEvent): boolean {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {

@@ -146,7 +146,7 @@ ${childCommandCompletions}`;
     command: Command,
     completionsPath: string,
   ): string {
-    let opts: string = "";
+    let opts = "";
     const options = command.getOptions(false);
     if (options.length) {
       opts += 'case "${prev}" in';
