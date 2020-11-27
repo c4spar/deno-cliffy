@@ -61,7 +61,6 @@ export class Secret extends GenericInput<string, SecretSettings> {
 
     message += underline(secret);
 
-    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length - 1 + this.index);

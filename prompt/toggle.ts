@@ -76,7 +76,6 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
       message += dim(this.settings.inactive + " / " + this.settings.active);
     }
 
-    this.clear();
     this.write(message);
   }
 

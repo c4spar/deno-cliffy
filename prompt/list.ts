@@ -67,7 +67,6 @@ export class List extends GenericInput<string[], ListSettings> {
     this.input = oldInputParts.join(separator);
     this.index -= oldInput.length - this.input.length;
 
-    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length - 1 + this.index);

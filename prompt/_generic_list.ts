@@ -68,7 +68,6 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
    * @param message Prompt message.
    */
   protected render(message: string): void {
-    this.clear();
     this.writeLine(message);
     this.writeListItems();
   }
