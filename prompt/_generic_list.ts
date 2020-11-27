@@ -52,19 +52,6 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   /**
-   * Map string option values to options.
-   * @param optValues List options.
-   */
-  protected static mapValues(
-    optValues: GenericListValueOptions,
-  ): GenericListOption[] {
-    return Object.values(optValues)
-      .map((item: string | GenericListOption) =>
-        typeof item === "string" ? { value: item } : item
-      );
-  }
-
-  /**
    * Set list option defaults.
    * @param item List option.
    */
@@ -80,9 +67,9 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
    * Set prompt message.
    * @param message Prompt message.
    */
-  protected setPrompt(message: string): void {
+  protected render(message: string): void {
+    this.clear();
     this.writeLine(message);
-
     this.writeListItems();
   }
 

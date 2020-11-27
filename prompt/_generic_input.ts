@@ -63,13 +63,14 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    * Set prompt message.
    * @param message Prompt message.
    */
-  protected setPrompt(message: string) {
+  protected render(message: string) {
     message += " " + this.settings.pointer + " ";
 
     const length = stripColor(message).length;
 
     message += underline(this.input);
 
+    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length + this.index + 1);

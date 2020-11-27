@@ -77,28 +77,12 @@ export class Select extends GenericList<string, string, SelectSettings> {
     }).prompt();
   }
 
-  /**
-   * Map string option values to options and set option defaults.
-   * @param options List options.
-   */
   protected static mapOptions(options: SelectOptions): SelectValueSettings {
-    return this.mapValues(options.options).map((item) => this.mapItem(item));
-  }
-
-  /**
-   * Map string option values to options.
-   * @param optValues Select option.
-   */
-  protected static mapValues(optValues: SelectValueOptions): SelectOption[] {
-    return super.mapValues(optValues) as SelectOption[];
-  }
-
-  /**
-   * Set select option defaults.
-   * @param item Select option.
-   */
-  protected static mapItem(item: SelectOption): SelectOptionSettings {
-    return super.mapItem(item) as SelectOptionSettings;
+    return options.options
+      .map((item: string | SelectOption) =>
+        typeof item === "string" ? { value: item } : item
+      )
+      .map((item) => this.mapItem(item));
   }
 
   /**

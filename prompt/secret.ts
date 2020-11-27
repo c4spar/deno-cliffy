@@ -50,19 +50,18 @@ export class Secret extends GenericInput<string, SecretSettings> {
    * Set prompt message.
    * @param message Prompt message.
    */
-  protected setPrompt(message: string) {
+  protected render(message: string) {
     if (this.settings.hidden) {
       this.screen.cursorHide();
     }
-
     message += " " + this.settings.pointer + " ";
 
     const length = new TextEncoder().encode(stripColor(message)).length;
-
     const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
 
     message += underline(secret);
 
+    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length - 1 + this.index);

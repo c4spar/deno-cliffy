@@ -53,24 +53,21 @@ export class List extends GenericInput<string[], ListSettings> {
    * Set prompt message.
    * @param message Prompt message.
    */
-  protected setPrompt(message: string) {
+  protected render(message: string) {
     message += " " + this.settings.pointer + " ";
 
     const length = new TextEncoder().encode(stripColor(message)).length;
-
     const oldInput: string = this.input;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
+    const separator: string = this.settings.separator + " ";
 
-    this.input = oldInputParts.join(`${this.settings.separator} `);
+    message += oldInputParts.map((val: string) => underline(val))
+      .join(separator);
 
-    message += oldInputParts.map((val: string) => underline(val)).join(
-      `${this.settings.separator} `,
-    );
+    this.input = oldInputParts.join(separator);
+    this.index -= oldInput.length - this.input.length;
 
-    const inputDiff = oldInput.length - this.input.length;
-
-    this.index -= inputDiff;
-
+    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length - 1 + this.index);
