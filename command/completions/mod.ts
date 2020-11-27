@@ -11,22 +11,21 @@ export class CompletionsCommand extends Command {
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;
-    this.description("Generate shell completions.")
-      .description(() => {
-        const baseCmd = this.#cmd || this.getMainCommand();
-        return `Generate shell completions.
+    this.description(() => {
+      const baseCmd = this.#cmd || this.getMainCommand();
+      return `Generate shell completions.
 
 To enable shell completions for this program add following line to your ${
-          dim(italic("~/.bashrc"))
-        } or similar:
+        dim(italic("~/.bashrc"))
+      } or similar:
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions [shell])`))}
 
     For mor information run ${
-          dim(italic(`${baseCmd.getPath()} completions [shell] --help`))
-        }
+        dim(italic(`${baseCmd.getPath()} completions [shell] --help`))
+      }
 `;
-      })
+    })
       .action(() => this.help())
       .command("bash", new BashCompletionsCommand(this.#cmd))
       .command("fish", new FishCompletionsCommand(this.#cmd))
