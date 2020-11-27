@@ -70,7 +70,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
     message += underline(this.input);
 
-    this.clear();
     this.write(message);
 
     this.screen.cursorTo(length + this.index + 1);

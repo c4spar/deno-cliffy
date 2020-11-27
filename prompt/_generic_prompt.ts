@@ -47,6 +47,7 @@ export abstract class GenericPrompt<
 
   protected screen = AnsiEscape.from(Deno.stdout);
   protected lastError: string | undefined;
+  protected isRunning = false;
   protected value: T | undefined;
 
   /**
@@ -105,7 +106,7 @@ export abstract class GenericPrompt<
   protected abstract getValue(): V;
 
   /** Clear prompt output. */
-  protected clear() {
+  protected clear(): void {
     this.screen
       .cursorLeft()
       .eraseDown();
@@ -113,6 +114,11 @@ export abstract class GenericPrompt<
 
   /** Execute the prompt. */
   protected async execute(): Promise<T> {
+    if (this.lastError || this.isRunning) {
+      this.clear();
+    }
+    this.isRunning = true;
+
     const message: string = await this.getMessage();
     // be sure there are empty lines after the cursor to fix restoring the
     // cursor if terminal output is longer than terminal window.
@@ -146,6 +152,7 @@ export abstract class GenericPrompt<
     this.screen.cursorShow();
 
     GenericPrompt.injectedValue = undefined;
+    this.isRunning = false;
 
     return this.value;
   }
