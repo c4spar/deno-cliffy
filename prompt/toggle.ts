@@ -63,21 +63,20 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * Set prompt message.
    * @param message Prompt message.
    */
-  protected setPrompt(message: string) {
-    message += ` ${this.settings.pointer} `;
+  protected render(message: string) {
+    message += " " + this.settings.pointer + " ";
 
     if (this.status === this.settings.active) {
-      message += `${dim(`${this.settings.inactive} /`)} ${
-        underline(this.settings.active)
-      }`;
+      message += dim(this.settings.inactive + " /") + " " +
+        underline(this.settings.active);
     } else if (this.status === this.settings.inactive) {
-      message += `${underline(this.settings.inactive)} ${
-        dim(`/ ${this.settings.active}`)
-      }`;
+      message += underline(this.settings.inactive) + " " +
+        dim("/ " + this.settings.active);
     } else {
-      message += dim(`${this.settings.inactive} / ${this.settings.active}`);
+      message += dim(this.settings.inactive + " / " + this.settings.active);
     }
 
+    this.clear();
     this.write(message);
   }
 

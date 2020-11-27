@@ -109,37 +109,18 @@ export class Checkbox
    * @param options Checkbox options.
    */
   protected static mapOptions(options: CheckboxOptions): CheckboxValueSettings {
-    return this.mapValues(options.options)
-      .map((item) => this.mapItem(item, options.default));
-  }
-
-  /**
-   * Map string option values to options.
-   * @param optValues Checkbox option.
-   */
-  protected static mapValues(
-    optValues: CheckboxValueOptions,
-  ): CheckboxOption[] {
-    return super.mapValues(optValues) as CheckboxOption[];
-  }
-
-  /**
-   * Set checkbox option defaults.
-   * @param item      Checkbox option.
-   * @param defaults  Checkbox defaults.
-   */
-  protected static mapItem(
-    item: CheckboxOption,
-    defaults?: string[],
-  ): CheckboxOptionSettings {
-    return {
-      ...super.mapItem(item),
-      checked: typeof item.checked === "undefined" && defaults &&
-          defaults.indexOf(item.value) !== -1
-        ? true
-        : !!item.checked,
-      icon: typeof item.icon === "undefined" ? true : item.icon,
-    };
+    return options.options
+      .map((item: string | CheckboxOption) =>
+        typeof item === "string" ? { value: item } : item
+      )
+      .map((item) => ({
+        ...this.mapItem(item),
+        checked: typeof item.checked === "undefined" &&
+            options.default?.indexOf(item.value) !== -1
+          ? true
+          : !!item.checked,
+        icon: typeof item.icon === "undefined" ? true : item.icon,
+      }));
   }
 
   /**
@@ -232,7 +213,9 @@ export class Checkbox
       value.every((val) =>
         typeof val === "string" &&
         val.length > 0 &&
-        this.settings.options.findIndex((option) => option.value === val) !== -1
+        this.settings.options.findIndex((option: CheckboxOptionSettings) =>
+            option.value === val
+          ) !== -1
       );
 
     if (!isValidValue) {
