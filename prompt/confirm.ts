@@ -41,31 +41,21 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }).prompt();
   }
 
-  /** Get prompt message */
-  protected getMessage(): string {
-    let message = ` ${yellow("?")} ${bold(this.settings.message)} `;
+  protected getDefaultMessage(): string {
+    let defaultMessage = "";
 
     if (this.settings.default === true) {
-      message += dim(
-        `(${this.settings.active[0].toUpperCase()}/${
-          this.settings.inactive[0].toLowerCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toUpperCase() + "/" +
+        this.settings.inactive[0].toLowerCase();
     } else if (this.settings.default === false) {
-      message += dim(
-        `(${this.settings.active[0].toLowerCase()}/${
-          this.settings.inactive[0].toUpperCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
+        this.settings.inactive[0].toUpperCase();
     } else {
-      message += dim(
-        `(${this.settings.active[0].toLowerCase()}/${
-          this.settings.inactive[0].toLowerCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
+        this.settings.inactive[0].toLowerCase();
     }
 
-    return message;
+    return defaultMessage ? dim(` (${defaultMessage})`) : "";
   }
 
   /**

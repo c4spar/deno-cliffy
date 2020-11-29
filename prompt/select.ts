@@ -123,17 +123,14 @@ export class Select extends GenericList<string, string, SelectSettings> {
    * @param item        Select option settings.
    * @param isSelected  Set to true if option is selected.
    */
-  protected writeListItem(item: SelectOptionSettings, isSelected?: boolean) {
+  protected getListItem(
+    item: SelectOptionSettings,
+    isSelected?: boolean,
+  ): string {
     let line = this.settings.indent;
-
-    // pointer
     line += isSelected ? `${this.settings.listPointer} ` : "  ";
-
-    // value
-    const value: string = item.name;
-    line += `${isSelected ? value : dim(value)}`;
-
-    this.writeLine(line);
+    line += `${isSelected ? item.name : dim(item.name)}`;
+    return line;
   }
 
   /**

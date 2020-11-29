@@ -63,22 +63,30 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected render(message: string): void {
-    this.writeLine(message);
-    this.writeListItems();
+  /** Render options. */
+  protected getBody(): string | undefined | Promise<string | undefined> {
+    const body: Array<string> = [];
+    const height: number = this.getListHeight();
+    for (let i = this.index; i < this.index + height; i++) {
+      body.push(
+        this.getListItem(
+          this.settings.options[i],
+          this.selected === i,
+        ),
+      );
+    }
+    return body.join("\n");
   }
 
-  /** Clear prompt output. */
-  protected clear(): void {
-    // clear list
-    this.screen.eraseLines(this.height() + 2);
-    // clear message and reset cursor
-    super.clear();
-  }
+  /**
+   * Render option.
+   * @param item        Option.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected abstract getListItem(
+    item: GenericListOptionSettings,
+    isSelected?: boolean,
+  ): string;
 
   /** Read user input. */
   protected read(): Promise<boolean> {
@@ -98,7 +106,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       }
     } else {
       this.selected = this.settings.options.length - 1;
-      this.index = this.settings.options.length - this.height();
+      this.index = this.settings.options.length - this.getListHeight();
       if (this.settings.options[this.selected].disabled) {
         this.selectPrevious();
       }
@@ -109,7 +117,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   protected selectNext(): void {
     if (this.selected < this.settings.options.length - 1) {
       this.selected++;
-      if (this.selected >= this.index + this.height()) {
+      if (this.selected >= this.index + this.getListHeight()) {
         this.index++;
       }
       if (this.settings.options[this.selected].disabled) {
@@ -123,25 +131,8 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     }
   }
 
-  /** Render options. */
-  protected writeListItems(): void {
-    for (let i = this.index; i < this.index + this.height(); i++) {
-      this.writeListItem(this.settings.options[i], this.selected === i);
-    }
-  }
-
-  /**
-   * Render option.
-   * @param item        Option.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected abstract writeListItem(
-    item: GenericListOptionSettings,
-    isSelected?: boolean,
-  ): void;
-
   /** Get options row height. */
-  protected height(): number {
+  protected getListHeight(): number {
     return Math.min(
       this.settings.options.length,
       this.settings.maxRows || this.settings.options.length,

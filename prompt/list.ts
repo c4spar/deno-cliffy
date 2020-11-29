@@ -49,27 +49,17 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected render(message: string) {
-    message += " " + this.settings.pointer + " ";
-
-    const length = new TextEncoder().encode(stripColor(message)).length;
+  protected getPrompt(): string {
     const oldInput: string = this.input;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
     const separator: string = this.settings.separator + " ";
 
-    message += oldInputParts.map((val: string) => underline(val))
-      .join(separator);
-
     this.input = oldInputParts.join(separator);
     this.index -= oldInput.length - this.input.length;
 
-    this.write(message);
-
-    this.screen.cursorTo(length - 1 + this.index);
+    return this.getMessage() + oldInputParts
+      .map((val: string) => underline(val))
+      .join(separator);
   }
 
   /** Create list regex.*/
@@ -132,6 +122,11 @@ export class List extends GenericInput<string[], ListSettings> {
     }
 
     return true;
+  }
+
+  protected transformValue(value: string): string[] | undefined {
+    // remove trailing comma and spaces.
+    return super.transformValue(value.replace(/,+\s*$/, ""));
   }
 
   /**
