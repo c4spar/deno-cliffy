@@ -115,12 +115,45 @@ export class Checkbox
       )
       .map((item) => ({
         ...this.mapItem(item),
-        checked: typeof item.checked === "undefined" &&
-            options.default?.indexOf(item.value) !== -1
+        checked: typeof item.checked === "undefined" && options.default &&
+            options.default.indexOf(item.value) !== -1
           ? true
           : !!item.checked,
         icon: typeof item.icon === "undefined" ? true : item.icon,
       }));
+  }
+
+  /**
+   * Render checkbox option.
+   * @param item        Checkbox option settings.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected getListItem(
+    item: CheckboxOptionSettings,
+    isSelected?: boolean,
+  ): string {
+    let line = this.settings.indent;
+
+    // pointer
+    line += isSelected ? this.settings.listPointer + " " : "  ";
+
+    // icon
+    if (item.icon) {
+      let check = item.checked
+        ? this.settings.check + " "
+        : this.settings.uncheck + " ";
+      if (item.disabled) {
+        check = dim(check);
+      }
+      line += check;
+    } else {
+      line += "  ";
+    }
+
+    // value
+    line += `${isSelected ? item.name : dim(item.name)}`;
+
+    return line;
   }
 
   /**
@@ -170,40 +203,6 @@ export class Checkbox
   }
 
   /**
-   * Render checkbox option.
-   * @param item        Checkbox option settings.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected writeListItem(
-    item: CheckboxOptionSettings,
-    isSelected?: boolean,
-  ): void {
-    let line = this.settings.indent;
-
-    // pointer
-    line += isSelected ? `${this.settings.listPointer} ` : "  ";
-
-    // icon
-    if (item.icon) {
-      let check = item.checked
-        ? `${this.settings.check} `
-        : `${this.settings.uncheck} `;
-      if (item.disabled) {
-        check = dim(check);
-      }
-      line += check;
-    } else {
-      line += "  ";
-    }
-
-    // value
-    const value: string = item.name;
-    line += `${isSelected ? value : dim(value)}`;
-
-    this.writeLine(line);
-  }
-
-  /**
    * Validate input value.
    * @param value User input value.
    * @return True on success, false or error message on error.
@@ -246,8 +245,7 @@ export class Checkbox
    * @param value Output value.
    */
   protected format(value: string[]): string {
-    return value.map((val) => this.getOptionByValue(val)?.name ?? val).join(
-      ", ",
-    );
+    return value.map((val) => this.getOptionByValue(val)?.name ?? val)
+      .join(", ");
   }
 }

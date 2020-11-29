@@ -70,11 +70,122 @@ export abstract class GenericPrompt<
     }
   }
 
+  /** Clear prompt output. */
+  protected clear(): void {
+    this.screen
+      .cursorLeft()
+      .eraseDown();
+  }
+
+  /** Get prompt message. */
+  protected getPrompt(): string {
+    return this.getMessage();
+  }
+
+  protected getMessage(): string {
+    return ` ${yellow("?")} ${bold(this.settings.message)}` +
+      this.getDefaultMessage();
+  }
+
+  protected getDefaultMessage(): string {
+    let defaultMessage = "";
+    if (typeof this.settings.default !== "undefined") {
+      defaultMessage += dim(` (${this.format(this.settings.default)})`);
+    }
+    return defaultMessage;
+  }
+
+  /** Get prompt success message. */
+  protected getSuccessMessage(value: T): string | undefined {
+    return ` ${yellow("?")} ${bold(this.settings.message)}` +
+      this.getDefaultMessage() +
+      " " + this.settings.pointer +
+      " " + green(this.format(value));
+  }
+
+  protected getBody?(): string | undefined | Promise<string | undefined>;
+
+  protected getFooter(): string | undefined {
+    return this.getError() ?? this.getHint();
+  }
+
+  protected getError(): string | undefined {
+    return this.lastError
+      ? red(bold(` ${Figures.CROSS} `) + this.lastError)
+      : undefined;
+  }
+
+  protected getHint(): string | undefined {
+    return this.settings.hint
+      ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
+      : undefined;
+  }
+
+  /********************************************
+   ********************************************
+   ********************************************/
+
+  /** Execute the prompt. */
+  protected async execute(): Promise<T> {
+    // Throw errors on unit tests.
+    if (typeof GenericPrompt.injectedValue !== "undefined" && this.lastError) {
+      throw new Error(await this.getError());
+    }
+
+    const result = await Promise.all([
+      this.getPrompt(),
+      this.getBody?.(),
+      this.getFooter(),
+    ]);
+
+    const output: string = result.filter((val) => !!val).join("\n");
+
+    await this.render(output);
+
+    this.lastError = undefined;
+
+    if (!await this.read()) {
+      return this.execute();
+    }
+
+    if (typeof this.value === "undefined") {
+      throw new Error("internal error: failed to read value");
+    }
+
+    this.clear();
+
+    const successMessage: string | undefined = this.getSuccessMessage(
+      this.value,
+    );
+    if (successMessage) {
+      await Deno.stdout.write(
+        new TextEncoder().encode(successMessage + "\n"),
+      );
+    }
+
+    this.screen.cursorShow();
+
+    GenericPrompt.injectedValue = undefined;
+    this.isRunning = false;
+
+    return this.value;
+  }
+
   /**
-   * Render prompt.
-   * @param message Prompt message.
+   * Render prompt content.
+   * @param content Prompt content.
    */
-  protected abstract render(message: string): void | Promise<void>;
+  protected async render(content: string): Promise<void> {
+    if (this.lastError || this.isRunning) {
+      this.clear();
+    }
+    this.isRunning = true;
+    const linesCount: number = content.split("\n").length - 1;
+    await Deno.stdout.write(new TextEncoder().encode(content));
+    if (linesCount) {
+      this.screen.cursorUp(linesCount);
+    }
+  }
 
   /**
    * Handle user input event.
@@ -104,76 +215,6 @@ export abstract class GenericPrompt<
 
   /** Get input value. */
   protected abstract getValue(): V;
-
-  /** Clear prompt output. */
-  protected clear(): void {
-    this.screen
-      .cursorLeft()
-      .eraseDown();
-  }
-
-  /** Execute the prompt. */
-  protected async execute(): Promise<T> {
-    if (this.lastError || this.isRunning) {
-      this.clear();
-    }
-    this.isRunning = true;
-
-    const message: string = await this.getMessage();
-    // be sure there are empty lines after the cursor to fix restoring the
-    // cursor if terminal output is longer than terminal window.
-    this.preBufferEmptyLines(this.lastError || this.settings.hint || "");
-
-    await this.render(message);
-
-    if (this.lastError || this.settings.hint) {
-      this.screen.cursorSave();
-      this.writeLine();
-      if (this.lastError) {
-        this.error(this.lastError);
-        this.lastError = undefined;
-      } else if (this.settings.hint) {
-        this.hint(this.settings.hint);
-      }
-      this.screen.cursorRestore();
-    }
-
-    if (!await this.read()) {
-      return this.execute();
-    }
-
-    if (typeof this.value === "undefined") {
-      throw new Error("internal error: failed to read value");
-    }
-
-    this.clear();
-    this.writeLine(await this.getSuccessMessage(this.value));
-
-    this.screen.cursorShow();
-
-    GenericPrompt.injectedValue = undefined;
-    this.isRunning = false;
-
-    return this.value;
-  }
-
-  /** Get prompt message. */
-  protected getMessage(): string | Promise<string> {
-    let message = ` ${yellow("?")} ${bold(this.settings.message)}`;
-
-    if (typeof this.settings.default !== "undefined") {
-      message += dim(` (${this.format(this.settings.default)})`);
-    }
-
-    return message;
-  }
-
-  /** Get prompt success message. */
-  protected async getSuccessMessage(value: T) {
-    return `${await this.getMessage()} ${this.settings.pointer} ${
-      green(this.format(value))
-    }`;
-  }
 
   /** Read user input from stdin, handle events and validate user input. */
   protected async read(): Promise<boolean> {
@@ -284,61 +325,5 @@ export abstract class GenericPrompt<
       (typeof event.sequence !== "undefined" &&
         keyNames.indexOf(event.sequence) !== -1)
     );
-  }
-
-  /**
-   * Write to stdout.
-   * @param value String value.
-   */
-  protected write(value: string) {
-    Deno.stdout.writeSync(new TextEncoder().encode(value));
-  }
-
-  /**
-   * Write line to stdout.
-   * @param value Line.
-   * @protected
-   */
-  protected writeLine(value?: string) {
-    Deno.stdout.writeSync(new TextEncoder().encode((value ?? "") + "\n"));
-  }
-
-  /**
-   * Renders empty lines to stdout to save space at the bottom of the terminal
-   * screen for the prompt message. This is required for multi-line prompts.
-   * @param message Prompt message.
-   */
-  protected preBufferEmptyLines(message: string) {
-    const linesCount: number = message.split("\n").length;
-    this.write("\n".repeat(linesCount));
-    this.screen.cursorUp(linesCount);
-  }
-
-  /**
-   * Write prompt error message. If a prompt value is injected an error is
-   * thrown.
-   * @param message Error message.
-   */
-  protected error(message: string) {
-    if (typeof GenericPrompt.injectedValue !== "undefined") {
-      throw new Error(red(bold(` ${Figures.CROSS} `) + message));
-    }
-    this.write(red(bold(` ${Figures.CROSS} `) + message));
-  }
-
-  /**
-   * Write message to stdout with blue pointer icon.
-   * @param message Message.
-   */
-  protected message(message: string) {
-    this.write(blue(` ${Figures.POINTER} `) + message);
-  }
-
-  /**
-   * Write dimmed message to stdout with blue pointer icon.
-   * @param message Message.
-   */
-  protected hint(message: string) {
-    this.write(dim(blue(` ${Figures.POINTER} `) + message));
   }
 }

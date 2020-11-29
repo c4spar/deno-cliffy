@@ -1,5 +1,5 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, dim, underline } from "./deps.ts";
+import { blue, dim, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericPrompt,
@@ -59,24 +59,24 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     }).prompt();
   }
 
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected render(message: string) {
-    message += " " + this.settings.pointer + " ";
+  protected getMessage(): string {
+    return super.getMessage() + " " + this.settings.pointer + " ";
+  }
+
+  protected getPrompt(): string {
+    let message = this.getMessage();
 
     if (this.status === this.settings.active) {
-      message += dim(this.settings.inactive + " /") + " " +
+      message += dim(this.settings.inactive + " / ") +
         underline(this.settings.active);
     } else if (this.status === this.settings.inactive) {
-      message += underline(this.settings.inactive) + " " +
-        dim("/ " + this.settings.active);
+      message += underline(this.settings.inactive) +
+        dim(" / " + this.settings.active);
     } else {
       message += dim(this.settings.inactive + " / " + this.settings.active);
     }
 
-    this.write(message);
+    return message;
   }
 
   /** Read user input from stdin, handle events and validate user input. */

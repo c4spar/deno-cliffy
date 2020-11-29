@@ -1,4 +1,12 @@
-import { blue, green, stripColor, underline } from "./deps.ts";
+import {
+  blue,
+  bold,
+  dim,
+  green,
+  stripColor,
+  underline,
+  yellow,
+} from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -46,32 +54,25 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected render(message: string) {
-    if (this.settings.hidden) {
-      this.screen.cursorHide();
-    }
-    message += " " + this.settings.pointer + " ";
-
-    const length = new TextEncoder().encode(stripColor(message)).length;
+  protected getPrompt(): string {
     const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
-
-    message += underline(secret);
-
-    this.write(message);
-
-    this.screen.cursorTo(length - 1 + this.index);
+    return this.getMessage() + underline(secret);
   }
 
   /** Get prompt success message. */
-  protected async getSuccessMessage(value: string) {
-    value = this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
-    return `${await this.getMessage()} ${this.settings.pointer} ${
-      green(value)
-    }`;
+  protected getSuccessMessage(value: string): string {
+    const secret = this.settings.hidden
+      ? "*".repeat(8)
+      : "*".repeat(value.length);
+    return this.getMessage() + green(secret);
+  }
+
+  /** Read user input. */
+  protected read(): Promise<boolean> {
+    if (this.settings.hidden) {
+      this.screen.cursorHide();
+    }
+    return super.read();
   }
 
   /**
