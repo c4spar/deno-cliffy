@@ -54,17 +54,17 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
-  protected getHeader(): string {
+  protected header(): string {
     const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
-    return this.getMessage() + underline(secret);
+    return this.message() + underline(secret);
   }
 
   /** Get prompt success message. */
-  protected getSuccessMessage(value: string): string {
+  protected success(value: string): string {
     const secret = this.settings.hidden
       ? "*".repeat(8)
       : "*".repeat(value.length);
-    return this.getMessage() + green(secret);
+    return this.message() + green(secret);
   }
 
   /** Read user input. */

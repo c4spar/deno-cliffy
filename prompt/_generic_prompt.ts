@@ -36,6 +36,13 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
+export interface Cursor {
+  x: number;
+  y: number;
+}
+
+export type RenderResult = [string, string | undefined, string | undefined];
+
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
@@ -49,6 +56,10 @@ export abstract class GenericPrompt<
   protected lastError: string | undefined;
   protected isRunning = false;
   protected value: T | undefined;
+  protected cursor: Cursor = {
+    x: 0,
+    y: 0,
+  };
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -78,16 +89,15 @@ export abstract class GenericPrompt<
   }
 
   /** Get prompt message. */
-  protected getHeader(): string {
-    return this.getMessage();
+  protected header(): string {
+    return this.message();
   }
 
-  protected getMessage(): string {
-    return ` ${yellow("?")} ${bold(this.settings.message)}` +
-      this.getDefaultMessage();
+  protected message(): string {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
   }
 
-  protected getDefaultMessage(): string {
+  protected defaults(): string {
     let defaultMessage = "";
     if (typeof this.settings.default !== "undefined") {
       defaultMessage += dim(` (${this.format(this.settings.default)})`);
@@ -96,51 +106,38 @@ export abstract class GenericPrompt<
   }
 
   /** Get prompt success message. */
-  protected getSuccessMessage(value: T): string | undefined {
-    return ` ${yellow("?")} ${bold(this.settings.message)}` +
-      this.getDefaultMessage() +
+  protected success(value: T): string | undefined {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
       " " + green(this.format(value));
   }
 
-  protected getBody?(): string | undefined | Promise<string | undefined>;
+  protected body?(): string | undefined | Promise<string | undefined>;
 
-  protected getFooter(): string | undefined {
-    return this.getError() ?? this.getHint();
+  protected footer(): string | undefined {
+    return this.error() ?? this.hint();
   }
 
-  protected getError(): string | undefined {
+  protected error(): string | undefined {
     return this.lastError
       ? red(bold(` ${Figures.CROSS} `) + this.lastError)
       : undefined;
   }
 
-  protected getHint(): string | undefined {
+  protected hint(): string | undefined {
     return this.settings.hint
       ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
       : undefined;
   }
 
-  /********************************************
-   ********************************************
-   ********************************************/
-
   /** Execute the prompt. */
   protected async execute(): Promise<T> {
     // Throw errors on unit tests.
     if (typeof GenericPrompt.injectedValue !== "undefined" && this.lastError) {
-      throw new Error(await this.getError());
+      throw new Error(await this.error());
     }
 
-    const result = await Promise.all([
-      this.getHeader(),
-      this.getBody?.(),
-      this.getFooter(),
-    ]);
-
-    const output: string = result.filter((val) => !!val).join("\n");
-
-    await this.render(output);
+    await this.render();
 
     this.lastError = undefined;
 
@@ -154,7 +151,7 @@ export abstract class GenericPrompt<
 
     this.clear();
 
-    const successMessage: string | undefined = this.getSuccessMessage(
+    const successMessage: string | undefined = this.success(
       this.value,
     );
     if (successMessage) {
@@ -171,11 +168,17 @@ export abstract class GenericPrompt<
     return this.value;
   }
 
-  /**
-   * Render prompt content.
-   * @param content Prompt content.
-   */
-  protected async render(content: string): Promise<void> {
+  /** Render prompt. */
+  protected async render(): Promise<void> {
+    const result: [string, string | undefined, string | undefined] =
+      await Promise.all([
+        this.header(),
+        this.body?.(),
+        this.footer(),
+      ]);
+
+    const content: string = result.filter(Boolean).join("\n");
+
     if (this.lastError || this.isRunning) {
       this.clear();
     }

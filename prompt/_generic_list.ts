@@ -64,7 +64,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   /** Render options. */
-  protected getBody(): string | undefined | Promise<string | undefined> {
+  protected body(): string | undefined | Promise<string | undefined> {
     const body: Array<string> = [];
     const height: number = this.getListHeight();
     for (let i = this.index; i < this.index + height; i++) {

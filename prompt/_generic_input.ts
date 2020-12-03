@@ -32,7 +32,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
   protected input = "";
   protected index = 0;
-  #promptPosition: number = 0;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -60,24 +59,20 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     });
   }
 
-  protected getMessage(): string {
-    const message: string = super.getMessage() +
-      " " + this.settings.pointer + " ";
-    this.#promptPosition = stripColor(message).length;
+  protected message(): string {
+    const message: string = super.message() + " " + this.settings.pointer + " ";
+    this.cursor.x = stripColor(message).length;
     return message;
   }
 
-  protected getHeader(): string {
-    return this.getMessage() + underline(this.input);
+  protected header(): string {
+    return this.message() + underline(this.input);
   }
 
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected async render(message: string): Promise<void> {
-    await super.render(message);
-    this.tty.cursorTo(this.#promptPosition + this.index + 1);
+  /** Render prompt. */
+  protected async render(): Promise<void> {
+    await super.render();
+    this.tty.cursorTo(this.cursor.x + this.index + 1);
   }
 
   /**
