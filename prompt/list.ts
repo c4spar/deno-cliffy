@@ -49,7 +49,7 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
-  protected getPrompt(): string {
+  protected getHeader(): string {
     const oldInput: string = this.input;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
     const separator: string = this.settings.separator + " ";

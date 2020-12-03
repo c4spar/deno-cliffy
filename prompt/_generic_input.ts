@@ -67,7 +67,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     return message;
   }
 
-  protected getPrompt(): string {
+  protected getHeader(): string {
     return this.getMessage() + underline(this.input);
   }
 

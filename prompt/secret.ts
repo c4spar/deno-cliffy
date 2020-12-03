@@ -54,7 +54,7 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
-  protected getPrompt(): string {
+  protected getHeader(): string {
     const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
     return this.getMessage() + underline(secret);
   }

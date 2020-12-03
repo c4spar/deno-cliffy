@@ -78,7 +78,7 @@ export abstract class GenericPrompt<
   }
 
   /** Get prompt message. */
-  protected getPrompt(): string {
+  protected getHeader(): string {
     return this.getMessage();
   }
 
@@ -133,7 +133,7 @@ export abstract class GenericPrompt<
     }
 
     const result = await Promise.all([
-      this.getPrompt(),
+      this.getHeader(),
       this.getBody?.(),
       this.getFooter(),
     ]);

@@ -63,7 +63,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     return super.getMessage() + " " + this.settings.pointer + " ";
   }
 
-  protected getPrompt(): string {
+  protected getHeader(): string {
     let message = this.getMessage();
 
     if (this.status === this.settings.active) {
