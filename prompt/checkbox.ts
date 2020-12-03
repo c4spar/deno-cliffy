@@ -165,7 +165,7 @@ export class Checkbox
       case event.name === "c":
         // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         break;

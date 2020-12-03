@@ -45,7 +45,7 @@ export abstract class GenericPrompt<
   // deno-lint-ignore no-explicit-any
   protected static injectedValue: any | undefined;
 
-  protected screen = AnsiEscape.from(Deno.stdout);
+  protected tty = AnsiEscape.from(Deno.stdout);
   protected lastError: string | undefined;
   protected isRunning = false;
   protected value: T | undefined;
@@ -66,13 +66,13 @@ export abstract class GenericPrompt<
     try {
       return await this.execute();
     } finally {
-      this.screen.cursorShow();
+      this.tty.cursorShow();
     }
   }
 
   /** Clear prompt output. */
   protected clear(): void {
-    this.screen
+    this.tty
       .cursorLeft()
       .eraseDown();
   }
@@ -163,7 +163,7 @@ export abstract class GenericPrompt<
       );
     }
 
-    this.screen.cursorShow();
+    this.tty.cursorShow();
 
     GenericPrompt.injectedValue = undefined;
     this.isRunning = false;
@@ -183,7 +183,7 @@ export abstract class GenericPrompt<
     const linesCount: number = content.split("\n").length - 1;
     await Deno.stdout.write(new TextEncoder().encode(content));
     if (linesCount) {
-      this.screen.cursorUp(linesCount);
+      this.tty.cursorUp(linesCount);
     }
   }
 

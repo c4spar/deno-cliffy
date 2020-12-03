@@ -81,7 +81,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
   /** Read user input from stdin, handle events and validate user input. */
   protected read(): Promise<boolean> {
-    this.screen.cursorHide();
+    this.tty.cursorHide();
     return super.read();
   }
 
@@ -93,7 +93,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         break;

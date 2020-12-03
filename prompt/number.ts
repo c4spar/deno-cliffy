@@ -70,7 +70,7 @@ export class Number extends GenericInput<number, NumberSettings> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         break;

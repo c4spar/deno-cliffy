@@ -70,7 +70,7 @@ export class Secret extends GenericInput<string, SecretSettings> {
   /** Read user input. */
   protected read(): Promise<boolean> {
     if (this.settings.hidden) {
-      this.screen.cursorHide();
+      this.tty.cursorHide();
     }
     return super.read();
   }

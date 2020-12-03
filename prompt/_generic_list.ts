@@ -90,7 +90,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
 
   /** Read user input. */
   protected read(): Promise<boolean> {
-    this.screen.cursorHide();
+    this.tty.cursorHide();
     return super.read();
   }
 

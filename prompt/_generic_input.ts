@@ -77,7 +77,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    */
   protected async render(message: string): Promise<void> {
     await super.render(message);
-    this.screen.cursorTo(this.#promptPosition + this.index + 1);
+    this.tty.cursorTo(this.#promptPosition + this.index + 1);
   }
 
   /**
@@ -88,7 +88,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         if (event.sequence) {
@@ -159,7 +159,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   protected deleteChar(): void {
     if (this.index > 0) {
       this.index--;
-      this.screen.cursorBackward(1);
+      this.tty.cursorBackward(1);
       this.input = this.input.slice(0, this.index) +
         this.input.slice(this.index + 1);
     }
