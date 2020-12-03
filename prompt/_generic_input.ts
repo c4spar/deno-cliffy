@@ -61,18 +61,12 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
   protected message(): string {
     const message: string = super.message() + " " + this.settings.pointer + " ";
-    this.cursor.x = stripColor(message).length;
+    this.cursor.x = stripColor(message).length + this.index + 1;
     return message;
   }
 
   protected header(): string {
     return this.message() + underline(this.input);
-  }
-
-  /** Render prompt. */
-  protected async render(): Promise<void> {
-    await super.render();
-    this.tty.cursorTo(this.cursor.x + this.index + 1);
   }
 
   /**

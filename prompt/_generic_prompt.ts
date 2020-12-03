@@ -24,13 +24,12 @@ export interface GenericPromptSettings<T, V>
 }
 
 /** Static generic prompt interface. */
-export interface StaticGenericPrompt<
-  T,
+export interface StaticGenericPrompt<T,
   V,
   O extends GenericPromptOptions<T, V>,
   S extends GenericPromptSettings<T, V>,
   P extends GenericPrompt<T, V, S>,
-> {
+  > {
   inject?(value: T): void;
 
   prompt(options: O): Promise<T>;
@@ -44,29 +43,25 @@ export interface Cursor {
 export type RenderResult = [string, string | undefined, string | undefined];
 
 /** Generic prompt representation. */
-export abstract class GenericPrompt<
-  T,
+export abstract class GenericPrompt<T,
   V,
   S extends GenericPromptSettings<T, V>,
-> {
-  // deno-lint-ignore no-explicit-any
-  protected static injectedValue: any | undefined;
-
-  protected tty = AnsiEscape.from(Deno.stdout);
-  protected lastError: string | undefined;
-  protected isRunning = false;
-  protected value: T | undefined;
-  protected cursor: Cursor = {
+  > {
+  protected static injectedValue: unknown | undefined;
+  protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
   };
+  protected value: T | undefined;
+  protected lastError: string | undefined;
+  #isFirstRun = true;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
    * @param value Input value.
    */
-  // deno-lint-ignore no-explicit-any
-  public static inject(value: any): void {
+  public static inject(value: unknown): void {
     GenericPrompt.injectedValue = value;
   }
 
@@ -138,7 +133,6 @@ export abstract class GenericPrompt<
     }
 
     await this.render();
-
     this.lastError = undefined;
 
     if (!await this.read()) {
@@ -150,7 +144,6 @@ export abstract class GenericPrompt<
     }
 
     this.clear();
-
     const successMessage: string | undefined = this.success(
       this.value,
     );
@@ -160,10 +153,8 @@ export abstract class GenericPrompt<
       );
     }
 
-    this.tty.cursorShow();
-
     GenericPrompt.injectedValue = undefined;
-    this.isRunning = false;
+    this.tty.cursorShow();
 
     return this.value;
   }
@@ -178,16 +169,19 @@ export abstract class GenericPrompt<
       ]);
 
     const content: string = result.filter(Boolean).join("\n");
+    const y: number = content.split("\n").length - this.cursor.y - 1;
 
-    if (this.lastError || this.isRunning) {
+    if (!this.#isFirstRun || this.lastError) {
       this.clear();
     }
-    this.isRunning = true;
-    const linesCount: number = content.split("\n").length - 1;
+    this.#isFirstRun = false;
+
     await Deno.stdout.write(new TextEncoder().encode(content));
-    if (linesCount) {
-      this.tty.cursorUp(linesCount);
+
+    if (y) {
+      this.tty.cursorUp(y);
     }
+    this.tty.cursorTo(this.cursor.x);
   }
 
   /**
@@ -222,7 +216,7 @@ export abstract class GenericPrompt<
   /** Read user input from stdin, handle events and validate user input. */
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
-      const value: V = GenericPrompt.injectedValue;
+      const value: V = GenericPrompt.injectedValue as V;
       return this.validateValue(value);
     }
 
