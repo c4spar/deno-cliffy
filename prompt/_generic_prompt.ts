@@ -24,12 +24,13 @@ export interface GenericPromptSettings<T, V>
 }
 
 /** Static generic prompt interface. */
-export interface StaticGenericPrompt<T,
+export interface StaticGenericPrompt<
+  T,
   V,
   O extends GenericPromptOptions<T, V>,
   S extends GenericPromptSettings<T, V>,
   P extends GenericPrompt<T, V, S>,
-  > {
+> {
   inject?(value: T): void;
 
   prompt(options: O): Promise<T>;
@@ -43,10 +44,11 @@ export interface Cursor {
 export type RenderResult = [string, string | undefined, string | undefined];
 
 /** Generic prompt representation. */
-export abstract class GenericPrompt<T,
+export abstract class GenericPrompt<
+  T,
   V,
   S extends GenericPromptSettings<T, V>,
-  > {
+> {
   protected static injectedValue: unknown | undefined;
   protected readonly tty = AnsiEscape.from(Deno.stdout);
   protected readonly cursor: Cursor = {
@@ -81,11 +83,6 @@ export abstract class GenericPrompt<T,
     this.tty
       .cursorLeft()
       .eraseDown();
-  }
-
-  /** Get prompt message. */
-  protected header(): string {
-    return this.message();
   }
 
   protected message(): string {
@@ -163,7 +160,7 @@ export abstract class GenericPrompt<T,
   protected async render(): Promise<void> {
     const result: [string, string | undefined, string | undefined] =
       await Promise.all([
-        this.header(),
+        this.message(),
         this.body?.(),
         this.footer(),
       ]);

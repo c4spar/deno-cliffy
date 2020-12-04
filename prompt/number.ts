@@ -124,45 +124,53 @@ export class Number extends GenericInput<number, NumberSettings> {
 
   /** Decrease/increase input number. */
   protected manipulateIndex(decrease?: boolean) {
-    if (this.input[this.index] === "-") {
-      this.index++;
+    if (this.inputValue[this.inputIndex] === "-") {
+      this.inputIndex++;
     }
 
-    if (this.input.length && (this.index > this.input.length - 1)) {
-      this.index--;
+    if (
+      this.inputValue.length && (this.inputIndex > this.inputValue.length - 1)
+    ) {
+      this.inputIndex--;
     }
 
-    const decimalIndex: number = this.input.indexOf(".");
-    const [abs, dec] = this.input.split(".");
+    const decimalIndex: number = this.inputValue.indexOf(".");
+    const [abs, dec] = this.inputValue.split(".");
 
-    if (dec && this.index === decimalIndex) {
-      this.index--;
+    if (dec && this.inputIndex === decimalIndex) {
+      this.inputIndex--;
     }
 
-    const inDecimal: boolean = decimalIndex !== -1 && this.index > decimalIndex;
+    const inDecimal: boolean = decimalIndex !== -1 &&
+      this.inputIndex > decimalIndex;
     let value: string = (inDecimal ? dec : abs) || "0";
-    const oldLength: number = this.input.length;
+    const oldLength: number = this.inputValue.length;
     const index: number = inDecimal
-      ? this.index - decimalIndex - 1
-      : this.index;
+      ? this.inputIndex - decimalIndex - 1
+      : this.inputIndex;
     const increaseValue = Math.pow(10, value.length - index - 1);
 
     value = (parseInt(value) + (decrease ? -increaseValue : increaseValue))
       .toString();
 
-    this.input = !dec
+    this.inputValue = !dec
       ? value
-      : (this.index > decimalIndex ? abs + "." + value : value + "." + dec);
+      : (this.inputIndex > decimalIndex ? abs + "." + value
+      : value + "." + dec);
 
-    if (this.input.length > oldLength) {
-      this.index++;
+    if (this.inputValue.length > oldLength) {
+      this.inputIndex++;
     } else if (
-      this.input.length < oldLength && this.input[this.index - 1] !== "-"
+      this.inputValue.length < oldLength &&
+      this.inputValue[this.inputIndex - 1] !== "-"
     ) {
-      this.index--;
+      this.inputIndex--;
     }
 
-    this.index = Math.max(0, Math.min(this.index, this.input.length - 1));
+    this.inputIndex = Math.max(
+      0,
+      Math.min(this.inputIndex, this.inputValue.length - 1),
+    );
   }
 
   /**
@@ -175,8 +183,8 @@ export class Number extends GenericInput<number, NumberSettings> {
     } else if (
       this.settings.float &&
       char === "." &&
-      this.input.indexOf(".") === -1 &&
-      (this.input[0] === "-" ? this.index > 1 : this.index > 0)
+      this.inputValue.indexOf(".") === -1 &&
+      (this.inputValue[0] === "-" ? this.inputIndex > 1 : this.inputIndex > 0)
     ) {
       super.addChar(char);
     }

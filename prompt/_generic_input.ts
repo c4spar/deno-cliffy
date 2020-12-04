@@ -30,8 +30,8 @@ export interface GenericInputPromptSettings<T>
 /** Generic input prompt representation. */
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
-  protected input = "";
-  protected index = 0;
+  protected inputValue = "";
+  protected inputIndex = 0;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -61,12 +61,12 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
   protected message(): string {
     const message: string = super.message() + " " + this.settings.pointer + " ";
-    this.cursor.x = stripColor(message).length + this.index + 1;
-    return message;
+    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+    return message + this.input();
   }
 
-  protected header(): string {
-    return this.message() + underline(this.input);
+  protected input(): string {
+    return underline(this.inputValue);
   }
 
   /**
@@ -125,45 +125,45 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    * @param char Char to add.
    */
   protected addChar(char: string): void {
-    this.input = this.input.slice(0, this.index) + char +
-      this.input.slice(this.index);
-    this.index++;
+    this.inputValue = this.inputValue.slice(0, this.inputIndex) + char +
+      this.inputValue.slice(this.inputIndex);
+    this.inputIndex++;
   }
 
   /** Move prompt cursor left. */
   protected moveCursorLeft(): void {
-    if (this.index > 0) {
-      this.index--;
+    if (this.inputIndex > 0) {
+      this.inputIndex--;
     }
   }
 
   /** Move prompt cursor right. */
   protected moveCursorRight(): void {
-    if (this.index < this.input.length) {
-      this.index++;
+    if (this.inputIndex < this.inputValue.length) {
+      this.inputIndex++;
     }
   }
 
   /** Delete char left. */
   protected deleteChar(): void {
-    if (this.index > 0) {
-      this.index--;
+    if (this.inputIndex > 0) {
+      this.inputIndex--;
       this.tty.cursorBackward(1);
-      this.input = this.input.slice(0, this.index) +
-        this.input.slice(this.index + 1);
+      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
+        this.inputValue.slice(this.inputIndex + 1);
     }
   }
 
   /** Delete char right. */
   protected deleteCharRight(): void {
-    if (this.index < this.input.length) {
-      this.input = this.input.slice(0, this.index) +
-        this.input.slice(this.index + 1);
+    if (this.inputIndex < this.inputValue.length) {
+      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
+        this.inputValue.slice(this.inputIndex + 1);
     }
   }
 
   /** Get input input. */
   protected getValue(): string {
-    return this.input;
+    return this.inputValue;
   }
 }

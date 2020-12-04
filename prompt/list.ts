@@ -49,15 +49,18 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
-  protected header(): string {
-    const oldInput: string = this.input;
+  protected input(): string {
+    const oldInput: string = this.inputValue;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
     const separator: string = this.settings.separator + " ";
 
-    this.input = oldInputParts.join(separator);
-    this.index -= oldInput.length - this.input.length;
+    this.inputValue = oldInputParts.join(separator);
 
-    return this.message() + oldInputParts
+    const diff = oldInput.length - this.inputValue.length;
+    this.inputIndex -= diff;
+    this.cursor.x -= diff;
+
+    return oldInputParts
       .map((val: string) => underline(val))
       .join(separator);
   }
@@ -74,8 +77,8 @@ export class List extends GenericInput<string[], ListSettings> {
     switch (char) {
       case this.settings.separator:
         if (
-          this.input.length &&
-          this.input.trim().slice(-1) !== this.settings.separator
+          this.inputValue.length &&
+          this.inputValue.trim().slice(-1) !== this.settings.separator
         ) {
           super.addChar(char);
         }
@@ -87,7 +90,7 @@ export class List extends GenericInput<string[], ListSettings> {
 
   /** Delete char left. */
   protected deleteChar(): void {
-    if (this.input[this.index - 1] === " ") {
+    if (this.inputValue[this.inputIndex - 1] === " ") {
       super.deleteChar();
     }
     super.deleteChar();
@@ -124,9 +127,10 @@ export class List extends GenericInput<string[], ListSettings> {
     return true;
   }
 
-  protected transformValue(value: string): string[] | undefined {
-    // remove trailing comma and spaces.
-    return super.transformValue(value.replace(/,+\s*$/, ""));
+  /** Get input value. */
+  protected getValue(): string {
+    // Remove trailing comma and spaces.
+    return super.getValue().replace(/,+\s*$/, "");
   }
 
   /**
