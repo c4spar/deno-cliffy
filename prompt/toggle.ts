@@ -60,23 +60,19 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
   }
 
   protected message(): string {
-    return super.message() + " " + this.settings.pointer + " ";
-  }
-
-  protected defaults(): string {
-    let defaults = "";
+    let message = super.message() + " " + this.settings.pointer + " ";
 
     if (this.status === this.settings.active) {
-      defaults += dim(this.settings.inactive + " / ") +
+      message += dim(this.settings.inactive + " / ") +
         underline(this.settings.active);
     } else if (this.status === this.settings.inactive) {
-      defaults += underline(this.settings.inactive) +
+      message += underline(this.settings.inactive) +
         dim(" / " + this.settings.active);
     } else {
-      defaults += dim(this.settings.inactive + " / " + this.settings.active);
+      message += dim(this.settings.inactive + " / " + this.settings.active);
     }
 
-    return defaults;
+    return message;
   }
 
   /** Read user input from stdin, handle events and validate user input. */
