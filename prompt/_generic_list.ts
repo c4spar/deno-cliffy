@@ -53,13 +53,15 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
 
   /**
    * Set list option defaults.
-   * @param item List option.
+   * @param option List option.
    */
-  protected static mapItem(item: GenericListOption): GenericListOptionSettings {
+  protected static mapOption(
+    option: GenericListOption,
+  ): GenericListOptionSettings {
     return {
-      value: item.value,
-      name: typeof item.name === "undefined" ? item.value : item.name,
-      disabled: !!item.disabled,
+      value: option.value,
+      name: typeof option.name === "undefined" ? option.value : option.name,
+      disabled: !!option.disabled,
     };
   }
 

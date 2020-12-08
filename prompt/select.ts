@@ -82,7 +82,7 @@ export class Select extends GenericList<string, string, SelectSettings> {
       .map((item: string | SelectOption) =>
         typeof item === "string" ? { value: item } : item
       )
-      .map((item) => this.mapItem(item));
+      .map((item) => this.mapOption(item));
   }
 
   /**

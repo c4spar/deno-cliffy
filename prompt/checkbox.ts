@@ -114,7 +114,7 @@ export class Checkbox
         typeof item === "string" ? { value: item } : item
       )
       .map((item) => ({
-        ...this.mapItem(item),
+        ...this.mapOption(item),
         checked: typeof item.checked === "undefined" && options.default &&
             options.default.indexOf(item.value) !== -1
           ? true
