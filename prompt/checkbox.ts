@@ -160,7 +160,7 @@ export class Checkbox
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
@@ -183,10 +183,9 @@ export class Checkbox
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
     }
-
-    return false;
   }
 
   /** Check selected option. */

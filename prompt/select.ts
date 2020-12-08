@@ -89,7 +89,7 @@ export class Select extends GenericList<string, string, SelectSettings> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
@@ -107,10 +107,9 @@ export class Select extends GenericList<string, string, SelectSettings> {
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
     }
-
-    return false;
   }
 
   /** Get value of selected option. */

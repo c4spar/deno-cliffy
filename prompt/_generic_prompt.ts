@@ -144,6 +144,30 @@ export abstract class GenericPrompt<
     this.tty.cursorTo(this.cursor.x);
   }
 
+  /** Read user input from stdin, handle events and validate user input. */
+  protected async read(): Promise<boolean> {
+    if (typeof GenericPrompt.injectedValue !== "undefined") {
+      const value: V = GenericPrompt.injectedValue as V;
+      return this.#validateValue(value);
+    }
+
+    const events: KeyEvent[] = await this.#readKey();
+
+    if (!events.length) {
+      return false;
+    }
+
+    for (const event of events) {
+      await this.handleEvent(event);
+    }
+
+    return typeof this.#value !== "undefined";
+  }
+
+  protected submit(): Promise<boolean> {
+    return this.#validateValue(this.getValue());
+  }
+
   protected message(): string {
     return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
   }
@@ -185,7 +209,7 @@ export abstract class GenericPrompt<
    * Handle user input event.
    * @param event Key event.
    */
-  protected abstract handleEvent(event: KeyEvent): boolean | Promise<boolean>;
+  protected abstract handleEvent(event: KeyEvent): void | Promise<void>;
 
   /**
    * Map input value to output value.
@@ -209,32 +233,6 @@ export abstract class GenericPrompt<
 
   /** Get input value. */
   protected abstract getValue(): V;
-
-  /** Read user input from stdin, handle events and validate user input. */
-  protected async read(): Promise<boolean> {
-    if (typeof GenericPrompt.injectedValue !== "undefined") {
-      const value: V = GenericPrompt.injectedValue as V;
-      return this.#validateValue(value);
-    }
-
-    const events: KeyEvent[] = await this.#readKey();
-
-    if (!events.length) {
-      return false;
-    }
-
-    let done = false;
-
-    for (const event of events) {
-      done = await this.handleEvent(event);
-    }
-
-    if (done) {
-      return this.#validateValue(this.getValue());
-    }
-
-    return false;
-  }
 
   /** Read user input from stdin and pars ansi codes. */
   #readKey = async (): Promise<KeyEvent[]> => {
@@ -299,7 +297,7 @@ export abstract class GenericPrompt<
       this.#value = this.#transformValue(value);
     }
 
-    return !this.#lastError;
+    return typeof this.#value !== "undefined";
   };
 
   /**

@@ -73,7 +73,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
@@ -108,16 +108,14 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
 
       default:
         if (event.sequence && !event.meta && !event.ctrl) {
           this.addChar(event.sequence);
         }
-        break;
     }
-
-    return false;
   }
 
   /**
