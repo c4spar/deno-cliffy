@@ -82,18 +82,18 @@ export class Select extends GenericList<string, string, SelectSettings> {
       .map((item: string | SelectOption) =>
         typeof item === "string" ? { value: item } : item
       )
-      .map((item) => this.mapItem(item));
+      .map((item) => this.mapOption(item));
   }
 
   /**
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         break;
@@ -107,10 +107,9 @@ export class Select extends GenericList<string, string, SelectSettings> {
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
     }
-
-    return false;
   }
 
   /** Get value of selected option. */

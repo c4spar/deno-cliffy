@@ -59,12 +59,8 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     }).prompt();
   }
 
-  protected getMessage(): string {
-    return super.getMessage() + " " + this.settings.pointer + " ";
-  }
-
-  protected getPrompt(): string {
-    let message = this.getMessage();
+  protected message(): string {
+    let message = super.message() + " " + this.settings.pointer + " ";
 
     if (this.status === this.settings.active) {
       message += dim(this.settings.inactive + " / ") +
@@ -81,7 +77,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
   /** Read user input from stdin, handle events and validate user input. */
   protected read(): Promise<boolean> {
-    this.screen.cursorHide();
+    this.tty.cursorHide();
     return super.read();
   }
 
@@ -89,11 +85,11 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         break;
@@ -109,10 +105,9 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
     }
-
-    return false;
   }
 
   /** Set active. */

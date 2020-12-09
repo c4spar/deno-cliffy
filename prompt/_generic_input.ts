@@ -30,9 +30,8 @@ export interface GenericInputPromptSettings<T>
 /** Generic input prompt representation. */
 export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
-  protected input = "";
-  protected index = 0;
-  #promptPosition: number = 0;
+  protected inputValue = "";
+  protected inputIndex = 0;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -60,35 +59,25 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     });
   }
 
-  protected getMessage(): string {
-    const message: string = super.getMessage() +
-      " " + this.settings.pointer + " ";
-    this.#promptPosition = stripColor(message).length;
-    return message;
+  protected message(): string {
+    const message: string = super.message() + " " + this.settings.pointer + " ";
+    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+    return message + this.input();
   }
 
-  protected getPrompt(): string {
-    return this.getMessage() + underline(this.input);
-  }
-
-  /**
-   * Set prompt message.
-   * @param message Prompt message.
-   */
-  protected async render(message: string): Promise<void> {
-    await super.render(message);
-    this.screen.cursorTo(this.#promptPosition + this.index + 1);
+  protected input(): string {
+    return underline(this.inputValue);
   }
 
   /**
    * Handle user input event.
    * @param event Key event.
    */
-  protected handleEvent(event: KeyEvent): boolean {
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           return Deno.exit(0);
         }
         if (event.sequence) {
@@ -119,16 +108,14 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
 
       default:
         if (event.sequence && !event.meta && !event.ctrl) {
           this.addChar(event.sequence);
         }
-        break;
     }
-
-    return false;
   }
 
   /**
@@ -136,45 +123,45 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    * @param char Char to add.
    */
   protected addChar(char: string): void {
-    this.input = this.input.slice(0, this.index) + char +
-      this.input.slice(this.index);
-    this.index++;
+    this.inputValue = this.inputValue.slice(0, this.inputIndex) + char +
+      this.inputValue.slice(this.inputIndex);
+    this.inputIndex++;
   }
 
   /** Move prompt cursor left. */
   protected moveCursorLeft(): void {
-    if (this.index > 0) {
-      this.index--;
+    if (this.inputIndex > 0) {
+      this.inputIndex--;
     }
   }
 
   /** Move prompt cursor right. */
   protected moveCursorRight(): void {
-    if (this.index < this.input.length) {
-      this.index++;
+    if (this.inputIndex < this.inputValue.length) {
+      this.inputIndex++;
     }
   }
 
   /** Delete char left. */
   protected deleteChar(): void {
-    if (this.index > 0) {
-      this.index--;
-      this.screen.cursorBackward(1);
-      this.input = this.input.slice(0, this.index) +
-        this.input.slice(this.index + 1);
+    if (this.inputIndex > 0) {
+      this.inputIndex--;
+      this.tty.cursorBackward(1);
+      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
+        this.inputValue.slice(this.inputIndex + 1);
     }
   }
 
   /** Delete char right. */
   protected deleteCharRight(): void {
-    if (this.index < this.input.length) {
-      this.input = this.input.slice(0, this.index) +
-        this.input.slice(this.index + 1);
+    if (this.inputIndex < this.inputValue.length) {
+      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
+        this.inputValue.slice(this.inputIndex + 1);
     }
   }
 
   /** Get input input. */
   protected getValue(): string {
-    return this.input;
+    return this.inputValue;
   }
 }

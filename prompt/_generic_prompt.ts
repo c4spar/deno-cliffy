@@ -36,26 +36,34 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
+export interface Cursor {
+  x: number;
+  y: number;
+}
+
+export type RenderResult = [string, string | undefined, string | undefined];
+
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
   V,
   S extends GenericPromptSettings<T, V>,
 > {
-  // deno-lint-ignore no-explicit-any
-  protected static injectedValue: any | undefined;
-
-  protected screen = AnsiEscape.from(Deno.stdout);
-  protected lastError: string | undefined;
-  protected isRunning = false;
-  protected value: T | undefined;
+  protected static injectedValue: unknown | undefined;
+  protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly cursor: Cursor = {
+    x: 0,
+    y: 0,
+  };
+  #value: T | undefined;
+  #lastError: string | undefined;
+  #isFirstRun = true;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
    * @param value Input value.
    */
-  // deno-lint-ignore no-explicit-any
-  public static inject(value: any): void {
+  public static inject(value: unknown): void {
     GenericPrompt.injectedValue = value;
   }
 
@@ -64,30 +72,107 @@ export abstract class GenericPrompt<
   /** Execute the prompt and show cursor on end. */
   public async prompt(): Promise<T> {
     try {
-      return await this.execute();
+      return await this.#execute();
     } finally {
-      this.screen.cursorShow();
+      this.tty.cursorShow();
     }
   }
 
   /** Clear prompt output. */
   protected clear(): void {
-    this.screen
+    this.tty
       .cursorLeft()
       .eraseDown();
   }
 
-  /** Get prompt message. */
-  protected getPrompt(): string {
-    return this.getMessage();
+  /** Execute the prompt. */
+  #execute = async (): Promise<T> => {
+    // Throw errors on unit tests.
+    if (typeof GenericPrompt.injectedValue !== "undefined" && this.#lastError) {
+      throw new Error(await this.error());
+    }
+
+    await this.render();
+    this.#lastError = undefined;
+
+    if (!await this.read()) {
+      return this.#execute();
+    }
+
+    if (typeof this.#value === "undefined") {
+      throw new Error("internal error: failed to read value");
+    }
+
+    this.clear();
+    const successMessage: string | undefined = this.success(
+      this.#value,
+    );
+    if (successMessage) {
+      await Deno.stdout.write(
+        new TextEncoder().encode(successMessage + "\n"),
+      );
+    }
+
+    GenericPrompt.injectedValue = undefined;
+    this.tty.cursorShow();
+
+    return this.#value;
+  };
+
+  /** Render prompt. */
+  protected async render(): Promise<void> {
+    const result: [string, string | undefined, string | undefined] =
+      await Promise.all([
+        this.message(),
+        this.body?.(),
+        this.footer(),
+      ]);
+
+    const content: string = result.filter(Boolean).join("\n");
+    const y: number = content.split("\n").length - this.cursor.y - 1;
+
+    if (!this.#isFirstRun || this.#lastError) {
+      this.clear();
+    }
+    this.#isFirstRun = false;
+
+    await Deno.stdout.write(new TextEncoder().encode(content));
+
+    if (y) {
+      this.tty.cursorUp(y);
+    }
+    this.tty.cursorTo(this.cursor.x);
   }
 
-  protected getMessage(): string {
-    return ` ${yellow("?")} ${bold(this.settings.message)}` +
-      this.getDefaultMessage();
+  /** Read user input from stdin, handle events and validate user input. */
+  protected async read(): Promise<boolean> {
+    if (typeof GenericPrompt.injectedValue !== "undefined") {
+      const value: V = GenericPrompt.injectedValue as V;
+      return this.#validateValue(value);
+    }
+
+    const events: KeyEvent[] = await this.#readKey();
+
+    if (!events.length) {
+      return false;
+    }
+
+    for (const event of events) {
+      await this.handleEvent(event);
+    }
+
+    return typeof this.#value !== "undefined";
   }
 
-  protected getDefaultMessage(): string {
+  protected submit(): Promise<boolean> {
+    return this.#validateValue(this.getValue());
+  }
+
+  protected message(): string {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
+  }
+
+  protected defaults(): string {
     let defaultMessage = "";
     if (typeof this.settings.default !== "undefined") {
       defaultMessage += dim(` (${this.format(this.settings.default)})`);
@@ -96,102 +181,35 @@ export abstract class GenericPrompt<
   }
 
   /** Get prompt success message. */
-  protected getSuccessMessage(value: T): string | undefined {
-    return ` ${yellow("?")} ${bold(this.settings.message)}` +
-      this.getDefaultMessage() +
+  protected success(value: T): string | undefined {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
       " " + green(this.format(value));
   }
 
-  protected getBody?(): string | undefined | Promise<string | undefined>;
+  protected body?(): string | undefined | Promise<string | undefined>;
 
-  protected getFooter(): string | undefined {
-    return this.getError() ?? this.getHint();
+  protected footer(): string | undefined {
+    return this.error() ?? this.hint();
   }
 
-  protected getError(): string | undefined {
-    return this.lastError
-      ? red(bold(` ${Figures.CROSS} `) + this.lastError)
+  protected error(): string | undefined {
+    return this.#lastError
+      ? red(bold(` ${Figures.CROSS} `) + this.#lastError)
       : undefined;
   }
 
-  protected getHint(): string | undefined {
+  protected hint(): string | undefined {
     return this.settings.hint
       ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
       : undefined;
-  }
-
-  /********************************************
-   ********************************************
-   ********************************************/
-
-  /** Execute the prompt. */
-  protected async execute(): Promise<T> {
-    // Throw errors on unit tests.
-    if (typeof GenericPrompt.injectedValue !== "undefined" && this.lastError) {
-      throw new Error(await this.getError());
-    }
-
-    const result = await Promise.all([
-      this.getPrompt(),
-      this.getBody?.(),
-      this.getFooter(),
-    ]);
-
-    const output: string = result.filter((val) => !!val).join("\n");
-
-    await this.render(output);
-
-    this.lastError = undefined;
-
-    if (!await this.read()) {
-      return this.execute();
-    }
-
-    if (typeof this.value === "undefined") {
-      throw new Error("internal error: failed to read value");
-    }
-
-    this.clear();
-
-    const successMessage: string | undefined = this.getSuccessMessage(
-      this.value,
-    );
-    if (successMessage) {
-      await Deno.stdout.write(
-        new TextEncoder().encode(successMessage + "\n"),
-      );
-    }
-
-    this.screen.cursorShow();
-
-    GenericPrompt.injectedValue = undefined;
-    this.isRunning = false;
-
-    return this.value;
-  }
-
-  /**
-   * Render prompt content.
-   * @param content Prompt content.
-   */
-  protected async render(content: string): Promise<void> {
-    if (this.lastError || this.isRunning) {
-      this.clear();
-    }
-    this.isRunning = true;
-    const linesCount: number = content.split("\n").length - 1;
-    await Deno.stdout.write(new TextEncoder().encode(content));
-    if (linesCount) {
-      this.screen.cursorUp(linesCount);
-    }
   }
 
   /**
    * Handle user input event.
    * @param event Key event.
    */
-  protected abstract handleEvent(event: KeyEvent): boolean | Promise<boolean>;
+  protected abstract handleEvent(event: KeyEvent): void | Promise<void>;
 
   /**
    * Map input value to output value.
@@ -216,41 +234,15 @@ export abstract class GenericPrompt<
   /** Get input value. */
   protected abstract getValue(): V;
 
-  /** Read user input from stdin, handle events and validate user input. */
-  protected async read(): Promise<boolean> {
-    if (typeof GenericPrompt.injectedValue !== "undefined") {
-      const value: V = GenericPrompt.injectedValue;
-      return this.validateValue(value);
-    }
-
-    const events: KeyEvent[] = await this.readKey();
-
-    if (!events.length) {
-      return false;
-    }
-
-    let done = false;
-
-    for (const event of events) {
-      done = await this.handleEvent(event);
-    }
-
-    if (done) {
-      return this.validateValue(this.getValue());
-    }
-
-    return false;
-  }
-
   /** Read user input from stdin and pars ansi codes. */
-  protected async readKey(): Promise<KeyEvent[]> {
-    const data: Uint8Array = await this.readChar();
+  #readKey = async (): Promise<KeyEvent[]> => {
+    const data: Uint8Array = await this.#readChar();
 
     return data.length ? KeyCode.parse(data) : [];
-  }
+  };
 
   /** Read user input from stdin. */
-  protected async readChar(): Promise<Uint8Array> {
+  #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
 
     Deno.setRaw(Deno.stdin.rid, true);
@@ -262,7 +254,7 @@ export abstract class GenericPrompt<
     }
 
     return buffer.subarray(0, nread);
-  }
+  };
 
   /**
    * Map input value to output value. If a custom transform handler ist set, the
@@ -270,11 +262,11 @@ export abstract class GenericPrompt<
    * from the prompt will be executed.
    * @param value The value to transform.
    */
-  protected transformValue(value: V): T | undefined {
+  #transformValue = (value: V): T | undefined => {
     return this.settings.transform
       ? this.settings.transform(value)
       : this.transform(value);
-  }
+  };
 
   /**
    * Map input value to output value. If a default value is set, the default
@@ -283,11 +275,14 @@ export abstract class GenericPrompt<
    * validation handler from the prompt will be executed.
    * @param value
    */
-  protected async validateValue(value: V): Promise<boolean> {
+  #validateValue = async (value: V): Promise<boolean> => {
     if (!value && typeof this.settings.default !== "undefined") {
-      this.value = this.settings.default;
+      this.#value = this.settings.default;
       return true;
     }
+
+    this.#value = undefined;
+    this.#lastError = undefined;
 
     const validation =
       await (this.settings.validate
@@ -295,15 +290,15 @@ export abstract class GenericPrompt<
         : this.validate(value));
 
     if (validation === false) {
-      this.lastError = `Invalid answer.`;
+      this.#lastError = `Invalid answer.`;
     } else if (typeof validation === "string") {
-      this.lastError = validation;
+      this.#lastError = validation;
     } else {
-      this.value = this.transformValue(value);
+      this.#value = this.#transformValue(value);
     }
 
-    return !this.lastError;
-  }
+    return typeof this.#value !== "undefined";
+  };
 
   /**
    * Check if key event has given name or sequence.

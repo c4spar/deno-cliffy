@@ -54,23 +54,16 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
-  protected getPrompt(): string {
-    const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
-    return this.getMessage() + underline(secret);
-  }
-
-  /** Get prompt success message. */
-  protected getSuccessMessage(value: string): string {
-    const secret = this.settings.hidden
-      ? "*".repeat(8)
-      : "*".repeat(value.length);
-    return this.getMessage() + green(secret);
+  protected input(): string {
+    return underline(
+      this.settings.hidden ? "" : "*".repeat(this.inputValue.length),
+    );
   }
 
   /** Read user input. */
   protected read(): Promise<boolean> {
     if (this.settings.hidden) {
-      this.screen.cursorHide();
+      this.tty.cursorHide();
     }
     return super.read();
   }
@@ -107,6 +100,6 @@ export class Secret extends GenericInput<string, SecretSettings> {
    * @param value Output value.
    */
   protected format(value: string): string {
-    return value;
+    return this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
   }
 }

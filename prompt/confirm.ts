@@ -41,7 +41,7 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }).prompt();
   }
 
-  protected getDefaultMessage(): string {
+  protected defaults(): string {
     let defaultMessage = "";
 
     if (this.settings.default === true) {
