@@ -1,3 +1,4 @@
+/** Border characters interface. */
 export interface IBorder {
   top: string;
   topMid: string;
@@ -16,6 +17,7 @@ export interface IBorder {
   middle: string;
 }
 
+/** Default border characters. */
 export const border: IBorder = {
   top: "─",
   topMid: "┬",

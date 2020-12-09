@@ -22,10 +22,11 @@ const win = {
   RADIO_OFF: "( )",
   TICK: "√",
   CROSS: "×",
-  ELLIPSIS: "...",
+  ELLIPSIS: main.ELLIPSIS,
   POINTER_SMALL: "»",
-  LINE: "─",
-  POINTER: ">",
+  LINE: main.LINE,
+  POINTER: main.POINTER,
 };
 
+/** Prompt icons. */
 export const Figures = Deno.build.os === "windows" ? win : main;

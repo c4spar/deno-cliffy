@@ -4,8 +4,10 @@ import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, bold, dim, green, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
+/** Prompt validation return tape. */
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
+/** Generic prompt options. */
 export interface GenericPromptOptions<T, V> {
   message: string;
   default?: T;
@@ -15,11 +17,13 @@ export interface GenericPromptOptions<T, V> {
   pointer?: string;
 }
 
+/** Generic prompt settings. */
 export interface GenericPromptSettings<T, V>
   extends GenericPromptOptions<T, V> {
   pointer: string;
 }
 
+/** Static generic prompt interface. */
 export interface StaticGenericPrompt<
   T,
   V,
@@ -32,144 +36,213 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
+export interface Cursor {
+  x: number;
+  y: number;
+}
+
+export type RenderResult = [string, string | undefined, string | undefined];
+
+/** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
   V,
   S extends GenericPromptSettings<T, V>,
 > {
-  // deno-lint-ignore no-explicit-any
-  protected static injectedValue: any | undefined;
+  protected static injectedValue: unknown | undefined;
+  protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly cursor: Cursor = {
+    x: 0,
+    y: 0,
+  };
+  #value: T | undefined;
+  #lastError: string | undefined;
+  #isFirstRun = true;
 
-  protected screen = AnsiEscape.from(Deno.stdout);
-  protected lastError: string | undefined;
-  protected isRunning = false;
-  protected value: T | undefined;
-
-  // deno-lint-ignore no-explicit-any
-  public static inject(value: any): void {
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: unknown): void {
     GenericPrompt.injectedValue = value;
   }
 
   protected constructor(protected readonly settings: S) {}
 
+  /** Execute the prompt and show cursor on end. */
   public async prompt(): Promise<T> {
     try {
-      return await this.execute();
+      return await this.#execute();
     } finally {
-      this.screen.cursorShow();
+      this.tty.cursorShow();
     }
   }
 
-  protected abstract setPrompt(message: string): void | Promise<void>;
-
-  protected abstract async handleEvent(event: KeyEvent): Promise<boolean>;
-
-  protected abstract transform(value: V): T | undefined;
-
-  protected abstract validate(value: V): ValidateResult;
-
-  protected abstract format(value: T): string;
-
-  protected abstract getValue(): V;
-
-  protected clear() {
-    this.screen
+  /** Clear prompt output. */
+  protected clear(): void {
+    this.tty
       .cursorLeft()
       .eraseDown();
   }
 
-  protected async execute(): Promise<T> {
-    if (this.lastError || this.isRunning) {
-      this.clear();
+  /** Execute the prompt. */
+  #execute = async (): Promise<T> => {
+    // Throw errors on unit tests.
+    if (typeof GenericPrompt.injectedValue !== "undefined" && this.#lastError) {
+      throw new Error(await this.error());
     }
 
-    this.isRunning = true;
-
-    // be sure there are empty lines after the cursor to fix restoring the cursor if terminal output is bigger than terminal window.
-    const message: string = await this.getMessage();
-    this.preBufferEmptyLines(this.lastError || this.settings.hint || "");
-
-    await this.setPrompt(message);
-
-    if (this.lastError || this.settings.hint) {
-      this.screen.cursorSave();
-      this.writeLine();
-      if (this.lastError) {
-        this.error(this.lastError);
-        this.lastError = undefined;
-      } else if (this.settings.hint) {
-        this.hint(this.settings.hint);
-      }
-      this.screen.cursorRestore();
-    }
+    await this.render();
+    this.#lastError = undefined;
 
     if (!await this.read()) {
-      return this.execute();
+      return this.#execute();
     }
 
-    if (typeof this.value === "undefined") {
+    if (typeof this.#value === "undefined") {
       throw new Error("internal error: failed to read value");
     }
 
     this.clear();
-    this.writeLine(await this.getSuccessMessage(this.value));
-
-    this.screen.cursorShow();
+    const successMessage: string | undefined = this.success(
+      this.#value,
+    );
+    if (successMessage) {
+      await Deno.stdout.write(
+        new TextEncoder().encode(successMessage + "\n"),
+      );
+    }
 
     GenericPrompt.injectedValue = undefined;
-    this.isRunning = false;
+    this.tty.cursorShow();
 
-    return this.value;
-  }
+    return this.#value;
+  };
 
-  protected getMessage(): string | Promise<string> {
-    let message = ` ${yellow("?")} ${bold(this.settings.message)}`;
+  /** Render prompt. */
+  protected async render(): Promise<void> {
+    const result: [string, string | undefined, string | undefined] =
+      await Promise.all([
+        this.message(),
+        this.body?.(),
+        this.footer(),
+      ]);
 
-    if (typeof this.settings.default !== "undefined") {
-      message += dim(` (${this.format(this.settings.default)})`);
+    const content: string = result.filter(Boolean).join("\n");
+    const y: number = content.split("\n").length - this.cursor.y - 1;
+
+    if (!this.#isFirstRun || this.#lastError) {
+      this.clear();
     }
+    this.#isFirstRun = false;
 
-    return message;
+    await Deno.stdout.write(new TextEncoder().encode(content));
+
+    if (y) {
+      this.tty.cursorUp(y);
+    }
+    this.tty.cursorTo(this.cursor.x);
   }
 
-  protected async getSuccessMessage(value: T) {
-    return `${await this.getMessage()} ${this.settings.pointer} ${
-      green(this.format(value))
-    }`;
-  }
-
+  /** Read user input from stdin, handle events and validate user input. */
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
-      const value: V = GenericPrompt.injectedValue;
-      return this.validateValue(value);
+      const value: V = GenericPrompt.injectedValue as V;
+      return this.#validateValue(value);
     }
 
-    const events: KeyEvent[] = await this.readKey();
+    const events: KeyEvent[] = await this.#readKey();
 
     if (!events.length) {
       return false;
     }
 
-    let done = false;
-
     for (const event of events) {
-      done = await this.handleEvent(event);
+      await this.handleEvent(event);
     }
 
-    if (done) {
-      return this.validateValue(this.getValue());
-    }
-
-    return false;
+    return typeof this.#value !== "undefined";
   }
 
-  protected async readKey(): Promise<KeyEvent[]> {
-    const data: Uint8Array = await this.readChar();
+  protected submit(): Promise<boolean> {
+    return this.#validateValue(this.getValue());
+  }
+
+  protected message(): string {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
+  }
+
+  protected defaults(): string {
+    let defaultMessage = "";
+    if (typeof this.settings.default !== "undefined") {
+      defaultMessage += dim(` (${this.format(this.settings.default)})`);
+    }
+    return defaultMessage;
+  }
+
+  /** Get prompt success message. */
+  protected success(value: T): string | undefined {
+    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults() +
+      " " + this.settings.pointer +
+      " " + green(this.format(value));
+  }
+
+  protected body?(): string | undefined | Promise<string | undefined>;
+
+  protected footer(): string | undefined {
+    return this.error() ?? this.hint();
+  }
+
+  protected error(): string | undefined {
+    return this.#lastError
+      ? red(bold(` ${Figures.CROSS} `) + this.#lastError)
+      : undefined;
+  }
+
+  protected hint(): string | undefined {
+    return this.settings.hint
+      ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
+      : undefined;
+  }
+
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected abstract handleEvent(event: KeyEvent): void | Promise<void>;
+
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
+  protected abstract transform(value: V): T | undefined;
+
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
+  protected abstract validate(value: V): ValidateResult;
+
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
+  protected abstract format(value: T): string;
+
+  /** Get input value. */
+  protected abstract getValue(): V;
+
+  /** Read user input from stdin and pars ansi codes. */
+  #readKey = async (): Promise<KeyEvent[]> => {
+    const data: Uint8Array = await this.#readChar();
 
     return data.length ? KeyCode.parse(data) : [];
-  }
+  };
 
-  protected async readChar(): Promise<Uint8Array> {
+  /** Read user input from stdin. */
+  #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
 
     Deno.setRaw(Deno.stdin.rid, true);
@@ -181,19 +254,35 @@ export abstract class GenericPrompt<
     }
 
     return buffer.subarray(0, nread);
-  }
+  };
 
-  protected transformValue(value: V): T | undefined {
+  /**
+   * Map input value to output value. If a custom transform handler ist set, the
+   * custom handler will be executed, otherwise the default transform handler
+   * from the prompt will be executed.
+   * @param value The value to transform.
+   */
+  #transformValue = (value: V): T | undefined => {
     return this.settings.transform
       ? this.settings.transform(value)
       : this.transform(value);
-  }
+  };
 
-  protected async validateValue(value: V): Promise<boolean> {
+  /**
+   * Map input value to output value. If a default value is set, the default
+   * will be used as value without any validation. If a custom validation
+   * handler ist set, the custom handler will be executed, otherwise the default
+   * validation handler from the prompt will be executed.
+   * @param value
+   */
+  #validateValue = async (value: V): Promise<boolean> => {
     if (!value && typeof this.settings.default !== "undefined") {
-      this.value = this.settings.default;
+      this.#value = this.settings.default;
       return true;
     }
+
+    this.#value = undefined;
+    this.#lastError = undefined;
 
     const validation =
       await (this.settings.validate
@@ -201,16 +290,22 @@ export abstract class GenericPrompt<
         : this.validate(value));
 
     if (validation === false) {
-      this.lastError = `Invalid answer.`;
+      this.#lastError = `Invalid answer.`;
     } else if (typeof validation === "string") {
-      this.lastError = validation;
+      this.#lastError = validation;
     } else {
-      this.value = this.transformValue(value);
+      this.#value = this.#transformValue(value);
     }
 
-    return !this.lastError;
-  }
+    return typeof this.#value !== "undefined";
+  };
 
+  /**
+   * Check if key event has given name or sequence.
+   * @param keys  Key map.
+   * @param name  Key name.
+   * @param event Key event.
+   */
   // deno-lint-ignore no-explicit-any
   protected isKey<K extends any, N extends keyof K>(
     keys: K | undefined,
@@ -225,34 +320,5 @@ export abstract class GenericPrompt<
       (typeof event.sequence !== "undefined" &&
         keyNames.indexOf(event.sequence) !== -1)
     );
-  }
-
-  protected write(value: string) {
-    Deno.stdout.writeSync(new TextEncoder().encode(value));
-  }
-
-  protected writeLine(value?: string) {
-    Deno.stdout.writeSync(new TextEncoder().encode((value ?? "") + "\n"));
-  }
-
-  protected preBufferEmptyLines(message: string) {
-    const linesCount: number = message.split("\n").length;
-    this.write("\n".repeat(linesCount));
-    this.screen.cursorUp(linesCount);
-  }
-
-  protected error(message: string) {
-    if (typeof GenericPrompt.injectedValue !== "undefined") {
-      throw new Error(red(bold(` ${Figures.CROSS} `) + message));
-    }
-    this.write(red(bold(` ${Figures.CROSS} `) + message));
-  }
-
-  protected message(message: string) {
-    this.write(blue(` ${Figures.POINTER} `) + message);
-  }
-
-  protected hint(hint: string) {
-    this.write(dim(blue(` ${Figures.POINTER} `) + hint));
   }
 }

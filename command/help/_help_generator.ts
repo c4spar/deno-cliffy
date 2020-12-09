@@ -4,9 +4,11 @@ import type { Command } from "../command.ts";
 import { blue, bold, dim, magenta, red, yellow } from "../deps.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
+/** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
 
+  /** Generate help text for given command. */
   public static generate(cmd: Command): string {
     return new HelpGenerator(cmd).generate();
   }
@@ -69,7 +71,7 @@ export class HelpGenerator {
       return "";
     }
 
-    const hasTypeDefinitions: boolean = !!options.find((option) =>
+    const hasTypeDefinitions = !!options.find((option) =>
       !!option.typeDefinition
     );
 
@@ -113,7 +115,7 @@ export class HelpGenerator {
       return "";
     }
 
-    const hasTypeDefinitions: boolean = !!commands.find((command) =>
+    const hasTypeDefinitions = !!commands.find((command) =>
       !!command.getArgsDefinition()
     );
 
@@ -197,12 +199,12 @@ export class HelpGenerator {
         blue(bold(`Default: `)) +
           blue(Deno.inspect(option.default, { depth: 1 })),
       );
-    option.depends && option.depends.length &&
+    option.depends?.length &&
       hints.push(
         red(bold(`depends: `)) +
           option.depends.map((depends) => red(depends)).join(", "),
       );
-    option.conflicts && option.conflicts.length &&
+    option.conflicts?.length &&
       hints.push(
         red(bold(`conflicts: `)) +
           option.conflicts.map((conflict) => red(conflict)).join(", "),

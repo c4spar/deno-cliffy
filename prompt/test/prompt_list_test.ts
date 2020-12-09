@@ -47,7 +47,7 @@ Deno.test("prompt list", async () => {
     message: "How old are you?",
     type: Number,
   }, {
-    before: async (result, _) => {
+    before: (result, _) => {
       assertEquals(result, expectedResult);
       /** skip unknown */
     },

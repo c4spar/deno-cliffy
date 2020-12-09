@@ -9,20 +9,24 @@ import {
 
 export type ConfirmKeys = GenericInputKeys;
 
+/** Confirm prompt options. */
 export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt settings. */
 interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
   active: string;
   inactive: string;
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt representation. */
 export class Confirm extends GenericInput<boolean, ConfirmSettings> {
-  public static async prompt(
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(
     options: string | ConfirmOptions,
   ): Promise<boolean> {
     if (typeof options === "string") {
@@ -37,32 +41,28 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }).prompt();
   }
 
-  protected getMessage(): string {
-    let message = ` ${yellow("?")} ${bold(this.settings.message)} `;
+  protected defaults(): string {
+    let defaultMessage = "";
 
     if (this.settings.default === true) {
-      message += dim(
-        `(${this.settings.active[0].toUpperCase()}/${
-          this.settings.inactive[0].toLowerCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toUpperCase() + "/" +
+        this.settings.inactive[0].toLowerCase();
     } else if (this.settings.default === false) {
-      message += dim(
-        `(${this.settings.active[0].toLowerCase()}/${
-          this.settings.inactive[0].toUpperCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
+        this.settings.inactive[0].toUpperCase();
     } else {
-      message += dim(
-        `(${this.settings.active[0].toLowerCase()}/${
-          this.settings.inactive[0].toLowerCase()
-        })`,
-      );
+      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
+        this.settings.inactive[0].toLowerCase();
     }
 
-    return message;
+    return defaultMessage ? dim(` (${defaultMessage})`) : "";
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       [
@@ -73,6 +73,11 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
         ].indexOf(value.toLowerCase()) !== -1;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): boolean | undefined {
     switch (value.toLowerCase()) {
       case this.settings.active[0].toLowerCase():
@@ -85,6 +90,10 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     return;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: boolean): string {
     return value ? this.settings.active : this.settings.inactive;
   }

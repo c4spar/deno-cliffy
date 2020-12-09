@@ -4,12 +4,14 @@ import {
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
 
+/** Generic list option options. */
 export interface GenericListOption {
   value: string;
   name?: string;
   disabled?: boolean;
 }
 
+/** Generic list option settings. */
 export interface GenericListOptionSettings extends GenericListOption {
   name: string;
   value: string;
@@ -19,6 +21,7 @@ export interface GenericListOptionSettings extends GenericListOption {
 export type GenericListValueOptions = (string | GenericListOption)[];
 export type GenericListValueSettings = GenericListOptionSettings[];
 
+/** Generic list prompt options. */
 export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
   options: GenericListValueOptions;
   indent?: string;
@@ -26,6 +29,7 @@ export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
   maxRows?: number;
 }
 
+/** Generic list prompt settings. */
 export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
   options: GenericListValueSettings;
   indent: string;
@@ -33,105 +37,117 @@ export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
   maxRows: number;
 }
 
+/** Generic list prompt representation. */
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   extends GenericPrompt<T, V, S> {
   protected index = 0;
   protected selected = 0;
 
+  /**
+   * Create list separator.
+   * @param label Separator label.
+   */
   public static separator(label = "------------"): GenericListOption {
     return { value: label, disabled: true };
   }
 
-  protected static mapValues(
-    optValues: GenericListValueOptions,
-  ): GenericListOption[] {
-    return Object.values(optValues)
-      .map((item: string | GenericListOption) =>
-        typeof item === "string" ? { value: item } : item
-      );
-  }
-
-  protected static mapItem(item: GenericListOption): GenericListOptionSettings {
+  /**
+   * Set list option defaults.
+   * @param option List option.
+   */
+  protected static mapOption(
+    option: GenericListOption,
+  ): GenericListOptionSettings {
     return {
-      value: item.value,
-      name: typeof item.name === "undefined" ? item.value : item.name,
-      disabled: !!item.disabled,
+      value: option.value,
+      name: typeof option.name === "undefined" ? option.value : option.name,
+      disabled: !!option.disabled,
     };
   }
 
-  protected setPrompt(message: string) {
-    this.writeLine(message);
-
-    this.writeListItems();
+  /** Render options. */
+  protected body(): string | undefined | Promise<string | undefined> {
+    const body: Array<string> = [];
+    const height: number = this.getListHeight();
+    for (let i = this.index; i < this.index + height; i++) {
+      body.push(
+        this.getListItem(
+          this.settings.options[i],
+          this.selected === i,
+        ),
+      );
+    }
+    return body.join("\n");
   }
 
-  protected clear() {
-    // clear list
-    this.screen.eraseLines(this.height() + 2);
-    // clear message and reset cursor
-    super.clear();
-  }
+  /**
+   * Render option.
+   * @param item        Option.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected abstract getListItem(
+    item: GenericListOptionSettings,
+    isSelected?: boolean,
+  ): string;
 
-  protected async read(): Promise<boolean> {
-    this.screen.cursorHide();
-
+  /** Read user input. */
+  protected read(): Promise<boolean> {
+    this.tty.cursorHide();
     return super.read();
   }
 
-  protected async selectPrevious(): Promise<void> {
+  /** Select previous option. */
+  protected selectPrevious(): void {
     if (this.selected > 0) {
       this.selected--;
       if (this.selected < this.index) {
         this.index--;
       }
       if (this.settings.options[this.selected].disabled) {
-        return this.selectPrevious();
+        this.selectPrevious();
       }
     } else {
       this.selected = this.settings.options.length - 1;
-      this.index = this.settings.options.length - this.height();
+      this.index = this.settings.options.length - this.getListHeight();
       if (this.settings.options[this.selected].disabled) {
-        return this.selectPrevious();
+        this.selectPrevious();
       }
     }
   }
 
-  protected async selectNext(): Promise<void> {
+  /** Select next option. */
+  protected selectNext(): void {
     if (this.selected < this.settings.options.length - 1) {
       this.selected++;
-      if (this.selected >= this.index + this.height()) {
+      if (this.selected >= this.index + this.getListHeight()) {
         this.index++;
       }
       if (this.settings.options[this.selected].disabled) {
-        return this.selectNext();
+        this.selectNext();
       }
     } else {
       this.selected = this.index = 0;
       if (this.settings.options[this.selected].disabled) {
-        return this.selectNext();
+        this.selectNext();
       }
     }
   }
 
-  protected writeListItems() {
-    for (let i = this.index; i < this.index + this.height(); i++) {
-      this.writeListItem(this.settings.options[i], this.selected === i);
-    }
-  }
-
-  protected abstract writeListItem(
-    item: GenericListOptionSettings,
-    isSelected?: boolean,
-  ): void;
-
-  protected height() {
+  /** Get options row height. */
+  protected getListHeight(): number {
     return Math.min(
       this.settings.options.length,
       this.settings.maxRows || this.settings.options.length,
     );
   }
 
-  protected getOptionByValue(value: string) {
+  /**
+   * Find option by value.
+   * @param value Value of the option.
+   */
+  protected getOptionByValue(
+    value: string,
+  ): GenericListOptionSettings | undefined {
     return this.settings.options.find((option) => option.value === value);
   }
 }

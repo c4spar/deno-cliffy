@@ -1,23 +1,26 @@
 <h1 align="center">Cliffy ❯ Table </h1>
 
-<p align="center">
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
+<p align="center" class="badges-container">
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github&color=blue" />
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=latest" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Atable">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:table?label=issues&logo=github&color=yellow">
   </a>
   <a href="https://deno.land/">
     <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
   </a>
-  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
-    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
-  </a>
-  <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Atable">
-    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:table?label=issues&logo=github">
+  <a href="https://doc.deno.land/https/deno.land/x/cliffy/table/mod.ts">
+    <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://nest.land/package/cliffy">
+    <img src="https://nest.land/badge.svg" alt="nest.land badge">
   </a>
 </p>
 
@@ -346,7 +349,8 @@ Enable table border. Doesn't override row and cell settings.
 
 #### .chars(chars)
 
-Override default border characters. Doesn't ovrride child settings.
+Override default border characters. Doesn't override row and cell settings.
+To change the default border characters globally you can use the static `Table.chars(chars)` method.
 
 | Argument | Type | Required | Description |
 | ----- | :--: | :--: | ----------- |

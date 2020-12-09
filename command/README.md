@@ -1,23 +1,26 @@
 <h1 align="center">Cliffy ❯ Command</h1>
 
-<p align="center">
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github" />
+<p align="center" class="badges-container">
+  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Release date" src="https://img.shields.io/github/release-date/c4spar/deno-cliffy?logo=github&color=blue" />
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=latest" />
+  </a>
+  <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Acommand">
+    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:command?label=issues&logo=github&color=yellow">
   </a>
   <a href="https://deno.land/">
     <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
   </a>
-  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
-    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
-  </a>
-  <a href="https://github.com/c4spar/deno-cliffy/issues?q=is%3Aissue+is%3Aopen+label%3Amodule%3Acommand">
-    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:command?label=issues&logo=github">
+  <a href="https://doc.deno.land/https/deno.land/x/cliffy/command/mod.ts">
+    <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+  <a href="https://nest.land/package/cliffy">
+    <img src="https://nest.land/badge.svg" alt="nest.land badge">
   </a>
 </p>
 
@@ -560,7 +563,7 @@ Some info
 
 ## ❯ Commands
 
-The command class operates as a factory class. It has an internal command pointer which point per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
+The command class acts like as a factory class. It has an internal command pointer that points per default to the command instance itself. Each time the `.command()` method is called, the internal pointer points to the newly created command. All methods such as `.name()`, `.description()`, `.option()`, `.action()`, etc... always work on the command to which the pointer points. If you need to change the pointer back to the command instance you can call the `.reset()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";

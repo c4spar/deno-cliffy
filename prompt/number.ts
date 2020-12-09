@@ -9,16 +9,19 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** Number key options. */
 export interface NumberKeys extends GenericInputKeys {
   increaseValue?: string[];
   decreaseValue?: string[];
 }
 
+/** Number key settings. */
 interface NumberKeysSettings extends GenericInputKeys {
   increaseValue: string[];
   decreaseValue: string[];
 }
 
+/** Number prompt options. */
 export interface NumberOptions extends GenericInputPromptOptions<number> {
   min?: number;
   max?: number;
@@ -27,6 +30,7 @@ export interface NumberOptions extends GenericInputPromptOptions<number> {
   keys?: NumberKeys;
 }
 
+/** Number prompt settings. */
 interface NumberSettings extends GenericInputPromptSettings<number> {
   min: number;
   max: number;
@@ -35,8 +39,10 @@ interface NumberSettings extends GenericInputPromptSettings<number> {
   keys: NumberKeysSettings;
 }
 
+/** Number prompt representation. */
 export class Number extends GenericInput<number, NumberSettings> {
-  public static async prompt(options: string | NumberOptions): Promise<number> {
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
       options = { message: options };
     }
@@ -56,11 +62,15 @@ export class Number extends GenericInput<number, NumberSettings> {
     }).prompt();
   }
 
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c":
         if (event.ctrl) {
-          this.screen.cursorShow();
+          this.tty.cursorShow();
           Deno.kill(Deno.pid, Deno.Signal.SIGINT);
         }
         break;
@@ -90,81 +100,99 @@ export class Number extends GenericInput<number, NumberSettings> {
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
-        return true;
+        await this.submit();
+        break;
 
       default:
         if (event.sequence && !event.meta && !event.ctrl) {
           this.addChar(event.sequence);
         }
-        break;
     }
-
-    return false;
   }
 
+  /** Increase input number. */
+  public increaseValue() {
+    this.manipulateIndex(false);
+  }
+
+  /** Decrease input number. */
+  public decreaseValue() {
+    this.manipulateIndex(true);
+  }
+
+  /** Decrease/increase input number. */
   protected manipulateIndex(decrease?: boolean) {
-    if (this.input[this.index] === "-") {
-      this.index++;
+    if (this.inputValue[this.inputIndex] === "-") {
+      this.inputIndex++;
     }
 
-    if (this.input.length && (this.index > this.input.length - 1)) {
-      this.index--;
+    if (
+      this.inputValue.length && (this.inputIndex > this.inputValue.length - 1)
+    ) {
+      this.inputIndex--;
     }
 
-    const decimalIndex: number = this.input.indexOf(".");
-    const [abs, dec] = this.input.split(".");
+    const decimalIndex: number = this.inputValue.indexOf(".");
+    const [abs, dec] = this.inputValue.split(".");
 
-    if (dec && this.index === decimalIndex) {
-      this.index--;
+    if (dec && this.inputIndex === decimalIndex) {
+      this.inputIndex--;
     }
 
-    const inDecimal: boolean = decimalIndex !== -1 && this.index > decimalIndex;
+    const inDecimal: boolean = decimalIndex !== -1 &&
+      this.inputIndex > decimalIndex;
     let value: string = (inDecimal ? dec : abs) || "0";
-    const oldLength: number = this.input.length;
+    const oldLength: number = this.inputValue.length;
     const index: number = inDecimal
-      ? this.index - decimalIndex - 1
-      : this.index;
+      ? this.inputIndex - decimalIndex - 1
+      : this.inputIndex;
     const increaseValue = Math.pow(10, value.length - index - 1);
 
     value = (parseInt(value) + (decrease ? -increaseValue : increaseValue))
       .toString();
 
-    this.input = !dec
+    this.inputValue = !dec
       ? value
-      : (this.index > decimalIndex ? abs + "." + value : value + "." + dec);
+      : (this.inputIndex > decimalIndex ? abs + "." + value
+      : value + "." + dec);
 
-    if (this.input.length > oldLength) {
-      this.index++;
+    if (this.inputValue.length > oldLength) {
+      this.inputIndex++;
     } else if (
-      this.input.length < oldLength && this.input[this.index - 1] !== "-"
+      this.inputValue.length < oldLength &&
+      this.inputValue[this.inputIndex - 1] !== "-"
     ) {
-      this.index--;
+      this.inputIndex--;
     }
 
-    this.index = Math.max(0, Math.min(this.index, this.input.length - 1));
+    this.inputIndex = Math.max(
+      0,
+      Math.min(this.inputIndex, this.inputValue.length - 1),
+    );
   }
 
-  public increaseValue() {
-    this.manipulateIndex(false);
-  }
-
-  public decreaseValue() {
-    this.manipulateIndex(true);
-  }
-
+  /**
+   * Add char to input.
+   * @param char Char.
+   */
   protected addChar(char: string): void {
     if (isNumeric(char)) {
       super.addChar(char);
     } else if (
       this.settings.float &&
       char === "." &&
-      this.input.indexOf(".") === -1 &&
-      (this.input[0] === "-" ? this.index > 1 : this.index > 0)
+      this.inputValue.indexOf(".") === -1 &&
+      (this.inputValue[0] === "-" ? this.inputIndex > 1 : this.inputIndex > 0)
     ) {
       super.addChar(char);
     }
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (!isNumeric(value)) {
       return false;
@@ -183,6 +211,11 @@ export class Number extends GenericInput<number, NumberSettings> {
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): number | undefined {
     const val: number = parseFloat(value);
 
@@ -193,6 +226,10 @@ export class Number extends GenericInput<number, NumberSettings> {
     return val;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: number): string {
     return value.toString();
   }

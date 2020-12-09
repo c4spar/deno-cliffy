@@ -1,5 +1,12 @@
+/** Base key mapping. */
 export const KeyMap: Record<string, string> = {
-  /* xterm/gnome ESC O letter */
+  /* xterm/gnome ESC [ letter (with modifier) */
+  "[P": "f1",
+  "[Q": "f2",
+  "[R": "f3",
+  "[S": "f4",
+
+  /* xterm/gnome ESC O letter (without modifier) */
   "OP": "f1",
   "OQ": "f2",
   "OR": "f3",
@@ -63,6 +70,7 @@ export const KeyMap: Record<string, string> = {
   "[8~": "end",
 };
 
+/** Shift key mapping. */
 export const KeyMapShift: Record<string, string> = {
   /* rxvt keys with modifiers */
   "[a": "up",
@@ -81,6 +89,7 @@ export const KeyMapShift: Record<string, string> = {
   "[Z": "tab",
 };
 
+/** Ctrl key mapping. */
 export const KeyMapCtrl: Record<string, string> = {
   /* rxvt keys with modifiers */
   "Oa": "up",
@@ -97,6 +106,7 @@ export const KeyMapCtrl: Record<string, string> = {
   "[8^": "end",
 };
 
+/** Special key mapping. */
 export const SpecialKeyMap: Record<string, string> = {
   "\r": "return",
   "\n": "enter",

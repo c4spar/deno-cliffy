@@ -7,8 +7,10 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** List key options. */
 export type ListKeys = GenericInputKeys;
 
+/** List prompt options. */
 export interface ListOptions extends GenericInputPromptOptions<string[]> {
   separator?: string;
   minLength?: number;
@@ -18,6 +20,7 @@ export interface ListOptions extends GenericInputPromptOptions<string[]> {
   keys?: ListKeys;
 }
 
+/** List prompt settings. */
 interface ListSettings extends GenericInputPromptSettings<string[]> {
   separator: string;
   minLength: number;
@@ -27,8 +30,10 @@ interface ListSettings extends GenericInputPromptSettings<string[]> {
   keys?: ListKeys;
 }
 
+/** List prompt representation. */
 export class List extends GenericInput<string[], ListSettings> {
-  public static async prompt(options: string | ListOptions): Promise<string[]> {
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
       options = { message: options };
     }
@@ -44,41 +49,36 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
-  protected setPrompt(message: string) {
-    message += " " + this.settings.pointer + " ";
-
-    const length = new TextEncoder().encode(stripColor(message)).length;
-
-    const oldInput: string = this.input;
+  protected input(): string {
+    const oldInput: string = this.inputValue;
     const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
+    const separator: string = this.settings.separator + " ";
 
-    this.input = oldInputParts.join(`${this.settings.separator} `);
+    this.inputValue = oldInputParts.join(separator);
 
-    message += oldInputParts.map((val: string) => underline(val)).join(
-      `${this.settings.separator} `,
-    );
+    const diff = oldInput.length - this.inputValue.length;
+    this.inputIndex -= diff;
+    this.cursor.x -= diff;
 
-    const inputDiff = oldInput.length - this.input.length;
-
-    this.index -= inputDiff;
-
-    this.write(message);
-
-    this.screen.cursorTo(length - 1 + this.index);
+    return oldInputParts
+      .map((val: string) => underline(val))
+      .join(separator);
   }
 
-  protected regexp() {
+  /** Create list regex.*/
+  protected regexp(): RegExp {
     return new RegExp(
       this.settings.separator === " " ? ` +` : ` *${this.settings.separator} *`,
     );
   }
 
+  /** Add char. */
   protected addChar(char: string): void {
     switch (char) {
       case this.settings.separator:
         if (
-          this.input.length &&
-          this.input.trim().slice(-1) !== this.settings.separator
+          this.inputValue.length &&
+          this.inputValue.trim().slice(-1) !== this.settings.separator
         ) {
           super.addChar(char);
         }
@@ -88,13 +88,19 @@ export class List extends GenericInput<string[], ListSettings> {
     }
   }
 
+  /** Delete char left. */
   protected deleteChar(): void {
-    if (this.input[this.index - 1] === " ") {
+    if (this.inputValue[this.inputIndex - 1] === " ") {
       super.deleteChar();
     }
     super.deleteChar();
   }
 
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (typeof value !== "string") {
       return false;
@@ -121,10 +127,25 @@ export class List extends GenericInput<string[], ListSettings> {
     return true;
   }
 
+  /** Get input value. */
+  protected getValue(): string {
+    // Remove trailing comma and spaces.
+    return super.getValue().replace(/,+\s*$/, "");
+  }
+
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): string[] {
     return value.trim().split(this.regexp());
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string[]): string {
     return value.join(`, `);
   }

@@ -1,3 +1,4 @@
+/** KeyEvent options. */
 export interface IKey {
   name?: string;
   sequence?: string;
@@ -6,6 +7,7 @@ export interface IKey {
   shift: boolean;
 }
 
+/** KeyEvent representation. */
 export class KeyEvent {
   protected constructor(
     public readonly name: string | undefined,
@@ -15,6 +17,10 @@ export class KeyEvent {
     public readonly shift = false,
   ) {}
 
+  /**
+   * Create new KeyEvent.
+   * @param key KeyEvent options.
+   */
   public static from(key: IKey): KeyEvent {
     return new this(
       key.name,

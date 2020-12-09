@@ -1,4 +1,12 @@
-import { blue, green, stripColor, underline } from "./deps.ts";
+import {
+  blue,
+  bold,
+  dim,
+  green,
+  stripColor,
+  underline,
+  yellow,
+} from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -7,8 +15,10 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
+/** Secret key options. */
 export type SecretKeys = GenericInputKeys;
 
+/** Secret prompt options. */
 export interface SecretOptions extends GenericInputPromptOptions<string> {
   label?: string;
   hidden?: boolean;
@@ -17,6 +27,7 @@ export interface SecretOptions extends GenericInputPromptOptions<string> {
   keys?: SecretKeys;
 }
 
+/** Secret prompt settings. */
 interface SecretSettings extends GenericInputPromptSettings<string> {
   label: string;
   hidden: boolean;
@@ -25,8 +36,10 @@ interface SecretSettings extends GenericInputPromptSettings<string> {
   keys?: SecretKeys;
 }
 
+/** Secret prompt representation. */
 export class Secret extends GenericInput<string, SecretSettings> {
-  public static async prompt(options: string | SecretOptions): Promise<string> {
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
     }
@@ -41,31 +54,25 @@ export class Secret extends GenericInput<string, SecretSettings> {
     }).prompt();
   }
 
-  protected setPrompt(message: string) {
+  protected input(): string {
+    return underline(
+      this.settings.hidden ? "" : "*".repeat(this.inputValue.length),
+    );
+  }
+
+  /** Read user input. */
+  protected read(): Promise<boolean> {
     if (this.settings.hidden) {
-      this.screen.cursorHide();
+      this.tty.cursorHide();
     }
-
-    message += " " + this.settings.pointer + " ";
-
-    const length = new TextEncoder().encode(stripColor(message)).length;
-
-    const secret = this.settings.hidden ? "" : "*".repeat(this.input.length);
-
-    message += underline(secret);
-
-    this.write(message);
-
-    this.screen.cursorTo(length - 1 + this.index);
+    return super.read();
   }
 
-  protected async getSuccessMessage(value: string) {
-    value = this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
-    return `${await this.getMessage()} ${this.settings.pointer} ${
-      green(value)
-    }`;
-  }
-
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string): boolean | string {
     if (typeof value !== "string") {
       return false;
@@ -79,11 +86,20 @@ export class Secret extends GenericInput<string, SecretSettings> {
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string): string | undefined {
     return value;
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string): string {
-    return value;
+    return this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
   }
 }

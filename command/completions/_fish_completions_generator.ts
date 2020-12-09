@@ -1,6 +1,7 @@
 import type { Command } from "../command.ts";
 import type { IOption } from "../types.ts";
 
+/** Generates fish completions script. */
 interface CompleteOptions {
   description?: string;
   shortOption?: string;

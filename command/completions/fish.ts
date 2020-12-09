@@ -2,25 +2,26 @@ import { Command } from "../command.ts";
 import { dim, italic } from "../deps.ts";
 import { FishCompletionsGenerator } from "./_fish_completions_generator.ts";
 
-/**
- * Generate fish completion script.
- */
+/** Generates fish completions script. */
 export class FishCompletionsCommand extends Command {
+  #cmd?: Command;
   public constructor(cmd?: Command) {
     super();
+    this.#cmd = cmd;
     this.description(() => {
-      cmd = cmd || this.getMainCommand();
+      const baseCmd = this.#cmd || this.getMainCommand();
       return `Generate shell completions for fish.
 
 To enable fish completions for this program add following line to your ${
         dim(italic("~/.config/fish/config.fish"))
       }:
 
-    ${dim(italic(`source (${cmd.getPath()} completions fish | psub)`))}`;
+    ${dim(italic(`source (${baseCmd.getPath()} completions fish | psub)`))}`;
     })
       .action(() => {
+        const baseCmd = this.#cmd || this.getMainCommand();
         Deno.stdout.writeSync(new TextEncoder().encode(
-          FishCompletionsGenerator.generate(cmd || this.getMainCommand()),
+          FishCompletionsGenerator.generate(baseCmd),
         ));
       });
   }

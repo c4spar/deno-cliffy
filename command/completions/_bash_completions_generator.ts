@@ -1,7 +1,9 @@
 import type { Command } from "../command.ts";
 import type { IArgument } from "../types.ts";
 
+/** Generates bash completions script. */
 export class BashCompletionsGenerator {
+  /** Generates bash completions script for given command. */
   public static generate(cmd: Command) {
     return new BashCompletionsGenerator(cmd).generate();
   }
@@ -144,7 +146,7 @@ ${childCommandCompletions}`;
     command: Command,
     completionsPath: string,
   ): string {
-    let opts: string = "";
+    let opts = "";
     const options = command.getOptions(false);
     if (options.length) {
       opts += 'case "${prev}" in';

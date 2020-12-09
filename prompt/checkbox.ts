@@ -10,16 +10,7 @@ import {
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
-export interface CheckboxOption extends GenericListOption {
-  checked?: boolean;
-  icon?: boolean;
-}
-
-export interface CheckboxOptionSettings extends GenericListOptionSettings {
-  checked: boolean;
-  icon: boolean;
-}
-
+/** Checkbox key options. */
 export interface CheckboxKeys {
   previous?: string[];
   next?: string[];
@@ -27,11 +18,27 @@ export interface CheckboxKeys {
   check?: string[];
 }
 
+/** Checkbox key settings. */
 type CheckboxKeysSettings = Required<CheckboxKeys>;
 
+/** Checkbox option options. */
+export interface CheckboxOption extends GenericListOption {
+  checked?: boolean;
+  icon?: boolean;
+}
+
+/** Checkbox option settings. */
+export interface CheckboxOptionSettings extends GenericListOptionSettings {
+  checked: boolean;
+  icon: boolean;
+}
+
+/** Checkbox options type. */
 export type CheckboxValueOptions = (string | CheckboxOption)[];
+/** Checkbox option settings type. */
 export type CheckboxValueSettings = CheckboxOptionSettings[];
 
+/** Checkbox prompt options. */
 export interface CheckboxOptions
   extends GenericListOptions<string[], string[]> {
   options: CheckboxValueOptions;
@@ -42,6 +49,7 @@ export interface CheckboxOptions
   keys?: CheckboxKeys;
 }
 
+/** Checkbox prompt settings. */
 interface CheckboxSettings extends GenericListSettings<string[], string[]> {
   options: CheckboxValueSettings;
   check: string;
@@ -51,13 +59,19 @@ interface CheckboxSettings extends GenericListSettings<string[], string[]> {
   keys: CheckboxKeysSettings;
 }
 
+/** Checkbox prompt representation. */
 export class Checkbox
   extends GenericList<string[], string[], CheckboxSettings> {
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Array of input values.
+   */
   public static inject(value: string[]): void {
     GenericPrompt.inject(value);
   }
 
-  public static async prompt(options: CheckboxOptions): Promise<string[]> {
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(options: CheckboxOptions): Promise<string[]> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       listPointer: blue(Figures.POINTER),
@@ -79,6 +93,10 @@ export class Checkbox
     }).prompt();
   }
 
+  /**
+   * Create list separator.
+   * @param label Separator label.
+   */
   public static separator(label = "------------"): CheckboxOption {
     return {
       ...super.separator(),
@@ -86,82 +104,44 @@ export class Checkbox
     };
   }
 
+  /**
+   * Map string option values to options and set option defaults.
+   * @param options Checkbox options.
+   */
   protected static mapOptions(options: CheckboxOptions): CheckboxValueSettings {
-    return this.mapValues(options.options)
-      .map((item) => this.mapItem(item, options.default));
+    return options.options
+      .map((item: string | CheckboxOption) =>
+        typeof item === "string" ? { value: item } : item
+      )
+      .map((item) => ({
+        ...this.mapOption(item),
+        checked: typeof item.checked === "undefined" && options.default &&
+            options.default.indexOf(item.value) !== -1
+          ? true
+          : !!item.checked,
+        icon: typeof item.icon === "undefined" ? true : item.icon,
+      }));
   }
 
-  protected static mapValues(
-    optValues: CheckboxValueOptions,
-  ): CheckboxOption[] {
-    return super.mapValues(optValues) as CheckboxOption[];
-  }
-
-  protected static mapItem(
-    item: CheckboxOption,
-    defaults?: string[],
-  ): CheckboxOptionSettings {
-    return {
-      ...super.mapItem(item),
-      checked: typeof item.checked === "undefined" && defaults &&
-          defaults.indexOf(item.value) !== -1
-        ? true
-        : !!item.checked,
-      icon: typeof item.icon === "undefined" ? true : item.icon,
-    };
-  }
-
-  protected async handleEvent(event: KeyEvent): Promise<boolean> {
-    switch (true) {
-      case event.name === "c":
-        // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
-        if (event.ctrl) {
-          this.screen.cursorShow();
-          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
-        }
-        break;
-
-      case this.isKey(this.settings.keys, "previous", event):
-        await this.selectPrevious();
-        break;
-
-      case this.isKey(this.settings.keys, "next", event):
-        await this.selectNext();
-        break;
-
-      case this.isKey(this.settings.keys, "check", event):
-        this.checkValue();
-        break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        return true;
-    }
-
-    return false;
-  }
-
-  protected checkValue() {
-    const item = this.settings.options[this.selected];
-    item.checked = !item.checked;
-  }
-
-  protected getValue(): string[] {
-    return this.settings.options
-      .filter((item) => item.checked)
-      .map((item) => item.value);
-  }
-
-  protected writeListItem(item: CheckboxOptionSettings, isSelected?: boolean) {
+  /**
+   * Render checkbox option.
+   * @param item        Checkbox option settings.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected getListItem(
+    item: CheckboxOptionSettings,
+    isSelected?: boolean,
+  ): string {
     let line = this.settings.indent;
 
     // pointer
-    line += isSelected ? `${this.settings.listPointer} ` : "  ";
+    line += isSelected ? this.settings.listPointer + " " : "  ";
 
     // icon
     if (item.icon) {
       let check = item.checked
-        ? `${this.settings.check} `
-        : `${this.settings.uncheck} `;
+        ? this.settings.check + " "
+        : this.settings.uncheck + " ";
       if (item.disabled) {
         check = dim(check);
       }
@@ -171,18 +151,69 @@ export class Checkbox
     }
 
     // value
-    const value: string = item.name;
-    line += `${isSelected ? value : dim(value)}`;
+    line += `${isSelected ? item.name : dim(item.name)}`;
 
-    this.writeLine(line);
+    return line;
   }
 
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      case event.name === "c":
+        // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
+        if (event.ctrl) {
+          this.tty.cursorShow();
+          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
+        }
+        break;
+
+      case this.isKey(this.settings.keys, "previous", event):
+        this.selectPrevious();
+        break;
+
+      case this.isKey(this.settings.keys, "next", event):
+        this.selectNext();
+        break;
+
+      case this.isKey(this.settings.keys, "check", event):
+        this.checkValue();
+        break;
+
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit();
+        break;
+    }
+  }
+
+  /** Check selected option. */
+  protected checkValue(): void {
+    const item = this.settings.options[this.selected];
+    item.checked = !item.checked;
+  }
+
+  /** Get value of checked options. */
+  protected getValue(): string[] {
+    return this.settings.options
+      .filter((item) => item.checked)
+      .map((item) => item.value);
+  }
+
+  /**
+   * Validate input value.
+   * @param value User input value.
+   * @return True on success, false or error message on error.
+   */
   protected validate(value: string[]): boolean | string {
     const isValidValue = Array.isArray(value) &&
       value.every((val) =>
         typeof val === "string" &&
         val.length > 0 &&
-        this.settings.options.findIndex((option) => option.value === val) !== -1
+        this.settings.options.findIndex((option: CheckboxOptionSettings) =>
+            option.value === val
+          ) !== -1
       );
 
     if (!isValidValue) {
@@ -199,13 +230,21 @@ export class Checkbox
     return true;
   }
 
+  /**
+   * Map input value to output value.
+   * @param value Input value.
+   * @return Output value.
+   */
   protected transform(value: string[]): string[] {
     return value.map((val) => val.trim());
   }
 
+  /**
+   * Format output value.
+   * @param value Output value.
+   */
   protected format(value: string[]): string {
-    return value.map((val) => this.getOptionByValue(val)?.name ?? val).join(
-      ", ",
-    );
+    return value.map((val) => this.getOptionByValue(val)?.name ?? val)
+      .join(", ");
   }
 }

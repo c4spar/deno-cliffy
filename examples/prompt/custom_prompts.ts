@@ -46,7 +46,7 @@ const result = await prompt([{
       }
 
       const readLineResult = await new BufReader(Deno.stdin).readLine();
-      const result: number = Number(
+      const result = Number(
         readLineResult ? new TextDecoder().decode(readLineResult.line) : null,
       );
 
