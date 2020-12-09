@@ -245,7 +245,7 @@ export abstract class GenericPrompt<
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
 
-    Deno.setRaw(Deno.stdin.rid, true);
+    Deno.setRaw(Deno.stdin.rid, true, { cbreak: true });
     const nread: number | null = await Deno.stdin.read(buffer);
     Deno.setRaw(Deno.stdin.rid, false);
 

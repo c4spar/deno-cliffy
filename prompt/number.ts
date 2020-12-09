@@ -68,13 +68,6 @@ export class Number extends GenericInput<number, NumberSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
-        }
-        break;
-
       case this.isKey(this.settings.keys, "increaseValue", event):
         this.increaseValue();
         break;

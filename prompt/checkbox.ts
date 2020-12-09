@@ -162,14 +162,6 @@ export class Checkbox
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
-        }
-        break;
-
       case this.isKey(this.settings.keys, "previous", event):
         this.selectPrevious();
         break;

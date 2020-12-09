@@ -75,16 +75,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
-        }
-        if (event.sequence) {
-          this.addChar(event.sequence);
-        }
-        break;
-
       // case "up": // scroll history?
       //   break;
       //

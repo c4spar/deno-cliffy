@@ -91,13 +91,6 @@ export class Select extends GenericList<string, string, SelectSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.kill(Deno.pid, Deno.Signal.SIGINT);
-        }
-        break;
-
       case this.isKey(this.settings.keys, "previous", event):
         this.selectPrevious();
         break;
