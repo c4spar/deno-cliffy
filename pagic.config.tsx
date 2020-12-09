@@ -9,7 +9,6 @@ export default {
   include: [
     "**/README.md",
     "**/assets",
-    "_layout.tsx",
     "docs/assets",
     "docs/fonts/cliffy.eot",
     "docs/fonts/cliffy.woff",
@@ -75,22 +74,22 @@ export default {
   ],
   sidebar: {
     "/": [{
-      title: "AnsiEscape",
+      text: "AnsiEscape",
       link: "ansi_escape/README.md",
     }, {
-      title: "Command",
+      text: "Command",
       link: "command/README.md",
     }, {
-      title: "Flags",
+      text: "Flags",
       link: "flags/README.md",
     }, {
-      title: "KeyCode",
+      text: "KeyCode",
       link: "keycode/README.md",
     }, {
-      title: "Prompt",
+      text: "Prompt",
       link: "prompt/README.md",
     }, {
-      title: "Table",
+      text: "Table",
       link: "table/README.md",
     }],
   },
