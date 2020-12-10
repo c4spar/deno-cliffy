@@ -162,6 +162,13 @@ export class Checkbox
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
+      case event.name === "c":
+        if (event.ctrl) {
+          this.tty.cursorShow();
+          Deno.exit(0);
+        }
+        break;
+
       case this.isKey(this.settings.keys, "previous", event):
         this.selectPrevious();
         break;

@@ -15,6 +15,7 @@ export interface GenericPromptOptions<T, V> {
   transform?: (value: V) => T | undefined;
   hint?: string;
   pointer?: string;
+  cbreak?: boolean;
 }
 
 /** Generic prompt settings. */
@@ -245,7 +246,7 @@ export abstract class GenericPrompt<
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
 
-    Deno.setRaw(Deno.stdin.rid, true, { cbreak: true });
+    Deno.setRaw(Deno.stdin.rid, true, { cbreak: !!this.settings.cbreak });
     const nread: number | null = await Deno.stdin.read(buffer);
     Deno.setRaw(Deno.stdin.rid, false);
 
