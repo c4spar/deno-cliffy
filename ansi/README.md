@@ -1,4 +1,4 @@
-<h1 align="center">Cliffy ❯ ANSI Escape</h1>
+<h1 align="center">Cliffy ❯ Ansi</h1>
 
 <p align="center" class="badges-container">
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
@@ -25,14 +25,17 @@
 </p>
 
 <p align="center">
-  <b>Control cli cursor, erase output and scroll window.</b><br>
-  <sub>>_ Used by cliffy's <a href="../prompt/">prompt</a> module</sub>
+  <b>Ansi escape sequences for Deno.</b><br>
+  <sub>>_ Control cli cursor, erase output, scroll window and more.</sub>
 </p>
 
 ## ❯ Content
 
 - [Install](#-install)
 - [Usage](#-usage)
+  - [Tty](#tty)
+  - [Ansi](#ansi)
+  - [Functional](#functional)
 - [Contributing](#-contributing)
 - [License](#-license)
 
