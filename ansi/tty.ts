@@ -57,6 +57,13 @@ function factory(options?: TtyOptions): Tty {
     return factory(args[0] as TtyOptions ?? options);
   } as Tty;
 
+  tty.text = function (text: string): TtyChain {
+    stack.push([text, []]);
+    update();
+    stdout.writeSync(new TextEncoder().encode(result));
+    return this;
+  };
+
   tty.getCursorPosition = (): Cursor => getCursorPosition({ stdout, stdin });
 
   const methodList: Array<[PropertyNames, Property]> = Object.entries(

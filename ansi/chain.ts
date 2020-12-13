@@ -3,6 +3,8 @@ import { ImageOptions } from "./ansi_escapes.ts";
 
 /** Chainable ansi escape method declarations. */
 export interface Chain<T extends Chain<T>> {
+  /** Add text. */
+  text: (text: string) => T;
   /** Ring audio bell: `\u0007` */
   bel: T;
   /** Get cursor position. */
@@ -12,13 +14,13 @@ export interface Chain<T extends Chain<T>> {
    * @param x Position left.
    * @param y Position top.
    */
-  cursorTo: ((x: number, y?: number) => T);
+  cursorTo: (x: number, y?: number) => T;
   /**
    * Move cursor by offset.
    * @param x Offset left.
    * @param y Offset top.
    */
-  cursorMove: ((x: number, y: number) => T);
+  cursorMove: (x: number, y: number) => T;
   /**
    * Move cursor up by n lines.
    * @param count Number of lines.
@@ -91,7 +93,7 @@ export interface Chain<T extends Chain<T>> {
    * Clear screen and move cursor by n lines up and move cursor to first column.
    * @param count Number of lines.
    */
-  eraseLines: ((count: number) => T);
+  eraseLines: (count: number) => T;
   /** Clear the terminal screen. (Viewport) */
   clearScreen: T;
   /**

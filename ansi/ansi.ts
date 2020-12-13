@@ -62,6 +62,11 @@ function factory(): Ansi {
     return factory();
   } as Ansi;
 
+  ansi.text = function (text: string): AnsiChain {
+    stack.push([text, []]);
+    return this;
+  };
+
   ansi.toString = function (): string {
     update();
     const str: string = result.join();
