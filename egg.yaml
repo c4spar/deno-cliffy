@@ -5,7 +5,7 @@ version: 0.16.0
 repository: https://github.com/c4spar/deno-cliffy/
 homepage: https://cliffy.io
 files:
-  - ansi_escape/**/*
+  - ansi/**/*
   - command/**/*
   - examples/**/*
   - flags/**/*

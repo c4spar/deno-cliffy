@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { BufReader } from "https://deno.land/std@0.74.0/io/bufio.ts";
-import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
+import { tty } from "../../ansi/tty.ts";
 import { Figures } from "../../prompt/figures.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Input } from "../../prompt/input.ts";
@@ -34,15 +34,13 @@ const result = await prompt([{
       options: { message: string },
       error?: string,
     ): Promise<number> {
-      const screen = AnsiEscape.from(Deno.stdout);
-
       const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
       await Deno.stdout.write(new TextEncoder().encode(message));
 
       if (error) {
-        screen.cursorSave();
+        tty.cursorSave();
         await Deno.stdout.write(new TextEncoder().encode("\n " + error));
-        screen.cursorRestore();
+        tty.cursorRestore();
       }
 
       const readLineResult = await new BufReader(Deno.stdin).readLine();
@@ -51,10 +49,7 @@ const result = await prompt([{
       );
 
       if (isNaN(result)) {
-        screen.cursorLeft()
-          .cursorUp()
-          .eraseDown();
-
+        tty.cursorLeft.cursorUp.eraseDown();
         return this.prompt(options, `${result} is not a number.`);
       }
 

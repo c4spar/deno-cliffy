@@ -1,4 +1,4 @@
-import { AnsiEscape } from "../ansi_escape/ansi_escape.ts";
+import { Cursor, tty } from "../ansi/tty.ts";
 import { KeyCode } from "../keycode/key_code.ts";
 import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, bold, dim, green, italic, red, yellow } from "./deps.ts";
@@ -44,11 +44,6 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
-export interface Cursor {
-  x: number;
-  y: number;
-}
-
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
@@ -57,7 +52,7 @@ export abstract class GenericPrompt<
 > {
   protected static injectedValue: unknown | undefined;
   protected readonly settings: S;
-  protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly tty = tty;
   protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
@@ -97,9 +92,7 @@ export abstract class GenericPrompt<
 
   /** Clear prompt output. */
   protected clear(): void {
-    this.tty
-      .cursorLeft()
-      .eraseDown();
+    this.tty.cursorLeft.eraseDown();
   }
 
   /** Execute the prompt. */

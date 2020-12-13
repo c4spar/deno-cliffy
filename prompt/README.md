@@ -179,7 +179,7 @@ Be shure to define an options and return type for your custom prompt method. Cli
 
 ```typescript
 import { BufReader } from "https://deno.land/std/io/bufio.ts";
-import { AnsiEscape } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
 import { prompt, Input, Figures } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const result = await prompt([{
@@ -210,15 +210,13 @@ const result = await prompt([{
       options: { message: string },
       error?: string,
     ): Promise<number> {
-      const screen = AnsiEscape.from(Deno.stdout);
-
       const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
       await Deno.stdout.write(new TextEncoder().encode(message));
 
       if (error) {
-        screen.cursorSave();
+        tty.cursorSave();
         await Deno.stdout.write(new TextEncoder().encode("\n " + error));
-        screen.cursorRestore();
+        tty.cursorRestore();
       }
 
       const readLineResult = await new BufReader(Deno.stdin).readLine();
@@ -227,10 +225,7 @@ const result = await prompt([{
       );
 
       if (isNaN(result)) {
-        screen.cursorLeft()
-          .cursorUp()
-          .eraseDown();
-
+        tty.cursorLeft.cursorUp.eraseDown();
         return this.prompt(options, `${result} is not a number.`);
       }
 

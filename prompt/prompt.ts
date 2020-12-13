@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
 
-import { AnsiEscape } from "../ansi_escape/ansi_escape.ts";
+import { tty } from "../ansi/tty.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
@@ -2126,7 +2126,7 @@ class PromptList {
     try {
       this.result[this.prompt.name] = await prompt.prompt(this.prompt);
     } finally {
-      AnsiEscape.from(Deno.stdout).cursorShow();
+      tty.cursorShow();
     }
   }
 

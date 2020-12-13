@@ -13,7 +13,7 @@
   <a href="https://deno.land/">
     <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
   </a>
-  <a href="https://doc.deno.land/https/deno.land/x/cliffy/ansi_escape/mod.ts">
+  <a href="https://doc.deno.land/https/deno.land/x/cliffy/ansi/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/blob/master/LICENSE">
@@ -43,19 +43,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy@<version>/ansi_escape/mod.ts";
+import { tty } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { tty } from "https://x.nest.land/cliffy@<version>/ansi_escape/mod.ts";
+import { tty } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi_escape/mod.ts";
+import { tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
 ```
 
 ## ❯ Usage
@@ -65,7 +65,7 @@ import { tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<versi
 Yu can use the predefined tty variable:
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
 
 tty
   // Hide cursor.
@@ -90,18 +90,20 @@ tty
 ### AnsiEscape
 
 ```typescript
-import { AnsiEscape } from "https://deno.land/x/cliffy/ansi_escape/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
 
-const tty: AnsiEscape = AnsiEscape.from(Deno.stdout)
-  .cursorHide()
-  .cursorShow()
+Deno.stdout.writeSync(
+  new TextEncoder().encode(
+    ansi.cursorUp.cursorLeft.eraseDown()
+  )
+);
   // ...
 ```
 
 ### Custom
 
 ```typescript
-import { cursor, erase, image, link } from "../../ansi_escape/csi.ts";
+import { cursor, erase, image, link } from "../../ansi/ansi.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
