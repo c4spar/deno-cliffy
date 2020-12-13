@@ -43,75 +43,101 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
+import { ansi, tty } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { tty } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
+import { ansi, tty } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
+import { ansi, tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
 ```
 
 ## ❯ Usage
 
-### tty
+The ansi module exports an `ansi` and a `tty` object which have chainable methods and properties for generating and writing ansi escape sequences. `ansi` and `tty` have allmost the same properties and methods.`ansi` generates and returns an ansi string, and `tty` writes the generated ansi escape sequence directly to stdout.
 
-Yu can use the predefined tty variable:
+Both objects can be also invoked as method to create a new instance from itself.
+
+### Tty
+
+Writes generated ansi escape sequences directly to stdout.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
 
-tty
-  // Hide cursor.
-  .cursorHide()
-  // Show cursor.
-  .cursorShow()
-  // Save cursor position.
-  .cursorSave()
-  // Hide cursor position.
-  .cursorRestore()
-  // Erase current line.
-  .eraseLine()
-  // Erase three line's up.
-  .eraseLines(3)
-  // Scroll two line's up.
-  .scrollUp(2)
-  // Scroll one line down.
-  .scrollDown()
-  // ...
+tty.cursorSave
+   .cursorHide
+   .cursorTo(0, 0)
+   .eraseScreen();
 ```
 
-### AnsiEscape
+Create new instance.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
+
+const myTty = tty({
+  stdout: Deno.stdout,
+  stdin: Deno.stdin
+});
+
+myTty.cursorSave
+   .cursorHide
+   .cursorTo(0, 0)
+   .eraseScreen();
+```
+
+### Ansi
+
+Returns generated ansi escape sequences.
+
+```typescript
+import { ansi } from "https://deno.land/x/cliffy/ansi/mod.ts";
 
 Deno.stdout.writeSync(
   new TextEncoder().encode(
     ansi.cursorUp.cursorLeft.eraseDown()
   )
 );
-  // ...
+
+// or:
+Deno.stdout.writeSync(
+  ansi.cursorUp.cursorLeft.eraseDown.toBuffer()
+);
 ```
 
-### Custom
+Create new instance.
 
 ```typescript
-import { cursor, erase, image, link } from "../../ansi/ansi.ts";
+import { ansi } from "https://deno.land/x/cliffy/ansi/mod.ts";
+
+const myAnsi = ansi();
+
+Deno.stdout.writeSync(
+  new TextEncoder().encode(
+    myAnsi.cursorUp.cursorLeft.eraseDown()
+  )
+);
+```
+
+### Functional
+
+```typescript
+import { cursorTo, eraseDown, image, link } from "../../ansi/ansi.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
 
 Deno.stdout.writeSync(
   new TextEncoder().encode(
-    cursor.to(0, 0) +
-    erase.down() +
+    cursorTo(0, 0) +
+    eraseDown() +
     image(imageBuffer, {
       width: 29,
       preserveAspectRatio: true,

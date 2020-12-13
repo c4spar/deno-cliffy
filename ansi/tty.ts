@@ -1,11 +1,6 @@
 import * as ansiEscapes from "./ansi_escapes.ts";
 import { Chain } from "./chain.ts";
-
-/** Cursor position. */
-export interface Cursor {
-  x: number;
-  y: number;
-}
+import { Cursor, getCursorPosition } from "./cursor_position.ts";
 
 /** Create new `Ansi` instance. */
 export interface TtyOptions {
@@ -62,22 +57,7 @@ function factory(options?: TtyOptions): Tty {
     return factory(args[0] as TtyOptions ?? options);
   } as Tty;
 
-  tty.getCursorPosition = function (): Cursor {
-    const data = new Uint8Array(8);
-
-    Deno.setRaw(stdin.rid, true);
-    stdout.writeSync(new TextEncoder().encode(ansiEscapes.cursorPosition));
-    stdin.readSync(data);
-    Deno.setRaw(stdin.rid, false);
-
-    const [y, x] = new TextDecoder()
-      .decode(data)
-      .match(/\[(\d+);(\d+)R/)
-      ?.slice(1, 3)
-      .map(Number) ?? [0, 0];
-
-    return { x, y };
-  };
+  tty.getCursorPosition = (): Cursor => getCursorPosition({ stdout, stdin });
 
   const methodList: Array<[PropertyNames, Property]> = Object.entries(
     ansiEscapes,
