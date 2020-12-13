@@ -132,7 +132,7 @@ Deno.stdout.writeSync(
 ### Functional
 
 ```typescript
-import { cursorTo, eraseDown, image, link } from "../../ansi/ansi.ts";
+import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/mod.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
