@@ -1,6 +1,7 @@
-import { ansiEscapes } from "./ansi_escapes.ts";
+import * as ansiEscapes from "./ansi_escapes.ts";
 import { Chain } from "./chain.ts";
 
+/** Cursor position. */
 export interface Cursor {
   x: number;
   y: number;
@@ -23,7 +24,6 @@ export interface TtyChain extends Exclude<Chain<TtyChain>, "cursorPosition"> {
   (): void;
   /** Get current cursor position. */
   getCursorPosition(): Cursor;
-  write(): void;
 }
 
 /** Create new `Tty` instance. */

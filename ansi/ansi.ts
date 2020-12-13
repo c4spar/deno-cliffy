@@ -1,4 +1,4 @@
-import { ansiEscapes } from "./ansi_escapes.ts";
+import * as ansiEscapes from "./ansi_escapes.ts";
 import { Chain } from "./chain.ts";
 
 type Args = Array<unknown>;
@@ -12,7 +12,7 @@ export interface AnsiChain extends Chain<AnsiChain> {
   (): string;
   /** Get ansi escape sequence. */
   toString(): string;
-  /** Get ansi escape sequence as array buffer. */
+  /** Get ansi escape sequence as Uint8Array. */
   toBuffer(): Uint8Array;
 }
 

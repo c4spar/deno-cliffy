@@ -1,7 +1,8 @@
 /** Chainable ansi escape sequence's. */
 import { ImageOptions } from "./ansi_escapes.ts";
 
-export interface Chain<T> {
+/** Chainable ansi escape method declarations. */
+export interface Chain<T extends Chain<T>> {
   /** Ring audio bell: `\u0007` */
   bel: T;
   /** Get cursor position. */
@@ -71,12 +72,12 @@ export interface Chain<T> {
   /** Clear screen. */
   eraseScreen: T;
   /**
-   * Clear screen up.
+   * Clear screen up by n lines.
    * @param count Number of lines.
    */
   eraseUp: T & ((count: number) => T);
   /**
-   * Clear screen down.
+   * Clear screen down by n lines.
    * @param count Number of lines.
    */
   eraseDown: T & ((count: number) => T);
