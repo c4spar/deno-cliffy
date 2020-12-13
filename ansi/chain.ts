@@ -92,6 +92,13 @@ export interface Chain<T extends Chain<T>> {
    * @param count Number of lines.
    */
   eraseLines: ((count: number) => T);
+  /** Clear the terminal screen. (Viewport) */
+  clearScreen: T;
+  /**
+   * Clear the whole terminal, including scrollback buffer.
+   * (Not just the visible part of it).
+   */
+  clearTerminal: T;
   /**
    * Create link.
    * @param text Link text.
