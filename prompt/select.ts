@@ -1,8 +1,9 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, dim } from "./deps.ts";
+import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
+  GenericListKeys,
   GenericListOption,
   GenericListOptions,
   GenericListOptionSettings,
@@ -11,7 +12,7 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Select key options. */
-export interface SelectKeys {
+export interface SelectKeys extends GenericListKeys {
   previous?: string[];
   next?: string[];
   submit?: string[];
@@ -44,9 +45,10 @@ export interface SelectSettings extends GenericListSettings<string, string> {
 }
 
 /** Select prompt representation. */
-export class Select extends GenericList<string, string, SelectSettings> {
-  protected selected: number = typeof this.settings.default !== "undefined"
-    ? this.settings.options.findIndex((item) =>
+export class Select<S extends SelectSettings = SelectSettings>
+  extends GenericList<string, string, S> {
+  protected listIndex: number = typeof this.settings.default !== "undefined"
+    ? this.options.findIndex((item: SelectOptionSettings) =>
       item.value === this.settings.default
     ) || 0
     : 0;
@@ -68,8 +70,12 @@ export class Select extends GenericList<string, string, SelectSettings> {
       maxRows: 10,
       ...options,
       keys: {
-        previous: ["up", "u"],
-        next: ["down", "d"],
+        moveCursorLeft: ["left"],
+        moveCursorRight: ["right"],
+        deleteCharLeft: ["backspace"],
+        deleteCharRight: ["delete"],
+        previous: options.filter ? ["up"] : ["up", "u", "8"],
+        next: options.filter ? ["down"] : ["down", "d", "2"],
         submit: ["return", "enter"],
         ...(options.keys ?? {}),
       },
@@ -85,36 +91,8 @@ export class Select extends GenericList<string, string, SelectSettings> {
       .map((item) => this.mapOption(item));
   }
 
-  /**
-   * Handle user input event.
-   * @param event Key event.
-   */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
-    switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          return Deno.exit(0);
-        }
-        break;
-
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
-    }
-  }
-
-  /** Get value of selected option. */
-  protected getValue(): string {
-    return this.settings.options[this.selected].value;
+  protected input(): string {
+    return underline(blue(this.inputValue));
   }
 
   /**
@@ -132,6 +110,68 @@ export class Select extends GenericList<string, string, SelectSettings> {
     return line;
   }
 
+  /** Get value of selected option. */
+  protected getValue(): string {
+    return this.options[this.listIndex]?.value ?? this.settings.default;
+  }
+
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      case event.name === "c":
+        if (event.ctrl) {
+          this.tty.cursorShow();
+          return Deno.exit(0);
+        }
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "moveCursorLeft", event):
+        this.moveCursorLeft();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "moveCursorRight", event):
+        this.moveCursorRight();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "deleteCharRight", event):
+        this.deleteCharRight();
+        this.match();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "deleteCharLeft", event):
+        this.deleteChar();
+        this.match();
+        break;
+
+      case this.isKey(this.settings.keys, "previous", event):
+        this.selectPrevious();
+        break;
+
+      case this.isKey(this.settings.keys, "next", event):
+        this.selectNext();
+        break;
+
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit();
+        break;
+
+      default:
+        if (
+          this.settings.filter && event.sequence && !event.meta && !event.ctrl
+        ) {
+          this.addChar(event.sequence);
+          this.match();
+        }
+    }
+  }
+
   /**
    * Validate input value.
    * @param value User input value.
@@ -140,8 +180,9 @@ export class Select extends GenericList<string, string, SelectSettings> {
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       value.length > 0 &&
-      this.settings.options.findIndex((option) => option.value === value) !==
-        -1;
+      this.options.findIndex((option: SelectOptionSettings) =>
+          option.value === value
+        ) !== -1;
   }
 
   /**

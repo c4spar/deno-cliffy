@@ -1,3 +1,4 @@
+import { GenericPrompt } from "./_generic_prompt.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
@@ -10,21 +11,22 @@ import {
 export type InputKeys = GenericInputKeys;
 
 /** Input prompt options. */
-export interface InputOptions extends GenericInputPromptOptions<string> {
+export interface InputOptions
+  extends GenericInputPromptOptions<string, string> {
   minLength?: number;
   maxLength?: number;
   keys?: InputKeys;
 }
 
 /** Input prompt settings. */
-interface InputSettings extends GenericInputPromptSettings<string> {
+interface InputSettings extends GenericInputPromptSettings<string, string> {
   minLength: number;
   maxLength: number;
   keys?: InputKeys;
 }
 
 /** Input prompt representation. */
-export class Input extends GenericInput<string, InputSettings> {
+export class Input extends GenericInput<string, string, InputSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | InputOptions): Promise<string> {
     if (typeof options === "string") {
@@ -37,6 +39,19 @@ export class Input extends GenericInput<string, InputSettings> {
       maxLength: Infinity,
       ...options,
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 
   /**

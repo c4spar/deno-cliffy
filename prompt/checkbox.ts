@@ -3,6 +3,7 @@ import { blue, dim, green, red } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
+  GenericListKeys,
   GenericListOption,
   GenericListOptions,
   GenericListOptionSettings,
@@ -11,7 +12,7 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Checkbox key options. */
-export interface CheckboxKeys {
+export interface CheckboxKeys extends GenericListKeys {
   previous?: string[];
   next?: string[];
   submit?: string[];
@@ -40,7 +41,7 @@ export type CheckboxValueSettings = CheckboxOptionSettings[];
 
 /** Checkbox prompt options. */
 export interface CheckboxOptions
-  extends GenericListOptions<string[], string[]> {
+  extends Omit<GenericListOptions<string[], string[]>, "suggestions"> {
   options: CheckboxValueOptions;
   check?: string;
   uncheck?: string;
@@ -83,13 +84,18 @@ export class Checkbox
       uncheck: red(Figures.CROSS),
       ...options,
       keys: {
-        previous: ["up", "u"],
-        next: ["down", "d"],
+        moveCursorLeft: ["left"],
+        moveCursorRight: ["right"],
+        deleteCharLeft: ["backspace"],
+        deleteCharRight: ["delete"],
+        previous: options.filter ? ["up"] : ["up", "u", "8"],
+        next: options.filter ? ["down"] : ["down", "d", "2"],
         submit: ["return", "enter"],
         check: ["space"],
         ...(options.keys ?? {}),
       },
       options: Checkbox.mapOptions(options),
+      suggestions: undefined,
     }).prompt();
   }
 
@@ -156,6 +162,13 @@ export class Checkbox
     return line;
   }
 
+  /** Get value of checked options. */
+  protected getValue(): string[] {
+    return this.settings.options
+      .filter((item) => item.checked)
+      .map((item) => item.value);
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
@@ -168,6 +181,28 @@ export class Checkbox
           this.tty.cursorShow();
           return Deno.exit(0);
         }
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "moveCursorLeft", event):
+        this.moveCursorLeft();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "moveCursorRight", event):
+        this.moveCursorRight();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "deleteCharRight", event):
+        this.deleteCharRight();
+        this.match();
+        break;
+
+      case this.settings.filter &&
+        this.isKey(this.settings.keys, "deleteCharLeft", event):
+        this.deleteChar();
+        this.match();
         break;
 
       case this.isKey(this.settings.keys, "previous", event):
@@ -185,20 +220,21 @@ export class Checkbox
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
         break;
+
+      default:
+        if (
+          this.settings.filter && event.sequence && !event.meta && !event.ctrl
+        ) {
+          this.addChar(event.sequence);
+          this.match();
+        }
     }
   }
 
   /** Check selected option. */
   protected checkValue(): void {
-    const item = this.settings.options[this.selected];
+    const item = this.options[this.listIndex];
     item.checked = !item.checked;
-  }
-
-  /** Get value of checked options. */
-  protected getValue(): string[] {
-    return this.settings.options
-      .filter((item) => item.checked)
-      .map((item) => item.value);
   }
 
   /**
