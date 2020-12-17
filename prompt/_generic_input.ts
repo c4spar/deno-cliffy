@@ -19,34 +19,29 @@ export interface GenericInputKeys {
 }
 
 /** Generic input prompt options. */
-export interface GenericInputPromptOptions<T>
-  extends GenericPromptOptions<T, string> {
+export interface GenericInputPromptOptions<T, V>
+  extends GenericPromptOptions<T, V> {
   keys?: GenericInputKeys;
   suggestions?: Array<string | number>;
 }
 
 /** Generic input prompt settings. */
-export interface GenericInputPromptSettings<T>
-  extends GenericPromptSettings<T, string> {
+export interface GenericInputPromptSettings<T, V>
+  extends GenericPromptSettings<T, V> {
   keys?: GenericInputKeys;
   suggestions?: Array<string | number>;
 }
 
 /** Generic input prompt representation. */
-export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
-  extends GenericPrompt<T, string, S> {
+export abstract class GenericInput<
+  T,
+  V,
+  S extends GenericInputPromptSettings<T, V>,
+> extends GenericPrompt<T, V, S> {
   protected inputValue = "";
   protected inputIndex = 0;
   protected suggestionsIndex = 0;
   protected suggestions: Array<string | number> = [];
-
-  /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Input value.
-   */
-  public static inject(value: string): void {
-    GenericPrompt.inject(value);
-  }
 
   /**
    * Prompt constructor.
@@ -107,11 +102,6 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
       this.suggestions.length - 1,
       Math.max(0, this.suggestionsIndex),
     );
-  }
-
-  /** Get user input. */
-  protected getValue(): string {
-    return this.inputValue;
   }
 
   /**
@@ -221,7 +211,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
   /** Select previous suggestion. */
   protected selectPreviousSuggestion(): void {
-    if (this.settings.suggestions?.length) {
+    if (this.suggestions?.length) {
       if (this.suggestionsIndex > 0) {
         this.suggestionsIndex--;
       }
@@ -230,7 +220,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
   /** Select next suggestion. */
   protected selectNextSuggestion(): void {
-    if (this.settings.suggestions?.length) {
+    if (this.suggestions?.length) {
       if (this.suggestionsIndex < this.suggestions.length - 1) {
         this.suggestionsIndex++;
       }

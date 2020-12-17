@@ -41,8 +41,6 @@ export interface Cursor {
   y: number;
 }
 
-export type RenderResult = [string, string | undefined, string | undefined];
-
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
@@ -149,17 +147,16 @@ export abstract class GenericPrompt<
     if (typeof GenericPrompt.injectedValue !== "undefined") {
       const value: V = GenericPrompt.injectedValue as V;
       await this.#validateValue(value);
-      return true;
-    }
+    } else {
+      const events: KeyEvent[] = await this.#readKey();
 
-    const events: KeyEvent[] = await this.#readKey();
+      if (!events.length) {
+        return false;
+      }
 
-    if (!events.length) {
-      return false;
-    }
-
-    for (const event of events) {
-      await this.handleEvent(event);
+      for (const event of events) {
+        await this.handleEvent(event);
+      }
     }
 
     return typeof this.#value !== "undefined";

@@ -1,4 +1,5 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
 import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
@@ -22,7 +23,8 @@ interface NumberKeysSettings extends GenericInputKeys {
 }
 
 /** Number prompt options. */
-export interface NumberOptions extends GenericInputPromptOptions<number> {
+export interface NumberOptions
+  extends GenericInputPromptOptions<number, string> {
   min?: number;
   max?: number;
   float?: boolean;
@@ -31,7 +33,7 @@ export interface NumberOptions extends GenericInputPromptOptions<number> {
 }
 
 /** Number prompt settings. */
-interface NumberSettings extends GenericInputPromptSettings<number> {
+interface NumberSettings extends GenericInputPromptSettings<number, string> {
   min: number;
   max: number;
   float: boolean;
@@ -40,7 +42,7 @@ interface NumberSettings extends GenericInputPromptSettings<number> {
 }
 
 /** Number prompt representation. */
-export class Number extends GenericInput<number, NumberSettings> {
+export class Number extends GenericInput<number, string, NumberSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
@@ -60,6 +62,14 @@ export class Number extends GenericInput<number, NumberSettings> {
         ...(options.keys ?? {}),
       },
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
   }
 
   /**
@@ -250,6 +260,11 @@ export class Number extends GenericInput<number, NumberSettings> {
    */
   protected format(value: number): string {
     return value.toString();
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 }
 

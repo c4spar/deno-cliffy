@@ -1,4 +1,5 @@
-import { blue, dim, stripColor, underline } from "./deps.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
+import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -11,7 +12,8 @@ import {
 export type ListKeys = GenericInputKeys;
 
 /** List prompt options. */
-export interface ListOptions extends GenericInputPromptOptions<string[]> {
+export interface ListOptions
+  extends GenericInputPromptOptions<string[], string> {
   separator?: string;
   minLength?: number;
   maxLength?: number;
@@ -21,7 +23,7 @@ export interface ListOptions extends GenericInputPromptOptions<string[]> {
 }
 
 /** List prompt settings. */
-interface ListSettings extends GenericInputPromptSettings<string[]> {
+interface ListSettings extends GenericInputPromptSettings<string[], string> {
   separator: string;
   minLength: number;
   maxLength: number;
@@ -31,7 +33,7 @@ interface ListSettings extends GenericInputPromptSettings<string[]> {
 }
 
 /** List prompt representation. */
-export class List extends GenericInput<string[], ListSettings> {
+export class List extends GenericInput<string[], string, ListSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
@@ -47,6 +49,14 @@ export class List extends GenericInput<string[], ListSettings> {
       maxTags: Infinity,
       ...options,
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
   }
 
   protected input(): string {
@@ -71,6 +81,12 @@ export class List extends GenericInput<string[], ListSettings> {
     return new RegExp(
       this.settings.separator === " " ? ` +` : ` *${this.settings.separator} *`,
     );
+  }
+
+  /** Get input value. */
+  protected getValue(): string {
+    // Remove trailing comma and spaces.
+    return this.inputValue.replace(/,+\s*$/, "");
   }
 
   protected getSuggestion(
@@ -119,7 +135,7 @@ export class List extends GenericInput<string[], ListSettings> {
       return false;
     }
 
-    const values = this.transform(value).filter((val) => val !== "");
+    const values = this.transform(value);
 
     for (const val of values) {
       if (val.length < this.settings.minLength) {
@@ -140,19 +156,13 @@ export class List extends GenericInput<string[], ListSettings> {
     return true;
   }
 
-  /** Get input value. */
-  protected getValue(): string {
-    // Remove trailing comma and spaces.
-    return super.getValue().replace(/,+\s*$/, "");
-  }
-
   /**
    * Map input value to output value.
    * @param value Input value.
    * @return Output value.
    */
   protected transform(value: string): string[] {
-    return value.trim().split(this.regexp());
+    return value.trim().split(this.regexp()).filter((val) => val !== "");
   }
 
   /**
