@@ -1,4 +1,4 @@
-import { blue, stripColor, underline } from "./deps.ts";
+import { blue, dim, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -62,7 +62,8 @@ export class List extends GenericInput<string[], ListSettings> {
 
     return oldInputParts
       .map((val: string) => underline(val))
-      .join(separator);
+      .join(separator) +
+      dim(this.getSuggestion());
   }
 
   /** Create list regex.*/
@@ -70,6 +71,18 @@ export class List extends GenericInput<string[], ListSettings> {
     return new RegExp(
       this.settings.separator === " " ? ` +` : ` *${this.settings.separator} *`,
     );
+  }
+
+  protected getSuggestion(
+    needle: string = this.inputValue.split(this.regexp()).pop() as string,
+  ): string {
+    return super.getSuggestion(needle);
+  }
+
+  protected match(
+    needle: string = this.inputValue.split(this.regexp()).pop() as string,
+  ): void {
+    super.match(needle);
   }
 
   /** Add char. */

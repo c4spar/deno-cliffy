@@ -148,7 +148,8 @@ export abstract class GenericPrompt<
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
       const value: V = GenericPrompt.injectedValue as V;
-      return this.#validateValue(value);
+      await this.#validateValue(value);
+      return true;
     }
 
     const events: KeyEvent[] = await this.#readKey();
@@ -164,7 +165,7 @@ export abstract class GenericPrompt<
     return typeof this.#value !== "undefined";
   }
 
-  protected submit(): Promise<boolean> {
+  protected submit(): Promise<void> {
     return this.#validateValue(this.getValue());
   }
 
@@ -269,16 +270,19 @@ export abstract class GenericPrompt<
   };
 
   /**
-   * Map input value to output value. If a default value is set, the default
-   * will be used as value without any validation. If a custom validation
-   * handler ist set, the custom handler will be executed, otherwise the default
-   * validation handler from the prompt will be executed.
-   * @param value
+   * Validate input value. Set error message if validation fails and transform
+   * output value on success.
+   * If a default value is set, the default will be used as value without any
+   * validation.
+   * If a custom validation handler ist set, the custom handler will
+   * be executed, otherwise a prompt specific default validation handler will be
+   * executed.
+   * @param value The value to validate.
    */
-  #validateValue = async (value: V): Promise<boolean> => {
+  #validateValue = async (value: V): Promise<void> => {
     if (!value && typeof this.settings.default !== "undefined") {
       this.#value = this.settings.default;
-      return true;
+      return;
     }
 
     this.#value = undefined;
@@ -296,8 +300,6 @@ export abstract class GenericPrompt<
     } else {
       this.#value = this.#transformValue(value);
     }
-
-    return typeof this.#value !== "undefined";
   };
 
   /**
@@ -306,8 +308,7 @@ export abstract class GenericPrompt<
    * @param name  Key name.
    * @param event Key event.
    */
-  // deno-lint-ignore no-explicit-any
-  protected isKey<K extends any, N extends keyof K>(
+  protected isKey<K extends unknown, N extends keyof K>(
     keys: K | undefined,
     name: N,
     event: KeyEvent,

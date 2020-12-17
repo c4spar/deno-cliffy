@@ -19,7 +19,8 @@ import {
 export type SecretKeys = GenericInputKeys;
 
 /** Secret prompt options. */
-export interface SecretOptions extends GenericInputPromptOptions<string> {
+export interface SecretOptions
+  extends Omit<GenericInputPromptOptions<string>, "suggestions"> {
   label?: string;
   hidden?: boolean;
   minLength?: number;
@@ -28,7 +29,8 @@ export interface SecretOptions extends GenericInputPromptOptions<string> {
 }
 
 /** Secret prompt settings. */
-interface SecretSettings extends GenericInputPromptSettings<string> {
+interface SecretSettings
+  extends Omit<GenericInputPromptSettings<string>, "suggestions"> {
   label: string;
   hidden: boolean;
   minLength: number;
