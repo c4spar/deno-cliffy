@@ -75,6 +75,16 @@ export class Number extends GenericInput<number, NumberSettings> {
         }
         break;
 
+      case this.settings.suggestions &&
+        this.isKey(this.settings.keys, "selectNextHistory", event):
+        this.selectNextSuggestion();
+        break;
+
+      case this.settings.suggestions &&
+        this.isKey(this.settings.keys, "selectPreviousHistory", event):
+        this.selectPreviousSuggestion();
+        break;
+
       case this.isKey(this.settings.keys, "increaseValue", event):
         this.increaseValue();
         break;
@@ -88,7 +98,11 @@ export class Number extends GenericInput<number, NumberSettings> {
         break;
 
       case this.isKey(this.settings.keys, "moveCursorRight", event):
-        this.moveCursorRight();
+        if (this.inputIndex < this.input.length) {
+          this.moveCursorRight();
+        } else {
+          this.complete();
+        }
         break;
 
       case this.isKey(this.settings.keys, "deleteCharRight", event):
@@ -97,6 +111,10 @@ export class Number extends GenericInput<number, NumberSettings> {
 
       case this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
+        break;
+
+      case this.isKey(this.settings.keys, "complete", event):
+        this.complete();
         break;
 
       case this.isKey(this.settings.keys, "submit", event):

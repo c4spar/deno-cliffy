@@ -10,7 +10,8 @@ import {
 export type ConfirmKeys = GenericInputKeys;
 
 /** Confirm prompt options. */
-export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
+export interface ConfirmOptions
+  extends Omit<GenericInputPromptOptions<boolean>, "suggestions"> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
@@ -38,6 +39,10 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
       inactive: "No",
       pointer: blue(Figures.POINTER_SMALL),
       ...options,
+      suggestions: [
+        options.active ?? "Yes",
+        options.inactive ?? "No",
+      ],
     }).prompt();
   }
 

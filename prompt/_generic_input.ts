@@ -4,7 +4,7 @@ import {
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { stripColor, underline } from "./deps.ts";
+import { dim, stripColor, underline } from "./deps.ts";
 
 /** Input keys options. */
 export interface GenericInputKeys {
@@ -12,6 +12,9 @@ export interface GenericInputKeys {
   moveCursorRight?: string[];
   deleteCharLeft?: string[];
   deleteCharRight?: string[];
+  complete?: string[];
+  selectNextHistory?: string[];
+  selectPreviousHistory?: string[];
   submit?: string[];
 }
 
@@ -19,12 +22,14 @@ export interface GenericInputKeys {
 export interface GenericInputPromptOptions<T>
   extends GenericPromptOptions<T, string> {
   keys?: GenericInputKeys;
+  suggestions?: Array<string | number>;
 }
 
 /** Generic input prompt settings. */
 export interface GenericInputPromptSettings<T>
   extends GenericPromptSettings<T, string> {
   keys?: GenericInputKeys;
+  suggestions?: Array<string | number>;
 }
 
 /** Generic input prompt representation. */
@@ -32,6 +37,8 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   extends GenericPrompt<T, string, S> {
   protected inputValue = "";
   protected inputIndex = 0;
+  protected suggestionsIndex = 0;
+  protected suggestions: Array<string | number> = [];
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -53,10 +60,17 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
         moveCursorRight: ["right"],
         deleteCharLeft: ["backspace"],
         deleteCharRight: ["delete"],
+        complete: ["tab"],
+        selectNextHistory: ["up"],
+        selectPreviousHistory: ["down"],
         submit: ["enter", "return"],
         ...(settings.keys ?? {}),
       },
+      suggestions: settings.suggestions?.slice(),
     });
+    this.settings.suggestions?.unshift(
+      this.settings.default ? this.format(this.settings.default) : "",
+    );
   }
 
   protected message(): string {
@@ -66,7 +80,38 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   }
 
   protected input(): string {
-    return underline(this.inputValue);
+    return underline(this.inputValue) + dim(this.getSuggestion());
+  }
+
+  protected render(): Promise<void> {
+    this.match();
+    return super.render();
+  }
+
+  protected getSuggestion(needle: string = this.inputValue): string {
+    return this.suggestions[this.suggestionsIndex]?.toString()
+      .substr(
+        needle.length,
+      ) ?? "";
+  }
+
+  protected match(needle: string = this.inputValue): void {
+    if (!this.settings.suggestions?.length) {
+      return;
+    }
+    this.suggestions = this.settings.suggestions
+      .filter((value: string | number) =>
+        value.toString().toLowerCase().startsWith(needle.toLowerCase())
+      );
+    this.suggestionsIndex = Math.min(
+      this.suggestions.length - 1,
+      Math.max(0, this.suggestionsIndex),
+    );
+  }
+
+  /** Get user input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 
   /**
@@ -85,18 +130,16 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
         }
         break;
 
-      // case "up": // scroll history?
-      //   break;
-      //
-      // case "down": // scroll history?
-      //   break;
-
       case this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();
         break;
 
       case this.isKey(this.settings.keys, "moveCursorRight", event):
-        this.moveCursorRight();
+        if (this.inputIndex < this.inputValue.length) {
+          this.moveCursorRight();
+        } else {
+          this.complete();
+        }
         break;
 
       case this.isKey(this.settings.keys, "deleteCharRight", event):
@@ -105,6 +148,18 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
 
       case this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
+        break;
+
+      case this.isKey(this.settings.keys, "selectNextHistory", event):
+        this.selectNextSuggestion();
+        break;
+
+      case this.isKey(this.settings.keys, "selectPreviousHistory", event):
+        this.selectPreviousSuggestion();
+        break;
+
+      case this.isKey(this.settings.keys, "complete", event):
+        this.complete();
         break;
 
       case this.isKey(this.settings.keys, "submit", event):
@@ -118,10 +173,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
-  /**
-   * Add character to current input.
-   * @param char Char to add.
-   */
+  /** Add character to current input. */
   protected addChar(char: string): void {
     this.inputValue = this.inputValue.slice(0, this.inputIndex) + char +
       this.inputValue.slice(this.inputIndex);
@@ -146,9 +198,8 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   protected deleteChar(): void {
     if (this.inputIndex > 0) {
       this.inputIndex--;
-      this.tty.cursorBackward(1);
-      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
-        this.inputValue.slice(this.inputIndex + 1);
+      this.tty.cursorBackward();
+      this.deleteCharRight();
     }
   }
 
@@ -160,8 +211,29 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
-  /** Get input input. */
-  protected getValue(): string {
-    return this.inputValue;
+  protected complete(): void {
+    if (this.suggestions.length) {
+      this.inputValue += this.getSuggestion();
+      this.inputIndex = this.inputValue.length;
+      this.suggestionsIndex = 0;
+    }
+  }
+
+  /** Select previous suggestion. */
+  protected selectPreviousSuggestion(): void {
+    if (this.settings.suggestions?.length) {
+      if (this.suggestionsIndex > 0) {
+        this.suggestionsIndex--;
+      }
+    }
+  }
+
+  /** Select next suggestion. */
+  protected selectNextSuggestion(): void {
+    if (this.settings.suggestions?.length) {
+      if (this.suggestionsIndex < this.suggestions.length - 1) {
+        this.suggestionsIndex++;
+      }
+    }
   }
 }
