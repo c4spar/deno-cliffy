@@ -87,12 +87,10 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          return Deno.exit(0);
-        }
-        break;
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
 
       case event.sequence === this.settings.inactive[0].toLowerCase():
       case this.isKey(this.settings.keys, "inactive", event):

@@ -14,8 +14,7 @@ type UnsupportedInputKeys =
   | "selectPreviousHistory";
 
 /** Select key options. */
-export interface GenericListKeys
-  extends Omit<InputKeys, UnsupportedInputKeys> {}
+export type GenericListKeys = Omit<InputKeys, UnsupportedInputKeys>;
 
 /** Generic list option options. */
 export interface GenericListOption {
@@ -34,14 +33,18 @@ export interface GenericListOptionSettings extends GenericListOption {
 export type GenericListValueOptions = (string | GenericListOption)[];
 export type GenericListValueSettings = GenericListOptionSettings[];
 
+type UnsupportedInputOptions = "suggestions" | "list";
+
 /** Generic list prompt options. */
 export interface GenericListOptions<T, V>
-  extends GenericInputPromptOptions<T, V> {
+  extends Omit<GenericInputPromptOptions<T, V>, UnsupportedInputOptions> {
   options: GenericListValueOptions;
   indent?: string;
   listPointer?: string;
+  searchIcon?: string;
   maxRows?: number;
-  filter?: boolean | string;
+  searchLabel?: string;
+  search?: boolean;
 }
 
 /** Generic list prompt settings. */
@@ -51,7 +54,8 @@ export interface GenericListSettings<T, V>
   indent: string;
   listPointer: string;
   maxRows: number;
-  filter?: boolean | string;
+  searchLabel: string;
+  search?: boolean;
 }
 
 /** Generic list prompt representation. */
@@ -83,51 +87,11 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
-  protected message(): string {
-    let message = ` ${yellow("?")} ` + bold(this.settings.message) +
-      this.defaults();
-    if (this.settings.filter) {
-      message += " " + this.settings.pointer + " ";
-    }
-    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
-    return message + this.input();
-  }
-
-  /** Render options. */
-  protected body(): string | undefined | Promise<string | undefined> {
-    const body: Array<string> = [];
-    const height: number = this.getListHeight();
-    for (let i = this.listOffset; i < this.listOffset + height; i++) {
-      body.push(
-        this.getListItem(
-          this.options[i],
-          this.listIndex === i,
-        ),
-      );
-    }
-    if (!body.length) {
-      body.push(
-        this.settings.indent + yellow("  No matches..."),
-      );
-    }
-    return body.join("\n");
-  }
-
-  /**
-   * Render option.
-   * @param item        Option.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected abstract getListItem(
-    item: GenericListOptionSettings,
-    isSelected?: boolean,
-  ): string;
-
-  protected match(needle: string = this.inputValue): void {
+  protected match(): void {
     this.options = this.settings.options.filter(
       (option: SelectOption) =>
         (option.name ?? option.value).toString().toLowerCase().startsWith(
-          needle.toLowerCase(),
+          this.getCurrentInputValue().toLowerCase(),
         ),
     );
     this.listIndex = Math.max(
@@ -143,9 +107,58 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     );
   }
 
+  protected message(): string {
+    let message = ` ${yellow("?")} ` + bold(this.settings.message) +
+      this.defaults();
+    if (this.settings.search) {
+      message += " " + this.settings.searchLabel + " ";
+    }
+    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+    return message + this.input();
+  }
+
+  /** Render options. */
+  protected body(): string | Promise<string> {
+    let body: string = this.getOptionsList();
+    if (this.settings.info) {
+      body += "\n" + this.getInfo();
+    }
+    return body;
+  }
+
+  /** Render options list. */
+  protected getOptionsList(): string {
+    const list: Array<string> = [];
+    const height: number = this.getListHeight();
+    for (let i = this.listOffset; i < this.listOffset + height; i++) {
+      list.push(
+        this.getOptionsListItem(
+          this.options[i],
+          this.listIndex === i,
+        ),
+      );
+    }
+    if (!list.length) {
+      list.push(
+        this.settings.indent + dim("  No matches..."),
+      );
+    }
+    return list.join("\n");
+  }
+
+  /**
+   * Render option.
+   * @param item        Option.
+   * @param isSelected  Set to true if option is selected.
+   */
+  protected abstract getOptionsListItem(
+    item: GenericListOptionSettings,
+    isSelected?: boolean,
+  ): string;
+
   /** Read user input. */
   protected read(): Promise<boolean> {
-    if (!this.settings.filter) {
+    if (!this.settings.search) {
       this.tty.cursorHide();
     }
     return super.read();

@@ -35,6 +35,9 @@ export class Input extends GenericInput<string, string, InputSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       minLength: 0,
       maxLength: Infinity,
       ...options,

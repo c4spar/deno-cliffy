@@ -42,6 +42,9 @@ export class List extends GenericInput<string[], string, ListSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       separator: ",",
       minLength: 0,
       maxLength: Infinity,
@@ -61,19 +64,23 @@ export class List extends GenericInput<string[], string, ListSettings> {
 
   protected input(): string {
     const oldInput: string = this.inputValue;
-    const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
+    const tags: string[] = this.getTags(oldInput);
     const separator: string = this.settings.separator + " ";
 
-    this.inputValue = oldInputParts.join(separator);
+    this.inputValue = tags.join(separator);
 
     const diff = oldInput.length - this.inputValue.length;
     this.inputIndex -= diff;
     this.cursor.x -= diff;
 
-    return oldInputParts
+    return tags
       .map((val: string) => underline(val))
       .join(separator) +
       dim(this.getSuggestion());
+  }
+
+  protected getTags(value: string = this.inputValue): Array<string> {
+    return value.trim().split(this.regexp());
   }
 
   /** Create list regex.*/
@@ -89,16 +96,8 @@ export class List extends GenericInput<string[], string, ListSettings> {
     return this.inputValue.replace(/,+\s*$/, "");
   }
 
-  protected getSuggestion(
-    needle: string = this.inputValue.split(this.regexp()).pop() as string,
-  ): string {
-    return super.getSuggestion(needle);
-  }
-
-  protected match(
-    needle: string = this.inputValue.split(this.regexp()).pop() as string,
-  ): void {
-    super.match(needle);
+  protected getCurrentInputValue(): string {
+    return this.getTags().pop() ?? "";
   }
 
   /** Add char. */
@@ -111,6 +110,8 @@ export class List extends GenericInput<string[], string, ListSettings> {
         ) {
           super.addChar(char);
         }
+        this.suggestionsIndex = -1;
+        this.suggestionsOffset = 0;
         break;
       default:
         super.addChar(char);
@@ -123,6 +124,17 @@ export class List extends GenericInput<string[], string, ListSettings> {
       super.deleteChar();
     }
     super.deleteChar();
+  }
+
+  protected complete(): void {
+    if (this.suggestions.length && this.suggestions[this.suggestionsIndex]) {
+      const tags = this.getTags().slice(0, -1);
+      tags.push(this.suggestions[this.suggestionsIndex].toString());
+      this.inputValue = tags.join(this.settings.separator + " ");
+      this.inputIndex = this.inputValue.length;
+      this.suggestionsIndex = 0;
+      this.suggestionsOffset = 0;
+    }
   }
 
   /**
@@ -162,7 +174,7 @@ export class List extends GenericInput<string[], string, ListSettings> {
    * @return Output value.
    */
   protected transform(value: string): string[] {
-    return value.trim().split(this.regexp()).filter((val) => val !== "");
+    return this.getTags(value).filter((val) => val !== "");
   }
 
   /**

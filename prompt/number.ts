@@ -51,6 +51,9 @@ export class Number extends GenericInput<number, string, NumberSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       min: -Infinity,
       max: Infinity,
       float: false,
@@ -78,35 +81,35 @@ export class Number extends GenericInput<number, string, NumberSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          return Deno.exit(0);
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
+      case this.settings.suggestions &&
+        this.isKey(this.settings.keys, "next", event):
+        if (this.settings.list) {
+          this.selectPreviousSuggestion();
+        } else {
+          this.selectNextSuggestion();
         }
         break;
-
       case this.settings.suggestions &&
-        this.isKey(this.settings.keys, "selectNextHistory", event):
-        this.selectNextSuggestion();
+        this.isKey(this.settings.keys, "previous", event):
+        if (this.settings.list) {
+          this.selectNextSuggestion();
+        } else {
+          this.selectPreviousSuggestion();
+        }
         break;
-
-      case this.settings.suggestions &&
-        this.isKey(this.settings.keys, "selectPreviousHistory", event):
-        this.selectPreviousSuggestion();
-        break;
-
       case this.isKey(this.settings.keys, "increaseValue", event):
         this.increaseValue();
         break;
-
       case this.isKey(this.settings.keys, "decreaseValue", event):
         this.decreaseValue();
         break;
-
       case this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();
         break;
-
       case this.isKey(this.settings.keys, "moveCursorRight", event):
         if (this.inputIndex < this.input.length) {
           this.moveCursorRight();
@@ -114,23 +117,18 @@ export class Number extends GenericInput<number, string, NumberSettings> {
           this.complete();
         }
         break;
-
       case this.isKey(this.settings.keys, "deleteCharRight", event):
         this.deleteCharRight();
         break;
-
       case this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
         break;
-
       case this.isKey(this.settings.keys, "complete", event):
         this.complete();
         break;
-
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
         break;
-
       default:
         if (event.sequence && !event.meta && !event.ctrl) {
           this.addChar(event.sequence);
