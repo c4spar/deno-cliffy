@@ -75,9 +75,10 @@ export class Checkbox
   public static prompt(options: CheckboxOptions): Promise<string[]> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
-      listPointer: blue(Figures.POINTER),
       indent: " ",
+      listPointer: blue(Figures.POINTER),
       maxRows: 10,
+      searchLabel: blue(Figures.SEARCH),
       minOptions: 0,
       maxOptions: Infinity,
       check: green(Figures.TICK),
@@ -88,8 +89,8 @@ export class Checkbox
         moveCursorRight: ["right"],
         deleteCharLeft: ["backspace"],
         deleteCharRight: ["delete"],
-        previous: options.filter ? ["up"] : ["up", "u", "8"],
-        next: options.filter ? ["down"] : ["down", "d", "2"],
+        previous: options.search ? ["up"] : ["up", "u", "8"],
+        next: options.search ? ["down"] : ["down", "d", "2"],
         submit: ["return", "enter"],
         check: ["space"],
         ...(options.keys ?? {}),
@@ -134,7 +135,7 @@ export class Checkbox
    * @param item        Checkbox option settings.
    * @param isSelected  Set to true if option is selected.
    */
-  protected getListItem(
+  protected getOptionsListItem(
     item: CheckboxOptionSettings,
     isSelected?: boolean,
   ): string {
@@ -157,7 +158,11 @@ export class Checkbox
     }
 
     // value
-    line += `${isSelected ? item.name : dim(item.name)}`;
+    line += `${
+      isSelected
+        ? this.highlight(item.name, (val) => val)
+        : this.highlight(item.name)
+    }`;
 
     return line;
   }
@@ -175,31 +180,29 @@ export class Checkbox
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          return Deno.exit(0);
-        }
-        break;
+      // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
 
-      case this.settings.filter &&
+      case this.settings.search &&
         this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();
         break;
 
-      case this.settings.filter &&
+      case this.settings.search &&
         this.isKey(this.settings.keys, "moveCursorRight", event):
         this.moveCursorRight();
         break;
 
-      case this.settings.filter &&
+      case this.settings.search &&
         this.isKey(this.settings.keys, "deleteCharRight", event):
         this.deleteCharRight();
         this.match();
         break;
 
-      case this.settings.filter &&
+      case this.settings.search &&
         this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
         this.match();
@@ -223,7 +226,7 @@ export class Checkbox
 
       default:
         if (
-          this.settings.filter && event.sequence && !event.meta && !event.ctrl
+          this.settings.search && event.sequence && !event.meta && !event.ctrl
         ) {
           this.addChar(event.sequence);
           this.match();

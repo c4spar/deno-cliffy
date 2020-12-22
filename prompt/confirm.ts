@@ -10,9 +10,11 @@ import {
 
 export type ConfirmKeys = GenericInputKeys;
 
+type UnsupportedInputOptions = "suggestions" | "list" | "info";
+
 /** Confirm prompt options. */
 export interface ConfirmOptions
-  extends Omit<GenericInputPromptOptions<boolean, string>, "suggestions"> {
+  extends Omit<GenericInputPromptOptions<boolean, string>, UnsupportedInputOptions> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
@@ -36,14 +38,19 @@ export class Confirm extends GenericInput<boolean, string, ConfirmSettings> {
     }
 
     return new this({
+      pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       active: "Yes",
       inactive: "No",
-      pointer: blue(Figures.POINTER_SMALL),
       ...options,
       suggestions: [
         options.active ?? "Yes",
         options.inactive ?? "No",
       ],
+      list: false,
+      info: false,
     }).prompt();
   }
 

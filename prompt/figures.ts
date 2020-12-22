@@ -23,6 +23,7 @@ const main = {
   PAGE_UP: "⇞",
   PAGE_DOWN: "⇟",
   ENTER: "↵",
+  SEARCH: "⌕",
 };
 
 const win = {
