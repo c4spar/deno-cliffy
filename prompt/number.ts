@@ -1,30 +1,24 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
+import {
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
-import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
 
 /** Number key options. */
-export interface NumberKeys extends GenericInputKeys {
+export interface NumberKeys extends GenericSuggestionsKeys {
   increaseValue?: string[];
   decreaseValue?: string[];
 }
 
-/** Number key settings. */
-interface NumberKeysSettings extends GenericInputKeys {
-  increaseValue: string[];
-  decreaseValue: string[];
-}
-
 /** Number prompt options. */
 export interface NumberOptions
-  extends GenericInputPromptOptions<number, string> {
+  extends GenericSuggestionsOptions<number, string> {
   min?: number;
   max?: number;
   float?: boolean;
@@ -33,16 +27,16 @@ export interface NumberOptions
 }
 
 /** Number prompt settings. */
-interface NumberSettings extends GenericInputPromptSettings<number, string> {
+interface NumberSettings extends GenericSuggestionsSettings<number, string> {
   min: number;
   max: number;
   float: boolean;
   round: number;
-  keys: NumberKeysSettings;
+  keys?: NumberKeys;
 }
 
 /** Number prompt representation. */
-export class Number extends GenericInput<number, string, NumberSettings> {
+export class Number extends GenericSuggestions<number, string, NumberSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
@@ -81,10 +75,6 @@ export class Number extends GenericInput<number, string, NumberSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c" && event.ctrl:
-        this.tty.cursorShow();
-        Deno.exit(0);
-        return;
       case this.settings.suggestions &&
         this.isKey(this.settings.keys, "next", event):
         if (this.settings.list) {
@@ -107,32 +97,8 @@ export class Number extends GenericInput<number, string, NumberSettings> {
       case this.isKey(this.settings.keys, "decreaseValue", event):
         this.decreaseValue();
         break;
-      case this.isKey(this.settings.keys, "moveCursorLeft", event):
-        this.moveCursorLeft();
-        break;
-      case this.isKey(this.settings.keys, "moveCursorRight", event):
-        if (this.inputIndex < this.input.length) {
-          this.moveCursorRight();
-        } else {
-          this.complete();
-        }
-        break;
-      case this.isKey(this.settings.keys, "deleteCharRight", event):
-        this.deleteCharRight();
-        break;
-      case this.isKey(this.settings.keys, "deleteCharLeft", event):
-        this.deleteChar();
-        break;
-      case this.isKey(this.settings.keys, "complete", event):
-        this.complete();
-        break;
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
       default:
-        if (event.sequence && !event.meta && !event.ctrl) {
-          this.addChar(event.sequence);
-        }
+        await super.handleEvent(event);
     }
   }
 

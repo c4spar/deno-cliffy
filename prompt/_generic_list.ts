@@ -1,20 +1,18 @@
+import { KeyEvent } from "../keycode/key_event.ts";
 import {
   GenericInput,
+  GenericInputKeys,
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { bold, dim, red, stripColor, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-import { InputKeys } from "./input.ts";
+import { bold, dim, stripColor, yellow } from "./deps.ts";
 import { SelectOption } from "./select.ts";
 
-type UnsupportedInputKeys =
-  | "complete"
-  | "selectNextHistory"
-  | "selectPreviousHistory";
-
 /** Select key options. */
-export type GenericListKeys = Omit<InputKeys, UnsupportedInputKeys>;
+export interface GenericListKeys extends GenericInputKeys {
+  previous?: string[];
+  next?: string[];
+}
 
 /** Generic list option options. */
 export interface GenericListOption {
@@ -39,6 +37,7 @@ type UnsupportedInputOptions = "suggestions" | "list";
 export interface GenericListOptions<T, V>
   extends Omit<GenericInputPromptOptions<T, V>, UnsupportedInputOptions> {
   options: GenericListValueOptions;
+  keys?: GenericListKeys;
   indent?: string;
   listPointer?: string;
   searchIcon?: string;
@@ -51,6 +50,7 @@ export interface GenericListOptions<T, V>
 export interface GenericListSettings<T, V>
   extends GenericInputPromptSettings<T, V> {
   options: GenericListValueSettings;
+  keys?: GenericListKeys;
   indent: string;
   listPointer: string;
   maxRows: number;
@@ -87,6 +87,17 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
+  constructor(settings: S) {
+    super({
+      ...settings,
+      keys: {
+        previous: settings.search ? ["up"] : ["up", "u", "8"],
+        next: settings.search ? ["down"] : ["down", "d", "2"],
+        ...(settings.keys ?? {}),
+      },
+    });
+  }
+
   protected match(): void {
     this.options = this.settings.options.filter(
       (option: SelectOption) =>
@@ -119,20 +130,21 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
 
   /** Render options. */
   protected body(): string | Promise<string> {
-    let body: string = this.getOptionsList();
-    if (this.settings.info) {
-      body += "\n" + this.getInfo();
-    }
-    return body;
+    return this.getList();
+    // let body: string = this.getOptionsList();
+    // if (this.settings.info) {
+    //   body += "\n" + this.getInfo();
+    // }
+    // return body;
   }
 
   /** Render options list. */
-  protected getOptionsList(): string {
+  protected getList(): string {
     const list: Array<string> = [];
     const height: number = this.getListHeight();
     for (let i = this.listOffset; i < this.listOffset + height; i++) {
       list.push(
-        this.getOptionsListItem(
+        this.getListItem(
           this.options[i],
           this.listIndex === i,
         ),
@@ -151,10 +163,28 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
    * @param item        Option.
    * @param isSelected  Set to true if option is selected.
    */
-  protected abstract getOptionsListItem(
+  protected abstract getListItem(
     item: GenericListOptionSettings,
     isSelected?: boolean,
   ): string;
+
+  /** Get options row height. */
+  protected getListHeight(): number {
+    return Math.min(
+      this.options.length,
+      this.settings.maxRows || this.options.length,
+    );
+  }
+
+  /**
+   * Find option by value.
+   * @param value Value of the option.
+   */
+  protected getOptionByValue(
+    value: string,
+  ): GenericListOptionSettings | undefined {
+    return this.options.find((option) => option.value === value);
+  }
 
   /** Read user input. */
   protected read(): Promise<boolean> {
@@ -162,6 +192,55 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       this.tty.cursorHide();
     }
     return super.read();
+  }
+
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      case this.isKey(this.settings.keys, "previous", event):
+        this.selectPrevious();
+        break;
+      case this.isKey(this.settings.keys, "next", event):
+        this.selectNext();
+        break;
+      default:
+        await super.handleEvent(event);
+    }
+  }
+
+  protected moveCursorLeft(): void {
+    if (this.settings.search) {
+      super.moveCursorLeft();
+    }
+  }
+
+  protected moveCursorRight(): void {
+    if (this.settings.search) {
+      super.moveCursorRight();
+    }
+  }
+
+  protected deleteChar(): void {
+    if (this.settings.search) {
+      super.deleteChar();
+    }
+  }
+
+  protected deleteCharRight(): void {
+    if (this.settings.search) {
+      super.deleteCharRight();
+      this.match();
+    }
+  }
+
+  protected addChar(char: string): void {
+    if (this.settings.search) {
+      super.addChar(char);
+      this.match();
+    }
   }
 
   /** Select previous option. */
@@ -205,23 +284,5 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
         this.selectNext();
       }
     }
-  }
-
-  /** Get options row height. */
-  protected getListHeight(): number {
-    return Math.min(
-      this.options.length,
-      this.settings.maxRows || this.options.length,
-    );
-  }
-
-  /**
-   * Find option by value.
-   * @param value Value of the option.
-   */
-  protected getOptionByValue(
-    value: string,
-  ): GenericListOptionSettings | undefined {
-    return this.options.find((option) => option.value === value);
   }
 }

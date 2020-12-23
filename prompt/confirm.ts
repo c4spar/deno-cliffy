@@ -1,34 +1,36 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
+import {
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
 import { blue, dim } from "./deps.ts";
 import { Figures } from "./figures.ts";
-import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
 
-export type ConfirmKeys = GenericInputKeys;
+export type ConfirmKeys = GenericSuggestionsKeys;
 
 type UnsupportedInputOptions = "suggestions" | "list" | "info";
 
 /** Confirm prompt options. */
 export interface ConfirmOptions
-  extends Omit<GenericInputPromptOptions<boolean, string>, UnsupportedInputOptions> {
+  extends
+    Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedInputOptions> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
 }
 
 /** Confirm prompt settings. */
-interface ConfirmSettings extends GenericInputPromptSettings<boolean, string> {
+interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
   active: string;
   inactive: string;
   keys?: ConfirmKeys;
 }
 
 /** Confirm prompt representation. */
-export class Confirm extends GenericInput<boolean, string, ConfirmSettings> {
+export class Confirm
+  extends GenericSuggestions<boolean, string, ConfirmSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(
     options: string | ConfirmOptions,
