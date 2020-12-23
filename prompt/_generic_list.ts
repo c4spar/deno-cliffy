@@ -119,7 +119,8 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   protected message(): string {
-    let message = ` ${yellow("?")} ` + bold(this.settings.message) +
+    let message = `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) +
       this.defaults();
     if (this.settings.search) {
       message += " " + this.settings.searchLabel + " ";

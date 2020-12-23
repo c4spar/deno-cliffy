@@ -3,6 +3,7 @@ export {
   bold,
   dim,
   green,
+  italic,
   red,
   stripColor,
   underline,

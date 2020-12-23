@@ -1,7 +1,7 @@
 import { AnsiEscape } from "../ansi_escape/ansi_escape.ts";
 import { KeyCode } from "../keycode/key_code.ts";
 import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, bold, dim, green, red, yellow } from "./deps.ts";
+import { blue, bold, dim, green, italic, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Prompt validation return tape. */
@@ -20,6 +20,7 @@ export interface GenericPromptOptions<T, V> {
   transform?: (value: V) => T | undefined;
   hint?: string;
   pointer?: string;
+  indent?: string;
   keys?: GenericPromptKeys;
 }
 
@@ -27,6 +28,7 @@ export interface GenericPromptOptions<T, V> {
 export interface GenericPromptSettings<T, V>
   extends GenericPromptOptions<T, V> {
   pointer: string;
+  indent: string;
 }
 
 /** Static generic prompt interface. */
@@ -56,6 +58,7 @@ export abstract class GenericPrompt<
   protected static injectedValue: unknown | undefined;
   protected readonly settings: S;
   protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
@@ -80,6 +83,7 @@ export abstract class GenericPrompt<
         ...(settings.keys ?? {}),
       },
     };
+    this.indent = this.settings.indent ?? " ";
   }
 
   /** Execute the prompt and show cursor on end. */
@@ -182,7 +186,8 @@ export abstract class GenericPrompt<
   }
 
   protected message(): string {
-    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
+    return `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) + this.defaults();
   }
 
   protected defaults(): string {
@@ -195,7 +200,8 @@ export abstract class GenericPrompt<
 
   /** Get prompt success message. */
   protected success(value: T): string | undefined {
-    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults() +
+    return `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
       " " + green(this.format(value));
   }
@@ -208,13 +214,14 @@ export abstract class GenericPrompt<
 
   protected error(): string | undefined {
     return this.#lastError
-      ? red(bold(` ${Figures.CROSS} `) + this.#lastError)
+      ? this.settings.indent + red(bold(`${Figures.CROSS} `) + this.#lastError)
       : undefined;
   }
 
   protected hint(): string | undefined {
     return this.settings.hint
-      ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
+      ? this.settings.indent +
+        italic(blue(dim(`${Figures.POINTER} `) + this.settings.hint))
       : undefined;
   }
 
