@@ -44,6 +44,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
       active: "Yes",
       inactive: "No",
       ...options,

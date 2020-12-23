@@ -22,7 +22,6 @@ export interface GenericSuggestionsOptions<T, V>
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
-  indent?: string;
   listPointer?: string;
   maxRows?: number;
 }
@@ -34,7 +33,6 @@ export interface GenericSuggestionsSettings<T, V>
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
-  indent: string;
   listPointer: string;
   maxRows: number;
 }
