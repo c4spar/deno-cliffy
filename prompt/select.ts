@@ -1,5 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, dim, underline } from "./deps.ts";
+import { blue, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -12,14 +11,7 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Select key options. */
-export interface SelectKeys extends GenericListKeys {
-  previous?: string[];
-  next?: string[];
-  submit?: string[];
-}
-
-/** Select key settings. */
-type SelectKeysSettings = Required<SelectKeys>;
+export type SelectKeys = GenericListKeys;
 
 /** Select option options. */
 export type SelectOption = GenericListOption;
@@ -41,7 +33,7 @@ export interface SelectOptions extends GenericListOptions<string, string> {
 /** Select prompt settings. */
 export interface SelectSettings extends GenericListSettings<string, string> {
   options: SelectValueSettings;
-  keys: SelectKeysSettings;
+  keys?: SelectKeys;
 }
 
 /** Select prompt representation. */
@@ -67,19 +59,7 @@ export class Select<S extends SelectSettings = SelectSettings>
       maxRows: 10,
       searchLabel: blue(Figures.SEARCH),
       ...options,
-      keys: {
-        moveCursorLeft: ["left"],
-        moveCursorRight: ["right"],
-        deleteCharLeft: ["backspace"],
-        deleteCharRight: ["delete"],
-        previous: options.search ? ["up"] : ["up", "u", "8"],
-        next: options.search ? ["down"] : ["down", "d", "2"],
-        submit: ["return", "enter"],
-        ...(options.keys ?? {}),
-      },
       options: Select.mapOptions(options),
-      suggestions: undefined,
-      list: false,
     }).prompt();
   }
 
@@ -100,7 +80,7 @@ export class Select<S extends SelectSettings = SelectSettings>
    * @param item        Select option settings.
    * @param isSelected  Set to true if option is selected.
    */
-  protected getOptionsListItem(
+  protected getListItem(
     item: SelectOptionSettings,
     isSelected?: boolean,
   ): string {
@@ -133,61 +113,6 @@ export class Select<S extends SelectSettings = SelectSettings>
     }
     const height: number = this.getListHeight();
     return Math.floor(index / height) * height;
-  }
-
-  /**
-   * Handle user input event.
-   * @param event Key event.
-   */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
-    switch (true) {
-      case event.name === "c" && event.ctrl:
-        this.tty.cursorShow();
-        Deno.exit(0);
-        return;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "moveCursorLeft", event):
-        this.moveCursorLeft();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "moveCursorRight", event):
-        this.moveCursorRight();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "deleteCharRight", event):
-        this.deleteCharRight();
-        this.match();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "deleteCharLeft", event):
-        this.deleteChar();
-        this.match();
-        break;
-
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
-
-      default:
-        if (
-          this.settings.search && event.sequence && !event.meta && !event.ctrl
-        ) {
-          this.addChar(event.sequence);
-          this.match();
-        }
-    }
   }
 
   /**

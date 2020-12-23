@@ -13,14 +13,8 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Checkbox key options. */
 export interface CheckboxKeys extends GenericListKeys {
-  previous?: string[];
-  next?: string[];
-  submit?: string[];
   check?: string[];
 }
-
-/** Checkbox key settings. */
-type CheckboxKeysSettings = Required<CheckboxKeys>;
 
 /** Checkbox option options. */
 export interface CheckboxOption extends GenericListOption {
@@ -41,7 +35,7 @@ export type CheckboxValueSettings = CheckboxOptionSettings[];
 
 /** Checkbox prompt options. */
 export interface CheckboxOptions
-  extends Omit<GenericListOptions<string[], string[]>, "suggestions"> {
+  extends GenericListOptions<string[], string[]> {
   options: CheckboxValueOptions;
   check?: string;
   uncheck?: string;
@@ -57,7 +51,7 @@ interface CheckboxSettings extends GenericListSettings<string[], string[]> {
   uncheck: string;
   minOptions: number;
   maxOptions: number;
-  keys: CheckboxKeysSettings;
+  keys?: CheckboxKeys;
 }
 
 /** Checkbox prompt representation. */
@@ -85,18 +79,10 @@ export class Checkbox
       uncheck: red(Figures.CROSS),
       ...options,
       keys: {
-        moveCursorLeft: ["left"],
-        moveCursorRight: ["right"],
-        deleteCharLeft: ["backspace"],
-        deleteCharRight: ["delete"],
-        previous: options.search ? ["up"] : ["up", "u", "8"],
-        next: options.search ? ["down"] : ["down", "d", "2"],
-        submit: ["return", "enter"],
         check: ["space"],
         ...(options.keys ?? {}),
       },
       options: Checkbox.mapOptions(options),
-      suggestions: undefined,
     }).prompt();
   }
 
@@ -135,7 +121,7 @@ export class Checkbox
    * @param item        Checkbox option settings.
    * @param isSelected  Set to true if option is selected.
    */
-  protected getOptionsListItem(
+  protected getListItem(
     item: CheckboxOptionSettings,
     isSelected?: boolean,
   ): string {
@@ -180,57 +166,11 @@ export class Checkbox
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      // @TODO: implement Deno.Signal?: https://deno.land/std/manual.md#handle-os-signals
-      case event.name === "c" && event.ctrl:
-        this.tty.cursorShow();
-        Deno.exit(0);
-        return;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "moveCursorLeft", event):
-        this.moveCursorLeft();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "moveCursorRight", event):
-        this.moveCursorRight();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "deleteCharRight", event):
-        this.deleteCharRight();
-        this.match();
-        break;
-
-      case this.settings.search &&
-        this.isKey(this.settings.keys, "deleteCharLeft", event):
-        this.deleteChar();
-        this.match();
-        break;
-
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-
       case this.isKey(this.settings.keys, "check", event):
         this.checkValue();
         break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
-
       default:
-        if (
-          this.settings.search && event.sequence && !event.meta && !event.ctrl
-        ) {
-          this.addChar(event.sequence);
-          this.match();
-        }
+        await super.handleEvent(event);
     }
   }
 

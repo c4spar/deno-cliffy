@@ -1,19 +1,19 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
+import {
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
 import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
-import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
 
 /** List key options. */
-export type ListKeys = GenericInputKeys;
+export type ListKeys = GenericSuggestionsKeys;
 
 /** List prompt options. */
 export interface ListOptions
-  extends GenericInputPromptOptions<string[], string> {
+  extends GenericSuggestionsOptions<string[], string> {
   separator?: string;
   minLength?: number;
   maxLength?: number;
@@ -23,7 +23,7 @@ export interface ListOptions
 }
 
 /** List prompt settings. */
-interface ListSettings extends GenericInputPromptSettings<string[], string> {
+interface ListSettings extends GenericSuggestionsSettings<string[], string> {
   separator: string;
   minLength: number;
   maxLength: number;
@@ -33,7 +33,7 @@ interface ListSettings extends GenericInputPromptSettings<string[], string> {
 }
 
 /** List prompt representation. */
-export class List extends GenericInput<string[], string, ListSettings> {
+export class List extends GenericSuggestions<string[], string, ListSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {

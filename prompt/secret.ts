@@ -11,12 +11,9 @@ import {
 /** Secret key options. */
 export type SecretKeys = GenericInputKeys;
 
-type UnsupportedInputOptions = "suggestions" | "list" | "info";
-
 /** Secret prompt options. */
 export interface SecretOptions
-  extends
-    Omit<GenericInputPromptOptions<string, string>, UnsupportedInputOptions> {
+  extends GenericInputPromptOptions<string, string> {
   label?: string;
   hidden?: boolean;
   minLength?: number;
@@ -43,9 +40,6 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
       label: "Password",
       hidden: false,
       minLength: 0,

@@ -7,6 +7,11 @@ import { Figures } from "./figures.ts";
 /** Prompt validation return tape. */
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
+/** Input keys options. */
+export interface GenericPromptKeys {
+  submit?: string[];
+}
+
 /** Generic prompt options. */
 export interface GenericPromptOptions<T, V> {
   message: string;
@@ -15,6 +20,7 @@ export interface GenericPromptOptions<T, V> {
   transform?: (value: V) => T | undefined;
   hint?: string;
   pointer?: string;
+  keys?: GenericPromptKeys;
 }
 
 /** Generic prompt settings. */
@@ -48,6 +54,7 @@ export abstract class GenericPrompt<
   S extends GenericPromptSettings<T, V>,
 > {
   protected static injectedValue: unknown | undefined;
+  protected readonly settings: S;
   protected readonly tty = AnsiEscape.from(Deno.stdout);
   protected readonly cursor: Cursor = {
     x: 0,
@@ -65,7 +72,15 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected constructor(protected readonly settings: S) {}
+  protected constructor(settings: S) {
+    this.settings = {
+      ...settings,
+      keys: {
+        submit: ["enter", "return"],
+        ...(settings.keys ?? {}),
+      },
+    };
+  }
 
   /** Execute the prompt and show cursor on end. */
   public async prompt(): Promise<T> {
@@ -207,7 +222,18 @@ export abstract class GenericPrompt<
    * Handle user input event.
    * @param event Key event.
    */
-  protected abstract handleEvent(event: KeyEvent): void | Promise<void>;
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      // @TODO: implement cbreak option
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit();
+        break;
+    }
+  }
 
   /**
    * Map input value to output value.
