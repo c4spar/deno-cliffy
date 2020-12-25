@@ -29,6 +29,10 @@
   <sub>>_ Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions </sub>
 </p>
 
+<p align="center">
+  <img alt="prompt" src="assets/img/demo.gif"/>
+</p>
+
 ## ❯ Content
 
 - [Install](#-install)
@@ -120,7 +124,7 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/usage.ts --help
 ```
 
-![](assets/img/usage.png)
+![](assets/img/usage.gif)
 
 ## ❯ Options
 
@@ -996,7 +1000,7 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 ```
 
-![](assets/img/examples.png)
+![](assets/img/examples.gif)
 
 ## ❯ Auto generated help
 
@@ -1032,7 +1036,7 @@ await new Command()
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts --help
 ```
 
-![](assets/img/help.png)
+![](assets/img/help.gif)
 
 #### Customize help option
 
