@@ -6,7 +6,6 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { bold, dim, stripColor, yellow } from "./deps.ts";
-import { SelectOption } from "./select.ts";
 
 /** Select key options. */
 export interface GenericListKeys extends GenericInputKeys {
@@ -100,10 +99,11 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
 
   protected match(): void {
     this.options = this.settings.options.filter(
-      (option: SelectOption) =>
-        (option.name ?? option.value).toString().toLowerCase().startsWith(
-          this.getCurrentInputValue().toLowerCase(),
-        ),
+      (option: GenericListOption) =>
+        stripColor(option.name ?? option.value).toString().toLowerCase()
+          .startsWith(
+            this.getCurrentInputValue().toLowerCase(),
+          ),
     );
     this.listIndex = Math.max(
       0,
