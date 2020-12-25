@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run
+#!/usr/bin/env -S deno run --unstable
 
 import {
   blue,
@@ -16,16 +16,24 @@ import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
 import { Cell, ICell } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
 
-const screen: AnsiEscape = AnsiEscape.from(Deno.stdout);
-screen.cursorShow();
+const tty: AnsiEscape = AnsiEscape.from(Deno.stdout);
+tty.cursorHide();
+
+const sig = Deno.signals.interrupt();
+(async () => {
+  for await (const _ of sig) {
+    tty.cursorShow();
+    Deno.exit(0);
+  }
+})();
 
 loop();
 
 function loop() {
   const table: Table = createTable();
-  // screen.eraseScreen().cursorTo( 0, 0 ).cursorHide();
+  tty.eraseScreen().cursorTo(0, 0);
   table.render();
-  // setTimeout( loop, 1000 );
+  setTimeout(loop, 1000);
 }
 
 function createTable(): Table {

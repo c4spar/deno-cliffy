@@ -3,10 +3,11 @@
 import { Table } from "../../table/table.ts";
 
 const table: Table = Table.from([
-  ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
-  ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+  ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+  ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+  ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
 ]);
 
-table.push(["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]);
+table.push(["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"]);
 table.sort();
 table.render();
