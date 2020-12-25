@@ -77,20 +77,20 @@ The example below will output a simple table with three rows and without any sty
 
 ```typescript
 const table: Table = new Table(
-  ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
-  ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
-  ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+  ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+  ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+  ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
+  ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
 );
 
 console.log(table.toString());
-// You can also use table.render() as shorthand which uses Deno.stdout.writeSync() under the hood.
 ```
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/table/basic_usage.ts
 ```
 
-![](assets/img/basic_usage.png)
+![](assets/img/basic_usage.gif)
 
 ### Using as Array
 
@@ -98,11 +98,12 @@ Since the `Table` class is an `Array`, you can call all the methods of the array
 
 ```typescript
 const table: Table = Table.from([
-  ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
-  ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+  ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+  ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+  ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
 ]);
 
-table.push(["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]);
+table.push(["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"]);
 table.sort();
 table.render();
 ```
@@ -111,7 +112,7 @@ table.render();
 $ deno run https://deno.land/x/cliffy/examples/table/using_as_array.ts
 ```
 
-![](assets/img/using_as_array.png)
+![](assets/img/using_as_array.gif)
 
 ### Header and Body
 
@@ -120,11 +121,12 @@ The `.body()` method adds an array of rows to the table and removes all existing
 
 ```typescript
 new Table()
-  .header(["Heading 1", "Heading 2", "Heading 3"])
+  .header(["Name", "Date", "City", "Country"])
   .body([
-    ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
-    ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
-    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+    ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+    ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+    ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
+    ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
   ])
   .render();
 ```
@@ -133,7 +135,7 @@ new Table()
 $ deno run https://deno.land/x/cliffy/examples/table/header_and_body.ts
 ```
 
-![](assets/img/header_and_body.png)
+![](assets/img/header_and_body.gif)
 
 ### Table Options
 
@@ -141,11 +143,12 @@ To customize the table, the table class provides a few chainable option methods.
 
 ```typescript
 new Table()
-  .header(["Heading 1", "Heading 2", "Heading 3"])
+  .header(["Name", "Date", "City", "Country"])
   .body([
-    ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
-    ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
-    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+    ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+    ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+    ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
+    ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
   ])
   .maxColWidth(10)
   .padding(1)
@@ -158,7 +161,7 @@ new Table()
 $ deno run https://deno.land/x/cliffy/examples/table/table_options.ts
 ```
 
-![](assets/img/table_options.png)
+![](assets/img/table_options.gif)
 
 ### Row's and Cell's
 
@@ -168,15 +171,20 @@ It is also possible to customize single rows and cell. To do this you can use th
 import { Table, Row, Cell } from "https://deno.land/x/cliffy@<version>/table/mod.ts";
 
 new Table()
-  .header(Row.from(["Heading 1", "Heading 2", "Heading 3"]).border(true))
+  .header(Row.from(["Name", "Date", "City", "Country"]).border(true))
   .body([
     [
-      "Row 1 Column 1",
-      Cell.from("Row 1 Column 2").border(true),
+      "Baxter Herman",
+      Cell.from("Oct 1, 2020").border(true),
       "Row 1 Column 3",
+      "Harderwijk",
+      "Slovenia",
     ],
-    new Row("Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3").border(true),
-    ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"],
+    new Row("Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan").border(
+      true,
+    ),
+    ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
+    ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
   ])
   .render();
 ```
@@ -185,7 +193,7 @@ new Table()
 $ deno run https://deno.land/x/cliffy/examples/table/rows_and_cells.ts
 ```
 
-![](assets/img/rows_and_cells.png)
+![](assets/img/rows_and_cells.gif)
 
 ### Colspan and Rowspan
 
@@ -216,7 +224,7 @@ Table.from([
 $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 ```
 
-![](assets/img/colspan_and_rowspan.png)
+![](assets/img/colspan_and_rowspan.gif)
 
 ## ❯ API
 
@@ -259,7 +267,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 Sets the table header row.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | row | `IRow ` | Yes | Can be an `Array` of `string`'s and `Cell`'s |
 
 *Return type*: `this`
@@ -269,7 +277,7 @@ Sets the table header row.
 Adds an array of rows to the table and removes all existing rows.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | rows | `Array<IRow>` | Yes | `Array` of row's. A row can be an `Array` of `string`'s and `Cell`'s |
 
 *Return type*: `this`
@@ -297,7 +305,7 @@ Outputs the result of the `.toString()` method with `Deno.stdout.writeSnyc()`.
 Set min column with.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | width | `number | Array<number>` | Yes | Min column with. To give all columns the same min width pass a number to `.minColWidth()`, to give each column an indiviuel min width you can pass an `Array<number>` to `.minColWidth()`. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -308,7 +316,7 @@ Set min column with.
 Set max column with.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | width | `number | Array<number>` | Yes | Max column with. To give all columns the same max width pass a number to `. maxColWidth()`, to give each column an indiviuel max width you can pass an `Array<number>` to `. maxColWidth()`. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -319,7 +327,7 @@ Set max column with.
 Indent the table output.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | width | `number` | Yes | Indent width. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -330,7 +338,7 @@ Indent the table output.
 Set column padding. If border is enabled the padding will be applyed on the left and the right side of each cell.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | padding | `number | number[]` | Yes | Padding with. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -341,7 +349,7 @@ Set column padding. If border is enabled the padding will be applyed on the left
 Enable table border. Doesn't override row and cell settings.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | enable | `boolean` | Yes | Enable or disable table border. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -353,7 +361,7 @@ Override default border characters. Doesn't override row and cell settings.
 To change the default border characters globally you can use the static `Table.chars(chars)` method.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | chars | `IBorderOptions` | Yes | An object with border characters. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -438,7 +446,7 @@ Clones the row.
 Enable row border. Override table settings but not cell settings.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | enable | `boolean` | Yes | Enable or disable table border. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -465,7 +473,7 @@ Clones the cell.
 Enable cell border. Overrides table and row settings.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | enable | `boolean` | Yes | Enable or disable table border. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -476,7 +484,7 @@ Enable cell border. Overrides table and row settings.
 Allows a single table cell to span the width of more than one cell or column. Can be combined with `.rowSpan()`.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | span | `number` | Yes | Number of columns to span the cell. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
@@ -487,7 +495,7 @@ Allows a single table cell to span the width of more than one cell or column. Ca
 Allows a single table cell to span the height of more than one cell or row. Can be combined with `.colSpan()`.
 
 | Argument | Type | Required | Description |
-| ----- | :--: | :--: | ----------- |
+| ----- | :---: | :---: | ----------- |
 | span | `number` | Yes | Number of rows to span the cell. |
 | override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
 
