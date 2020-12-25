@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { blue, bold, dim, underline } from "./deps.ts";
+import { blue, bold, dim, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Input keys options. */
@@ -77,7 +77,7 @@ export abstract class GenericSuggestions<
     }
     this.suggestions = this.settings.suggestions.filter(
       (value: string | number) =>
-        value.toString().toLowerCase().startsWith(
+        stripColor(value.toString()).toLowerCase().startsWith(
           this.getCurrentInputValue().toLowerCase(),
         ),
     );
