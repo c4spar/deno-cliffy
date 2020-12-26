@@ -1,7 +1,7 @@
 import { Table } from "../../table/table.ts";
 import { ArgumentsParser } from "../_arguments_parser.ts";
 import type { Command } from "../command.ts";
-import { blue, bold, dim, magenta, red, yellow } from "../deps.ts";
+import { blue, bold, dim, italic, magenta, red, yellow } from "../deps.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
 /** Help text generator. */
@@ -174,14 +174,14 @@ export class HelpGenerator {
   }
 
   private generateExamples(): string {
-    const examples = this.cmd.getExamples(); ///Users/psychedelix/workspace/deno/deno-cliffy/command/test/option/action_test.ts
+    const examples = this.cmd.getExamples();
     if (!examples.length) {
       return "";
     }
     return this.label("Examples") +
       Table.from(examples.map((example: IExample) => [
         dim(bold(`${capitalize(example.name)}:`)),
-        `\n${example.description}`,
+        example.description,
       ]))
         .padding(1)
         .indent(this.indent * 2)
@@ -194,21 +194,17 @@ export class HelpGenerator {
     const hints = [];
 
     option.required && hints.push(yellow(`required`));
-    typeof option.default !== "undefined" &&
-      hints.push(
-        blue(bold(`Default: `)) +
-          blue(Deno.inspect(option.default, { depth: 1 })),
-      );
-    option.depends?.length &&
-      hints.push(
-        red(bold(`depends: `)) +
-          option.depends.map((depends) => red(depends)).join(", "),
-      );
-    option.conflicts?.length &&
-      hints.push(
-        red(bold(`conflicts: `)) +
-          option.conflicts.map((conflict) => red(conflict)).join(", "),
-      );
+    typeof option.default !== "undefined" && hints.push(
+      bold(`Default: `) + inspect(option.default),
+    );
+    option.depends?.length && hints.push(
+      yellow(bold(`Depends: `)) +
+        italic(option.depends.map(getFlag).join(", ")),
+    );
+    option.conflicts?.length && hints.push(
+      red(bold(`Conflicts: `)) +
+        italic(option.conflicts.map(getFlag).join(", ")),
+    );
 
     if (hints.length) {
       return `(${hints.join(", ")})`;
@@ -226,4 +222,18 @@ export class HelpGenerator {
 
 function capitalize(string: string): string {
   return string?.charAt(0).toUpperCase() + string.slice(1) ?? "";
+}
+
+function inspect(value: unknown): string {
+  return Deno.inspect(value, { depth: 1, colors: true, trailingComma: false });
+}
+
+function getFlag(name: string) {
+  if (name.startsWith("-")) {
+    return name;
+  }
+  if (name.length > 1) {
+    return `--${name}`;
+  }
+  return `-${name}`;
 }
