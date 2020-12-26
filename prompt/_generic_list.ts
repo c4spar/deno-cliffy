@@ -11,6 +11,8 @@ import { bold, dim, stripColor, yellow } from "./deps.ts";
 export interface GenericListKeys extends GenericInputKeys {
   previous?: string[];
   next?: string[];
+  previousPage?: string[];
+  nextPage?: string[];
 }
 
 /** Generic list option options. */
@@ -92,6 +94,8 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       keys: {
         previous: settings.search ? ["up"] : ["up", "u", "8"],
         next: settings.search ? ["down"] : ["down", "d", "2"],
+        previousPage: ["pageup"],
+        nextPage: ["pagedown"],
         ...(settings.keys ?? {}),
       },
     });
@@ -207,6 +211,12 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       case this.isKey(this.settings.keys, "next", event):
         this.selectNext();
         break;
+      case this.isKey(this.settings.keys, "nextPage", event):
+        this.selectNextPage();
+        break;
+      case this.isKey(this.settings.keys, "previousPage", event):
+        this.selectPreviousPage();
+        break;
       default:
         await super.handleEvent(event);
     }
@@ -283,6 +293,35 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       this.listIndex = this.listOffset = 0;
       if (this.options[this.listIndex].disabled) {
         this.selectNext();
+      }
+    }
+  }
+
+  /** Select previous page. */
+  protected selectPreviousPage(): void {
+    if (this.options?.length) {
+      const height: number = this.getListHeight();
+      if (this.listOffset >= height) {
+        this.listIndex -= height;
+        this.listOffset -= height;
+      } else if (this.listOffset > 0) {
+        this.listIndex -= this.listOffset;
+        this.listOffset = 0;
+      }
+    }
+  }
+
+  /** Select next page. */
+  protected selectNextPage(): void {
+    if (this.options?.length) {
+      const height: number = this.getListHeight();
+      if (this.listOffset + height + height < this.options.length) {
+        this.listIndex += height;
+        this.listOffset += height;
+      } else if (this.listOffset + height < this.options.length) {
+        const offset = this.options.length - height;
+        this.listIndex += offset - this.listOffset;
+        this.listOffset = offset;
       }
     }
   }
