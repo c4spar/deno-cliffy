@@ -5,7 +5,8 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { bold, dim, stripColor, yellow } from "./deps.ts";
+import { blue, bold, dim, stripColor, yellow } from "./deps.ts";
+import { Figures } from "./figures.ts";
 
 /** Select key options. */
 export interface GenericListKeys extends GenericInputKeys {
@@ -45,6 +46,7 @@ export interface GenericListOptions<T, V>
   maxRows?: number;
   searchLabel?: string;
   search?: boolean;
+  info?: boolean;
 }
 
 /** Generic list prompt settings. */
@@ -57,6 +59,7 @@ export interface GenericListSettings<T, V>
   maxRows: number;
   searchLabel: string;
   search?: boolean;
+  info?: boolean;
 }
 
 /** Generic list prompt representation. */
@@ -135,12 +138,29 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
 
   /** Render options. */
   protected body(): string | Promise<string> {
-    return this.getList();
-    // let body: string = this.getOptionsList();
-    // if (this.settings.info) {
-    //   body += "\n" + this.getInfo();
-    // }
-    // return body;
+    return this.getList() + this.getInfo();
+  }
+
+  protected getInfo(): string {
+    if (!this.settings.info) {
+      return "";
+    }
+    const selected: number = this.listIndex + 1;
+    const actions: Array<[string, Array<string>]> = [];
+
+    actions.push(
+      ["Next", [Figures.ARROW_DOWN]],
+      ["Previous", [Figures.ARROW_UP]],
+      ["Next Page", [Figures.PAGE_DOWN]],
+      ["Previous Page", [Figures.PAGE_UP]],
+      ["Submit", [Figures.ENTER]],
+    );
+
+    return "\n" + this.settings.indent + blue(Figures.INFO) +
+      bold(` ${selected}/${this.options.length} `) +
+      actions
+        .map((cur) => `${cur[0]}: ${bold(cur[1].join(" "))}`)
+        .join(", ");
   }
 
   /** Render options list. */
