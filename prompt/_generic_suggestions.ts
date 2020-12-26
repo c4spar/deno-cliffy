@@ -13,6 +13,8 @@ export interface GenericSuggestionsKeys extends GenericInputKeys {
   complete?: string[];
   next?: string[];
   previous?: string[];
+  nextPage?: string[];
+  previousPage?: string[];
 }
 
 /** Generic input prompt options. */
@@ -58,6 +60,8 @@ export abstract class GenericSuggestions<
         complete: ["tab"],
         next: ["up"],
         previous: ["down"],
+        nextPage: ["pageup"],
+        previousPage: ["pagedown"],
         ...(settings.keys ?? {}),
       },
     });
@@ -223,6 +227,20 @@ export abstract class GenericSuggestions<
           this.selectPreviousSuggestion();
         }
         break;
+      case this.isKey(this.settings.keys, "nextPage", event):
+        if (this.settings.list) {
+          this.selectPreviousSuggestionsPage();
+        } else {
+          this.selectNextSuggestionsPage();
+        }
+        break;
+      case this.isKey(this.settings.keys, "previousPage", event):
+        if (this.settings.list) {
+          this.selectNextSuggestionsPage();
+        } else {
+          this.selectPreviousSuggestionsPage();
+        }
+        break;
       case this.isKey(this.settings.keys, "complete", event):
         this.complete();
         break;
@@ -281,6 +299,35 @@ export abstract class GenericSuggestions<
         ) {
           this.suggestionsOffset++;
         }
+      }
+    }
+  }
+
+  /** Select previous suggestions page. */
+  protected selectPreviousSuggestionsPage(): void {
+    if (this.suggestions?.length) {
+      const height: number = this.getListHeight();
+      if (this.suggestionsOffset >= height) {
+        this.suggestionsIndex -= height;
+        this.suggestionsOffset -= height;
+      } else if (this.suggestionsOffset > 0) {
+        this.suggestionsIndex -= this.suggestionsOffset;
+        this.suggestionsOffset = 0;
+      }
+    }
+  }
+
+  /** Select next suggestions page. */
+  protected selectNextSuggestionsPage(): void {
+    if (this.suggestions?.length) {
+      const height: number = this.getListHeight();
+      if (this.suggestionsOffset + height + height < this.suggestions.length) {
+        this.suggestionsIndex += height;
+        this.suggestionsOffset += height;
+      } else if (this.suggestionsOffset + height < this.suggestions.length) {
+        const offset = this.suggestions.length - height;
+        this.suggestionsIndex += offset - this.suggestionsOffset;
+        this.suggestionsOffset = offset;
       }
     }
   }
