@@ -33,9 +33,9 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
-  - [Colors](#colors)
-  - [Tty](#tty)
   - [Ansi](#ansi)
+  - [Tty](#tty)
+  - [Colors](#colors)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -67,16 +67,48 @@ The ansi module exports an `ansi` and a `tty` object which have chainable method
 
 Both objects can be also invoked as method to create a new instance from itself.
 
-### Colors
+### Ansi
 
-The colors module is a simple chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts) module.
-
+Returns generated ansi escape sequences.
 
 ```typescript
-import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
+import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 console.log(
-  colors.bold.underline.rgb24("Welcome to Deno.Land!", 0xff3333),
+  myAnsi.cursorUp.cursorLeft.eraseDown()
+);
+
+// or:
+await Deno.stdout.write(
+  new TextEncoder().encode(
+    ansi.cursorUp.cursorLeft.eraseDown()
+  )
+);
+
+// or:
+await Deno.stdout.write(
+  ansi.cursorUp.cursorLeft.eraseDown.toBuffer()
+);
+```
+
+You can also directly import the ansi escape methods from the `ansi_escapes.ts` module.
+
+```typescript
+import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
+
+const response = await fetch("https://deno.land/images/hashrock_simple.png");
+const imageBuffer: ArrayBuffer = await response.arrayBuffer();
+
+console.log(
+  cursorTo(0, 0) +
+  eraseDown() +
+  image(imageBuffer, {
+    width: 29,
+    preserveAspectRatio: true,
+  }) +
+  "\n          " +
+  link("Deno Land", "https://deno.land") +
+  "\n",
 );
 ```
 
@@ -109,60 +141,16 @@ myTty.cursorSave
    .eraseScreen();
 ```
 
-### Ansi
+### Colors
 
-Returns generated ansi escape sequences.
-
-```typescript
-import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
-
-console.log(
-  myAnsi.cursorUp.cursorLeft.eraseDown()
-);
-
-// or:
-Deno.stdout.writeSync(
-  new TextEncoder().encode(
-    ansi.cursorUp.cursorLeft.eraseDown()
-  )
-);
-
-// or:
-Deno.stdout.writeSync(
-  ansi.cursorUp.cursorLeft.eraseDown.toBuffer()
-);
-```
-
-Create a new instance.
+The colors module is a simple chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts)
+module and works like node's [chalk](https://github.com/chalk/chalk) module.
 
 ```typescript
-import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
-
-const myAnsi = ansi();
+import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
 
 console.log(
-  myAnsi.cursorUp.cursorLeft.eraseDown()
-);
-```
-
-You can also directly import the ansi escape methods from the `ansi_escapes.ts` module.
-
-```typescript
-import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
-
-const response = await fetch("https://deno.land/images/hashrock_simple.png");
-const imageBuffer: ArrayBuffer = await response.arrayBuffer();
-
-console.log(
-  cursorTo(0, 0) +
-  eraseDown() +
-  image(imageBuffer, {
-    width: 29,
-    preserveAspectRatio: true,
-  }) +
-  "\n          " +
-  link("Deno Land", "https://deno.land") +
-  "\n",
+  colors.bold.underline.rgb24("Welcome to Deno.Land!", 0xff3333),
 );
 ```
 
