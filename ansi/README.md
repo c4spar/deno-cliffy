@@ -80,7 +80,7 @@ tty.cursorSave
    .eraseScreen();
 ```
 
-Create new instance.
+Create a new instance.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
@@ -120,7 +120,7 @@ Deno.stdout.writeSync(
 );
 ```
 
-Create new instance.
+Create a new instance.
 
 ```typescript
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
