@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { rgb24 } from "https://deno.land/std@0.74.0/fmt/colors.ts";
-import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
+import { tty } from "../../ansi/tty.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Checkbox } from "../../prompt/checkbox.ts";
 import { Input } from "../../prompt/input.ts";
@@ -86,6 +86,6 @@ const result = await prompt([{
 
 console.log("result:", result);
 
-AnsiEscape.from(Deno.stdout).cursorHide();
+tty.cursorHide();
 await new Promise((resolve) => setTimeout(resolve, 1000));
-AnsiEscape.from(Deno.stdout).cursorTo(0, 0);
+tty.cursorTo(0, 0);
