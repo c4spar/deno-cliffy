@@ -30,7 +30,7 @@
 
 ## ❯ Modules
 
-* **[ansi_escape](ansi_escape/):** Show, hide and move cli cursor, erase output and scroll window.
+* **[ansi](ansi/):** Chainable ansi escape sequences to show, hide and move cli cursor, erase output and scroll window.
 
 * **[command](command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions (inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
 

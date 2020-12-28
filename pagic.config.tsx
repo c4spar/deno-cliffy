@@ -36,8 +36,8 @@ export default {
   </>),
   nav: [
     {
-      text: "AnsiEscape",
-      link: "/ansi_escape/",
+      text: "Ansi",
+      link: "/ansi/",
     },
     {
       text: "Command",
@@ -74,8 +74,8 @@ export default {
   ],
   sidebar: {
     "/": [{
-      text: "AnsiEscape",
-      link: "ansi_escape/README.md",
+      text: "Ansi",
+      link: "ansi/README.md",
     }, {
       text: "Command",
       link: "command/README.md",

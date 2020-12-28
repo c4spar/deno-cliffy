@@ -12,11 +12,10 @@ import {
   underline,
   yellow,
 } from "https://deno.land/std@0.74.0/fmt/colors.ts";
-import { AnsiEscape } from "../../ansi_escape/ansi_escape.ts";
+import { tty } from "../../ansi/tty.ts";
 import { Cell, ICell } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
 
-const tty: AnsiEscape = AnsiEscape.from(Deno.stdout);
 tty.cursorHide();
 
 const sig = Deno.signals.interrupt();
@@ -31,7 +30,7 @@ loop();
 
 function loop() {
   const table: Table = createTable();
-  tty.eraseScreen().cursorTo(0, 0);
+  tty.eraseScreen.cursorTo(0, 0);
   table.render();
   setTimeout(loop, 1000);
 }
