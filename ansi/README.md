@@ -36,7 +36,6 @@
   - [Colors](#colors)
   - [Tty](#tty)
   - [Ansi](#ansi)
-  - [Functional](#functional)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -146,7 +145,7 @@ console.log(
 );
 ```
 
-### Functional
+You can also directly import the ansi escape methods from the `ansi_escapes.ts` module.
 
 ```typescript
 import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
