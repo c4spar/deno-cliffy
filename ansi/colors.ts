@@ -41,7 +41,7 @@ function factory(): Colors {
     str: string,
     ...args: Array<unknown>
   ): string | ColorsChain {
-    if (this) {
+    if (str) {
       const lastname = stack.pop() as ColorMethods;
       const method = stdColors[lastname] as ColorMethod;
       const result: string = method(
@@ -65,7 +65,7 @@ function factory(): Colors {
     }
     Object.defineProperty(colors, name, {
       get(this: ColorsChain) {
-        stack.push(name);
+        stack.unshift(name);
         return this;
       },
     });

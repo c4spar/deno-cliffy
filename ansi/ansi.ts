@@ -69,7 +69,7 @@ function factory(): Ansi {
 
   ansi.toString = function (): string {
     update();
-    const str: string = result.join();
+    const str: string = result.join("");
     result = [];
     return str;
   };

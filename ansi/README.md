@@ -33,6 +33,7 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
+  - [Colors](#colors)
   - [Tty](#tty)
   - [Ansi](#ansi)
   - [Functional](#functional)
@@ -46,19 +47,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { ansi, tty, cursorTo } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
+import { ansi, colors, tty, cursorTo } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { ansi, tty, cursorTo } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
+import { ansi, colors, tty, cursorTo } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { ansi, tty, cursorTo } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
+import { ansi, colors, tty, cursorTo } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
 ```
 
 ## ❯ Usage
@@ -66,6 +67,19 @@ import { ansi, tty, cursorTo } from "https://raw.githubusercontent.com/c4spar/de
 The ansi module exports an `ansi` and a `tty` object which have chainable methods and properties for generating and writing ansi escape sequences. `ansi` and `tty` have allmost the same properties and methods.`ansi` generates and returns an ansi string, and `tty` writes the generated ansi escape sequence directly to stdout.
 
 Both objects can be also invoked as method to create a new instance from itself.
+
+### Colors
+
+The colors module is a simple chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts) module.
+
+
+```typescript
+import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
+
+console.log(
+  colors.bold.underline.rgb24("Welcome to Deno.Land!", 0xff3333),
+);
+```
 
 ### Tty
 
