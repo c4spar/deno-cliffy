@@ -46,19 +46,19 @@ This module can be imported directly from the repo and from following registries
 Deno Registry
 
 ```typescript
-import { ansi, tty } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
+import { ansi, tty, cursorTo } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { ansi, tty } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
+import { ansi, tty, cursorTo } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { ansi, tty } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
+import { ansi, tty, cursorTo } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
 ```
 
 ## ❯ Usage
@@ -72,7 +72,7 @@ Both objects can be also invoked as method to create a new instance from itself.
 Writes generated ansi escape sequences directly to stdout.
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
 
 tty.cursorSave
    .cursorHide
@@ -83,7 +83,7 @@ tty.cursorSave
 Create new instance.
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
 
 const myTty = tty({
   stdout: Deno.stdout,
@@ -101,8 +101,13 @@ myTty.cursorSave
 Returns generated ansi escape sequences.
 
 ```typescript
-import { ansi } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
+console.log(
+  myAnsi.cursorUp.cursorLeft.eraseDown()
+);
+
+// or:
 Deno.stdout.writeSync(
   new TextEncoder().encode(
     ansi.cursorUp.cursorLeft.eraseDown()
@@ -118,37 +123,33 @@ Deno.stdout.writeSync(
 Create new instance.
 
 ```typescript
-import { ansi } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 const myAnsi = ansi();
 
-Deno.stdout.writeSync(
-  new TextEncoder().encode(
-    myAnsi.cursorUp.cursorLeft.eraseDown()
-  )
+console.log(
+  myAnsi.cursorUp.cursorLeft.eraseDown()
 );
 ```
 
 ### Functional
 
 ```typescript
-import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
 
-Deno.stdout.writeSync(
-  new TextEncoder().encode(
-    cursorTo(0, 0) +
-    eraseDown() +
-    image(imageBuffer, {
-      width: 29,
-      preserveAspectRatio: true,
-    }) +
-    "\n          " +
-    link("Deno Land", "https://deno.land") +
-    "\n",
-  ),
+console.log(
+  cursorTo(0, 0) +
+  eraseDown() +
+  image(imageBuffer, {
+    width: 29,
+    preserveAspectRatio: true,
+  }) +
+  "\n          " +
+  link("Deno Land", "https://deno.land") +
+  "\n",
 );
 ```
 
