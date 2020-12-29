@@ -79,7 +79,7 @@ async function read(): Promise<void> {
 
   const events: Array<KeyCode> = KeyCode.parse(data);
 
-  for( const event of events) {
+  for (const event of events) {
     if (event.ctrl && event.name === "c") {
       console.log("exit");
       return;
