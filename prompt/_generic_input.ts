@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import {
   GenericPrompt,
   GenericPromptKeys,
@@ -87,7 +87,7 @@ export abstract class GenericInput<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case event.name === "c" && event.ctrl:
         this.tty.cursorShow();

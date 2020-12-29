@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/mod.ts";
+import type { KeyCode } from "../keycode/mod.ts";
 import { blue, dim, green, red } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
@@ -164,7 +164,7 @@ export class Checkbox
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "check", event):
         this.checkValue();

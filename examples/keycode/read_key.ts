@@ -15,14 +15,15 @@ async function read(): Promise<void> {
 
   const data = buffer.subarray(0, nread);
 
-  const [event] = KeyCode.parse(data);
+  const events: Array<KeyCode> = KeyCode.parse(data);
 
-  if (event?.name === "c" && event.ctrl) {
-    console.log("exit");
-    return;
+  for( const event of events) {
+    if (event.ctrl && event.name === "c") {
+      console.log("exit");
+      return;
+    }
+    console.log(event);
   }
-
-  console.log(event);
 
   await read();
 }
