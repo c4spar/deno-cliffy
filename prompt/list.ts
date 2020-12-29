@@ -1,17 +1,19 @@
-import { blue, stripColor, underline } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
 import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
+import { blue, dim, underline } from "./deps.ts";
+import { Figures } from "./figures.ts";
 
 /** List key options. */
-export type ListKeys = GenericInputKeys;
+export type ListKeys = GenericSuggestionsKeys;
 
 /** List prompt options. */
-export interface ListOptions extends GenericInputPromptOptions<string[]> {
+export interface ListOptions
+  extends GenericSuggestionsOptions<string[], string> {
   separator?: string;
   minLength?: number;
   maxLength?: number;
@@ -21,7 +23,7 @@ export interface ListOptions extends GenericInputPromptOptions<string[]> {
 }
 
 /** List prompt settings. */
-interface ListSettings extends GenericInputPromptSettings<string[]> {
+interface ListSettings extends GenericSuggestionsSettings<string[], string> {
   separator: string;
   minLength: number;
   maxLength: number;
@@ -31,7 +33,7 @@ interface ListSettings extends GenericInputPromptSettings<string[]> {
 }
 
 /** List prompt representation. */
-export class List extends GenericInput<string[], ListSettings> {
+export class List extends GenericSuggestions<string[], string, ListSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
@@ -40,6 +42,9 @@ export class List extends GenericInput<string[], ListSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       separator: ",",
       minLength: 0,
       maxLength: Infinity,
@@ -49,20 +54,33 @@ export class List extends GenericInput<string[], ListSettings> {
     }).prompt();
   }
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
   protected input(): string {
     const oldInput: string = this.inputValue;
-    const oldInputParts: string[] = oldInput.trimLeft().split(this.regexp());
+    const tags: string[] = this.getTags(oldInput);
     const separator: string = this.settings.separator + " ";
 
-    this.inputValue = oldInputParts.join(separator);
+    this.inputValue = tags.join(separator);
 
     const diff = oldInput.length - this.inputValue.length;
     this.inputIndex -= diff;
     this.cursor.x -= diff;
 
-    return oldInputParts
+    return tags
       .map((val: string) => underline(val))
-      .join(separator);
+      .join(separator) +
+      dim(this.getSuggestion());
+  }
+
+  protected getTags(value: string = this.inputValue): Array<string> {
+    return value.trim().split(this.regexp());
   }
 
   /** Create list regex.*/
@@ -70,6 +88,16 @@ export class List extends GenericInput<string[], ListSettings> {
     return new RegExp(
       this.settings.separator === " " ? ` +` : ` *${this.settings.separator} *`,
     );
+  }
+
+  /** Get input value. */
+  protected getValue(): string {
+    // Remove trailing comma and spaces.
+    return this.inputValue.replace(/,+\s*$/, "");
+  }
+
+  protected getCurrentInputValue(): string {
+    return this.getTags().pop() ?? "";
   }
 
   /** Add char. */
@@ -82,6 +110,8 @@ export class List extends GenericInput<string[], ListSettings> {
         ) {
           super.addChar(char);
         }
+        this.suggestionsIndex = -1;
+        this.suggestionsOffset = 0;
         break;
       default:
         super.addChar(char);
@@ -96,6 +126,17 @@ export class List extends GenericInput<string[], ListSettings> {
     super.deleteChar();
   }
 
+  protected complete(): void {
+    if (this.suggestions.length && this.suggestions[this.suggestionsIndex]) {
+      const tags = this.getTags().slice(0, -1);
+      tags.push(this.suggestions[this.suggestionsIndex].toString());
+      this.inputValue = tags.join(this.settings.separator + " ");
+      this.inputIndex = this.inputValue.length;
+      this.suggestionsIndex = 0;
+      this.suggestionsOffset = 0;
+    }
+  }
+
   /**
    * Validate input value.
    * @param value User input value.
@@ -106,7 +147,7 @@ export class List extends GenericInput<string[], ListSettings> {
       return false;
     }
 
-    const values = this.transform(value).filter((val) => val !== "");
+    const values = this.transform(value);
 
     for (const val of values) {
       if (val.length < this.settings.minLength) {
@@ -127,19 +168,13 @@ export class List extends GenericInput<string[], ListSettings> {
     return true;
   }
 
-  /** Get input value. */
-  protected getValue(): string {
-    // Remove trailing comma and spaces.
-    return super.getValue().replace(/,+\s*$/, "");
-  }
-
   /**
    * Map input value to output value.
    * @param value Input value.
    * @return Output value.
    */
   protected transform(value: string): string[] {
-    return value.trim().split(this.regexp());
+    return this.getTags(value).filter((val) => val !== "");
   }
 
   /**

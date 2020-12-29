@@ -1,3 +1,33 @@
+# [v0.16.0](https://github.com/c4spar/deno-cli/compare/v0.15.0...v0.16.0) (2020-12-09)
+
+### Features
+
+* **table:** add static `Table.chars()` method to set global default table characters (#107) ([fec09df](https://github.com/c4spar/deno-cli/commit/fec09df))
+
+### Bug Fixes
+
+* **keycode:** f1-f4 + shift returns undefined key name (#111) ([112c0b5](https://github.com/c4spar/deno-cli/commit/112c0b5))
+* **prompt:** fix default value of select prompt (#123) ([3a97617](https://github.com/c4spar/deno-cli/commit/3a97617))
+* **prompt:** wrong cursor position on windows (#114) ([0e14b51](https://github.com/c4spar/deno-cli/commit/0e14b51))
+* **prompt:** remove async modifer from abstract method declartion that breaks cliffy on deno 1.6 (#122) ([63351d0](https://github.com/c4spar/deno-cli/commit/63351d0))
+
+### Code Refactoring
+
+* **command:** remove duplication description from completions command (#118) ([d116c73](https://github.com/c4spar/deno-cli/commit/d116c73))
+* **prompt:** refactor prompt's (#122, #120, #119, #117) ([63351d0](https://github.com/c4spar/deno-cli/commit/63351d0), [2fda6e0](https://github.com/c4spar/deno-cli/commit/2fda6e0), [b5ecced](https://github.com/c4spar/deno-cli/commit/b5ecced), [f4ca0bb](https://github.com/c4spar/deno-cli/commit/f4ca0bb))
+
+### Chore
+
+* **lint:** fix lint errors (#115) ([6a088bd](https://github.com/c4spar/deno-cli/commit/6a088bd))
+* **pagic:** setup pagic (#112) ([fdaf064](https://github.com/c4spar/deno-cli/commit/fdaf064), [0ff1fdc](https://github.com/c4spar/deno-cli/commit/0ff1fdc))
+
+### Documentation Updates
+
+* fix discord channel invite link ([2b9df6d](https://github.com/c4spar/deno-cli/commit/2b9df6d))
+* update jsdoc's (#109) ([27ee6b1](https://github.com/c4spar/deno-cli/commit/27ee6b1))
+
+
+
 # [v0.15.0](https://github.com/c4spar/deno-cli/compare/v0.14.3...v0.15.0) (2020-10-24)
 
 ### Features

@@ -3,6 +3,10 @@ const main = {
   ARROW_DOWN: "↓",
   ARROW_LEFT: "←",
   ARROW_RIGHT: "→",
+  ARROW_UP_LEFT: "↖",
+  ARROW_UP_RIGHT: "↗",
+  ARROW_DOWN_RIGHT: "↘",
+  ARROW_DOWN_LEFT: "↙",
   RADIO_ON: "◉",
   RADIO_OFF: "◯",
   TICK: "✔",
@@ -11,21 +15,24 @@ const main = {
   POINTER_SMALL: "›",
   LINE: "─",
   POINTER: "❯",
+  INFO: "ℹ",
+  TAB_LEFT: "⇤",
+  TAB_RIGHT: "⇥",
+  ESCAPE: "⎋",
+  BACKSPACE: "⌫",
+  PAGE_UP: "⇞",
+  PAGE_DOWN: "⇟",
+  ENTER: "↵",
+  SEARCH: "⌕",
 };
 
 const win = {
-  ARROW_UP: main.ARROW_UP,
-  ARROW_DOWN: main.ARROW_DOWN,
-  ARROW_LEFT: main.ARROW_LEFT,
-  ARROW_RIGHT: main.ARROW_RIGHT,
+  ...main,
   RADIO_ON: "(*)",
   RADIO_OFF: "( )",
   TICK: "√",
   CROSS: "×",
-  ELLIPSIS: main.ELLIPSIS,
   POINTER_SMALL: "»",
-  LINE: main.LINE,
-  POINTER: main.POINTER,
 };
 
 /** Prompt icons. */

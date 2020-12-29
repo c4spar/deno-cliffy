@@ -82,13 +82,13 @@ Deno.test({
 
   Options:
 
-    -h, --help                     - Show this help.                                             
-    -V, --version                  - Show the version number for this program.                   
-    -t, --test       [val:string]  - test description                                            
-    -D, --default    [val:string]  - I have a default value!                    (Default: test)  
-    -r, --required   [val:string]  - I am required!                             (required)       
-    -d, --depends    [val:string]  - I depend on test!                          (depends: test)  
-    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)
+    -h, --help                     - Show this help.                                               
+    -V, --version                  - Show the version number for this program.                     
+    -t, --test       [val:string]  - test description                                              
+    -D, --default    [val:string]  - I have a default value!                    (Default: test)    
+    -r, --required   [val:string]  - I am required!                             (required)         
+    -d, --depends    [val:string]  - I depend on test!                          (Depends: --test)  
+    -c, --conflicts  [val:string]  - I conflict with test!                      (Conflicts: --test)
 
   Commands:
 
@@ -125,11 +125,11 @@ Deno.test({
 
   Options:
 
-    -t, --test       [val:string]  - test description                          
-    -D, --default    [val:string]  - I have a default value!  (Default: test)  
-    -r, --required   [val:string]  - I am required!           (required)       
-    -d, --depends    [val:string]  - I depend on test!        (depends: test)  
-    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)
+    -t, --test       [val:string]  - test description                            
+    -D, --default    [val:string]  - I have a default value!  (Default: test)    
+    -r, --required   [val:string]  - I am required!           (required)         
+    -d, --depends    [val:string]  - I depend on test!        (Depends: --test)  
+    -c, --conflicts  [val:string]  - I conflict with test!    (Conflicts: --test)
 
   Commands:
 
@@ -165,15 +165,15 @@ Deno.test({
 
   Options:
 
-    -h, --help                     - Show this help.                                                                                 
-    -V, --version                  - Show the version number for this program.                                                       
-    -t, --test       [val:string]  - test description                                                                                
-    -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                    
-    -r, --required   [val:string]  - I am required!                             (required)                                           
-    -d, --depends    [val:string]  - I depend on test!                          (depends: test)                                      
-    -c, --conflicts  [val:string]  - I conflict with test!                      (conflicts: test)                                    
-    -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", depends: test, conflicts:
-                                                                                depends)                                             
+    -h, --help                     - Show this help.                                                                                   
+    -V, --version                  - Show the version number for this program.                                                         
+    -t, --test       [val:string]  - test description                                                                                  
+    -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                      
+    -r, --required   [val:string]  - I am required!                             (required)                                             
+    -d, --depends    [val:string]  - I depend on test!                          (Depends: --test)                                      
+    -c, --conflicts  [val:string]  - I conflict with test!                      (Conflicts: --test)                                    
+    -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", Depends: --test, Conflicts:
+                                                                                --depends)                                             
 
   Commands:
 
@@ -210,13 +210,13 @@ Deno.test({
 
   Options:
 
-    -t, --test       [val:string]  - test description                                                              
-    -D, --default    [val:string]  - I have a default value!  (Default: "test")                                    
-    -r, --required   [val:string]  - I am required!           (required)                                           
-    -d, --depends    [val:string]  - I depend on test!        (depends: test)                                      
-    -c, --conflicts  [val:string]  - I conflict with test!    (conflicts: test)                                    
-    -a, --all        <val:string>  - I have many hints!       (required, Default: "test", depends: test, conflicts:
-                                                              depends)                                             
+    -t, --test       [val:string]  - test description                                                                
+    -D, --default    [val:string]  - I have a default value!  (Default: "test")                                      
+    -r, --required   [val:string]  - I am required!           (required)                                             
+    -d, --depends    [val:string]  - I depend on test!        (Depends: --test)                                      
+    -c, --conflicts  [val:string]  - I conflict with test!    (Conflicts: --test)                                    
+    -a, --all        <val:string>  - I have many hints!       (required, Default: "test", Depends: --test, Conflicts:
+                                                              --depends)                                             
 
   Commands:
 

@@ -1,12 +1,5 @@
-import {
-  blue,
-  bold,
-  dim,
-  green,
-  stripColor,
-  underline,
-  yellow,
-} from "./deps.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
+import { blue, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -19,7 +12,8 @@ import {
 export type SecretKeys = GenericInputKeys;
 
 /** Secret prompt options. */
-export interface SecretOptions extends GenericInputPromptOptions<string> {
+export interface SecretOptions
+  extends GenericInputPromptOptions<string, string> {
   label?: string;
   hidden?: boolean;
   minLength?: number;
@@ -28,7 +22,7 @@ export interface SecretOptions extends GenericInputPromptOptions<string> {
 }
 
 /** Secret prompt settings. */
-interface SecretSettings extends GenericInputPromptSettings<string> {
+interface SecretSettings extends GenericInputPromptSettings<string, string> {
   label: string;
   hidden: boolean;
   minLength: number;
@@ -37,7 +31,7 @@ interface SecretSettings extends GenericInputPromptSettings<string> {
 }
 
 /** Secret prompt representation. */
-export class Secret extends GenericInput<string, SecretSettings> {
+export class Secret extends GenericInput<string, string, SecretSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
@@ -46,12 +40,21 @@ export class Secret extends GenericInput<string, SecretSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
       label: "Password",
       hidden: false,
       minLength: 0,
       maxLength: Infinity,
       ...options,
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
   }
 
   protected input(): string {
@@ -101,5 +104,10 @@ export class Secret extends GenericInput<string, SecretSettings> {
    */
   protected format(value: string): string {
     return this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 }

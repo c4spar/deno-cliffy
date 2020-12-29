@@ -1,8 +1,8 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, dim } from "./deps.ts";
+import { blue, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
+  GenericListKeys,
   GenericListOption,
   GenericListOptions,
   GenericListOptionSettings,
@@ -11,14 +11,7 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Select key options. */
-export interface SelectKeys {
-  previous?: string[];
-  next?: string[];
-  submit?: string[];
-}
-
-/** Select key settings. */
-type SelectKeysSettings = Required<SelectKeys>;
+export type SelectKeys = GenericListKeys;
 
 /** Select option options. */
 export type SelectOption = GenericListOption;
@@ -40,16 +33,14 @@ export interface SelectOptions extends GenericListOptions<string, string> {
 /** Select prompt settings. */
 export interface SelectSettings extends GenericListSettings<string, string> {
   options: SelectValueSettings;
-  keys: SelectKeysSettings;
+  keys?: SelectKeys;
 }
 
 /** Select prompt representation. */
-export class Select extends GenericList<string, string, SelectSettings> {
-  protected selected: number = typeof this.settings.default !== "undefined"
-    ? this.settings.options.findIndex((item) =>
-      item.value === this.settings.default
-    ) || 0
-    : 0;
+export class Select<S extends SelectSettings = SelectSettings>
+  extends GenericList<string, string, S> {
+  protected listIndex: number = this.getListIndex(this.settings.default);
+  protected listOffset: number = this.getPageOffset(this.listIndex);
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -63,16 +54,11 @@ export class Select extends GenericList<string, string, SelectSettings> {
   public static prompt(options: SelectOptions): Promise<string> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
-      listPointer: blue(Figures.POINTER),
       indent: " ",
+      listPointer: blue(Figures.POINTER),
       maxRows: 10,
+      searchLabel: blue(Figures.SEARCH),
       ...options,
-      keys: {
-        previous: ["up", "u"],
-        next: ["down", "d"],
-        submit: ["return", "enter"],
-        ...(options.keys ?? {}),
-      },
       options: Select.mapOptions(options),
     }).prompt();
   }
@@ -85,36 +71,8 @@ export class Select extends GenericList<string, string, SelectSettings> {
       .map((item) => this.mapOption(item));
   }
 
-  /**
-   * Handle user input event.
-   * @param event Key event.
-   */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
-    switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.exit(0);
-        }
-        break;
-
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
-    }
-  }
-
-  /** Get value of selected option. */
-  protected getValue(): string {
-    return this.settings.options[this.selected].value;
+  protected input(): string {
+    return underline(blue(this.inputValue));
   }
 
   /**
@@ -128,8 +86,33 @@ export class Select extends GenericList<string, string, SelectSettings> {
   ): string {
     let line = this.settings.indent;
     line += isSelected ? `${this.settings.listPointer} ` : "  ";
-    line += `${isSelected ? item.name : dim(item.name)}`;
+    line += `${
+      isSelected
+        ? this.highlight(item.name, (val) => val)
+        : this.highlight(item.name)
+    }`;
     return line;
+  }
+
+  /** Get value of selected option. */
+  protected getValue(): string {
+    return this.options[this.listIndex]?.value ?? this.settings.default;
+  }
+
+  protected getListIndex(value: string | undefined) {
+    return typeof value === "undefined"
+      ? 0
+      : this.options.findIndex((item: SelectOptionSettings) =>
+        item.value === value
+      ) || 0;
+  }
+
+  protected getPageOffset(index: number) {
+    if (index === 0) {
+      return 0;
+    }
+    const height: number = this.getListHeight();
+    return Math.floor(index / height) * height;
   }
 
   /**
@@ -140,8 +123,9 @@ export class Select extends GenericList<string, string, SelectSettings> {
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       value.length > 0 &&
-      this.settings.options.findIndex((option) => option.value === value) !==
-        -1;
+      this.options.findIndex((option: SelectOptionSettings) =>
+          option.value === value
+        ) !== -1;
   }
 
   /**

@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { rgb24 } from "https://deno.land/std@0.74.0/fmt/colors.ts";
+import { tty } from "../../ansi/tty.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Checkbox } from "../../prompt/checkbox.ts";
 import { Input } from "../../prompt/input.ts";
@@ -9,49 +10,26 @@ import { Number } from "../../prompt/number.ts";
 import { Secret } from "../../prompt/secret.ts";
 import { Select } from "../../prompt/select.ts";
 import { Toggle } from "../../prompt/toggle.ts";
-
-const colors: Record<string, number> = {
-  alloyOrange: 0xC46210,
-  darkMagenta: 0x8B008B,
-  darkSkyBlue: 0x8CBED6,
-  deepSaffron: 0xFF9933,
-  amaranthRed: 0xD3212D,
-  amber: 0xFFBF00,
-  arcticLime: 0xD0FF14,
-};
+import { colors } from "./data/colors.ts";
+import { firstNames } from "./data/first_names.ts";
 
 const result = await prompt([{
   name: "text",
   message: "Enter some cool stuff",
   type: Input,
 }, {
+  message: "Whats your name?",
+  name: "text",
+  type: Input,
+  suggestions: firstNames,
+}, {
   name: "color",
-  type: Select,
   message: "Choose a color",
-  options: [{
-    name: "Alloy Orange",
-    value: "alloyOrange",
-  }, {
-    name: "Dark Magenta",
-    value: "darkMagenta",
-  }, {
-    name: "Dark Sky Blue",
-    value: "darkSkyBlue",
-  }, {
-    name: "Deep Saffron",
-    value: "deepSaffron",
-  }, {
-    name: "Amaranth Red",
-    value: "amaranthRed",
-  }, {
-    name: "Amber",
-    value: "amber",
-  }, {
-    name: "Arctic Lime",
-    value: "arcticLime",
-  }].map((color) => ({
-    name: rgb24(color.name, colors[color.value]),
-    value: color.value,
+  type: Select,
+  search: true,
+  options: Object.entries<number>(colors).map(([name, value]) => ({
+    name: rgb24(name, value),
+    value: name,
   })),
 }, {
   name: "animals",
@@ -103,6 +81,11 @@ const result = await prompt([{
   name: "tags",
   message: "Enter some comma separated words",
   type: List,
+  suggestions: ["deno", "typescript", "cliffy"],
 }]);
 
 console.log("result:", result);
+
+tty.cursorHide();
+await new Promise((resolve) => setTimeout(resolve, 1000));
+tty.cursorTo(0, 0);

@@ -1,8 +1,20 @@
+import { KeyEvent } from "../keycode/key_event.ts";
 import {
-  GenericPrompt,
-  GenericPromptOptions,
-  GenericPromptSettings,
-} from "./_generic_prompt.ts";
+  GenericInput,
+  GenericInputKeys,
+  GenericInputPromptOptions,
+  GenericInputPromptSettings,
+} from "./_generic_input.ts";
+import { blue, bold, dim, stripColor, yellow } from "./deps.ts";
+import { Figures } from "./figures.ts";
+
+/** Select key options. */
+export interface GenericListKeys extends GenericInputKeys {
+  previous?: string[];
+  next?: string[];
+  previousPage?: string[];
+  nextPage?: string[];
+}
 
 /** Generic list option options. */
 export interface GenericListOption {
@@ -21,27 +33,41 @@ export interface GenericListOptionSettings extends GenericListOption {
 export type GenericListValueOptions = (string | GenericListOption)[];
 export type GenericListValueSettings = GenericListOptionSettings[];
 
+type UnsupportedInputOptions = "suggestions" | "list";
+
 /** Generic list prompt options. */
-export interface GenericListOptions<T, V> extends GenericPromptOptions<T, V> {
+export interface GenericListOptions<T, V>
+  extends Omit<GenericInputPromptOptions<T, V>, UnsupportedInputOptions> {
   options: GenericListValueOptions;
+  keys?: GenericListKeys;
   indent?: string;
   listPointer?: string;
+  searchIcon?: string;
   maxRows?: number;
+  searchLabel?: string;
+  search?: boolean;
+  info?: boolean;
 }
 
 /** Generic list prompt settings. */
-export interface GenericListSettings<T, V> extends GenericPromptSettings<T, V> {
+export interface GenericListSettings<T, V>
+  extends GenericInputPromptSettings<T, V> {
   options: GenericListValueSettings;
+  keys?: GenericListKeys;
   indent: string;
   listPointer: string;
   maxRows: number;
+  searchLabel: string;
+  search?: boolean;
+  info?: boolean;
 }
 
 /** Generic list prompt representation. */
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
-  extends GenericPrompt<T, V, S> {
-  protected index = 0;
-  protected selected = 0;
+  extends GenericInput<T, V, S> {
+  protected listOffset = 0;
+  protected listIndex = 0;
+  protected options: S["options"] = this.settings.options;
 
   /**
    * Create list separator.
@@ -65,19 +91,96 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
+  constructor(settings: S) {
+    super({
+      ...settings,
+      keys: {
+        previous: settings.search ? ["up"] : ["up", "u", "8"],
+        next: settings.search ? ["down"] : ["down", "d", "2"],
+        previousPage: ["pageup"],
+        nextPage: ["pagedown"],
+        ...(settings.keys ?? {}),
+      },
+    });
+  }
+
+  protected match(): void {
+    this.options = this.settings.options.filter(
+      (option: GenericListOption) =>
+        stripColor(option.name ?? option.value).toString().toLowerCase()
+          .startsWith(
+            this.getCurrentInputValue().toLowerCase(),
+          ),
+    );
+    this.listIndex = Math.max(
+      0,
+      Math.min(this.options.length - 1, this.listIndex),
+    );
+    this.listOffset = Math.max(
+      0,
+      Math.min(
+        this.options.length - this.getListHeight(),
+        this.listOffset,
+      ),
+    );
+  }
+
+  protected message(): string {
+    let message = `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) +
+      this.defaults();
+    if (this.settings.search) {
+      message += " " + this.settings.searchLabel + " ";
+    }
+    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+    return message + this.input();
+  }
+
   /** Render options. */
-  protected body(): string | undefined | Promise<string | undefined> {
-    const body: Array<string> = [];
+  protected body(): string | Promise<string> {
+    return this.getList() + this.getInfo();
+  }
+
+  protected getInfo(): string {
+    if (!this.settings.info) {
+      return "";
+    }
+    const selected: number = this.listIndex + 1;
+    const actions: Array<[string, Array<string>]> = [];
+
+    actions.push(
+      ["Next", [Figures.ARROW_DOWN]],
+      ["Previous", [Figures.ARROW_UP]],
+      ["Next Page", [Figures.PAGE_DOWN]],
+      ["Previous Page", [Figures.PAGE_UP]],
+      ["Submit", [Figures.ENTER]],
+    );
+
+    return "\n" + this.settings.indent + blue(Figures.INFO) +
+      bold(` ${selected}/${this.options.length} `) +
+      actions
+        .map((cur) => `${cur[0]}: ${bold(cur[1].join(" "))}`)
+        .join(", ");
+  }
+
+  /** Render options list. */
+  protected getList(): string {
+    const list: Array<string> = [];
     const height: number = this.getListHeight();
-    for (let i = this.index; i < this.index + height; i++) {
-      body.push(
+    for (let i = this.listOffset; i < this.listOffset + height; i++) {
+      list.push(
         this.getListItem(
-          this.settings.options[i],
-          this.selected === i,
+          this.options[i],
+          this.listIndex === i,
         ),
       );
     }
-    return body.join("\n");
+    if (!list.length) {
+      list.push(
+        this.settings.indent + dim("  No matches..."),
+      );
+    }
+    return list.join("\n");
   }
 
   /**
@@ -90,54 +193,11 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     isSelected?: boolean,
   ): string;
 
-  /** Read user input. */
-  protected read(): Promise<boolean> {
-    this.tty.cursorHide();
-    return super.read();
-  }
-
-  /** Select previous option. */
-  protected selectPrevious(): void {
-    if (this.selected > 0) {
-      this.selected--;
-      if (this.selected < this.index) {
-        this.index--;
-      }
-      if (this.settings.options[this.selected].disabled) {
-        this.selectPrevious();
-      }
-    } else {
-      this.selected = this.settings.options.length - 1;
-      this.index = this.settings.options.length - this.getListHeight();
-      if (this.settings.options[this.selected].disabled) {
-        this.selectPrevious();
-      }
-    }
-  }
-
-  /** Select next option. */
-  protected selectNext(): void {
-    if (this.selected < this.settings.options.length - 1) {
-      this.selected++;
-      if (this.selected >= this.index + this.getListHeight()) {
-        this.index++;
-      }
-      if (this.settings.options[this.selected].disabled) {
-        this.selectNext();
-      }
-    } else {
-      this.selected = this.index = 0;
-      if (this.settings.options[this.selected].disabled) {
-        this.selectNext();
-      }
-    }
-  }
-
   /** Get options row height. */
   protected getListHeight(): number {
     return Math.min(
-      this.settings.options.length,
-      this.settings.maxRows || this.settings.options.length,
+      this.options.length,
+      this.settings.maxRows || this.options.length,
     );
   }
 
@@ -148,6 +208,141 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   protected getOptionByValue(
     value: string,
   ): GenericListOptionSettings | undefined {
-    return this.settings.options.find((option) => option.value === value);
+    return this.options.find((option) => option.value === value);
+  }
+
+  /** Read user input. */
+  protected read(): Promise<boolean> {
+    if (!this.settings.search) {
+      this.tty.cursorHide();
+    }
+    return super.read();
+  }
+
+  /**
+   * Handle user input event.
+   * @param event Key event.
+   */
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      case this.isKey(this.settings.keys, "previous", event):
+        this.selectPrevious();
+        break;
+      case this.isKey(this.settings.keys, "next", event):
+        this.selectNext();
+        break;
+      case this.isKey(this.settings.keys, "nextPage", event):
+        this.selectNextPage();
+        break;
+      case this.isKey(this.settings.keys, "previousPage", event):
+        this.selectPreviousPage();
+        break;
+      default:
+        await super.handleEvent(event);
+    }
+  }
+
+  protected moveCursorLeft(): void {
+    if (this.settings.search) {
+      super.moveCursorLeft();
+    }
+  }
+
+  protected moveCursorRight(): void {
+    if (this.settings.search) {
+      super.moveCursorRight();
+    }
+  }
+
+  protected deleteChar(): void {
+    if (this.settings.search) {
+      super.deleteChar();
+    }
+  }
+
+  protected deleteCharRight(): void {
+    if (this.settings.search) {
+      super.deleteCharRight();
+      this.match();
+    }
+  }
+
+  protected addChar(char: string): void {
+    if (this.settings.search) {
+      super.addChar(char);
+      this.match();
+    }
+  }
+
+  /** Select previous option. */
+  protected selectPrevious(): void {
+    if (this.options.length < 2) {
+      return;
+    }
+    if (this.listIndex > 0) {
+      this.listIndex--;
+      if (this.listIndex < this.listOffset) {
+        this.listOffset--;
+      }
+      if (this.options[this.listIndex].disabled) {
+        this.selectPrevious();
+      }
+    } else {
+      this.listIndex = this.options.length - 1;
+      this.listOffset = this.options.length - this.getListHeight();
+      if (this.options[this.listIndex].disabled) {
+        this.selectPrevious();
+      }
+    }
+  }
+
+  /** Select next option. */
+  protected selectNext(): void {
+    if (this.options.length < 2) {
+      return;
+    }
+    if (this.listIndex < this.options.length - 1) {
+      this.listIndex++;
+      if (this.listIndex >= this.listOffset + this.getListHeight()) {
+        this.listOffset++;
+      }
+      if (this.options[this.listIndex].disabled) {
+        this.selectNext();
+      }
+    } else {
+      this.listIndex = this.listOffset = 0;
+      if (this.options[this.listIndex].disabled) {
+        this.selectNext();
+      }
+    }
+  }
+
+  /** Select previous page. */
+  protected selectPreviousPage(): void {
+    if (this.options?.length) {
+      const height: number = this.getListHeight();
+      if (this.listOffset >= height) {
+        this.listIndex -= height;
+        this.listOffset -= height;
+      } else if (this.listOffset > 0) {
+        this.listIndex -= this.listOffset;
+        this.listOffset = 0;
+      }
+    }
+  }
+
+  /** Select next page. */
+  protected selectNextPage(): void {
+    if (this.options?.length) {
+      const height: number = this.getListHeight();
+      if (this.listOffset + height + height < this.options.length) {
+        this.listIndex += height;
+        this.listOffset += height;
+      } else if (this.listOffset + height < this.options.length) {
+        const offset = this.options.length - height;
+        this.listIndex += offset - this.listOffset;
+        this.listOffset = offset;
+      }
+    }
   }
 }

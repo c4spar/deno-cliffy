@@ -1,21 +1,18 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, dim, stripColor, underline } from "./deps.ts";
+import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericPrompt,
+  GenericPromptKeys,
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
 
 /** Toggle key options. */
-export interface ToggleKeys {
+export interface ToggleKeys extends GenericPromptKeys {
   active?: string[];
   inactive?: string[];
-  submit?: string[];
 }
-
-/** Toggle key settings. */
-type ToggleKeysSettings = Required<ToggleKeys>;
 
 /** Generic prompt options. */
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
@@ -28,7 +25,7 @@ export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
 interface ToggleSettings extends GenericPromptSettings<boolean, string> {
   active: string;
   inactive: string;
-  keys: ToggleKeysSettings;
+  keys: ToggleKeys;
 }
 
 /** Toggle prompt representation. */
@@ -47,13 +44,13 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
       active: "Yes",
       inactive: "No",
       ...options,
       keys: {
         active: ["right", "y", "j", "s", "o"],
         inactive: ["left", "n"],
-        submit: ["enter", "return"],
         ...(options.keys ?? {}),
       },
     }).prompt();
@@ -87,26 +84,16 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.exit(0);
-        }
-        break;
-
       case event.sequence === this.settings.inactive[0].toLowerCase():
       case this.isKey(this.settings.keys, "inactive", event):
         this.selectInactive();
         break;
-
       case event.sequence === this.settings.active[0].toLowerCase():
       case this.isKey(this.settings.keys, "active", event):
         this.selectActive();
         break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
+      default:
+        await super.handleEvent(event);
     }
   }
 

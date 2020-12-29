@@ -1,11 +1,17 @@
-import { AnsiEscape } from "../ansi_escape/ansi_escape.ts";
+import { Cursor } from "../ansi/cursor_position.ts";
+import { tty } from "../ansi/tty.ts";
 import { KeyCode } from "../keycode/key_code.ts";
 import type { KeyEvent } from "../keycode/key_event.ts";
-import { blue, bold, dim, green, red, yellow } from "./deps.ts";
+import { blue, bold, dim, green, italic, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Prompt validation return tape. */
 export type ValidateResult = string | boolean | Promise<string | boolean>;
+
+/** Input keys options. */
+export interface GenericPromptKeys {
+  submit?: string[];
+}
 
 /** Generic prompt options. */
 export interface GenericPromptOptions<T, V> {
@@ -15,6 +21,8 @@ export interface GenericPromptOptions<T, V> {
   transform?: (value: V) => T | undefined;
   hint?: string;
   pointer?: string;
+  indent?: string;
+  keys?: GenericPromptKeys;
   cbreak?: boolean;
 }
 
@@ -22,6 +30,7 @@ export interface GenericPromptOptions<T, V> {
 export interface GenericPromptSettings<T, V>
   extends GenericPromptOptions<T, V> {
   pointer: string;
+  indent: string;
 }
 
 /** Static generic prompt interface. */
@@ -37,13 +46,6 @@ export interface StaticGenericPrompt<
   prompt(options: O): Promise<T>;
 }
 
-export interface Cursor {
-  x: number;
-  y: number;
-}
-
-export type RenderResult = [string, string | undefined, string | undefined];
-
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   T,
@@ -51,7 +53,9 @@ export abstract class GenericPrompt<
   S extends GenericPromptSettings<T, V>,
 > {
   protected static injectedValue: unknown | undefined;
-  protected readonly tty = AnsiEscape.from(Deno.stdout);
+  protected readonly settings: S;
+  protected readonly tty = tty;
+  protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
@@ -68,7 +72,16 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected constructor(protected readonly settings: S) {}
+  protected constructor(settings: S) {
+    this.settings = {
+      ...settings,
+      keys: {
+        submit: ["enter", "return"],
+        ...(settings.keys ?? {}),
+      },
+    };
+    this.indent = this.settings.indent ?? " ";
+  }
 
   /** Execute the prompt and show cursor on end. */
   public async prompt(): Promise<T> {
@@ -81,9 +94,7 @@ export abstract class GenericPrompt<
 
   /** Clear prompt output. */
   protected clear(): void {
-    this.tty
-      .cursorLeft()
-      .eraseDown();
+    this.tty.cursorLeft.eraseDown();
   }
 
   /** Execute the prompt. */
@@ -149,28 +160,29 @@ export abstract class GenericPrompt<
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
       const value: V = GenericPrompt.injectedValue as V;
-      return this.#validateValue(value);
-    }
+      await this.#validateValue(value);
+    } else {
+      const events: KeyEvent[] = await this.#readKey();
 
-    const events: KeyEvent[] = await this.#readKey();
+      if (!events.length) {
+        return false;
+      }
 
-    if (!events.length) {
-      return false;
-    }
-
-    for (const event of events) {
-      await this.handleEvent(event);
+      for (const event of events) {
+        await this.handleEvent(event);
+      }
     }
 
     return typeof this.#value !== "undefined";
   }
 
-  protected submit(): Promise<boolean> {
+  protected submit(): Promise<void> {
     return this.#validateValue(this.getValue());
   }
 
   protected message(): string {
-    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults();
+    return `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) + this.defaults();
   }
 
   protected defaults(): string {
@@ -183,7 +195,8 @@ export abstract class GenericPrompt<
 
   /** Get prompt success message. */
   protected success(value: T): string | undefined {
-    return ` ${yellow("?")} ` + bold(this.settings.message) + this.defaults() +
+    return `${this.settings.indent}${yellow("?")} ` +
+      bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
       " " + green(this.format(value));
   }
@@ -196,13 +209,14 @@ export abstract class GenericPrompt<
 
   protected error(): string | undefined {
     return this.#lastError
-      ? red(bold(` ${Figures.CROSS} `) + this.#lastError)
+      ? this.settings.indent + red(bold(`${Figures.CROSS} `) + this.#lastError)
       : undefined;
   }
 
   protected hint(): string | undefined {
     return this.settings.hint
-      ? dim(blue(` ${Figures.POINTER} `) + this.settings.hint)
+      ? this.settings.indent +
+        italic(blue(dim(`${Figures.POINTER} `) + this.settings.hint))
       : undefined;
   }
 
@@ -210,7 +224,17 @@ export abstract class GenericPrompt<
    * Handle user input event.
    * @param event Key event.
    */
-  protected abstract handleEvent(event: KeyEvent): void | Promise<void>;
+  protected async handleEvent(event: KeyEvent): Promise<void> {
+    switch (true) {
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit();
+        break;
+    }
+  }
 
   /**
    * Map input value to output value.
@@ -270,16 +294,19 @@ export abstract class GenericPrompt<
   };
 
   /**
-   * Map input value to output value. If a default value is set, the default
-   * will be used as value without any validation. If a custom validation
-   * handler ist set, the custom handler will be executed, otherwise the default
-   * validation handler from the prompt will be executed.
-   * @param value
+   * Validate input value. Set error message if validation fails and transform
+   * output value on success.
+   * If a default value is set, the default will be used as value without any
+   * validation.
+   * If a custom validation handler ist set, the custom handler will
+   * be executed, otherwise a prompt specific default validation handler will be
+   * executed.
+   * @param value The value to validate.
    */
-  #validateValue = async (value: V): Promise<boolean> => {
+  #validateValue = async (value: V): Promise<void> => {
     if (!value && typeof this.settings.default !== "undefined") {
       this.#value = this.settings.default;
-      return true;
+      return;
     }
 
     this.#value = undefined;
@@ -297,8 +324,6 @@ export abstract class GenericPrompt<
     } else {
       this.#value = this.#transformValue(value);
     }
-
-    return typeof this.#value !== "undefined";
   };
 
   /**
@@ -307,8 +332,7 @@ export abstract class GenericPrompt<
    * @param name  Key name.
    * @param event Key event.
    */
-  // deno-lint-ignore no-explicit-any
-  protected isKey<K extends any, N extends keyof K>(
+  protected isKey<K extends unknown, N extends keyof K>(
     keys: K | undefined,
     name: N,
     event: KeyEvent,

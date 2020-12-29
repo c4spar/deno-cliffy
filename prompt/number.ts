@@ -1,28 +1,24 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
+import {
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
-import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
 
 /** Number key options. */
-export interface NumberKeys extends GenericInputKeys {
+export interface NumberKeys extends GenericSuggestionsKeys {
   increaseValue?: string[];
   decreaseValue?: string[];
 }
 
-/** Number key settings. */
-interface NumberKeysSettings extends GenericInputKeys {
-  increaseValue: string[];
-  decreaseValue: string[];
-}
-
 /** Number prompt options. */
-export interface NumberOptions extends GenericInputPromptOptions<number> {
+export interface NumberOptions
+  extends GenericSuggestionsOptions<number, string> {
   min?: number;
   max?: number;
   float?: boolean;
@@ -31,16 +27,16 @@ export interface NumberOptions extends GenericInputPromptOptions<number> {
 }
 
 /** Number prompt settings. */
-interface NumberSettings extends GenericInputPromptSettings<number> {
+interface NumberSettings extends GenericSuggestionsSettings<number, string> {
   min: number;
   max: number;
   float: boolean;
   round: number;
-  keys: NumberKeysSettings;
+  keys?: NumberKeys;
 }
 
 /** Number prompt representation. */
-export class Number extends GenericInput<number, NumberSettings> {
+export class Number extends GenericSuggestions<number, string, NumberSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
@@ -49,6 +45,9 @@ export class Number extends GenericInput<number, NumberSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       min: -Infinity,
       max: Infinity,
       float: false,
@@ -63,50 +62,43 @@ export class Number extends GenericInput<number, NumberSettings> {
   }
 
   /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
+  /**
    * Handle user input event.
    * @param event Key event.
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.exit(0);
+      case this.settings.suggestions &&
+        this.isKey(this.settings.keys, "next", event):
+        if (this.settings.list) {
+          this.selectPreviousSuggestion();
+        } else {
+          this.selectNextSuggestion();
         }
         break;
-
+      case this.settings.suggestions &&
+        this.isKey(this.settings.keys, "previous", event):
+        if (this.settings.list) {
+          this.selectNextSuggestion();
+        } else {
+          this.selectPreviousSuggestion();
+        }
+        break;
       case this.isKey(this.settings.keys, "increaseValue", event):
         this.increaseValue();
         break;
-
       case this.isKey(this.settings.keys, "decreaseValue", event):
         this.decreaseValue();
         break;
-
-      case this.isKey(this.settings.keys, "moveCursorLeft", event):
-        this.moveCursorLeft();
-        break;
-
-      case this.isKey(this.settings.keys, "moveCursorRight", event):
-        this.moveCursorRight();
-        break;
-
-      case this.isKey(this.settings.keys, "deleteCharRight", event):
-        this.deleteCharRight();
-        break;
-
-      case this.isKey(this.settings.keys, "deleteCharLeft", event):
-        this.deleteChar();
-        break;
-
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
-        break;
-
       default:
-        if (event.sequence && !event.meta && !event.ctrl) {
-          this.addChar(event.sequence);
-        }
+        await super.handleEvent(event);
     }
   }
 
@@ -232,6 +224,11 @@ export class Number extends GenericInput<number, NumberSettings> {
    */
   protected format(value: number): string {
     return value.toString();
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 }
 

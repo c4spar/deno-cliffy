@@ -1,45 +1,40 @@
 import type { KeyEvent } from "../keycode/key_event.ts";
 import {
   GenericPrompt,
+  GenericPromptKeys,
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { stripColor, underline } from "./deps.ts";
+import { blue, dim, stripColor, underline } from "./deps.ts";
 
 /** Input keys options. */
-export interface GenericInputKeys {
+export interface GenericInputKeys extends GenericPromptKeys {
   moveCursorLeft?: string[];
   moveCursorRight?: string[];
   deleteCharLeft?: string[];
   deleteCharRight?: string[];
-  submit?: string[];
 }
 
 /** Generic input prompt options. */
-export interface GenericInputPromptOptions<T>
-  extends GenericPromptOptions<T, string> {
+export interface GenericInputPromptOptions<T, V>
+  extends GenericPromptOptions<T, V> {
   keys?: GenericInputKeys;
 }
 
 /** Generic input prompt settings. */
-export interface GenericInputPromptSettings<T>
-  extends GenericPromptSettings<T, string> {
+export interface GenericInputPromptSettings<T, V>
+  extends GenericPromptSettings<T, V> {
   keys?: GenericInputKeys;
 }
 
 /** Generic input prompt representation. */
-export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
-  extends GenericPrompt<T, string, S> {
+export abstract class GenericInput<
+  T,
+  V,
+  S extends GenericInputPromptSettings<T, V>,
+> extends GenericPrompt<T, V, S> {
   protected inputValue = "";
   protected inputIndex = 0;
-
-  /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Input value.
-   */
-  public static inject(value: string): void {
-    GenericPrompt.inject(value);
-  }
 
   /**
    * Prompt constructor.
@@ -53,10 +48,13 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
         moveCursorRight: ["right"],
         deleteCharLeft: ["backspace"],
         deleteCharRight: ["delete"],
-        submit: ["enter", "return"],
         ...(settings.keys ?? {}),
       },
     });
+  }
+
+  protected getCurrentInputValue(): string {
+    return this.inputValue;
   }
 
   protected message(): string {
@@ -69,48 +67,47 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     return underline(this.inputValue);
   }
 
+  protected highlight(
+    value: string | number,
+    color1: (val: string) => string = dim,
+    color2: (val: string) => string = blue,
+  ): string {
+    value = value.toString();
+    const inputLowerCase = this.getCurrentInputValue().toLowerCase();
+    const valueLowerCase = value.toLowerCase();
+    const index = valueLowerCase.indexOf(inputLowerCase);
+    const matched: string = value.slice(index, index + inputLowerCase.length);
+    return index >= 0
+      ? color1(value.slice(0, index)) + color2(matched) +
+        color1(value.slice(index + inputLowerCase.length))
+      : value;
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      case event.name === "c":
-        if (event.ctrl) {
-          this.tty.cursorShow();
-          Deno.exit(0);
-        }
-        if (event.sequence) {
-          this.addChar(event.sequence);
-        }
-        break;
-
-      // case "up": // scroll history?
-      //   break;
-      //
-      // case "down": // scroll history?
-      //   break;
-
+      case event.name === "c" && event.ctrl:
+        this.tty.cursorShow();
+        Deno.exit(0);
+        return;
       case this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();
         break;
-
       case this.isKey(this.settings.keys, "moveCursorRight", event):
         this.moveCursorRight();
         break;
-
       case this.isKey(this.settings.keys, "deleteCharRight", event):
         this.deleteCharRight();
         break;
-
       case this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
         break;
-
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
         break;
-
       default:
         if (event.sequence && !event.meta && !event.ctrl) {
           this.addChar(event.sequence);
@@ -118,10 +115,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
     }
   }
 
-  /**
-   * Add character to current input.
-   * @param char Char to add.
-   */
+  /** Add character to current input. */
   protected addChar(char: string): void {
     this.inputValue = this.inputValue.slice(0, this.inputIndex) + char +
       this.inputValue.slice(this.inputIndex);
@@ -146,9 +140,7 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
   protected deleteChar(): void {
     if (this.inputIndex > 0) {
       this.inputIndex--;
-      this.tty.cursorBackward(1);
-      this.inputValue = this.inputValue.slice(0, this.inputIndex) +
-        this.inputValue.slice(this.inputIndex + 1);
+      this.deleteCharRight();
     }
   }
 
@@ -158,10 +150,5 @@ export abstract class GenericInput<T, S extends GenericInputPromptSettings<T>>
       this.inputValue = this.inputValue.slice(0, this.inputIndex) +
         this.inputValue.slice(this.inputIndex + 1);
     }
-  }
-
-  /** Get input input. */
-  protected getValue(): string {
-    return this.inputValue;
   }
 }

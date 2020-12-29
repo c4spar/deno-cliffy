@@ -1,30 +1,36 @@
-import { blue, bold, dim, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { GenericPrompt } from "./_generic_prompt.ts";
 import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
+import { blue, dim } from "./deps.ts";
+import { Figures } from "./figures.ts";
 
-export type ConfirmKeys = GenericInputKeys;
+export type ConfirmKeys = GenericSuggestionsKeys;
+
+type UnsupportedInputOptions = "suggestions" | "list" | "info";
 
 /** Confirm prompt options. */
-export interface ConfirmOptions extends GenericInputPromptOptions<boolean> {
+export interface ConfirmOptions
+  extends
+    Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedInputOptions> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
 }
 
 /** Confirm prompt settings. */
-interface ConfirmSettings extends GenericInputPromptSettings<boolean> {
+interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
   active: string;
   inactive: string;
   keys?: ConfirmKeys;
 }
 
 /** Confirm prompt representation. */
-export class Confirm extends GenericInput<boolean, ConfirmSettings> {
+export class Confirm
+  extends GenericSuggestions<boolean, string, ConfirmSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(
     options: string | ConfirmOptions,
@@ -34,11 +40,28 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }
 
     return new this({
+      pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       active: "Yes",
       inactive: "No",
-      pointer: blue(Figures.POINTER_SMALL),
       ...options,
+      suggestions: [
+        options.active ?? "Yes",
+        options.inactive ?? "No",
+      ],
+      list: false,
+      info: false,
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
   }
 
   protected defaults(): string {
@@ -56,6 +79,11 @@ export class Confirm extends GenericInput<boolean, ConfirmSettings> {
     }
 
     return defaultMessage ? dim(` (${defaultMessage})`) : "";
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 
   /**

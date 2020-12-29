@@ -1,30 +1,32 @@
+import { GenericPrompt } from "./_generic_prompt.ts";
+import {
+  GenericSuggestions,
+  GenericSuggestionsKeys,
+  GenericSuggestionsOptions,
+  GenericSuggestionsSettings,
+} from "./_generic_suggestions.ts";
 import { blue } from "./deps.ts";
 import { Figures } from "./figures.ts";
-import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
 
-export type InputKeys = GenericInputKeys;
+export type InputKeys = GenericSuggestionsKeys;
 
 /** Input prompt options. */
-export interface InputOptions extends GenericInputPromptOptions<string> {
+export interface InputOptions
+  extends GenericSuggestionsOptions<string, string> {
   minLength?: number;
   maxLength?: number;
   keys?: InputKeys;
 }
 
 /** Input prompt settings. */
-interface InputSettings extends GenericInputPromptSettings<string> {
+interface InputSettings extends GenericSuggestionsSettings<string, string> {
   minLength: number;
   maxLength: number;
   keys?: InputKeys;
 }
 
 /** Input prompt representation. */
-export class Input extends GenericInput<string, InputSettings> {
+export class Input extends GenericSuggestions<string, string, InputSettings> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | InputOptions): Promise<string> {
     if (typeof options === "string") {
@@ -33,10 +35,26 @@ export class Input extends GenericInput<string, InputSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      indent: " ",
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
       minLength: 0,
       maxLength: Infinity,
       ...options,
     }).prompt();
+  }
+
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
+  /** Get input input. */
+  protected getValue(): string {
+    return this.inputValue;
   }
 
   /**
