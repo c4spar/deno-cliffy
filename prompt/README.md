@@ -40,6 +40,7 @@
     - [Prompt List](#prompt-list)
     - [Dynamic Prompts](#dynamic-prompts)
     - [Custom Prompts](#custom-prompts)
+    - [OS Signals](#os-signals)
 - [API](#-api)
 - [Types](#-types)
 - [Contributing](#-contributing)
@@ -245,6 +246,43 @@ console.log(result);
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom_prompts.ts
 ```
 
+### OS Signals
+
+> The `break` option is an unstable feature and requires Deno => 1.6!
+
+By default, cliffy will call `Deno.exit(0)` after the user presses `ctrl+c`. If you need to use a custom signal
+handler, you can enable the `cbreak` option on your prompt. This will enable pass-through of os signals to deno,
+allowing you to register your own signal handler. Currently, when using prompts like `Select` or `Toggle` and `cbreak`
+mode is enabled, you must manually show the cursor before calling `Deno.exit()`. Maybe this will be improved somehow
+in the future.
+
+```typescript
+import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
+import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
+
+const sig = Deno.signal(Deno.Signal.SIGINT);
+(async () => {
+  for await (const _ of sig) {
+    tty.cursorShow();
+    console.log("\nSigint received. Exiting deno process!");
+    Deno.exit(1);
+  }
+})();
+
+const value: string = await Input.prompt({
+  message: "Enter some value",
+  cbreak: true,
+});
+
+console.log({ value });
+
+sig.dispose();
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/os_signals.ts
+```
+
 ## ❯ API
 
 ### prompt(prompts, options)
@@ -264,8 +302,8 @@ The prompt method has also following global options.
 
 | Param | Type | Required | Description |
 | ----- | :---: | :---: | ----------- |
-| before | `(result, next) => Promise<void>` | No | Same as above but will be executed before every prompt. |
-| after | `(result, next) => Promise<void>` | No | Same as above but will be executed after every prompt. |
+| before | `(result, next) => Promise<void>` | No | Same as above but will be executed before each prompt. |
+| after | `(result, next) => Promise<void>` | No | Same as above but will be executed after each prompt. |
 
 ### Prompt.prompt(options)
 
@@ -292,9 +330,10 @@ All prompts have the following base options:
 | default | `T` | No | Default value. Type depends on prompt type. |
 | transform | `(value: V) => T \| undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
 | validate | `(value: T \| undefined) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
-| hint | `string` | No | Hint to display to the user. (not implemented) |
+| hint | `string` | No | Hint to display to the user. |
 | pointer | `string` | No | Change the pointer icon. |
 | indent | `string` | No | Prompt indentation. Defaults to `' '` |
+| cbreak | `boolean` | No | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-singals)). **This is an unstable feature and requires Deno => 1.6!** |
 
 ***
 
