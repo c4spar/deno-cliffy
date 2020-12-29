@@ -5,13 +5,8 @@ type PropertyNames = keyof typeof stdColors;
 type ColorMethod = (str: string, ...args: Array<unknown>) => string;
 type ColorMethods = Exclude<PropertyNames, ExcludedColorMethods>;
 type Chainable<T, E extends keyof T | null = null> = {
-  [P in keyof T]:
-    & (P extends E ? T[P] : Chainable<T, E> & T[P])
-    & TemplateFactory<T, E, T[P]>;
+  [P in keyof T]: P extends E ? T[P] : Chainable<T, E> & T[P];
 };
-type TemplateFactory<T, E extends keyof T | null, V> = () =>
-  & Chainable<T, E>
-  & V;
 
 /** Chainable colors instance returned by all ansi escape properties. */
 export type ColorsChain =

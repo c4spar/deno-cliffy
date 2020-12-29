@@ -15,7 +15,7 @@ Deno.test({
 Deno.test({
   name: "test color theme",
   fn() {
-    const theme = colors.red.underline();
+    const theme = colors.red.underline;
     assertEquals(
       theme.bold("test"),
       bold(underline(red("test"))),
