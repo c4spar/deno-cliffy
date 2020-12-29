@@ -111,7 +111,7 @@ export interface Chain<T extends Chain<T>> {
    * );
    * ```
    */
-  link: T & ((text: string, url: string) => T);
+  link: (text: string, url: string) => T;
   /**
    * Create image.
    * @param buffer  Image buffer.
@@ -124,7 +124,5 @@ export interface Chain<T extends Chain<T>> {
    * );
    * ```
    */
-  image:
-    & T
-    & ((buffer: string | ArrayBuffer, options?: ImageOptions) => T);
+  image: (buffer: string | ArrayBuffer, options?: ImageOptions) => T;
 }
