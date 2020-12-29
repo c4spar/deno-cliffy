@@ -29,6 +29,10 @@
   <sub>>_ Control cli cursor, erase output, scroll window and more.</sub>
 </p>
 
+<p align="center">
+  <img alt="demo" src="assets/img/demo.gif"/>
+</p>
+
 ## ❯ Content
 
 - [Install](#-install)
