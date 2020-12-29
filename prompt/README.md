@@ -248,7 +248,7 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom_prompts.
 
 ### OS Signals
 
-> The `break` option is an unstable feature and requires Deno => 1.6!
+> The `cbreak` option is an unstable feature and requires Deno => 1.6!
 
 By default, cliffy will call `Deno.exit(0)` after the user presses `ctrl+c`. If you need to use a custom signal
 handler, you can enable the `cbreak` option on your prompt. This will enable pass-through of os signals to deno,
