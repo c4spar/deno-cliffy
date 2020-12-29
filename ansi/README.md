@@ -63,13 +63,10 @@ import { ansi, colors, tty, cursorTo } from "https://raw.githubusercontent.com/c
 
 ## ❯ Usage
 
-The ansi module exports an `ansi` and a `tty` object which have chainable methods and properties for generating and writing ansi escape sequences. `ansi` and `tty` have allmost the same properties and methods.`ansi` generates and returns an ansi string, and `tty` writes the generated ansi escape sequence directly to stdout.
-
-Both objects can be also invoked as method to create a new instance from itself.
-
 ### Ansi
 
-Returns generated ansi escape sequences.
+The ansi module exports an `ansi` object with chainable methods and properties for generating ansi escape sequence
+strings. The last property must be invoked as a method to generate the ansi string.
 
 ```typescript
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
@@ -77,15 +74,23 @@ import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 console.log(
   myAnsi.cursorUp.cursorLeft.eraseDown()
 );
+```
 
-// or:
-await Deno.stdout.write(
-  new TextEncoder().encode(
-    ansi.cursorUp.cursorLeft.eraseDown()
-  )
+If a method takes some arguments, you have to invoke the `.toString()` method to generate the ansi string.
+
+```typescript
+import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
+
+console.log(
+  myAnsi.cursorUp(2).cursorLeft.eraseDown(2).toString()
 );
+```
 
-// or:
+Convert to `Uint8Array`:
+
+```typescript
+import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
+
 await Deno.stdout.write(
   ansi.cursorUp.cursorLeft.eraseDown.toBuffer()
 );
@@ -118,7 +123,8 @@ $ deno run https://deno.land/x/cliffy/examples/ansi/functional.ts
 
 ### Tty
 
-Writes generated ansi escape sequences directly to stdout.
+The tty module exports a `tty` object which works almost the same way as the `ansi` module. The only difference is, the
+`tty` module writes the ansi escape sequences directly to stdout.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
