@@ -225,7 +225,11 @@ function capitalize(string: string): string {
 }
 
 function inspect(value: unknown): string {
-  return Deno.inspect(value, { depth: 1, colors: true, trailingComma: false });
+  return Deno.inspect(
+    value,
+    // deno < 1.4.3 doesn't support the colors property.
+    { depth: 1, colors: true, trailingComma: false } as Deno.InspectOptions,
+  );
 }
 
 function getFlag(name: string) {
