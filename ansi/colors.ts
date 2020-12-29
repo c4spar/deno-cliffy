@@ -42,17 +42,16 @@ function factory(): Colors {
     ...args: Array<unknown>
   ): string | ColorsChain {
     if (str) {
-      const lastname = stack.pop() as ColorMethods;
-      const method = stdColors[lastname] as ColorMethod;
-      const result: string = method(
-        stack.reduce(
-          (str: string, name) => (stdColors[name] as ColorMethod)(str),
-          str,
-        ),
-        ...args,
-      );
+      const lastIndex = stack.length - 1;
+      const tmp = stack;
       stack = [];
-      return result;
+      return tmp.reduce(
+        (str: string, name: PropertyNames, index: number) =>
+          index === lastIndex
+            ? (stdColors[name] as ColorMethod)(str, ...args)
+            : (stdColors[name] as ColorMethod)(str),
+        str,
+      );
     }
     return factory();
   } as Colors;
@@ -65,7 +64,7 @@ function factory(): Colors {
     }
     Object.defineProperty(colors, name, {
       get(this: ColorsChain) {
-        stack.unshift(name);
+        stack.push(name);
         return this;
       },
     });

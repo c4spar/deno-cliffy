@@ -7,7 +7,7 @@ Deno.test({
   fn() {
     assertEquals(
       colors.red.underline.bold("test"),
-      red(underline(bold("test"))),
+      bold(underline(red("test"))),
     );
   },
 });
