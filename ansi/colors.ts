@@ -5,11 +5,18 @@ type PropertyNames = keyof typeof stdColors;
 type ColorMethod = (str: string, ...args: Array<unknown>) => string;
 type ColorMethods = Exclude<PropertyNames, ExcludedColorMethods>;
 type Chainable<T, E extends keyof T | null = null> = {
-  [P in keyof T]: P extends E ? T[P] : Chainable<T, E> & T[P];
+  [P in keyof T]:
+    & (P extends E ? T[P] : Chainable<T, E> & T[P])
+    & TemplateFactory<T, E, T[P]>;
 };
+type TemplateFactory<T, E extends keyof T | null, V> = () =>
+  & Chainable<T, E>
+  & V;
 
 /** Chainable colors instance returned by all ansi escape properties. */
-export type ColorsChain = Chainable<typeof stdColors, ExcludedColorMethods>;
+export type ColorsChain =
+  & Chainable<typeof stdColors, ExcludedColorMethods>
+  & { _stack: Array<ColorMethods> };
 
 /** Create new `Colors` instance. */
 export type ColorsFactory = () => Colors;
@@ -19,6 +26,21 @@ export type ColorsFactory = () => Colors;
  * If invoked as method, a new `Colors` instance will be returned.
  */
 export type Colors = ColorsFactory & ColorsChain;
+
+const proto = Object.create(null);
+const methodNames = Object.keys(stdColors) as Array<PropertyNames>;
+for (const name of methodNames) {
+  if (name === "setColorEnabled" || name === "getColorEnabled") {
+    continue;
+  }
+  Object.defineProperty(proto, name, {
+    get(this: ColorsChain) {
+      return factory([...this._stack, name]);
+    },
+  });
+}
+
+export const colors: Colors = factory();
 
 /**
  * Chainable colors module.
@@ -31,21 +53,15 @@ export type Colors = ColorsFactory & ColorsChain;
  * console.log(myColors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
  */
-export const colors: Colors = factory();
-
-function factory(): Colors {
-  let stack: Array<ColorMethods> = [];
-
+function factory(stack: Array<ColorMethods> = []): Colors {
   const colors: Colors = function (
     this: ColorsChain | undefined,
-    str: string,
+    str?: string,
     ...args: Array<unknown>
   ): string | ColorsChain {
     if (str) {
       const lastIndex = stack.length - 1;
-      const tmp = stack;
-      stack = [];
-      return tmp.reduce(
+      return stack.reduce(
         (str: string, name: PropertyNames, index: number) =>
           index === lastIndex
             ? (stdColors[name] as ColorMethod)(str, ...args)
@@ -53,22 +69,12 @@ function factory(): Colors {
         str,
       );
     }
-    return factory();
+    const tmp = stack.slice();
+    stack = [];
+    return factory(tmp);
   } as Colors;
 
-  const methodNames = Object.keys(stdColors) as Array<PropertyNames>;
-
-  for (const name of methodNames) {
-    if (name === "setColorEnabled" || name === "getColorEnabled") {
-      continue;
-    }
-    Object.defineProperty(colors, name, {
-      get(this: ColorsChain) {
-        stack.push(name);
-        return this;
-      },
-    });
-  }
-
+  Object.setPrototypeOf(colors, proto);
+  colors._stack = stack;
   return colors;
 }

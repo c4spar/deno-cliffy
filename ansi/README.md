@@ -143,8 +143,8 @@ myTty.cursorSave
 
 ### Colors
 
-The colors module is a simple chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts)
-module and works like node's [chalk](https://github.com/chalk/chalk) module.
+The colors module is a simple and tiny chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts)
+module and works similar to node's [chalk](https://github.com/chalk/chalk) module.
 
 ```typescript
 import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
@@ -152,6 +152,26 @@ import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
 console.log(
   colors.bold.underline.rgb24("Welcome to Deno.Land!", 0xff3333),
 );
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/ansi/colors.ts
+```
+
+Define your own themes:
+
+```typescript
+const error = colors.bold.red();
+const warn = colors.bold.yellow();
+const info = colors.bold.blue();
+
+console.log(error("[ERROR]"), "Some error!");
+console.log(warn("[WARN]"), "Some warning!");
+console.log(info("[INFO]"), "Some information!");
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/ansi/color_themes.ts
 ```
 
 ## ❯ Contributing
