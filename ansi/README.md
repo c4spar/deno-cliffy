@@ -112,6 +112,10 @@ console.log(
 );
 ```
 
+```
+$ deno run https://deno.land/x/cliffy/examples/ansi/functional.ts
+```
+
 ### Tty
 
 Writes generated ansi escape sequences directly to stdout.
