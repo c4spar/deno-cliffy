@@ -3,7 +3,7 @@
 import { tty } from "../../ansi/tty.ts";
 import { Toggle } from "../../prompt/toggle.ts";
 
-const sig = Deno.signal(Deno.Signal.SIGINT);
+const sig = Deno.signals.interrupt();
 (async () => {
   for await (const _ of sig) {
     tty.cursorShow();

@@ -260,7 +260,7 @@ in the future.
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
 import { Toggle } from "https://deno.land/x/cliffy/prompt/toggle.ts";
 
-const sig = Deno.signal(Deno.Signal.SIGINT);
+const sig = Deno.signals.interrupt();
 (async () => {
   for await (const _ of sig) {
     tty.cursorShow();
