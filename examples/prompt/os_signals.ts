@@ -1,23 +1,22 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { tty } from "../../ansi/tty.ts";
-import { Input } from "../../prompt/input.ts";
+import { Toggle } from "../../prompt/toggle.ts";
 
 const sig = Deno.signal(Deno.Signal.SIGINT);
 (async () => {
   for await (const _ of sig) {
     tty.cursorShow();
     console.log("\nSigint received. Exiting deno process!");
-    sig.dispose();
     Deno.exit(1);
   }
 })();
 
-const value: string = await Input.prompt({
-  message: "Enter some value",
+const confirmed: boolean = await Toggle.prompt({
+  message: "Please confirm",
   cbreak: true,
 });
 
-console.log({ value });
+console.log({ confirmed });
 
 sig.dispose();

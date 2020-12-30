@@ -257,8 +257,8 @@ mode is enabled, you must manually show the cursor before calling `Deno.exit()`.
 in the future.
 
 ```typescript
-import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
-import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
+import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
+import { Toggle } from "https://deno.land/x/cliffy/prompt/toggle.ts";
 
 const sig = Deno.signal(Deno.Signal.SIGINT);
 (async () => {
@@ -269,12 +269,12 @@ const sig = Deno.signal(Deno.Signal.SIGINT);
   }
 })();
 
-const value: string = await Input.prompt({
-  message: "Enter some value",
+const confirmed: boolean = await Toggle.prompt({
+  message: "Please confirm",
   cbreak: true,
 });
 
-console.log({ value });
+console.log({ confirmed });
 
 sig.dispose();
 ```
