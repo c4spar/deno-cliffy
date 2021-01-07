@@ -295,6 +295,7 @@ An prompt object has following options and all type specific options. See the li
 | ----- | :---: | :---: | ----------- |
 | name | `string` | Yes | The response will be saved under this key/property in the returned response object. |
 | type | `string` | Yes | Defines the type of prompt to display. See the list of [prompt types](#-types) for valid values. |
+| cbreak | `boolean` | No | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-singals)). **This is an unstable feature and requires Deno => 1.6!** |
 | before | `(result, next) => Promise<void>` | No | `next()`execute's the next prompt in the list (for the before callback it's the current prompt). To change the index to a specific prompt you can pass the name or index of the prompt to the `next()` method. To skip this prompt you can pass `true` to the `next()` method. If `next()` isn't called all other prompts will be skipped. |
 | after | `(result, next) => Promise<void>` | No | Same as `before` but will be executed *after* the prompt. |
 

@@ -45,6 +45,7 @@ type PromptResult<
 };
 
 interface PromptListOptions<R, N extends keyof R = keyof R> {
+  cbreak?: boolean;
   before?: (
     name: N,
     opts: R,
@@ -2124,7 +2125,10 @@ class PromptList {
     }
 
     try {
-      this.result[this.prompt.name] = await prompt.prompt(this.prompt);
+      this.result[this.prompt.name] = await prompt.prompt({
+        cbreak: this.options?.cbreak,
+        ...this.prompt,
+      });
     } finally {
       tty.cursorShow();
     }
