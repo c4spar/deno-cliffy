@@ -23,6 +23,7 @@ export interface GenericPromptOptions<T, V> {
   pointer?: string;
   indent?: string;
   keys?: GenericPromptKeys;
+  cbreak?: boolean;
 }
 
 /** Generic prompt settings. */
@@ -225,7 +226,6 @@ export abstract class GenericPrompt<
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      // @TODO: implement cbreak option
       case event.name === "c" && event.ctrl:
         this.tty.cursorShow();
         Deno.exit(0);
@@ -270,7 +270,12 @@ export abstract class GenericPrompt<
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
 
-    Deno.setRaw(Deno.stdin.rid, true);
+    // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
+    (Deno.setRaw as setRaw)(
+      Deno.stdin.rid,
+      true,
+      { cbreak: !!this.settings.cbreak },
+    );
     const nread: number | null = await Deno.stdin.read(buffer);
     Deno.setRaw(Deno.stdin.rid, false);
 
@@ -347,3 +352,9 @@ export abstract class GenericPrompt<
     );
   }
 }
+
+type setRaw = (
+  rid: number,
+  mode: boolean,
+  options?: { cbreak?: boolean },
+) => void;

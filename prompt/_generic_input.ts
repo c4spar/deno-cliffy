@@ -89,7 +89,6 @@ export abstract class GenericInput<
    */
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
-      // @TODO: implement cbreak option
       case event.name === "c" && event.ctrl:
         this.tty.cursorShow();
         Deno.exit(0);
