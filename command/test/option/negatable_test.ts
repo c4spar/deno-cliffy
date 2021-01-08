@@ -69,6 +69,6 @@ Deno.test("negatable options should not be combinable with positive options", as
       await command().parse(["--color", "--no-color", "--no-check"]);
     },
     Error,
-    "Duplicate option: --no-color",
+    `Duplicate option "--no-color".`,
   );
 });

@@ -12,7 +12,7 @@ const result = parseFlags(Deno.args, {
       case "float":
         if (isNaN(Number(value))) {
           throw new Error(
-            `${label} ${name} must be of type ${type} but got: ${value}`,
+            `${label} "${name}" must be of type "${type}", but got "${value}".`,
           );
         }
         return parseFloat(value);

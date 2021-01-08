@@ -72,7 +72,7 @@ Deno.test("flags optionVariadic booleanInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-b", "1", "0", "true", "false", "2"], options),
     Error,
-    "Option --boolean must be of type boolean but got: 2",
+    `Option "--boolean" must be of type "boolean", but got "2".`,
   );
 });
 
@@ -106,7 +106,7 @@ Deno.test("flags optionVariadic numberInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-n", "1", "0", "654", "abc", "1,2"], options),
     Error,
-    "Option --number must be of type number but got: abc",
+    `Option "--number" must be of type "number", but got "abc".`,
   );
 });
 
@@ -135,7 +135,7 @@ Deno.test("flags optionVariadic exactInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-e", "abc", "def", "ghi", "1"], options),
     Error,
-    "Option --variadic-option must be of type number but got: abc",
+    `Option "--variadic-option" must be of type "number", but got "abc".`,
   );
 });
 
@@ -143,7 +143,7 @@ Deno.test("flags optionVariadic exactMissingValue", () => {
   assertThrows(
     () => parseFlags(["-e", "1"], options),
     Error,
-    "Missing value for option: --variadic-option",
+    `Missing value for option "--variadic-option".`,
   );
 });
 

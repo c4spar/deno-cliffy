@@ -69,7 +69,7 @@ export class ArgumentsParser {
 
       if (!details.optionalValue && hasOptional) {
         throw new Error(
-          "An required argument can not follow an optional argument.",
+          `An required argument can not follow an optional argument but "${details.name}" is defined as required.`,
         );
       }
 

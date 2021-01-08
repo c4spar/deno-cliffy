@@ -1,4 +1,10 @@
-import { paramCaseToCamelCase } from "./_utils.ts";
+import {
+  didYouMeanOption,
+  didYouMeanType,
+  getFlag,
+  getOption,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import { normalize } from "./normalize.ts";
 import type {
   IFlagArgument,
@@ -65,12 +71,20 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   opts.flags.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new Error(`Unknown required option: ${flag}`);
+        throw new Error(
+          `Unknown required option "${flag}".${
+            didYouMeanOption(flag, opts.flags ?? [])
+          }`,
+        );
       }
     });
     opt.conflicts?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new Error(`Unknown conflicting option: ${flag}`);
+        throw new Error(
+          `Unknown conflicting option "${flag}".${
+            didYouMeanOption(flag, opts.flags ?? [])
+          }`,
+        );
       }
     });
   });
@@ -96,7 +110,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
     if (isFlag && !stopEarly) {
       if (current[2] === "-" || (current[1] === "-" && current.length === 3)) {
-        throw new Error(`Invalid flag name: ${current}`);
+        throw new Error(
+          `Unknown option "${current}".${
+            didYouMeanOption(current, opts.flags)
+          }`,
+        );
       }
 
       negate = current.startsWith("--no-");
@@ -109,7 +127,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       if (!option) {
         if (opts.flags.length) {
-          throw new Error(`Unknown option: ${current}`);
+          throw new Error(
+            `Unknown option "${current}".${
+              didYouMeanOption(current, opts.flags)
+            }`,
+          );
         }
 
         option = {
@@ -120,14 +142,14 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       }
 
       if (!option.name) {
-        throw new Error(`Missing name for option: ${current}`);
+        throw new Error(`Missing name for option "${current}".`);
       }
 
       const positiveName: string = option.name.replace(/^no-?/, "");
       const propName: string = paramCaseToCamelCase(positiveName);
 
       if (typeof flags[propName] !== "undefined" && !option.collect) {
-        throw new Error(`Duplicate option: ${current}`);
+        throw new Error(`Duplicate option "${current}".`);
       }
 
       args = option.args?.length ? option.args : [{
@@ -151,7 +173,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             ? option.default()
             : option.default;
         } else if (args[argIndex].requiredValue) {
-          throw new Error(`Missing value for option: --${option.name}`);
+          throw new Error(`Missing value for option "--${option.name}".`);
         } else {
           flags[propName] = true;
         }
@@ -173,7 +195,12 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         const arg: IFlagArgument = args[argIndex];
 
         if (!arg) {
-          throw new Error("Unknown option: " + next());
+          const flag = next();
+          throw new Error(
+            `Unknown option "${flag}".${
+              didYouMeanOption(flag, opts.flags ?? [])
+            }`,
+          );
         }
 
         if (!arg.type) {
@@ -204,7 +231,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         if (arg.requiredValue) {
           if (inOptionalArg) {
             throw new Error(
-              `An required argument can not follow an optional argument but found in: ${option.name}`,
+              `An required argument can not follow an optional argument but "${option.name}"  is defined as required.`,
             );
           }
         } else {
@@ -226,8 +253,9 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
               const value = parseValue(option, arg, nextValue);
               if (typeof value === "undefined") {
                 throw new Error(
-                  `List item of option --${option
-                    ?.name} must be of type ${arg.type} but got: ${nextValue}`,
+                  `List item of option "${
+                    getFlag(option?.name)
+                  }" must be of type "${arg.type}", but got "${nextValue}".`,
                 );
               }
               return value;
@@ -250,7 +278,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             argIndex++;
           } else if (args[argIndex + 1]) {
             throw new Error(
-              "An argument cannot follow an variadic argument: " + next(),
+              `An argument cannot follow an variadic argument but found "${next()}".`,
             );
           }
         }
@@ -363,7 +391,9 @@ function parseFlagValue(
   const parseType = Types[type];
 
   if (!parseType) {
-    throw new Error(`Unknown type ${type}`);
+    throw new Error(
+      `Unknown type "${type}".${didYouMeanType(type, Object.keys(Types))}`,
+    );
   }
 
   return parseType({
@@ -372,38 +402,4 @@ function parseFlagValue(
     name: `--${option.name}`,
     value,
   });
-}
-
-/**
- * Find option by flag, name or alias.
- *
- * @param flags Source option's array.
- * @param name  Name of the option.
- */
-export function getOption(
-  flags: IFlagOptions[],
-  name: string,
-): IFlagOptions | undefined {
-  while (name[0] === "-") {
-    name = name.slice(1);
-  }
-
-  for (const flag of flags) {
-    if (isOption(flag, name)) {
-      return flag;
-    }
-  }
-
-  return;
-}
-
-/**
- * Check if option has name or alias.
- *
- * @param option    The option to check.
- * @param name      The option name or alias.
- */
-export function isOption(option: IFlagOptions, name: string) {
-  return option.name === name ||
-    (option.aliases && option.aliases.indexOf(name) !== -1);
 }

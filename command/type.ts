@@ -10,7 +10,7 @@ import type { ITypeInfo } from "./types.ts";
  *   public parse({ label, name, value, type }: ITypeInfo): string {
  *     if (["red", "blue"].includes(value)) {
  *       trow new Error(
- *         `${label} ${name} must be of type ${type} but got: ${value}.` +
+ *         `${label} "${name}" must be of type "${type}", but got "${value}".` +
  *         "Valid colors are: red, blue"
  *       );
  *     }

@@ -12,5 +12,7 @@ export const boolean: ITypeHandler<boolean> = (
     return false;
   }
 
-  throw new Error(`${label} ${name} must be of type ${type} but got: ${value}`);
+  throw new Error(
+    `${label} "${name}" must be of type "${type}", but got "${value}".`,
+  );
 };

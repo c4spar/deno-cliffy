@@ -83,6 +83,6 @@ Deno.test("flags stopEarly unknown option", async () => {
       ]);
     },
     Error,
-    "Unknown option: -t",
+    `Unknown option "-t". Did you mean option "-h"?`,
   );
 });

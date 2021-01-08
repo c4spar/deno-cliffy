@@ -20,7 +20,7 @@ Deno.test("command optionStandalone flagCombine", async () => {
       await cmd.parse(["-f", "-a"]);
     },
     Error,
-    "Option --flag cannot be combined with other options",
+    `Option "--flag" cannot be combined with other options.`,
   );
 });
 
@@ -30,6 +30,6 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["--flag", "--all"]);
     },
     Error,
-    "Option --flag cannot be combined with other options",
+    `Option "--flag" cannot be combined with other options.`,
   );
 });

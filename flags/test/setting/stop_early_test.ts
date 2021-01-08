@@ -114,6 +114,6 @@ Deno.test("flags stopEarly unknown option", () => {
         }],
       }),
     Error,
-    "Unknown option: -t",
+    `Unknown option "-t".`,
   );
 });

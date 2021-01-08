@@ -35,7 +35,7 @@ Deno.test("flags optionStandalone flagCombine", () => {
   assertThrows(
     () => parseFlags(["-f", "-a"], options),
     Error,
-    "Option --flag cannot be combined with other options.",
+    `Option "--flag" cannot be combined with other options.`,
   );
 });
 
@@ -43,6 +43,6 @@ Deno.test("flags optionStandalone flagCombineLong", () => {
   assertThrows(
     () => parseFlags(["--flag", "--all"], options),
     Error,
-    "Option --flag cannot be combined with other options.",
+    `Option "--flag" cannot be combined with other options.`,
   );
 });

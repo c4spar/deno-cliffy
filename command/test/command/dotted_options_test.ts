@@ -55,7 +55,7 @@ Deno.test("command: dotted aliases", () => {
   assertThrowsAsync(
     () => cmd().parse(["--audio-bitrate", "300"]),
     Error,
-    "Option --bitrate.audio depends on option: --bitrate.video",
+    `Option "--bitrate.audio" depends on option "--bitrate.video".`,
   );
 });
 
@@ -63,6 +63,6 @@ Deno.test("command: dotted option with invalid value", () => {
   assertThrowsAsync(
     () => cmd().parse(["--bitrate.audio", "300", "--bitrate.video", "900k"]),
     Error,
-    "Option --bitrate.video must be of type number but got: 900k",
+    `Option "--bitrate.video" must be of type "number", but got "900k".`,
   );
 });

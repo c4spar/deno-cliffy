@@ -69,6 +69,6 @@ Deno.test("flags optionConflicts videoTypeDependsOnImageType", () => {
   assertThrows(
     () => parseFlags(["-v", "value", "-a", "value"], options),
     Error,
-    "Option --video-type depends on option: --image-type",
+    `Option "--video-type" depends on option "--image-type".`,
   );
 });

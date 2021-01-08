@@ -210,7 +210,7 @@ parseFlags(Deno.args, {
       case "float":
         if (isNaN(Number(value))) {
           throw new Error(
-            `${label} ${name} must be of type ${type} but got: ${value}`,
+            `${label} "${name}" must be of type "${type}", but got "${value}".`,
           );
         }
         return parseFloat(value);
@@ -228,7 +228,7 @@ $ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts --foo abc
-error: Uncaught Error: Option --foo must be of type float but got: abc
+error: Uncaught Error: Option "--foo" must be of type "float", but got "abc".
 ```
 
 ## ❯ Contributing

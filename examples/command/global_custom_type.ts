@@ -7,7 +7,9 @@ const emailRegex =
 
 function emailType({ label, name, value }: ITypeInfo): string {
   if (!emailRegex.test(value.toLowerCase())) {
-    throw new Error(`${label} ${name} must be a valid email but got: ${value}`);
+    throw new Error(
+      `${label} "${name}" must be a valid "email", but got "${value}".`,
+    );
   }
 
   return value;

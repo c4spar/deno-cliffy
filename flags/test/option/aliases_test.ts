@@ -50,7 +50,7 @@ Deno.test("flags optionAliases InvalidValue f", () => {
   assertThrows(
     () => parseFlags(["-f", "value"], options),
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -58,7 +58,7 @@ Deno.test("flags optionAliases InvalidValue fl", () => {
   assertThrows(
     () => parseFlags(["--fl", "value"], options),
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -66,7 +66,7 @@ Deno.test("flags optionAliases InvalidValue flag", () => {
   assertThrows(
     () => parseFlags(["--flag", "value"], options),
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -74,6 +74,6 @@ Deno.test("flags optionAliases InvalidValue flags", () => {
   assertThrows(
     () => parseFlags(["--flags", "value"], options),
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });

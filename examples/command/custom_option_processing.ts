@@ -15,7 +15,7 @@ const { options } = await new Command()
     value: (value: string, previous: string[] = []): string[] => {
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
         throw new Error(
-          `Color must be one of blue, yellow or red but got: ${value}`,
+          `Option "color" must be one of "blue, yellow or red", but got "${value}".`,
         );
       }
       previous.push(value);

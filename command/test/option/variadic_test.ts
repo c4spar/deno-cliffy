@@ -37,7 +37,7 @@ Deno.test("command optionVariadic booleanInvalidValue", async () => {
       await cmd.parse(["-b", "1", "0", "true", "false", "2"]);
     },
     Error,
-    "Option --boolean must be of type boolean but got: 2",
+    `Option "--boolean" must be of type "boolean", but got "2".`,
   );
 });
 
@@ -65,7 +65,7 @@ Deno.test("command optionVariadic numberInvalidValue", async () => {
       await cmd.parse(["-n", "1", "0", "654", "abc", "1,2"]);
     },
     Error,
-    "Option --number must be of type number but got: abc",
+    `Option "--number" must be of type "number", but got "abc".`,
   );
 });
 
@@ -84,7 +84,7 @@ Deno.test("command optionVariadic exactInvalidValue", async () => {
       await cmd.parse(["-v", "abc", "abc", "1"]);
     },
     Error,
-    "Option --variadic-option must be of type number but got: abc",
+    `Option "--variadic-option" must be of type "number", but got "abc".`,
   );
 });
 
@@ -94,7 +94,7 @@ Deno.test("command optionVariadic exactMissingValue", async () => {
       await cmd.parse(["-v", "1"]);
     },
     Error,
-    "Missing value for option: --variadic-option",
+    `Missing value for option "--variadic-option".`,
   );
 });
 

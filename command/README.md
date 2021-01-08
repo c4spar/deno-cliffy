@@ -184,7 +184,7 @@ console.log(options);
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -p
-Error: Missing value for option: --pizza-type
+Error: Missing value for option "--pizza-type".
 
 $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -sp vegetarian --amount 3
 { small: true, pizzaType: "vegetarian", amount: 3 }
@@ -472,7 +472,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/depending_options.ts -a a
 { audioCodec: "aac" }
 
 $ deno run https://deno.land/x/cliffy/examples/command/depending_options.ts -v x265
-Option --video-codec depends on option: --audio-codec
+Error: Option "--video-codec" depends on option "--audio-codec".
 
 $ deno run https://deno.land/x/cliffy/examples/command/depending_options.ts -a aac -v x265
 { audioCodec: "aac", videoCodec: "x265" }
@@ -521,7 +521,7 @@ const { options } = await new Command()
     value: (value: string, previous: string[] = []): string[] => {
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
         throw new Error(
-          `Color must be one of blue, yellow or red but got: ${value}`,
+          `Color must be one of "blue, yellow or red", but got "${value}".`,
         );
       }
       previous.push(value);
@@ -837,7 +837,7 @@ try {
 
 ```textile
 $ deno run https://deno.land/x/cliffy/examples/command/override_exit_handling.ts -t
-[CUSTOM_ERROR] Error: Unknown option: -t
+[CUSTOM_ERROR] Error: Unknown option "-t".
 ```
 
 ## ❯ Custom types
@@ -857,7 +857,7 @@ const emailRegex =
 
 function emailType({ label, name, value }: ITypeInfo): string {
   if (!emailRegex.test(value.toLowerCase())) {
-    throw new Error(`${label} ${name} must be a valid email but got: ${value}`);
+    throw new Error(`${label} "${name}" must be a valid "email", but got "${value}".`);
   }
 
   return value;
@@ -878,7 +878,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type.ts -e 
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type.ts -e "my @email.com"
-Option --email must be a valid email but got: my @email.com
+Error: Option "--email" must be a valid "email", but got "my @email.com".
 ```
 
 ### Class types
@@ -896,7 +896,7 @@ class EmailType extends Type<string> {
   public parse({ label, name, value }: ITypeInfo): string {
     if (!this.emailRegex.test(value.toLowerCase())) {
       throw new Error(
-        `${label} ${name} must be a valid email but got: ${value}`,
+        `${label} "${name}" must be a valid "email", but got "${value}".`,
       );
     }
 
@@ -919,7 +919,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type_class.
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type_class.ts -e "my @email.de"
-Option --email must be a valid email but got: my @email.de
+Error: Option "--email" must be a valid "email", but got "my @email.de".
 ```
 
 ### Global types
@@ -976,7 +976,7 @@ $ SOME_ENV_VAR=1 deno run --allow-env --unstable https://deno.land/x/cliffy/exam
 1
 
 $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment_variables.ts
-Error: Environment variable SOME_ENV_VAR must be of type number but got: abc
+Error: Environment variable "SOME_ENV_VAR" must be of type "number", but got "abc".
 ```
 
 ## ❯ Add examples
