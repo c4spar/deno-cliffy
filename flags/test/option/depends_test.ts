@@ -49,7 +49,7 @@ Deno.test("flags optionDepends videoType", () => {
   assertThrows(
     () => parseFlags(["-v", "value"], options),
     Error,
-    "Option --video-type depends on option: --audio-type",
+    `Option "--video-type" depends on option "--audio-type".`,
   );
 });
 
@@ -57,7 +57,7 @@ Deno.test("flags optionDepends audioType", () => {
   assertThrows(
     () => parseFlags(["-a", "value"], options),
     Error,
-    "Option --audio-type depends on option: --video-type",
+    `Option "--audio-type" depends on option "--video-type".`,
   );
 });
 
@@ -65,7 +65,7 @@ Deno.test("flags optionDepends imageType", () => {
   assertThrows(
     () => parseFlags(["-i", "value"], options),
     Error,
-    "Option --image-type depends on option: --video-type",
+    `Option "--image-type" depends on option "--video-type".`,
   );
 });
 
@@ -73,7 +73,7 @@ Deno.test("flags optionDepends videoAudio", () => {
   assertThrows(
     () => parseFlags(["-v", "value", "-a", "value"], options),
     Error,
-    "Option --video-type depends on option: --image-type",
+    `Option "--video-type" depends on option "--image-type".`,
   );
 });
 
@@ -81,7 +81,7 @@ Deno.test("flags optionDepends audioVideo", () => {
   assertThrows(
     () => parseFlags(["-a", "value", "-v", "value"], options),
     Error,
-    "Option --audio-type depends on option: --image-type",
+    `Option "--audio-type" depends on option "--image-type".`,
   );
 });
 
@@ -89,7 +89,7 @@ Deno.test("flags optionDepends imageVideo", () => {
   assertThrows(
     () => parseFlags(["-i", "value", "-v", "value"], options),
     Error,
-    "Option --image-type depends on option: --audio-type",
+    `Option "--image-type" depends on option "--audio-type".`,
   );
 });
 
@@ -138,7 +138,7 @@ Deno.test("flags depends: should not accept --flag2", () => {
   assertThrows(
     () => parseFlags(["--flag2"], options2),
     Error,
-    "Option --flag2 depends on option: --flag1",
+    `Option "--flag2" depends on option "--flag1".`,
   );
 });
 

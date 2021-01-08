@@ -1,4 +1,4 @@
-import { Command } from "../command.ts";
+import { Command, didYouMeanCommand } from "../command.ts";
 import type { ICompletion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
@@ -20,8 +20,8 @@ export class CompleteCommand extends Command {
               const childCmd: Command | undefined = cmd.getCommand(name, false);
               if (!childCmd) {
                 throw new Error(
-                  `Auto-completion failed. Command not found: ${
-                    commandNames.join(" ")
+                  `Auto-completion failed. Unknown command "${name}".${
+                    didYouMeanCommand(name, cmd.getCommands())
                   }`,
                 );
               }

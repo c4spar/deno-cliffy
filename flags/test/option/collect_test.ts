@@ -35,7 +35,7 @@ Deno.test("flags optionCollect flag", () => {
   assertThrows(
     () => parseFlags(["-f", "-f"], options),
     Error,
-    "Duplicate option: -f",
+    `Duplicate option "-f".`,
   );
 });
 
@@ -43,7 +43,7 @@ Deno.test("flags optionCollect flagLong", () => {
   assertThrows(
     () => parseFlags(["-f", "--flag"], options),
     Error,
-    "Duplicate option: --flag",
+    `Duplicate option "--flag".`,
   );
 });
 
@@ -51,7 +51,7 @@ Deno.test("flags optionCollect flagTrueLongFalse", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--flag", "false"], options),
     Error,
-    "Duplicate option: --flag",
+    `Duplicate option "--flag".`,
   );
 });
 
@@ -59,7 +59,7 @@ Deno.test("flags optionCollect flagTrueNoFlag", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--no-flag"], options),
     Error,
-    "Duplicate option: --no-flag",
+    `Duplicate option "--no-flag".`,
   );
 });
 

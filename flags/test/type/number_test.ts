@@ -58,7 +58,7 @@ Deno.test("flags typeNumber flagMissing", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredValueOptions),
     Error,
-    "Missing value for option: --flag",
+    `Missing value for option "--flag".`,
   );
 });
 
@@ -66,6 +66,6 @@ Deno.test("flags typeNumber flagInvalidType", () => {
   assertThrows(
     () => parseFlags(["-f", "abc"], requiredValueOptions),
     Error,
-    "Option --flag must be of type number but got: abc",
+    `Option "--flag" must be of type "number", but got "abc".`,
   );
 });

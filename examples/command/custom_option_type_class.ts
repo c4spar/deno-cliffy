@@ -9,7 +9,7 @@ class EmailType extends Type<string> {
   public parse({ label, name, value }: ITypeInfo): string {
     if (!this.emailRegex.test(value.toLowerCase())) {
       throw new Error(
-        `${label} ${name} must be a valid email but got: ${value}`,
+        `${label} "${name}" must be a valid "email", but got "${value}".`,
       );
     }
 

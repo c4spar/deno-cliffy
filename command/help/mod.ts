@@ -1,4 +1,4 @@
-import { Command } from "../command.ts";
+import { Command, didYouMeanCommand } from "../command.ts";
 import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
@@ -15,8 +15,16 @@ export class HelpCommand extends Command {
             : this.getGlobalParent();
         }
         if (!cmd) {
+          const cmds = this.getGlobalParent()?.getCommands();
           throw new Error(
-            `Failed to generate help for command '${name}'. Command not found.`,
+            `Unknown command "${name}".${
+              name && cmds
+                ? didYouMeanCommand(name, cmds, [
+                  this.getName(),
+                  ...this.getAliases(),
+                ])
+                : ""
+            }`,
           );
         }
         cmd.help();

@@ -45,7 +45,7 @@ Deno.test("command optionRequire videoType", async () => {
       await cmd.parse(["-v", "value"]);
     },
     Error,
-    "Option --video-type depends on option: --audio-type",
+    `Option "--video-type" depends on option "--audio-type".`,
   );
 });
 
@@ -55,7 +55,7 @@ Deno.test("command optionRequire audioType", async () => {
       await cmd.parse(["-a", "value"]);
     },
     Error,
-    "Option --audio-type depends on option: --video-type",
+    `Option "--audio-type" depends on option "--video-type".`,
   );
 });
 
@@ -65,7 +65,7 @@ Deno.test("command optionRequire imageType", async () => {
       await cmd.parse(["-i", "value"]);
     },
     Error,
-    "Option --image-type depends on option: --video-type",
+    `Option "--image-type" depends on option "--video-type".`,
   );
 });
 
@@ -75,7 +75,7 @@ Deno.test("command optionRequire videoAudio", async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);
     },
     Error,
-    "Option --video-type depends on option: --image-type",
+    `Option "--video-type" depends on option "--image-type".`,
   );
 });
 
@@ -85,7 +85,7 @@ Deno.test("command optionRequire audioVideo", async () => {
       await cmd.parse(["-a", "value", "-v", "value"]);
     },
     Error,
-    "Option --audio-type depends on option: --image-type",
+    `Option "--audio-type" depends on option "--image-type".`,
   );
 });
 
@@ -95,6 +95,6 @@ Deno.test("command optionRequire imageVideo", async () => {
       await cmd.parse(["-i", "value", "-v", "value"]);
     },
     Error,
-    "Option --image-type depends on option: --audio-type",
+    `Option "--image-type" depends on option "--audio-type".`,
   );
 });

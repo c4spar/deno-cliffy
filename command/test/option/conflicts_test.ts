@@ -60,6 +60,6 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);
     },
     Error,
-    "Option --video-type depends on option: --image-type",
+    `Option "--video-type" depends on option "--image-type".`,
   );
 });

@@ -40,7 +40,7 @@ Deno.test("command optionAliases fInvalidValie", async () => {
       await cmd.parse(["-f", "value"]);
     },
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -50,7 +50,7 @@ Deno.test("command optionAliases flInvalidValue", async () => {
       await cmd.parse(["--fl", "value"]);
     },
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -60,7 +60,7 @@ Deno.test("command optionAliases flagInvalidValue", async () => {
       await cmd.parse(["--flag", "value"]);
     },
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });
 
@@ -70,6 +70,6 @@ Deno.test("command optionAliases flagsInvalidValue", async () => {
       await cmd.parse(["--flags", "value"]);
     },
     Error,
-    "Option --flag must be of type boolean but got: value",
+    `Option "--flag" must be of type "boolean", but got "value".`,
   );
 });

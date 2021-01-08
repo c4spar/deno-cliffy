@@ -27,6 +27,6 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["-f", "value", "unknown"]);
     },
     Error,
-    "No arguments allowed for command: COMMAND",
+    `No arguments allowed for command "COMMAND".`,
   );
 });

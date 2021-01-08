@@ -9,7 +9,7 @@ const email = (): ITypeHandler<string> => {
   return ({ label, value, name }: ITypeInfo): string => {
     if (!emailRegex.test(value.toLowerCase())) {
       throw new Error(
-        `${label} ${name} must be a valid email but got: ${value}`,
+        `${label} "${name}" must be a valid "email", but got "${value}".`,
       );
     }
 
@@ -56,7 +56,7 @@ Deno.test("sub command none global custom type", async () => {
       await cmd.parse(["init", "-e", "my@email.com"]);
     },
     Error,
-    "No type registered with name: email",
+    `Unknown type "email". Did you mean type "email2"?`,
   );
 });
 
@@ -66,6 +66,6 @@ Deno.test("sub command with global custom type and invalid value", async () => {
       await cmd.parse(["init", "-E", "my @email.com"]);
     },
     Error,
-    "Option --email2 must be a valid email but got: my @email.com",
+    `Option "--email2" must be a valid "email", but got "my @email.com".`,
   );
 });

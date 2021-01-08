@@ -1,4 +1,9 @@
-import { didYouMeanOption, getOption, paramCaseToCamelCase } from "./_utils.ts";
+import {
+  didYouMeanOption,
+  getFlag,
+  getOption,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
@@ -80,7 +85,7 @@ export function validateFlags(
   for (const { name, option } of options) {
     if (!option) {
       throw new Error(
-        `Unknown option: --${name}. ${didYouMeanOption(name, flags)}`,
+        `Unknown option "${getFlag(name)}".${didYouMeanOption(name, flags)}`,
       );
     }
 
@@ -97,7 +102,9 @@ export function validateFlags(
         }
 
         throw new Error(
-          `Option --${option.name} cannot be combined with other options.`,
+          `Option "${
+            getFlag(option.name)
+          }" cannot be combined with other options.`,
         );
       }
       return;
@@ -106,7 +113,9 @@ export function validateFlags(
     option.conflicts?.forEach((flag: string) => {
       if (isset(flag, values)) {
         throw new Error(
-          `Option --${option.name} conflicts with option: --${flag}`,
+          `Option "${getFlag(option.name)}" conflicts with option "${
+            getFlag(flag)
+          }".`,
         );
       }
     });
@@ -114,7 +123,11 @@ export function validateFlags(
     option.depends?.forEach((flag: string) => {
       // don't throw an error if the value is coming from the default option.
       if (!isset(flag, values) && !defaultValues[option.name]) {
-        throw new Error(`Option --${option.name} depends on option: --${flag}`);
+        throw new Error(
+          `Option "${getFlag(option.name)}" depends on option "${
+            getFlag(flag)
+          }".`,
+        );
       }
     });
 
@@ -129,7 +142,7 @@ export function validateFlags(
             typeof (values[name] as Array<unknown>)[i] === "undefined")
         )
       ) {
-        throw new Error(`Missing value for option: --${option.name}`);
+        throw new Error(`Missing value for option "${getFlag(option.name)}".`);
       }
     });
   }

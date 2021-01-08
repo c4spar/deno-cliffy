@@ -58,6 +58,6 @@ Deno.test("flags typeString flagMissing", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredValueOptions),
     Error,
-    "Missing value for option: --flag",
+    `Missing value for option "--flag".`,
   );
 });

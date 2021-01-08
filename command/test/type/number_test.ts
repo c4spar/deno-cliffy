@@ -27,7 +27,7 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["-f", "123", "unknown"]);
     },
     Error,
-    "No arguments allowed for command: COMMAND",
+    `No arguments allowed for command "COMMAND".`,
   );
 });
 
@@ -37,6 +37,6 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["-f", "abc"]);
     },
     Error,
-    "Option --flag must be of type number but got: abc",
+    `Option "--flag" must be of type "number", but got "abc".`,
   );
 });

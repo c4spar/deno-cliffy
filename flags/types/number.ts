@@ -6,7 +6,7 @@ export const number: ITypeHandler<number> = (
 ): number => {
   if (isNaN(Number(value))) {
     throw new Error(
-      `${label} ${name} must be of type ${type} but got: ${value}`,
+      `${label} "${name}" must be of type "${type}", but got "${value}".`,
     );
   }
 

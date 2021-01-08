@@ -54,7 +54,7 @@ Deno.test("flags: dotted aliases", () => {
   assertThrows(
     () => parseFlags(["--audio-bitrate", "300"], options),
     Error,
-    "Option --bitrate.audio depends on option: --bitrate.video",
+    `Option "--bitrate.audio" depends on option "--bitrate.video".`,
   );
 });
 
@@ -66,6 +66,6 @@ Deno.test("flags: dotted option with invalid value", () => {
         options,
       ),
     Error,
-    "Option --bitrate.video must be of type number but got: 900k",
+    `Option "--bitrate.video" must be of type "number", but got "900k".`,
   );
 });

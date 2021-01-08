@@ -28,7 +28,7 @@ Deno.test("command: types - no value short flag invalid arg", async () => {
       await cmd.parse(["-f", "true"]);
     },
     Error,
-    "Unknown command: true",
+    `Unknown command "true". Did you mean command "help"?`,
   );
 });
 
@@ -38,6 +38,6 @@ Deno.test("command: types - no value long flag invalid arg", async () => {
       await cmd.parse(["--flag", "true"]);
     },
     Error,
-    "Unknown command: true",
+    `Unknown command "true". Did you mean command "help"?`,
   );
 });

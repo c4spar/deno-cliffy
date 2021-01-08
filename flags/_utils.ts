@@ -31,7 +31,10 @@ export function getOption(
   return;
 }
 
-export function didYouMeanOption(option: string, options: Array<IFlagOptions>) {
+export function didYouMeanOption(
+  option: string,
+  options: Array<IFlagOptions>,
+): string {
   const optionNames = options
     .map((option) => [option.name, ...(option.aliases ?? [])])
     .reduce(
@@ -45,7 +48,7 @@ export function didYouMeanOption(option: string, options: Array<IFlagOptions>) {
   return didYouMean(" Did you mean option", getFlag(option), optionNames);
 }
 
-export function didYouMeanType(type: string, types: Array<string>) {
+export function didYouMeanType(type: string, types: Array<string>): string {
   return didYouMean(" Did you mean type", type, types);
 }
 
@@ -53,9 +56,9 @@ export function didYouMean(
   message: string,
   type: string,
   types: Array<string>,
-) {
+): string {
   const match: string | undefined = closest(type, types);
-  return match ? `${message} ${match}?` : match;
+  return match ? `${message} "${match}"?` : "";
 }
 
 export function getFlag(name: string) {

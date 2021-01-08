@@ -43,7 +43,7 @@ Deno.test("duplicate option with negatable flags", () => {
   assertThrows(
     () => parseFlags(["--color", "--no-color", "--no-check"], options),
     Error,
-    "Duplicate option: --no-color",
+    `Duplicate option "--no-color".`,
   );
 });
 
@@ -51,6 +51,6 @@ Deno.test("unknown negatable flag", () => {
   assertThrows(
     () => parseFlags(["--no-remote"], options),
     Error,
-    "Unknown option: --no-remote",
+    `Unknown option "--no-remote".`,
   );
 });

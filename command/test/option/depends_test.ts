@@ -50,6 +50,6 @@ Deno.test("command depends option with default value: should not accept --flag2 
       await command().parse(["--flag2", "test"]);
     },
     Error,
-    "Option --flag2 depends on option: --flag1",
+    `Option "--flag2" depends on option "--flag1".`,
   );
 });

@@ -91,7 +91,7 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["-f", "true", "unknown"]);
     },
     Error,
-    "No arguments allowed for command: test-command",
+    `No arguments allowed for command "test-command".`,
   );
 });
 
@@ -101,6 +101,6 @@ Deno.test("command optionStandalone flagCombineLong", async () => {
       await cmd.parse(["-f", "unknown"]);
     },
     Error,
-    "Option --flag must be of type boolean but got: unknown",
+    `Option "--flag" must be of type "boolean", but got "unknown".`,
   );
 });

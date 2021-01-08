@@ -1,3 +1,4 @@
+import { didYouMean, didYouMeanType } from "../flags/_utils.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
 import { existsSync, red } from "./deps.ts";
@@ -221,7 +222,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
     if (this.getBaseCommand(name, true)) {
       if (!override) {
-        throw this.error(new Error(`Duplicate command: ${name}`));
+        throw this.error(new Error(`Duplicate command "${name}".`));
       }
       this.removeCommand(name);
     }
@@ -284,12 +285,12 @@ export class Command<O = any, A extends Array<any> = any> {
   public alias(alias: string): this {
     if (this.cmd === this) {
       throw this.error(
-        new Error(`Failed to add alias '${alias}'. No sub command selected.`),
+        new Error(`Failed to add alias "${alias}". No sub command selected.`),
       );
     }
 
     if (this.cmd.aliases.indexOf(alias) !== -1) {
-      throw this.error(new Error(`Duplicate alias: ${alias}`));
+      throw this.error(new Error(`Duplicate alias "${alias}".`));
     }
 
     this.cmd.aliases.push(alias);
@@ -310,7 +311,13 @@ export class Command<O = any, A extends Array<any> = any> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw this.error(new Error(`Sub-command not found: ${name}`));
+      throw this.error(
+        new Error(
+          `Unknown sub-command "${name}".${
+            didYouMeanCommand(name, this.getBaseCommands(true))
+          }`,
+        ),
+      );
     }
 
     this.cmd = cmd;
@@ -446,7 +453,7 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ITypeOptions,
   ): this {
     if (this.cmd.types.get(name) && !options?.override) {
-      throw this.error(new Error(`Type '${name}' already exists.`));
+      throw this.error(new Error(`Type with name "${name}" already exists.`));
     }
 
     this.cmd.types.set(name, { ...options, name, handler });
@@ -475,7 +482,9 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
-      throw this.error(new Error(`Completion '${name}' already exists.`));
+      throw this.error(
+        new Error(`Completion with name "${name}" already exists.`),
+      );
     }
 
     this.cmd.completions.set(name, {
@@ -549,7 +558,9 @@ export class Command<O = any, A extends Array<any> = any> {
       if (
         option.name === name || option.aliases && ~option.aliases.indexOf(name)
       ) {
-        throw this.error(new Error(`Duplicate command name: ${name}`));
+        throw this.error(
+          new Error(`Command with name "${name}" already exists.`),
+        );
       }
 
       if (!option.name && isLong) {
@@ -564,7 +575,9 @@ export class Command<O = any, A extends Array<any> = any> {
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw this.error(new Error(`Duplicate option name: ${name}`));
+          throw this.error(
+            new Error(`Option with name "${name}" already exists.`),
+          );
         }
       }
     }
@@ -585,7 +598,9 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
-      throw this.error(new Error("Example already exists."));
+      throw this.error(
+        new Error(`Example with name "${name}" already exists.`),
+      );
     }
 
     this.cmd.examples.push({ name, description });
@@ -612,7 +627,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
     if (result.flags.some((envName) => this.cmd.getBaseEnvVar(envName, true))) {
       throw this.error(
-        new Error(`Environment variable already exists: ${name}`),
+        new Error(`Environment variable with name "${name}" already exists.`),
       );
     }
 
@@ -623,19 +638,19 @@ export class Command<O = any, A extends Array<any> = any> {
     if (details.length > 1) {
       throw this.error(
         new Error(
-          `An environment variable can only have one value but got: ${name}`,
+          `An environment variable can only have one value but "${name}" has more than one.`,
         ),
       );
     } else if (details.length && details[0].optionalValue) {
       throw this.error(
         new Error(
-          `An environment variable can not have an optional value but '${name}' is defined as optional.`,
+          `An environment variable can not have an optional value but "${name}" is defined as optional.`,
         ),
       );
     } else if (details.length && details[0].variadic) {
       throw this.error(
         new Error(
-          `An environment variable can not have an variadic value but '${name}' is defined as variadic.`,
+          `An environment variable can not have an variadic value but "${name}" is defined as variadic.`,
         ),
       );
     }
@@ -664,6 +679,8 @@ export class Command<O = any, A extends Array<any> = any> {
     args: string[] = Deno.args,
     dry?: boolean,
   ): Promise<IParseResult<O, A>> {
+    // @TODO: remove all `this.error()` calls and catch errors only in parse method!
+
     this.reset()
       .registerDefaults();
 
@@ -791,7 +808,11 @@ export class Command<O = any, A extends Array<any> = any> {
 
       if (!cmd) {
         throw this.error(
-          new Error(`Default command '${this.defaultCommand}' not found.`),
+          new Error(
+            `Default command "${this.defaultCommand}" not found.${
+              didYouMeanCommand(this.defaultCommand, this.getCommands())
+            }`,
+          ),
         );
       }
 
@@ -920,7 +941,13 @@ export class Command<O = any, A extends Array<any> = any> {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
-      throw this.error(new Error(`No type registered with name: ${type.type}`));
+      throw this.error(
+        new Error(
+          `Unknown type "${type.type}".${
+            didYouMeanType(type.type, this.getTypes().map((type) => type.name))
+          }`,
+        ),
+      );
     }
 
     return typeSettings.handler instanceof Type
@@ -967,10 +994,16 @@ export class Command<O = any, A extends Array<any> = any> {
     if (!this.hasArguments()) {
       if (args.length) {
         if (this.hasCommands(true)) {
-          throw this.error(new Error(`Unknown command: ${args.join(" ")}`));
+          throw this.error(
+            new Error(
+              `Unknown command "${args[0]}".${
+                didYouMeanCommand(args[0], this.getCommands())
+              }`,
+            ),
+          );
         } else {
           throw this.error(
-            new Error(`No arguments allowed for command: ${this.getPath()}`),
+            new Error(`No arguments allowed for command "${this.getPath()}".`),
           );
         }
       }
@@ -1754,4 +1787,15 @@ function isDebug(): boolean {
   }
   const debug: string | undefined = Deno.env.get("CLIFFY_DEBUG");
   return debug === "true" || debug === "1";
+}
+
+export function didYouMeanCommand(
+  command: string,
+  commands: Array<Command>,
+  excludes: Array<string> = [],
+): string {
+  const commandNames = commands
+    .map((command) => command.getName())
+    .filter((command) => !excludes.includes(command));
+  return didYouMean(" Did you mean command", command, commandNames);
 }
