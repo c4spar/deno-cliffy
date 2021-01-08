@@ -1,3 +1,4 @@
+import { getFlag } from "../../flags/_utils.ts";
 import { Table } from "../../table/table.ts";
 import { ArgumentsParser } from "../_arguments_parser.ts";
 import type { Command } from "../command.ts";
@@ -230,14 +231,4 @@ function inspect(value: unknown): string {
     // deno < 1.4.3 doesn't support the colors property.
     { depth: 1, colors: true, trailingComma: false } as Deno.InspectOptions,
   );
-}
-
-function getFlag(name: string) {
-  if (name.startsWith("-")) {
-    return name;
-  }
-  if (name.length > 1) {
-    return `--${name}`;
-  }
-  return `-${name}`;
 }

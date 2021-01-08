@@ -1,5 +1,9 @@
-import { paramCaseToCamelCase } from "./_utils.ts";
-import { didYouMeanOption, didYouMeanType } from "./did_you_mean.ts";
+import {
+  didYouMeanOption,
+  didYouMeanType,
+  getOption,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import { normalize } from "./normalize.ts";
 import type {
   IFlagArgument,
@@ -67,18 +71,18 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
         throw new Error(
-          `Unknown required option: ${flag}. ${
+          `Unknown required option: ${flag}.${
             didYouMeanOption(flag, opts.flags ?? [])
-          }`.trim(),
+          }`,
         );
       }
     });
     opt.conflicts?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
         throw new Error(
-          `Unknown conflicting option: ${flag}. ${
+          `Unknown conflicting option: ${flag}.${
             didYouMeanOption(flag, opts.flags ?? [])
-          }`.trim(),
+          }`,
         );
       }
     });
@@ -106,7 +110,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     if (isFlag && !stopEarly) {
       if (current[2] === "-" || (current[1] === "-" && current.length === 3)) {
         throw new Error(
-          `Invalid flag name: ${current}. ${
+          `Invalid flag name: ${current}.${
             didYouMeanOption(current, opts.flags)
           }`,
         );
@@ -123,7 +127,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       if (!option) {
         if (opts.flags.length) {
           throw new Error(
-            `Unknown option: ${current}. ${
+            `Unknown option: ${current}.${
               didYouMeanOption(current, opts.flags)
             }`,
           );
@@ -192,7 +196,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         if (!arg) {
           const flag = next();
           throw new Error(
-            `Unknown option: ${flag}. ${
+            `Unknown option: ${flag}.${
               didYouMeanOption(flag, opts.flags ?? [])
             }`,
           );
@@ -386,7 +390,7 @@ function parseFlagValue(
 
   if (!parseType) {
     throw new Error(
-      `Unknown type ${type}. ${didYouMeanType(type, Object.keys(Types))}`,
+      `Unknown type ${type}.${didYouMeanType(type, Object.keys(Types))}`,
     );
   }
 
@@ -396,38 +400,4 @@ function parseFlagValue(
     name: `--${option.name}`,
     value,
   });
-}
-
-/**
- * Find option by flag, name or alias.
- *
- * @param flags Source option's array.
- * @param name  Name of the option.
- */
-export function getOption(
-  flags: IFlagOptions[],
-  name: string,
-): IFlagOptions | undefined {
-  while (name[0] === "-") {
-    name = name.slice(1);
-  }
-
-  for (const flag of flags) {
-    if (isOption(flag, name)) {
-      return flag;
-    }
-  }
-
-  return;
-}
-
-/**
- * Check if option has name or alias.
- *
- * @param option    The option to check.
- * @param name      The option name or alias.
- */
-export function isOption(option: IFlagOptions, name: string) {
-  return option.name === name ||
-    (option.aliases && option.aliases.indexOf(name) !== -1);
 }
