@@ -1,3 +1,7 @@
+import {
+  ArgumentFollowsVariadicArgument,
+  RequiredArgumentFollowsOptionalArgument,
+} from "../flags/errors.ts";
 import { OptionType } from "../flags/types.ts";
 import { green, magenta, red, yellow } from "./deps.ts";
 import type { IArgument } from "./types.ts";
@@ -52,7 +56,7 @@ export class ArgumentsParser {
 
     for (const arg of parts) {
       if (hasVariadic) {
-        throw new Error("An argument can not follow an variadic argument.");
+        throw new ArgumentFollowsVariadicArgument(arg);
       }
 
       const parts: string[] = arg.split(this.ARGUMENT_DETAILS_REGEX);
@@ -68,9 +72,7 @@ export class ArgumentsParser {
       };
 
       if (!details.optionalValue && hasOptional) {
-        throw new Error(
-          `An required argument can not follow an optional argument but "${details.name}" is defined as required.`,
-        );
+        throw new RequiredArgumentFollowsOptionalArgument(details.name);
       }
 
       if (arg[0] === "[") {

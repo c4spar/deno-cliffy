@@ -31,7 +31,7 @@ Deno.test("command optionConflicts noArguments", async () => {
       await cmd.parse([]);
     },
     Error,
-    "Missing required option: --type",
+    `Missing required option "--type".`,
   );
 });
 

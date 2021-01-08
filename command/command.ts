@@ -1,7 +1,26 @@
-import { didYouMean, didYouMeanType } from "../flags/_utils.ts";
+import { DuplicateOptionName, UnknownType } from "../flags/errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
 import { existsSync, red } from "./deps.ts";
+import {
+  CommandExecutableNotFound,
+  DefaultCommandNotFound,
+  DuplicateCommandAlias,
+  DuplicateCommandName,
+  DuplicateCompletion,
+  DuplicateEnvironmentVariable,
+  DuplicateExample,
+  DuplicateType,
+  EnvironmentVariableOptionalValue,
+  EnvironmentVariableSingleValue,
+  EnvironmentVariableVariadicValue,
+  MissingArgument,
+  MissingArguments,
+  MissingCommandName,
+  NoArgumentsAllowed,
+  TooManyArguments,
+  UnknownCommand,
+} from "./errors.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
@@ -217,12 +236,12 @@ export class Command<O = any, A extends Array<any> = any> {
     const aliases: string[] = result.flags;
 
     if (!name) {
-      throw this.error(new Error("Missing command name."));
+      throw new MissingCommandName();
     }
 
     if (this.getBaseCommand(name, true)) {
       if (!override) {
-        throw this.error(new Error(`Duplicate command "${name}".`));
+        throw new DuplicateCommandName(name);
       }
       this.removeCommand(name);
     }
@@ -283,14 +302,8 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param alias Tha name of the alias.
    */
   public alias(alias: string): this {
-    if (this.cmd === this) {
-      throw this.error(
-        new Error(`Failed to add alias "${alias}". No sub command selected.`),
-      );
-    }
-
     if (this.cmd.aliases.indexOf(alias) !== -1) {
-      throw this.error(new Error(`Duplicate alias "${alias}".`));
+      throw new DuplicateCommandAlias(alias);
     }
 
     this.cmd.aliases.push(alias);
@@ -311,13 +324,7 @@ export class Command<O = any, A extends Array<any> = any> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw this.error(
-        new Error(
-          `Unknown sub-command "${name}".${
-            didYouMeanCommand(name, this.getBaseCommands(true))
-          }`,
-        ),
-      );
+      throw new UnknownCommand(name, this.getBaseCommands(true));
     }
 
     this.cmd = cmd;
@@ -453,7 +460,7 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ITypeOptions,
   ): this {
     if (this.cmd.types.get(name) && !options?.override) {
-      throw this.error(new Error(`Type with name "${name}" already exists.`));
+      throw new DuplicateType(name);
     }
 
     this.cmd.types.set(name, { ...options, name, handler });
@@ -482,9 +489,7 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
-      throw this.error(
-        new Error(`Completion with name "${name}" already exists.`),
-      );
+      throw new DuplicateCompletion(name);
     }
 
     this.cmd.completions.set(name, {
@@ -558,9 +563,7 @@ export class Command<O = any, A extends Array<any> = any> {
       if (
         option.name === name || option.aliases && ~option.aliases.indexOf(name)
       ) {
-        throw this.error(
-          new Error(`Command with name "${name}" already exists.`),
-        );
+        throw new DuplicateOptionName(name);
       }
 
       if (!option.name && isLong) {
@@ -575,9 +578,7 @@ export class Command<O = any, A extends Array<any> = any> {
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw this.error(
-            new Error(`Option with name "${name}" already exists.`),
-          );
+          throw new DuplicateOptionName(name);
         }
       }
     }
@@ -598,9 +599,7 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
-      throw this.error(
-        new Error(`Example with name "${name}" already exists.`),
-      );
+      throw new DuplicateExample(name);
     }
 
     this.cmd.examples.push({ name, description });
@@ -626,9 +625,7 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     if (result.flags.some((envName) => this.cmd.getBaseEnvVar(envName, true))) {
-      throw this.error(
-        new Error(`Environment variable with name "${name}" already exists.`),
-      );
+      throw new DuplicateEnvironmentVariable(name);
     }
 
     const details: IArgument[] = ArgumentsParser.parseArgumentsDefinition(
@@ -636,23 +633,11 @@ export class Command<O = any, A extends Array<any> = any> {
     );
 
     if (details.length > 1) {
-      throw this.error(
-        new Error(
-          `An environment variable can only have one value but "${name}" has more than one.`,
-        ),
-      );
+      throw new EnvironmentVariableSingleValue(name);
     } else if (details.length && details[0].optionalValue) {
-      throw this.error(
-        new Error(
-          `An environment variable can not have an optional value but "${name}" is defined as optional.`,
-        ),
-      );
+      throw new EnvironmentVariableOptionalValue(name);
     } else if (details.length && details[0].variadic) {
-      throw this.error(
-        new Error(
-          `An environment variable can not have an variadic value but "${name}" is defined as variadic.`,
-        ),
-      );
+      throw new EnvironmentVariableVariadicValue(name);
     }
 
     this.cmd.envVars.push({
@@ -679,62 +664,60 @@ export class Command<O = any, A extends Array<any> = any> {
     args: string[] = Deno.args,
     dry?: boolean,
   ): Promise<IParseResult<O, A>> {
-    // @TODO: remove all `this.error()` calls and catch errors only in parse method!
+    try {
+      this.reset().registerDefaults();
+      this.rawArgs = args;
+      const subCommand = args.length > 0 && this.getCommand(args[0], true);
 
-    this.reset()
-      .registerDefaults();
-
-    this.rawArgs = args;
-
-    const subCommand = this.rawArgs.length > 0 &&
-      this.getCommand(this.rawArgs[0], true);
-
-    if (subCommand) {
-      subCommand._globalParent = this;
-      return await subCommand.parse(this.rawArgs.slice(1), dry);
-    }
-
-    if (this.isExecutable) {
-      if (!dry) {
-        await this.executeExecutable(this.rawArgs);
+      if (subCommand) {
+        subCommand._globalParent = this;
+        return await subCommand.parse(this.rawArgs.slice(1), dry);
       }
 
-      return {
-        options: {} as O,
-        args: this.rawArgs as A,
-        cmd: this,
-        literal: this.literalArgs,
-      };
-    } else if (this._useRawArgs) {
-      if (dry) {
+      if (this.isExecutable) {
+        if (!dry) {
+          await this.executeExecutable(this.rawArgs);
+        }
+
         return {
           options: {} as O,
           args: this.rawArgs as A,
           cmd: this,
           literal: this.literalArgs,
         };
+      } else if (this._useRawArgs) {
+        if (dry) {
+          return {
+            options: {} as O,
+            args: this.rawArgs as A,
+            cmd: this,
+            literal: this.literalArgs,
+          };
+        }
+
+        return await this.execute({} as O, ...this.rawArgs as A);
+      } else {
+        const { flags, unknown, literal } = this.parseFlags(this.rawArgs);
+
+        this.literalArgs = literal;
+
+        const params = this.parseArguments(unknown, flags);
+
+        this.validateEnvVars();
+
+        if (dry) {
+          return {
+            options: flags,
+            args: params,
+            cmd: this,
+            literal: this.literalArgs,
+          };
+        }
+
+        return await this.execute(flags, ...params);
       }
-
-      return await this.execute({} as O, ...this.rawArgs as A);
-    } else {
-      const { flags, unknown, literal } = this.parseFlags(this.rawArgs);
-
-      this.literalArgs = literal;
-
-      const params = this.parseArguments(unknown, flags);
-
-      this.validateEnvVars();
-
-      if (dry) {
-        return {
-          options: flags,
-          args: params,
-          cmd: this,
-          literal: this.literalArgs,
-        };
-      }
-
-      return await this.execute(flags, ...params);
+    } catch (error) {
+      throw this.error(error);
     }
   }
 
@@ -798,31 +781,19 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     if (this.fn) {
-      try {
-        await this.fn(options, ...args);
-      } catch (e) {
-        throw this.error(e);
-      }
+      await this.fn(options, ...args);
     } else if (this.defaultCommand) {
       const cmd = this.getCommand(this.defaultCommand, true);
 
       if (!cmd) {
-        throw this.error(
-          new Error(
-            `Default command "${this.defaultCommand}" not found.${
-              didYouMeanCommand(this.defaultCommand, this.getCommands())
-            }`,
-          ),
+        throw new DefaultCommandNotFound(
+          this.defaultCommand,
+          this.getCommands(),
         );
       }
 
       cmd._globalParent = this;
-
-      try {
-        await cmd.execute(options, ...args);
-      } catch (e) {
-        throw this.error(e);
-      }
+      await cmd.execute(options, ...args);
     }
 
     return { options, args, cmd: this, literal: this.literalArgs };
@@ -911,12 +882,7 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    throw this.error(
-      new Error(
-        `Sub-command executable not found: ${executableName}:\n    - ` +
-          files.join("\n    - "),
-      ),
-    );
+    throw new CommandExecutableNotFound(executableName, files);
   }
 
   /**
@@ -924,16 +890,12 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected parseFlags(args: string[]): IFlagsResult<O> {
-    try {
-      return parseFlags<O>(args, {
-        stopEarly: this._stopEarly,
-        allowEmpty: this._allowEmpty,
-        flags: this.getOptions(true),
-        parse: (type: ITypeInfo) => this.parseType(type),
-      });
-    } catch (e) {
-      throw this.error(e);
-    }
+    return parseFlags<O>(args, {
+      stopEarly: this._stopEarly,
+      allowEmpty: this._allowEmpty,
+      flags: this.getOptions(true),
+      parse: (type: ITypeInfo) => this.parseType(type),
+    });
   }
 
   /** Parse argument type. */
@@ -941,12 +903,9 @@ export class Command<O = any, A extends Array<any> = any> {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
-      throw this.error(
-        new Error(
-          `Unknown type "${type.type}".${
-            didYouMeanType(type.type, this.getTypes().map((type) => type.name))
-          }`,
-        ),
+      throw new UnknownType(
+        type.type,
+        this.getTypes().map((type) => type.name),
       );
     }
 
@@ -994,17 +953,9 @@ export class Command<O = any, A extends Array<any> = any> {
     if (!this.hasArguments()) {
       if (args.length) {
         if (this.hasCommands(true)) {
-          throw this.error(
-            new Error(
-              `Unknown command "${args[0]}".${
-                didYouMeanCommand(args[0], this.getCommands())
-              }`,
-            ),
-          );
+          throw new UnknownCommand(args[0], this.getCommands());
         } else {
-          throw this.error(
-            new Error(`No arguments allowed for command "${this.getPath()}".`),
-          );
+          throw new NoArgumentsAllowed(this.getPath());
         }
       }
     } else {
@@ -1020,9 +971,7 @@ export class Command<O = any, A extends Array<any> = any> {
           );
 
           if (!hasStandaloneOption) {
-            throw this.error(
-              new Error("Missing argument(s): " + required.join(", ")),
-            );
+            throw new MissingArguments(required);
           }
         }
       } else {
@@ -1031,9 +980,7 @@ export class Command<O = any, A extends Array<any> = any> {
             if (expectedArg.optionalValue) {
               break;
             }
-            throw this.error(
-              new Error(`Missing argument: ${expectedArg.name}`),
-            );
+            throw new MissingArgument(`Missing argument: ${expectedArg.name}`);
           }
 
           let arg: unknown;
@@ -1063,7 +1010,7 @@ export class Command<O = any, A extends Array<any> = any> {
         }
 
         if (args.length) {
-          throw this.error(new Error(`Too many arguments: ${args.join(" ")}`));
+          throw new TooManyArguments(args);
         }
       }
     }
@@ -1787,15 +1734,4 @@ function isDebug(): boolean {
   }
   const debug: string | undefined = Deno.env.get("CLIFFY_DEBUG");
   return debug === "true" || debug === "1";
-}
-
-export function didYouMeanCommand(
-  command: string,
-  commands: Array<Command>,
-  excludes: Array<string> = [],
-): string {
-  const commandNames = commands
-    .map((command) => command.getName())
-    .filter((command) => !excludes.includes(command));
-  return didYouMean(" Did you mean command", command, commandNames);
 }

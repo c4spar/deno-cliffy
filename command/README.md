@@ -316,7 +316,7 @@ await new Command()
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/required_options.ts
-Missing required option: --cheese
+Error: Missing required option "--cheese".
 ```
 
 ### Negatable options
