@@ -20,7 +20,6 @@ await new Command()
     depends: ["foo"],
   })
   .option("-B, --baz <value:boolean>", "Some boolean value.", {
-    default: true,
     conflicts: ["beep"],
   })
   .command("help", new HelpCommand().global())
