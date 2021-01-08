@@ -1,4 +1,5 @@
 import { paramCaseToCamelCase } from "./_utils.ts";
+import { didYouMeanOption, didYouMeanType } from "./did_you_mean.ts";
 import { normalize } from "./normalize.ts";
 import type {
   IFlagArgument,
@@ -65,12 +66,20 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   opts.flags.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new Error(`Unknown required option: ${flag}`);
+        throw new Error(
+          `Unknown required option: ${flag}. ${
+            didYouMeanOption(flag, opts.flags ?? [])
+          }`.trim(),
+        );
       }
     });
     opt.conflicts?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new Error(`Unknown conflicting option: ${flag}`);
+        throw new Error(
+          `Unknown conflicting option: ${flag}. ${
+            didYouMeanOption(flag, opts.flags ?? [])
+          }`.trim(),
+        );
       }
     });
   });
@@ -96,7 +105,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
     if (isFlag && !stopEarly) {
       if (current[2] === "-" || (current[1] === "-" && current.length === 3)) {
-        throw new Error(`Invalid flag name: ${current}`);
+        throw new Error(
+          `Invalid flag name: ${current}. ${
+            didYouMeanOption(current, opts.flags)
+          }`,
+        );
       }
 
       negate = current.startsWith("--no-");
@@ -109,7 +122,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       if (!option) {
         if (opts.flags.length) {
-          throw new Error(`Unknown option: ${current}`);
+          throw new Error(
+            `Unknown option: ${current}. ${
+              didYouMeanOption(current, opts.flags)
+            }`,
+          );
         }
 
         option = {
@@ -173,7 +190,12 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         const arg: IFlagArgument = args[argIndex];
 
         if (!arg) {
-          throw new Error("Unknown option: " + next());
+          const flag = next();
+          throw new Error(
+            `Unknown option: ${flag}. ${
+              didYouMeanOption(flag, opts.flags ?? [])
+            }`,
+          );
         }
 
         if (!arg.type) {
@@ -363,7 +385,9 @@ function parseFlagValue(
   const parseType = Types[type];
 
   if (!parseType) {
-    throw new Error(`Unknown type ${type}`);
+    throw new Error(
+      `Unknown type ${type}. ${didYouMeanType(type, Object.keys(Types))}`,
+    );
   }
 
   return parseType({
