@@ -160,7 +160,7 @@ export class UnknownCompletionCommand extends CommandError {
   }
 }
 
-export function didYouMeanCommand(
+function didYouMeanCommand(
   command: string,
   commands: Array<Command>,
   excludes: Array<string> = [],
