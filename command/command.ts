@@ -1,6 +1,13 @@
 import { DuplicateOptionName, UnknownType } from "../flags/errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
+import {
+  isUnstable,
+  parseArgumentsDefinition,
+  PermissionName,
+  permissions,
+  splitArguments,
+} from "./_utils.ts";
 import { existsSync, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
@@ -25,7 +32,6 @@ import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
-import { ArgumentsParser } from "./_arguments_parser.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type {
   IAction,
@@ -46,49 +52,6 @@ import type {
   ITypeInfo,
   ITypeOptions,
 } from "./types.ts";
-
-type PermissionName =
-  | "run"
-  | "read"
-  | "write"
-  | "net"
-  | "env"
-  | "plugin"
-  | "hrtime";
-
-async function hasPermission(permission: PermissionName): Promise<boolean> {
-  try {
-    // deno-lint-ignore no-explicit-any
-    return (await (Deno as any).permissions?.query?.({ name: permission }))
-      ?.state === "granted";
-  } catch {
-    return false;
-  }
-}
-
-async function hasPermissions<K extends PermissionName>(
-  names: K[],
-): Promise<Record<K, boolean>> {
-  const permissions: Record<string, boolean> = {};
-  await Promise.all(
-    names.map((name: K) =>
-      hasPermission(name).then((hasPermission) =>
-        permissions[name] = hasPermission
-      )
-    ),
-  );
-  return permissions as Record<K, boolean>;
-}
-
-const permissions = await hasPermissions([
-  "env",
-  "hrtime",
-  "net",
-  "plugin",
-  "read",
-  "run",
-  "write",
-]);
 
 // deno-lint-ignore no-explicit-any
 interface IDefaultOption<O = any, A extends Array<any> = any> {
@@ -230,7 +193,7 @@ export class Command<O = any, A extends Array<any> = any> {
     cmdOrDescription?: Command | string,
     override?: boolean,
   ): this {
-    const result = ArgumentsParser.splitArguments(nameAndArguments);
+    const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
     const aliases: string[] = result.flags;
@@ -531,10 +494,10 @@ export class Command<O = any, A extends Array<any> = any> {
       return this.option(flags, desc, { value: opts });
     }
 
-    const result = ArgumentsParser.splitArguments(flags);
+    const result = splitArguments(flags);
 
     const args: IArgument[] = result.typeDefinition
-      ? ArgumentsParser.parseArgumentsDefinition(result.typeDefinition)
+      ? parseArgumentsDefinition(result.typeDefinition)
       : [];
 
     const option: IOption = {
@@ -618,7 +581,7 @@ export class Command<O = any, A extends Array<any> = any> {
     description: string,
     options?: IEnvVarOptions,
   ): this {
-    const result = ArgumentsParser.splitArguments(name);
+    const result = splitArguments(name);
 
     if (!result.typeDefinition) {
       result.typeDefinition = "<value:boolean>";
@@ -628,7 +591,7 @@ export class Command<O = any, A extends Array<any> = any> {
       throw new DuplicateEnvironmentVariable(name);
     }
 
-    const details: IArgument[] = ArgumentsParser.parseArgumentsDefinition(
+    const details: IArgument[] = parseArgumentsDefinition(
       result.typeDefinition,
     );
 
@@ -804,9 +767,6 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected async executeExecutable(args: string[]) {
-    // deno-lint-ignore no-explicit-any
-    const unstable = !!(Deno as any).permissions;
-
     if (!permissions.read) {
       // deno-lint-ignore no-explicit-any
       await (Deno as any).permissions?.request({ name: "read" });
@@ -840,7 +800,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
     const denoOpts = [];
 
-    if (unstable) {
+    if (isUnstable) {
       denoOpts.push("--unstable");
     }
 
@@ -1116,7 +1076,7 @@ export class Command<O = any, A extends Array<any> = any> {
   /** Get arguments. */
   public getArguments(): IArgument[] {
     if (!this.args.length && this.argsDefinition) {
-      this.args = ArgumentsParser.parseArgumentsDefinition(this.argsDefinition);
+      this.args = parseArgumentsDefinition(this.argsDefinition);
     }
 
     return this.args;

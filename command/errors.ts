@@ -1,4 +1,4 @@
-import { didYouMean } from "../flags/_utils.ts";
+import { didYouMeanCommand } from "./_utils.ts";
 import { Command } from "./command.ts";
 
 export class CommandError extends Error {
@@ -75,7 +75,7 @@ export class DuplicateEnvironmentVariable extends CommandError {
 export class EnvironmentVariableSingleValue extends CommandError {
   constructor(name: string) {
     super(
-      `An environment variable can only have one value but "${name}" has more than one.`,
+      `An environment variable can only have one value, but "${name}" has more than one.`,
     );
     Object.setPrototypeOf(this, EnvironmentVariableSingleValue.prototype);
   }
@@ -84,7 +84,7 @@ export class EnvironmentVariableSingleValue extends CommandError {
 export class EnvironmentVariableOptionalValue extends CommandError {
   constructor(name: string) {
     super(
-      `An environment variable can not have an optional value but "${name}" is defined as optional.`,
+      `An environment variable cannot have an optional value, but "${name}" is defined as optional.`,
     );
     Object.setPrototypeOf(this, EnvironmentVariableOptionalValue.prototype);
   }
@@ -93,7 +93,7 @@ export class EnvironmentVariableOptionalValue extends CommandError {
 export class EnvironmentVariableVariadicValue extends CommandError {
   constructor(name: string) {
     super(
-      `An environment variable can not have an variadic value but "${name}" is defined as variadic.`,
+      `An environment variable cannot have an variadic value, but "${name}" is defined as variadic.`,
     );
     Object.setPrototypeOf(this, EnvironmentVariableVariadicValue.prototype);
   }
@@ -158,15 +158,4 @@ export class UnknownCompletionCommand extends CommandError {
     );
     Object.setPrototypeOf(this, UnknownCompletionCommand.prototype);
   }
-}
-
-function didYouMeanCommand(
-  command: string,
-  commands: Array<Command>,
-  excludes: Array<string> = [],
-): string {
-  const commandNames = commands
-    .map((command) => command.getName())
-    .filter((command) => !excludes.includes(command));
-  return didYouMean(" Did you mean command", command, commandNames);
 }

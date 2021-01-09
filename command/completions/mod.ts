@@ -8,6 +8,7 @@ import { ZshCompletionsCommand } from "./zsh.ts";
 /** Generates shell completion scripts for various shell's. */
 export class CompletionsCommand extends Command {
   #cmd?: Command;
+
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;

@@ -112,7 +112,7 @@ export class MissingRequiredOption extends FlagsError {
 export class RequiredArgumentFollowsOptionalArgument extends FlagsError {
   constructor(arg: string) {
     super(
-      `An required argument can not follow an optional argument but "${arg}"  is defined as required.`,
+      `An required argument cannot follow an optional argument, but "${arg}"  is defined as required.`,
     );
     Object.setPrototypeOf(
       this,

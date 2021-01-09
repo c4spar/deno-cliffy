@@ -1,8 +1,18 @@
 import { getFlag } from "../../flags/_utils.ts";
 import { Table } from "../../table/table.ts";
-import { ArgumentsParser } from "../_arguments_parser.ts";
+import { parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
-import { blue, bold, dim, italic, magenta, red, yellow } from "../deps.ts";
+import {
+  blue,
+  bold,
+  dim,
+  green,
+  italic,
+  magenta,
+  red,
+  yellow,
+} from "../deps.ts";
+import { IArgument } from "../types.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
 /** Help text generator. */
@@ -81,7 +91,7 @@ export class HelpGenerator {
         Table.from([
           ...options.map((option: IOption) => [
             option.flags.split(/,? +/g).map((flag) => blue(flag)).join(", "),
-            ArgumentsParser.highlightArguments(option.typeDefinition || ""),
+            highlightArguments(option.typeDefinition || ""),
             red(bold("-")) + " " +
             option.description.split("\n").shift() as string,
             this.generateHints(option),
@@ -127,7 +137,7 @@ export class HelpGenerator {
             [command.getName(), ...command.getAliases()].map((name) =>
               blue(name)
             ).join(", "),
-            ArgumentsParser.highlightArguments(
+            highlightArguments(
               command.getArgsDefinition() || "",
             ),
             red(bold("-")) + " " +
@@ -164,7 +174,7 @@ export class HelpGenerator {
       Table.from([
         ...envVars.map((envVar: IEnvVar) => [
           envVar.names.map((name: string) => blue(name)).join(", "),
-          ArgumentsParser.highlightArgumentDetails(envVar.details),
+          highlightArgumentDetails(envVar.details),
           `${red(bold("-"))} ${envVar.description}`,
         ]),
       ])
@@ -231,4 +241,49 @@ function inspect(value: unknown): string {
     // deno < 1.4.3 doesn't support the colors property.
     { depth: 1, colors: true, trailingComma: false } as Deno.InspectOptions,
   );
+}
+
+/**
+ * Colorize arguments string.
+ * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
+ */
+function highlightArguments(argsDefinition: string) {
+  if (!argsDefinition) {
+    return "";
+  }
+
+  return parseArgumentsDefinition(argsDefinition)
+    .map((arg: IArgument) => highlightArgumentDetails(arg)).join(" ");
+}
+
+/**
+ * Colorize argument string.
+ * @param arg Argument details.
+ */
+function highlightArgumentDetails(arg: IArgument): string {
+  let str = "";
+
+  str += yellow(arg.optionalValue ? "[" : "<");
+
+  let name = "";
+  name += arg.name;
+  if (arg.variadic) {
+    name += "...";
+  }
+  name = magenta(name);
+
+  str += name;
+
+  // if ( arg.name !== arg.type ) {
+  str += yellow(":");
+  str += red(arg.type);
+  // }
+
+  if (arg.list) {
+    str += green("[]");
+  }
+
+  str += yellow(arg.optionalValue ? "]" : ">");
+
+  return str;
 }

@@ -653,7 +653,7 @@ await new Command()
 
 ### Argument syntax
 
-You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
+You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input cannot be defined after an optional input.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
