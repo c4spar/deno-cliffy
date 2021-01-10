@@ -1007,22 +1007,15 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param error Error to handle.
    */
   protected error(error: Error): Error {
-    if (this.shouldThrowErrors()) {
+    if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       return error;
     }
-
-    const log = (message: string) =>
-      Deno.stderr.writeSync(
-        new TextEncoder().encode(message + "\n"),
-      );
-
-    if (error instanceof ValidationError) {
-      this.help();
-      log(red(`  ${bold("error")}: ${error.message}\n`));
-    } else {
-      throw error;
-    }
-
+    this.help();
+    Deno.stderr.writeSync(
+      new TextEncoder().encode(
+        red(`  ${bold("error")}: ${error.message}\n`) + "\n",
+      ),
+    );
     Deno.exit(1);
   }
 
