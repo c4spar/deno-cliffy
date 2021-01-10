@@ -17,7 +17,7 @@ const result = parseFlags(Deno.args, {
         }
         return parseFloat(value);
       default:
-        throw new Error(`Unknown type: ${type}`);
+        throw new Error(`Unknown type "${type}".`);
     }
   },
 });

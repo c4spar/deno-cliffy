@@ -1,9 +1,13 @@
+import { getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
-  didYouMeanOption,
-  getFlag,
-  getOption,
-  paramCaseToCamelCase,
-} from "./_utils.ts";
+  ConflictingOption,
+  DependingOption,
+  MissingOptionValue,
+  MissingRequiredOption,
+  NoArguments,
+  OptionNotCombinable,
+  UnknownOption,
+} from "./_errors.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
@@ -84,9 +88,7 @@ export function validateFlags(
 
   for (const { name, option } of options) {
     if (!option) {
-      throw new Error(
-        `Unknown option "${getFlag(name)}".${didYouMeanOption(name, flags)}`,
-      );
+      throw new UnknownOption(name, flags);
     }
 
     if (option.standalone) {
@@ -101,33 +103,21 @@ export function validateFlags(
           return;
         }
 
-        throw new Error(
-          `Option "${
-            getFlag(option.name)
-          }" cannot be combined with other options.`,
-        );
+        throw new OptionNotCombinable(option.name);
       }
       return;
     }
 
     option.conflicts?.forEach((flag: string) => {
       if (isset(flag, values)) {
-        throw new Error(
-          `Option "${getFlag(option.name)}" conflicts with option "${
-            getFlag(flag)
-          }".`,
-        );
+        throw new ConflictingOption(option.name, flag);
       }
     });
 
     option.depends?.forEach((flag: string) => {
       // don't throw an error if the value is coming from the default option.
       if (!isset(flag, values) && !defaultValues[option.name]) {
-        throw new Error(
-          `Option "${getFlag(option.name)}" depends on option "${
-            getFlag(flag)
-          }".`,
-        );
+        throw new DependingOption(option.name, flag);
       }
     });
 
@@ -142,7 +132,7 @@ export function validateFlags(
             typeof (values[name] as Array<unknown>)[i] === "undefined")
         )
       ) {
-        throw new Error(`Missing value for option "${getFlag(option.name)}".`);
+        throw new MissingOptionValue(option.name);
       }
     });
   }
@@ -158,13 +148,13 @@ export function validateFlags(
           opt.option?.conflicts?.find((flag: string) => flag === option.name)
         )
       ) {
-        throw new Error(`Missing required option: --${option.name}`);
+        throw new MissingRequiredOption(option.name);
       }
     }
   }
 
   if (keys.length === 0 && !allowEmpty) {
-    throw new Error("No arguments.");
+    throw new NoArguments();
   }
 }
 

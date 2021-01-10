@@ -1,4 +1,5 @@
-import { Command, didYouMeanCommand } from "../command.ts";
+import { Command } from "../command.ts";
+import { UnknownCommand } from "../_errors.ts";
 import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
@@ -16,16 +17,10 @@ export class HelpCommand extends Command {
         }
         if (!cmd) {
           const cmds = this.getGlobalParent()?.getCommands();
-          throw new Error(
-            `Unknown command "${name}".${
-              name && cmds
-                ? didYouMeanCommand(name, cmds, [
-                  this.getName(),
-                  ...this.getAliases(),
-                ])
-                : ""
-            }`,
-          );
+          throw new UnknownCommand(name ?? "", cmds ?? [], [
+            this.getName(),
+            ...this.getAliases(),
+          ]);
         }
         cmd.help();
         Deno.exit(0);

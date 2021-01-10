@@ -20,6 +20,6 @@ Deno.test("command optionRequired noArguments", async () => {
       await cmd.parse([]);
     },
     Error,
-    "Missing required option: --flag",
+    `Missing required option "--flag".`,
   );
 });

@@ -39,7 +39,7 @@ Deno.test("flags optionConflicts noArguments", () => {
   assertThrows(
     () => parseFlags([], options),
     Error,
-    "Missing required option: --type",
+    `Missing required option "--type".`,
   );
 });
 
