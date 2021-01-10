@@ -1,3 +1,4 @@
+import { ValidationError } from "../flags/_errors.ts";
 import { didYouMeanCommand } from "./_utils.ts";
 import { Command } from "./command.ts";
 
@@ -29,7 +30,7 @@ export class DuplicateCommandAlias extends CommandError {
   }
 }
 
-export class UnknownCommand extends CommandError {
+export class CommandNotFound extends CommandError {
   constructor(
     name: string,
     commands: Array<Command>,
@@ -121,34 +122,6 @@ export class CommandExecutableNotFound extends CommandError {
   }
 }
 
-export class NoArgumentsAllowed extends CommandError {
-  constructor(name: string) {
-    super(`No arguments allowed for command "${name}".`);
-    Object.setPrototypeOf(this, NoArgumentsAllowed.prototype);
-  }
-}
-
-export class MissingArguments extends CommandError {
-  constructor(args: Array<string>) {
-    super("Missing argument(s): " + args.join(", "));
-    Object.setPrototypeOf(this, MissingArguments.prototype);
-  }
-}
-
-export class MissingArgument extends CommandError {
-  constructor(arg: string) {
-    super(`Missing argument "${arg}".`);
-    Object.setPrototypeOf(this, MissingArgument.prototype);
-  }
-}
-
-export class TooManyArguments extends CommandError {
-  constructor(args: Array<string>) {
-    super(`Too many arguments: ${args.join(" ")}`);
-    Object.setPrototypeOf(this, TooManyArguments.prototype);
-  }
-}
-
 export class UnknownCompletionCommand extends CommandError {
   constructor(name: string, commands: Array<Command>) {
     super(
@@ -157,5 +130,50 @@ export class UnknownCompletionCommand extends CommandError {
       }`,
     );
     Object.setPrototypeOf(this, UnknownCompletionCommand.prototype);
+  }
+}
+
+/* Validation errors. */
+
+export class UnknownCommand extends ValidationError {
+  constructor(
+    name: string,
+    commands: Array<Command>,
+    excluded?: Array<string>,
+  ) {
+    super(
+      `Unknown command "${name}".${
+        didYouMeanCommand(name, commands, excluded)
+      }`,
+    );
+    Object.setPrototypeOf(this, UnknownCommand.prototype);
+  }
+}
+
+export class NoArgumentsAllowed extends ValidationError {
+  constructor(name: string) {
+    super(`No arguments allowed for command "${name}".`);
+    Object.setPrototypeOf(this, NoArgumentsAllowed.prototype);
+  }
+}
+
+export class MissingArguments extends ValidationError {
+  constructor(args: Array<string>) {
+    super("Missing argument(s): " + args.join(", "));
+    Object.setPrototypeOf(this, MissingArguments.prototype);
+  }
+}
+
+export class MissingArgument extends ValidationError {
+  constructor(arg: string) {
+    super(`Missing argument "${arg}".`);
+    Object.setPrototypeOf(this, MissingArgument.prototype);
+  }
+}
+
+export class TooManyArguments extends ValidationError {
+  constructor(args: Array<string>) {
+    super(`Too many arguments: ${args.join(" ")}`);
+    Object.setPrototypeOf(this, TooManyArguments.prototype);
   }
 }

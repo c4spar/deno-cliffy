@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { UnknownCommand } from "../errors.ts";
+import { UnknownCommand } from "../_errors.ts";
 import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */

@@ -12,7 +12,7 @@ export class UnknownRequiredOption extends FlagsError {
   constructor(option: string, options: Array<IFlagOptions>) {
     super(
       `Unknown required option "${getFlag(option)}".${
-        didYouMeanOption(getFlag(option), options)
+        didYouMeanOption(option, options)
       }`,
     );
     Object.setPrototypeOf(this, UnknownRequiredOption.prototype);
@@ -23,7 +23,7 @@ export class UnknownConflictingOption extends FlagsError {
   constructor(option: string, options: Array<IFlagOptions>) {
     super(
       `Unknown conflicting option "${getFlag(option)}".${
-        didYouMeanOption(getFlag(option), options)
+        didYouMeanOption(option, options)
       }`,
     );
     Object.setPrototypeOf(this, UnknownConflictingOption.prototype);
@@ -46,10 +46,15 @@ export class UnknownType extends FlagsError {
 
 /* Validation errors. */
 
+/**
+ * A validation error is thrown when the command is wrongly used by the user.
+ * For example: If the user passes some invalid options or arguments to the
+ * command.
+ */
 export class ValidationError extends FlagsError {
   constructor(message: string) {
     super(message);
-    Object.setPrototypeOf(this, FlagsError.prototype);
+    Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
 
@@ -57,7 +62,7 @@ export class UnknownOption extends ValidationError {
   constructor(option: string, options: Array<IFlagOptions>) {
     super(
       `Unknown option "${getFlag(option)}".${
-        didYouMeanOption(getFlag(option), options)
+        didYouMeanOption(option, options)
       }`,
     );
     Object.setPrototypeOf(this, UnknownOption.prototype);

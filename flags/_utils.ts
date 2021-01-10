@@ -1,4 +1,4 @@
-import { IFlagOptions } from "./types.ts";
+import type { IFlagOptions } from "./types.ts";
 
 /** Convert param case string to camel case. */
 export function paramCaseToCamelCase(str: string): string {

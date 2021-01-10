@@ -2,19 +2,21 @@ import {
   DuplicateOptionName,
   UnknownType,
   ValidationError,
-} from "../flags/errors.ts";
+} from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
 import {
+  getPermissions,
+  hasPermission,
   isUnstable,
   parseArgumentsDefinition,
-  PermissionName,
-  permissions,
   splitArguments,
 } from "./_utils.ts";
+import type { PermissionName } from "./_utils.ts";
 import { bold, existsSync, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
+  CommandNotFound,
   DefaultCommandNotFound,
   DuplicateCommandAlias,
   DuplicateCommandName,
@@ -31,7 +33,7 @@ import {
   NoArgumentsAllowed,
   TooManyArguments,
   UnknownCommand,
-} from "./errors.ts";
+} from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
@@ -291,7 +293,7 @@ export class Command<O = any, A extends Array<any> = any> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw new UnknownCommand(name, this.getBaseCommands(true));
+      throw new CommandNotFound(name, this.getBaseCommands(true));
     }
 
     this.cmd = cmd;
@@ -469,9 +471,31 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-   * Throw error's instead of calling `Deno.exit()` to handle error's manually.
+   * Throw validation error's instead of calling `Deno.exit()` to handle
+   * validation error's manually.
+   *
+   * A validation error is thrown when the command is wrongly used by the user.
+   * For example: If the user passes some invalid options or arguments to the
+   * command.
+   *
    * This has no effect for parent commands. Only for the command on which this
    * method was called and all child commands.
+   *
+   * **Example:**
+   *
+   * ```
+   * try {
+   *   cmd.parse();
+   * } catch(error) {
+   *   if (error instanceof ValidationError) {
+   *     cmd.help();
+   *     Deno.exit(1);
+   *   }
+   *   throw error;
+   * }
+   * ```
+   *
+   * @see ValidationError
    */
   public throwErrors(): this {
     this.cmd.throwOnError = true;
@@ -670,7 +694,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
         const params = this.parseArguments(unknown, flags);
 
-        this.validateEnvVars();
+        await this.validateEnvVars();
 
         if (dry) {
           return {
@@ -771,6 +795,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected async executeExecutable(args: string[]) {
+    const permissions = await getPermissions();
     if (!permissions.read) {
       // deno-lint-ignore no-explicit-any
       await (Deno as any).permissions?.request({ name: "read" });
@@ -804,7 +829,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
     const denoOpts = [];
 
-    if (isUnstable) {
+    if (isUnstable()) {
       denoOpts.push("--unstable");
     }
 
@@ -832,9 +857,6 @@ export class Command<O = any, A extends Array<any> = any> {
 
       const process: Deno.Process = Deno.run({
         cmd: cmd,
-        env: {
-          CLIFFY_DEBUG: isDebug() ? "true" : "false",
-        },
       });
 
       const status: Deno.ProcessStatus = await process.status();
@@ -879,8 +901,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /** Validate environment variables. */
-  protected validateEnvVars() {
-    if (!permissions.env) {
+  protected async validateEnvVars(): Promise<void> {
+    if (!await hasPermission("env")) {
       return;
     }
 
@@ -1685,12 +1707,4 @@ export class Command<O = any, A extends Array<any> = any> {
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
   }
-}
-
-function isDebug(): boolean {
-  if (!permissions.env) {
-    return false;
-  }
-  const debug: string | undefined = Deno.env.get("CLIFFY_DEBUG");
-  return debug === "true" || debug === "1";
 }

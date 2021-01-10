@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { UnknownCompletionCommand } from "../errors.ts";
+import { UnknownCompletionCommand } from "../_errors.ts";
 import type { ICompletion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */

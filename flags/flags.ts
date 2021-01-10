@@ -9,7 +9,7 @@ import {
   UnknownOption,
   UnknownRequiredOption,
   UnknownType,
-} from "./errors.ts";
+} from "./_errors.ts";
 import { normalize } from "./normalize.ts";
 import type {
   IFlagArgument,

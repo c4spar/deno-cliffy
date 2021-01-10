@@ -2,10 +2,10 @@ import { didYouMean } from "../flags/_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
   RequiredArgumentFollowsOptionalArgument,
-} from "../flags/errors.ts";
+} from "../flags/_errors.ts";
 import { OptionType } from "../flags/types.ts";
-import { Command } from "./command.ts";
-import { IArgument } from "./types.ts";
+import type { Command } from "./command.ts";
+import type { IArgument } from "./types.ts";
 
 export type PermissionName =
   | "run"
@@ -16,8 +16,8 @@ export type PermissionName =
   | "plugin"
   | "hrtime";
 
-export const permissions: Record<PermissionName, boolean> =
-  await hasPermissions([
+export function getPermissions(): Promise<Record<PermissionName, boolean>> {
+  return hasPermissions([
     "env",
     "hrtime",
     "net",
@@ -26,9 +26,12 @@ export const permissions: Record<PermissionName, boolean> =
     "run",
     "write",
   ]);
+}
 
-// deno-lint-ignore no-explicit-any
-export const isUnstable = !!(Deno as any).permissions;
+export function isUnstable(): boolean {
+  // deno-lint-ignore no-explicit-any
+  return !!(Deno as any).permissions;
+}
 
 export function didYouMeanCommand(
   command: string,
@@ -41,7 +44,9 @@ export function didYouMeanCommand(
   return didYouMean(" Did you mean command", command, commandNames);
 }
 
-async function hasPermission(permission: PermissionName): Promise<boolean> {
+export async function hasPermission(
+  permission: PermissionName,
+): Promise<boolean> {
   try {
     // deno-lint-ignore no-explicit-any
     return (await (Deno as any).permissions?.query?.({ name: permission }))

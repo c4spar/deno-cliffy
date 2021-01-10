@@ -7,7 +7,7 @@ import {
   NoArguments,
   OptionNotCombinable,
   UnknownOption,
-} from "./errors.ts";
+} from "./_errors.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
 
 // @TODO: add support for knownFlaks
