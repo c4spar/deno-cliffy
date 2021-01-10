@@ -60,7 +60,7 @@
   - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
   - [Stop early](#stop-early)
-  - [Override exit handling](#override-exit-handling)
+  - [Error handling](#error-handling)
 - [Custom types](#-custom-types)
   - [Function types](#function-types)
   - [Class types](#class-types)
@@ -818,33 +818,67 @@ script: server
 args: [ "-p", "80" ]
 ```
 
-### Override exit handling
+### Error handling
 
-By default, cliffy calls `Deno.exit` when it detects validation errors. You can override this behaviour with the `.throwErrors()` method.
+By default, cliffy calls `Deno.exit` when a `ValidationError` is thrown. You can override this behaviour with the
+`.throwErrors()` method. All other errors will be thrown by default.
+
+**Catch runtime errors**
 
 ```typescript
-import { Command, ValidationError } from "https://deno.land/x/cliffy/command/mod.ts";
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const cmd = new Command()
+  .option("-p, --pizza-type <type>", "Flavour of pizza.")
+  .action(() => {
+    throw new Error("Some error happened.");
+  });
 
 try {
-  await new Command()
-    .throwErrors()
-    .option("-p, --pizza-type <type>", "Flavour of pizza.")
-    .action(() => {
-      throw new Error("Some error happened.");
-    })
-    .parse(Deno.args);
+  cmd.parse();
 } catch (error) {
-  // custom error handling...
-  if (error instanceof ValidationError) {
-    console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
-  } else {
-    console.error("[CUSTOM_ERROR]", error);
-  }
+  console.error("[CUSTOM_ERROR]", error);
+  Deno.exit(1);
 }
 ```
 
 ```textile
-$ deno run https://deno.land/x/cliffy/examples/command/override_exit_handling.ts -t
+$ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts -t
+Unknown option "-t". Did you mean option "-h"?
+```
+
+```textile
+$ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts
+[CUSTOM_ERROR] Some error happened.
+```
+
+**Catch validation errors**
+
+```typescript
+import { Command, ValidationError } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const cmd = new Command()
+        .throwErrors() // <-- throw also validation errors.
+        .option("-p, --pizza-type <type>", "Flavour of pizza.")
+        .action(() => {
+          throw new Error("Some error happened.");
+        });
+
+try {
+  cmd.parse();
+} catch (error) {
+  if (error instanceof ValidationError) {
+    cmd.help();
+    console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
+  } else {
+    console.error("[CUSTOM_ERROR]", error);
+  }
+  Deno.exit(1);
+}
+```
+
+```textile
+$ deno run https://deno.land/x/cliffy/examples/command/validation_error_handling.ts -t
 [CUSTOM_VALIDATION_ERROR] Unknown option "-t". Did you mean option "-h"?
 ```
 

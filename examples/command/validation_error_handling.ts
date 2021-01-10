@@ -1,20 +1,20 @@
-#!/usr/bin/env -S deno run
-
 import { Command, ValidationError } from "../../command/mod.ts";
 
+const cmd = new Command()
+  .throwErrors() // <-- throw also validation errors.
+  .option("-p, --pizza-type <type>", "Flavour of pizza.")
+  .action(() => {
+    throw new Error("Some error happened.");
+  });
+
 try {
-  await new Command()
-    .throwErrors()
-    .option("-p, --pizza-type <type>", "Flavour of pizza.")
-    .action(() => {
-      throw new Error("Some error happened.");
-    })
-    .parse(Deno.args);
+  cmd.parse();
 } catch (error) {
-  // custom error handling...
   if (error instanceof ValidationError) {
+    cmd.help();
     console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
   } else {
     console.error("[CUSTOM_ERROR]", error);
   }
+  Deno.exit(1);
 }
