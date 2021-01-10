@@ -70,6 +70,7 @@
 - [Auto generated help](#-auto-generated-help)
   - [Help option](#help-option)
   - [Help command](#help-command)
+- [Did you mean](#-did-you-mean)
 - [Shell completion](#-shell-completion)
   - [Completions command](#completions-command)
     - [Bash Completions](#bash-completions)
@@ -1095,6 +1096,16 @@ The `help` command excepts the name of a sub-command as optional argument to sho
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts help
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts help completions
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts completions help
+```
+
+## ❯ Did you mean
+
+Cliffy has build-in *did-you-mean* support to improve the user and developer experience. For example, cliffy prints some
+suggestions, when the user executes an invalid command, or the developer has a typo in the name of a type.
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/demo.ts -g
+error: Unknown option "-g". Did you mean option "-h"?
 ```
 
 ## ❯ Shell completion
