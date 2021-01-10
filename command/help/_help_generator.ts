@@ -5,16 +5,27 @@ import type { Command } from "../command.ts";
 import { blue, bold, dim, italic, magenta, red, yellow } from "../deps.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
+export interface HelpOptions {
+  types?: boolean;
+  hints?: boolean;
+}
+
 /** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
+  private options: HelpOptions;
 
   /** Generate help text for given command. */
-  public static generate(cmd: Command): string {
-    return new HelpGenerator(cmd).generate();
+  public static generate(cmd: Command, options?: HelpOptions): string {
+    return new HelpGenerator(cmd, options).generate();
   }
 
-  private constructor(protected cmd: Command) {}
+  private constructor(private cmd: Command, options: HelpOptions = {}) {
+    this.options = Object.assign({
+      types: false,
+      hints: true,
+    }, options);
+  }
 
   private generate(): string {
     return this.generateHeader() +
@@ -81,7 +92,10 @@ export class HelpGenerator {
         Table.from([
           ...options.map((option: IOption) => [
             option.flags.split(/,? +/g).map((flag) => blue(flag)).join(", "),
-            ArgumentsParser.highlightArguments(option.typeDefinition || ""),
+            ArgumentsParser.highlightArguments(
+              option.typeDefinition || "",
+              this.options.types,
+            ),
             red(bold("-")) + " " +
             option.description.split("\n").shift() as string,
             this.generateHints(option),
@@ -129,6 +143,7 @@ export class HelpGenerator {
             ).join(", "),
             ArgumentsParser.highlightArguments(
               command.getArgsDefinition() || "",
+              this.options.types,
             ),
             red(bold("-")) + " " +
             command.getDescription().split("\n").shift() as string,
@@ -164,7 +179,10 @@ export class HelpGenerator {
       Table.from([
         ...envVars.map((envVar: IEnvVar) => [
           envVar.names.map((name: string) => blue(name)).join(", "),
-          ArgumentsParser.highlightArgumentDetails(envVar.details),
+          ArgumentsParser.highlightArgumentDetails(
+            envVar.details,
+            this.options.types,
+          ),
           `${red(bold("-"))} ${envVar.description}`,
         ]),
       ])
@@ -192,6 +210,9 @@ export class HelpGenerator {
   }
 
   private generateHints(option: IOption): string {
+    if (!this.options.hints) {
+      return "";
+    }
     const hints = [];
 
     option.required && hints.push(yellow(`required`));

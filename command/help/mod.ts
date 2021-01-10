@@ -27,7 +27,7 @@ export class HelpCommand extends Command {
             }`,
           );
         }
-        cmd.help();
+        cmd.showHelp();
         Deno.exit(0);
       });
   }

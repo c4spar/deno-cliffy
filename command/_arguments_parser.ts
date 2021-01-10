@@ -100,22 +100,29 @@ export class ArgumentsParser {
 
   /**
    * Colorize arguments string.
-   * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
+   * @param argsDefinition  Arguments definition: `<color1:string> <color2:string>`
+   * @param types           Print types.
    */
-  public static highlightArguments(argsDefinition: string) {
+  public static highlightArguments(argsDefinition: string, types?: boolean) {
     if (!argsDefinition) {
       return "";
     }
 
     return this.parseArgumentsDefinition(argsDefinition)
-      .map((arg: IArgument) => this.highlightArgumentDetails(arg)).join(" ");
+      .map((arg: IArgument) => this.highlightArgumentDetails(arg, types)).join(
+        " ",
+      );
   }
 
   /**
    * Colorize argument string.
    * @param arg Argument details.
+   * @param types           Print types.
    */
-  public static highlightArgumentDetails(arg: IArgument): string {
+  public static highlightArgumentDetails(
+    arg: IArgument,
+    types = true,
+  ): string {
     let str = "";
 
     str += yellow(arg.optionalValue ? "[" : "<");
@@ -129,10 +136,10 @@ export class ArgumentsParser {
 
     str += name;
 
-    // if ( arg.name !== arg.type ) {
-    str += yellow(":");
-    str += red(arg.type);
-    // }
+    if (types) {
+      str += yellow(":");
+      str += red(arg.type);
+    }
 
     if (arg.list) {
       str += green("[]");
