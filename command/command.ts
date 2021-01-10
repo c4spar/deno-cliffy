@@ -1,4 +1,8 @@
-import { DuplicateOptionName, UnknownType } from "../flags/errors.ts";
+import {
+  DuplicateOptionName,
+  UnknownType,
+  ValidationError,
+} from "../flags/errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
 import {
@@ -8,7 +12,7 @@ import {
   permissions,
   splitArguments,
 } from "./_utils.ts";
-import { existsSync, red } from "./deps.ts";
+import { bold, existsSync, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
   DefaultCommandNotFound,
@@ -997,25 +1001,27 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-   * Handle error. If `.throwErrors()` was called all error's will be thrown,
-   * otherwise `Deno.exit(1)` will be called.
+   * Handle error. If `throwErrors` is enabled the error will be returned,
+   * otherwise a formatted error message will be printed and `Deno.exit(1)`
+   * will be called.
    * @param error Error to handle.
-   * @param showHelp Show help.
    */
-  protected error(error: Error, showHelp = true): Error {
+  protected error(error: Error): Error {
     if (this.shouldThrowErrors()) {
       return error;
     }
 
-    showHelp && this.help();
+    const log = (message: string) =>
+      Deno.stderr.writeSync(
+        new TextEncoder().encode(message + "\n"),
+      );
 
-    const message = " ".repeat(2) + red(
-      isDebug() && error.stack
-        ? error.stack
-        : `${error.name}: ${error.message}`,
-    ) + "\n\n";
-
-    Deno.stderr.writeSync(new TextEncoder().encode(message));
+    if (error instanceof ValidationError) {
+      this.help();
+      log(red(`  ${bold("error")}: ${error.message}\n`));
+    } else {
+      throw error;
+    }
 
     Deno.exit(1);
   }

@@ -3,7 +3,6 @@ import {
   ArgumentFollowsVariadicArgument,
   DuplicateOptionName,
   InvalidOptionValue,
-  MissingOptionName,
   MissingOptionValue,
   RequiredArgumentFollowsOptionalArgument,
   UnknownConflictingOption,
@@ -129,10 +128,6 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           optionalValue: true,
           type: OptionType.STRING,
         };
-      }
-
-      if (!option.name) {
-        throw new MissingOptionName(current);
       }
 
       const positiveName: string = option.name.replace(/^no-?/, "");
