@@ -846,7 +846,7 @@ try {
 
 ```textile
 $ deno run https://deno.land/x/cliffy/examples/command/override_exit_handling.ts -t
-[CUSTOM_ERROR] Error: Unknown option "-t".
+[CUSTOM_VALIDATION_ERROR] Unknown option "-t". Did you mean option "-h"?
 ```
 
 ## ❯ Custom types
