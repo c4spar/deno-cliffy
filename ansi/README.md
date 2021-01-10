@@ -76,7 +76,7 @@ strings. The last property must be invoked as a method to generate the ansi stri
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 console.log(
-  myAnsi.cursorUp.cursorLeft.eraseDown()
+  ansi.cursorUp.cursorLeft.eraseDown()
 );
 ```
 
@@ -86,7 +86,7 @@ If a method takes some arguments, you have to invoke the `.toString()` method to
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 console.log(
-  myAnsi.cursorUp(2).cursorLeft.eraseDown(2).toString()
+  ansi.cursorUp(2).cursorLeft.eraseDown(2).toString()
 );
 ```
 
