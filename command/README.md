@@ -68,6 +68,7 @@
 - [Environment variables](#-environment-variables)
 - [Add examples](#-add-examples)
 - [Auto generated help](#-auto-generated-help)
+  - [Customize help](#customize-help)
   - [Help option](#help-option)
   - [Help command](#help-command)
 - [Did you mean](#-did-you-mean)
@@ -1007,10 +1008,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
 The help information is auto-generated based on the information you have defined on your command's.
 
-### Help option
-
-The `--help` and `-h` option flag prints the auto generated help.
-
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
 import { CompletionsCommand } from "https://deno.land/x/cliffy/command/completions/mod.ts";
@@ -1038,6 +1035,42 @@ $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.t
 ```
 
 ![](assets/img/help.gif)
+
+### Customize help
+
+Customize default help with the `.help()` method.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/command.ts";
+
+await new Command()
+  .help({
+    // Show argument types.
+    types: true, // default: false
+    // Show hints.
+    hints: true, // default: true
+  })
+  .option("-f, --foo [val:number]", "Some description.", { required: true, default: 2 })
+  .parse();
+```
+
+You can also override the help output with the `.help()` method. This overrides the output of the `.getHelp()` and
+`.showHelp()` method's which is used by the `-h` and `--help` option and the `help` command. The help handler will be
+used for each command, but can be overridden by child commands.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/command.ts";
+
+await new Command()
+  .help("My custom help")
+  // Can be also a function.
+  .help(() => "My custom help")
+  .parse();
+```
+
+### Help option
+
+The `--help` and `-h` option flag prints the auto generated help.
 
 #### Customize help option
 
