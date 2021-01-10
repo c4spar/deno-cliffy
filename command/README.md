@@ -823,8 +823,7 @@ args: [ "-p", "80" ]
 By default, cliffy calls `Deno.exit` when it detects validation errors. You can override this behaviour with the `.throwErrors()` method.
 
 ```typescript
-import { ValidationError } from "https://deno.land/x/cliffy/flags/mod.ts";
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { Command, ValidationError } from "https://deno.land/x/cliffy/command/mod.ts";
 
 try {
   await new Command()

@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
-import { ValidationError } from "../../flags/mod.ts";
+import { Command, ValidationError } from "../../command/mod.ts";
 
 try {
   await new Command()
