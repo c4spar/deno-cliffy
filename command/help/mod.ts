@@ -22,7 +22,7 @@ export class HelpCommand extends Command {
             ...this.getAliases(),
           ]);
         }
-        cmd.help();
+        cmd.showHelp();
         Deno.exit(0);
       });
   }

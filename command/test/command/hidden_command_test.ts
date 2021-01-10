@@ -8,6 +8,10 @@ function command(): Command {
     .throwErrors()
     .version("1.0.0")
     .description("Test description ...")
+    .help({
+      types: true,
+      hints: true,
+    })
     .command("help", new HelpCommand())
     .command("completions", new CompletionsCommand())
     .command("hidden-command <input:string> <output:string>")

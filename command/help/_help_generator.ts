@@ -15,16 +15,27 @@ import {
 import { IArgument } from "../types.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
+export interface HelpOptions {
+  types?: boolean;
+  hints?: boolean;
+}
+
 /** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
+  private options: HelpOptions;
 
   /** Generate help text for given command. */
-  public static generate(cmd: Command): string {
-    return new HelpGenerator(cmd).generate();
+  public static generate(cmd: Command, options?: HelpOptions): string {
+    return new HelpGenerator(cmd, options).generate();
   }
 
-  private constructor(protected cmd: Command) {}
+  private constructor(private cmd: Command, options: HelpOptions = {}) {
+    this.options = Object.assign({
+      types: false,
+      hints: true,
+    }, options);
+  }
 
   private generate(): string {
     return this.generateHeader() +
@@ -91,7 +102,10 @@ export class HelpGenerator {
         Table.from([
           ...options.map((option: IOption) => [
             option.flags.split(/,? +/g).map((flag) => blue(flag)).join(", "),
-            highlightArguments(option.typeDefinition || ""),
+            highlightArguments(
+              option.typeDefinition || "",
+              this.options.types,
+            ),
             red(bold("-")) + " " +
             option.description.split("\n").shift() as string,
             this.generateHints(option),
@@ -139,6 +153,7 @@ export class HelpGenerator {
             ).join(", "),
             highlightArguments(
               command.getArgsDefinition() || "",
+              this.options.types,
             ),
             red(bold("-")) + " " +
             command.getDescription().split("\n").shift() as string,
@@ -174,7 +189,10 @@ export class HelpGenerator {
       Table.from([
         ...envVars.map((envVar: IEnvVar) => [
           envVar.names.map((name: string) => blue(name)).join(", "),
-          highlightArgumentDetails(envVar.details),
+          highlightArgumentDetails(
+            envVar.details,
+            this.options.types,
+          ),
           `${red(bold("-"))} ${envVar.description}`,
         ]),
       ])
@@ -202,6 +220,9 @@ export class HelpGenerator {
   }
 
   private generateHints(option: IOption): string {
+    if (!this.options.hints) {
+      return "";
+    }
     const hints = [];
 
     option.required && hints.push(yellow(`required`));
@@ -246,21 +267,26 @@ function inspect(value: unknown): string {
 /**
  * Colorize arguments string.
  * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
+ * @param types Show types.
  */
-function highlightArguments(argsDefinition: string) {
+function highlightArguments(argsDefinition: string, types = true) {
   if (!argsDefinition) {
     return "";
   }
 
   return parseArgumentsDefinition(argsDefinition)
-    .map((arg: IArgument) => highlightArgumentDetails(arg)).join(" ");
+    .map((arg: IArgument) => highlightArgumentDetails(arg, types)).join(" ");
 }
 
 /**
  * Colorize argument string.
  * @param arg Argument details.
+ * @param types Show types.
  */
-function highlightArgumentDetails(arg: IArgument): string {
+function highlightArgumentDetails(
+  arg: IArgument,
+  types = true,
+): string {
   let str = "";
 
   str += yellow(arg.optionalValue ? "[" : "<");
@@ -274,10 +300,10 @@ function highlightArgumentDetails(arg: IArgument): string {
 
   str += name;
 
-  // if ( arg.name !== arg.type ) {
-  str += yellow(":");
-  str += red(arg.type);
-  // }
+  if (types) {
+    str += yellow(":");
+    str += red(arg.type);
+  }
 
   if (arg.list) {
     str += green("[]");

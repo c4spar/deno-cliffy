@@ -27,7 +27,7 @@ To enable shell completions for this program add following line to your ${
       }
 `;
     })
-      .action(() => this.help())
+      .action(() => this.showHelp())
       .command("bash", new BashCompletionsCommand(this.#cmd))
       .command("fish", new FishCompletionsCommand(this.#cmd))
       .command("zsh", new ZshCompletionsCommand(this.#cmd))

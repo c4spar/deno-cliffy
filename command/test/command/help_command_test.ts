@@ -9,7 +9,11 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
   const cmd = new Command()
     .throwErrors()
     .version("1.0.0")
-    .description("Test description ...");
+    .description("Test description ...")
+    .help({
+      hints: true,
+      types: true,
+    });
 
   if (!defaultOptions) {
     cmd.versionOption(false)

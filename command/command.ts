@@ -39,6 +39,7 @@ import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
+import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   IAction,
   IArgument,
@@ -105,6 +106,7 @@ export class Command<O = any, A extends Array<any> = any> {
   private hasDefaults = false;
   private _versionOption?: IDefaultOption<O, A> | false;
   private _helpOption?: IDefaultOption<O, A> | false;
+  private _help?: (this: Command<O, A>) => string;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -320,6 +322,21 @@ export class Command<O = any, A extends Array<any> = any> {
     return this;
   }
 
+  public help(
+    help: string | ((this: Command<O, A>) => string) | HelpOptions,
+  ): this {
+    if (typeof help === "string") {
+      this.cmd._help = () => help;
+    } else if (typeof help === "function") {
+      this.cmd._help = help;
+    } else {
+      this.cmd._help = function (this: Command<O, A>): string {
+        return HelpGenerator.generate(this, help);
+      };
+    }
+    return this;
+  }
+
   /**
    * Set the long command description.
    * @param description The command description.
@@ -488,7 +505,7 @@ export class Command<O = any, A extends Array<any> = any> {
    *   cmd.parse();
    * } catch(error) {
    *   if (error instanceof ValidationError) {
-   *     cmd.help();
+   *     cmd.showHelp();
    *     Deno.exit(1);
    *   }
    *   throw error;
@@ -721,6 +738,12 @@ export class Command<O = any, A extends Array<any> = any> {
 
     this.reset();
 
+    if (!this._help) {
+      this._help = function (this: Command<O, A>): string {
+        return HelpGenerator.generate(this);
+      };
+    }
+
     if (this.ver && this._versionOption !== false) {
       this.option(
         this._versionOption?.flags || "-V, --version",
@@ -748,7 +771,7 @@ export class Command<O = any, A extends Array<any> = any> {
           global: true,
           prepend: true,
           action: function (this: Command) {
-            this.help();
+            this.showHelp();
             Deno.exit(0);
           },
         }, this._helpOption?.opts ?? {}),
@@ -1032,7 +1055,7 @@ export class Command<O = any, A extends Array<any> = any> {
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       return error;
     }
-    this.help();
+    this.showHelp();
     Deno.stderr.writeSync(
       new TextEncoder().encode(
         red(`  ${bold("error")}: ${error.message}\n`) + "\n",
@@ -1140,14 +1163,14 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /** Output generated help without exiting. */
-  public help() {
+  public showHelp() {
     Deno.stdout.writeSync(new TextEncoder().encode(this.getHelp()));
   }
 
   /** Get generated help. */
   public getHelp(): string {
     this.registerDefaults();
-    return HelpGenerator.generate(this);
+    return (this._help!)();
   }
 
   /*****************************************************************************
