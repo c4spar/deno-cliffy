@@ -39,11 +39,11 @@ Deno.test("negatable flags", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("duplicate option with negatable flags", () => {
+Deno.test("Option with name with negatable flags", () => {
   assertThrows(
     () => parseFlags(["--color", "--no-color", "--no-check"], options),
     Error,
-    `Duplicate option "--no-color".`,
+    `Option with name "--no-color" already exists.`,
   );
 });
 

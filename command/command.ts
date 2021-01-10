@@ -1,12 +1,43 @@
-import { didYouMean, didYouMeanType } from "../flags/_utils.ts";
+import {
+  DuplicateOptionName,
+  UnknownType,
+  ValidationError,
+} from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagsResult } from "../flags/types.ts";
-import { existsSync, red } from "./deps.ts";
+import {
+  getPermissions,
+  hasPermission,
+  isUnstable,
+  parseArgumentsDefinition,
+  splitArguments,
+} from "./_utils.ts";
+import type { PermissionName } from "./_utils.ts";
+import { bold, existsSync, red } from "./deps.ts";
+import {
+  CommandExecutableNotFound,
+  CommandNotFound,
+  DefaultCommandNotFound,
+  DuplicateCommandAlias,
+  DuplicateCommandName,
+  DuplicateCompletion,
+  DuplicateEnvironmentVariable,
+  DuplicateExample,
+  DuplicateType,
+  EnvironmentVariableOptionalValue,
+  EnvironmentVariableSingleValue,
+  EnvironmentVariableVariadicValue,
+  MissingArgument,
+  MissingArguments,
+  MissingCommandName,
+  NoArgumentsAllowed,
+  TooManyArguments,
+  UnknownCommand,
+} from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
-import { ArgumentsParser } from "./_arguments_parser.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
@@ -28,49 +59,6 @@ import type {
   ITypeInfo,
   ITypeOptions,
 } from "./types.ts";
-
-type PermissionName =
-  | "run"
-  | "read"
-  | "write"
-  | "net"
-  | "env"
-  | "plugin"
-  | "hrtime";
-
-async function hasPermission(permission: PermissionName): Promise<boolean> {
-  try {
-    // deno-lint-ignore no-explicit-any
-    return (await (Deno as any).permissions?.query?.({ name: permission }))
-      ?.state === "granted";
-  } catch {
-    return false;
-  }
-}
-
-async function hasPermissions<K extends PermissionName>(
-  names: K[],
-): Promise<Record<K, boolean>> {
-  const permissions: Record<string, boolean> = {};
-  await Promise.all(
-    names.map((name: K) =>
-      hasPermission(name).then((hasPermission) =>
-        permissions[name] = hasPermission
-      )
-    ),
-  );
-  return permissions as Record<K, boolean>;
-}
-
-const permissions = await hasPermissions([
-  "env",
-  "hrtime",
-  "net",
-  "plugin",
-  "read",
-  "run",
-  "write",
-]);
 
 // deno-lint-ignore no-explicit-any
 interface IDefaultOption<O = any, A extends Array<any> = any> {
@@ -213,18 +201,18 @@ export class Command<O = any, A extends Array<any> = any> {
     cmdOrDescription?: Command | string,
     override?: boolean,
   ): this {
-    const result = ArgumentsParser.splitArguments(nameAndArguments);
+    const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
     const aliases: string[] = result.flags;
 
     if (!name) {
-      throw this.error(new Error("Missing command name."));
+      throw new MissingCommandName();
     }
 
     if (this.getBaseCommand(name, true)) {
       if (!override) {
-        throw this.error(new Error(`Duplicate command "${name}".`));
+        throw new DuplicateCommandName(name);
       }
       this.removeCommand(name);
     }
@@ -285,14 +273,8 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param alias Tha name of the alias.
    */
   public alias(alias: string): this {
-    if (this.cmd === this) {
-      throw this.error(
-        new Error(`Failed to add alias "${alias}". No sub command selected.`),
-      );
-    }
-
     if (this.cmd.aliases.indexOf(alias) !== -1) {
-      throw this.error(new Error(`Duplicate alias "${alias}".`));
+      throw new DuplicateCommandAlias(alias);
     }
 
     this.cmd.aliases.push(alias);
@@ -313,13 +295,7 @@ export class Command<O = any, A extends Array<any> = any> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw this.error(
-        new Error(
-          `Unknown sub-command "${name}".${
-            didYouMeanCommand(name, this.getBaseCommands(true))
-          }`,
-        ),
-      );
+      throw new CommandNotFound(name, this.getBaseCommands(true));
     }
 
     this.cmd = cmd;
@@ -470,7 +446,7 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ITypeOptions,
   ): this {
     if (this.cmd.types.get(name) && !options?.override) {
-      throw this.error(new Error(`Type with name "${name}" already exists.`));
+      throw new DuplicateType(name);
     }
 
     this.cmd.types.set(name, { ...options, name, handler });
@@ -499,9 +475,7 @@ export class Command<O = any, A extends Array<any> = any> {
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
-      throw this.error(
-        new Error(`Completion with name "${name}" already exists.`),
-      );
+      throw new DuplicateCompletion(name);
     }
 
     this.cmd.completions.set(name, {
@@ -514,9 +488,31 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-   * Throw error's instead of calling `Deno.exit()` to handle error's manually.
+   * Throw validation error's instead of calling `Deno.exit()` to handle
+   * validation error's manually.
+   *
+   * A validation error is thrown when the command is wrongly used by the user.
+   * For example: If the user passes some invalid options or arguments to the
+   * command.
+   *
    * This has no effect for parent commands. Only for the command on which this
    * method was called and all child commands.
+   *
+   * **Example:**
+   *
+   * ```
+   * try {
+   *   cmd.parse();
+   * } catch(error) {
+   *   if (error instanceof ValidationError) {
+   *     cmd.showHelp();
+   *     Deno.exit(1);
+   *   }
+   *   throw error;
+   * }
+   * ```
+   *
+   * @see ValidationError
    */
   public throwErrors(): this {
     this.cmd.throwOnError = true;
@@ -543,10 +539,10 @@ export class Command<O = any, A extends Array<any> = any> {
       return this.option(flags, desc, { value: opts });
     }
 
-    const result = ArgumentsParser.splitArguments(flags);
+    const result = splitArguments(flags);
 
     const args: IArgument[] = result.typeDefinition
-      ? ArgumentsParser.parseArgumentsDefinition(result.typeDefinition)
+      ? parseArgumentsDefinition(result.typeDefinition)
       : [];
 
     const option: IOption = {
@@ -575,9 +571,7 @@ export class Command<O = any, A extends Array<any> = any> {
       if (
         option.name === name || option.aliases && ~option.aliases.indexOf(name)
       ) {
-        throw this.error(
-          new Error(`Command with name "${name}" already exists.`),
-        );
+        throw new DuplicateOptionName(name);
       }
 
       if (!option.name && isLong) {
@@ -592,9 +586,7 @@ export class Command<O = any, A extends Array<any> = any> {
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw this.error(
-            new Error(`Option with name "${name}" already exists.`),
-          );
+          throw new DuplicateOptionName(name);
         }
       }
     }
@@ -615,9 +607,7 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
-      throw this.error(
-        new Error(`Example with name "${name}" already exists.`),
-      );
+      throw new DuplicateExample(name);
     }
 
     this.cmd.examples.push({ name, description });
@@ -636,40 +626,26 @@ export class Command<O = any, A extends Array<any> = any> {
     description: string,
     options?: IEnvVarOptions,
   ): this {
-    const result = ArgumentsParser.splitArguments(name);
+    const result = splitArguments(name);
 
     if (!result.typeDefinition) {
       result.typeDefinition = "<value:boolean>";
     }
 
     if (result.flags.some((envName) => this.cmd.getBaseEnvVar(envName, true))) {
-      throw this.error(
-        new Error(`Environment variable with name "${name}" already exists.`),
-      );
+      throw new DuplicateEnvironmentVariable(name);
     }
 
-    const details: IArgument[] = ArgumentsParser.parseArgumentsDefinition(
+    const details: IArgument[] = parseArgumentsDefinition(
       result.typeDefinition,
     );
 
     if (details.length > 1) {
-      throw this.error(
-        new Error(
-          `An environment variable can only have one value but "${name}" has more than one.`,
-        ),
-      );
+      throw new EnvironmentVariableSingleValue(name);
     } else if (details.length && details[0].optionalValue) {
-      throw this.error(
-        new Error(
-          `An environment variable can not have an optional value but "${name}" is defined as optional.`,
-        ),
-      );
+      throw new EnvironmentVariableOptionalValue(name);
     } else if (details.length && details[0].variadic) {
-      throw this.error(
-        new Error(
-          `An environment variable can not have an variadic value but "${name}" is defined as variadic.`,
-        ),
-      );
+      throw new EnvironmentVariableVariadicValue(name);
     }
 
     this.cmd.envVars.push({
@@ -696,62 +672,60 @@ export class Command<O = any, A extends Array<any> = any> {
     args: string[] = Deno.args,
     dry?: boolean,
   ): Promise<IParseResult<O, A>> {
-    // @TODO: remove all `this.error()` calls and catch errors only in parse method!
+    try {
+      this.reset().registerDefaults();
+      this.rawArgs = args;
+      const subCommand = args.length > 0 && this.getCommand(args[0], true);
 
-    this.reset()
-      .registerDefaults();
-
-    this.rawArgs = args;
-
-    const subCommand = this.rawArgs.length > 0 &&
-      this.getCommand(this.rawArgs[0], true);
-
-    if (subCommand) {
-      subCommand._globalParent = this;
-      return await subCommand.parse(this.rawArgs.slice(1), dry);
-    }
-
-    if (this.isExecutable) {
-      if (!dry) {
-        await this.executeExecutable(this.rawArgs);
+      if (subCommand) {
+        subCommand._globalParent = this;
+        return await subCommand.parse(this.rawArgs.slice(1), dry);
       }
 
-      return {
-        options: {} as O,
-        args: this.rawArgs as A,
-        cmd: this,
-        literal: this.literalArgs,
-      };
-    } else if (this._useRawArgs) {
-      if (dry) {
+      if (this.isExecutable) {
+        if (!dry) {
+          await this.executeExecutable(this.rawArgs);
+        }
+
         return {
           options: {} as O,
           args: this.rawArgs as A,
           cmd: this,
           literal: this.literalArgs,
         };
+      } else if (this._useRawArgs) {
+        if (dry) {
+          return {
+            options: {} as O,
+            args: this.rawArgs as A,
+            cmd: this,
+            literal: this.literalArgs,
+          };
+        }
+
+        return await this.execute({} as O, ...this.rawArgs as A);
+      } else {
+        const { flags, unknown, literal } = this.parseFlags(this.rawArgs);
+
+        this.literalArgs = literal;
+
+        const params = this.parseArguments(unknown, flags);
+
+        await this.validateEnvVars();
+
+        if (dry) {
+          return {
+            options: flags,
+            args: params,
+            cmd: this,
+            literal: this.literalArgs,
+          };
+        }
+
+        return await this.execute(flags, ...params);
       }
-
-      return await this.execute({} as O, ...this.rawArgs as A);
-    } else {
-      const { flags, unknown, literal } = this.parseFlags(this.rawArgs);
-
-      this.literalArgs = literal;
-
-      const params = this.parseArguments(unknown, flags);
-
-      this.validateEnvVars();
-
-      if (dry) {
-        return {
-          options: flags,
-          args: params,
-          cmd: this,
-          literal: this.literalArgs,
-        };
-      }
-
-      return await this.execute(flags, ...params);
+    } catch (error) {
+      throw this.error(error);
     }
   }
 
@@ -821,31 +795,19 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     if (this.fn) {
-      try {
-        await this.fn(options, ...args);
-      } catch (e) {
-        throw this.error(e);
-      }
+      await this.fn(options, ...args);
     } else if (this.defaultCommand) {
       const cmd = this.getCommand(this.defaultCommand, true);
 
       if (!cmd) {
-        throw this.error(
-          new Error(
-            `Default command "${this.defaultCommand}" not found.${
-              didYouMeanCommand(this.defaultCommand, this.getCommands())
-            }`,
-          ),
+        throw new DefaultCommandNotFound(
+          this.defaultCommand,
+          this.getCommands(),
         );
       }
 
       cmd._globalParent = this;
-
-      try {
-        await cmd.execute(options, ...args);
-      } catch (e) {
-        throw this.error(e);
-      }
+      await cmd.execute(options, ...args);
     }
 
     return { options, args, cmd: this, literal: this.literalArgs };
@@ -856,9 +818,7 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected async executeExecutable(args: string[]) {
-    // deno-lint-ignore no-explicit-any
-    const unstable = !!(Deno as any).permissions;
-
+    const permissions = await getPermissions();
     if (!permissions.read) {
       // deno-lint-ignore no-explicit-any
       await (Deno as any).permissions?.request({ name: "read" });
@@ -892,7 +852,7 @@ export class Command<O = any, A extends Array<any> = any> {
 
     const denoOpts = [];
 
-    if (unstable) {
+    if (isUnstable()) {
       denoOpts.push("--unstable");
     }
 
@@ -920,9 +880,6 @@ export class Command<O = any, A extends Array<any> = any> {
 
       const process: Deno.Process = Deno.run({
         cmd: cmd,
-        env: {
-          CLIFFY_DEBUG: isDebug() ? "true" : "false",
-        },
       });
 
       const status: Deno.ProcessStatus = await process.status();
@@ -934,12 +891,7 @@ export class Command<O = any, A extends Array<any> = any> {
       return;
     }
 
-    throw this.error(
-      new Error(
-        `Sub-command executable not found: ${executableName}:\n    - ` +
-          files.join("\n    - "),
-      ),
-    );
+    throw new CommandExecutableNotFound(executableName, files);
   }
 
   /**
@@ -947,16 +899,12 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Raw command line arguments.
    */
   protected parseFlags(args: string[]): IFlagsResult<O> {
-    try {
-      return parseFlags<O>(args, {
-        stopEarly: this._stopEarly,
-        allowEmpty: this._allowEmpty,
-        flags: this.getOptions(true),
-        parse: (type: ITypeInfo) => this.parseType(type),
-      });
-    } catch (e) {
-      throw this.error(e);
-    }
+    return parseFlags<O>(args, {
+      stopEarly: this._stopEarly,
+      allowEmpty: this._allowEmpty,
+      flags: this.getOptions(true),
+      parse: (type: ITypeInfo) => this.parseType(type),
+    });
   }
 
   /** Parse argument type. */
@@ -964,12 +912,9 @@ export class Command<O = any, A extends Array<any> = any> {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
-      throw this.error(
-        new Error(
-          `Unknown type "${type.type}".${
-            didYouMeanType(type.type, this.getTypes().map((type) => type.name))
-          }`,
-        ),
+      throw new UnknownType(
+        type.type,
+        this.getTypes().map((type) => type.name),
       );
     }
 
@@ -979,8 +924,8 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /** Validate environment variables. */
-  protected validateEnvVars() {
-    if (!permissions.env) {
+  protected async validateEnvVars(): Promise<void> {
+    if (!await hasPermission("env")) {
       return;
     }
 
@@ -1017,17 +962,9 @@ export class Command<O = any, A extends Array<any> = any> {
     if (!this.hasArguments()) {
       if (args.length) {
         if (this.hasCommands(true)) {
-          throw this.error(
-            new Error(
-              `Unknown command "${args[0]}".${
-                didYouMeanCommand(args[0], this.getCommands())
-              }`,
-            ),
-          );
+          throw new UnknownCommand(args[0], this.getCommands());
         } else {
-          throw this.error(
-            new Error(`No arguments allowed for command "${this.getPath()}".`),
-          );
+          throw new NoArgumentsAllowed(this.getPath());
         }
       }
     } else {
@@ -1043,9 +980,7 @@ export class Command<O = any, A extends Array<any> = any> {
           );
 
           if (!hasStandaloneOption) {
-            throw this.error(
-              new Error("Missing argument(s): " + required.join(", ")),
-            );
+            throw new MissingArguments(required);
           }
         }
       } else {
@@ -1054,9 +989,7 @@ export class Command<O = any, A extends Array<any> = any> {
             if (expectedArg.optionalValue) {
               break;
             }
-            throw this.error(
-              new Error(`Missing argument: ${expectedArg.name}`),
-            );
+            throw new MissingArgument(`Missing argument: ${expectedArg.name}`);
           }
 
           let arg: unknown;
@@ -1086,7 +1019,7 @@ export class Command<O = any, A extends Array<any> = any> {
         }
 
         if (args.length) {
-          throw this.error(new Error(`Too many arguments: ${args.join(" ")}`));
+          throw new TooManyArguments(args);
         }
       }
     }
@@ -1113,26 +1046,21 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-   * Handle error. If `.throwErrors()` was called all error's will be thrown,
-   * otherwise `Deno.exit(1)` will be called.
+   * Handle error. If `throwErrors` is enabled the error will be returned,
+   * otherwise a formatted error message will be printed and `Deno.exit(1)`
+   * will be called.
    * @param error Error to handle.
-   * @param showHelp Show help.
    */
-  protected error(error: Error, showHelp = true): Error {
-    if (this.shouldThrowErrors()) {
+  protected error(error: Error): Error {
+    if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       return error;
     }
-
-    showHelp && this.showHelp();
-
-    const message = " ".repeat(2) + red(
-      isDebug() && error.stack
-        ? error.stack
-        : `${error.name}: ${error.message}`,
-    ) + "\n\n";
-
-    Deno.stderr.writeSync(new TextEncoder().encode(message));
-
+    this.showHelp();
+    Deno.stderr.writeSync(
+      new TextEncoder().encode(
+        red(`  ${bold("error")}: ${error.message}\n`) + "\n",
+      ),
+    );
     Deno.exit(1);
   }
 
@@ -1192,7 +1120,7 @@ export class Command<O = any, A extends Array<any> = any> {
   /** Get arguments. */
   public getArguments(): IArgument[] {
     if (!this.args.length && this.argsDefinition) {
-      this.args = ArgumentsParser.parseArgumentsDefinition(this.argsDefinition);
+      this.args = parseArgumentsDefinition(this.argsDefinition);
     }
 
     return this.args;
@@ -1802,23 +1730,4 @@ export class Command<O = any, A extends Array<any> = any> {
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
   }
-}
-
-function isDebug(): boolean {
-  if (!permissions.env) {
-    return false;
-  }
-  const debug: string | undefined = Deno.env.get("CLIFFY_DEBUG");
-  return debug === "true" || debug === "1";
-}
-
-export function didYouMeanCommand(
-  command: string,
-  commands: Array<Command>,
-  excludes: Array<string> = [],
-): string {
-  const commandNames = commands
-    .map((command) => command.getName())
-    .filter((command) => !excludes.includes(command));
-  return didYouMean(" Did you mean command", command, commandNames);
 }

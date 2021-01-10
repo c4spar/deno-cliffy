@@ -60,7 +60,7 @@
   - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
   - [Stop early](#stop-early)
-  - [Override exit handling](#override-exit-handling)
+  - [Error handling](#error-handling)
 - [Custom types](#-custom-types)
   - [Function types](#function-types)
   - [Class types](#class-types)
@@ -317,7 +317,7 @@ await new Command()
 
 ```
 $ deno run https://deno.land/x/cliffy/examples/command/required_options.ts
-Missing required option: --cheese
+Error: Missing required option "--cheese".
 ```
 
 ### Negatable options
@@ -654,7 +654,7 @@ await new Command()
 
 ### Argument syntax
 
-You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input can not be defined after an optional input.
+You can use `.arguments()` to specify the arguments for the top-level and for sub-commands. For sub-commands they can also be included in the `.command()` call. Angled brackets (e.g. `<required>`) indicate required input and square brackets (e.g. `[optional]`) indicate optional input. A required input cannot be defined after an optional input.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -819,27 +819,68 @@ script: server
 args: [ "-p", "80" ]
 ```
 
-### Override exit handling
+### Error handling
 
-By default cliffy calls `Deno.exit` when it detects errors. You can override this behaviour with the `.throwErrors()` method.
+By default, cliffy calls `Deno.exit` when a `ValidationError` is thrown. You can override this behaviour with the
+`.throwErrors()` method. All other errors will be thrown by default.
+
+**Catch runtime errors**
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
+const cmd = new Command()
+  .option("-p, --pizza-type <type>", "Flavour of pizza.")
+  .action(() => {
+    throw new Error("Some error happened.");
+  });
+
 try {
-  await new Command()
-    .throwErrors()
-    .option("-p, --pizza-type <type>", "Flavour of pizza.")
-    .parse(Deno.args);
-} catch (err) {
-  // custom processing...
-  console.error("[CUSTOM_ERROR]", err);
+  cmd.parse();
+} catch (error) {
+  console.error("[CUSTOM_ERROR]", error);
+  Deno.exit(1);
 }
 ```
 
 ```textile
-$ deno run https://deno.land/x/cliffy/examples/command/override_exit_handling.ts -t
-[CUSTOM_ERROR] Error: Unknown option "-t".
+$ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts -t
+Unknown option "-t". Did you mean option "-h"?
+```
+
+```textile
+$ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts
+[CUSTOM_ERROR] Some error happened.
+```
+
+**Catch validation errors**
+
+```typescript
+import { Command, ValidationError } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const cmd = new Command()
+        .throwErrors() // <-- throw also validation errors.
+        .option("-p, --pizza-type <type>", "Flavour of pizza.")
+        .action(() => {
+          throw new Error("Some error happened.");
+        });
+
+try {
+  cmd.parse();
+} catch (error) {
+  if (error instanceof ValidationError) {
+    cmd.help();
+    console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
+  } else {
+    console.error("[CUSTOM_ERROR]", error);
+  }
+  Deno.exit(1);
+}
+```
+
+```textile
+$ deno run https://deno.land/x/cliffy/examples/command/validation_error_handling.ts -t
+[CUSTOM_VALIDATION_ERROR] Unknown option "-t". Did you mean option "-h"?
 ```
 
 ## ❯ Custom types
