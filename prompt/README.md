@@ -580,9 +580,41 @@ const keywords: string[] = await List.prompt("Enter some keywords");
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
 ```
 
-The `List` prompt has all [base options](#base-options) and the following prompt specific options.
+#### Auto suggestions
+
+You can add suggestions to the `Input`, `Number` and `List` prompt to enable tab-completions.
+
+![](assets/img/suggestions_list_prompt.gif)
+
+```typescript
+import { List } from "https://deno.land/x/cliffy/prompt/list.ts";
+
+const color: string = await List.prompt({
+  message: "Choose a color",
+  suggestions: [
+    "Abbey",
+    "Absolute Zero",
+    "Acadia",
+    "Acapulco",
+    "Acid Green",
+    "Aero",
+    "Aero Blue",
+    "Affair",
+    "African Violet",
+    "Air Force Blue",
+  ],
+});
+
+console.log({ color });
+```
+
+```
+$ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_list_prompt.ts
+```
 
 **Options**
+
+The `List` prompt has all [base options](#base-options) and the following prompt specific options.
 
 | Param | Type | Required | Description |
 | ----- | :---: | :---: | ----------- |
