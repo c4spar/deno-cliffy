@@ -157,7 +157,7 @@ myTty.cursorSave
 
 ### Colors
 
-The colors module is a simple and tiny chainable wrapper around [deno's std colors](https://deno.land/std@0.82.0/fmt/colors.ts)
+The colors module is a simple and tiny chainable wrapper around [deno's std colors](https://deno.land/std/fmt/colors.ts)
 module and works similar to node's [chalk](https://github.com/chalk/chalk) module.
 
 ```typescript
