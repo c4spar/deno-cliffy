@@ -1,3 +1,34 @@
+# [v0.17.0](https://github.com/c4spar/deno-cli/compare/v0.16.0...v0.17.0) (Mon Jan 11 00:07:34 2021)
+
+### Features
+
+* **ansi:** add a chainable (chalk like) ansi colors module (#128) ([f2d8c93](https://github.com/c4spar/deno-cli/commit/f2d8c93))
+* **command:** make generated help customizable (#134) ([0cfceb7](https://github.com/c4spar/deno-cli/commit/0cfceb7))
+* **command,flags:** add *did-you-mean* support for improved error messages (#131) ([afd8697](https://github.com/c4spar/deno-cli/commit/afd8697))
+* **prompt:** add cbreak option to support custom signal handling (#106) ([a637b54](https://github.com/c4spar/deno-cli/commit/a637b54))
+* **prompt:** add auto suggestion support to Input, Number, Confirm and List prompt's ([7dd6660](https://github.com/c4spar/deno-cli/commit/7dd6660), [a67dc53](https://github.com/c4spar/deno-cli/commit/a67dc53))
+* **prompt:** add search option to Select and Checkbox prompt ([7d09739](https://github.com/c4spar/deno-cli/commit/7d09739), [a67dc53](https://github.com/c4spar/deno-cli/commit/a67dc53))
+* **prompt:** add info option to all prompts with a select or suggestions list ([c7bfce6](https://github.com/c4spar/deno-cli/commit/c7bfce6))
+* **prompt:** add pageup and pagedown keys to all prompts with a select or suggestions list ([44575e3](https://github.com/c4spar/deno-cli/commit/44575e3))
+
+### Code Refactoring
+
+* **flags, command:** improve error handling and unify error messages (#133) ([8c7789b](https://github.com/c4spar/deno-cli/commit/8c7789b))
+* **command:** refactor hints formatting in help output (#130) ([ed588e2](https://github.com/c4spar/deno-cli/commit/ed588e2))
+* **prompt:** refactor indent option ([ad7923f](https://github.com/c4spar/deno-cli/commit/ad7923f))
+* **prompt:** refactor internal keypress event handling ([37fcbaf](https://github.com/c4spar/deno-cli/commit/37fcbaf))
+
+### Documentation Updates
+
+* update documentations and add new example gifs ([4dc9991](https://github.com/c4spar/deno-cli/commit/4dc9991), [87223aa](https://github.com/c4spar/deno-cli/commit/87223aa), [df45bd8](https://github.com/c4spar/deno-cli/commit/df45bd8), [5d060b0](https://github.com/c4spar/deno-cli/commit/5d060b0), [99153ba](https://github.com/c4spar/deno-cli/commit/99153ba), [2383f5b](https://github.com/c4spar/deno-cli/commit/2383f5b))
+
+### BREAKING CHANGES
+
+* **ansi:** re-write ansi_escape module and rename to ansi (#124) ([41a39d0](https://github.com/c4spar/deno-cli/commit/41a39d0))
+* **command:** rename help method to showHelp ([0cfceb7](https://github.com/c4spar/deno-cli/commit/0cfceb7))
+
+
+
 # [v0.16.0](https://github.com/c4spar/deno-cli/compare/v0.15.0...v0.16.0) (2020-12-09)
 
 ### Features
