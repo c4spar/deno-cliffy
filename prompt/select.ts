@@ -40,7 +40,6 @@ export interface SelectSettings extends GenericListSettings<string, string> {
 export class Select<S extends SelectSettings = SelectSettings>
   extends GenericList<string, string, S> {
   protected listIndex: number = this.getListIndex(this.settings.default);
-  protected listOffset: number = this.getPageOffset(this.listIndex);
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -97,22 +96,6 @@ export class Select<S extends SelectSettings = SelectSettings>
   /** Get value of selected option. */
   protected getValue(): string {
     return this.options[this.listIndex]?.value ?? this.settings.default;
-  }
-
-  protected getListIndex(value: string | undefined) {
-    return typeof value === "undefined"
-      ? 0
-      : this.options.findIndex((item: SelectOptionSettings) =>
-        item.value === value
-      ) || 0;
-  }
-
-  protected getPageOffset(index: number) {
-    if (index === 0) {
-      return 0;
-    }
-    const height: number = this.getListHeight();
-    return Math.floor(index / height) * height;
   }
 
   /**

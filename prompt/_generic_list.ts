@@ -65,9 +65,9 @@ export interface GenericListSettings<T, V>
 /** Generic list prompt representation. */
 export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   extends GenericInput<T, V, S> {
-  protected listOffset = 0;
-  protected listIndex = 0;
   protected options: S["options"] = this.settings.options;
+  protected listIndex: number = this.getListIndex();
+  protected listOffset: number = this.getPageOffset(this.listIndex);
 
   /**
    * Create list separator.
@@ -199,6 +199,24 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       this.options.length,
       this.settings.maxRows || this.options.length,
     );
+  }
+
+  protected getListIndex(value?: string) {
+    return typeof value === "undefined"
+      ? this.options.findIndex((item: GenericListOptionSettings) =>
+        !item.disabled
+      ) || 0
+      : this.options.findIndex((item: GenericListOptionSettings) =>
+        item.value === value
+      ) || 0;
+  }
+
+  protected getPageOffset(index: number) {
+    if (index === 0) {
+      return 0;
+    }
+    const height: number = this.getListHeight();
+    return Math.floor(index / height) * height;
   }
 
   /**
