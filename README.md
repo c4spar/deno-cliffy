@@ -29,25 +29,33 @@
   <sub>>_ A collection of modules for creating interactive command line tools.</sub>
 </p>
 
-> This project is still under development. Expect breaking changes. If you find a bug or have a feature request feel free to create an issue.
+> This project is still under development. Expect breaking changes. If you find
+> a bug or have a feature request feel free to create an issue.
 
 ## ❯ Modules
 
-* **[ansi](ansi/):** Chainable ansi escape sequences to show, hide and move cli cursor, erase output and scroll window.
+- **[ansi](ansi/):** Chainable ansi escape sequences to show, hide and move cli
+  cursor, erase output and scroll window.
 
-* **[command](command/):** Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions (inspired by [node.js's](http://nodejs.org) [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
+- **[command](command/):** Create flexible command line interfaces with type
+  checking, auto generated help and out of the box support for shell completions
+  (inspired by [node.js's](http://nodejs.org)
+  [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
 
-* **[flags](flags/):** Parse command line arguments.
+- **[flags](flags/):** Parse command line arguments.
 
-* **[keycode](keycode/):** Parse ANSI key codes.
+- **[keycode](keycode/):** Parse ANSI key codes.
 
-* **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm, input, number, select, etc...
+- **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm,
+  input, number, select, etc...
 
-* **[table](table/):** Create cli table's with border, padding, nested table's, etc...
+- **[table](table/):** Create cli table's with border, padding, nested table's,
+  etc...
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](CONTRIBUTING.md).
 
 ## ❯ License
 

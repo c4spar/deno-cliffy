@@ -36,19 +36,20 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
-    - [Basic Usage](#basic-usage)
-    - [Using as Array](#using-as-array)
-    - [Header and Body](#header-and-body)
-    - [Table Options](#table-options)
-    - [Row's and Cell's](#rows-and-cells)
-    - [Colspan and Rowspan](#colspan-and-rowspan)
+  - [Basic Usage](#basic-usage)
+  - [Using as Array](#using-as-array)
+  - [Header and Body](#header-and-body)
+  - [Table Options](#table-options)
+  - [Row's and Cell's](#rows-and-cells)
+  - [Colspan and Rowspan](#colspan-and-rowspan)
 - [API](#-api)
 - [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
 
-This module can be imported directly from the repo and from following registries.
+This module can be imported directly from the repo and from following
+registries.
 
 Deno Registry
 
@@ -72,8 +73,10 @@ import { Table } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<ver
 
 ### Basic Usage
 
-To create a table you can simple create an instance of the `Table` class and pass the rows as arguments to the constructor.
-The example below will output a simple table with three rows and without any styles. The only default option is `padding` which is set to `1`.
+To create a table you can simple create an instance of the `Table` class and
+pass the rows as arguments to the constructor. The example below will output a
+simple table with three rows and without any styles. The only default option is
+`padding` which is set to `1`.
 
 ```typescript
 const table: Table = new Table(
@@ -94,7 +97,8 @@ $ deno run https://deno.land/x/cliffy/examples/table/basic_usage.ts
 
 ### Using as Array
 
-Since the `Table` class is an `Array`, you can call all the methods of the array class like `.from()`, `.sort()`, `.push()`, `.unshift()` and friends.
+Since the `Table` class is an `Array`, you can call all the methods of the array
+class like `.from()`, `.sort()`, `.push()`, `.unshift()` and friends.
 
 ```typescript
 const table: Table = Table.from([
@@ -116,8 +120,10 @@ $ deno run https://deno.land/x/cliffy/examples/table/using_as_array.ts
 
 ### Header and Body
 
-To define a table header you can use the `.header()` method. The header is not affected by any `Array` method like `.sort()` because it is stored as a separate property and not in the array stack.
-The `.body()` method adds an array of rows to the table and removes all existing rows.
+To define a table header you can use the `.header()` method. The header is not
+affected by any `Array` method like `.sort()` because it is stored as a separate
+property and not in the array stack. The `.body()` method adds an array of rows
+to the table and removes all existing rows.
 
 ```typescript
 new Table()
@@ -139,7 +145,8 @@ $ deno run https://deno.land/x/cliffy/examples/table/header_and_body.ts
 
 ### Table Options
 
-To customize the table, the table class provides a few chainable option methods. To see a list of all available options go to the [Talbe](#table) API section.
+To customize the table, the table class provides a few chainable option methods.
+To see a list of all available options go to the [Talbe](#table) API section.
 
 ```typescript
 new Table()
@@ -165,10 +172,17 @@ $ deno run https://deno.land/x/cliffy/examples/table/table_options.ts
 
 ### Row's and Cell's
 
-It is also possible to customize single rows and cell. To do this you can use the `Row` and `Cell` class. The `Row` class is also an `Array` class like the `Table` class. To see a list of all available options go to the [Row](#row) or [Cell](#cell) API section.
+It is also possible to customize single rows and cell. To do this you can use
+the `Row` and `Cell` class. The `Row` class is also an `Array` class like the
+`Table` class. To see a list of all available options go to the [Row](#row) or
+[Cell](#cell) API section.
 
 ```typescript
-import { Table, Row, Cell } from "https://deno.land/x/cliffy@<version>/table/mod.ts";
+import {
+  Cell,
+  Row,
+  Table,
+} from "https://deno.land/x/cliffy@<version>/table/mod.ts";
 
 new Table()
   .header(Row.from(["Name", "Date", "City", "Country"]).border(true))
@@ -197,7 +211,8 @@ $ deno run https://deno.land/x/cliffy/examples/table/rows_and_cells.ts
 
 ### Colspan and Rowspan
 
-Colspan and rowspan allows a single table cell to span the width/height of more than one column and/or row.
+Colspan and rowspan allows a single table cell to span the width/height of more
+than one column and/or row.
 
 ```typescript
 Table.from([
@@ -229,36 +244,36 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 ## ❯ API
 
 - [Table](#table)
-    - [.header(row)](#headerrow)
-    - [.body(rows)](#bodyrows)
-    - [.clone()](#clone)
-    - [.toString()](#tostring)
-    - [.render()](#render)
-    - [.minColWidth(width,override)](#mincolwidthwidthoverride)
-    - [.maxColWidth(width,override)](#maxcolwidthwidthoverride)
-    - [.indent(width,override)](#indentwidthoverride)
-    - [.padding(padding,override)](#paddingpaddingoverride)
-    - [.border(enable,override)](#borderenableoverride)
-    - [.chars(chars)](#charschars)
-    - [.getHeader()](#getheader)
-    - [.getBody()](#getbody)
-    - [.getMinColWidth()](#getmincolwidth)
-    - [.getMaxColWidth()](#getmaxcolwidth)
-    - [.getIndent()](#getindent)
-    - [.getPadding()](#getpadding)
-    - [.getBorder()](#getborder)
+  - [.header(row)](#headerrow)
+  - [.body(rows)](#bodyrows)
+  - [.clone()](#clone)
+  - [.toString()](#tostring)
+  - [.render()](#render)
+  - [.minColWidth(width,override)](#mincolwidthwidthoverride)
+  - [.maxColWidth(width,override)](#maxcolwidthwidthoverride)
+  - [.indent(width,override)](#indentwidthoverride)
+  - [.padding(padding,override)](#paddingpaddingoverride)
+  - [.border(enable,override)](#borderenableoverride)
+  - [.chars(chars)](#charschars)
+  - [.getHeader()](#getheader)
+  - [.getBody()](#getbody)
+  - [.getMinColWidth()](#getmincolwidth)
+  - [.getMaxColWidth()](#getmaxcolwidth)
+  - [.getIndent()](#getindent)
+  - [.getPadding()](#getpadding)
+  - [.getBorder()](#getborder)
 - [Row](#row)
-    - [.clone()](#clone-1)
-    - [.border(enable,override)](#borderenableoverride-1)
-    - [.getBorder()](#getborder-1)
+  - [.clone()](#clone-1)
+  - [.border(enable,override)](#borderenableoverride-1)
+  - [.getBorder()](#getborder-1)
 - [Cell](#cell)
-    - [.clone()](#clone-2)
-    - [.border(enable,override)](#borderenableoverride-2)`
-    - [.colSpan(span,override)](#colspanspanoverride)
-    - [.rowSpan(span,override)](#rowspanspanoverride)
-    - [.getBorder()](#getborder-2)
-    - [.getColSpan()](#getcolspan)
-    - [.getRowSpan()](#getrowspan)
+  - [.clone()](#clone-2)
+  - [.border(enable,override)](#borderenableoverride-2)`
+  - [.colSpan(span,override)](#colspanspanoverride)
+  - [.rowSpan(span,override)](#rowspanspanoverride)
+  - [.getBorder()](#getborder-2)
+  - [.getColSpan()](#getcolspan)
+  - [.getRowSpan()](#getrowspan)
 
 ### Table
 
@@ -266,172 +281,174 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 
 Sets the table header row.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| row | `IRow ` | Yes | Can be an `Array` of `string`'s and `Cell`'s |
+| Argument |  Type  | Required | Description                                  |
+| -------- | :----: | :------: | -------------------------------------------- |
+| row      | `IRow` |   Yes    | Can be an `Array` of `string`'s and `Cell`'s |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .body(rows)
 
 Adds an array of rows to the table and removes all existing rows.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| rows | `Array<IRow>` | Yes | `Array` of row's. A row can be an `Array` of `string`'s and `Cell`'s |
+| Argument |     Type      | Required | Description                                                          |
+| -------- | :-----------: | :------: | -------------------------------------------------------------------- |
+| rows     | `Array<IRow>` |   Yes    | `Array` of row's. A row can be an `Array` of `string`'s and `Cell`'s |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .clone()
 
 Clones the table.
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .toString()
 
 Generates the table string.
 
-*Return type*: `string`
+_Return type_: `string`
 
 #### .render()
 
 Outputs the result of the `.toString()` method with `Deno.stdout.writeSnyc()`.
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .minColWidth(width,override)
 
 Set min column with.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| width | `number | Array<number>` | Yes | Min column with. To give all columns the same min width pass a number to `.minColWidth()`, to give each column an indiviuel min width you can pass an `Array<number>` to `.minColWidth()`. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    |    Required    | Description                                                    |
+| -------- | :-------: | :------------: | -------------------------------------------------------------- |
+| width    |  `number  | Array<number>` | Yes                                                            |
+| override | `boolean` |       No       | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .maxColWidth(width,override)
 
 Set max column with.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| width | `number | Array<number>` | Yes | Max column with. To give all columns the same max width pass a number to `. maxColWidth()`, to give each column an indiviuel max width you can pass an `Array<number>` to `. maxColWidth()`. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    |    Required    | Description                                                    |
+| -------- | :-------: | :------------: | -------------------------------------------------------------- |
+| width    |  `number  | Array<number>` | Yes                                                            |
+| override | `boolean` |       No       | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .indent(width,override)
 
 Indent the table output.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| width | `number` | Yes | Indent width. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| width    | `number`  |   Yes    | Indent width.                                                  |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .padding(padding,override)
 
-Set column padding. If border is enabled the padding will be applyed on the left and the right side of each cell.
+Set column padding. If border is enabled the padding will be applyed on the left
+and the right side of each cell.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| padding | `number | number[]` | Yes | Padding with. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required  | Description                                                    |
+| -------- | :-------: | :-------: | -------------------------------------------------------------- |
+| padding  |  `number  | number[]` | Yes                                                            |
+| override | `boolean` |    No     | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .border(enable,override)
 
 Enable table border. Doesn't override row and cell settings.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| enable | `boolean` | Yes | Enable or disable table border. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| enable   | `boolean` |   Yes    | Enable or disable table border.                                |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .chars(chars)
 
-Override default border characters. Doesn't override row and cell settings.
-To change the default border characters globally you can use the static `Table.chars(chars)` method.
+Override default border characters. Doesn't override row and cell settings. To
+change the default border characters globally you can use the static
+`Table.chars(chars)` method.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| chars | `IBorderOptions` | Yes | An object with border characters. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |       Type       | Required | Description                                                    |
+| -------- | :--------------: | :------: | -------------------------------------------------------------- |
+| chars    | `IBorderOptions` |   Yes    | An object with border characters.                              |
+| override |    `boolean`     |    No    | Set override to `false` to prevent overriding existing values. |
 
 Here is an example of the default border characters:
 
-```typescript
+```
 {
-    top: "─",
-    topMid: "┬",
-    topLeft: "┌",
-    topRight: "┐",
-    bottom: "─",
-    bottomMid: "┴",
-    bottomLeft: "└",
-    bottomRight: "┘",
-    left: "│",
-    leftMid: "├",
-    mid: "─",
-    midMid: "┼",
-    right: "│",
-    rightMid: "┤",
-    middle: "│"
-}
+  top: "─",
+  topMid: "┬",
+  topLeft: "┌",
+  topRight: "┐",
+  bottom: "─",
+  bottomMid: "┴",
+  bottomLeft: "└",
+  bottomRight: "┘",
+  left: "│",
+  leftMid: "├",
+  mid: "─",
+  midMid: "┼",
+  right: "│",
+  rightMid: "┤",
+  middle: "│",
+};
 ```
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .getHeader()
 
 Returns the header row.
 
-*Return type*: `Row | undefined `
+_Return type_: `Row | undefined`
 
 #### .getBody()
 
 Returns all body rows.
 
-*Return type*: `IRow[]`
+_Return type_: `IRow[]`
 
 #### .getMinColWidth()
 
 Get min columns width.
 
-*Return type*: `number | number[]`
+_Return type_: `number | number[]`
 
 #### .getMaxColWidth()
 
 Get max columns width.
 
-*Return type*: `number | number[]`
+_Return type_: `number | number[]`
 
 #### .getIndent()
 
 Get indent width.
 
-*Return type*: `number`
+_Return type_: `number`
 
 #### .getPadding()
 
 Get padding.
 
-*Return type*: `number | number[]`
+_Return type_: `number | number[]`
 
 #### .getBorder()
 
 Check if border is enabled on the table.
 
-*Return type*: `boolean`
+_Return type_: `boolean`
 
-***
+---
 
 ### Row
 
@@ -439,26 +456,26 @@ Check if border is enabled on the table.
 
 Clones the row.
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .border(enable,override)
 
 Enable row border. Override table settings but not cell settings.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| enable | `boolean` | Yes | Enable or disable table border. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| enable   | `boolean` |   Yes    | Enable or disable table border.                                |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .getBorder()
 
 Check if border is enabled on the row.
 
-*Return type*: `boolean`
+_Return type_: `boolean`
 
-***
+---
 
 ### Cell
 
@@ -466,62 +483,65 @@ Check if border is enabled on the row.
 
 Clones the cell.
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .border(enable,override)
 
 Enable cell border. Overrides table and row settings.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| enable | `boolean` | Yes | Enable or disable table border. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| enable   | `boolean` |   Yes    | Enable or disable table border.                                |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .colSpan(span,override)
 
-Allows a single table cell to span the width of more than one cell or column. Can be combined with `.rowSpan()`.
+Allows a single table cell to span the width of more than one cell or column.
+Can be combined with `.rowSpan()`.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| span | `number` | Yes | Number of columns to span the cell. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| span     | `number`  |   Yes    | Number of columns to span the cell.                            |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .rowSpan(span,override)
 
-Allows a single table cell to span the height of more than one cell or row. Can be combined with `.colSpan()`.
+Allows a single table cell to span the height of more than one cell or row. Can
+be combined with `.colSpan()`.
 
-| Argument | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| span | `number` | Yes | Number of rows to span the cell. |
-| override | `boolean` | No | Set override to `false` to prevent overriding existing values. |
+| Argument |   Type    | Required | Description                                                    |
+| -------- | :-------: | :------: | -------------------------------------------------------------- |
+| span     | `number`  |   Yes    | Number of rows to span the cell.                               |
+| override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
 
-*Return type*: `this`
+_Return type_: `this`
 
 #### .getBorder()
 
 Check if border is enabled on the cell.
 
-*Return type*: `boolean`
+_Return type_: `boolean`
 
 #### .getColSpan()
 
 Get cell column span.
 
-*Return type*: `number`
+_Return type_: `number`
 
 #### .getRowSpan()
 
 Get cell row span.
 
-*Return type*: `number`
+_Return type_: `number`
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 
