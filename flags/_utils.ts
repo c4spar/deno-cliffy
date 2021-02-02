@@ -37,13 +37,7 @@ export function didYouMeanOption(
 ): string {
   const optionNames = options
     .map((option) => [option.name, ...(option.aliases ?? [])])
-    .reduce(
-      (prev, cur) => {
-        prev.push(...cur);
-        return prev;
-      },
-      [],
-    )
+    .flat()
     .map((option) => getFlag(option));
   return didYouMean(" Did you mean option", getFlag(option), optionNames);
 }

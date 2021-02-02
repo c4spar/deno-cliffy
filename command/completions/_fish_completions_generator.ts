@@ -93,11 +93,10 @@ ${this.generateCompletions(this.cmd).trim()}
   }
 
   private completeOption(command: Command, option: IOption) {
-    const flags = option.flags.split(/[, ] */g);
-    const shortOption: string | undefined = flags
+    const shortOption: string | undefined = option.flags
       .find((flag) => flag.length === 2)
       ?.replace(/^(-)+/, "");
-    const longOption: string | undefined = flags
+    const longOption: string | undefined = option.flags
       .find((flag) => flag.length > 2)
       ?.replace(/^(-)+/, "");
 

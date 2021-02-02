@@ -70,7 +70,7 @@ export interface ICommandOption<O = any, A extends Array<any> = any>
 export interface IOption<O = any, A extends Array<any> = any>
   extends ICommandOption<O, A>, IFlagOptions {
   description: string;
-  flags: string;
+  flags: Array<string>;
   typeDefinition?: string;
   args: IArgument[];
 }
