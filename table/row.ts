@@ -25,7 +25,7 @@ export class Row<T extends ICell = ICell> extends Array<T> {
   public static from<T extends ICell = ICell>(cells: IRow<T>): Row<T> {
     const row = new this(...cells);
     if (cells instanceof Row) {
-      row.options = Object.assign({}, cells.options);
+      row.options = { ...cells.options };
     }
     return row;
   }
@@ -35,7 +35,7 @@ export class Row<T extends ICell = ICell> extends Array<T> {
     const row = new Row(
       ...this.map((cell: T) => cell instanceof Cell ? cell.clone() : cell),
     );
-    row.options = Object.assign({}, this.options);
+    row.options = { ...this.options };
     return row;
   }
 

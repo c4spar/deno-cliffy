@@ -26,7 +26,7 @@ export class Cell {
   public static from(value: ICell): Cell {
     const cell = new this(value);
     if (value instanceof Cell) {
-      cell.options = Object.assign({}, value.options);
+      cell.options = { ...value.options };
     }
     return cell;
   }
@@ -57,7 +57,7 @@ export class Cell {
    */
   public clone(value?: ICell): Cell {
     const cell = new Cell(value ?? this);
-    cell.options = Object.assign({}, this.options);
+    cell.options = { ...this.options };
     return cell;
   }
 

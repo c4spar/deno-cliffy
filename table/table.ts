@@ -26,14 +26,14 @@ export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
 /** Table representation. */
 export class Table<T extends IRow = IRow> extends Array<T> {
-  protected static _chars: IBorder = Object.assign({}, border);
+  protected static _chars: IBorder = { ...border };
   protected options: ITableSettings = {
     indent: 0,
     border: false,
     maxColWidth: Infinity,
     minColWidth: 0,
     padding: 1,
-    chars: Object.assign({}, Table._chars),
+    chars: { ...Table._chars },
   };
   private headerRow?: Row;
 
@@ -45,7 +45,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   public static from<T extends IRow>(rows: ITable<T>): Table<T> {
     const table = new this(...rows);
     if (rows instanceof Table) {
-      table.options = Object.assign({}, rows.options);
+      table.options = { ...rows.options };
       table.headerRow = rows.headerRow ? Row.from(rows.headerRow) : undefined;
     }
     return table;
@@ -114,7 +114,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
         row instanceof Row ? row.clone() : Row.from(row).clone()
       ),
     );
-    table.options = Object.assign({}, this.options);
+    table.options = { ...this.options };
     table.headerRow = this.headerRow?.clone();
     return table;
   }
