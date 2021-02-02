@@ -134,11 +134,7 @@ ${childCommandCompletions}`;
 
   private getFlags(command: Command): string[] {
     return command.getOptions(false)
-      .map((option) =>
-        option.flags
-          .split(",")
-          .map((flag) => flag.trim())
-      )
+      .map((option) => option.flags)
       .flat();
   }
 
@@ -152,7 +148,6 @@ ${childCommandCompletions}`;
       opts += 'case "${prev}" in';
       for (const option of options) {
         const flags: string = option.flags
-          .split(",")
           .map((flag) => flag.trim())
           .join("|");
 

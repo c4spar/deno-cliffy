@@ -546,12 +546,12 @@ export class Command<O = any, A extends Array<any> = any> {
       : [];
 
     const option: IOption = {
+      ...opts,
       name: "",
       description: desc,
       args,
-      flags: result.flags.join(", "),
+      flags: result.flags,
       typeDefinition: result.typeDefinition,
-      ...opts,
     };
 
     if (option.separator) {
@@ -562,7 +562,7 @@ export class Command<O = any, A extends Array<any> = any> {
       }
     }
 
-    for (const part of result.flags) {
+    for (const part of option.flags) {
       const arg = part.trim();
       const isLong = /^--/.test(arg);
 
@@ -788,8 +788,7 @@ export class Command<O = any, A extends Array<any> = any> {
    */
   protected async execute(options: O, ...args: A): Promise<IParseResult<O, A>> {
     const actionOption = this.findActionFlag(options);
-
-    if (actionOption && actionOption.action) {
+    if (actionOption?.action) {
       await actionOption.action.call(this, options, ...args);
       return { options, args, cmd: this, literal: this.literalArgs };
     }

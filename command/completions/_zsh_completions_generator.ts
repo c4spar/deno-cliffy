@@ -206,13 +206,11 @@ function _${replaceSpecialChars(path)}() {` +
   private generateOptions(command: Command, path: string) {
     const options: string[] = [];
     const cmdArgs: string[] = path.split(" ");
-    const baseName: string = cmdArgs.shift() as string;
+    const _baseName: string = cmdArgs.shift() as string;
     const completionsPath: string = cmdArgs.join(" ");
 
     const excludedFlags: string[] = command.getOptions(false)
-      .map((option) =>
-        option.standalone ? option.flags.split(/[, ] */g) : false
-      )
+      .map((option) => option.standalone ? option.flags : false)
       .flat()
       .filter((flag) => typeof flag === "string") as string[];
 
@@ -228,7 +226,7 @@ function _${replaceSpecialChars(path)}() {` +
     completionsPath: string,
     excludedOptions: string[],
   ): string {
-    const flags = option.flags.split(/[, ] */g);
+    const flags = option.flags;
     let excludedFlags = option.conflicts?.length
       ? [
         ...excludedOptions,
@@ -237,7 +235,7 @@ function _${replaceSpecialChars(path)}() {` +
       : excludedOptions;
     excludedFlags = option.collect ? excludedFlags : [
       ...excludedFlags,
-      ...option.flags.split(/[, ] */g),
+      ...flags,
     ];
 
     let args = "";

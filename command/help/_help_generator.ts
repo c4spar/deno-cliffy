@@ -101,7 +101,7 @@ export class HelpGenerator {
       return this.label("Options") +
         Table.from([
           ...options.map((option: IOption) => [
-            option.flags.split(/,? +/g).map((flag) => blue(flag)).join(", "),
+            option.flags.map((flag) => blue(flag)).join(", "),
             highlightArguments(
               option.typeDefinition || "",
               this.options.types,
@@ -121,7 +121,7 @@ export class HelpGenerator {
     return this.label("Options") +
       Table.from([
         ...options.map((option: IOption) => [
-          option.flags.split(/,? +/g).map((flag) => blue(flag)).join(", "),
+          option.flags.map((flag) => blue(flag)).join(", "),
           red(bold("-")) + " " +
           option.description.split("\n").shift() as string,
           this.generateHints(option),
