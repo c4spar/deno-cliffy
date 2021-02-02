@@ -13,6 +13,9 @@
   <a href="https://deno.land/">
     <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
   </a>
+  <a href="https://discord.gg/nktwtG">
+    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>

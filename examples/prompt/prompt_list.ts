@@ -1,32 +1,58 @@
 #!/usr/bin/env -S deno run --unstable
 
+import { tty } from "../../ansi/tty.ts";
 import { prompt } from "../../prompt/prompt.ts";
-import { Checkbox } from "../../prompt/checkbox.ts";
-import { Confirm } from "../../prompt/confirm.ts";
 import { Input } from "../../prompt/input.ts";
-import { Number } from "../../prompt/number.ts";
+import { Select } from "../../prompt/select.ts";
+
+const sig = Deno.signals.interrupt();
+(async () => {
+  for await (const _ of sig) {
+    // tty.cursorShow();
+    // console.log("\nSigint received. Exiting deno process!");
+    Deno.exit(1);
+  }
+})();
 
 const result = await prompt([{
-  name: "name",
-  message: "What's your name?",
+  name: "configuration",
+  message: "Select the Setting to Configure",
+  type: Select,
+  search: true,
+  options: [
+    "token",
+    "prefix",
+    "supportServerID",
+    "channelIds",
+    "roleIDs",
+    "userIDs",
+  ],
+}, {
+  name: "token",
+  message: "Enter the Bot Token:",
   type: Input,
+  before: async ({ configuration }, next) => {
+    if (configuration?.includes("token")) {
+      await next(); // run token prompt
+    } else {
+      await next(true); // skip token prompt
+    }
+  },
 }, {
-  name: "age",
-  message: "How old are you?",
-  type: Number,
-}, {
-  name: "like",
-  message: "Do you like animal's?",
-  type: Confirm,
-}, {
-  name: "animals",
-  message: "Select some animal's",
-  type: Checkbox,
-  options: ["dog", "cat", "snake"],
-}]);
+  name: "prefix",
+  message: "prefix...",
+  type: Input,
+  before: async ({ configuration }, next) => {
+    if (configuration?.includes("prefix")) {
+      await next(); // run prefix prompt
+    } else {
+      await next(true); // skip prefix prompt
+    }
+  },
+}], {
+  cbreak: true,
+});
 
 console.log(result);
 
-// if ( result.foo ) {} // error: Property 'foo' does not exist
-// if ( result.name && isNaN( result.name ) ) {} // error: Argument of type 'string' is not assignable to parameter of type 'number'.
-// if ( result.age && isNaN( result.age ) ) {} // no error: age is of type number
+sig.dispose();
