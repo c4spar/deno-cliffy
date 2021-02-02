@@ -749,7 +749,7 @@ export class Command<O = any, A extends Array<any> = any> {
         this._versionOption?.flags || "-V, --version",
         this._versionOption?.desc ||
           "Show the version number for this program.",
-        Object.assign({
+        {
           standalone: true,
           prepend: true,
           action: async function (this: Command) {
@@ -758,7 +758,8 @@ export class Command<O = any, A extends Array<any> = any> {
             );
             Deno.exit(0);
           },
-        }, this._versionOption?.opts ?? {}),
+          ...(this._versionOption?.opts ?? {}),
+        },
       );
     }
 
@@ -766,7 +767,7 @@ export class Command<O = any, A extends Array<any> = any> {
       this.option(
         this._helpOption?.flags || "-h, --help",
         this._helpOption?.desc || "Show this help.",
-        Object.assign({
+        {
           standalone: true,
           global: true,
           prepend: true,
@@ -774,7 +775,8 @@ export class Command<O = any, A extends Array<any> = any> {
             this.showHelp();
             Deno.exit(0);
           },
-        }, this._helpOption?.opts ?? {}),
+          ...(this._helpOption?.opts ?? {}),
+        },
       );
     }
 

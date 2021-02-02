@@ -31,10 +31,11 @@ export class HelpGenerator {
   }
 
   private constructor(private cmd: Command, options: HelpOptions = {}) {
-    this.options = Object.assign({
+    this.options = {
       types: false,
       hints: true,
-    }, options);
+      ...options,
+    };
   }
 
   private generate(): string {
