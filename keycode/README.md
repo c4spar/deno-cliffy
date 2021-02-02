@@ -16,6 +16,9 @@
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/keycode/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
+  <a href="https://discord.gg/nktwtG">
+    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
@@ -34,14 +37,15 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [API](#-api)
-    - [KeyCode](#keycode)
-    - [KeyEvent](#keyevent)
+  - [KeyCode](#keycode)
+  - [KeyEvent](#keyevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
 ## ❯ Install
 
-This module can be imported directly from the repo and from following registries.
+This module can be imported directly from the repo and from following
+registries.
 
 Deno Registry
 
@@ -104,19 +108,20 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
 
 ### KeyCode
 
-* parse( data: Uint8Array | string ): KeyEvent | undefined
+- parse( data: Uint8Array | string ): KeyEvent | undefined
 
 ### KeyEvent
 
-* name?: string
-* sequence?: string
-* ctrl: boolean
-* meta: boolean
-* shift: boolean
+- name?: string
+- sequence?: string
+- ctrl: boolean
+- meta: boolean
+- shift: boolean
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

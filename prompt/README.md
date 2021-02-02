@@ -16,6 +16,9 @@
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/prompt/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
+  <a href="https://discord.gg/nktwtG">
+    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
@@ -36,11 +39,11 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
-    - [Single Prompt](#single-prompt)
-    - [Prompt List](#prompt-list)
-    - [Dynamic Prompts](#dynamic-prompts)
-    - [Custom Prompts](#custom-prompts)
-    - [OS Signals](#os-signals)
+  - [Single Prompt](#single-prompt)
+  - [Prompt List](#prompt-list)
+  - [Dynamic Prompts](#dynamic-prompts)
+  - [Custom Prompts](#custom-prompts)
+  - [OS Signals](#os-signals)
 - [API](#-api)
 - [Types](#-types)
 - [Contributing](#-contributing)
@@ -48,7 +51,8 @@
 
 ## ❯ Install
 
-This module can be imported directly from the repo and from following registries.
+This module can be imported directly from the repo and from following
+registries.
 
 Deno Registry
 
@@ -71,15 +75,18 @@ import { prompt } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<ve
 ## ❯ Usage
 
 ### Single Prompt
-Each prompt type is usable as standalone module and can be imported directly from the prompt specific module or from the main prompt module.
-Each prompt has a static prompt method which accepts a prompt message or an options object and returns the prompt result.
+
+Each prompt type is usable as standalone module and can be imported directly
+from the prompt specific module or from the main prompt module. Each prompt has
+a static prompt method which accepts a prompt message or an options object and
+returns the prompt result.
 
 Execute a single prompt with a single message.
 
 ```typescript
 import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const name: string = await Input.prompt( `What's your name?` );
+const name: string = await Input.prompt(`What's your name?`);
 ```
 
 Execute a single prompt with an options object.
@@ -87,17 +94,34 @@ Execute a single prompt with an options object.
 ```typescript
 import { Input } from "https://deno.land/x/cliffy/prompt/mod.ts";
 
-const name: string = await Input.prompt( { message: `Choose a username`, minLength: 8 } );
+const name: string = await Input.prompt({
+  message: `Choose a username`,
+  minLength: 8,
+});
 ```
 
 ### Prompt List
 
-To execute a list of prompts you can use the `prompt()` method. The prompt method accapts an array of [prompt options](#-types) combined with a `name` and `type` property. **Make sure to give each prompt a unique name to prevent overwriting values!**
+To execute a list of prompts you can use the `prompt()` method. The prompt
+method accapts an array of [prompt options](#-types) combined with a `name` and
+`type` property. **Make sure to give each prompt a unique name to prevent
+overwriting values!**
 
-Unlike npm's inquerer, the `type` property accepts a prompt object and not the name of the prompt. This makes it possible to extract the options and return types of each prompt to get typed options for any prompt and a **typed result object**. This works also with [custom prompts](#custom-prompts) which are easily implemented. Another advantage is that you only import the modules that you really need.
+Unlike npm's inquerer, the `type` property accepts a prompt object and not the
+name of the prompt. This makes it possible to extract the options and return
+types of each prompt to get typed options for any prompt and a **typed result
+object**. This works also with [custom prompts](#custom-prompts) which are
+easily implemented. Another advantage is that you only import the modules that
+you really need.
 
 ```typescript
-import { prompt, Input, Number, Confirm, Checkbox } from "https://deno.land/x/cliffy/prompt/mod.ts";
+import {
+  Checkbox,
+  Confirm,
+  Input,
+  Number,
+  prompt,
+} from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const result = await prompt([{
   name: "name",
@@ -131,10 +155,21 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt_list.ts
 
 ### Dynamic Prompts
 
-You can dynamicly control the flow of the prompt list with the `before` and `after` callbacks which works like a middleware function. The first argument is the `result` object and the second argument a `next()` method. The next method calls the next prompt in the list if no argument is passed to it. To jump to a specific prompt pass the name or the index of the prompt to the next method. To skip the next prompt pass true to it. To skip all other prompts simple omit the next call.
+You can dynamicly control the flow of the prompt list with the `before` and
+`after` callbacks which works like a middleware function. The first argument is
+the `result` object and the second argument a `next()` method. The next method
+calls the next prompt in the list if no argument is passed to it. To jump to a
+specific prompt pass the name or the index of the prompt to the next method. To
+skip the next prompt pass true to it. To skip all other prompts simple omit the
+next call.
 
 ```typescript
-import { prompt, Number, Confirm, Checkbox } from "https://deno.land/x/cliffy/prompt/mod.ts";
+import {
+  Checkbox,
+  Confirm,
+  Number,
+  prompt,
+} from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const result = await prompt([{
   name: "animals",
@@ -174,14 +209,21 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/dynamic_prompts
 
 ### Custom Prompts
 
-A prompt is nothing more than an object with a prompt method. You can use a plain object or a class with a static prompt method.
-The prompt method accepts an options object as argument and the return value will be stored in the results object.
-Be shure to define an options and return type for your custom prompt method. Cliffy extracts the type of the options and return value to get **typed options** and a **typed result object** also for custom prompts.
+A prompt is nothing more than an object with a prompt method. You can use a
+plain object or a class with a static prompt method. The prompt method accepts
+an options object as argument and the return value will be stored in the results
+object. Be shure to define an options and return type for your custom prompt
+method. Cliffy extracts the type of the options and return value to get **typed
+options** and a **typed result object** also for custom prompts.
 
 ```typescript
 import { BufReader } from "https://deno.land/std/io/bufio.ts";
 import { tty } from "https://deno.land/x/cliffy/ansi/mod.ts";
-import { prompt, Input, Figures } from "https://deno.land/x/cliffy/prompt/mod.ts";
+import {
+  Figures,
+  Input,
+  prompt,
+} from "https://deno.land/x/cliffy/prompt/mod.ts";
 
 const result = await prompt([{
   name: "text",
@@ -248,13 +290,16 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom_prompts.
 
 ### OS Signals
 
-> The [cbreak](https://doc.deno.land/builtin/unstable#Deno.setRaw) option is an unstable feature and requires Deno => 1.6 and works currently only on Linux and macOS!
+> The [cbreak](https://doc.deno.land/builtin/unstable#Deno.setRaw) option is an
+> unstable feature and requires Deno => 1.6 and works currently only on Linux
+> and macOS!
 
-By default, cliffy will call `Deno.exit(0)` after the user presses `ctrl+c`. If you need to use a custom signal
-handler, you can enable the `cbreak` option on your prompt. This will enable pass-through of os signals to deno,
-allowing you to register your own signal handler. Currently, when using prompts like `Select` or `Toggle` and `cbreak`
-mode is enabled, you must manually show the cursor before calling `Deno.exit()`. Maybe this will be improved somehow
-in the future.
+By default, cliffy will call `Deno.exit(0)` after the user presses `ctrl+c`. If
+you need to use a custom signal handler, you can enable the `cbreak` option on
+your prompt. This will enable pass-through of os signals to deno, allowing you
+to register your own signal handler. Currently, when using prompts like `Select`
+or `Toggle` and `cbreak` mode is enabled, you must manually show the cursor
+before calling `Deno.exit()`. Maybe this will be improved somehow in the future.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
@@ -289,22 +334,23 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/os_signals.ts
 
 Execute a list of prompts.
 
-An prompt object has following options and all type specific options. See the list of [prompt types](#-types) for all available options.
+An prompt object has following options and all type specific options. See the
+list of [prompt types](#-types) for all available options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| name | `string` | Yes | The response will be saved under this key/property in the returned response object. |
-| type | `string` | Yes | Defines the type of prompt to display. See the list of [prompt types](#-types) for valid values. |
-| before | `(result, next) => Promise<void>` | No | `next()`execute's the next prompt in the list (for the before callback it's the current prompt). To change the index to a specific prompt you can pass the name or index of the prompt to the `next()` method. To skip this prompt you can pass `true` to the `next()` method. If `next()` isn't called all other prompts will be skipped. |
-| after | `(result, next) => Promise<void>` | No | Same as `before` but will be executed *after* the prompt. |
+| Param  |               Type                | Required | Description                                                                                                                                                                                                                                                                                                                                |
+| ------ | :-------------------------------: | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| name   |             `string`              |   Yes    | The response will be saved under this key/property in the returned response object.                                                                                                                                                                                                                                                        |
+| type   |             `string`              |   Yes    | Defines the type of prompt to display. See the list of [prompt types](#-types) for valid values.                                                                                                                                                                                                                                           |
+| before | `(result, next) => Promise<void>` |    No    | `next()`execute's the next prompt in the list (for the before callback it's the current prompt). To change the index to a specific prompt you can pass the name or index of the prompt to the `next()` method. To skip this prompt you can pass `true` to the `next()` method. If `next()` isn't called all other prompts will be skipped. |
+| after  | `(result, next) => Promise<void>` |    No    | Same as `before` but will be executed _after_ the prompt.                                                                                                                                                                                                                                                                                  |
 
 The prompt method has also following global options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| before | `(result, next) => Promise<void>` | No | Same as above but will be executed before each prompt. |
-| after | `(result, next) => Promise<void>` | No | Same as above but will be executed after each prompt. |
-| cbreak | `boolean` | No | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-signals)). **This is an unstable feature and requires Deno => 1.6!** |
+| Param  |               Type                | Required | Description                                                                                                                                                                                         |
+| ------ | :-------------------------------: | :------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| before | `(result, next) => Promise<void>` |    No    | Same as above but will be executed before each prompt.                                                                                                                                              |
+| after  | `(result, next) => Promise<void>` |    No    | Same as above but will be executed after each prompt.                                                                                                                                               |
+| cbreak |             `boolean`             |    No    | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-signals)). **This is an unstable feature and requires Deno => 1.6!** |
 
 ### Prompt.prompt(options)
 
@@ -312,31 +358,31 @@ For all available options see [prompt types](#-types).
 
 ## ❯ Types
 
-* [input](#%EF%B8%8F-input)
-* [number](#-number)
-* [secret](#-secret)
-* [confirm](#-confirm)
-* [toggle](#-toggle)
-* [list](#-list)
-* [select](#-select)
-* [checkbox](#%EF%B8%8F-checkbox)
+- [input](#%EF%B8%8F-input)
+- [number](#-number)
+- [secret](#-secret)
+- [confirm](#-confirm)
+- [toggle](#-toggle)
+- [list](#-list)
+- [select](#-select)
+- [checkbox](#%EF%B8%8F-checkbox)
 
 #### Base Options
 
 All prompts have the following base options:
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| message | `string` | Yes | Prompt message to display. |
-| default | `T` | No | Default value. Type depends on prompt type. |
-| transform | `(value: V) => T \| undefined` | No | Receive user input. The returned value will be returned by the `.prompt()` method. |
-| validate | `(value: T \| undefined) => ValidateResult` | No | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown |
-| hint | `string` | No | Hint to display to the user. |
-| pointer | `string` | No | Change the pointer icon. |
-| indent | `string` | No | Prompt indentation. Defaults to `' '` |
-| cbreak | `boolean` | No | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-signals)). **This is an unstable feature and requires Deno => 1.6!** |
+| Param     |                    Type                     | Required | Description                                                                                                                                                                                         |
+| --------- | :-----------------------------------------: | :------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| message   |                  `string`                   |   Yes    | Prompt message to display.                                                                                                                                                                          |
+| default   |                     `T`                     |    No    | Default value. Type depends on prompt type.                                                                                                                                                         |
+| transform |       `(value: V) => T \| undefined`        |    No    | Receive user input. The returned value will be returned by the `.prompt()` method.                                                                                                                  |
+| validate  | `(value: T \| undefined) => ValidateResult` |    No    | Receive sanitized user input. Should return `true` if the value is valid, and an error message `String` otherwise. If `false` is returned, a default error message is shown                         |
+| hint      |                  `string`                   |    No    | Hint to display to the user.                                                                                                                                                                        |
+| pointer   |                  `string`                   |    No    | Change the pointer icon.                                                                                                                                                                            |
+| indent    |                  `string`                   |    No    | Prompt indentation. Defaults to `' '`                                                                                                                                                               |
+| cbreak    |                  `boolean`                  |    No    | cbreak mode enables pass-through of os signals to deno, allowing you to register your own signal handler (see [OS Signals](#os-signals)). **This is an unstable feature and requires Deno => 1.6!** |
 
-***
+---
 
 ### ✏️ Input
 
@@ -356,7 +402,8 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/input.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable tab-completions.
+You can add suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions.
 
 ![](assets/img/suggestions.gif)
 
@@ -386,10 +433,11 @@ console.log({ color });
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions.ts
 ```
 
-Suggestions can be also shown as a list. Matched suggestions will be highlighted in the list and can be completed
-with the `tab` key.
+Suggestions can be also shown as a list. Matched suggestions will be highlighted
+in the list and can be completed with the `tab` key.
 
-You can also enable the info bar to show the number of available suggestions and usage information. 
+You can also enable the info bar to show the number of available suggestions and
+usage information.
 
 ![](assets/img/suggestions_list.gif)
 
@@ -423,21 +471,22 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_lis
 
 **Options**
 
-The `Input` prompt has all [base](#base-options) and the following prompt specific options.
+The `Input` prompt has all [base](#base-options) and the following prompt
+specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| minLength | `number` | No | Min length of value. Defaults to `0`. |
-| maxLength | `number` | No | Max length of value. Defaults to `infinity`. |
-| suggestions | `Array<string \| number>` | No | A list of auto suggestions. |
-| list | `number` | No | Show auto suggestions list. |
-| maxRows | `number` | No | Number of options suggestions per page. Defaults to `10`. |
-| listPointer | `string` | No | Change the list pointer icon. |
-| info | `number` | No | Show some usage information. |
+| Param       |           Type            | Required | Description                                               |
+| ----------- | :-----------------------: | :------: | --------------------------------------------------------- |
+| minLength   |         `number`          |    No    | Min length of value. Defaults to `0`.                     |
+| maxLength   |         `number`          |    No    | Max length of value. Defaults to `infinity`.              |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                               |
+| list        |         `number`          |    No    | Show auto suggestions list.                               |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`. |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                             |
+| info        |         `number`          |    No    | Show some usage information.                              |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### 💯 Number
 
@@ -457,23 +506,24 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/number.ts
 
 **Options**
 
-The `Number` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Number` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| min | `number` | No | Min value. Defaults to `-infinity`. |
-| max | `number` | No | Max value. Defaults to `Infinity`. |
-| float | `boolean` | No | Allow floating point inputs. Defaults to `false`. |
-| round | `number` | No | Round float values to `x` decimals. Defaults to `2`. |
-| suggestions | `Array<string \| number>` | No | A list of auto suggestions. |
-| list | `number` | No | Show auto suggestions list. |
-| maxRows | `number` | No | Number of options suggestions per page. Defaults to `10`. |
-| listPointer | `string` | No | Change the list pointer icon. |
-| info | `number` | No | Show some usage information. |
+| Param       |           Type            | Required | Description                                               |
+| ----------- | :-----------------------: | :------: | --------------------------------------------------------- |
+| min         |         `number`          |    No    | Min value. Defaults to `-infinity`.                       |
+| max         |         `number`          |    No    | Max value. Defaults to `Infinity`.                        |
+| float       |         `boolean`         |    No    | Allow floating point inputs. Defaults to `false`.         |
+| round       |         `number`          |    No    | Round float values to `x` decimals. Defaults to `2`.      |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                               |
+| list        |         `number`          |    No    | Show auto suggestions list.                               |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`. |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                             |
+| info        |         `number`          |    No    | Show some usage information.                              |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### 🔑 Secret
 
@@ -493,18 +543,19 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/secret.ts
 
 **Options**
 
-The `Secret` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Secret` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| label | `string` | No | Name of secret. Defaults to `Password`. |
-| hidden | `number` | No | Hide input during typing and show a fix number of asterisk's on success. |
-| minLength | `number` | No | Min length of secret value. Defaults to `0`. |
-| maxLength | `number` | No | Max length of secret value. Defaults to `infinity`. |
+| Param     |   Type   | Required | Description                                                              |
+| --------- | :------: | :------: | ------------------------------------------------------------------------ |
+| label     | `string` |    No    | Name of secret. Defaults to `Password`.                                  |
+| hidden    | `number` |    No    | Hide input during typing and show a fix number of asterisk's on success. |
+| minLength | `number` |    No    | Min length of secret value. Defaults to `0`.                             |
+| maxLength | `number` |    No    | Max length of secret value. Defaults to `infinity`.                      |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### 👌 Confirm
 
@@ -524,16 +575,17 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/confirm.ts
 
 **Options**
 
-The `Config` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Config` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
-| inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
+| Param    |   Type   | Required | Description                                    |
+| -------- | :------: | :------: | ---------------------------------------------- |
+| active   | `string` |    No    | Text for `active` state. Defaults to `'Yes'`.  |
+| inactive | `string` |    No    | Text for `inactive` state. Defaults to `'No'`. |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### 🔘 Toggle
 
@@ -553,16 +605,17 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/toggle.ts
 
 **Options**
 
-The `Toggle` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Toggle` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| active | `string` | No | Text for `active` state. Defaults to `'Yes'`. |
-| inactive | `string` | No | Text for `inactive` state. Defaults to `'No'`. |
+| Param    |   Type   | Required | Description                                    |
+| -------- | :------: | :------: | ---------------------------------------------- |
+| active   | `string` |    No    | Text for `active` state. Defaults to `'Yes'`.  |
+| inactive | `string` |    No    | Text for `inactive` state. Defaults to `'No'`. |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### 📃 List
 
@@ -582,7 +635,8 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable tab-completions.
+You can add suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions.
 
 ![](assets/img/suggestions_list_prompt.gif)
 
@@ -614,24 +668,25 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_lis
 
 **Options**
 
-The `List` prompt has all [base options](#base-options) and the following prompt specific options.
+The `List` prompt has all [base options](#base-options) and the following prompt
+specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| separator | `string` | No | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
-| minLength | `number` | No | Min length of a single tag. Defaults to `0`. |
-| maxLength | `number` | No | Max length of a single tag. Defaults to `infinity`. |
-| minTags | `number` | No | Min number of tags. Defaults to `0`. |
-| maxTags | `number` | No | Max number of tags. Defaults to `infinity`. |
-| suggestions | `Array<string \| number>` | No | A list of auto suggestions. |
-| list | `number` | No | Show auto suggestions list. |
-| maxRows | `number` | No | Number of options suggestions per page. Defaults to `10`. |
-| listPointer | `string` | No | Change the list pointer icon. |
-| info | `number` | No | Show some usage information. |
+| Param       |           Type            | Required | Description                                                                                   |
+| ----------- | :-----------------------: | :------: | --------------------------------------------------------------------------------------------- |
+| separator   |         `string`          |    No    | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
+| minLength   |         `number`          |    No    | Min length of a single tag. Defaults to `0`.                                                  |
+| maxLength   |         `number`          |    No    | Max length of a single tag. Defaults to `infinity`.                                           |
+| minTags     |         `number`          |    No    | Min number of tags. Defaults to `0`.                                                          |
+| maxTags     |         `number`          |    No    | Max number of tags. Defaults to `infinity`.                                                   |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                                                                   |
+| list        |         `number`          |    No    | Show auto suggestions list.                                                                   |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`.                                     |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                                                                 |
+| info        |         `number`          |    No    | Show some usage information.                                                                  |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### ❯ Select
 
@@ -661,27 +716,28 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/select.ts
 
 **Options**
 
-The `Select` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Select` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| options | `(string \| Option)[]` | Yes | Array of string's or Option's. |
-| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| listPointer | `string` | No | Change the list pointer icon. |
-| search | `boolean` | No | Enable search/filter input. |
-| searchLabel | `string` | No | Change the search input label. |
+| Param       |          Type          | Required | Description                                             |
+| ----------- | :--------------------: | :------: | ------------------------------------------------------- |
+| options     | `(string \| Option)[]` |   Yes    | Array of string's or Option's.                          |
+| maxRows     |        `number`        |    No    | Number of options displayed per page. Defaults to `10`. |
+| listPointer |        `string`        |    No    | Change the list pointer icon.                           |
+| search      |       `boolean`        |    No    | Enable search/filter input.                             |
+| searchLabel |        `string`        |    No    | Change the search input label.                          |
 
 **Option**
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| value | `string` | Yes | Value which will be returned as result. |
-| name | `string` | No | Name is displayed in the list. Defaults to `value` |
-| disabled | `boolean` | No | Disabled item. Can't be selected. |
+| Param    |   Type    | Required | Description                                        |
+| -------- | :-------: | :------: | -------------------------------------------------- |
+| value    | `string`  |   Yes    | Value which will be returned as result.            |
+| name     | `string`  |    No    | Name is displayed in the list. Defaults to `value` |
+| disabled | `boolean` |    No    | Disabled item. Can't be selected.                  |
 
 **↑ back to:** [Prompt types](#-types)
 
-***
+---
 
 ### ✔️ Checkbox
 
@@ -711,35 +767,37 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/checkbox.ts
 
 **Options**
 
-The `Checkbox` prompt has all [base options](#base-options) and the following prompt specific options.
+The `Checkbox` prompt has all [base options](#base-options) and the following
+prompt specific options.
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| options | `(string \| Option)[]` | Yes | Array of string's or Option's. |
-| maxRows | `number` | No | Number of options displayed per page. Defaults to `10`. |
-| minOptions | `number` | No | Min number of selectable options. Defaults to `0`. |
-| maxOptions | `number` | No | Max number of selectable options. Defaults to `infinity`. |
-| listPointer | `string` | No | Change the list pointer icon. |
-| search | `boolean` | No | Enable search/filter input. |
-| searchLabel | `string` | No | Change the search input label. |
-| check | `string` | No | Change the check icon. |
-| uncheck | `string` | No | Change the uncheck icon. |
+| Param       |          Type          | Required | Description                                               |
+| ----------- | :--------------------: | :------: | --------------------------------------------------------- |
+| options     | `(string \| Option)[]` |   Yes    | Array of string's or Option's.                            |
+| maxRows     |        `number`        |    No    | Number of options displayed per page. Defaults to `10`.   |
+| minOptions  |        `number`        |    No    | Min number of selectable options. Defaults to `0`.        |
+| maxOptions  |        `number`        |    No    | Max number of selectable options. Defaults to `infinity`. |
+| listPointer |        `string`        |    No    | Change the list pointer icon.                             |
+| search      |       `boolean`        |    No    | Enable search/filter input.                               |
+| searchLabel |        `string`        |    No    | Change the search input label.                            |
+| check       |        `string`        |    No    | Change the check icon.                                    |
+| uncheck     |        `string`        |    No    | Change the uncheck icon.                                  |
 
 **Option**
 
-| Param | Type | Required | Description |
-| ----- | :---: | :---: | ----------- |
-| value | `string` | Yes | Value which will be added to the returned result array. |
-| name | `string` | No | Name is displayed in the list. Defaults to `value`. |
-| disabled | `boolean` | No | Disabled item. Can't be selected. |
-| checked | `boolean` | No | Whether item is checked or not. Defaults to `false`. |
-| icon | `boolean` | No | Show or hide item icon. Defaults to `true`. |
+| Param    |   Type    | Required | Description                                             |
+| -------- | :-------: | :------: | ------------------------------------------------------- |
+| value    | `string`  |   Yes    | Value which will be added to the returned result array. |
+| name     | `string`  |    No    | Name is displayed in the list. Defaults to `value`.     |
+| disabled | `boolean` |    No    | Disabled item. Can't be selected.                       |
+| checked  | `boolean` |    No    | Whether item is checked or not. Defaults to `false`.    |
+| icon     | `boolean` |    No    | Show or hide item icon. Defaults to `true`.             |
 
 **↑ back to:** [Prompt types](#-types)
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

@@ -16,6 +16,9 @@
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/flags/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
+  <a href="https://discord.gg/nktwtG">
+    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
@@ -40,7 +43,8 @@
 
 ## ❯ Install
 
-This module can be imported directly from the repo and from following registries.
+This module can be imported directly from the repo and from following
+registries.
 
 Deno Registry
 
@@ -94,7 +98,10 @@ $ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y.z -n5 -abc
 ### With Options
 
 ```typescript
-import { parseFlags, OptionType } from "https://deno.land/x/cliffy/flags/mod.ts";
+import {
+  OptionType,
+  parseFlags,
+} from "https://deno.land/x/cliffy/flags/mod.ts";
 
 const result = parseFlags(Deno.args, {
   allowEmpty: true,
@@ -152,11 +159,14 @@ $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./ex
 
 ### Error handling
 
-You can catch command validation errors with the `ValidationError` class.
-A validation error is thrown when an invalid command is invoked by the user.
+You can catch command validation errors with the `ValidationError` class. A
+validation error is thrown when an invalid command is invoked by the user.
 
 ```typescript
-import { parseFlags, ValidationError } from "https://deno.land/x/cliffy/flags/mod.ts";
+import {
+  parseFlags,
+  ValidationError,
+} from "https://deno.land/x/cliffy/flags/mod.ts";
 
 try {
   const flags = parseFlags(Deno.args, {
@@ -185,56 +195,56 @@ $ deno run https://deno.land/x/cliffy/examples/flags/error_handling.ts -d
 
 ### parseFlags Options
 
-| Param      | Type             | Required | Description                                                                                    |
-| ---------- |:----------------:|:--------:| ---------------------------------------------------------------------------------------------- |
-| allowEmpty | `boolean`        | No       | Allow no arguments. Defaults to `false`                                                        |
-| stopEarly  | `boolean`        | No       | If enabled, all values starting from the first non option argument will be added to `unknown`. |
-| flags      | `IFlagOptions[]` | No       | Array of flag options.                                                                         |
-| parse      | `function`       | No       | Custom type parser.                                                                            |
+| Param      |       Type       | Required | Description                                                                                    |
+| ---------- | :--------------: | :------: | ---------------------------------------------------------------------------------------------- |
+| allowEmpty |    `boolean`     |    No    | Allow no arguments. Defaults to `false`                                                        |
+| stopEarly  |    `boolean`     |    No    | If enabled, all values starting from the first non option argument will be added to `unknown`. |
+| flags      | `IFlagOptions[]` |    No    | Array of flag options.                                                                         |
+| parse      |    `function`    |    No    | Custom type parser.                                                                            |
 
 ### Flag Options
 
-| Param      | Type                                  | Required | Description                                                                                               |
-| ---------- |:-------------------------------------:|:--------:| --------------------------------------------------------------------------------------------------------- |
-| name       | `string`                              | Yes      | The name of the option.                                                                                   |
-| args       | `IFlagArgument[]`                     | No       | An Array of argument options.                                                                             |
-| aliases    | `string[]`                            | No       | Array of option alias's.                                                                                  |
-| standalone | `boolean `                            | No       | Cannot be combined with other options.                                                                    |
-| default    | `any`                                 | No       | Default option value.                                                                                     |
-| required   | `boolean `                            | No       | Mark option as required and throw an error if the option is missing.                                      |
-| depends    | `string[]`                            | No       | Array of option names that depends on this option.                                                        |
-| conflicts  | `string[]`                            | No       | Array of option names that conflicts with this option.                                                    |
-| collect    | `boolean`                             | No       | Allow to call this option multiple times and add each value to an array which will be returned as result. |
-| value      | `( val: any, previous?: any ) => any` | No       | Custom value processing.                                                                                  |
+| Param      |                 Type                  | Required | Description                                                                                               |
+| ---------- | :-----------------------------------: | :------: | --------------------------------------------------------------------------------------------------------- |
+| name       |               `string`                |   Yes    | The name of the option.                                                                                   |
+| args       |           `IFlagArgument[]`           |    No    | An Array of argument options.                                                                             |
+| aliases    |              `string[]`               |    No    | Array of option alias's.                                                                                  |
+| standalone |               `boolean`               |    No    | Cannot be combined with other options.                                                                    |
+| default    |                 `any`                 |    No    | Default option value.                                                                                     |
+| required   |               `boolean`               |    No    | Mark option as required and throw an error if the option is missing.                                      |
+| depends    |              `string[]`               |    No    | Array of option names that depends on this option.                                                        |
+| conflicts  |              `string[]`               |    No    | Array of option names that conflicts with this option.                                                    |
+| collect    |               `boolean`               |    No    | Allow to call this option multiple times and add each value to an array which will be returned as result. |
+| value      | `( val: any, previous?: any ) => any` |    No    | Custom value processing.                                                                                  |
 
 ### Argument options
 
-| Param         | Type                   | Required | Description                     |
-| ------------- |:----------------------:|:--------:| ------------------------------- |
-| type          | `OptionType \| string` | no       | Type of the argument.           |
-| optionalValue | `boolean`              | no       | Make argument optional.         |
-| requiredValue | `boolean`              | no       | Make argument required.         |
-| variadic      | `boolean`              | no       | Make arguments variadic.        |
-| list          | `boolean`              | no       | Split argument by `separator`.  |
-| separator     | `string`               | no       | List separator. Defaults to `,` |
+| Param         |          Type          | Required | Description                     |
+| ------------- | :--------------------: | :------: | ------------------------------- |
+| type          | `OptionType \| string` |    no    | Type of the argument.           |
+| optionalValue |       `boolean`        |    no    | Make argument optional.         |
+| requiredValue |       `boolean`        |    no    | Make argument required.         |
+| variadic      |       `boolean`        |    no    | Make arguments variadic.        |
+| list          |       `boolean`        |    no    | Split argument by `separator`.  |
+| separator     |        `string`        |    no    | List separator. Defaults to `,` |
 
 ### OptionType
 
-* `OptionType.STRING`
+- `OptionType.STRING`
 
-* `OptionType.NUMBER`
+- `OptionType.NUMBER`
 
-* `OptionType.BOOLEAN`
+- `OptionType.BOOLEAN`
 
 ## ❯ Custom type processing
 
 ```typescript
-import { parseFlags, ITypeInfo } from "https://deno.land/x/cliffy/flags/mod.ts";
+import { ITypeInfo, parseFlags } from "https://deno.land/x/cliffy/flags/mod.ts";
 
 parseFlags(Deno.args, {
   flags: [{
     name: "foo",
-    type: "float"
+    type: "float",
   }],
   parse: ({ label, name, value, type }: ITypeInfo) => {
     switch (type) {
@@ -264,7 +274,8 @@ error: Uncaught Error: Option "--foo" must be of type "float", but got "abc".
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 

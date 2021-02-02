@@ -16,6 +16,9 @@
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/ansi/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
+  <a href="https://discord.gg/nktwtG">
+    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/blob/master/LICENSE">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
@@ -45,48 +48,66 @@
 
 ## ❯ Install
 
-This module can be imported directly from the repo and from following registries.
+This module can be imported directly from the repo and from following
+registries.
 
 Deno Registry
 
 ```typescript
-import { ansi, colors, tty, cursorTo } from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
+import {
+  ansi,
+  colors,
+  cursorTo,
+  tty,
+} from "https://deno.land/x/cliffy@<version>/ansi/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { ansi, colors, tty, cursorTo } from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
+import {
+  ansi,
+  colors,
+  cursorTo,
+  tty,
+} from "https://x.nest.land/cliffy@<version>/ansi/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { ansi, colors, tty, cursorTo } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
+import {
+  ansi,
+  colors,
+  cursorTo,
+  tty,
+} from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/ansi/mod.ts";
 ```
 
 ## ❯ Usage
 
 ### Ansi
 
-The ansi module exports an `ansi` object with chainable methods and properties for generating ansi escape sequence
-strings. The last property must be invoked as a method to generate the ansi string.
+The ansi module exports an `ansi` object with chainable methods and properties
+for generating ansi escape sequence strings. The last property must be invoked
+as a method to generate the ansi string.
 
 ```typescript
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 console.log(
-  ansi.cursorUp.cursorLeft.eraseDown()
+  ansi.cursorUp.cursorLeft.eraseDown(),
 );
 ```
 
-If a method takes some arguments, you have to invoke the `.toString()` method to generate the ansi string.
+If a method takes some arguments, you have to invoke the `.toString()` method to
+generate the ansi string.
 
 ```typescript
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 console.log(
-  ansi.cursorUp(2).cursorLeft.eraseDown(2).toString()
+  ansi.cursorUp(2).cursorLeft.eraseDown(2).toString(),
 );
 ```
 
@@ -96,28 +117,34 @@ Convert to `Uint8Array`:
 import { ansi } from "https://deno.land/x/cliffy/ansi/ansi.ts";
 
 await Deno.stdout.write(
-  ansi.cursorUp.cursorLeft.eraseDown.toBuffer()
+  ansi.cursorUp.cursorLeft.eraseDown.toBuffer(),
 );
 ```
 
-You can also directly import the ansi escape methods from the `ansi_escapes.ts` module.
+You can also directly import the ansi escape methods from the `ansi_escapes.ts`
+module.
 
 ```typescript
-import { cursorTo, eraseDown, image, link } from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
+import {
+  cursorTo,
+  eraseDown,
+  image,
+  link,
+} from "https://deno.land/x/cliffy/ansi/ansi_escapes.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
 
 console.log(
   cursorTo(0, 0) +
-  eraseDown() +
-  image(imageBuffer, {
-    width: 29,
-    preserveAspectRatio: true,
-  }) +
-  "\n          " +
-  link("Deno Land", "https://deno.land") +
-  "\n",
+    eraseDown() +
+    image(imageBuffer, {
+      width: 29,
+      preserveAspectRatio: true,
+    }) +
+    "\n          " +
+    link("Deno Land", "https://deno.land") +
+    "\n",
 );
 ```
 
@@ -127,16 +154,17 @@ $ deno run https://deno.land/x/cliffy/examples/ansi/functional.ts
 
 ### Tty
 
-The tty module exports a `tty` object which works almost the same way as the `ansi` module. The only difference is, the
-`tty` module writes the ansi escape sequences directly to stdout.
+The tty module exports a `tty` object which works almost the same way as the
+`ansi` module. The only difference is, the `tty` module writes the ansi escape
+sequences directly to stdout.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
 
 tty.cursorSave
-   .cursorHide
-   .cursorTo(0, 0)
-   .eraseScreen();
+  .cursorHide
+  .cursorTo(0, 0)
+  .eraseScreen();
 ```
 
 Create a new instance.
@@ -146,19 +174,20 @@ import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
 
 const myTty = tty({
   stdout: Deno.stdout,
-  stdin: Deno.stdin
+  stdin: Deno.stdin,
 });
 
 myTty.cursorSave
-   .cursorHide
-   .cursorTo(0, 0)
-   .eraseScreen();
+  .cursorHide
+  .cursorTo(0, 0)
+  .eraseScreen();
 ```
 
 ### Colors
 
-The colors module is a simple and tiny chainable wrapper around [deno's std colors](https://deno.land/std/fmt/colors.ts)
-module and works similar to node's [chalk](https://github.com/chalk/chalk) module.
+The colors module is a simple and tiny chainable wrapper around
+[deno's std colors](https://deno.land/std/fmt/colors.ts) module and works
+similar to node's [chalk](https://github.com/chalk/chalk) module.
 
 ```typescript
 import { colors } from "https://deno.land/x/cliffy/ansi/colors.ts";
@@ -197,7 +226,8 @@ $ deno run https://deno.land/x/cliffy/examples/ansi/color_themes.ts
 
 ## ❯ Contributing
 
-Any kind of contribution is welcome! Please take a look at the [contributing guidelines](../CONTRIBUTING.md).
+Any kind of contribution is welcome! Please take a look at the
+[contributing guidelines](../CONTRIBUTING.md).
 
 ## ❯ License
 
