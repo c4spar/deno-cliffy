@@ -298,8 +298,8 @@ By default, cliffy will call `Deno.exit(0)` after the user presses `ctrl+c`. If
 you need to use a custom signal handler, you can enable the `cbreak` option on
 your prompt. This will enable pass-through of os signals to deno, allowing you
 to register your own signal handler. Currently, when using prompts like `Select`
-or `Toggle` and `cbreak` mode is enabled, you must manually show the cursor
-before calling `Deno.exit()`. Maybe this will be improved somehow in the future.
+or `Toggle` and `cbreak` mode is enabled, you have to show the cursor and clear the stdout before calling `Deno.exit()` manually. Maybe this
+will be improved somehow in the future.
 
 ```typescript
 import { tty } from "https://deno.land/x/cliffy/ansi/tty.ts";
@@ -308,7 +308,7 @@ import { Toggle } from "https://deno.land/x/cliffy/prompt/toggle.ts";
 const sig = Deno.signals.interrupt();
 (async () => {
   for await (const _ of sig) {
-    tty.cursorShow();
+    tty.cursorLeft.eraseDown.cursorShow();
     console.log("\nSigint received. Exiting deno process!");
     Deno.exit(1);
   }
