@@ -227,7 +227,7 @@ export abstract class GenericPrompt<
   protected async handleEvent(event: KeyEvent): Promise<void> {
     switch (true) {
       case event.name === "c" && event.ctrl:
-        this.tty.cursorShow();
+        this.tty.cursorLeft.eraseDown.cursorShow();
         Deno.exit(0);
         return;
       case this.isKey(this.settings.keys, "submit", event):

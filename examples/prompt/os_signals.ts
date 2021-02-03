@@ -6,7 +6,7 @@ import { Toggle } from "../../prompt/toggle.ts";
 const sig = Deno.signals.interrupt();
 (async () => {
   for await (const _ of sig) {
-    tty.cursorShow();
+    tty.cursorLeft.eraseDown.cursorShow();
     console.log("\nSigint received. Exiting deno process!");
     Deno.exit(1);
   }
