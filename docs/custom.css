@@ -33,3 +33,7 @@ nav a[href="https://nest.land/package/cliffy"]:before {
 .badges-container a:hover {
     text-decoration: none;
 }
+
+.main_toc {
+    width: 200px;
+}
