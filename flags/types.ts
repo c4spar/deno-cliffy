@@ -1,7 +1,8 @@
 /** Parser options. */
 export interface IParseOptions {
-  flags?: IFlagOptions[];
+  flags?: Array<IFlagOptions>;
   parse?: ITypeHandler<unknown>;
+  option?: (option: IFlagOptions, value?: unknown) => void;
   knownFlaks?: Record<string, unknown>;
   stopEarly?: boolean;
   allowEmpty?: boolean;

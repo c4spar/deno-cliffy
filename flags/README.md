@@ -195,12 +195,13 @@ $ deno run https://deno.land/x/cliffy/examples/flags/error_handling.ts -d
 
 ### parseFlags Options
 
-| Param      |       Type       | Required | Description                                                                                    |
-| ---------- | :--------------: | :------: | ---------------------------------------------------------------------------------------------- |
-| allowEmpty |    `boolean`     |    No    | Allow no arguments. Defaults to `false`                                                        |
-| stopEarly  |    `boolean`     |    No    | If enabled, all values starting from the first non option argument will be added to `unknown`. |
-| flags      | `IFlagOptions[]` |    No    | Array of flag options.                                                                         |
-| parse      |    `function`    |    No    | Custom type parser.                                                                            |
+| Param      |                       Type                        | Required | Description                                                                                    |
+| ---------- | :-----------------------------------------------: | :------: | ---------------------------------------------------------------------------------------------- |
+| allowEmpty |                     `boolean`                     |    No    | Allow no arguments. Defaults to `false`                                                        |
+| stopEarly  |                     `boolean`                     |    No    | If enabled, all values starting from the first non option argument will be added to `unknown`. |
+| flags      |                 `IFlagOptions[]`                  |    No    | Array of flag options.                                                                         |
+| parse      |                    `function`                     |    No    | Custom type parser.                                                                            |
+| option     | `(option: IFlagOptions, value?: unknown) => void` |    No    | A callback function that will be called for every parsed option.                               |
 
 ### Flag Options
 
