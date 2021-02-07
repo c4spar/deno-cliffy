@@ -705,7 +705,9 @@ export class Command<O = any, A extends Array<any> = any> {
 
         return await this.execute({} as O, ...this.rawArgs as A);
       } else {
-        const { flags, unknown, literal } = this.parseFlags(this.rawArgs);
+        const { action, flags, unknown, literal } = this.parseFlags(
+          this.rawArgs,
+        );
 
         this.literalArgs = literal;
 
@@ -713,7 +715,10 @@ export class Command<O = any, A extends Array<any> = any> {
 
         await this.validateEnvVars();
 
-        if (dry) {
+        if (dry || action) {
+          if (action) {
+            await action.call(this, flags, ...params);
+          }
           return {
             options: flags,
             args: params,
@@ -789,12 +794,6 @@ export class Command<O = any, A extends Array<any> = any> {
    * @param args Command arguments.
    */
   protected async execute(options: O, ...args: A): Promise<IParseResult<O, A>> {
-    const actionOption = this.findActionFlag(options);
-    if (actionOption?.action) {
-      await actionOption.action.call(this, options, ...args);
-      return { options, args, cmd: this, literal: this.literalArgs };
-    }
-
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
@@ -899,13 +898,22 @@ export class Command<O = any, A extends Array<any> = any> {
    * Parse raw command line arguments.
    * @param args Raw command line arguments.
    */
-  protected parseFlags(args: string[]): IFlagsResult<O> {
-    return parseFlags<O>(args, {
+  protected parseFlags(
+    args: string[],
+  ): IFlagsResult<O> & { action?: IAction<O, A> } {
+    let action: IAction<O, A> | undefined;
+    const result = parseFlags<O>(args, {
       stopEarly: this._stopEarly,
       allowEmpty: this._allowEmpty,
       flags: this.getOptions(true),
-      parse: (type: ITypeInfo) => this.parseType(type),
+      parse: (type: ITypeInfo) => {
+        if (!action) {
+          action = this.getOptionAction(type.name);
+        }
+        return this.parseType(type);
+      },
     });
+    return { ...result, action };
   }
 
   /** Parse argument type. */
@@ -1029,21 +1037,17 @@ export class Command<O = any, A extends Array<any> = any> {
   }
 
   /**
-   * Returns the first option which has an action.
-   * @param flags Command options.
+   * Returns the action or undefined of the given option.
+   * @param name Option name.
    */
-  protected findActionFlag(flags: O): IOption | undefined {
-    const flagNames = Object.keys(flags);
-
-    for (const flag of flagNames) {
-      const option = this.getOption(flag, true);
-
-      if (option?.action) {
-        return option;
-      }
+  private getOptionAction(name: string): IAction<O, A> | undefined {
+    const option: IOption<O, A> | undefined = this.getOption(
+      name.replace(/^(-)+/, ""),
+      true,
+    );
+    if (option?.action) {
+      return option?.action;
     }
-
-    return;
   }
 
   /**
