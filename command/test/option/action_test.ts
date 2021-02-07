@@ -65,6 +65,30 @@ Deno.test("option action with dashed option name", async () => {
 
   const cmd = new Command()
     .throwErrors()
+    .arguments("[beep:string] [boop:string]")
+    .option("-f, --foo-bar", "action ...", {
+      action: function (options, ...args) {
+        stats.context = this;
+        stats.options = options;
+        stats.args = args;
+      },
+    });
+
+  const { options, args } = await cmd.parse(["-f", "beep", "boop"]);
+
+  assert(stats.context, "option action not executed");
+  assertEquals(stats.context, cmd);
+  assertEquals(stats.options, { fooBar: true });
+  assertEquals(stats.args, ["beep", "boop"]);
+  assertEquals(stats.options, options);
+  assertEquals(stats.args, args);
+});
+
+Deno.test("option action with dashed option name an value", async () => {
+  const stats: IStats = {};
+
+  const cmd = new Command()
+    .throwErrors()
     .arguments("[beep:string]")
     .option("-f, --foo-bar [value:string]", "action ...", {
       action: function (options, ...args) {
