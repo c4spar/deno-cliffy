@@ -717,7 +717,9 @@ export class Command<O = any, A extends Array<any> = any> {
 
         if (dry || action) {
           if (action) {
-            await action.call(this, flags, ...params);
+            // Fix deno 1.2 error:
+            // deno-lint-ignore no-explicit-any
+            await (action as any).call(this, flags, ...params);
           }
           return {
             options: flags,
