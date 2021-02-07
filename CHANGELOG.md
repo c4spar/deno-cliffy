@@ -1,4 +1,4 @@
-# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.17.0...1ee0366) (Sun Feb 7 01:42:38 2021)
+# [v0.17.1](https://github.com/c4spar/deno-cli/compare/v0.17.0...1ee0366) (2021-02-07)
 
 ### Bug Fixes
 
@@ -29,7 +29,7 @@
 - fmt reamde's and add discord budget (#140)
   ([821f13d](https://github.com/c4spar/deno-cli/commit/821f13d))
 
-# [v0.17.0](https://github.com/c4spar/deno-cli/compare/v0.16.0...v0.17.0) (Mon Jan 11 00:07:34 2021)
+# [v0.17.0](https://github.com/c4spar/deno-cli/compare/v0.16.0...v0.17.0) (2021-01-11)
 
 ### Features
 
