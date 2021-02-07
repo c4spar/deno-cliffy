@@ -174,6 +174,10 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       optionNames[propName] = option.name;
 
+      if (typeof previous === "undefined") {
+        opts.option?.(option, flags[propName]);
+      }
+
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
       function parseNext(option: IFlagOptions, args: IFlagArgument[]): void {
