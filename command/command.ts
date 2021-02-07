@@ -60,8 +60,12 @@ import type {
   ITypeOptions,
 } from "./types.ts";
 
-// deno-lint-ignore no-explicit-any
-interface IDefaultOption<O = any, A extends Array<any> = any> {
+interface IDefaultOption<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+> {
   flags: string;
   desc?: string;
   opts?: ICommandOption<O, A>;

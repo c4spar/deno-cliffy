@@ -17,8 +17,12 @@ export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 export type IDescription = string | ((this: Command) => string);
 
 /** Action handler for commands and options. */
-// deno-lint-ignore no-explicit-any
-export type IAction<O, A extends Array<any>> = (
+export type IAction<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+> = (
   this: Command,
   options: O,
   ...args: A
@@ -35,8 +39,12 @@ export interface IArgument extends IFlagArgument {
 }
 
 /** Result of `cmd.parse()` method. */
-// deno-lint-ignore no-explicit-any
-export interface IParseResult<O = any, A extends Array<any> = any> {
+export interface IParseResult<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+> {
   options: O;
   args: A;
   literal: string[];
@@ -55,9 +63,12 @@ type ExcludedCommandOptions =
   | "list";
 
 /** Command option options. */
-// deno-lint-ignore no-explicit-any
-export interface ICommandOption<O = any, A extends Array<any> = any>
-  extends Omit<IFlagOptions, ExcludedCommandOptions> {
+export interface ICommandOption<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+> extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
@@ -66,9 +77,12 @@ export interface ICommandOption<O = any, A extends Array<any> = any>
 }
 
 /** Command option settings. */
-// deno-lint-ignore no-explicit-any
-export interface IOption<O = any, A extends Array<any> = any>
-  extends ICommandOption<O, A>, IFlagOptions {
+export interface IOption<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+> extends ICommandOption<O, A>, IFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
