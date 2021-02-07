@@ -1,3 +1,27 @@
+# [Changelog](https://github.com/c4spar/deno-cli/compare/v0.17.0...1ee0366) (Sun Feb 7 01:42:38 2021)
+
+### Bug Fixes
+
+* **command:** actions on hyphenated options won't run (#144) ([1ee0366](https://github.com/c4spar/deno-cli/commit/1ee0366))
+* **prompt:** clear stdout on ctrl+c (#142) ([1e15d38](https://github.com/c4spar/deno-cli/commit/1e15d38), [a6b5d36](https://github.com/c4spar/deno-cli/commit/a6b5d36))
+* **prompt:** disabled item gets selected when it's the first option (#137) ([f5c9be5](https://github.com/c4spar/deno-cli/commit/f5c9be5))
+
+### Code Refactoring
+
+* use object spread instead of Object.assign ([22681f0](https://github.com/c4spar/deno-cli/commit/22681f0))
+* **command,flags:** make options.flags an array ([eeac740](https://github.com/c4spar/deno-cli/commit/eeac740))
+
+### Chore
+
+* **upgrade:** deno/std v0.86.0 (#146) ([ce54da4](https://github.com/c4spar/deno-cli/commit/ce54da4))
+
+### Documentation Updates
+
+* fix sidebar width ([98dfe3b](https://github.com/c4spar/deno-cli/commit/98dfe3b))
+* fmt reamde's and add discord budget (#140) ([821f13d](https://github.com/c4spar/deno-cli/commit/821f13d))
+
+
+
 # [v0.17.0](https://github.com/c4spar/deno-cli/compare/v0.16.0...v0.17.0) (Mon Jan 11 00:07:34 2021)
 
 ### Features
