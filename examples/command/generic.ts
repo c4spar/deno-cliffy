@@ -4,7 +4,7 @@ import { Command } from "../../command/command.ts";
 import type { IParseResult } from "../../command/types.ts";
 
 // define your argument types
-type Arguments = [string, string];
+type Arguments = [input: string, output: string];
 
 // define your option types
 interface Options {
