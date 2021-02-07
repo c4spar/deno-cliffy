@@ -84,7 +84,7 @@ Deno.test("option action with dashed option name", async () => {
   assertEquals(stats.args, args);
 });
 
-Deno.test("option action with dashed option name an value", async () => {
+Deno.test("option action with dashed option name and value", async () => {
   const stats: IStats = {};
 
   const cmd = new Command()
