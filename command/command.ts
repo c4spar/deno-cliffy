@@ -115,9 +115,9 @@ export class Command<
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
-  private _versionOption?: IDefaultOption<CO, CA> | false;
-  private _helpOption?: IDefaultOption<CO, CA> | false;
-  private _help?: (this: Command) => string;
+  private _versionOption?: IDefaultOption | false;
+  private _helpOption?: IDefaultOption | false;
+  private _help?: IHelpHandler;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -127,10 +127,27 @@ export class Command<
    * @param desc  The description of the version option.
    * @param opts  Version option options.
    */
+  /**
+   * Set version option.
+   * @param flags The flags of the version option.
+   * @param desc  The description of the version option.
+   * @param opts  Version option options.
+   */
   public versionOption(
-    flags: string | false,
+    flags: string,
     desc?: string,
-    opts?: IAction<CO, CA> | ICommandOption<CO, CA>,
+    opts?: ICommandOption & { global: true },
+  ): this;
+  /**
+   * Set version option.
+   * @param flags The flags of the version option.
+   * @param desc  The description of the version option.
+   * @param opts  Version option options.
+   */
+  public versionOption(
+    flags: string,
+    desc?: string,
+    opts?: ICommandOption<CO, CA>,
   ): this;
   /**
    * Set version option.
@@ -139,14 +156,14 @@ export class Command<
    * @param opts  The action of the version option.
    */
   public versionOption(
-    flags: string | false,
+    flags: string,
     desc?: string,
-    opts?: IAction<CO, CA> | ICommandOption<CO, CA>,
+    opts?: IAction<CO, CA>,
   ): this;
   public versionOption(
     flags: string | false,
     desc?: string,
-    opts?: IAction<CO, CA> | ICommandOption<CO, CA>,
+    opts?: IAction<CO, CA> | ICommandOption,
   ): this {
     this._versionOption = flags === false ? flags : {
       flags,
@@ -158,6 +175,17 @@ export class Command<
 
   /** Disable help option. */
   public helpOption(enable: false): this;
+  /**
+   * Set help option.
+   * @param flags The flags of the help option.
+   * @param desc  The description of the help option.
+   * @param opts  Help option options.
+   */
+  public helpOption(
+    flags: string,
+    desc?: string,
+    opts?: ICommandOption & { global: true },
+  ): this;
   /**
    * Set help option.
    * @param flags The flags of the help option.
@@ -183,7 +211,7 @@ export class Command<
   public helpOption(
     flags: string | false,
     desc?: string,
-    opts?: IAction<CO, CA> | ICommandOption<CO, CA>,
+    opts?: IAction<CO, CA> | ICommandOption,
   ): this {
     this._helpOption = flags === false ? flags : {
       flags,
