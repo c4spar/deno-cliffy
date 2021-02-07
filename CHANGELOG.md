@@ -1,4 +1,16 @@
-# [v0.17.1](https://github.com/c4spar/deno-cli/compare/v0.17.0...1ee0366) (2021-02-07)
+# [v0.17.2](https://github.com/c4spar/deno-cli/compare/v0.17.1...v0.17.2) (2021-20-08)
+
+### Features
+
+- **flags:** add option callback method (#147)
+  ([246035c](https://github.com/c4spar/deno-cli/commit/246035c))
+
+### Bug Fixes
+
+- **command:** option action not executed for options with no value (#148)
+  ([c436221](https://github.com/c4spar/deno-cli/commit/c436221))
+
+# [v0.17.1](https://github.com/c4spar/deno-cli/compare/v0.17.0...v0.17.1) (2021-02-07)
 
 ### Bug Fixes
 
