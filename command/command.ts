@@ -4,7 +4,7 @@ import {
   ValidationError,
 } from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IFlagsResult } from "../flags/types.ts";
+import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
 import {
   getPermissions,
   hasPermission,
@@ -908,11 +908,11 @@ export class Command<O = any, A extends Array<any> = any> {
       stopEarly: this._stopEarly,
       allowEmpty: this._allowEmpty,
       flags: this.getOptions(true),
-      parse: (type: ITypeInfo) => {
-        if (!action) {
-          action = this.getOptionAction(type.name);
+      parse: (type: ITypeInfo) => this.parseType(type),
+      option: (option: IFlagOptions) => {
+        if (!action && (option as IOption).action) {
+          action = (option as IOption).action;
         }
-        return this.parseType(type);
       },
     });
     return { ...result, action };
@@ -1036,20 +1036,6 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     return params as A;
-  }
-
-  /**
-   * Returns the action or undefined of the given option.
-   * @param name Option name.
-   */
-  private getOptionAction(name: string): IAction<O, A> | undefined {
-    const option: IOption<O, A> | undefined = this.getOption(
-      name.replace(/^(-)+/, ""),
-      true,
-    );
-    if (option?.action) {
-      return option?.action;
-    }
   }
 
   /**
