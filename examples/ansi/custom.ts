@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable --allow-net=deno.land
 
-import { rgb24 } from "https://deno.land/std@0.83.0/fmt/colors.ts";
+import { rgb24 } from "https://deno.land/std@0.86.0/fmt/colors.ts";
 import { tty } from "../../ansi/tty.ts";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");

@@ -8,4 +8,4 @@ export {
   stripColor,
   underline,
   yellow,
-} from "https://deno.land/std@0.83.0/fmt/colors.ts";
+} from "https://deno.land/std@0.86.0/fmt/colors.ts";
