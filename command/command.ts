@@ -343,7 +343,12 @@ export class Command<
    * Set internal command pointer to child command with given name.
    * @param name The name of the command to select.
    */
-  public select(name: string): this {
+  public select<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> = any,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = any,
+  >(name: string): Command<O, A> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -352,7 +357,7 @@ export class Command<
 
     this.cmd = cmd;
 
-    return this;
+    return this as Command as Command<O, A>;
   }
 
   /*****************************************************************************
@@ -472,9 +477,9 @@ export class Command<
    * for the command on which this method was called.
    * @param useRawArgs Enable/disable raw arguments.
    */
-  public useRawArgs(useRawArgs = true): this {
+  public useRawArgs(useRawArgs = true): Command<CO, Array<string>> {
     this.cmd._useRawArgs = useRawArgs;
-    return this;
+    return this as Command<CO, Array<string>>;
   }
 
   /**
@@ -520,7 +525,7 @@ export class Command<
    * Register command specific custom type.
    * @param name      The name of the completion.
    * @param complete  The callback method to complete the type.
-   * @param options   Complet options.
+   * @param options   Complete options.
    */
   public complete(
     name: string,
