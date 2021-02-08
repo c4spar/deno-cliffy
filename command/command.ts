@@ -788,9 +788,7 @@ export class Command<
 
         if (dry || action) {
           if (action) {
-            // Fix deno 1.2 error:
-            // deno-lint-ignore no-explicit-any
-            await (action as any).call(this, flags, ...params);
+            await action.call(this, flags, ...params);
           }
           return {
             options: flags,
@@ -976,8 +974,8 @@ export class Command<
    */
   protected parseFlags(
     args: string[],
-  ): IFlagsResult<CO> & { action?: IAction<CO, CA> } {
-    let action: IAction<CO, CA> | undefined;
+  ): IFlagsResult<CO> & { action?: IAction } {
+    let action: IAction | undefined;
     const result = parseFlags<CO>(args, {
       stopEarly: this._stopEarly,
       allowEmpty: this._allowEmpty,
@@ -1453,11 +1451,15 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  // deno-lint-ignore no-explicit-any
-  public getCommand<O = any>(
+  public getCommand<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> = any,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = any,
+  >(
     name: string,
     hidden?: boolean,
-  ): Command<O> | undefined {
+  ): Command<O, A> | undefined {
     return this.getBaseCommand(name, hidden) ??
       this.getGlobalCommand(name, hidden);
   }
@@ -1467,11 +1469,15 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  // deno-lint-ignore no-explicit-any
-  public getBaseCommand<O = any>(
+  public getBaseCommand<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> = any,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = any,
+  >(
     name: string,
     hidden?: boolean,
-  ): Command<O> | undefined {
+  ): Command<O, A> | undefined {
     const cmd: Command | undefined = this.commands.get(name);
 
     return cmd && (hidden || !cmd.isHidden) ? cmd : undefined;
@@ -1482,11 +1488,15 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  // deno-lint-ignore no-explicit-any
-  public getGlobalCommand<O = any>(
+  public getGlobalCommand<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> = any,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = any,
+  >(
     name: string,
     hidden?: boolean,
-  ): Command<O> | undefined {
+  ): Command<O, A> | undefined {
     if (!this._parent) {
       return;
     }
@@ -1504,8 +1514,12 @@ export class Command<
    * Remove sub-command by name.
    * @param name Name of the command.
    */
-  // deno-lint-ignore no-explicit-any
-  public removeCommand<O = any>(name: string): Command<O> | undefined {
+  public removeCommand<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> = any,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = any,
+  >(name: string): Command<O, A> | undefined {
     const command = this.getBaseCommand(name, true);
 
     if (command) {
