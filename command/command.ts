@@ -75,7 +75,6 @@ type ITypeMap = Map<string, IType>;
 
 type IHelpHandler = (this: Command) => string;
 
-// deno-lint-ignore no-explicit-any
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> = any,
@@ -376,14 +375,14 @@ export class Command<
   }
 
   public help(
-    help: string | ((this: Command<CO, CA>) => string) | HelpOptions,
+    help: string | ((this: Command) => string) | HelpOptions,
   ): this {
     if (typeof help === "string") {
       this.cmd._help = () => help;
     } else if (typeof help === "function") {
       this.cmd._help = help;
     } else {
-      this.cmd._help = function (this: Command<CO, CA>): string {
+      this.cmd._help = function (this: Command): string {
         return HelpGenerator.generate(this, help);
       };
     }
@@ -813,7 +812,7 @@ export class Command<
     this.reset();
 
     if (!this._help) {
-      this._help = function (this: Command<CO, CA>): string {
+      this._help = function (this: Command): string {
         return HelpGenerator.generate(this);
       };
     }
