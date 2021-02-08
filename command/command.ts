@@ -73,7 +73,7 @@ interface IDefaultOption<
 
 type ITypeMap = Map<string, IType>;
 
-type IHelpHandler = (this: Command) => string;
+type IHelpHandler = (this: Command, cmd: Command) => string;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
@@ -387,9 +387,8 @@ export class Command<
     } else if (typeof help === "function") {
       this.cmd._help = help;
     } else {
-      this.cmd._help = function (this: Command): string {
-        return HelpGenerator.generate(this, help);
-      };
+      this.cmd._help = (cmd: Command): string =>
+        HelpGenerator.generate(cmd, help);
     }
     return this;
   }
@@ -815,9 +814,7 @@ export class Command<
     this.reset();
 
     if (!this._help) {
-      this._help = function (this: Command): string {
-        return HelpGenerator.generate(this);
-      };
+      this._help = (cmd: Command): string => HelpGenerator.generate(cmd);
     }
 
     if (this.ver && this._versionOption !== false) {
@@ -1235,7 +1232,7 @@ export class Command<
   /** Get generated help. */
   public getHelp(): string {
     this.registerDefaults();
-    return this.getHelpHandler().call(this);
+    return this.getHelpHandler().call(this, this);
   }
 
   /** Get generated help. */
