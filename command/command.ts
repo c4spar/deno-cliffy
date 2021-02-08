@@ -69,6 +69,8 @@ interface IDefaultOption<O = any, A extends Array<any> = any> {
 
 type ITypeMap = Map<string, IType>;
 
+type IHelpHandler = (this: Command) => string;
+
 // deno-lint-ignore no-explicit-any
 export class Command<O = any, A extends Array<any> = any> {
   private types: ITypeMap = new Map<string, IType>([
@@ -106,7 +108,7 @@ export class Command<O = any, A extends Array<any> = any> {
   private hasDefaults = false;
   private _versionOption?: IDefaultOption<O, A> | false;
   private _helpOption?: IDefaultOption<O, A> | false;
-  private _help?: (this: Command<O, A>) => string;
+  private _help?: IHelpHandler;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -1163,7 +1165,12 @@ export class Command<O = any, A extends Array<any> = any> {
   /** Get generated help. */
   public getHelp(): string {
     this.registerDefaults();
-    return (this._help!)();
+    return this.getHelpHandler().call(this);
+  }
+
+  /** Get generated help. */
+  private getHelpHandler(): IHelpHandler {
+    return this._help ?? this._parent?.getHelpHandler() as IHelpHandler;
   }
 
   /*****************************************************************************
