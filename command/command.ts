@@ -1386,7 +1386,7 @@ export class Command<
    * Get commands.
    * @param hidden Include hidden commands.
    */
-  public getCommands(hidden?: boolean): Command[] {
+  public getCommands(hidden?: boolean): Array<Command> {
     return this.getGlobalCommands(hidden).concat(this.getBaseCommands(hidden));
   }
 
@@ -1394,7 +1394,7 @@ export class Command<
    * Get base commands.
    * @param hidden Include hidden commands.
    */
-  public getBaseCommands(hidden?: boolean): Command[] {
+  public getBaseCommands(hidden?: boolean): Array<Command> {
     const commands = Array.from(this.commands.values());
     return hidden ? commands : commands.filter((cmd) => !cmd.isHidden);
   }
@@ -1403,12 +1403,12 @@ export class Command<
    * Get global commands.
    * @param hidden Include hidden commands.
    */
-  public getGlobalCommands(hidden?: boolean): Command[] {
+  public getGlobalCommands(hidden?: boolean): Array<Command> {
     const getCommands = (
       cmd: Command | undefined,
-      commands: Command[] = [],
+      commands: Array<Command> = [],
       names: string[] = [],
-    ): Command[] => {
+    ): Array<Command> => {
       if (cmd) {
         if (cmd.commands.size) {
           cmd.commands.forEach((cmd: Command) => {
