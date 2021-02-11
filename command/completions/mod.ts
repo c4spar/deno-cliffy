@@ -6,7 +6,7 @@ import { FishCompletionsCommand } from "./fish.ts";
 import { ZshCompletionsCommand } from "./zsh.ts";
 
 /** Generates shell completion scripts for various shell's. */
-export class CompletionsCommand extends Command {
+export class CompletionsCommand extends Command<Record<string, never>, []> {
   #cmd?: Command;
 
   public constructor(cmd?: Command) {

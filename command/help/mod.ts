@@ -3,7 +3,8 @@ import { UnknownCommand } from "../_errors.ts";
 import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
-export class HelpCommand extends Command {
+export class HelpCommand
+  extends Command<Record<string, never>, [command?: string]> {
   public constructor(cmd?: Command) {
     super();
     this.type("command", new CommandType())

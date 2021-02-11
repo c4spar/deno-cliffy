@@ -3,7 +3,7 @@ import { dim, italic } from "../deps.ts";
 import { FishCompletionsGenerator } from "./_fish_completions_generator.ts";
 
 /** Generates fish completions script. */
-export class FishCompletionsCommand extends Command {
+export class FishCompletionsCommand extends Command<Record<string, never>, []> {
   #cmd?: Command;
   public constructor(cmd?: Command) {
     super();
