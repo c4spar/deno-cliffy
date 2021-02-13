@@ -62,7 +62,7 @@ import type {
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
 > {
@@ -77,7 +77,7 @@ type IHelpHandler = (this: Command, cmd: Command) => string;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
-  CO extends Record<string, any> = any,
+  CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   CA extends Array<any> = any,
 > {
@@ -239,13 +239,13 @@ export class Command<
    */
   public command<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(name: string, desc?: string, override?: boolean): Command<O, A>;
   public command<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(
@@ -345,7 +345,7 @@ export class Command<
    */
   public select<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(name: string): Command<O, A> {
@@ -588,19 +588,19 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> = CO>(
+  public option<O extends Record<string, any> | void = any>(
     flags: string,
     desc: string,
     opts?: ICommandOption & { global: true } | IFlagValueHandler,
   ): Command<CO & O, CA>;
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> = CO>(
+  public option<O extends Record<string, any> | void = any>(
     flags: string,
     desc: string,
     opts?: ICommandOption<CO & O, CA> | IFlagValueHandler,
   ): Command<CO & O, CA>;
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> = CO>(
+  public option<O extends Record<string, any> | void = any>(
     flags: string,
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
@@ -790,14 +790,14 @@ export class Command<
             await action.call(this, flags, ...params);
           }
           return {
-            options: flags,
+            options: flags as CO,
             args: params,
             cmd: this,
             literal: this.literalArgs,
           };
         }
 
-        return await this.execute(flags, ...params);
+        return await this.execute(flags as CO, ...params);
       }
     } catch (error) {
       throw this.error(error);
@@ -971,9 +971,9 @@ export class Command<
    */
   protected parseFlags(
     args: string[],
-  ): IFlagsResult<CO> & { action?: IAction } {
+  ): IFlagsResult & { action?: IAction } {
     let action: IAction | undefined;
-    const result = parseFlags<CO>(args, {
+    const result = parseFlags(args, {
       stopEarly: this._stopEarly,
       allowEmpty: this._allowEmpty,
       flags: this.getOptions(true),
@@ -1033,7 +1033,7 @@ export class Command<
    * @param args  Raw command line arguments.
    * @param flags Parsed command line options.
    */
-  protected parseArguments(args: string[], flags: CO): CA {
+  protected parseArguments(args: string[], flags: Record<string, unknown>): CA {
     const params: Array<unknown> = [];
 
     // remove array reference
@@ -1450,7 +1450,7 @@ export class Command<
    */
   public getCommand<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(
@@ -1468,7 +1468,7 @@ export class Command<
    */
   public getBaseCommand<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(
@@ -1487,7 +1487,7 @@ export class Command<
    */
   public getGlobalCommand<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(
@@ -1513,7 +1513,7 @@ export class Command<
    */
   public removeCommand<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> = any,
+    O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
   >(name: string): Command<O, A> | undefined {

@@ -19,7 +19,7 @@ export type IDescription = string | ((this: Command) => string);
 /** Action handler for commands and options. */
 export type IAction<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
 > = (
@@ -41,7 +41,7 @@ export interface IArgument extends IFlagArgument {
 /** Result of `cmd.parse()` method. */
 export interface IParseResult<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
 > {
@@ -65,7 +65,7 @@ type ExcludedCommandOptions =
 /** Command option options. */
 export interface ICommandOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
@@ -79,7 +79,7 @@ export interface ICommandOption<
 /** Command option settings. */
 export interface IOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
 > extends ICommandOption<O, A>, IFlagOptions {
