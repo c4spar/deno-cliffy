@@ -1379,10 +1379,10 @@ import {
   IParseResult,
 } from "https://deno.land/x/cliffy/command/mod.ts";
 
-// define your argument types
+// Define your argument types.
 type Arguments = [string, string];
 
-// define your option types
+// Define your option types.
 interface Options {
   name: string;
   age: number;
@@ -1411,7 +1411,7 @@ const output: string | undefined = result.args[1];
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-// Start with no options (void) and no arguments (empty tuple)
+// Start with no options (void) and no arguments (empty tuple).
 await new Command<void, []>()
   // Add argument types.
   .arguments<[input: string, output?: string]>("<input:string> [output:string]")
