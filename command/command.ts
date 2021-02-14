@@ -592,19 +592,19 @@ export class Command<
     flags: string,
     desc: string,
     opts?: ICommandOption & { global: true } | IFlagValueHandler,
-  ): Command<CO & O, CA>;
+  ): Command<CO extends void ? O : CO & O, CA>;
   // deno-lint-ignore no-explicit-any
   public option<O extends Record<string, any> | void = any>(
     flags: string,
     desc: string,
-    opts?: ICommandOption<CO & O, CA> | IFlagValueHandler,
-  ): Command<CO & O, CA>;
+    opts?: ICommandOption<CO extends void ? O : CO & O, CA> | IFlagValueHandler,
+  ): Command<CO extends void ? O : CO & O, CA>;
   // deno-lint-ignore no-explicit-any
   public option<O extends Record<string, any> | void = any>(
     flags: string,
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
-  ): Command<CO & O, CA> {
+  ): Command<CO extends void ? O : CO & O, CA> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
@@ -667,7 +667,7 @@ export class Command<
       this.cmd.options.push(option);
     }
 
-    return this as Command<CO & O, CA>;
+    return this as Command;
   }
 
   /**
