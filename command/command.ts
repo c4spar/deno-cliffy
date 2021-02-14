@@ -80,6 +80,8 @@ export class Command<
   CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   CA extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  CGO extends Record<string, any> | void = void,
 > {
   private types: ITypeMap = new Map<string, IType>([
     ["string", { name: "string", handler: new StringType() }],
@@ -226,7 +228,13 @@ export class Command<
    * @param cmd       The new child command to register.
    * @param override  Override existing child command.
    */
-  public command<C extends Command>(
+  public command<
+    // deno-lint-ignore no-explicit-any
+    O extends Record<string, any> | void,
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any>,
+    C extends Command<CGO extends void ? O : CGO & O, A, CGO | void>,
+  >(
     name: string,
     cmd: C,
     override?: boolean,
@@ -239,10 +247,14 @@ export class Command<
    */
   public command<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
+    O extends Record<string, any> | void = CGO,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
-  >(name: string, desc?: string, override?: boolean): Command<O, A>;
+  >(
+    name: string,
+    desc?: string,
+    override?: boolean,
+  ): Command<CGO extends void ? O : CGO & O, A, CGO>; //  extends void ? O : CO & O
   public command<
     // deno-lint-ignore no-explicit-any
     O extends Record<string, any> | void = any,
@@ -250,9 +262,9 @@ export class Command<
     A extends Array<any> = any,
   >(
     nameAndArguments: string,
-    cmdOrDescription?: Command<O, A> | string,
+    cmdOrDescription?: Command<CGO extends void ? O : CGO & O, A, CGO> | string,
     override?: boolean,
-  ): Command<O, A> {
+  ): Command<CGO extends void ? O : CGO & O, A, CGO> {
     const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
@@ -277,7 +289,7 @@ export class Command<
     }
 
     if (cmdOrDescription instanceof Command) {
-      cmd = cmdOrDescription.reset();
+      cmd = cmdOrDescription.reset() as Command;
     } else {
       cmd = new Command();
     }
@@ -303,7 +315,7 @@ export class Command<
 
     this.select(name);
 
-    return this as Command as Command<O, A>;
+    return this as Command;
   }
 
   // public static async exists(name: string) {
@@ -335,7 +347,7 @@ export class Command<
   }
 
   /** Reset internal command reference to main command. */
-  public reset(): this {
+  public reset(): Command {
     return this.cmd = this;
   }
 
@@ -348,7 +360,9 @@ export class Command<
     O extends Record<string, any> | void = any,
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
-  >(name: string): Command<O, A> {
+    // deno-lint-ignore no-explicit-any
+    GO extends Record<string, any> | void = any,
+  >(name: string): Command<O, A, GO> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -357,7 +371,7 @@ export class Command<
 
     this.cmd = cmd;
 
-    return this as Command as Command<O, A>;
+    return this as Command;
   }
 
   /*****************************************************************************
@@ -428,9 +442,11 @@ export class Command<
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
   // deno-lint-ignore no-explicit-any
-  public arguments<A extends Array<any> = CA>(args: string): Command<CO, A> {
+  public arguments<A extends Array<any> = CA>(
+    args: string,
+  ): Command<CO, A, CGO> {
     this.cmd.argsDefinition = args;
-    return this as Command as Command<CO, A>;
+    return this as Command;
   }
 
   /**
@@ -476,9 +492,9 @@ export class Command<
    * for the command on which this method was called.
    * @param useRawArgs Enable/disable raw arguments.
    */
-  public useRawArgs(useRawArgs = true): Command<CO, Array<string>> {
+  public useRawArgs(useRawArgs = true): Command<CO, Array<string>, CGO> {
     this.cmd._useRawArgs = useRawArgs;
-    return this as Command<CO, Array<string>>;
+    return this as Command<CO, Array<string>, CGO>;
   }
 
   /**
@@ -588,23 +604,23 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> | void = any>(
+  public option<O extends Record<string, any> | void = CGO>(
     flags: string,
     desc: string,
-    opts?: ICommandOption & { global: true } | IFlagValueHandler,
-  ): Command<CO extends void ? O : CO & O, CA>;
+    opts: ICommandOption & { global: true } | IFlagValueHandler,
+  ): Command<CO extends void ? O : CO & O, CA, CGO extends void ? O : CGO & O>;
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> | void = any>(
+  public option<O extends Record<string, any> | void = CO>(
     flags: string,
     desc: string,
     opts?: ICommandOption<CO extends void ? O : CO & O, CA> | IFlagValueHandler,
-  ): Command<CO extends void ? O : CO & O, CA>;
+  ): Command<CO extends void ? O : CO & O, CA, CGO>;
   // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> | void = any>(
+  public option<O extends Record<string, any> | void = CO>(
     flags: string,
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
-  ): Command<CO extends void ? O : CO & O, CA> {
+  ): Command<CO extends void ? O : CO & O, CA, CGO> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
