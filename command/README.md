@@ -1424,7 +1424,7 @@ await new Command<void, []>()
     required: true,
   })
   // Define email option type.
-  .option<{ email: string }>("-e, --email <email:string>", "description ...")
+  .option<{ email?: string }>("-e, --email <email:string>", "description ...")
   // The action method has no typed options and arguments.
   .action((options, input, output?) => {})
   .parse(Deno.args);

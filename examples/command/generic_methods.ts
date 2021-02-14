@@ -10,6 +10,6 @@ await new Command<void>()
   .option<{ age: number }>("-a, --age <age:number>", "description ...", {
     required: true,
   })
-  .option<{ email: string }>("-e, --email <email:string>", "description ...")
+  .option<{ email?: string }>("-e, --email <email:string>", "description ...")
   .action((options, input, output?) => {})
   .parse(Deno.args);
