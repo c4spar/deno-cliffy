@@ -1357,12 +1357,21 @@ source <(command-name completions zsh)
 
 ## ❯ Generic options and arguments
 
-> This is an experimental feature and may change in the future!
+By default, the options type is `Record<string, any>` and the arguments type
+`Array<any>`. You can define strict types by using generics. Options and
+arguments can be defined with the `new Command<O, A>()` constructor and with the
+`.options<O>()` and `.arguments<A>()` method's.
 
-You can define an interface for your command options and a tuple for the command
-arguments.
+Options must be compatible to `Record<string, any>` or `void` for no options and
+argument to `Array<any>` or a empty tuple for no arguments.
 
-Here's how to do that:
+> ⚠️ Don't use the `{}` type to define an empty options object, because it
+> doesn't mean to be an empty object. (see
+> [here](https://github.com/typescript-eslint/typescript-eslint/issues/2063#issuecomment-675156492)
+> for more information), instead use `void`.
+
+**Option 1:** Using an interface for the options, and a tuple type for the
+arguments:
 
 ```typescript
 import {
@@ -1394,6 +1403,66 @@ const result: IParseResult<Options, Arguments> = await new Command<
 const options: Options = result.options;
 const input: string = result.args[0];
 const output: string | undefined = result.args[1];
+```
+
+**Option 2:** Passing the types directly to the `.options<O>()` and
+`.arguments<A>()` method's.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+// Start with no options (void) and no arguments (empty tuple)
+await new Command<void, []>()
+  // Define argument types.
+  .arguments<[input: string, output?: string]>("<input:string> [output:string]")
+  // Define name option type.
+  .option<{ name: string }>("-n, --name <name:string>", "description ...", {
+    required: true,
+  })
+  // Define age option type.
+  .option<{ age: number }>("-a, --age <age:number>", "description ...", {
+    required: true,
+  })
+  // Define email option type.
+  .option<{ email: string }>("-e, --email <email:string>", "description ...")
+  // The action method has no typed options and arguments.
+  .action((options, input, output?) => {})
+  .parse(Deno.args);
+```
+
+**Global options:**
+
+If a child command needs access to a global option of a parent command, you can
+define the global options in the constructor of the child command.
+
+```typescript
+// main.ts
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { fooCommand } from "./foo.ts";
+
+await new Command<void, []>()
+  // Define global option.
+  .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
+  .command("foo", fooCommand)
+  .parse(Deno.args);
+```
+
+```typescript
+// foo.ts
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+// Define global parent options.
+export const fooCommand = new Command<{ debug?: boolean }, []>()
+  // Define foo command options.
+  .option<{ bar?: boolean }>("-b, --bar", "...")
+  .action((options) => {
+    if (options.debug) {
+      console.log("debug");
+    }
+    if (options.bar) {
+      console.log("bar");
+    }
+  });
 ```
 
 ## ❯ Version option
