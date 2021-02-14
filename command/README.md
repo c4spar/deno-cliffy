@@ -1413,17 +1413,17 @@ import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Start with no options (void) and no arguments (empty tuple)
 await new Command<void, []>()
-  // Define argument types.
+  // Add argument types.
   .arguments<[input: string, output?: string]>("<input:string> [output:string]")
-  // Define name option type.
+  // Add name option type.
   .option<{ name: string }>("-n, --name <name:string>", "description ...", {
     required: true,
   })
-  // Define age option type.
+  // Add age option type.
   .option<{ age: number }>("-a, --age <age:number>", "description ...", {
     required: true,
   })
-  // Define email option type.
+  // Add email option type.
   .option<{ email?: string }>("-e, --email <email:string>", "description ...")
   // The action method has no typed options and arguments.
   .action((options, input, output?) => {})
@@ -1441,7 +1441,7 @@ import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 import { fooCommand } from "./foo.ts";
 
 await new Command<void, []>()
-  // Define global option.
+  // Add global option.
   .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
   .command("foo", fooCommand)
   .parse(Deno.args);
@@ -1453,7 +1453,7 @@ import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Define global parent options.
 export const fooCommand = new Command<{ debug?: boolean }, []>()
-  // Define foo command options.
+  // Add foo command options.
   .option<{ bar?: boolean }>("-b, --bar", "...")
   .action((options) => {
     if (options.debug) {
