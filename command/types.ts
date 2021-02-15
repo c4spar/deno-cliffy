@@ -22,9 +22,11 @@ export type IAction<
   O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  GO extends Record<string, any> | void = any,
 > = (
-  this: Command,
-  options: O,
+  this: Command<O, A, GO>,
+  options: O & GO,
   ...args: A
 ) => void | Promise<void>;
 
@@ -44,11 +46,13 @@ export interface IParseResult<
   O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  GO extends Record<string, any> | void = any,
 > {
-  options: O;
+  options: O & GO;
   args: A;
   literal: string[];
-  cmd: Command<O>;
+  cmd: Command<O, A, GO>;
 }
 
 /* OPTION TYPES */
@@ -68,11 +72,13 @@ export interface ICommandOption<
   O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  GO extends Record<string, any> | void = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
-  action?: IAction<O, A>;
+  action?: IAction<O, A, GO>;
   prepend?: boolean;
 }
 
@@ -82,7 +88,9 @@ export interface IOption<
   O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
-> extends ICommandOption<O, A>, IFlagOptions {
+  // deno-lint-ignore no-explicit-any
+  GO extends Record<string, any> | void = any,
+> extends ICommandOption<O, A, GO>, IFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
