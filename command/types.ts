@@ -24,8 +24,10 @@ export type IAction<
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
   GO extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  MGO extends Record<string, any> | void = any,
 > = (
-  this: Command<O, A, GO>,
+  this: Command<O, A, GO, MGO>,
   options: O & GO,
   ...args: A
 ) => void | Promise<void>;
@@ -74,11 +76,13 @@ export interface ICommandOption<
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
   GO extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  MGO extends Record<string, any> | void = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
-  action?: IAction<O, A, GO>;
+  action?: IAction<O, A, GO, MGO>;
   prepend?: boolean;
 }
 
