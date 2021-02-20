@@ -1411,7 +1411,8 @@ const output: string | undefined = result.args[1];
 By default, the type of the command options and arguments is `any`. To start
 with an empty command with no options and no arguments, you can pass the `void`
 type to the command constructor. Then you can add dynamically new option and
-argument types by passing the types to the options and arguments methods.
+argument types by passing the types to the `.options<O>()` and `.arguments<A>()`
+method's.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1419,7 +1420,7 @@ import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 new Command<void>()
   .arguments<[input: string, output?: string]>("<input> [output]")
   .globalOption<{ debug?: boolean }>("-d, --debug", "...")
-  .globalOption<{ logLevel?: boolean }>("-L, --log-level", "...")
+  .option<{ logLevel?: boolean }>("", "", { global: true })
   .option<{ main?: boolean }>("-m, --main", "...")
   .action((options) => {
     options.debug && options.logLevel &&
