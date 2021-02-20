@@ -11,7 +11,7 @@
     <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:ansi-escape?label=issues&logo=github&color=yellow">
   </a>
   <a href="https://deno.land/">
-    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
+    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.4.0-blue?logo=deno" />
   </a>
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/ansi/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
