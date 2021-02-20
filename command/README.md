@@ -1371,7 +1371,7 @@ argument to `Array<any>` or a empty tuple for no arguments.
 > for more information), instead use `void`.
 
 **Option 1:** Using an interface for the options, and a tuple type for the
-arguments:
+arguments in the command constructor:
 
 ```typescript
 import {
@@ -1408,51 +1408,61 @@ const output: string | undefined = result.args[1];
 **Option 2:** Passing the types directly to the `.options<O>()` and
 `.arguments<A>()` method's.
 
+By default, the type of the command options and arguments is `any`. To start
+with an empty command with no options and no arguments, you can pass the `void`
+type to the command constructor. Then you can add dynamically new option and
+argument types by passing the types to the options and arguments methods.
+
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-// Start with no options (void) and no arguments (empty tuple).
-await new Command<void, []>()
-  // Add argument types.
-  .arguments<[input: string, output?: string]>("<input:string> [output:string]")
-  // Add name option type.
-  .option<{ name: string }>("-n, --name <name:string>", "description ...", {
-    required: true,
+new Command<void>()
+  .arguments<[input: string, output?: string]>("<input> [output]")
+  .globalOption<{ debug?: boolean }>("-d, --debug", "...")
+  .globalOption<{ logLevel?: boolean }>("-L, --log-level", "...")
+  .option<{ main?: boolean }>("-m, --main", "...")
+  .action((options) => {
+    options.debug && options.logLevel &&
+      options.main;
+    // @ts-expect-error foo & fooGlobal option's only exists on foo command.
+    options.foo && options.fooGlobal &&
+      // @ts-expect-error bar & barGlobal option's only exists on bar command.
+      options.bar && options.barGlobal;
   })
-  // Add age option type.
-  .option<{ age: number }>("-a, --age <age:number>", "description ...", {
-    required: true,
+  .command("foo")
+  .globalOption<{ fooGlobal?: boolean }>("-F, --foo-global", "...")
+  .option<{ foo?: boolean }>("-f, --foo", "...")
+  .action((options) => {
+    options.debug && options.logLevel &&
+      options.foo && options.fooGlobal;
+    // @ts-expect-error main option only exists on main command.
+    options.main &&
+      // @ts-expect-error bar & barGlobal option's only exists on bar command.
+      options.bar && options.barGlobal;
   })
-  // Add email option type.
-  .option<{ email?: string }>("-e, --email <email:string>", "description ...")
-  // The action method has no typed options and arguments.
-  .action((options, input, output?) => {})
-  .parse(Deno.args);
+  .command("bar")
+  .globalOption<{ barGlobal?: boolean }>("-B, --bar-global", "...")
+  .option<{ bar?: boolean }>("-b, --bar", "...")
+  .action((options) => {
+    options.debug && options.logLevel &&
+      options.bar && options.barGlobal;
+    // @ts-expect-error main option only exists on main command.
+    options.main &&
+      // @ts-expect-error foo & fooGlobal option's only exists on foo command.
+      options.foo && options.fooGlobal;
+  });
 ```
 
-**Global options:**
+If you want to split your command into different commands/files, you can
+define required global parent options in the constructor of the child command.
 
-If a child command needs access to a global option of a parent command, you can
-define the global options in the constructor of the child command.
-
-```typescript
-// main.ts
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-import { fooCommand } from "./foo.ts";
-
-await new Command<void, []>()
-  // Add global option.
-  .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
-  .command("foo", fooCommand)
-  .parse(Deno.args);
-```
+> foo.ts
 
 ```typescript
-// foo.ts
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Define global parent options.
-export const fooCommand = new Command<{ debug?: boolean }, []>()
+export const fooCommand = new Command<void, [], { debug?: boolean }>()
   // Add foo command options.
   .option<{ bar?: boolean }>("-b, --bar", "...")
   .action((options) => {
@@ -1463,6 +1473,19 @@ export const fooCommand = new Command<{ debug?: boolean }, []>()
       console.log("bar");
     }
   });
+```
+
+> main.ts
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { fooCommand } from "./foo.ts";
+
+await new Command<void]()
+  // Add global option.
+  .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
+  .command("foo", fooCommand)
+  .parse(Deno.args);
 ```
 
 ## ❯ Version option
@@ -1515,7 +1538,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-The version option can be also disable.
+The version option can be also disabled.
 
 ```typescript
 await new Command()
