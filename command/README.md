@@ -1453,8 +1453,8 @@ new Command<void>()
   });
 ```
 
-If you want to split your command into different commands/files, you can
-define required global parent options in the constructor of the child command.
+If you want to split your command into different commands/files, you can define
+required global parent options in the constructor of the child command.
 
 > foo.ts
 
