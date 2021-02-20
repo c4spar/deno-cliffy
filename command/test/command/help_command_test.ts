@@ -44,13 +44,12 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
     );
 
   if (hintOption) {
-    cmd
-      .option("-a, --all <val:string>", "I have many hints!", {
-        default: "test",
-        required: true,
-        depends: ["test"],
-        conflicts: ["depends"],
-      });
+    cmd.option("-a, --all <val:string>", "I have many hints!", {
+      default: "test",
+      required: true,
+      depends: ["test"],
+      conflicts: ["depends"],
+    });
   }
 
   cmd

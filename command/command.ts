@@ -70,7 +70,7 @@ interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command<any, any, any, any, any> | void = any,
+  P extends Command | void = any,
 > {
   flags: string;
   desc?: string;
@@ -87,13 +87,13 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<any> = any,
+  CA extends Array<any> = CO extends void ? [] : any,
   // deno-lint-ignore no-explicit-any
-  CG extends Record<string, any> | void = void,
+  CG extends Record<string, any> | void = CO extends void ? void : any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = void,
+  PG extends Record<string, any> | void = CO extends void ? void : any,
   // deno-lint-ignore no-explicit-any
-  P extends Command<any, any, any, any, any> | void = void,
+  P extends Command | void = CO extends void ? void : any,
 > {
   private types: ITypeMap = new Map<string, IType>([
     ["string", { name: "string", handler: new StringType() }],
@@ -105,10 +105,8 @@ export class Command<
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
-  // deno-lint-ignore no-explicit-any
-  private _parent?: Command<any, any, any, any, any>;
-  // deno-lint-ignore no-explicit-any
-  private _globalParent?: Command<any, any, any, any, any>;
+  private _parent?: Command;
+  private _globalParent?: Command;
   private ver?: string;
   private desc: IDescription = "";
   private fn?: IAction;
@@ -118,8 +116,7 @@ export class Command<
   private envVars: IEnvVar[] = [];
   private aliases: string[] = [];
   private completions: Map<string, ICompletion> = new Map();
-  // deno-lint-ignore no-explicit-any
-  private cmd: Command<any, any, any, any, any> = this;
+  private cmd: Command = this;
   private argsDefinition?: string;
   private isExecutable = false;
   private throwOnError = false;
@@ -285,8 +282,7 @@ export class Command<
     nameAndArguments: string,
     cmdOrDescription?: Command | string,
     override?: boolean,
-    // deno-lint-ignore no-explicit-any
-  ): Command<any, any, any, any, any> {
+  ): Command {
     const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
@@ -669,10 +665,8 @@ export class Command<
   public option(
     flags: string,
     desc: string,
-    // deno-lint-ignore no-explicit-any
-    opts?: ICommandOption<any, any, any, any, any> | IFlagValueHandler,
-    // deno-lint-ignore no-explicit-any
-  ): Command<any, any, any, any, any> {
+    opts?: ICommandOption | IFlagValueHandler,
+  ): Command {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
