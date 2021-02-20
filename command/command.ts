@@ -66,23 +66,22 @@ interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  GO extends Record<string, any> | void = any,
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
 > {
   flags: string;
   desc?: string;
-  opts?: ICommandOption<O, A, GO>;
+  opts?: ICommandOption<O, A, G, PG, P>;
 }
 
 type ITypeMap = Map<string, IType>;
-
 type IHelpHandler = (this: Command, cmd: Command) => string;
-
-// MergeOptions<CGO, O> --> CGO extends void ? O : (O extends void ? CGO : CGO & O)
-// MergeOptions<CGO, GO> --> CGO extends void ? GO : (GO extends void ? CGO : CGO & GO)
-// MergeOptions<CO, O> --> CO extends void ? O : (O extends void ? CO : CO & O)
-type MergeOptions<CO, O> = CO extends void ? O : (O extends void ? CO : CO & O);
-type GlobalOptions<MCGO, CGO> = MCGO extends void ? CGO : MCGO;
-// type MergeOptions<CO, O> = CO & O;
+type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+type OneOf<T, V> = T extends void ? V : T;
+// type Globals<T, V> = Merge<T, OneOf<T, V>>;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
@@ -90,9 +89,11 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   CA extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  CGO extends Record<string, any> | void = void,
+  CG extends Record<string, any> | void = void,
   // deno-lint-ignore no-explicit-any
-  MCGO extends Record<string, any> | void = CGO,
+  PG extends Record<string, any> | void = void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = void,
 > {
   private types: ITypeMap = new Map<string, IType>([
     ["string", { name: "string", handler: new StringType() }],
@@ -104,8 +105,10 @@ export class Command<
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
-  private _parent?: Command;
-  private _globalParent?: Command;
+  // deno-lint-ignore no-explicit-any
+  private _parent?: Command<any, any, any, any, any>;
+  // deno-lint-ignore no-explicit-any
+  private _globalParent?: Command<any, any, any, any, any>;
   private ver?: string;
   private desc: IDescription = "";
   private fn?: IAction;
@@ -115,7 +118,8 @@ export class Command<
   private envVars: IEnvVar[] = [];
   private aliases: string[] = [];
   private completions: Map<string, ICompletion> = new Map();
-  private cmd: Command = this;
+  // deno-lint-ignore no-explicit-any
+  private cmd: Command<any, any, any, any, any> = this;
   private argsDefinition?: string;
   private isExecutable = false;
   private throwOnError = false;
@@ -148,7 +152,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption & { global: true },
+    opts?: ICommandOption<Partial<CO>, CA, CG, PG, P> & { global: true },
   ): this;
   /**
    * Set version option.
@@ -159,7 +163,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CGO, MCGO>,
+    opts?: ICommandOption<CO, CA, CG, PG, P>,
   ): this;
   /**
    * Set version option.
@@ -170,15 +174,15 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CGO, MCGO>,
+    opts?: IAction<CO, CA, CG, PG, P>,
   ): this;
   public versionOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CGO, MCGO>
-      | ICommandOption<CO, CA, CGO, MCGO>
-      | ICommandOption & { global: true },
+      | IAction<CO, CA, CG, PG, P>
+      | ICommandOption<CO, CA, CG, PG, P>
+      | ICommandOption<Partial<CO>, CA, CG, PG, P> & { global: true },
   ): this {
     this._versionOption = flags === false ? flags : {
       flags,
@@ -199,7 +203,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption & { global: true },
+    opts?: ICommandOption<Partial<CO>, CA, CG, PG, P> & { global: true },
   ): this;
   /**
    * Set help option.
@@ -210,7 +214,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CGO, MCGO>,
+    opts?: ICommandOption<CO, CA, CG, PG, P>,
   ): this;
   /**
    * Set help option.
@@ -221,29 +225,21 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CGO, MCGO>,
+    opts?: IAction<CO, CA, CG, PG, P>,
   ): this;
   public helpOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CGO, MCGO>
-      | ICommandOption<CO, CA, CGO, MCGO>
-      | ICommandOption & { global: true },
+      | IAction<CO, CA, CG, PG, P>
+      | ICommandOption<CO, CA, CG, PG, P>
+      | ICommandOption<Partial<CO>, CA, CG, PG, P> & { global: true },
   ): this {
     this._helpOption = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
     };
-    return this;
-  }
-
-  public test(fn: (options: MCGO) => void): this {
-    return this;
-  }
-
-  public test2(fn: (options: CGO) => void): this {
     return this;
   }
 
@@ -254,11 +250,14 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any>,
-    C extends Command<O, A, GlobalOptions<MCGO, CGO>, GlobalOptions<MCGO, CGO>>,
+    C extends Command<
+      void,
+      // deno-lint-ignore no-explicit-any
+      Array<any>,
+      void,
+      Merge<PG, CG> | void,
+      OneOf<P, this> | void
+    >,
   >(
     name: string,
     cmd: C,
@@ -270,28 +269,24 @@ export class Command<
    * @param desc      The description of the new child command.
    * @param override  Override existing child command.
    */
-  public command<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = GlobalOptions<MCGO, CGO>,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-  >(
+  // deno-lint-ignore no-explicit-any
+  public command<A extends Array<any> = []>(
     name: string,
     desc?: string,
     override?: boolean,
-  ): Command<O, A, CGO, CGO>;
-  public command<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-  >(
+  ): Command<void, A, void, Merge<PG, CG>, OneOf<P, this>>;
+  /**
+   * Add new sub-command.
+   * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
+   * @param cmdOrDescription  The description of the new child command.
+   * @param override          Override existing child command.
+   */
+  command(
     nameAndArguments: string,
-    cmdOrDescription?:
-      | Command<O, A, GlobalOptions<MCGO, CGO>, GlobalOptions<MCGO, CGO>>
-      | string,
+    cmdOrDescription?: Command | string,
     override?: boolean,
-  ): Command<O, A, GlobalOptions<MCGO, CGO>, GlobalOptions<MCGO, CGO>> {
+    // deno-lint-ignore no-explicit-any
+  ): Command<any, any, any, any, any> {
     const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
@@ -316,7 +311,7 @@ export class Command<
     }
 
     if (cmdOrDescription instanceof Command) {
-      cmd = cmdOrDescription.reset() as Command;
+      cmd = cmdOrDescription.reset();
     } else {
       cmd = new Command();
     }
@@ -342,7 +337,7 @@ export class Command<
 
     this.select(name);
 
-    return this as any;
+    return this;
   }
 
   // public static async exists(name: string) {
@@ -374,8 +369,9 @@ export class Command<
   }
 
   /** Reset internal command reference to main command. */
-  public reset(): Command {
-    return this.cmd = this;
+  public reset(): OneOf<P, this> {
+    this.cmd = this;
+    return this as OneOf<P, this>;
   }
 
   /**
@@ -388,8 +384,8 @@ export class Command<
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
     // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CGO,
-  >(name: string): Command<O, A, GO, MCGO> {
+    GO extends Record<string, any> | void = CG,
+  >(name: string): Command<O, A, GO, PG, P> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -398,7 +394,7 @@ export class Command<
 
     this.cmd = cmd;
 
-    return this as Command as Command<O, A, GO, MCGO>;
+    return this as Command as Command<O, A, GO, PG, P>;
   }
 
   /*****************************************************************************
@@ -438,7 +434,7 @@ export class Command<
    * Set the long command description.
    * @param description The command description.
    */
-  public description(description: IDescription): this {
+  public description(description: IDescription<CO, CA, CG, PG, P>): this {
     this.cmd.desc = description;
     return this;
   }
@@ -471,16 +467,16 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   public arguments<A extends Array<any> = CA>(
     args: string,
-  ): Command<CO, A, CGO, MCGO> {
+  ): Command<CO, A, CG, PG, P> {
     this.cmd.argsDefinition = args;
-    return this as Command as Command<CO, A, CGO, MCGO>;
+    return this as Command as Command<CO, A, CG, PG, P>;
   }
 
   /**
    * Set command callback method.
    * @param fn Command action handler.
    */
-  public action(fn: IAction<CO, CA, CGO, MCGO>): this {
+  public action(fn: IAction<CO, CA, CG, PG, P>): this {
     this.cmd.fn = fn;
     return this;
   }
@@ -519,9 +515,9 @@ export class Command<
    * for the command on which this method was called.
    * @param useRawArgs Enable/disable raw arguments.
    */
-  public useRawArgs(useRawArgs = true): Command<CO, Array<string>, CGO, MCGO> {
+  public useRawArgs(useRawArgs = true): Command<CO, Array<string>, CG, PG, P> {
     this.cmd._useRawArgs = useRawArgs;
-    return this as Command<CO, Array<string>, CGO, MCGO>;
+    return this as Command<CO, Array<string>, CG, PG, P>;
   }
 
   /**
@@ -554,8 +550,7 @@ export class Command<
     if (handler instanceof Type && typeof handler.complete !== "undefined") {
       this.complete(
         name,
-        (cmd: Command, parent?: Command) =>
-          handler.complete?.(cmd, parent) || [],
+        (cmd, parent?: Command) => handler.complete?.(cmd, parent) || [],
         options,
       );
     }
@@ -571,7 +566,18 @@ export class Command<
    */
   public complete(
     name: string,
-    complete: ICompleteHandler,
+    // deno-lint-ignore no-explicit-any
+    complete: ICompleteHandler<Partial<CO>, Partial<CA>, CG, PG, any>,
+    options: ICompleteOptions & { global: boolean },
+  ): this;
+  public complete(
+    name: string,
+    complete: ICompleteHandler<CO, CA, CG, PG, P>,
+    options?: ICompleteOptions,
+  ): this;
+  complete(
+    name: string,
+    complete: ICompleteHandler<CO, CA, CG, PG, P>,
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
@@ -625,11 +631,13 @@ export class Command<
   }
 
   // deno-lint-ignore no-explicit-any
-  public globalOption<GO extends Record<string, any> | void = CGO>(
+  public globalOption<G extends Record<string, any> | void = CG>(
     flags: string,
     desc: string,
-    opts?: Omit<ICommandOption, "global"> | IFlagValueHandler,
-  ): Command<CO, CA, MergeOptions<CGO, GO>, MCGO> {
+    opts?:
+      | Omit<ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P>, "global">
+      | IFlagValueHandler,
+  ): Command<CO, CA, Merge<CG, G>, PG, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -643,27 +651,28 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   // deno-lint-ignore no-explicit-any
-  public option<GO extends Record<string, any> | void = CGO>(
+  public option<G extends Record<string, any> | void = CG>(
     flags: string,
     desc: string,
-    opts: ICommandOption & { global: true } | IFlagValueHandler,
-  ): Command<CO, CA, MergeOptions<CGO, GO>, MCGO>;
+    opts:
+      | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
+      | IFlagValueHandler,
+  ): Command<CO, CA, Merge<CG, G>, PG, P>;
   // deno-lint-ignore no-explicit-any
   public option<O extends Record<string, any> | void = CO>(
     flags: string,
     desc: string,
     opts?:
-      | ICommandOption<MergeOptions<CO, O>, CA, CGO, MCGO>
+      | ICommandOption<Merge<CO, O>, CA, CG, PG, P>
       | IFlagValueHandler,
-  ): Command<MergeOptions<CO, O>, CA, CGO, MCGO>;
-  // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> | void = CO>(
+  ): Command<Merge<CO, O>, CA, CG, PG, P>;
+  public option(
     flags: string,
     desc: string,
-    opts?: ICommandOption | IFlagValueHandler,
-  ):
-    | Command<CO, CA, MergeOptions<CGO, O>, MCGO>
-    | Command<MergeOptions<CO, O>, CA, CGO, MCGO> {
+    // deno-lint-ignore no-explicit-any
+    opts?: ICommandOption<any, any, any, any, any> | IFlagValueHandler,
+    // deno-lint-ignore no-explicit-any
+  ): Command<any, any, any, any, any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
@@ -726,9 +735,7 @@ export class Command<
       this.cmd.options.push(option);
     }
 
-    return this as Command as
-      | Command<CO, CA, MergeOptions<CGO, O>, MCGO>
-      | Command<MergeOptions<CO, O>, CA, CGO, MCGO>;
+    return this;
   }
 
   /**
@@ -802,22 +809,26 @@ export class Command<
   public async parse(
     args: string[] = Deno.args,
     dry?: boolean,
-  ): Promise<IParseResult<CO, CA, CGO>> {
+  ): Promise<IParseResult<CO, CA, CG, PG, P>> {
     try {
-      this.reset().registerDefaults();
+      this.reset();
+      this.registerDefaults();
       this.rawArgs = args;
       const subCommand = args.length > 0 &&
-        this.getCommand<CO, CA>(args[0], true);
+        this.getCommand(args[0], true);
 
       if (subCommand) {
         subCommand._globalParent = this;
-        return await subCommand.parse(this.rawArgs.slice(1), dry);
+        return await subCommand.parse(
+          this.rawArgs.slice(1),
+          dry,
+        ) as IParseResult<CO, CA, CG, PG, P>;
       }
 
-      const result: IParseResult<CO, CA, CGO> = {
-        options: {} as CO & CGO,
+      const result: IParseResult<CO, CA, CG, PG, P> = {
+        options: {} as PG & CG & CO,
         args: this.rawArgs as CA,
-        cmd: this as Command<CO, CA, CGO, MCGO>,
+        cmd: this,
         literal: this.literalArgs,
       };
 
@@ -832,7 +843,7 @@ export class Command<
           return result;
         }
 
-        return await this.execute({} as CO & CGO, ...this.rawArgs as CA);
+        return await this.execute({} as PG & CG & CO, ...this.rawArgs as CA);
       } else {
         const { action, flags, unknown, literal } = this.parseFlags(
           this.rawArgs,
@@ -849,14 +860,14 @@ export class Command<
             await action.call(this, flags, ...params);
           }
           return {
-            options: flags as CO & CGO,
+            options: flags as PG & CG & CO,
             args: params,
-            cmd: this as Command<CO, CA, CGO, MCGO>,
+            cmd: this,
             literal: this.literalArgs,
           };
         }
 
-        return await this.execute(flags as CO & CGO, ...params);
+        return await this.execute(flags as PG & CG & CO, ...params);
       }
     } catch (error) {
       throw this.error(error);
@@ -884,8 +895,8 @@ export class Command<
         {
           standalone: true,
           prepend: true,
-          action: async function (this: Command) {
-            await Deno.stdout.writeSync(
+          action: async function () {
+            await Deno.stdout.write(
               new TextEncoder().encode(this.ver + "\n"),
             );
             Deno.exit(0);
@@ -903,7 +914,7 @@ export class Command<
           standalone: true,
           global: true,
           prepend: true,
-          action: function (this: Command) {
+          action: function () {
             this.showHelp();
             Deno.exit(0);
           },
@@ -921,9 +932,9 @@ export class Command<
    * @param args Command arguments.
    */
   protected async execute(
-    options: CO & CGO,
+    options: PG & CG & CO,
     ...args: CA
-  ): Promise<IParseResult<CO, CA, CGO>> {
+  ): Promise<IParseResult<CO, CA, CG, PG, P>> {
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
@@ -1199,12 +1210,6 @@ export class Command<
     return this._parent;
   }
 
-  /** Get parent command. */
-  public setParent(cmd: Command): this {
-    this._parent = this;
-    return this;
-  }
-
   /**
    * Get parent command from global executed command.
    * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
@@ -1216,7 +1221,7 @@ export class Command<
 
   /** Get main command. */
   public getMainCommand(): Command {
-    return this._parent?.getMainCommand() ?? this;
+    return this._parent?.getMainCommand() ?? this as Command;
   }
 
   /** Get command name aliases. */
@@ -1297,7 +1302,7 @@ export class Command<
   /** Get generated help. */
   public getHelp(): string {
     this.registerDefaults();
-    return this.getHelpHandler().call(this, this);
+    return this.getHelpHandler().call(this as Command, this as Command);
   }
 
   /** Get generated help. */
@@ -1513,19 +1518,12 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  public getCommand<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-    // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CGO,
-  >(
+  public getCommand(
     name: string,
     hidden?: boolean,
-  ): Command<O, A, GO, MCGO> | undefined {
-    return this.getBaseCommand<O, A, GO>(name, hidden) ??
-      this.getGlobalCommand<O, A, GO>(name, hidden);
+  ): Command | undefined {
+    return this.getBaseCommand(name, hidden) ??
+      this.getGlobalCommand(name, hidden);
   }
 
   /**
@@ -1533,21 +1531,14 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  public getBaseCommand<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-    // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CGO,
-  >(
+  public getBaseCommand(
     name: string,
     hidden?: boolean,
-  ): Command<O, A, GO, MCGO> | undefined {
+  ): Command | undefined {
     const cmd: Command | undefined = this.commands.get(name);
 
     return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
-      | Command<O, A, GO, MCGO>
+      | Command
       | undefined;
   }
 
@@ -1556,25 +1547,18 @@ export class Command<
    * @param name Name of the command.
    * @param hidden Include hidden commands.
    */
-  public getGlobalCommand<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-    // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CGO,
-  >(
+  public getGlobalCommand(
     name: string,
     hidden?: boolean,
-  ): Command<O, A, GO, MCGO> | undefined {
+  ): Command | undefined {
     if (!this._parent) {
       return;
     }
 
-    const cmd = this._parent.getBaseCommand<O, A, GO>(name, hidden);
+    const cmd = this._parent.getBaseCommand(name, hidden);
 
     if (!cmd?.isGlobal) {
-      return this._parent.getGlobalCommand<O, A, GO>(name, hidden);
+      return this._parent.getGlobalCommand(name, hidden);
     }
 
     return cmd;
@@ -1584,15 +1568,8 @@ export class Command<
    * Remove sub-command by name.
    * @param name Name of the command.
    */
-  public removeCommand<
-    // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
-    // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
-    // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CGO,
-  >(name: string): Command<O, A, GO, MCGO> | undefined {
-    const command = this.getBaseCommand<O, A, GO>(name, true);
+  public removeCommand(name: string): Command | undefined {
+    const command = this.getBaseCommand(name, true);
 
     if (command) {
       this.commands.delete(name);

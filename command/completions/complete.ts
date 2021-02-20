@@ -4,7 +4,7 @@ import type { ICompletion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
 export class CompleteCommand
-  extends Command<Record<string, never>, [string, Array<string>?]> {
+  extends Command<void, [action: string, commandNames?: Array<string>]> {
   public constructor(cmd?: Command) {
     super();
     this.description("Get completions for given action from given command.")

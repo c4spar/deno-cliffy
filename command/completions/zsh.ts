@@ -3,7 +3,7 @@ import { dim, italic } from "../deps.ts";
 import { ZshCompletionsGenerator } from "./_zsh_completions_generator.ts";
 
 /** Generates zsh completions script. */
-export class ZshCompletionsCommand extends Command<Record<string, never>, []> {
+export class ZshCompletionsCommand extends Command<void, []> {
   #cmd?: Command;
   public constructor(cmd?: Command) {
     super();

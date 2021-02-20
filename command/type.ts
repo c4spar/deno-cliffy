@@ -26,5 +26,10 @@ import type { ITypeInfo } from "./types.ts";
 export abstract class Type<T> {
   public abstract parse(type: ITypeInfo): T;
 
-  public complete?(cmd: Command, parent?: Command): string[];
+  public complete?(
+    // deno-lint-ignore no-explicit-any
+    cmd: Command<any, any, any, any, any>,
+    // deno-lint-ignore no-explicit-any
+    parent?: Command<any, any, any, any, any>,
+  ): string[];
 }

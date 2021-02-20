@@ -14,7 +14,18 @@ export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 /* COMMAND TYPES */
 
 /** Description handler. */
-export type IDescription = string | ((this: Command) => string);
+export type IDescription<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
+> = string | ((this: Command<O, A, G, PG, P>) => string);
 
 /** Action handler for commands and options. */
 export type IAction<
@@ -23,12 +34,14 @@ export type IAction<
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  GO extends Record<string, any> | void = any,
+  G extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  MGO extends Record<string, any> | void = any,
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
 > = (
-  this: Command<O, A, GO, MGO>,
-  options: O & GO,
+  this: Command<O, A, G, PG, P>,
+  options: PG & G & O,
   ...args: A
 ) => void | Promise<void>;
 
@@ -49,12 +62,16 @@ export interface IParseResult<
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  GO extends Record<string, any> | void = any,
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
 > {
-  options: O & GO;
+  options: PG & G & O;
   args: A;
   literal: string[];
-  cmd: Command<O, A, GO>;
+  cmd: Command<O, A, G, PG, P>;
 }
 
 /* OPTION TYPES */
@@ -75,14 +92,16 @@ export interface ICommandOption<
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  GO extends Record<string, any> | void = any,
+  G extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  MGO extends Record<string, any> | void = any,
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
-  action?: IAction<O, A, GO, MGO>;
+  action?: IAction<O, A, G, PG, P>;
   prepend?: boolean;
 }
 
@@ -93,8 +112,12 @@ export interface IOption<
   // deno-lint-ignore no-explicit-any
   A extends Array<any> = any,
   // deno-lint-ignore no-explicit-any
-  GO extends Record<string, any> | void = any,
-> extends ICommandOption<O, A, GO>, IFlagOptions {
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
+> extends ICommandOption<O, A, G, PG, P>, IFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
@@ -148,13 +171,35 @@ export interface ICompleteOptions {
 }
 
 /** Completion settings. */
-export interface ICompletion extends ICompleteOptions {
+export interface ICompletion<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
+> extends ICompleteOptions {
   name: string;
-  complete: ICompleteHandler;
+  complete: ICompleteHandler<O, A, G, PG, P>;
 }
 
 /** Type parser method. */
-export type ICompleteHandler = (
-  cmd: Command,
+export type ICompleteHandler<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<any> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command<any, any, any, any, any> | void = any,
+> = (
+  cmd: Command<O, A, G, PG, P>,
   parent?: Command,
 ) => string[] | Promise<string[]>;
