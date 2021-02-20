@@ -380,8 +380,8 @@ export class Command<
     // deno-lint-ignore no-explicit-any
     A extends Array<any> = any,
     // deno-lint-ignore no-explicit-any
-    GO extends Record<string, any> | void = CG,
-  >(name: string): Command<O, A, GO, PG, P> {
+    G extends Record<string, any> | void = any,
+  >(name: string): Command<O, A, G, PG, P> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -390,7 +390,7 @@ export class Command<
 
     this.cmd = cmd;
 
-    return this as Command as Command<O, A, GO, PG, P>;
+    return this as Command as Command<O, A, G, PG, P>;
   }
 
   /*****************************************************************************
@@ -413,7 +413,10 @@ export class Command<
   }
 
   public help(
-    help: string | ((this: Command) => string) | HelpOptions,
+    help:
+      | string
+      | ((this: Command<Partial<CO>, Partial<CA>, CG, PG>) => string)
+      | HelpOptions,
   ): this {
     if (typeof help === "string") {
       this.cmd._help = () => help;
@@ -878,7 +881,10 @@ export class Command<
     this.reset();
 
     if (!this._help) {
-      this._help = (cmd: Command): string => HelpGenerator.generate(cmd);
+      this.help({
+        hints: true,
+        types: false,
+      });
     }
 
     if (this.ver && this._versionOption !== false) {
