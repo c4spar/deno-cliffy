@@ -1420,7 +1420,7 @@ import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 new Command<void>()
   .arguments<[input: string, output?: string]>("<input> [output]")
   .globalOption<{ debug?: boolean }>("-d, --debug", "...")
-  .option<{ logLevel?: boolean }>("", "", { global: true })
+  .option<{ logLevel?: boolean }>("-L, --log-level", "...", { global: true })
   .option<{ main?: boolean }>("-m, --main", "...")
   .action((options) => {
     options.debug && options.logLevel &&
