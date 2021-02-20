@@ -1,5 +1,5 @@
 /** Chainable ansi escape sequence's. */
-import { ImageOptions } from "./ansi_escapes.ts";
+import type { ImageOptions } from "./ansi_escapes.ts";
 
 /** Chainable ansi escape method declarations. */
 export interface Chain<T extends Chain<T>> {

@@ -1,4 +1,4 @@
-import { Cursor } from "../ansi/cursor_position.ts";
+import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode } from "../keycode/key_code.ts";
 import type { KeyEvent } from "../keycode/key_event.ts";
