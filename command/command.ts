@@ -62,13 +62,13 @@ import type {
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > {
@@ -85,13 +85,13 @@ type OneOf<T, V> = T extends void ? V : T;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
-  CO extends Record<string, any> | void = any,
+  CO extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<any> = CO extends void ? [] : any,
+  CA extends Array<unknown> = CO extends void ? [] : any,
   // deno-lint-ignore no-explicit-any
-  CG extends Record<string, any> | void = CO extends void ? void : any,
+  CG extends Record<string, unknown> | void = CO extends void ? void : any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = CO extends void ? void : any,
+  PG extends Record<string, unknown> | void = CO extends void ? void : any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = CO extends void ? void : any,
 > {
@@ -249,8 +249,7 @@ export class Command<
   public command<
     C extends Command<
       void,
-      // deno-lint-ignore no-explicit-any
-      Array<any>,
+      Array<unknown>,
       void,
       Merge<PG, CG> | void,
       OneOf<P, this> | void
@@ -266,8 +265,7 @@ export class Command<
    * @param desc      The description of the new child command.
    * @param override  Override existing child command.
    */
-  // deno-lint-ignore no-explicit-any
-  public command<A extends Array<any> = []>(
+  public command<A extends Array<unknown> = []>(
     name: string,
     desc?: string,
     override?: boolean,
@@ -376,11 +374,11 @@ export class Command<
    */
   public select<
     // deno-lint-ignore no-explicit-any
-    O extends Record<string, any> | void = any,
+    O extends Record<string, unknown> | void = any,
     // deno-lint-ignore no-explicit-any
-    A extends Array<any> = any,
+    A extends Array<unknown> = any,
     // deno-lint-ignore no-explicit-any
-    G extends Record<string, any> | void = any,
+    G extends Record<string, unknown> | void = any,
   >(name: string): Command<O, A, G, PG, P> {
     const cmd = this.getBaseCommand(name, true);
 
@@ -463,8 +461,7 @@ export class Command<
    *
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
-  // deno-lint-ignore no-explicit-any
-  public arguments<A extends Array<any> = CA>(
+  public arguments<A extends Array<unknown> = CA>(
     args: string,
   ): Command<CO, A, CG, PG, P> {
     this.cmd.argsDefinition = args;
@@ -629,8 +626,7 @@ export class Command<
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
   }
 
-  // deno-lint-ignore no-explicit-any
-  public globalOption<G extends Record<string, any> | void = CG>(
+  public globalOption<G extends Record<string, unknown> | void = CG>(
     flags: string,
     desc: string,
     opts?:
@@ -649,16 +645,14 @@ export class Command<
    * @param desc Flag description.
    * @param opts Flag options or custom handler for processing flag value.
    */
-  // deno-lint-ignore no-explicit-any
-  public option<G extends Record<string, any> | void = CG>(
+  public option<G extends Record<string, unknown> | void = CG>(
     flags: string,
     desc: string,
     opts:
       | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
       | IFlagValueHandler,
   ): Command<CO, CA, Merge<CG, G>, PG, P>;
-  // deno-lint-ignore no-explicit-any
-  public option<O extends Record<string, any> | void = CO>(
+  public option<O extends Record<string, unknown> | void = CO>(
     flags: string,
     desc: string,
     opts?:

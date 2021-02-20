@@ -16,13 +16,13 @@ export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 /** Description handler. */
 export type IDescription<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > = string | ((this: Command<O, A, G, PG, P>) => string);
@@ -30,13 +30,13 @@ export type IDescription<
 /** Action handler for commands and options. */
 export type IAction<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > = (
@@ -58,13 +58,13 @@ export interface IArgument extends IFlagArgument {
 /** Result of `cmd.parse()` method. */
 export interface IParseResult<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > {
@@ -88,13 +88,13 @@ type ExcludedCommandOptions =
 /** Command option options. */
 export interface ICommandOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
@@ -108,13 +108,13 @@ export interface ICommandOption<
 /** Command option settings. */
 export interface IOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > extends ICommandOption<O, A, G, PG, P>, IFlagOptions {
@@ -173,13 +173,13 @@ export interface ICompleteOptions {
 /** Completion settings. */
 export interface ICompletion<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > extends ICompleteOptions {
@@ -190,13 +190,13 @@ export interface ICompletion<
 /** Type parser method. */
 export type ICompleteHandler<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> | void = any,
+  O extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  A extends Array<any> = any,
+  A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, any> | void = any,
+  G extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = any,
+  PG extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > = (
