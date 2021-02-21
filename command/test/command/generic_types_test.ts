@@ -1,0 +1,272 @@
+import { Command } from "../../command.ts";
+const { test } = Deno;
+
+test({
+  name: "command - generic types - default generics should be of type any",
+  fn() {
+    new Command()
+      .action((options, ...args) => {
+        options = 1;
+        args = 1;
+        args[0] = 1;
+        args.length = 1;
+        args.foo = 1;
+        options.foo = 1;
+        options.bar = 1;
+        options.baz = 1;
+      });
+  },
+});
+
+test({
+  name: "command - generic types - command with void options",
+  fn() {
+    new Command<void>()
+      .action((options, ...args) => {
+        args.length;
+        // @ts-expect-error option foo not exists
+        args[0] = 1;
+        // @ts-expect-error args is an array
+        args.foo;
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("foo", new Command())
+      .action((_options) => {
+        // callback fn should be valid also if args is not defined as second parameter.
+      });
+  },
+});
+
+test({
+  name: "command - generic types - command with void options and arguments",
+  fn() {
+    new Command<void, []>()
+      .action((options, ...args) => {
+        args.length;
+        // @ts-expect-error index 0 is undefined
+        args[0] = 1;
+        // @ts-expect-error args is an array
+        args.foo;
+        // @ts-expect-error option foo not exists
+        options.foo;
+      });
+  },
+});
+
+test({
+  name:
+    "command - generic types - command with void options and predefined arguments",
+  fn() {
+    new Command<void, [number]>()
+      .action((options, ...args) => {
+        args[0] = 1;
+        args.length;
+        // @ts-expect-error option foo not exists
+        options.foo;
+      });
+  },
+});
+
+test({
+  name:
+    "command - generic types - command with predefined options and arguments",
+  fn() {
+    new Command<{ foo?: boolean }, [bar?: number], { bar?: boolean }>()
+      .action((options, ...args) => {
+        options.foo;
+        options.bar;
+        args[0] = 1;
+        // @ts-expect-error arg[0] is of type number
+        args[0] = "1";
+        // @ts-expect-error index 1 does not exist
+        args[1] = 1;
+        // @ts-expect-error options is not assignable to number
+        options = 1;
+        // @ts-expect-error option not exists
+        options.baz;
+      });
+  },
+});
+
+test({
+  name: "command - generic types - chained command with generics",
+  fn() {
+    new Command<void, []>()
+      .versionOption("-V, --versionx", "")
+      .option<{ main: boolean }>("--main", "")
+      .globalOption<{ debug: boolean }>("--debug", "", {
+        action: (options) => {
+          /** valid */
+          options.debug &&
+            options.main;
+          /** invalid */
+          // @ts-expect-error option not exists
+          options.logLevel &&
+            // @ts-expect-error option logLevel is defined after debug
+            options.foo && options.fooGlobal &&
+            // @ts-expect-error option not exists
+            options.bar && options.barGlobal;
+        },
+      })
+      .option<{ logLevel: boolean }>("--log-level", "", {
+        global: true,
+        action: (options) => {
+          /** valid */
+          options.debug && options.logLevel &&
+            options.main;
+          /** invalid */
+          // @ts-expect-error option not exists
+          options.foo && options.fooGlobal &&
+            // @ts-expect-error option not exists
+            options.bar && options.barGlobal;
+        },
+      })
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.main;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.foo && options.fooGlobal &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal;
+      })
+      .command("foo")
+      .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
+      .option<{ foo?: boolean }>("--foo", "")
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.foo && options.fooGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal;
+      })
+      .command("bar")
+      .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
+      .option<{ bar?: boolean }>("--bar", "")
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.bar && options.barGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.foo && options.fooGlobal;
+      });
+  },
+});
+
+test({
+  name: "command - generic types - splitted command with generics",
+  fn() {
+    const foo = new Command<
+      void,
+      [],
+      { debug?: boolean; logLevel?: boolean }
+    >()
+      .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
+      .option<{ foo?: boolean }>("--foo", "")
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.foo && options.fooGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal &&
+          // @ts-expect-error option not exists
+          options.fooFoo && options.fooFooGlobal;
+      })
+      .command("bar-bar")
+      .command("foo-foo")
+      .globalOption<{ fooFooGlobal?: boolean }>("--foo-foo-global", "")
+      .option<{ fooFoo?: boolean }>("--foo-foo", "")
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.fooGlobal &&
+          options.fooFoo && options.fooFooGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.foo &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal;
+      })
+      .select("bar-bar")
+      .reset();
+
+    const bar = new Command<void, [], { debug: boolean; logLevel: boolean }>()
+      .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
+      .option<{ bar: boolean }>("--bar", "")
+      .versionOption("--versionx", "", {
+        global: true,
+        action(options) {
+          options.bar;
+        },
+      })
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.bar && options.barGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.foo && options.fooGlobal &&
+          // @ts-expect-error option not exists
+          options.fooFoo && options.fooFooGlobal;
+      });
+
+    const _main: Command = new Command<void, []>()
+      .arguments<[input: string, output: string]>("<input> [output]")
+      .globalOption<{ debug?: boolean }>("--debug", "")
+      .globalOption<{ logLevel?: boolean }>("--log-level", "")
+      .option<{ main?: boolean }>("--main", "")
+      .action((options, ..._args: [input: string, output: string]) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.main;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.foo && options.fooGlobal &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal &&
+          // @ts-expect-error option not exists
+          options.fooFoo && options.fooFooGlobal;
+      })
+      .command("foo", foo)
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.foo && options.fooGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.bar && options.barGlobal &&
+          // @ts-expect-error option not exists
+          options.fooFoo && options.fooFooGlobal;
+      })
+      .command("bar", bar)
+      .action((options) => {
+        /** valid */
+        options.debug && options.logLevel &&
+          options.bar && options.barGlobal;
+        /** invalid */
+        // @ts-expect-error option not exists
+        options.main &&
+          // @ts-expect-error option not exists
+          options.foo && options.fooGlobal &&
+          // @ts-expect-error option not exists
+          options.fooFoo && options.fooFooGlobal;
+      });
+  },
+});
