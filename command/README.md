@@ -1357,13 +1357,12 @@ source <(command-name completions zsh)
 
 ## ❯ Generic options and arguments
 
-By default, the options and arguments variables in the action callback have the
-type `any`. You can define strict types by passing the types to the constructor
-`new Command<O, A, G>()` or to the instance methods `.options<O>()` and
-`.arguments<A>()`.
+By default, options and arguments are of type `any`. You can define strict types
+by passing the types to the constructor `new Command<O, A, G>()` or to the
+instance methods `.option<O>()`, `.arguments<A>()` and `.globalOption<O>()`.
 
 Options must be compatible to `Record<string, unknown>` (or `void` for no
-options) and argument to `Array<unknown>` (or a empty tuple `[]` for no
+options) and argument to `Array<unknown>` (or an empty tuple `[]` for no
 arguments).
 
 > ⚠️ Don't use the `{}` type to define an empty options object, because it
@@ -1374,7 +1373,7 @@ arguments).
 ### Generic constructor types
 
 The `Command` constructor takes multiple generic types, but normally you only
-need the first 3 types. The last 2 type are mostly used internally.
+need the first 3 types. The last 2 type are only used internally.
 
 The first type is to define the command options. The second to define the
 command arguments `new Command<O, A, G>()`. The third type is to define global
@@ -1423,14 +1422,11 @@ const output: string | undefined = result.args[1];
 
 ### Generic instance method types
 
-**Option 2:** Passing the types directly to the `.options<O>()` and
-`.arguments<A>()` method's.
-
 By default, the type of the command options and arguments is `any`. To start
 with an empty command with no options and no arguments, you can pass the `void`
 type to the command constructor. Then you can add dynamically new option and
-argument types by passing the types to the `.options<O>()` and `.arguments<A>()`
-method's.
+argument types by passing the types to the `.option<O>()`, `.arguments<A>()` and
+`.globalOption<O>()` method's.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1510,7 +1506,7 @@ import { fooCommand } from "./foo.ts";
 
 await new Command<void>()
   // Add global option.
-  .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
+  .globalOption<{ debug?: boolean }>("-d, --debug", "...")
   .command("foo", fooCommand)
   .parse(Deno.args);
 ```
