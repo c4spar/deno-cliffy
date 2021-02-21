@@ -82,6 +82,9 @@
     - [Fish Completions](#fish-completions)
     - [Zsh Completions](#zsh-completions)
 - [Generic options and arguments](#-generic-options-and-arguments)
+  - [Generic constructor types](#generic-constructor-types)
+  - [Generic instance method types](#generic-instance-method-types)
+  - [Generic global parent types](#generic-global-parent-types)
 - [Version option](#-version-option)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -1372,13 +1375,12 @@ arguments).
 
 ### Generic constructor types
 
-The `Command` constructor takes multiple generic types, but normally you only
-need the first 3 types. The last 2 type are only used internally.
+The `new Command<O, A, G>()` constructor takes multiple generic types (5), but
+you only need the first 3 types. The last 2 type are only used internally.
 
-The first type is to define the command options. The second to define the
-command arguments `new Command<O, A, G>()`. The third type is to define global
-parent options and is only needed, if you want to split your command into
-multiple command instances.
+The first type is to define the command options type, the second for the command
+arguments and the third to define global parent options. The third type is only
+needed, if you want to split your command into multiple command instances.
 
 ```typescript
 import {
@@ -1476,8 +1478,9 @@ new Command<void>()
 
 ### Generic global parent types
 
-If you want to split your command into different commands/files, you can define
-required global parent options in the constructor of the child command.
+If you want to split up your command into different command instances, to
+organize your commands into different files, you can define required global
+parent options in the constructor of the child command.
 
 > foo.ts
 
