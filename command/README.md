@@ -1357,21 +1357,29 @@ source <(command-name completions zsh)
 
 ## ❯ Generic options and arguments
 
-By default, the options type is `Record<string, any>` and the arguments type
-`Array<any>`. You can define strict types by using generics. Options and
-arguments can be defined with the `new Command<O, A>()` constructor and with the
-`.options<O>()` and `.arguments<A>()` method's.
+By default, the options and arguments variables in the action callback have the
+type `any`. You can define strict types by passing the types to the constructor
+`new Command<O, A, G>()` or to the instance methods `.options<O>()` and
+`.arguments<A>()`.
 
-Options must be compatible to `Record<string, any>` or `void` for no options and
-argument to `Array<any>` or a empty tuple for no arguments.
+Options must be compatible to `Record<string, unknown>` (or `void` for no
+options) and argument to `Array<unknown>` (or a empty tuple `[]` for no
+arguments).
 
 > ⚠️ Don't use the `{}` type to define an empty options object, because it
 > doesn't mean to be an empty object. (see
 > [here](https://github.com/typescript-eslint/typescript-eslint/issues/2063#issuecomment-675156492)
 > for more information), instead use `void`.
 
-**Option 1:** Using an interface for the options, and a tuple type for the
-arguments in the command constructor:
+### Generic constructor types
+
+The `Command` constructor takes multiple generic types, but normally you only
+need the first 3 types. The last 2 type are mostly used internally.
+
+The first type is to define the command options. The second to define the
+command arguments `new Command<O, A, G>()`. The third type is to define global
+parent options and is only needed, if you want to split your command into
+multiple command instances.
 
 ```typescript
 import {
@@ -1380,7 +1388,7 @@ import {
 } from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Define your argument types.
-type Arguments = [string, string];
+type Arguments = [input: string, output?: string];
 
 // Define your option types.
 interface Options {
@@ -1398,12 +1406,22 @@ const result: IParseResult<Options, Arguments> = await new Command<
   .option("-a, --age <age:number>", "description ...", { required: true })
   .option("-e, --email <email:string>", "description ...")
   .action((options: Options, input: string, output?: string) => {})
+  .action((options) => {
+    /** valid options */
+    options.name && options.age &&
+      options.email;
+    /** invalid options */
+    // @ts-expect-error option foo does not exist.
+    options.foo;
+  })
   .parse(Deno.args);
 
 const options: Options = result.options;
 const input: string = result.args[0];
 const output: string | undefined = result.args[1];
 ```
+
+### Generic instance method types
 
 **Option 2:** Passing the types directly to the `.options<O>()` and
 `.arguments<A>()` method's.
@@ -1423,8 +1441,10 @@ new Command<void>()
   .option<{ logLevel?: boolean }>("-L, --log-level", "...", { global: true })
   .option<{ main?: boolean }>("-m, --main", "...")
   .action((options) => {
+    /** valid options */
     options.debug && options.logLevel &&
       options.main;
+    /** invalid options */
     // @ts-expect-error foo & fooGlobal option's only exists on foo command.
     options.foo && options.fooGlobal &&
       // @ts-expect-error bar & barGlobal option's only exists on bar command.
@@ -1434,8 +1454,10 @@ new Command<void>()
   .globalOption<{ fooGlobal?: boolean }>("-F, --foo-global", "...")
   .option<{ foo?: boolean }>("-f, --foo", "...")
   .action((options) => {
+    /** valid options */
     options.debug && options.logLevel &&
       options.foo && options.fooGlobal;
+    /** invalid options */
     // @ts-expect-error main option only exists on main command.
     options.main &&
       // @ts-expect-error bar & barGlobal option's only exists on bar command.
@@ -1445,14 +1467,18 @@ new Command<void>()
   .globalOption<{ barGlobal?: boolean }>("-B, --bar-global", "...")
   .option<{ bar?: boolean }>("-b, --bar", "...")
   .action((options) => {
+    /** valid options */
     options.debug && options.logLevel &&
       options.bar && options.barGlobal;
+    /** invalid options */
     // @ts-expect-error main option only exists on main command.
     options.main &&
       // @ts-expect-error foo & fooGlobal option's only exists on foo command.
       options.foo && options.fooGlobal;
   });
 ```
+
+### Generic global parent types
 
 If you want to split your command into different commands/files, you can define
 required global parent options in the constructor of the child command.
@@ -1462,7 +1488,7 @@ required global parent options in the constructor of the child command.
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-// Define global parent options.
+// Define global parent option `debug`.
 export const fooCommand = new Command<void, [], { debug?: boolean }>()
   // Add foo command options.
   .option<{ bar?: boolean }>("-b, --bar", "...")
@@ -1482,7 +1508,7 @@ export const fooCommand = new Command<void, [], { debug?: boolean }>()
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 import { fooCommand } from "./foo.ts";
 
-await new Command<void]()
+await new Command<void>()
   // Add global option.
   .option<{ debug?: boolean }>("-d, --debug", "...", { global: true })
   .command("foo", fooCommand)
