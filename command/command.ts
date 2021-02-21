@@ -90,17 +90,9 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = DefaultType<CO, [], any>,
-  CG extends Record<string, unknown> | void = DefaultType<
-    CO,
-    void,
-    Record<string, unknown>
-  >,
-  PG extends Record<string, unknown> | void = DefaultType<
-    CO,
-    void,
-    Record<string, unknown>
-  >,
+  CA extends Array<unknown> = DefaultType<CO, [], Array<any>>,
+  CG extends Record<string, unknown> | void = Record<string, unknown> | void,
+  PG extends Record<string, unknown> | void = Record<string, unknown> | void,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = CO extends void ? void : any,
 > {
