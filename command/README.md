@@ -1375,8 +1375,8 @@ arguments).
 
 ### Generic constructor types
 
-The `Command<O, A, G>` constructor takes multiple generic types (5), but
-you only need the first 3 types. The last 2 types are only used internally.
+The `Command<O, A, G>` constructor takes multiple generic types (5), but you
+only need the first 3 types. The last 2 types are only used internally.
 
 The first type is to define the command options type, the second for the command
 arguments and the third to define global parent options. The third type is only
