@@ -81,16 +81,12 @@ interface IDefaultOption<
 type ITypeMap = Map<string, IType>;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 type OneOf<T, V> = T extends void ? V : T;
-type DefaultType<T, V, R> = T extends Record<string, unknown> ? V
-  : (T extends void ? V : R);
-// type Globals<T, V> = Merge<T, OneOf<T, V>>;
-// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = DefaultType<CO, [], Array<any>>,
+  CA extends Array<unknown> = CO extends void ? [] : any,
   CG extends Record<string, unknown> | void = Record<string, unknown> | void,
   PG extends Record<string, unknown> | void = Record<string, unknown> | void,
   // deno-lint-ignore no-explicit-any
