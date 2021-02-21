@@ -132,13 +132,7 @@ export class Command<
   /** Disable version option. */
   public versionOption(enable: false): this;
   /**
-   * Set version option.
-   * @param flags The flags of the version option.
-   * @param desc  The description of the version option.
-   * @param opts  Version option options.
-   */
-  /**
-   * Set version option.
+   * Set global version option.
    * @param flags The flags of the version option.
    * @param desc  The description of the version option.
    * @param opts  Version option options.
@@ -189,7 +183,7 @@ export class Command<
   /** Disable help option. */
   public helpOption(enable: false): this;
   /**
-   * Set help option.
+   * Set global help option.
    * @param flags The flags of the help option.
    * @param desc  The description of the help option.
    * @param opts  Help option options.
@@ -1212,7 +1206,7 @@ export class Command<
 
   /** Get main command. */
   public getMainCommand(): Command {
-    return this._parent?.getMainCommand() ?? this as Command;
+    return this._parent?.getMainCommand() ?? this;
   }
 
   /** Get command name aliases. */
@@ -1293,7 +1287,7 @@ export class Command<
   /** Get generated help. */
   public getHelp(): string {
     this.registerDefaults();
-    return this.getHelpHandler().call(this as Command, this as Command);
+    return this.getHelpHandler().call(this, this);
   }
 
   /** Get generated help. */
