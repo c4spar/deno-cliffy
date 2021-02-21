@@ -11,6 +11,10 @@ import type { Command } from "./command.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
+// type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+// type OneOf<T, V> = T extends void ? V : T;
+// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
+
 /* COMMAND TYPES */
 
 /** Description handler. */
@@ -203,3 +207,18 @@ export type ICompleteHandler<
   cmd: Command<O, A, G, PG, P>,
   parent?: Command,
 ) => string[] | Promise<string[]>;
+
+/** Help callback method to print the help. Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` method's. */
+export type IHelpHandler<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, unknown> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, unknown> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, unknown> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | void = any,
+  C extends Command<O, A, G, PG, P> = Command<O, A, G, PG, P>,
+> = (this: C, cmd: C) => string;

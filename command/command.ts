@@ -52,6 +52,7 @@ import type {
   IEnvVarOptions,
   IExample,
   IFlagValueHandler,
+  IHelpHandler,
   IOption,
   IParseResult,
   IType,
@@ -78,20 +79,28 @@ interface IDefaultOption<
 }
 
 type ITypeMap = Map<string, IType>;
-type IHelpHandler = (this: Command, cmd: Command) => string;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 type OneOf<T, V> = T extends void ? V : T;
+type DefaultType<T, V, R> = T extends Record<string, unknown> ? V
+  : (T extends void ? V : R);
 // type Globals<T, V> = Merge<T, OneOf<T, V>>;
+// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, unknown> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = CO extends void ? [] : any,
-  // deno-lint-ignore no-explicit-any
-  CG extends Record<string, unknown> | void = CO extends void ? void : any,
-  // deno-lint-ignore no-explicit-any
-  PG extends Record<string, unknown> | void = CO extends void ? void : any,
+  CA extends Array<unknown> = DefaultType<CO, [], any>,
+  CG extends Record<string, unknown> | void = DefaultType<
+    CO,
+    void,
+    Record<string, unknown>
+  >,
+  PG extends Record<string, unknown> | void = DefaultType<
+    CO,
+    void,
+    Record<string, unknown>
+  >,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = CO extends void ? void : any,
 > {
@@ -248,9 +257,9 @@ export class Command<
    */
   public command<
     C extends Command<
-      void,
+      Record<string, unknown> | void,
       Array<unknown>,
-      void,
+      Record<string, unknown> | void,
       Merge<PG, CG> | void,
       OneOf<P, this> | void
     >,
