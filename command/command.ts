@@ -436,6 +436,14 @@ export class Command<O = any, A extends Array<any> = any> {
     return this;
   }
 
+  public globalType(
+    name: string,
+    type: Type<unknown> | ITypeHandler<unknown>,
+    options?: Omit<ITypeOptions, "global">,
+  ): this {
+    return this.type(name, type, { ...options, global: true });
+  }
+
   /**
    * Register custom type.
    * @param name    The name of the type.
@@ -463,6 +471,14 @@ export class Command<O = any, A extends Array<any> = any> {
     }
 
     return this;
+  }
+
+  public globalComplete(
+    name: string,
+    complete: ICompleteHandler,
+    options?: Omit<ICompleteOptions, "global">,
+  ): this {
+    return this.complete(name, complete, { ...options, global: true });
   }
 
   /**
@@ -524,6 +540,17 @@ export class Command<O = any, A extends Array<any> = any> {
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+  }
+
+  public globalOption(
+    flags: string,
+    desc: string,
+    opts?: Omit<ICommandOption, "global"> | IFlagValueHandler,
+  ): this {
+    if (typeof opts === "function") {
+      return this.option(flags, desc, { value: opts, global: true });
+    }
+    return this.option(flags, desc, { ...opts, global: true });
   }
 
   /**
@@ -615,6 +642,14 @@ export class Command<O = any, A extends Array<any> = any> {
     this.cmd.examples.push({ name, description });
 
     return this;
+  }
+
+  public globalEnv(
+    name: string,
+    description: string,
+    options?: Omit<IEnvVarOptions, "global">,
+  ): this {
+    return this.env(name, description, { ...options, global: true });
   }
 
   /**
