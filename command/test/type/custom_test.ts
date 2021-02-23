@@ -20,7 +20,7 @@ const email = (): ITypeHandler<string> => {
 const cmd = new Command()
   .throwErrors()
   .type("email", email())
-  .type("email2", email(), { global: true })
+  .globalType("email2", email())
   .option("-e, --email [value:email]", "description ...")
   .option("-E, --email2 [value:email2]", "description ...")
   .command("init")
