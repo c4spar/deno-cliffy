@@ -112,13 +112,18 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     } else {
       this.options = this.settings.options
         .filter((option: GenericListOptionSettings) =>
-          stripColor(option.name)
-            .toLowerCase()
-            .includes(input)
+          match(option.name) ||
+          (option.name !== option.value && match(option.value))
         )
         .sort((a: GenericListOptionSettings, b: GenericListOptionSettings) =>
           distance(a.name, input) - distance(b.name, input)
         );
+
+      function match(value: string): boolean {
+        return stripColor(value)
+          .toLowerCase()
+          .includes(input);
+      }
     }
     this.listIndex = Math.max(
       0,
