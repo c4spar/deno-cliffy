@@ -517,6 +517,14 @@ export class Command<
     return this;
   }
 
+  public globalType(
+    name: string,
+    type: Type<unknown> | ITypeHandler<unknown>,
+    options?: Omit<ITypeOptions, "global">,
+  ): this {
+    return this.type(name, type, { ...options, global: true });
+  }
+
   /**
    * Register custom type.
    * @param name    The name of the type.
@@ -543,6 +551,14 @@ export class Command<
     }
 
     return this;
+  }
+
+  public globalComplete(
+    name: string,
+    complete: ICompleteHandler,
+    options?: Omit<ICompleteOptions, "global">,
+  ): this {
+    return this.complete(name, complete, { ...options, global: true });
   }
 
   /**
@@ -733,6 +749,14 @@ export class Command<
     this.cmd.examples.push({ name, description });
 
     return this;
+  }
+
+  public globalEnv(
+    name: string,
+    description: string,
+    options?: Omit<IEnvVarOptions, "global">,
+  ): this {
+    return this.env(name, description, { ...options, global: true });
   }
 
   /**

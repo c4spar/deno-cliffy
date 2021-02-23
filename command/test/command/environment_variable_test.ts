@@ -7,7 +7,11 @@ function command(): Command {
     .version("1.0.0")
     .description("Test description ...")
     .env("SOME_ENV_VAR=<val:number>", "number env var description ...")
-    .env("SOME_OTHER_ENV_VAR=<val:boolean>", "boolean env var description ...");
+    .globalEnv(
+      "SOME_OTHER_ENV_VAR=<val:boolean>",
+      "boolean env var description ...",
+    )
+    .command("foo");
 }
 
 Deno.test("command environment variable number", async () => {
@@ -54,6 +58,32 @@ Deno.test("command environment variable invalid boolean", async () => {
   await assertThrowsAsync(
     async () => {
       await command().parse([]);
+    },
+    Error,
+    `Environment variable "SOME_OTHER_ENV_VAR" must be of type "boolean", but got "2".`,
+  );
+
+  Deno.env.set("SOME_ENV_VAR", "");
+});
+
+Deno.test("command global environment variable boolean", async () => {
+  Deno.env.set("SOME_OTHER_ENV_VAR", "true");
+
+  const cmd: Command = command();
+  const { options, args } = await cmd.parse(["foo"]);
+
+  assertEquals(options, {});
+  assertEquals(args, []);
+
+  Deno.env.set("SOME_ENV_VAR", "");
+});
+
+Deno.test("command global environment variable invalid boolean", async () => {
+  Deno.env.set("SOME_OTHER_ENV_VAR", "2");
+
+  await assertThrowsAsync(
+    async () => {
+      await command().parse(["foo"]);
     },
     Error,
     `Environment variable "SOME_OTHER_ENV_VAR" must be of type "boolean", but got "2".`,
