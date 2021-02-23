@@ -11,6 +11,11 @@ import type { Command } from "./command.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
+// type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+// type OneOf<T, V> = T extends void ? V : T;
+// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
+// type NonVoidable<T> = T extends null | undefined | void ? Record<string, any> : T;
+
 /* COMMAND TYPES */
 
 /** Description handler. */
