@@ -118,12 +118,6 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
         .sort((a: GenericListOptionSettings, b: GenericListOptionSettings) =>
           distance(a.name, input) - distance(b.name, input)
         );
-
-      function match(value: string): boolean {
-        return stripColor(value)
-          .toLowerCase()
-          .includes(input);
-      }
     }
     this.listIndex = Math.max(
       0,
@@ -136,6 +130,12 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
         this.listOffset,
       ),
     );
+
+    function match(value: string): boolean {
+      return stripColor(value)
+        .toLowerCase()
+        .includes(input);
+    }
   }
 
   protected message(): string {
