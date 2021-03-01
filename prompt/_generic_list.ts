@@ -106,7 +106,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   protected match(): void {
-    const input: string = this.getCurrentInputValue().trim().toLowerCase();
+    const input: string = this.getCurrentInputValue().toLowerCase();
     if (!input.length) {
       this.options = this.settings.options.slice();
     } else {
