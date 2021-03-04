@@ -63,13 +63,13 @@ import type {
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, unknown> | void = any,
+  O extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   A extends Array<unknown> = any,
   // deno-lint-ignore no-explicit-any
-  G extends Record<string, unknown> | void = any,
+  G extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, unknown> | void = any,
+  PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = any,
 > {
@@ -84,11 +84,13 @@ type OneOf<T, V> = T extends void ? V : T;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
-  CO extends Record<string, unknown> | void = any,
+  CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   CA extends Array<unknown> = CO extends void ? [] : any,
-  CG extends Record<string, unknown> | void = Record<string, unknown> | void,
-  PG extends Record<string, unknown> | void = Record<string, unknown> | void,
+  // deno-lint-ignore no-explicit-any
+  CG extends Record<string, any> | void = Record<string, any> | void,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = Record<string, any> | void,
   // deno-lint-ignore no-explicit-any
   P extends Command | void = CO extends void ? void : any,
 > {
