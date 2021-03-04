@@ -1361,8 +1361,8 @@ source <(command-name completions zsh)
 ## ❯ Generic options and arguments
 
 By default, options and arguments are of type `any`. You can define strict types
-by passing the types to the constructor `new Command<O, A, G>()` or to the
-instance methods `.option<O>()`, `.arguments<A>()` and `.globalOption<O>()`.
+by passing the types to the constructor `new Command<O, A, G, PG, P>()` or to
+the instance methods `.option<O>()`, `.arguments<A>()` and `.globalOption<O>()`.
 
 Options must be compatible to `Record<string, unknown>` (or `void` for no
 options) and argument to `Array<unknown>` (or an empty tuple `[]` for no
@@ -1373,60 +1373,11 @@ arguments).
 > [here](https://github.com/typescript-eslint/typescript-eslint/issues/2063#issuecomment-675156492)
 > for more information), instead use `void`.
 
-### Generic constructor types
-
-The `Command<O, A, G>` constructor takes multiple generic types (5), but you
-only need the first 3 types. The last 2 types are only used internally.
-
-The first type is to define the command options type, the second for the command
-arguments and the third to define global parent options. The third type is only
-needed, if you want to split your command into multiple command instances.
-
-```typescript
-import {
-  Command,
-  IParseResult,
-} from "https://deno.land/x/cliffy/command/mod.ts";
-
-// Define your argument types.
-type Arguments = [input: string, output?: string];
-
-// Define your option types.
-interface Options {
-  name: string;
-  age: number;
-  email?: string;
-}
-
-const result: IParseResult<Options, Arguments> = await new Command<
-  Options,
-  Arguments
->()
-  .arguments("<input:string> [output:string]")
-  .option("-n, --name <name:string>", "description ...", { required: true })
-  .option("-a, --age <age:number>", "description ...", { required: true })
-  .option("-e, --email <email:string>", "description ...")
-  .action((options: Options, input: string, output?: string) => {})
-  .action((options) => {
-    /** valid options */
-    options.name && options.age &&
-      options.email;
-    /** invalid options */
-    // @ts-expect-error option foo does not exist.
-    options.foo;
-  })
-  .parse(Deno.args);
-
-const options: Options = result.options;
-const input: string = result.args[0];
-const output: string | undefined = result.args[1];
-```
-
 ### Generic instance method types
 
-By default, the type of the command options and arguments is `any`. To start
-with an empty command with no options and no arguments, you can pass the `void`
-type to the command constructor. Then you can add dynamically new option and
+By default, options and arguments are of type `any`. To start with an empty
+command with no options and no arguments, you can pass the `void` type to the
+`new Command<void>()` constructor. Then you can add dynamically new option and
 argument types by passing the types to the `.option<O>()`, `.arguments<A>()` and
 `.globalOption<O>()` method's.
 
@@ -1471,9 +1422,78 @@ new Command<void>()
     /** invalid options */
     // @ts-expect-error main option only exists on main command.
     options.main &&
-      // @ts-expect-error foo & fooGlobal option's only exists on foo command.
+      // @ts-expect-error foo & fooGlobal option's only exists on foo command and it's child command's.
       options.foo && options.fooGlobal;
   });
+```
+
+### Generic constructor types
+
+You can also define the types directly in the constructor. The
+`Command<O, A, G, PG, P>` constructor takes multiple generic types.
+
+- `O` Options (defined with `.option()`)
+- `A` Arguments (defined with `.arguments()`)
+- `G` Global options (defined with `.globalOption()`)
+- `PG` Global parent command options
+- `P` Parent command
+
+Global parent options are only needed, if you want to split your command into
+multiple command instances (see
+[Generic global parent types](#generic-global-parent-types)). The parent command
+is mostly used internally.
+
+```typescript
+import {
+  Command,
+  IParseResult,
+} from "https://deno.land/x/cliffy/command/mod.ts";
+
+// Define your argument types.
+type Arguments = [input: string, output?: string];
+
+// Define your argument types.
+type Arguments = [input: string, output?: string];
+
+// Define your option types.
+interface Options {
+  name: string;
+  age: number;
+  email?: string;
+}
+
+// Define your global option types.
+interface GlobalOptions {
+  debug?: boolean;
+  debugLevel?: string;
+}
+
+const result: IParseResult<Options, Arguments, GlobalOptions> =
+  await new Command<
+    Options,
+    Arguments,
+    GlobalOptions
+  >()
+    .arguments("<input:string> [output:string]")
+    .globalOption("-d, --debug", "description ...")
+    .option("-l, --debug-level <string>", "description ...", { global: true })
+    .option("-n, --name <name:string>", "description ...", { required: true })
+    .option("-a, --age <age:number>", "description ...", { required: true })
+    .option("-e, --email <email:string>", "description ...")
+    .action((options: Options, input: string, output?: string) => {})
+    .action((options) => {
+      /** valid options */
+      options.name && options.age &&
+        options.email;
+      /** invalid options */
+      // @ts-expect-error option foo does not exist.
+      options.foo;
+    })
+    .parse(Deno.args);
+
+const options: Options = result.options;
+const input: string = result.args[0];
+const output: string | undefined = result.args[1];
 ```
 
 ### Generic global parent types

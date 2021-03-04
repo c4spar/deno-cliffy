@@ -34,6 +34,6 @@ new Command<void>()
       options.bar && options.barGlobal;
     // @ts-expect-error main option only exists on main command.
     options.main &&
-      // @ts-expect-error foo & fooGlobal option's only exists on foo command.
+      // @ts-expect-error foo & fooGlobal option's only exists on foo command and it's child command's.
       options.foo && options.fooGlobal;
   });
