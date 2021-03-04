@@ -1452,9 +1452,6 @@ import {
 // Define your argument types.
 type Arguments = [input: string, output?: string];
 
-// Define your argument types.
-type Arguments = [input: string, output?: string];
-
 // Define your option types.
 interface Options {
   name: string;
@@ -1465,35 +1462,30 @@ interface Options {
 // Define your global option types.
 interface GlobalOptions {
   debug?: boolean;
-  debugLevel?: string;
+  debugLevel: "debug" | "info" | "warn" | "error";
 }
 
-const result: IParseResult<Options, Arguments, GlobalOptions> =
-  await new Command<
-    Options,
-    Arguments,
-    GlobalOptions
-  >()
-    .arguments("<input:string> [output:string]")
-    .globalOption("-d, --debug", "description ...")
-    .option("-l, --debug-level <string>", "description ...", { global: true })
-    .option("-n, --name <name:string>", "description ...", { required: true })
-    .option("-a, --age <age:number>", "description ...", { required: true })
-    .option("-e, --email <email:string>", "description ...")
-    .action((options: Options, input: string, output?: string) => {})
-    .action((options) => {
-      /** valid options */
-      options.name && options.age &&
-        options.email;
-      /** invalid options */
-      // @ts-expect-error option foo does not exist.
-      options.foo;
-    })
-    .parse(Deno.args);
-
-const options: Options = result.options;
-const input: string = result.args[0];
-const output: string | undefined = result.args[1];
+await new Command<
+  Options,
+  Arguments,
+  GlobalOptions
+>()
+  .arguments("<input:string> [output:string]")
+  .globalOption("-d, --debug", "description ...")
+  .globalOption("-l, --debug-level <string>", "description ...", {
+    default: "warn",
+  })
+  .option("-n, --name <name:string>", "description ...", { required: true })
+  .option("-a, --age <age:number>", "description ...", { required: true })
+  .option("-e, --email <email:string>", "description ...")
+  .action((options: Options, input: string, output?: string) => {
+    /** valid options */
+    options.name && options.age && options.email;
+    /** invalid options */
+    // @ts-expect-error option foo does not exist.
+    options.foo;
+  })
+  .parse(Deno.args);
 ```
 
 ### Generic global parent types
@@ -1502,13 +1494,11 @@ If you want to split up your command into different command instances, to
 organize your commands into different files, you can define required global
 parent options in the constructor of the child command.
 
-> foo.ts
-
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Define global parent option `debug`.
-export const fooCommand = new Command<void, [], { debug?: boolean }>()
+const fooCommand = new Command<void, [], void, { debug?: boolean }>()
   // Add foo command options.
   .option<{ bar?: boolean }>("-b, --bar", "...")
   .action((options) => {
@@ -1518,14 +1508,11 @@ export const fooCommand = new Command<void, [], { debug?: boolean }>()
     if (options.bar) {
       console.log("bar");
     }
+    // @ts-expect-error option foo does not exist.
+    if (options.foo) {
+      console.log("foo");
+    }
   });
-```
-
-> main.ts
-
-```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-import { fooCommand } from "./foo.ts";
 
 await new Command<void>()
   // Add global option.
