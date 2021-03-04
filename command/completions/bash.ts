@@ -3,7 +3,7 @@ import { dim, italic } from "../deps.ts";
 import { BashCompletionsGenerator } from "./_bash_completions_generator.ts";
 
 /** Generates bash completions script. */
-export class BashCompletionsCommand extends Command<Record<string, never>, []> {
+export class BashCompletionsCommand extends Command<void> {
   #cmd?: Command;
   public constructor(cmd?: Command) {
     super();
