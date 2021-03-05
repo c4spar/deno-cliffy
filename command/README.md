@@ -1384,7 +1384,7 @@ argument types by passing the types to the `.option<O>()`, `.arguments<A>()` and
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-new Command<void>()
+const cmd = new Command<void>()
   .arguments<[input: string, output?: string]>("<input> [output]")
   .globalOption<{ debug?: boolean }>("-d, --debug", "...")
   .option<{ logLevel?: boolean }>("-L, --log-level", "...", { global: true })
@@ -1398,8 +1398,9 @@ new Command<void>()
     options.foo && options.fooGlobal &&
       // @ts-expect-error bar & barGlobal option's only exists on bar command.
       options.bar && options.barGlobal;
-  })
-  .command("foo")
+  });
+
+cmd.command("foo")
   .globalOption<{ fooGlobal?: boolean }>("-F, --foo-global", "...")
   .option<{ foo?: boolean }>("-f, --foo", "...")
   .action((options) => {
@@ -1411,8 +1412,9 @@ new Command<void>()
     options.main &&
       // @ts-expect-error bar & barGlobal option's only exists on bar command.
       options.bar && options.barGlobal;
-  })
-  .command("bar")
+  });
+
+cmd.command("bar")
   .globalOption<{ barGlobal?: boolean }>("-B, --bar-global", "...")
   .option<{ bar?: boolean }>("-b, --bar", "...")
   .action((options) => {
@@ -1422,7 +1424,7 @@ new Command<void>()
     /** invalid options */
     // @ts-expect-error main option only exists on main command.
     options.main &&
-      // @ts-expect-error foo & fooGlobal option's only exists on foo command and it's child command's.
+      // @ts-expect-error foo & fooGlobal option's only exists on foo command.
       options.foo && options.fooGlobal;
   });
 ```

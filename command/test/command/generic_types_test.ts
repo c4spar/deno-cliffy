@@ -93,7 +93,7 @@ test({
 test({
   name: "command - generic types - chained command with generics",
   fn() {
-    new Command<void, []>()
+    const cmd = new Command<void, []>()
       .versionOption("-V, --versionx", "")
       .option<{ main: boolean }>("--main", "")
       .globalOption<{ debug: boolean }>("--debug", "", {
@@ -132,8 +132,9 @@ test({
         options.foo && options.fooGlobal &&
           // @ts-expect-error option not exists
           options.bar && options.barGlobal;
-      })
-      .command("foo")
+      });
+
+    cmd.command("foo")
       .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
       .option<{ foo?: boolean }>("--foo", "")
       .action((options) => {
@@ -145,8 +146,9 @@ test({
         options.main &&
           // @ts-expect-error option not exists
           options.bar && options.barGlobal;
-      })
-      .command("bar")
+      });
+
+    cmd.command("bar")
       .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
       .option<{ bar?: boolean }>("--bar", "")
       .action((options) => {
