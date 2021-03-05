@@ -71,7 +71,7 @@ interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | void = any,
+  P extends Command | undefined = any,
 > {
   flags: string;
   desc?: string;
@@ -92,7 +92,7 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = Record<string, any> | void,
   // deno-lint-ignore no-explicit-any
-  P extends Command | void = CO extends void ? void : any,
+  P extends Command | undefined = CO extends void ? undefined : any,
 > {
   private types: ITypeMap = new Map<string, IType>([
     ["string", { name: "string", handler: new StringType() }],
@@ -104,7 +104,7 @@ export class Command<
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
-  private _parent?: Command;
+  private _parent?: P;
   private _globalParent?: Command;
   private ver?: string;
   private desc: IDescription = "";
@@ -245,7 +245,7 @@ export class Command<
       Array<unknown>,
       Record<string, unknown> | void,
       Merge<PG, CG> | void,
-      OneOf<P, this> | void
+      OneOf<P, this> | undefined
     >,
   >(
     name: string,
@@ -1217,8 +1217,8 @@ export class Command<
   }
 
   /** Get parent command. */
-  public getParent(): Command | undefined {
-    return this._parent;
+  public getParent(): P {
+    return this._parent as P;
   }
 
   /**
