@@ -7,6 +7,7 @@ import {
 } from "./_generic_input.ts";
 import { blue, bold, dim, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
+import { distance } from "../_utils/distance.ts";
 
 /** Input keys options. */
 export interface GenericSuggestionsKeys extends GenericInputKeys {
@@ -79,12 +80,21 @@ export abstract class GenericSuggestions<
     if (!this.settings.suggestions?.length) {
       return;
     }
-    this.suggestions = this.settings.suggestions.filter(
-      (value: string | number) =>
-        stripColor(value.toString()).toLowerCase().startsWith(
-          this.getCurrentInputValue().toLowerCase(),
-        ),
-    );
+    const input: string = this.getCurrentInputValue().toLowerCase();
+    if (!input.length) {
+      this.suggestions = this.settings.suggestions.slice();
+    } else {
+      this.suggestions = this.settings.suggestions
+        .filter((value: string | number) =>
+          stripColor(value.toString())
+            .toLowerCase()
+            .startsWith(input)
+        )
+        .sort((a: string | number, b: string | number) =>
+          distance((a || a).toString(), input) -
+          distance((b || b).toString(), input)
+        );
+    }
     this.suggestionsIndex = Math.max(
       this.getCurrentInputValue().trim().length === 0 ? -1 : 0,
       Math.min(this.suggestions.length - 1, this.suggestionsIndex),

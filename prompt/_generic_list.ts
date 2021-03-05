@@ -7,6 +7,7 @@ import {
 } from "./_generic_input.ts";
 import { blue, bold, dim, stripColor, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
+import { distance } from "../_utils/distance.ts";
 
 /** Select key options. */
 export interface GenericListKeys extends GenericInputKeys {
@@ -105,13 +106,19 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   protected match(): void {
-    this.options = this.settings.options.filter(
-      (option: GenericListOption) =>
-        stripColor(option.name ?? option.value).toString().toLowerCase()
-          .startsWith(
-            this.getCurrentInputValue().toLowerCase(),
-          ),
-    );
+    const input: string = this.getCurrentInputValue().toLowerCase();
+    if (!input.length) {
+      this.options = this.settings.options.slice();
+    } else {
+      this.options = this.settings.options
+        .filter((option: GenericListOptionSettings) =>
+          match(option.name) ||
+          (option.name !== option.value && match(option.value))
+        )
+        .sort((a: GenericListOptionSettings, b: GenericListOptionSettings) =>
+          distance(a.name, input) - distance(b.name, input)
+        );
+    }
     this.listIndex = Math.max(
       0,
       Math.min(this.options.length - 1, this.listIndex),
@@ -123,6 +130,12 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
         this.listOffset,
       ),
     );
+
+    function match(value: string): boolean {
+      return stripColor(value)
+        .toLowerCase()
+        .includes(input);
+    }
   }
 
   protected message(): string {
@@ -146,15 +159,13 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       return "";
     }
     const selected: number = this.listIndex + 1;
-    const actions: Array<[string, Array<string>]> = [];
-
-    actions.push(
+    const actions: Array<[string, Array<string>]> = [
       ["Next", [Figures.ARROW_DOWN]],
       ["Previous", [Figures.ARROW_UP]],
       ["Next Page", [Figures.PAGE_DOWN]],
       ["Previous Page", [Figures.PAGE_UP]],
       ["Submit", [Figures.ENTER]],
-    );
+    ];
 
     return "\n" + this.settings.indent + blue(Figures.INFO) +
       bold(` ${selected}/${this.options.length} `) +
