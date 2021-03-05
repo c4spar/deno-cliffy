@@ -11,7 +11,7 @@
     <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy?label=issues&logo=github">
   </a>
   <a href="https://deno.land/">
-    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.2.0-blue?logo=deno" />
+    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.4.0-blue?logo=deno" />
   </a>
   <a href="https://discord.gg/nktwtG">
     <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
@@ -29,8 +29,7 @@
   <sub>>_ A collection of modules for creating interactive command line tools.</sub>
 </p>
 
-> This project is still under development. Expect breaking changes. If you find
-> a bug or have a feature request feel free to create an issue.
+> ⚠️ This project is still under development. Expect breaking changes.
 
 ## ❯ Modules
 

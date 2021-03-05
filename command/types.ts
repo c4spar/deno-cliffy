@@ -11,16 +11,42 @@ import type { Command } from "./command.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
+// type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+// type OneOf<T, V> = T extends void ? V : T;
+// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
+// type NonVoidable<T> = T extends null | undefined | void ? Record<string, any> : T;
+
 /* COMMAND TYPES */
 
 /** Description handler. */
-export type IDescription = string | ((this: Command) => string);
+export type IDescription<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> = string | ((this: Command<O, A, G, PG, P>) => string);
 
 /** Action handler for commands and options. */
-// deno-lint-ignore no-explicit-any
-export type IAction<O, A extends Array<any>> = (
-  this: Command,
-  options: O,
+export type IAction<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> = (
+  this: Command<O, A, G, PG, P>,
+  options: PG & G & O,
   ...args: A
 ) => void | Promise<void>;
 
@@ -35,12 +61,22 @@ export interface IArgument extends IFlagArgument {
 }
 
 /** Result of `cmd.parse()` method. */
-// deno-lint-ignore no-explicit-any
-export interface IParseResult<O = any, A extends Array<any> = any> {
-  options: O;
+export interface IParseResult<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> {
+  options: PG & G & O;
   args: A;
   literal: string[];
-  cmd: Command<O>;
+  cmd: Command<O, A, G, PG, P>;
 }
 
 /* OPTION TYPES */
@@ -55,20 +91,38 @@ type ExcludedCommandOptions =
   | "list";
 
 /** Command option options. */
-// deno-lint-ignore no-explicit-any
-export interface ICommandOption<O = any, A extends Array<any> = any>
-  extends Omit<IFlagOptions, ExcludedCommandOptions> {
+export interface ICommandOption<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
-  action?: IAction<O, A>;
+  action?: IAction<O, A, G, PG, P>;
   prepend?: boolean;
 }
 
 /** Command option settings. */
-// deno-lint-ignore no-explicit-any
-export interface IOption<O = any, A extends Array<any> = any>
-  extends ICommandOption<O, A>, IFlagOptions {
+export interface IOption<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> extends ICommandOption<O, A, G, PG, P>, IFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
@@ -122,13 +176,50 @@ export interface ICompleteOptions {
 }
 
 /** Completion settings. */
-export interface ICompletion extends ICompleteOptions {
+export interface ICompletion<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> extends ICompleteOptions {
   name: string;
-  complete: ICompleteHandler;
+  complete: ICompleteHandler<O, A, G, PG, P>;
 }
 
 /** Type parser method. */
-export type ICompleteHandler = (
-  cmd: Command,
+export type ICompleteHandler<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> = (
+  cmd: Command<O, A, G, PG, P>,
   parent?: Command,
 ) => string[] | Promise<string[]>;
+
+/** Help callback method to print the help. Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` method's. */
+export type IHelpHandler<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+  C extends Command<O, A, G, PG, P> = Command<O, A, G, PG, P>,
+> = (this: C, cmd: C) => string;

@@ -15,10 +15,10 @@ export function paramCaseToCamelCase(str: string): string {
  * @param flags Source option's array.
  * @param name  Name of the option.
  */
-export function getOption(
-  flags: IFlagOptions[],
+export function getOption<O extends IFlagOptions>(
+  flags: Array<O>,
   name: string,
-): IFlagOptions | undefined {
+): O | undefined {
   while (name[0] === "-") {
     name = name.slice(1);
   }

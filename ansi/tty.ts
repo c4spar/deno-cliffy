@@ -1,5 +1,5 @@
 import * as ansiEscapes from "./ansi_escapes.ts";
-import { Chain } from "./chain.ts";
+import type { Chain } from "./chain.ts";
 import { Cursor, getCursorPosition } from "./cursor_position.ts";
 
 /** Create new `Ansi` instance. */

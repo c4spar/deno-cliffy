@@ -1,6 +1,6 @@
 import { ValidationError } from "../flags/_errors.ts";
 import { didYouMeanCommand } from "./_utils.ts";
-import { Command } from "./command.ts";
+import type { Command } from "./command.ts";
 
 export class CommandError extends Error {
   constructor(message: string) {

@@ -65,5 +65,4 @@ export interface ITypeInfo {
 }
 
 /** Custom type handler/parser. */
-// deno-lint-ignore no-explicit-any
-export type ITypeHandler<T = any> = (type: ITypeInfo) => T;
+export type ITypeHandler<T = unknown> = (type: ITypeInfo) => T;

@@ -1,4 +1,4 @@
-import { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyEvent } from "../keycode/key_event.ts";
 import {
   GenericInput,
   GenericInputKeys,

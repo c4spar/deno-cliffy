@@ -12,7 +12,7 @@ import {
   red,
   yellow,
 } from "../deps.ts";
-import { IArgument } from "../types.ts";
+import type { IArgument } from "../types.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 
 export interface HelpOptions {

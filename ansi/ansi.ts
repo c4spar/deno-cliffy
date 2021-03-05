@@ -1,5 +1,5 @@
 import * as ansiEscapes from "./ansi_escapes.ts";
-import { Chain } from "./chain.ts";
+import type { Chain } from "./chain.ts";
 
 type Args = Array<unknown>;
 type Executor = (this: AnsiChain, ...args: Args) => string;
