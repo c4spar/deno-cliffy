@@ -1,8 +1,8 @@
 <h1 align="center">Cliffy ❯ Ansi</h1>
 
 <p align="center" class="badges-container">
-  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
-    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
+  <a href="https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/releases">
     <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=latest" />

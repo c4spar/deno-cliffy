@@ -1,8 +1,8 @@
 <h1 align="center">Cliffy ❯ Command</h1>
 
 <p align="center" class="badges-container">
-  <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3ATest">
-    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=master" />
+  <a href="https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml">
+    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/releases">
     <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=latest" />
@@ -82,8 +82,8 @@
     - [Fish Completions](#fish-completions)
     - [Zsh Completions](#zsh-completions)
 - [Generic options and arguments](#-generic-options-and-arguments)
-  - [Generic constructor types](#generic-constructor-types)
   - [Generic instance method types](#generic-instance-method-types)
+  - [Generic constructor types](#generic-constructor-types)
   - [Generic global parent types](#generic-global-parent-types)
 - [Version option](#-version-option)
 - [Contributing](#-contributing)
