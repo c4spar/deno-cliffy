@@ -30,8 +30,16 @@ test({
         args.foo;
         // @ts-expect-error option foo does not exists
         options.foo;
+        // @TODO: fix options type
+        // if (options) {
+        //   // @ts-expect-error option foo does not exists
+        //   options.foo;
+        // }
       })
       .command("foo", new Command<void>())
+      .action((_options) => {
+        // callback fn should be valid also if args is not defined as second parameter.
+      })
       .command("bar", new Command())
       .action((_options) => {
         // callback fn should be valid also if args is not defined as second parameter.

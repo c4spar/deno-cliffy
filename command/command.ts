@@ -82,6 +82,42 @@ type ITypeMap = Map<string, IType>;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 type OneOf<T, V> = T extends void ? V : T;
 
+// export class Command<
+//   // deno-lint-ignore no-explicit-any
+//   CO extends Record<string, unknown> | void = Record<string, any>,
+//   // deno-lint-ignore no-explicit-any
+//   CA extends Array<unknown> = DefaultType<CO, Array<any> | [], Array<any> | []>,
+//   CG extends Record<string, unknown> | void = Record<string, unknown> | void,
+//   PG extends Record<string, unknown> | void = Record<string, unknown> | void,
+//   // deno-lint-ignore no-explicit-any
+//   P extends Command | void = CO extends void ? void : any,
+// > {
+
+// type DefaultType<T, V, R> = T extends Record<string, unknown> ? V
+//   : (T extends void ? V : R);
+// type Globals<T, V> = Merge<T, OneOf<T, V>>;
+// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
+
+// CA extends Array<unknown> = CO extends void ? [] : Array<any>,
+// CA extends Array<unknown> = DefaultType<CO, [], any>,
+// CA extends Array<unknown> = DefaultType<CO, [], Array<any>>,
+// CA extends Array<unknown> = Array<any>,
+// CG extends Record<string, unknown> | void = Record<string, unknown> | void,
+// PG extends Record<string, unknown> | void = Record<string, unknown> | void,
+// CG extends Record<string, unknown> | void = CO extends void ? void
+//   : Record<string, unknown> | void,
+// PG extends Record<string, unknown> | void = CO extends void ? void
+//   : Record<string, unknown> | void,
+
+// // deno-lint-ignore no-explicit-any
+// CG extends Record<string, any> | void = CO extends void ? void
+// // deno-lint-ignore no-explicit-any
+// : Record<string, any> | void,
+// // deno-lint-ignore no-explicit-any
+// PG extends Record<string, any> | void = CO extends void ? void
+// // deno-lint-ignore no-explicit-any
+//   : Record<string, any> | void,
+
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
@@ -258,11 +294,22 @@ export class Command<
    * @param desc      The description of the new child command.
    * @param override  Override existing child command.
    */
-  public command<A extends Array<unknown> = []>(
+  public command<
+    // deno-lint-ignore no-explicit-any
+    A extends Array<any> = Array<any>,
+  >(
     name: string,
     desc?: string,
     override?: boolean,
-  ): Command<void, A, void, Merge<PG, CG>, OneOf<P, this>>;
+  ): Command<
+    // deno-lint-ignore no-explicit-any
+    CO extends number ? any : void,
+    A,
+    // deno-lint-ignore no-explicit-any
+    CO extends number ? any : void,
+    Merge<PG, CG>,
+    OneOf<P, this>
+  >;
   /**
    * Add new sub-command.
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
