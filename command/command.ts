@@ -122,7 +122,7 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = CO extends void ? [] : any,
+  CA extends Array<unknown> = CO extends number ? any : [],
   // deno-lint-ignore no-explicit-any
   CG extends Record<string, any> | void = Record<string, any> | void,
   // deno-lint-ignore no-explicit-any
