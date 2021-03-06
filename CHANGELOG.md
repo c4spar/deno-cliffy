@@ -1,4 +1,35 @@
-# [v0.17.2](https://github.com/c4spar/deno-cli/compare/v0.17.1...v0.17.2) (2021-20-08)
+# [v0.18.0](https://github.com/c4spar/deno-cli/compare/v0.17.2...v0.18.0) (2021-03-07)
+
+### Features
+
+- **command:** add improved support for generic types (#151, #157, #159)
+  ([f43a7f1](https://github.com/c4spar/deno-cli/commit/f43a7f1),
+  [e143799](https://github.com/c4spar/deno-cli/commit/e143799),
+  [406afc2](https://github.com/c4spar/deno-cli/commit/406afc2))
+- **command:** add globalOption, globalType, globalComplete and globalEnv alias
+  method's (#152) ([e1a6bb2](https://github.com/c4spar/deno-cli/commit/e1a6bb2))
+- **prompt:** improve search and auto suggestions (#153)
+  ([6597205](https://github.com/c4spar/deno-cli/commit/6597205))
+
+### Bug Fixes
+
+- **command:** help callback does not work with global options and commands
+  (#149) ([0972cc0](https://github.com/c4spar/deno-cli/commit/0972cc0))
+
+### Chore
+
+- **egg:** ignore .DS_Store files
+  ([84fba89](https://github.com/c4spar/deno-cli/commit/84fba89))
+
+* **upgrade:** deno/std v0.89.0 (#158)
+  ([3ecd38e](https://github.com/c4spar/deno-cli/commit/3ecd38e))
+
+### Documentation Updates
+
+- fix ci badges (#156)
+  ([bc93ae5](https://github.com/c4spar/deno-cli/commit/bc93ae5))
+
+# [v0.17.2](https://github.com/c4spar/deno-cli/compare/v0.17.1...v0.17.2) (2021-02-08)
 
 ### Features
 
