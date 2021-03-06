@@ -244,9 +244,11 @@ export class Command<
    */
   public command<
     C extends Command<
-      Record<string, unknown> | void,
+    // deno-lint-ignore no-explicit-any
+      Record<string, any> | void,
       Array<unknown>,
-      Record<string, unknown> | void,
+      // deno-lint-ignore no-explicit-any
+      Record<string, any> | void,
       PG & CG | void | undefined,
       OneOf<P, this> | undefined
     >,
