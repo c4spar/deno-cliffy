@@ -265,7 +265,7 @@ export class Command<
    */
   public command<
     // deno-lint-ignore no-explicit-any
-    A extends Array<any> = Array<any>,
+    A extends Array<unknown> = Array<any>,
   >(
     name: string,
     desc?: string,
