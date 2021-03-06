@@ -79,18 +79,21 @@ interface IDefaultOption<
 }
 
 type ITypeMap = Map<string, IType>;
-type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 type OneOf<T, V> = T extends void ? V : T;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = CO extends void ? [] : any,
+  CA extends Array<unknown> = CO extends number ? any : [],
   // deno-lint-ignore no-explicit-any
-  CG extends Record<string, any> | void = Record<string, any> | void,
+  CG extends Record<string, any> | void = CO extends number ? // deno-lint-ignore no-explicit-any
+  Record<string, any>
+    : void,
   // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = Record<string, any> | void,
+  PG extends Record<string, any> | void = CO extends number ? // deno-lint-ignore no-explicit-any
+  Record<string, any>
+    : void,
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = CO extends void ? undefined : any,
 > {
@@ -241,10 +244,12 @@ export class Command<
    */
   public command<
     C extends Command<
-      Record<string, unknown> | void,
+      // deno-lint-ignore no-explicit-any
+      Record<string, any> | void,
       Array<unknown>,
-      Record<string, unknown> | void,
-      Merge<PG, CG> | void,
+      // deno-lint-ignore no-explicit-any
+      Record<string, any> | void,
+      PG & CG | void | undefined,
       OneOf<P, this> | undefined
     >,
   >(
@@ -258,11 +263,22 @@ export class Command<
    * @param desc      The description of the new child command.
    * @param override  Override existing child command.
    */
-  public command<A extends Array<unknown> = []>(
+  public command<
+    // deno-lint-ignore no-explicit-any
+    A extends Array<unknown> = Array<any>,
+  >(
     name: string,
     desc?: string,
     override?: boolean,
-  ): Command<void, A, void, Merge<PG, CG>, OneOf<P, this>>;
+  ): Command<
+    // deno-lint-ignore no-explicit-any
+    CO extends number ? any : void,
+    A,
+    // deno-lint-ignore no-explicit-any
+    CO extends number ? any : void,
+    PG & CG,
+    OneOf<P, this>
+  >;
   /**
    * Add new sub-command.
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
@@ -639,9 +655,9 @@ export class Command<
     flags: string,
     desc: string,
     opts?:
-      | Omit<ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P>, "global">
+      | Omit<ICommandOption<Partial<CO>, CA, CG & G, PG, P>, "global">
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P> {
+  ): Command<CO, CA, CG & G, PG, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -658,16 +674,16 @@ export class Command<
     flags: string,
     desc: string,
     opts:
-      | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
+      | ICommandOption<Partial<CO>, CA, CG & G, PG, P> & { global: true }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P>;
+  ): Command<CO, CA, CG & G, PG, P>;
   public option<O extends Record<string, unknown> | void = CO>(
     flags: string,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, P>
+      | ICommandOption<CO & O, CA, CG, PG, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, O>, CA, CG, PG, P>;
+  ): Command<CO & O, CA, CG, PG, P>;
   public option(
     flags: string,
     desc: string,
