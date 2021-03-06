@@ -79,9 +79,9 @@ interface IDefaultOption<
 }
 
 type ITypeMap = Map<string, IType>;
-type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 type OneOf<T, V> = T extends void ? V : T;
 
+// type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 // export class Command<
 //   // deno-lint-ignore no-explicit-any
 //   CO extends Record<string, unknown> | void = Record<string, any>,
@@ -284,7 +284,7 @@ export class Command<
       Record<string, unknown> | void,
       Array<unknown>,
       Record<string, unknown> | void,
-      Merge<PG, CG> | void,
+      PG & CG | void,
       OneOf<P, this> | undefined
     >,
   >(
@@ -311,7 +311,7 @@ export class Command<
     A,
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
-    Merge<PG, CG>,
+    PG & CG,
     OneOf<P, this>
   >;
   /**
@@ -690,9 +690,9 @@ export class Command<
     flags: string,
     desc: string,
     opts?:
-      | Omit<ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P>, "global">
+      | Omit<ICommandOption<Partial<CO>, CA, CG & G, PG, P>, "global">
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P> {
+  ): Command<CO, CA, CG & G, PG, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -709,16 +709,16 @@ export class Command<
     flags: string,
     desc: string,
     opts:
-      | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
+      | ICommandOption<Partial<CO>, CA, CG & G, PG, P> & { global: true }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P>;
+  ): Command<CO, CA, CG & G, PG, P>;
   public option<O extends Record<string, unknown> | void = CO>(
     flags: string,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, P>
+      | ICommandOption<CO & O, CA, CG, PG, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, O>, CA, CG, PG, P>;
+  ): Command<CO & O, CA, CG, PG, P>;
   public option(
     flags: string,
     desc: string,

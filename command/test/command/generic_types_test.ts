@@ -338,7 +338,7 @@ test({
 //   name: "command - generic types - child command with invalid parent option 3",
 //   async fn() {
 //     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
-
+//
 //     await new Command<void>()
 //       .option<{ main?: boolean }>("--main", "")
 //       // @ts-expect-error unknown global option main2
@@ -346,12 +346,12 @@ test({
 //       .parse(Deno.args);
 //   },
 // });
-
+//
 // test({
 //   name: "command - generic types - child command with invalid parent option 4",
 //   async fn() {
 //     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
-
+//
 //     await new Command<void>()
 //       .option<{ main?: boolean }>("--main", "")
 //       // @ts-expect-error unknown global option main2
@@ -359,7 +359,7 @@ test({
 //       .parse(Deno.args);
 //   },
 // });
-
+//
 // test({
 //   name: "command - generic types - child command with invalid parent option 5",
 //   async fn() {
