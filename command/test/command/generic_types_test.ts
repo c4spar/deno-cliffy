@@ -216,7 +216,7 @@ test({
       .select("bar-bar")
       .reset();
 
-    const bar = new Command<void, [], { debug: boolean; logLevel: boolean }>()
+    const bar = new Command<void, [], { debug?: boolean; logLevel?: boolean }>()
       .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
       .option<{ bar: boolean }>("--bar", "")
       .versionOption("--versionx", "", {
@@ -247,7 +247,7 @@ test({
           options.fooFoo && options.fooFooGlobal;
       });
 
-    const _main: Command = new Command<void, []>()
+    const _main: Command = new Command<void>()
       .arguments<[input: string, output: string]>("<input> [output]")
       .globalOption<{ debug?: boolean }>("--debug", "")
       .globalOption<{ logLevel?: boolean }>("--log-level", "")
@@ -333,39 +333,51 @@ test({
   },
 });
 
-// @TODO: unknown global options doesn't emit an type checking error.
-// test({
-//   name: "command - generic types - child command with invalid parent option 3",
-//   async fn() {
-//     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
-//
-//     await new Command<void>()
-//       .option<{ main?: boolean }>("--main", "")
-//       // @ts-expect-error unknown global option main2
-//       .command("foo", fooCommand)
-//       .parse(Deno.args);
-//   },
-// });
-//
-// test({
-//   name: "command - generic types - child command with invalid parent option 4",
-//   async fn() {
-//     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
-//
-//     await new Command<void>()
-//       .option<{ main?: boolean }>("--main", "")
-//       // @ts-expect-error unknown global option main2
-//       .command("foo", fooCommand)
-//       .parse(Deno.args);
-//   },
-// });
-//
-// test({
-//   name: "command - generic types - child command with invalid parent option 5",
-//   async fn() {
-//     await new Command<void>()
-//       // @ts-expect-error unknown global option main
-//       .command("foo", new Command<void, [], void, { main?: boolean }>())
-//       .parse(Deno.args);
-//   },
-// });
+test({
+  name: "command - generic types - child command with invalid parent option 3",
+  async fn() {
+    const fooCommand = new Command<void, [], void, { main2?: boolean }>();
+
+    await new Command<void>()
+      .option<{ main?: boolean }>("--main", "")
+      // @ts-expect-error unknown global option main2
+      .command("foo", fooCommand)
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - child command with invalid parent option 4",
+  async fn() {
+    const fooCommand = new Command<void, [], void, { main2?: boolean }>();
+
+    await new Command<void>()
+      .option<{ main?: boolean }>("--main", "")
+      // @ts-expect-error unknown global option main2
+      .command("foo", fooCommand)
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - child command with invalid parent option 5",
+  async fn() {
+    const fooCommand = new Command<void, [], void, { main?: boolean }>();
+
+    await new Command<void>()
+      .option<{ main?: boolean }>("--main", "")
+      // @ts-expect-error unknown global option main
+      .command("foo", fooCommand)
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - child command with invalid parent option 6",
+  async fn() {
+    await new Command<void>()
+      // @ts-expect-error unknown global option main
+      .command("foo", new Command<void, [], void, { main?: boolean }>())
+      .parse(Deno.args);
+  },
+});

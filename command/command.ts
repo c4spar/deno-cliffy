@@ -247,7 +247,7 @@ export class Command<
       Record<string, unknown> | void,
       Array<unknown>,
       Record<string, unknown> | void,
-      PG & CG | void,
+      PG & CG | void | undefined,
       OneOf<P, this> | undefined
     >,
   >(
