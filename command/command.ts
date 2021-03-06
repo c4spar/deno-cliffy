@@ -244,7 +244,7 @@ export class Command<
    */
   public command<
     C extends Command<
-    // deno-lint-ignore no-explicit-any
+      // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
       Array<unknown>,
       // deno-lint-ignore no-explicit-any
