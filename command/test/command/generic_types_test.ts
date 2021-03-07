@@ -449,3 +449,73 @@ test({
       .parse(Deno.args);
   },
 });
+
+test({
+  name: "command - generic types - child command with invalid parent option 6",
+  async fn() {
+    type Arguments = [input: string, output?: string, level?: number];
+    interface Options {
+      name: string;
+      age: number;
+      email?: string;
+    }
+    interface GlobalOptions {
+      debug?: boolean;
+      debugLevel: "debug" | "info" | "warn" | "error";
+    }
+
+    await new Command<
+      Options,
+      Arguments,
+      GlobalOptions
+    >()
+      .arguments("<input:string> [output:string] [level:number]")
+      .globalOption("-d, --debug", "description ...")
+      .globalOption("-l, --debug-level <string>", "description ...", {
+        default: "warn",
+      })
+      .option("-n, --name <name:string>", "description ...", { required: true })
+      .option("-a, --age <age:number>", "description ...", { required: true })
+      .option("-e, --email <email:string>", "description ...")
+      .action((options, input, output?, level?) => {
+        /** valid options */
+        options.name && options.age && options.email;
+        options.debug && options.debugLevel;
+        if (level) {
+          isNaN(level);
+        }
+        /** invalid options */
+        // @ts-expect-error option foo does not exist.
+        options.foo;
+        // @ts-expect-error argument of type string is not assignable to parameter of type number
+        isNaN(input);
+        // @ts-expect-error argument of type string | undefined is not assignable to parameter of type number
+        isNaN(output);
+        // @ts-expect-error argument of type number | undefined is not assignable to parameter of type number
+        isNaN(level);
+      })
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - extended command",
+  async fn() {
+    class Foo extends Command {}
+
+    await new Command()
+      .command("foo", new Foo())
+      .parse(Deno.args);
+  },
+});
+
+// test({
+//   name: "command - generic types - extended command 2",
+//   async fn() {
+//     class Foo extends Command {}
+
+//     await new Command<void>()
+//     .command("foo", new Foo())
+//     .parse(Deno.args);
+//   },
+// });
