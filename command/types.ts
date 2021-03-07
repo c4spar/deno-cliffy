@@ -43,7 +43,7 @@ export type IAction<
   P extends Command | undefined = any,
 > = (
   this: Command<O, A, G, PG, P>,
-  options: Merge<PG, Merge<G, O>>,
+  options: Merge<Merge<PG, G>, O>,
   ...args: A
 ) => void | Promise<void>;
 
