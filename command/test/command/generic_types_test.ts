@@ -40,7 +40,7 @@ test({
       .action((_options) => {
         // callback fn should be valid also if args is not defined as second parameter.
       })
-      // @ts-expect-error not allowed to add Command<any> to typed commands, must be casted to Command<void> or or a typed command.
+      // // @ts-expect-error not allowed to add Command<any> to typed commands, must be casted to Command<void> or or a typed command.
       .command("bar", new Command())
       .command("baz", new Command() as Command<void>)
       .action((_options) => {
@@ -177,11 +177,7 @@ test({
 test({
   name: "command - generic types - splitted command with generics",
   fn() {
-    const foo = new Command<
-      void,
-      [],
-      { debug?: boolean; logLevel?: boolean }
-    >()
+    const foo = new Command<void, [], { debug?: boolean; logLevel?: boolean }>()
       .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
       .option<{ foo?: boolean }>("--foo", "")
       .action((options) => {
@@ -294,6 +290,78 @@ test({
 });
 
 test({
+  name: "command - generic types - child command with parent option 1",
+  async fn() {
+    const fooCommand = new Command<void, [], void, { main?: boolean }>();
+
+    await new Command<void>()
+      .globalOption<{ main?: boolean }>("--main", "")
+      .command("foo", fooCommand)
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - child command with parent option 2",
+  async fn() {
+    type GlobalOptions = { main?: boolean };
+
+    const foo = new Command<void>()
+      .option<{ foo?: boolean }>("-f, --foo", "");
+
+    const cmd = new Command<void>()
+      .globalOption<GlobalOptions>("--main", "")
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("1", new Command<void, [], void, GlobalOptions>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("2", new Command<void>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("3", new Command<void, [], void, GlobalOptions>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("4", foo)
+      .action((options) => {
+        /** valid */
+        options.main;
+        options.foo;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.bar;
+      });
+
+    cmd.command("5", new Command<void, [], void, { main?: boolean }>());
+
+    // @ts-expect-error unknown global option main2
+    cmd.command("6", new Command<void, [], void, { main2?: boolean }>());
+
+    await cmd.parse(Deno.args);
+  },
+});
+
+test({
   name:
     "command - generic types - child command with invalid parent option type",
   async fn() {
@@ -381,3 +449,72 @@ test({
       .parse(Deno.args);
   },
 });
+
+test({
+  name: "command - generic types - constructor types",
+  fn() {
+    type Arguments = [input: string, output?: string, level?: number];
+    interface Options {
+      name: string;
+      age: number;
+      email?: string;
+    }
+    interface GlobalOptions {
+      debug?: boolean;
+      debugLevel: "debug" | "info" | "warn" | "error";
+    }
+
+    new Command<
+      Options,
+      Arguments,
+      GlobalOptions
+    >()
+      .arguments("<input:string> [output:string] [level:number]")
+      .globalOption("-d, --debug", "description ...")
+      .globalOption("-l, --debug-level <string>", "description ...", {
+        default: "warn",
+      })
+      .option("-n, --name <name:string>", "description ...", { required: true })
+      .option("-a, --age <age:number>", "description ...", { required: true })
+      .option("-e, --email <email:string>", "description ...")
+      .action((options, input, output?, level?) => {
+        /** valid options */
+        options.name && options.age && options.email;
+        options.debug && options.debugLevel;
+        if (level) {
+          isNaN(level);
+        }
+        /** invalid options */
+        // @ts-expect-error option foo does not exist.
+        options.foo;
+        // @ts-expect-error argument of type string is not assignable to parameter of type number
+        isNaN(input);
+        // @ts-expect-error argument of type string | undefined is not assignable to parameter of type number
+        isNaN(output);
+        // @ts-expect-error argument of type number | undefined is not assignable to parameter of type number
+        isNaN(level);
+      });
+  },
+});
+
+test({
+  name: "command - generic types - extended command",
+  async fn() {
+    class Foo extends Command {}
+
+    await new Command()
+      .command("foo", new Foo())
+      .parse(Deno.args);
+  },
+});
+
+// test({
+//   name: "command - generic types - extended command 2",
+//   async fn() {
+//     class Foo extends Command {}
+
+//     await new Command<void>()
+//     .command("foo", new Foo())
+//     .parse(Deno.args);
+//   },
+// });
