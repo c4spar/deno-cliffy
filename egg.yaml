@@ -5,6 +5,7 @@ version: 0.18.0
 repository: https://github.com/c4spar/deno-cliffy/
 homepage: https://cliffy.io
 files:
+  - _utils/**/*
   - ansi/**/*
   - command/**/*
   - examples/**/*
