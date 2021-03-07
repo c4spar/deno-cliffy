@@ -11,10 +11,7 @@ import type { Command } from "./command.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
-// type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
-// type OneOf<T, V> = T extends void ? V : T;
-// type MergeOptions<PG, G, O> = Merge<PG, Merge<G, O>>;
-// type NonVoidable<T> = T extends null | undefined | void ? Record<string, any> : T;
+type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 
 /* COMMAND TYPES */
 
@@ -46,7 +43,7 @@ export type IAction<
   P extends Command | undefined = any,
 > = (
   this: Command<O, A, G, PG, P>,
-  options: PG & G & O,
+  options: Merge<PG, Merge<G, O>>,
   ...args: A
 ) => void | Promise<void>;
 

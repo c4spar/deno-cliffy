@@ -40,7 +40,7 @@ test({
       .action((_options) => {
         // callback fn should be valid also if args is not defined as second parameter.
       })
-      // @ts-expect-error not allowed to add Command<any> to typed commands, must be casted to Command<void> or or a typed command.
+      // // @ts-expect-error not allowed to add Command<any> to typed commands, must be casted to Command<void> or or a typed command.
       .command("bar", new Command())
       .command("baz", new Command() as Command<void>)
       .action((_options) => {
@@ -177,11 +177,7 @@ test({
 test({
   name: "command - generic types - splitted command with generics",
   fn() {
-    const foo = new Command<
-      void,
-      [],
-      { debug?: boolean; logLevel?: boolean }
-    >()
+    const foo = new Command<void, [], { debug?: boolean; logLevel?: boolean }>()
       .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
       .option<{ foo?: boolean }>("--foo", "")
       .action((options) => {
@@ -290,6 +286,78 @@ test({
           // @ts-expect-error option not exists
           options.fooFoo && options.fooFooGlobal;
       });
+  },
+});
+
+test({
+  name: "command - generic types - child command with parent option 1",
+  async fn() {
+    const fooCommand = new Command<void, [], void, { main?: boolean }>();
+
+    await new Command<void>()
+      .globalOption<{ main?: boolean }>("--main", "")
+      .command("foo", fooCommand)
+      .parse(Deno.args);
+  },
+});
+
+test({
+  name: "command - generic types - child command with parent option 2",
+  async fn() {
+    type GlobalOptions = { main?: boolean };
+
+    const foo = new Command<void>()
+      .option<{ foo?: boolean }>("-f, --foo", "");
+
+    const cmd = new Command<void>()
+      .globalOption<GlobalOptions>("--main", "")
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("1", new Command<void, [], void, GlobalOptions>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("2", new Command<void>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("3", new Command<void, [], void, GlobalOptions>())
+      .action((options) => {
+        /** valid */
+        options.main;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.foo;
+      })
+      .command("4", foo)
+      .action((options) => {
+        /** valid */
+        options.main;
+        options.foo;
+        /** invalid */
+        // @ts-expect-error option foo not exists
+        options.bar;
+      });
+
+    cmd.command("5", new Command<void, [], void, { main?: boolean }>());
+
+    // @ts-expect-error unknown global option main2
+    cmd.command("6", new Command<void, [], void, { main2?: boolean }>());
+
+    await cmd.parse(Deno.args);
   },
 });
 
