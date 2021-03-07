@@ -451,8 +451,8 @@ test({
 });
 
 test({
-  name: "command - generic types - child command with invalid parent option 6",
-  async fn() {
+  name: "command - generic types - constructor types",
+  fn() {
     type Arguments = [input: string, output?: string, level?: number];
     interface Options {
       name: string;
@@ -464,7 +464,7 @@ test({
       debugLevel: "debug" | "info" | "warn" | "error";
     }
 
-    await new Command<
+    new Command<
       Options,
       Arguments,
       GlobalOptions
@@ -493,8 +493,7 @@ test({
         isNaN(output);
         // @ts-expect-error argument of type number | undefined is not assignable to parameter of type number
         isNaN(level);
-      })
-      .parse(Deno.args);
+      });
   },
 });
 
