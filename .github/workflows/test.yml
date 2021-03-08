@@ -25,12 +25,19 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
+        run: deno test --allow-env --unstable
+        if: ${{ matrix.deno != 'v1.x' }}
+
+      - name: Run tests
         run: deno test --coverage=./cov --allow-env --unstable
+        if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./cov > cov.lcov
+        if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Upload coverage
+        if: ${{ matrix.deno == 'v1.x' }}
         uses: codecov/codecov-action@v1
         with:
           name: ${{ matrix.os }}-${{ matrix.deno }}
