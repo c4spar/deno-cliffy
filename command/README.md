@@ -1,11 +1,14 @@
 <h1 align="center">Cliffy ❯ Command</h1>
 
 <p align="center" class="badges-container">
+  <a href="https://github.com/c4spar/deno-cliffy/releases">
+    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue" />
+  </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml">
     <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main" />
   </a>
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=latest" />
+  <a href="https://codecov.io/gh/c4spar/deno-cliffy">
+    <img src="https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg"/>
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/labels/module%3Acommand">
     <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy/module:command?label=issues&logo=github&color=yellow">
@@ -21,6 +24,12 @@
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
+  </a>
+</p>
+
+<p align="center" class="badges-container">
+  <a href="https://deno.land/x/cliffy">
+    <img alt="Discord" src="https://img.shields.io/badge/Published on deno.land-blue?logo=deno&logoColor=959DA6&color=272727" />
   </a>
   <a href="https://nest.land/package/cliffy">
     <img src="https://nest.land/badge.svg" alt="nest.land badge">
