@@ -25,9 +25,7 @@
   <a href="https://github.com/c4spar/deno-cliffy/actions?query=workflow%3Aci">
     <img alt="Licence" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
   </a>
-</p>
-
-<p align="center" class="badges-container">
+  <br>
   <a href="https://deno.land/x/cliffy">
     <img alt="Discord" src="https://img.shields.io/badge/Published on deno.land-blue?logo=deno&logoColor=959DA6&color=272727" />
   </a>
