@@ -7,7 +7,6 @@ on:
     - cron: 0 0 * * *
 
 jobs:
-
   stable:
     name: Deno Stable
     runs-on: ${{ matrix.os }}
@@ -15,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno_version: [ v1.4.0, v1.x ]
+        deno: [v1.4.0, v1.x]
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -23,22 +22,23 @@ jobs:
       - name: Setup Deno
         uses: denolib/setup-deno@v2
         with:
-          deno-version: ${{ matrix.deno_version }}
+          deno-version: ${{ matrix.deno }}
 
-      - name: Run command tests
-        run: >
-          deno test command/test/command --allow-env --unstable &&
-          deno test command/test/option &&
-          deno test command/test/type
+      - name: Run tests
+        run: deno test --allow-env --unstable
+        if: ${{ matrix.deno != 'v1.x' }}
 
-      - name: Run flags tests
-        run: deno test flags
+      - name: Run tests
+        run: deno test --coverage=./cov --allow-env --unstable
+        if: ${{ matrix.deno == 'v1.x' }}
 
-      - name: Run keycode tests
-        run: deno test keycode
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./cov > cov.lcov
+        if: ${{ matrix.deno == 'v1.x' }}
 
-      - name: Run prompt tests
-        run: deno test prompt --unstable
-
-      - name: Run table tests
-        run: deno test table
+      - name: Upload coverage
+        if: ${{ matrix.deno == 'v1.x' }}
+        uses: codecov/codecov-action@v1
+        with:
+          name: ${{ matrix.os }}-${{ matrix.deno }}
+          files: cov.lcov
