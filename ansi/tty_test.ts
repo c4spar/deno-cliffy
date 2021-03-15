@@ -5,7 +5,7 @@ Deno.test({
   name: "ansi - tty - chainable tty",
   fn() {
     assertEquals(
-      typeof tty.getCursorPosition === "function",
+      typeof tty.eraseDown === "function",
       true,
     );
   },
