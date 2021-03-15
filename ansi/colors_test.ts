@@ -3,7 +3,7 @@ import { underline } from "../prompt/deps.ts";
 import { colors } from "./colors.ts";
 
 Deno.test({
-  name: "test colors",
+  name: "ansi - colors - chainable colors",
   fn() {
     assertEquals(
       colors.red.underline.bold("test"),
@@ -13,9 +13,25 @@ Deno.test({
 });
 
 Deno.test({
-  name: "test color theme",
+  name: "ansi - colors - chainable colors theme",
   fn() {
     const theme = colors.red.underline;
+    assertEquals(
+      theme.bold("test"),
+      bold(underline(red("test"))),
+    );
+    assertEquals(
+      theme("test"),
+      underline(red("test")),
+    );
+  },
+});
+
+Deno.test({
+  name: "ansi - colors - chainable colors custom instance",
+  fn() {
+    const myColors = colors();
+    const theme = myColors.red.underline;
     assertEquals(
       theme.bold("test"),
       bold(underline(red("test"))),
