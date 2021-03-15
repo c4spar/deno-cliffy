@@ -1,3 +1,23 @@
+# [v0.18.1](https://github.com/c4spar/deno-cli/compare/v0.18.0...v0.18.1) (2021-03-15)
+
+### Bug Fixes
+
+- **prompt:** adopt prompts to work with enabled ts option
+  useDefineForClassFields (#162)
+  ([ac6ce0e](https://github.com/c4spar/deno-cli/commit/ac6ce0e))
+
+### Chore
+
+- **ci:** generate coverage (#160)
+  ([63b1a73](https://github.com/c4spar/deno-cli/commit/63b1a73))
+- **egg:** add _utils to files list
+  ([c2e60f9](https://github.com/c4spar/deno-cli/commit/c2e60f9))
+
+### Documentation Updates
+
+- update readme's ([933c3ed](https://github.com/c4spar/deno-cli/commit/933c3ed),
+  [62a009c](https://github.com/c4spar/deno-cli/commit/62a009c))
+
 # [v0.18.0](https://github.com/c4spar/deno-cli/compare/v0.17.2...v0.18.0) (2021-03-07)
 
 ### Features
