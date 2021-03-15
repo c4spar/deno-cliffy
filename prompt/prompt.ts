@@ -2008,7 +2008,7 @@ export function inject(values: Record<string, any>): void {
 class PromptList {
   private result: Record<string, any> = {};
   private index: number = -1;
-  private names: string[] = this.prompts.map((prompt) => prompt.name);
+  private names: Array<string>;
   private isInBeforeHook = false;
 
   private get prompt(): PromptOptions<string, any, any> {
@@ -2018,7 +2018,9 @@ class PromptList {
   public constructor(
     private prompts: PromptOptions<string, any, any>[],
     private options?: PromptListOptions<any>,
-  ) {}
+  ) {
+    this.names = this.prompts.map((prompt) => prompt.name);
+  }
 
   public async run(
     name?: string | number | true,
