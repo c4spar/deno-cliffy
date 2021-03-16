@@ -20,9 +20,12 @@ export interface CursorPositionOptions {
  * console.log(cursor); // { x: 0, y: 14}
  * ```
  */
-export function getCursorPosition(options: CursorPositionOptions): Cursor {
-  const stdout: Deno.WriterSync = options?.stdout ?? Deno.stdout;
-  const stdin: Deno.ReaderSync & { rid: number } = options?.stdin ?? Deno.stdin;
+export function getCursorPosition(
+  {
+    stdin = Deno.stdin,
+    stdout = Deno.stdout,
+  }: CursorPositionOptions = {},
+): Cursor {
   const data = new Uint8Array(8);
 
   Deno.setRaw(stdin.rid, true);
