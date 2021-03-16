@@ -927,7 +927,7 @@ export class Command<
       });
     }
 
-    if (this.ver && this._versionOption !== false) {
+    if (this._versionOption !== false && (this._versionOption || this.ver)) {
       this.option(
         this._versionOption?.flags || "-V, --version",
         this._versionOption?.desc ||
@@ -936,9 +936,7 @@ export class Command<
           standalone: true,
           prepend: true,
           action: async function () {
-            await Deno.stdout.write(
-              new TextEncoder().encode(this.getVersion() + "\n"),
-            );
+            this.showVersion();
             Deno.exit(0);
           },
           ...(this._versionOption?.opts ?? {}),
@@ -1305,7 +1303,12 @@ export class Command<
 
   /** Get command version. */
   public getVersion(): string | undefined {
-    return this.ver?.call(this, this) ?? this._parent?.getVersion();
+    return this.getVersionHandler()?.call(this, this);
+  }
+
+  /** Get help handler method. */
+  private getVersionHandler(): IVersionHandler | undefined {
+    return this.ver ?? this._parent?.getVersionHandler();
   }
 
   /** Get command description. */
@@ -1332,6 +1335,11 @@ export class Command<
   /** Get all arguments defined after the double dash. */
   public getLiteralArgs(): string[] {
     return this.literalArgs;
+  }
+
+  /** Output generated help without exiting. */
+  public showVersion() {
+    Deno.stdout.writeSync(new TextEncoder().encode(this.getVersion()));
   }
 
   /** Output generated help without exiting. */
