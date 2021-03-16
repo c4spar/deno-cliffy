@@ -1,4 +1,8 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import {
+  assertEquals,
+  assertThrows,
+  assertThrowsAsync,
+} from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const version = "1.0.0";
@@ -33,7 +37,7 @@ function command(states: States = {}): Command {
     );
 }
 
-Deno.test("command subCommand", async () => {
+Deno.test("command - sub command - sub-command with arguments", async () => {
   const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
@@ -48,7 +52,7 @@ Deno.test("command subCommand", async () => {
   assertEquals(stats.action3, undefined);
 });
 
-Deno.test("command subCommand2", async () => {
+Deno.test("command - sub command - sub-command2 with arguments", async () => {
   const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
@@ -63,7 +67,7 @@ Deno.test("command subCommand2", async () => {
   assertEquals(stats.action3, undefined);
 });
 
-Deno.test("command subCommand3", async () => {
+Deno.test("command - sub command - nested child command with arguments", async () => {
   const stats: States = {};
   const cmd: Command = command(stats);
   const { options, args } = await cmd.parse(
@@ -78,7 +82,7 @@ Deno.test("command subCommand3", async () => {
   assertEquals(stats.action3, true);
 });
 
-Deno.test("command subCommand typeString flagMissing", async () => {
+Deno.test("command - sub command - sub-command with missing argument", async () => {
   await assertThrowsAsync(
     async () => {
       await command().parse(["sub-command", "input-path"]);
@@ -88,7 +92,7 @@ Deno.test("command subCommand typeString flagMissing", async () => {
   );
 });
 
-Deno.test("command subCommand2 typeString flagMissing", async () => {
+Deno.test("command - sub command - sub-command 2 with missing argument", async () => {
   await assertThrowsAsync(
     async () => {
       await command().parse(["sub-command2", "input-path"]);
@@ -98,12 +102,59 @@ Deno.test("command subCommand2 typeString flagMissing", async () => {
   );
 });
 
-Deno.test("command subCommand3 typeString flagMissing", async () => {
+Deno.test("command - sub command - nested sub-command with missing argument", async () => {
   await assertThrowsAsync(
     async () => {
       await command().parse(["sub-command2", "sub-command3", "input-path"]);
     },
     Error,
     "Missing argument: output",
+  );
+});
+
+Deno.test("command - sub command - command with empty name", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await new Command()
+        .command("")
+        .parse(["foo"]);
+    },
+    Error,
+    "Missing command name.",
+  );
+});
+
+Deno.test("command - sub command - override child command", async () => {
+  await new Command()
+    .command("foo")
+    .command("foo", "...", true)
+    .parse(["foo"]);
+});
+
+Deno.test("command - sub command - duplicate command name", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await new Command()
+        .command("foo")
+        .command("foo")
+        .parse(["foo"]);
+    },
+    Error,
+    `Duplicate command name "foo".`,
+  );
+});
+
+Deno.test("command - sub command - select sub-command", async () => {
+  const cmd = new Command()
+    .command("foo")
+    .command("bar");
+
+  cmd.select("foo");
+  cmd.select("bar");
+
+  await assertThrows(
+    () => cmd.select("baz"),
+    Error,
+    `Unknown command "baz". Did you mean command "bar"?`,
   );
 });
