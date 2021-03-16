@@ -220,3 +220,18 @@ export type IHelpHandler<
   P extends Command | undefined = any,
   C extends Command<O, A, G, PG, P> = Command<O, A, G, PG, P>,
 > = (this: C, cmd: C) => string;
+
+/** Version callback method to print the version. Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` method's. */
+export type IVersionHandler<
+  // deno-lint-ignore no-explicit-any
+  O extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  A extends Array<unknown> = any,
+  // deno-lint-ignore no-explicit-any
+  G extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  PG extends Record<string, any> | void = any,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+  C extends Command<O, A, G, PG, P> = Command<O, A, G, PG, P>,
+> = (this: C, cmd: C) => string;
