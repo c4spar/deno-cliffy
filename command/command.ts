@@ -59,6 +59,7 @@ import type {
   ITypeHandler,
   ITypeInfo,
   ITypeOptions,
+  IVersionHandler,
 } from "./types.ts";
 
 interface IDefaultOption<
@@ -106,7 +107,7 @@ export class Command<
   private _name = "COMMAND";
   private _parent?: P;
   private _globalParent?: Command;
-  private ver?: string;
+  private ver?: IVersionHandler;
   private desc: IDescription = "";
   private fn?: IAction;
   private options: IOption[] = [];
@@ -412,17 +413,29 @@ export class Command<
 
   /**
    * Set command version.
-   * @param version Semantic version string.
+   * @param version Semantic version string string or method that returns the version string.
    */
-  public version(version: string): this {
-    this.cmd.ver = version;
+  public version(
+    version:
+      | string
+      | IVersionHandler<Partial<CO>, Partial<CA>, CG, PG>,
+  ): this {
+    if (typeof version === "string") {
+      this.cmd.ver = () => version;
+    } else if (typeof version === "function") {
+      this.cmd.ver = version;
+    }
     return this;
   }
 
+  /**
+   * Set command help.
+   * @param help Help string or method that returns the help string.
+   */
   public help(
     help:
       | string
-      | ((this: Command<Partial<CO>, Partial<CA>, CG, PG>) => string)
+      | IHelpHandler<Partial<CO>, Partial<CA>, CG, PG>
       | HelpOptions,
   ): this {
     if (typeof help === "string") {
@@ -924,7 +937,7 @@ export class Command<
           prepend: true,
           action: async function () {
             await Deno.stdout.write(
-              new TextEncoder().encode(this.ver + "\n"),
+              new TextEncoder().encode(this.getVersion() + "\n"),
             );
             Deno.exit(0);
           },
@@ -1292,7 +1305,7 @@ export class Command<
 
   /** Get command version. */
   public getVersion(): string | undefined {
-    return this.ver ?? this._parent?.getVersion();
+    return this.ver?.call(this, this) ?? this._parent?.getVersion();
   }
 
   /** Get command description. */
@@ -1332,7 +1345,7 @@ export class Command<
     return this.getHelpHandler().call(this, this);
   }
 
-  /** Get generated help. */
+  /** Get help handler method. */
   private getHelpHandler(): IHelpHandler {
     return this._help ?? this._parent?.getHelpHandler() as IHelpHandler;
   }
