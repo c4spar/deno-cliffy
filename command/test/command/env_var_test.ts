@@ -2,7 +2,7 @@
 
 import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import { IEnvVar } from "../../types.ts";
+import type { IEnvVar } from "../../types.ts";
 
 function command(): Command {
   return new Command()

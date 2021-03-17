@@ -2,7 +2,7 @@
 
 import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import { ICompletion } from "../../types.ts";
+import type { ICompletion } from "../../types.ts";
 
 function command(): Command {
   return new Command()
