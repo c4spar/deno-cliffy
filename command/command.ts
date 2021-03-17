@@ -824,6 +824,7 @@ export class Command<
     }
 
     this.cmd.envVars.push({
+      name: result.flags[0],
       names: result.flags,
       description,
       type: details[0].type,
