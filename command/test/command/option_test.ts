@@ -251,3 +251,18 @@ Deno.test("command - option - override existing option", async () => {
     .parse(["--foo-override"]);
   assertEquals(options, { foo: true });
 });
+
+Deno.test("command - option - option value handler", async () => {
+  const { options } = await new Command()
+    .option("-f, --foo <value:string>", "...", (value) => ({ value }))
+    .parse(["--foo", "bar"]);
+  assertEquals(options, { foo: { value: "bar" } });
+});
+
+Deno.test("command - option - global option value handler", async () => {
+  const { options } = await new Command()
+    .globalOption("-f, --foo <value:string>", "...", (value) => ({ value }))
+    .command("foo")
+    .parse(["foo", "--foo", "bar"]);
+  assertEquals(options, { foo: { value: "bar" } });
+});
