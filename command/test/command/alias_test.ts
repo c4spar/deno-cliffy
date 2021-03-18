@@ -1,7 +1,7 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-Deno.test("command - alias - command with alias", async () => {
+Deno.test("command - alias - command with alias 1", async () => {
   const cmd = new Command()
     .throwErrors()
     .command("foo, bar")
@@ -14,7 +14,7 @@ Deno.test("command - alias - command with alias", async () => {
   assertEquals(barOptions, { baz: true });
 });
 
-Deno.test("command - alias - command with alias method", async () => {
+Deno.test("command - alias - command with alias 2", async () => {
   const cmd = new Command()
     .throwErrors()
     .command("foo")
@@ -26,4 +26,31 @@ Deno.test("command - alias - command with alias method", async () => {
 
   assertEquals(fooOptions, { baz: true });
   assertEquals(barOptions, { baz: true });
+});
+
+Deno.test("command - alias - duplicate command alias name 1", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await new Command()
+        .throwErrors()
+        .command("foo, foo")
+        .parse([]);
+    },
+    Error,
+    `Duplicate command alias "foo".`,
+  );
+});
+
+Deno.test("command - alias - duplicate command alias name 2", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await new Command()
+        .throwErrors()
+        .command("foo")
+        .alias("foo")
+        .parse([]);
+    },
+    Error,
+    `Duplicate command alias "foo".`,
+  );
 });

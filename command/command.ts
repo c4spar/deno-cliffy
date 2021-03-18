@@ -335,7 +335,7 @@ export class Command<
     //   cmd.isExecutable = true;
     // }
 
-    aliases.forEach((alias) => cmd.aliases.push(alias));
+    aliases.forEach((alias: string) => cmd.alias(alias));
 
     this.commands.set(name, cmd);
 
@@ -363,7 +363,7 @@ export class Command<
    * @param alias Tha name of the alias.
    */
   public alias(alias: string): this {
-    if (this.cmd.aliases.indexOf(alias) !== -1) {
+    if (this.cmd._name === alias || this.cmd.aliases.includes(alias)) {
       throw new DuplicateCommandAlias(alias);
     }
 
