@@ -19,7 +19,7 @@
   <a href="https://doc.deno.land/https/deno.land/x/cliffy/ansi/mod.ts">
     <img alt="doc" src="https://img.shields.io/badge/deno-doc-yellow?logo=deno" />
   </a>
-  <a href="https://discord.gg/nktwtG">
+  <a href="https://discord.gg/ghFYyP53jb">
     <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
   </a>
   <a href="https://github.com/c4spar/deno-cliffy/blob/master/LICENSE">
