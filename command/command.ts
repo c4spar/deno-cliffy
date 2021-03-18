@@ -1553,8 +1553,8 @@ export class Command<
   }
 
   /**
-   * Checks whether the command has a sub-command with given name or not.
-   * @param name Name of the command.
+   * Checks whether a child command exists by given name or alias.
+   * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
   public hasCommand(name: string, hidden?: boolean): boolean {
@@ -1562,8 +1562,8 @@ export class Command<
   }
 
   /**
-   * Get command by name.
-   * @param name Name of the command.
+   * Get command by name or alias.
+   * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
   public getCommand(
@@ -1575,24 +1575,26 @@ export class Command<
   }
 
   /**
-   * Get base command by name.
-   * @param name Name of the command.
+   * Get base command by name or alias.
+   * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
   public getBaseCommand(
     name: string,
     hidden?: boolean,
   ): Command | undefined {
-    const cmd: Command | undefined = this.commands.get(name);
-
-    return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
-      | Command
-      | undefined;
+    for (const cmd of this.commands.values()) {
+      if (cmd._name === name || cmd.aliases.includes(name)) {
+        return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
+          | Command
+          | undefined;
+      }
+    }
   }
 
   /**
-   * Get global command by name.
-   * @param name Name of the command.
+   * Get global command by name or alias.
+   * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
   public getGlobalCommand(
@@ -1613,14 +1615,14 @@ export class Command<
   }
 
   /**
-   * Remove sub-command by name.
-   * @param name Name of the command.
+   * Remove sub-command by name or alias.
+   * @param name Name or alias of the command.
    */
   public removeCommand(name: string): Command | undefined {
     const command = this.getBaseCommand(name, true);
 
     if (command) {
-      this.commands.delete(name);
+      this.commands.delete(command._name);
     }
 
     return command;
