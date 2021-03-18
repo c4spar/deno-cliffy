@@ -136,6 +136,7 @@ export interface IEnvVarOptions {
 
 /** Environment variable settings. */
 export interface IEnvVar extends IEnvVarOptions {
+  name: string;
   names: string[];
   description: string;
   type: string;

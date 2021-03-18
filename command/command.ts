@@ -732,13 +732,14 @@ export class Command<
     for (const part of option.flags) {
       const arg = part.trim();
       const isLong = /^--/.test(arg);
-
       const name = isLong ? arg.slice(2) : arg.slice(1);
 
-      if (
-        option.name === name || option.aliases && ~option.aliases.indexOf(name)
-      ) {
-        throw new DuplicateOptionName(name);
+      if (this.cmd.getBaseOption(name, true)) {
+        if (opts?.override) {
+          this.removeOption(name);
+        } else {
+          throw new DuplicateOptionName(name);
+        }
       }
 
       if (!option.name && isLong) {
@@ -747,14 +748,6 @@ export class Command<
         option.aliases = [name];
       } else {
         option.aliases.push(name);
-      }
-
-      if (this.cmd.getBaseOption(name, true)) {
-        if (opts?.override) {
-          this.removeOption(name);
-        } else {
-          throw new DuplicateOptionName(name);
-        }
       }
     }
 
@@ -824,6 +817,7 @@ export class Command<
     }
 
     this.cmd.envVars.push({
+      name: result.flags[0],
       names: result.flags,
       description,
       type: details[0].type,
