@@ -935,7 +935,7 @@ export class Command<
         {
           standalone: true,
           prepend: true,
-          action: async function () {
+          action: function () {
             this.showVersion();
             Deno.exit(0);
           },
