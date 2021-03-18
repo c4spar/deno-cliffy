@@ -1,6 +1,6 @@
 // deno-fmt-ignore-file
 
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { IOption } from "../../types.ts";
 
@@ -230,4 +230,24 @@ Deno.test("command - option - remove option", () => {
   assertEquals(cmd.removeOption("foo")?.name, "foo");
   assertEquals(cmd.getOption("foo"), undefined);
   assertEquals(cmd.removeOption("foo"), undefined);
+});
+
+Deno.test("command - option - duplicate option", () => {
+  assertThrows(
+    () => {
+      new Command()
+        .option("-f, --foo", "...")
+        .option("-x, --foo", "...");
+    },
+    Error,
+    `Option with name "--foo" already exists.`,
+  );
+});
+
+Deno.test("command - option - override existing option", async () => {
+  const { options } = await new Command()
+    .option("-f, --foo", "...")
+    .option("-x, --foo, --foo-override", "...", { override: true })
+    .parse(["--foo-override"]);
+  assertEquals(options, { foo: true });
 });
