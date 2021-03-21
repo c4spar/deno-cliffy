@@ -79,7 +79,6 @@ interface IDefaultOption<
   opts?: ICommandOption<O, A, G, PG, P>;
 }
 
-type ITypeMap = Map<string, IType>;
 type OneOf<T, V> = T extends void ? V : T;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 
@@ -95,11 +94,7 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = CO extends number ? any : undefined,
 > {
-  private types: ITypeMap = new Map<string, IType>([
-    ["string", { name: "string", handler: new StringType() }],
-    ["number", { name: "number", handler: new NumberType() }],
-    ["boolean", { name: "boolean", handler: new BooleanType() }],
-  ]);
+  private types: Map<string, IType> = new Map();
   private rawArgs: string[] = [];
   private literalArgs: string[] = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
@@ -913,6 +908,13 @@ export class Command<
     this.hasDefaults = true;
 
     this.reset();
+
+    !this.types.has("string") &&
+      this.type("string", new StringType(), { global: true });
+    !this.types.has("number") &&
+      this.type("number", new NumberType(), { global: true });
+    !this.types.has("boolean") &&
+      this.type("boolean", new BooleanType(), { global: true });
 
     if (!this._help) {
       this.help({
