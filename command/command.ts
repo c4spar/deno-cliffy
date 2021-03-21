@@ -1334,12 +1334,12 @@ export class Command<
   }
 
   /** Output generated help without exiting. */
-  public showVersion() {
+  public showVersion(): void {
     Deno.stdout.writeSync(new TextEncoder().encode(this.getVersion()));
   }
 
   /** Output generated help without exiting. */
-  public showHelp() {
+  public showHelp(): void {
     Deno.stdout.writeSync(new TextEncoder().encode(this.getHelp()));
   }
 

@@ -1,4 +1,4 @@
-import { Command, CompletionsCommand } from "../../mod.ts";
+import { Command, CompletionsCommand, HelpCommand } from "../../mod.ts";
 
 await new Command()
   .name("completions-test")
@@ -16,5 +16,6 @@ await new Command()
       .command("bar", "Bar command.")
       .option("-b, --bar", "Bar option."),
   )
+  .command("help", new HelpCommand())
   .command("completions", new CompletionsCommand())
   .parse();

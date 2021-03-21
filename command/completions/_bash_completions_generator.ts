@@ -28,7 +28,7 @@ _${replaceSpecialChars(path)}() {
   prev="\${COMP_WORDS[COMP_CWORD-1]}"
   cmd="_"
   opts=()
-  
+
   _${replaceSpecialChars(this.cmd.getName())}_complete() {
     local action="$1"; shift
     mapfile -t values < <( ${this.cmd.getName()} completions complete "\${action}" "\${@}" )
@@ -38,18 +38,18 @@ _${replaceSpecialChars(path)}() {
   }
 
   ${this.generateCompletions(this.cmd).trim()}
-  
+
   for word in "\${COMP_WORDS[@]}"; do
     case "\${word}" in
       -*) ;;
-      *) 
+      *)
         cmd_tmp="\${cmd}_\${word//[^[:alnum:]]/_}"
         if type "\${cmd_tmp}" &>/dev/null; then
           cmd="\${cmd_tmp}"
         fi
     esac
   done
-  
+
   \${cmd}
 
   if [[ \${#opts[@]} -eq 0 ]]; then
@@ -70,7 +70,7 @@ _${replaceSpecialChars(path)}() {
     # shellcheck disable=SC2207
     COMPREPLY=($(printf '%q\\n' "\${result[@]}"))
   fi
-  
+
   return 0
 }
 
@@ -148,7 +148,7 @@ ${childCommandCompletions}`;
       opts += 'case "${prev}" in';
       for (const option of options) {
         const flags: string = option.flags
-          .map((flag) => flag.trim())
+          .map((flag: string) => flag.trim())
           .join("|");
 
         const completionsCmd: string = this.generateOptionCompletionsCommand(

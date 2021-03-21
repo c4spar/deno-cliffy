@@ -1,6 +1,8 @@
 import { assertEquals, dirname, expandGlob } from "../../../dev_deps.ts";
 
-for await (const file of expandGlob(`${dir()}/fixtures/*.in`)) {
+const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
+
+for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
   if (file.isFile) {
     const name = file.name.replace(/_/g, " ").replace(".in", "");
     const outPath = file.path.replace(/\.in$/, ".out");
@@ -9,8 +11,8 @@ for await (const file of expandGlob(`${dir()}/fixtures/*.in`)) {
       async fn() {
         const cmd: string = await Deno.readTextFile(file.path);
         const expected: string = await Deno.readTextFile(outPath);
-        const output: string = await runCommand(cmd.trim().split(" "));
-        assertEquals(output.trim(), expected.trim());
+        const output: string = await runCommand(cmd.split(" "));
+        assertEquals(output, expected);
       },
     });
   }
@@ -24,7 +26,7 @@ async function runCommand(cmd: Array<string>): Promise<string> {
       "run",
       "--unstable",
       "--allow-all",
-      `${dir()}/command.ts`,
+      `${baseDir}/command.ts`,
       ...cmd,
     ],
   });
@@ -33,8 +35,4 @@ async function runCommand(cmd: Array<string>): Promise<string> {
   process.close();
 
   return new TextDecoder().decode(output);
-}
-
-function dir(): string {
-  return `${dirname(import.meta.url).replace("file://", "")}`;
 }
