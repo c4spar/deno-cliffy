@@ -8,6 +8,7 @@ for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
     const outPath = file.path.replace(/\.in$/, ".out");
     Deno.test({
       name: `command - integration - ${name}`,
+      ignore: Deno.build.os === "windows",
       async fn() {
         const cmd: string = await Deno.readTextFile(file.path);
         const expected: string = await Deno.readTextFile(outPath);
