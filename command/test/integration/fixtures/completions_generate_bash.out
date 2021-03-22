@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bash completion support for completions-test
+# bash completion support for completions-test v1.0.0
 
 _completions_test() {
   local word cur prev
@@ -19,20 +19,21 @@ _completions_test() {
   }
 
   __completions_test() {
-    opts=(-h --help -g --global -m --main foo help completions)
+    opts=(-h --help -V --version -g --global -m --main foo help completions)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
       return 0
     fi
     case "${prev}" in
       -h|--help) opts=() ;;
+      -V|--version) opts=() ;;
       -g|--global) opts=(); _completions_test_complete boolean ;;
       -m|--main) opts=(); _completions_test_complete boolean ;;
     esac
   }
 
   __completions_test_foo() {
-    opts=(-h --help -g --global -f --foo bar)
+    opts=(-h --help -g --global -f --foo help bar)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
       return 0
@@ -44,8 +45,20 @@ _completions_test() {
     esac
   }
 
+  __completions_test_foo_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command foo help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo help ;;
+    esac
+  }
+
   __completions_test_foo_bar() {
-    opts=(-h --help -g --global -b --bar)
+    opts=(-h --help -g --global -b --bar help)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
       return 0
@@ -54,6 +67,18 @@ _completions_test() {
       -h|--help) opts=() ;;
       -g|--global) opts=(); _completions_test_complete boolean foo bar ;;
       -b|--bar)  ;;
+    esac
+  }
+
+  __completions_test_foo_bar_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command foo bar help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo bar help ;;
     esac
   }
 
@@ -70,7 +95,7 @@ _completions_test() {
   }
 
   __completions_test_completions() {
-    opts=(-h --help -g --global bash fish zsh)
+    opts=(-h --help -g --global help bash fish zsh)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
       return 0
@@ -81,8 +106,20 @@ _completions_test() {
     esac
   }
 
-  __completions_test_completions_bash() {
+  __completions_test_completions_help() {
     opts=(-h --help -g --global)
+    _completions_test_complete command completions help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions help ;;
+    esac
+  }
+
+  __completions_test_completions_bash() {
+    opts=(-h --help -g --global help)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
       return 0
@@ -93,8 +130,20 @@ _completions_test() {
     esac
   }
 
-  __completions_test_completions_fish() {
+  __completions_test_completions_bash_help() {
     opts=(-h --help -g --global)
+    _completions_test_complete command completions bash help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions bash help ;;
+    esac
+  }
+
+  __completions_test_completions_fish() {
+    opts=(-h --help -g --global help)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
       return 0
@@ -105,8 +154,20 @@ _completions_test() {
     esac
   }
 
-  __completions_test_completions_zsh() {
+  __completions_test_completions_fish_help() {
     opts=(-h --help -g --global)
+    _completions_test_complete command completions fish help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions fish help ;;
+    esac
+  }
+
+  __completions_test_completions_zsh() {
+    opts=(-h --help -g --global help)
     
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
       return 0
@@ -114,6 +175,18 @@ _completions_test() {
     case "${prev}" in
       -h|--help) opts=() ;;
       -g|--global) opts=(); _completions_test_complete boolean completions zsh ;;
+    esac
+  }
+
+  __completions_test_completions_zsh_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command completions zsh help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions zsh help ;;
     esac
   }
 

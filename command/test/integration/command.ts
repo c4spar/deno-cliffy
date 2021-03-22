@@ -1,6 +1,7 @@
 import { Command, CompletionsCommand, HelpCommand } from "../../mod.ts";
 
-await new Command()
+const cmd = new Command()
+  .version("1.0.0")
   .name("completions-test")
   .description("Completions test.")
   .globalOption("-g, --global <val:boolean>", "Foo option.")
@@ -16,6 +17,9 @@ await new Command()
       .command("bar", "Bar command.")
       .option("-b, --bar", "Bar option."),
   )
-  .command("help", new HelpCommand())
+  .command("help", new HelpCommand().global())
   .command("completions", new CompletionsCommand())
-  .parse();
+
+if (import.meta.main) {
+  await cmd.parse();
+}

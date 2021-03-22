@@ -10,8 +10,10 @@ for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
       name: `command - integration - ${name}`,
       ignore: Deno.build.os === "windows",
       async fn() {
-        const cmd: string = await Deno.readTextFile(file.path);
-        const expected: string = await Deno.readTextFile(outPath);
+        const [cmd, expected] = await Promise.all([
+          Deno.readTextFile(file.path),
+          Deno.readTextFile(outPath),
+        ]);
         const output: string = await runCommand(cmd.split(" "));
         assertEquals(output, expected);
       },
