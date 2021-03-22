@@ -25,11 +25,11 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --allow-env --unstable
+        run: deno test --allow-all --unstable
         if: ${{ matrix.deno != 'v1.x' }}
 
       - name: Run tests
-        run: deno test --coverage=./cov --allow-env --unstable
+        run: deno test --coverage=./cov --allow-all --unstable
         if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Generate lcov

@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+# bash completion support for completions-test v1.0.0
+
+_completions_test() {
+  local word cur prev
+  local -a opts
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  cmd="_"
+  opts=()
+
+  _completions_test_complete() {
+    local action="$1"; shift
+    mapfile -t values < <( completions-test completions complete "${action}" "${@}" )
+    for i in "${values[@]}"; do
+      opts+=("$i")
+    done
+  }
+
+  __completions_test() {
+    opts=(-h --help -V --version -g --global -m --main foo help completions)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -V|--version) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean ;;
+      -m|--main) opts=(); _completions_test_complete boolean ;;
+    esac
+  }
+
+  __completions_test_foo() {
+    opts=(-h --help -g --global -f --foo help bar)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo ;;
+      -f|--foo)  ;;
+    esac
+  }
+
+  __completions_test_foo_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command foo help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo help ;;
+    esac
+  }
+
+  __completions_test_foo_bar() {
+    opts=(-h --help -g --global -b --bar help)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo bar ;;
+      -b|--bar)  ;;
+    esac
+  }
+
+  __completions_test_foo_bar_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command foo bar help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean foo bar help ;;
+    esac
+  }
+
+  __completions_test_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean help ;;
+    esac
+  }
+
+  __completions_test_completions() {
+    opts=(-h --help -g --global help bash fish zsh)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions ;;
+    esac
+  }
+
+  __completions_test_completions_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command completions help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions help ;;
+    esac
+  }
+
+  __completions_test_completions_bash() {
+    opts=(-h --help -g --global help)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions bash ;;
+    esac
+  }
+
+  __completions_test_completions_bash_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command completions bash help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions bash help ;;
+    esac
+  }
+
+  __completions_test_completions_fish() {
+    opts=(-h --help -g --global help)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions fish ;;
+    esac
+  }
+
+  __completions_test_completions_fish_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command completions fish help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions fish help ;;
+    esac
+  }
+
+  __completions_test_completions_zsh() {
+    opts=(-h --help -g --global help)
+    
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions zsh ;;
+    esac
+  }
+
+  __completions_test_completions_zsh_help() {
+    opts=(-h --help -g --global)
+    _completions_test_complete command completions zsh help
+    if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _completions_test_complete boolean completions zsh help ;;
+    esac
+  }
+
+  for word in "${COMP_WORDS[@]}"; do
+    case "${word}" in
+      -*) ;;
+      *)
+        cmd_tmp="${cmd}_${word//[^[:alnum:]]/_}"
+        if type "${cmd_tmp}" &>/dev/null; then
+          cmd="${cmd_tmp}"
+        fi
+    esac
+  done
+
+  ${cmd}
+
+  if [[ ${#opts[@]} -eq 0 ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=($(compgen -f "${cur}"))
+    return 0
+  fi
+
+  local values
+  values="$( printf "\n%s" "${opts[@]}" )"
+  local IFS=$'\n'
+  # shellcheck disable=SC2207
+  local result=($(compgen -W "${values[@]}" -- "${cur}"))
+  if [[ ${#result[@]} -eq 0 ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=($(compgen -f "${cur}"))
+  else
+    # shellcheck disable=SC2207
+    COMPREPLY=($(printf '%q\n' "${result[@]}"))
+  fi
+
+  return 0
+}
+
+complete -F _completions_test -o bashdefault -o default completions-test
