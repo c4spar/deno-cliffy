@@ -18,7 +18,7 @@ const cmd = new Command()
       .option("-b, --bar", "Bar option."),
   )
   .command("help", new HelpCommand().global())
-  .command("completions", new CompletionsCommand())
+  .command("completions", new CompletionsCommand());
 
 if (import.meta.main) {
   await cmd.parse();
