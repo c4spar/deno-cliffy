@@ -23,20 +23,5 @@ jobs:
         with:
           deno-version: ${{ matrix.deno_version }}
 
-      - name: Run command tests
-        run: >
-          deno test command/test/command --allow-env --unstable &&
-          deno test command/test/option &&
-          deno test command/test/type
-
-      - name: Run flags tests
-        run: deno test flags
-
-      - name: Run keycode tests
-        run: deno test keycode
-
-      - name: Run prompt tests
-        run: deno test prompt --unstable
-
-      - name: Run table tests
-        run: deno test table
+      - name: Run tests
+        run: deno test --allow-all --unstable
