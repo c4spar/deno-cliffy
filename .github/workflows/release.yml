@@ -27,7 +27,9 @@ jobs:
       - name: Setup eggs
         run: >
           deno install --unstable --allow-all https://x.nest.land/eggs@0.3.5/eggs.ts &&
-          eggs link ${{ NEST_TOKEN }}
+          eggs link "${NEST_TOKEN}"
+        env:
+          NEST_TOKEN: ${{ secrets.NEST_TOKEN }}
 
       - name: Setup pagic
         run: >
@@ -43,7 +45,8 @@ jobs:
 
       - name: Publish Vercel
         run: vercel --version
-        # run: vercel --prod --scope ${{ VERCEL_SCOPE }}
+        # run: vercel --prod --scope "${VERCEL_SCOPE}"
         env:
-          VERCEL_ORG_ID: ${{ VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ VERCEL_PROJECT_ID }}
+          VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
