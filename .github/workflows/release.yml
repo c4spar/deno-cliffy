@@ -1,7 +1,6 @@
 name: Release
 
 on:
-  push:
   release:
     types:
       - created
@@ -24,6 +23,9 @@ jobs:
         with:
           node-version: v15.x
 
+      - name: Setup Vercel
+        run: npm install -g vercel
+
       - name: Setup eggs
         run: >
           deno install --unstable --allow-all https://x.nest.land/eggs@0.3.5/eggs.ts &&
@@ -36,16 +38,11 @@ jobs:
           deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.2.0/mod.ts &&
           pagic build
 
-      - name: Setup Vercel
-        run: npm install -g vercel
-
       - name: Publish Nest.land
-        run: eggs --version
-        # run: eggs publish --no-check --yes
+        run: eggs publish --no-check --yes
 
       - name: Publish Vercel
-        run: vercel --version
-        # run: vercel --prod --scope "${VERCEL_SCOPE}"
+        run: vercel --prod --scope "${VERCEL_SCOPE}"
         env:
           VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
