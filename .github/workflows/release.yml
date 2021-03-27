@@ -1,7 +1,6 @@
 name: Release
 
 on:
-  push:
   release:
     types:
       - created
@@ -40,12 +39,10 @@ jobs:
         run: npm install -g vercel
 
       - name: Publish Nest.land
-        run: eggs --version
-        # run: eggs publish --no-check --yes
+        run: eggs publish --no-check --yes
 
       - name: Publish Vercel
-        run: vercel --version
-        # run: vercel --prod --scope "${VERCEL_SCOPE}"
+        run: vercel --prod --scope "${VERCEL_SCOPE}"
         env:
           VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
