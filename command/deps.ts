@@ -7,6 +7,6 @@ export {
   magenta,
   red,
   yellow,
-} from "https://deno.land/std@0.89.0/fmt/colors.ts";
+} from "https://deno.land/std@0.93.0/fmt/colors.ts";
 
-export { existsSync } from "https://deno.land/std@0.89.0/fs/exists.ts";
+export { existsSync } from "https://deno.land/std@0.93.0/fs/exists.ts";
