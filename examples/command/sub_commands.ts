@@ -9,7 +9,7 @@ await new Command()
     "Clone a repository into a newly created directory.",
   )
   .action((source: string, destination: string) => {
-    console.log("clone command called");
+    console.log("clone: %s -> %s", source, destination);
   })
   .parse(Deno.args);
 
@@ -21,7 +21,7 @@ await new Command()
       .arguments("<source:string> [destination:string]")
       .description("Clone a repository into a newly created directory.")
       .action((source: string, destination: string) => {
-        console.log("clone command called");
+        console.log("clone: %s -> %s", source, destination);
       }),
   )
   .parse(Deno.args);

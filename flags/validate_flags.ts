@@ -23,14 +23,14 @@ interface IFlagOptionsMap {
  *
  * @param flags         Available flag options.
  * @param values        Flag to validate.
- * @param knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
+ * @param _knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
  * @param optionNames   Mapped option names of negatable options.
  */
 export function validateFlags(
   flags: IFlagOptions[],
   values: Record<string, unknown>,
-  knownFlaks?: Record<string, unknown>,
+  _knownFlaks?: Record<string, unknown>,
   allowEmpty?: boolean,
   optionNames: Record<string, string> = {},
 ): void {

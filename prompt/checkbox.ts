@@ -90,9 +90,9 @@ export class Checkbox
    * Create list separator.
    * @param label Separator label.
    */
-  public static separator(label = "------------"): CheckboxOption {
+  public static separator(label?: string): CheckboxOption {
     return {
-      ...super.separator(),
+      ...super.separator(label),
       icon: false,
     };
   }

@@ -1,6 +1,5 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { tty } from "../../ansi/tty.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Input } from "../../prompt/input.ts";
 import { Select } from "../../prompt/select.ts";
@@ -8,8 +7,7 @@ import { Select } from "../../prompt/select.ts";
 const sig = Deno.signals.interrupt();
 (async () => {
   for await (const _ of sig) {
-    // tty.cursorShow();
-    // console.log("\nSigint received. Exiting deno process!");
+    console.log("\nSigint received. Exiting deno process!");
     Deno.exit(1);
   }
 })();
