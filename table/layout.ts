@@ -216,7 +216,7 @@ export class TableLayout {
         continue;
       }
 
-      result += this.renderCell(colIndex, row, prevRow, rowSpan, opts);
+      result += this.renderCell(colIndex, row, opts);
 
       if (rowSpan[colIndex] > 1) {
         if (!isMultiline) {
@@ -267,16 +267,12 @@ export class TableLayout {
    * Render cell.
    * @param colIndex  Current col index.
    * @param row       Current row.
-   * @param prevRow   Previous row.
-   * @param rowSpan   Current row span.
    * @param opts      Render options.
    * @param noBorder  Disable border.
    */
   protected renderCell(
     colIndex: number,
     row: Row<Cell>,
-    prevRow: Row<Cell> | undefined,
-    rowSpan: number[],
     opts: IRenderSettings,
     noBorder?: boolean,
   ): string {
@@ -531,8 +527,6 @@ export class TableLayout {
       result += this.renderCell(
         colIndex,
         nextRow,
-        prevRow,
-        rowSpan,
         opts,
         true,
       );

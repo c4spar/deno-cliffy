@@ -1,3 +1,4 @@
+// deno-lint-ignore no-unused-vars
 import { React } from "https://deno.land/x/pagic/mod.ts";
 
 export default {
