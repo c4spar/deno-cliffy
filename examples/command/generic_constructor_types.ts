@@ -31,7 +31,7 @@ await new Command<
   .option("-n, --name <name:string>", "description ...", { required: true })
   .option("-a, --age <age:number>", "description ...", { required: true })
   .option("-e, --email <email:string>", "description ...")
-  .action((options: Options, input: string, output?: string) => {
+  .action((options: Options, _input: string, _output?: string) => {
     /** valid options */
     options.name && options.age && options.email;
     /** invalid options */
