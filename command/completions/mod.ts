@@ -16,13 +16,13 @@ export class CompletionsCommand extends Command<void> {
       const baseCmd = this.#cmd || this.getMainCommand();
       return `Generate shell completions.
 
-To enable shell completions for this program add following line to your ${
+To enable shell completions for this program add the following line to your ${
         dim(italic("~/.bashrc"))
       } or similar:
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions [shell])`))}
 
-    For mor information run ${
+    For more information run ${
         dim(italic(`${baseCmd.getPath()} completions [shell] --help`))
       }
 `;
