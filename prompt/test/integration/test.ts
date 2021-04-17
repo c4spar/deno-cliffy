@@ -17,7 +17,12 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
         const output: string = await runPrompt(file);
         const outputPath = file.path.replace(/\.ts$/, ".out");
         const expectedOutput: string = await Deno.readTextFile(outputPath);
-        assertEquals(output, expectedOutput.replace(/\\x1b/g, "\x1b"));
+        assertEquals(
+          output,
+          expectedOutput
+            .replace(/\\x1b/g, "\x1b")
+            .replace(/\r\n/g, "\n"),
+        );
       },
     });
   }
