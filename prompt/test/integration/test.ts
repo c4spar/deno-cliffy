@@ -28,7 +28,7 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
 }
 
 async function getExpectedOutput(path: string) {
-  const osOutputPath = path.replace(/\.ts$/, `_${Deno.build.os}.out`);
+  const osOutputPath = path.replace(/\.ts$/, `.${Deno.build.os}.out`);
   try {
     return await Deno.readTextFile(osOutputPath);
   } catch (_) {
