@@ -11,8 +11,9 @@ import type { IKey, KeyEvent } from "../key_event.ts";
 const ESC = "\x1B";
 
 const defaults = <IKey> {
-  sequence: undefined,
   name: undefined,
+  sequence: undefined,
+  code: undefined,
   ctrl: false,
   meta: false,
   shift: false,
@@ -94,6 +95,7 @@ for (const code of Object.keys(KeyMap)) {
         ...defaults,
         name,
         sequence: ESC + code,
+        code,
       }],
     );
   });
@@ -111,6 +113,7 @@ for (const code of Object.keys(KeyMapShift)) {
         ...defaults,
         name,
         sequence: ESC + code,
+        code,
         shift: true,
       }],
     );
@@ -129,6 +132,7 @@ for (const code of Object.keys(KeyMapCtrl)) {
         ...defaults,
         name,
         sequence: ESC + code,
+        code,
         ctrl: true,
       }],
     );
@@ -154,4 +158,116 @@ Deno.test(`keycode - parse string - abc`, function () {
       sequence: "c",
     }],
   );
+});
+
+Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
+  const keys = KeyCode.parse(
+    "\x1b[2P\x1b[3P\x1b[4P\x1b[5P\x1b[6P\x1b[7P\x1b[8P\x1b[3Q\x1b[8Q\x1b[3R\x1b[8R\x1b[3S\x1b[8S",
+  );
+  assertEquals(keys, [
+    {
+      name: "f1",
+      sequence: "\x1b[2P",
+      code: "[P",
+      shift: true,
+      meta: false,
+      ctrl: false,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[3P",
+      code: "[P",
+      shift: false,
+      meta: true,
+      ctrl: false,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[4P",
+      code: "[P",
+      shift: true,
+      meta: true,
+      ctrl: false,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[5P",
+      code: "[P",
+      shift: false,
+      meta: false,
+      ctrl: true,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[6P",
+      code: "[P",
+      shift: true,
+      meta: false,
+      ctrl: true,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[7P",
+      code: "[P",
+      shift: false,
+      meta: true,
+      ctrl: true,
+    },
+    {
+      name: "f1",
+      sequence: "\x1b[8P",
+      code: "[P",
+      shift: true,
+      meta: true,
+      ctrl: true,
+    },
+    {
+      name: "f2",
+      sequence: "\x1b[3Q",
+      code: "[Q",
+      shift: false,
+      meta: true,
+      ctrl: false,
+    },
+    {
+      name: "f2",
+      sequence: "\x1b[8Q",
+      code: "[Q",
+      shift: true,
+      meta: true,
+      ctrl: true,
+    },
+    {
+      name: "f3",
+      sequence: "\x1b[3R",
+      code: "[R",
+      shift: false,
+      meta: true,
+      ctrl: false,
+    },
+    {
+      name: "f3",
+      sequence: "\x1b[8R",
+      code: "[R",
+      shift: true,
+      meta: true,
+      ctrl: true,
+    },
+    {
+      name: "f4",
+      sequence: "\x1b[3S",
+      code: "[S",
+      shift: false,
+      meta: true,
+      ctrl: false,
+    },
+    {
+      name: "f4",
+      sequence: "\x1b[8S",
+      code: "[S",
+      shift: true,
+      meta: true,
+      ctrl: true,
+    },
+  ]);
 });
