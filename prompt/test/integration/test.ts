@@ -13,7 +13,6 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
     const name = file.name.replace(/_/g, " ").replace(".ts", "");
     Deno.test({
       name: `prompt - integration - ${name}`,
-      ignore: Deno.build.os === "windows",
       async fn() {
         const output: string = await runPrompt(file);
         const outputPath = file.path.replace(/\.ts$/, ".out");
