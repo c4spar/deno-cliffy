@@ -270,15 +270,21 @@ export abstract class GenericPrompt<
   /** Read user input from stdin. */
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
+    const isTty = Deno.isatty(Deno.stdin.rid);
 
-    // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
-    (Deno.setRaw as setRaw)(
-      Deno.stdin.rid,
-      true,
-      { cbreak: !!this.settings.cbreak },
-    );
+    if (isTty) {
+      // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
+      (Deno.setRaw as setRaw)(
+        Deno.stdin.rid,
+        true,
+        { cbreak: this.settings.cbreak === true },
+      );
+    }
     const nread: number | null = await Deno.stdin.read(buffer);
-    Deno.setRaw(Deno.stdin.rid, false);
+
+    if (isTty) {
+      Deno.setRaw(Deno.stdin.rid, false);
+    }
 
     if (nread === null) {
       return buffer;
