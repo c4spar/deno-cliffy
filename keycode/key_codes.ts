@@ -113,5 +113,6 @@ export const SpecialKeyMap: Record<string, string> = {
   "\t": "tab",
   "\b": "backspace",
   "\x7f": "backspace",
+  "\x1b": "escape",
   " ": "space",
 };
