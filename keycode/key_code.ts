@@ -81,6 +81,7 @@ export class KeyCode {
         ctrl: false,
         meta: false,
         shift: false,
+        code: undefined,
       };
 
       if (ch === kEscape && hasNext()) {
@@ -191,6 +192,7 @@ export class KeyCode {
         key.ctrl = !!(modifier & 4);
         key.meta = !!(modifier & 10);
         key.shift = !!(modifier & 1);
+        key.code = code;
 
         // Parse the key itself
         if (code in KeyMap) {
