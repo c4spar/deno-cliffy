@@ -6,8 +6,7 @@ import {
   KeyMapShift,
   SpecialKeyMap,
 } from "../key_codes.ts";
-import { KeyEvent } from "../key_event.ts";
-import type { IKey } from "../key_event.ts";
+import type { IKey, KeyEvent } from "../key_event.ts";
 
 const ESC = "\x1B";
 
