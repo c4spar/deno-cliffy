@@ -19,7 +19,7 @@ const defaults = <IKey> {
 };
 
 for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
-  Deno.test(`parse key: ${char}`, function () {
+  Deno.test(`keycode - parse key - ${char}`, function () {
     const keys: KeyEvent[] = KeyCode.parse(char);
 
     assertEquals(
@@ -34,7 +34,7 @@ for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
 }
 
 for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-  Deno.test(`parse key: shift + ${char.toLowerCase()}`, function () {
+  Deno.test(`keycode - parse key - shift + ${char}`, function () {
     const keys: KeyEvent[] = KeyCode.parse(char);
 
     assertEquals(
@@ -50,7 +50,7 @@ for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 }
 
 for (const char of '!"§$%&/()=?,;.:-_') {
-  Deno.test(`parse key: ${char}`, function () {
+  Deno.test(`keycode - parse special key - ${char}`, function () {
     const keys: KeyEvent[] = KeyCode.parse(char);
 
     assertEquals(
@@ -67,7 +67,7 @@ for (const char of '!"§$%&/()=?,;.:-_') {
 for (const code of Object.keys(SpecialKeyMap)) {
   const name = SpecialKeyMap[code];
 
-  Deno.test(`parse key: ${name} (${code})`, function () {
+  Deno.test(`keycode - parse key - SpecialKeyMap - ${name} (${code})`, function () {
     // const keys: KeyEvent[] = KeyCode.parse( ESC + code );
     const keys: KeyEvent[] = KeyCode.parse(code);
 
@@ -85,7 +85,7 @@ for (const code of Object.keys(SpecialKeyMap)) {
 for (const code of Object.keys(KeyMap)) {
   const name = KeyMap[code];
 
-  Deno.test(`parse key: ${name} (${code})`, function () {
+  Deno.test(`keycode - parse key - KeyMap - ${name} (${code})`, function () {
     const keys: KeyEvent[] = KeyCode.parse(ESC + code);
 
     assertEquals(
@@ -93,7 +93,7 @@ for (const code of Object.keys(KeyMap)) {
       <KeyEvent[]> [{
         ...defaults,
         name,
-        sequence: undefined,
+        sequence: ESC + code,
       }],
     );
   });
@@ -102,7 +102,7 @@ for (const code of Object.keys(KeyMap)) {
 for (const code of Object.keys(KeyMapShift)) {
   const name = KeyMapShift[code];
 
-  Deno.test(`parse key: shift + ${name} (${code})`, function () {
+  Deno.test(`keycode - parse key - KeyMapShift - shift + ${name} (${code})`, function () {
     const keys: KeyEvent[] = KeyCode.parse(ESC + code);
 
     assertEquals(
@@ -110,7 +110,7 @@ for (const code of Object.keys(KeyMapShift)) {
       <KeyEvent[]> [{
         ...defaults,
         name,
-        sequence: undefined,
+        sequence: ESC + code,
         shift: true,
       }],
     );
@@ -120,7 +120,7 @@ for (const code of Object.keys(KeyMapShift)) {
 for (const code of Object.keys(KeyMapCtrl)) {
   const name = KeyMapCtrl[code];
 
-  Deno.test(`parse key: ctrl + ${name} (${code})`, function () {
+  Deno.test(`keycode - parse key - KeyMapCtrl - ctrl + ${name} (${code})`, function () {
     const keys: KeyEvent[] = KeyCode.parse(ESC + code);
 
     assertEquals(
@@ -128,14 +128,14 @@ for (const code of Object.keys(KeyMapCtrl)) {
       <KeyEvent[]> [{
         ...defaults,
         name,
-        sequence: undefined,
+        sequence: ESC + code,
         ctrl: true,
       }],
     );
   });
 }
 
-Deno.test(`parse string: abc`, function () {
+Deno.test(`keycode - parse string - abc`, function () {
   const keys: KeyEvent[] = KeyCode.parse("abc");
 
   assertEquals(

@@ -4,14 +4,6 @@ import { IKey, KeyEvent } from "./key_event.ts";
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = "\x1b";
 
-// deno-lint-ignore no-explicit-any
-const permissions: any = (Deno as any).permissions;
-// deno-lint-ignore no-explicit-any
-const envPermissionStatus: any = permissions && permissions.query &&
-  await permissions.query({ name: "env" });
-const hasEnvPermissions: boolean = !!envPermissionStatus &&
-  envPermissionStatus.state === "granted";
-
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 // https://github.com/nodejs/node/blob/v13.13.0/lib/internal/readline/utils.js
 
@@ -33,13 +25,9 @@ export class KeyCode {
   public static parse(data: Uint8Array | string): KeyEvent[] {
     try {
       return this.parseEscapeSequence(data);
-    } catch (e) {
-      if (hasEnvPermissions && Deno.env.get("CLIFFY_DEBUG")) {
-        Deno.stderr.writeSync(new TextEncoder().encode(e.toString() + "\n"));
-      }
+    } catch (_) {
+      return [];
     }
-
-    return [];
   }
 
   /**
@@ -95,7 +83,7 @@ export class KeyCode {
         shift: false,
       };
 
-      if (ch === kEscape) {
+      if (ch === kEscape && hasNext()) {
         escaped = true;
         s += (ch = next());
 
@@ -218,11 +206,6 @@ export class KeyCode {
         }
       } else if (ch in SpecialKeyMap) {
         key.name = SpecialKeyMap[ch];
-        if (key.name === "backspace" || key.name === "space") {
-          key.meta = escaped;
-        }
-      } else if (ch === kEscape) {
-        key.name = "escape";
         key.meta = escaped;
       } else if (!escaped && ch <= "\x1a") {
         // ctrl+letter
@@ -245,11 +228,11 @@ export class KeyCode {
 
       if (s.length !== 0 && (key.name !== undefined || escaped)) {
         /* Named character or sequence */
-        key.sequence = escaped ? undefined : s;
+        // key.sequence = escaped ? undefined : s;
         keys.push(KeyEvent.from(key));
       } else if (charLengthAt(s, 0) === s.length) {
         /* Single unnamed character, e.g. "." */
-        key.sequence = s;
+        // key.sequence = s;
         keys.push(KeyEvent.from(key));
       } else {
         /* Unrecognized or broken escape sequence. */
