@@ -15,8 +15,7 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
       name: `prompt - integration - ${name}`,
       async fn() {
         const output: string = await runPrompt(file);
-        const outputPath = file.path.replace(/\.ts$/, ".out");
-        const expectedOutput: string = await Deno.readTextFile(outputPath);
+        const expectedOutput: string = await getExpectedOutput(file.path);
         assertEquals(
           output,
           expectedOutput
@@ -25,6 +24,16 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
         );
       },
     });
+  }
+}
+
+async function getExpectedOutput(path: string) {
+  const osOutputPath = path.replace(/\.ts$/, `_${Deno.build.os}.out`);
+  try {
+    return await Deno.readTextFile(osOutputPath);
+  } catch (e) {
+    const outputPath = path.replace(/\.ts$/, ".out");
+    return await Deno.readTextFile(outputPath);
   }
 }
 
