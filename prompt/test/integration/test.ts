@@ -31,7 +31,7 @@ async function getExpectedOutput(path: string) {
   const osOutputPath = path.replace(/\.ts$/, `_${Deno.build.os}.out`);
   try {
     return await Deno.readTextFile(osOutputPath);
-  } catch (e) {
+  } catch (_) {
     const outputPath = path.replace(/\.ts$/, ".out");
     return await Deno.readTextFile(outputPath);
   }
