@@ -1,4 +1,4 @@
-import { KeyMap, KeyMapCtrl, KeyMapShift } from "./key_codes.ts";
+import { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from "./key_codes.ts";
 import { IKey, KeyEvent } from "./key_event.ts";
 
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
@@ -216,25 +216,13 @@ export class KeyCode {
         } else {
           key.name = "undefined";
         }
-      } else if (ch === "\r") {
-        // carriage return
-        key.name = "return";
-      } else if (ch === "\n") {
-        // Enter, should have been called linefeed
-        key.name = "enter";
-      } else if (ch === "\t") {
-        // tab
-        key.name = "tab";
-      } else if (ch === "\b" || ch === "\x7f") {
-        // backspace or ctrl+h
-        key.name = "backspace";
-        key.meta = escaped;
+      } else if (ch in SpecialKeyMap) {
+        key.name = SpecialKeyMap[ch];
+        if (key.name === "backspace" || key.name === "space") {
+          key.meta = escaped;
+        }
       } else if (ch === kEscape) {
-        // escape key
         key.name = "escape";
-        key.meta = escaped;
-      } else if (ch === " ") {
-        key.name = "space";
         key.meta = escaped;
       } else if (!escaped && ch <= "\x1a") {
         // ctrl+letter
