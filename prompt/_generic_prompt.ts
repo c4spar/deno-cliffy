@@ -1,6 +1,6 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
-import { KeyCode } from "../keycode/key_code.ts";
+import { KeyCode, parse } from "../keycode/key_code.ts";
 import { blue, bold, dim, green, italic, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
@@ -263,7 +263,7 @@ export abstract class GenericPrompt<
   #readKey = async (): Promise<KeyCode[]> => {
     const data: Uint8Array = await this.#readChar();
 
-    return data.length ? KeyCode.parse(data) : [];
+    return data.length ? parse(data) : [];
   };
 
   /** Read user input from stdin. */

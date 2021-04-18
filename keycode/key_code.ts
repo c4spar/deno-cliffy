@@ -6,7 +6,7 @@ import { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from "./key_codes.ts";
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = "\x1b";
 
-export interface KeyCodeOptions {
+export interface KeyCode {
   name?: string;
   sequence?: string;
   code?: string;
@@ -15,87 +15,53 @@ export interface KeyCodeOptions {
   shift?: boolean;
 }
 
-/** KeyCode representation. */
-export class KeyCode {
-  protected constructor(
-    public readonly name?: string,
-    public readonly sequence?: string,
-    public readonly code?: string,
-    public readonly ctrl = false,
-    public readonly meta = false,
-    public readonly shift = false,
-  ) {}
-
-  /**
-   * Create new KeyCode.
-   * @param key KeyCode options.
-   */
-  public static from(key: KeyCodeOptions): KeyCode {
-    return new this(
-      key.name,
-      key.sequence,
-      key.code,
-      key.ctrl,
-      key.meta,
-      key.shift,
-    );
-  }
-
-  /**
-   * Parse ansi escape sequence.
-   * @param data Ansi escape sequence.
-   * ```
-   * KeyCode.parse("\x04\x18");
-   * ```
-   * ```
-   * [
-   *   KeyCode { name: "d", sequence: "\x04", ctrl: true, meta: false, shift: false },
-   *   KeyCode { name: "x", sequence: "\x18", ctrl: true, meta: false, shift: false },
-   * ]
-   * ```
-   */
-  public static parse(data: Uint8Array | string): KeyCode[] {
-    try {
-      return parseEscapeSequence(data);
-    } catch (_) {
-      return [];
-    }
-  }
-}
-
 /**
- * Some patterns seen in terminal key escape codes, derived from combos seen
- * at http://www.midnight-commander.org/browser/lib/tty/key.c
- *
- * ESC letter
- * ESC [ letter
- * ESC [ modifier letter
- * ESC [ 1 ; modifier letter
- * ESC [ num char
- * ESC [ num ; modifier char
- * ESC O letter
- * ESC O modifier letter
- * ESC O 1 ; modifier letter
- * ESC N letter
- * ESC [ [ num ; modifier char
- * ESC [ [ 1 ; modifier letter
- * ESC ESC [ num char
- * ESC ESC O letter
- *
- * - char is usually ~ but $ and ^ also happen with rxvt
- * - modifier is 1 +
- *               (shift     * 1) +
- *               (left_alt  * 2) +
- *               (ctrl      * 4) +
- *               (right_alt * 8)
- * - two leading ESCs apparently mean the same as one leading ESC
+ * Parse ansi escape sequence.
+ * @param data Ansi escape sequence.
+ * ```
+ * parse("\x04\x18");
+ * ```
+ * ```
+ * [
+ *   KeyCode { name: "d", sequence: "\x04", ctrl: true, meta: false, shift: false },
+ *   KeyCode { name: "x", sequence: "\x18", ctrl: true, meta: false, shift: false },
+ * ]
+ * ```
  */
-function parseEscapeSequence(data: Uint8Array | string): KeyCode[] {
+export function parse(data: Uint8Array | string): KeyCode[] {
+  /*
+   * Some patterns seen in terminal key escape codes, derived from combos seen
+   * at http://www.midnight-commander.org/browser/lib/tty/key.c
+   *
+   * ESC letter
+   * ESC [ letter
+   * ESC [ modifier letter
+   * ESC [ 1 ; modifier letter
+   * ESC [ num char
+   * ESC [ num ; modifier char
+   * ESC O letter
+   * ESC O modifier letter
+   * ESC O 1 ; modifier letter
+   * ESC N letter
+   * ESC [ [ num ; modifier char
+   * ESC [ [ 1 ; modifier letter
+   * ESC ESC [ num char
+   * ESC ESC O letter
+   *
+   * - char is usually ~ but $ and ^ also happen with rxvt
+   * - modifier is 1 +
+   *               (shift     * 1) +
+   *               (left_alt  * 2) +
+   *               (ctrl      * 4) +
+   *               (right_alt * 8)
+   * - two leading ESCs apparently mean the same as one leading ESC
+   */
   let index = -1;
   const keys: KeyCode[] = [];
   const input: string = data instanceof Uint8Array
     ? new TextDecoder().decode(data)
     : data;
+
   const hasNext = () => input.length - 1 >= index + 1;
   const next = () => input[++index];
 
@@ -108,7 +74,7 @@ function parseEscapeSequence(data: Uint8Array | string): KeyCode[] {
     let s: string = ch;
     let escaped = false;
 
-    const key: KeyCodeOptions = {
+    const key: KeyCode = {
       name: undefined,
       sequence: undefined,
       code: undefined,
@@ -264,13 +230,12 @@ function parseEscapeSequence(data: Uint8Array | string): KeyCode[] {
     if (s.length !== 0 && (key.name !== undefined || escaped)) {
       /* Named character or sequence */
       // key.sequence = escaped ? undefined : s;
-      keys.push(KeyCode.from(key));
+      keys.push(key);
     } else if (charLengthAt(s, 0) === s.length) {
       /* Single unnamed character, e.g. "." */
       // key.sequence = s;
-      keys.push(KeyCode.from(key));
+      keys.push(key);
     } else {
-      /* Unrecognized or broken escape sequence. */
       throw new Error("Unrecognized or broken escape sequence");
     }
 
