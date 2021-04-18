@@ -44,8 +44,6 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [API](#-api)
-  - [KeyCode](#keycode)
-  - [KeyEvent](#keyevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -90,14 +88,15 @@ async function read(): Promise<void> {
 
   const data = buffer.subarray(0, nread);
 
-  const [event] = KeyCode.parse(data);
+  const events: Array<KeyCode> = KeyCode.parse(data);
 
-  if (event?.name === "c" && event.ctrl) {
-    console.log("exit");
-    return;
+  for (const event of events) {
+    if (event.ctrl && event.name === "c") {
+      console.log("exit");
+      return;
+    }
+    console.log(event);
   }
-
-  console.log(event);
 
   await read();
 }
@@ -113,14 +112,10 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
 
 ## ❯ API
 
-### KeyCode
-
-- parse( data: Uint8Array | string ): KeyEvent | undefined
-
-### KeyEvent
-
+- KeyCode.parse( data: Uint8Array | string ): Array<KeyCode>
 - name?: string
 - sequence?: string
+- code?: string
 - ctrl: boolean
 - meta: boolean
 - shift: boolean

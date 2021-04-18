@@ -1,7 +1,6 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode } from "../keycode/key_code.ts";
-import type { KeyEvent } from "../keycode/key_event.ts";
 import { blue, bold, dim, green, italic, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
@@ -162,7 +161,7 @@ export abstract class GenericPrompt<
       const value: V = GenericPrompt.injectedValue as V;
       await this.#validateValue(value);
     } else {
-      const events: KeyEvent[] = await this.#readKey();
+      const events: KeyCode[] = await this.#readKey();
 
       if (!events.length) {
         return false;
@@ -224,7 +223,7 @@ export abstract class GenericPrompt<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case event.name === "c" && event.ctrl:
         this.clear();
@@ -261,7 +260,7 @@ export abstract class GenericPrompt<
   protected abstract getValue(): V;
 
   /** Read user input from stdin and pars ansi codes. */
-  #readKey = async (): Promise<KeyEvent[]> => {
+  #readKey = async (): Promise<KeyCode[]> => {
     const data: Uint8Array = await this.#readChar();
 
     return data.length ? KeyCode.parse(data) : [];
@@ -347,7 +346,7 @@ export abstract class GenericPrompt<
   protected isKey<K extends unknown, N extends keyof K>(
     keys: K | undefined,
     name: N,
-    event: KeyEvent,
+    event: KeyCode,
   ): boolean {
     // deno-lint-ignore no-explicit-any
     const keyNames: Array<unknown> | undefined = keys?.[name] as any;
