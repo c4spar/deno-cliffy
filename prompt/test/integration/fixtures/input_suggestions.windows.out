@@ -1,0 +1,5 @@
+ ? Whats your name? (foo) » 
+   foo
+   bar
+   baz\x1b[3A\x1b[29G\x1b[G\x1b[0J ? Whats your name? (foo) » foo
+\x1b[?25h\x1b[?25h

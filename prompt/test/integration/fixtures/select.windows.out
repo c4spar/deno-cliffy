@@ -1,0 +1,8 @@
+ ? Select an option
+ ❯ Foo
+   Bar
+   Baz\x1b[3A\x1b[20G\x1b[?25l\x1b[G\x1b[0J ? Select an option
+   Foo
+ ❯ Bar
+   Baz\x1b[3A\x1b[20G\x1b[?25l\x1b[G\x1b[0J ? Select an option » Baz
+\x1b[?25h\x1b[?25h
