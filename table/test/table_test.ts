@@ -1,5 +1,10 @@
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
+import {
+  assertEquals,
+  assertStrictEquals,
+  assertThrows,
+} from "../../dev_deps.ts";
+import { Row } from "../row.ts";
 
 Deno.test("simple table", () => {
   assertEquals(
@@ -17,6 +22,114 @@ cell1 cell2 cell3`.slice(1),
   );
 });
 
+Deno.test("simple table from table", () => {
+  assertEquals(
+    Table.from(
+      new Table()
+        .header(["1", "2", "3"])
+        .body([
+          ["cell1", "cell2", "cell3"],
+          ["cell1", "cell2", "cell3"],
+          ["cell1", "cell2", "cell3"],
+        ]),
+    )
+      .padding(1)
+      .toString(),
+    `
+1     2     3    
+cell1 cell2 cell3
+cell1 cell2 cell3
+cell1 cell2 cell3`.slice(1),
+  );
+});
+
+Deno.test("simple table from json", () => {
+  assertEquals(
+    Table.fromJson([{
+      firstName: "foo",
+      lastName: "bar",
+      age: "3",
+    }, {
+      firstName: "foo",
+      lastName: "bar",
+      age: "44",
+    }, {
+      firstName: "foo",
+      lastName: "bar",
+      age: "132",
+    }])
+      .padding(1)
+      .toString(),
+    `
+firstName lastName age
+foo       bar      3  
+foo       bar      44 
+foo       bar      132`.slice(1),
+  );
+});
+
+Deno.test("clone simple table", () => {
+  const table1 = Table.from([
+    ["cell1", "cell2", "cell3"],
+    ["cell1", "cell2", "cell3"],
+    ["cell1", "cell2", "cell3"],
+  ]).padding(1);
+  const table2 = table1.clone();
+  const table3 = table2.clone();
+  assertEquals(table2, table3);
+  assertThrows(() => assertStrictEquals(table2, table3), Error);
+});
+
+Deno.test("table getter", () => {
+  const header = Row.from(["1", "2", "3"]).border(false);
+  const table = new Table()
+    .header(header)
+    .body([
+      ["cell1", "cell2", "cell3"],
+      ["cell1", "cell2", "cell3"],
+      ["cell1", "cell2", "cell3"],
+    ])
+    .minColWidth(3)
+    .maxColWidth(10)
+    .indent(2)
+    .padding(4)
+    .border(true);
+  assertEquals(table.getHeader(), header);
+  assertEquals(table.getBody(), [
+    ["cell1", "cell2", "cell3"],
+    ["cell1", "cell2", "cell3"],
+    ["cell1", "cell2", "cell3"],
+  ]);
+  assertEquals(table.getMinColWidth(), 3);
+  assertEquals(table.getMaxColWidth(), 10);
+  assertEquals(table.getIndent(), 2);
+  assertEquals(table.getPadding(), 4);
+  assertEquals(table.hasBorder(), true);
+  assertEquals(table.hasBodyBorder(), true);
+  assertEquals(table.hasHeaderBorder(), false);
+});
+
+Deno.test("simple table with min col with", () => {
+  assertEquals(
+    Table.from([
+      ["cell1", "cell2", "cell3"],
+      ["cell1", "cell2", "cell3"],
+      ["cell1", "cell2", "cell3"],
+    ])
+      .indent(2)
+      .indent(5, false)
+      .minColWidth(10)
+      .minColWidth(20, false)
+      .padding(1)
+      .padding(10, false)
+      .toString(),
+    `
+  cell1      cell2      cell3     
+  cell1      cell2      cell3     
+  cell1      cell2      cell3     `.slice(1),
+  );
+});
+
 Deno.test("simple table with word break", () => {
   assertEquals(
     Table.from([
@@ -25,6 +138,7 @@ Deno.test("simple table with word break", () => {
       ["cell1", "cell2", "cell3 cell3"],
     ])
       .maxColWidth(4)
+      .maxColWidth(20, false)
       .padding(1)
       .toString(),
     `
@@ -49,6 +163,7 @@ Deno.test("simple border table", () => {
       ["cell1", "cell2", "cell3"],
     ])
       .border(true)
+      .border(false, false)
       .toString(),
     `
 ┌───────┬───────┬───────┐
