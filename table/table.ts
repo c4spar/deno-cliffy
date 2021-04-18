@@ -206,7 +206,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
 
   /** Get table body. */
   public getBody(): T[] {
-    return this.slice();
+    return [...this];
   }
 
   /** Get mac col widrth. */
@@ -236,9 +236,8 @@ export class Table<T extends IRow = IRow> extends Array<T> {
 
   /** Check if header row has border. */
   public hasHeaderBorder(): boolean {
-    return this.getBorder() || (
-      this.headerRow instanceof Row && this.headerRow.hasBorder()
-    );
+    const hasBorder = this.headerRow?.hasBorder();
+    return hasBorder === true || (this.getBorder() && hasBorder !== false);
   }
 
   /** Check if table bordy has border. */
