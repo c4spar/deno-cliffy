@@ -108,7 +108,7 @@ console.log(
 ```typescript
 import { KeyCode, parse } from "https://deno.land/x/cliffy/keycode/mod.ts";
 
-async function* keypress(): AsyncGenerator<KeyCode> {
+async function* keypress(): AsyncGenerator<KeyCode, void> {
   while (true) {
     const data = new Uint8Array(8);
 

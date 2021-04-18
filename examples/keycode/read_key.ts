@@ -2,7 +2,7 @@
 
 import { KeyCode, parse } from "../../keycode/key_code.ts";
 
-async function* keypress(): AsyncGenerator<KeyCode> {
+async function* keypress(): AsyncGenerator<KeyCode, void> {
   while (true) {
     const data = new Uint8Array(8);
 
