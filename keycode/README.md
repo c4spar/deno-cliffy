@@ -91,6 +91,8 @@ console.log(
 );
 ```
 
+**Output:**
+
 ```json
 [
   { name: "up", sequence: "\x1b[A", code: "[A", ctrl: false, meta: false, shift: false },
