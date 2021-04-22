@@ -162,7 +162,6 @@ export class KeyPress extends EventTarget
       }
       throw error;
     }
-    await this.#eventLoop();
   };
 
   #read = async (): Promise<void> => {
