@@ -4,4 +4,4 @@ import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
 
 const event: KeyPressEvent | null = await keypress();
 
-console.log({ ...event });
+console.log(event);

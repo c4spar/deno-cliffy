@@ -1,34 +1,15 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyPress, keypress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
 
-const eventTarget: KeyPress = keypress();
-
-const timeout = setTimeout(() => {
-  // Dispose stops the event loop but not reading from stdin,
-  // because there is currently no way to abort reading from stdin.
-  eventTarget.dispose();
-  console.log("Press any key to exit.");
-}, 3000);
-
-// Register an event listener that is called an every keypress event.
-eventTarget.addEventListener("keypress", (event: KeyPressEvent) => {
-  console.log("event:", event);
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
+  console.log(event);
+  if (event.ctrlKey && event.key === "c") {
+    console.log("exit");
+    event.preventDefault();
+  }
 });
 
-// Register an event listener that is called only once.
-eventTarget.addEventListener("keypress", (event: KeyPressEvent) => {
-  console.log("first:", event);
-  // Prevents other listeners that was registered after this listener from being called
-  event.stopImmediatePropagation();
-}, {
-  // Executes the listener only once
-  once: true,
-});
-
-eventTarget.addEventListener("keypress", (event: KeyPressEvent) => {
-  console.log("second:", event);
-  // Stops the event loop and listening on keypress events.
-  event.preventDefault();
-  clearTimeout(timeout);
+keypress().addEventListener("keyup", (event: KeyPressEvent) => {
+  console.log(event.type);
 });

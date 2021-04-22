@@ -32,43 +32,54 @@ type KeyPressEventListenerOrEventListenerObject =
   | KeyPressEventListenerObject;
 
 export class KeyPressEvent extends Event {
-  public readonly name?: string;
+  public readonly key?: string;
   public readonly sequence?: string;
   public readonly code?: string;
-  public readonly ctrl: boolean;
-  public readonly meta: boolean;
-  public readonly shift: boolean;
+  public readonly ctrlKey: boolean;
+  public readonly metaKey: boolean;
+  public readonly shiftKey: boolean;
 
-  constructor(eventInitDict: KeyPressEventInit) {
-    super("keypress", eventInitDict);
-    this.name = eventInitDict.name;
+  constructor(
+    type: KeyPressEventType,
+    eventInitDict: KeyPressEventInit,
+  ) {
+    super(type, eventInitDict);
+    this.key = eventInitDict.name;
     this.sequence = eventInitDict.sequence;
     this.code = eventInitDict.code;
-    this.ctrl = eventInitDict.ctrl ?? false;
-    this.meta = eventInitDict.meta ?? false;
-    this.shift = eventInitDict.shift ?? false;
+    this.ctrlKey = eventInitDict.ctrl ?? false;
+    this.metaKey = eventInitDict.meta ?? false;
+    this.shiftKey = eventInitDict.shift ?? false;
   }
 }
 
+type KeyPressEventType = "keydown" | "keyup";
+
 export class KeyPress extends EventTarget
   implements AsyncIterableIterator<KeyPressEvent>, PromiseLike<KeyPressEvent> {
-  #listening: boolean = false;
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
   #pushQueue: (KeyPressEvent | null)[] = [];
+  #listeners: Record<KeyPressEventType, Set<any>> = {
+    keydown: new Set(),
+    keyup: new Set(),
+  };
 
   [Symbol.asyncIterator](): AsyncIterableIterator<KeyPressEvent> {
     return this;
   }
 
+  get disposed(): boolean {
+    return this.#disposed;
+  }
+
   async next(): Promise<IteratorResult<KeyPressEvent>> {
     const event: KeyPressEvent | null | false = !this.#disposed &&
       await this.#pullEvent();
-    if (!event) {
-      this.#listening = false;
-      return { done: true, value: undefined };
-    }
-    return { done: false, value: event };
+
+    return event && !this.#disposed
+      ? { done: false, value: event }
+      : { done: true, value: undefined };
   }
 
   then<T, S>(
@@ -76,36 +87,48 @@ export class KeyPress extends EventTarget
     g?: (v: Error) => S | Promise<S>,
   ): Promise<T | S> {
     return this.next()
-      .then(({ value }) => value)
+      .then(({ value }) => {
+        this.dispose();
+        return value;
+      })
       .then(f)
       .catch(g);
   }
 
   addEventListener(
-    type: "keypress",
+    type: "keydown",
     listener: KeyPressEventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
-    type: "keypress",
+    type: "keyup",
+    listener: KeyPressEventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void {
-    this.#listen();
+    if (!this.#hasListeners()) {
+      void this.#eventLoop();
+    }
     super.addEventListener(type, listener, options);
+    this.#listeners[type].add(listener);
   }
 
   removeEventListener(
-    type: "keypress",
+    type: "keydown",
     callback: KeyPressEventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void;
   removeEventListener(
-    type: "keypress",
-    callback: EventListenerOrEventListenerObject | null,
+    type: KeyPressEventType,
+    listener: EventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void {
-    super.removeEventListener(type, callback, options);
+    super.removeEventListener(type, listener, options);
+    this.#listeners[type].delete(listener);
   }
 
   dispose() {
@@ -113,13 +136,81 @@ export class KeyPress extends EventTarget
       throw new Error("KeyCodeStream already disposed");
     }
     this.#disposed = true;
-    Deno.stdin.close();
     if (this.#pullQueue.length > 0) {
       const { resolve } = this.#pullQueue[0];
       this.#pullQueue.shift();
       resolve(null);
     }
   }
+
+  #eventLoop = async (): Promise<void> => {
+    if (this.#disposed) {
+      return;
+    }
+    try {
+      await this.#read();
+      await new Promise((resolve) => setTimeout(resolve));
+      if (this.#pullQueue.length || this.#hasListeners()) {
+        await this.#eventLoop();
+      } else {
+        this.dispose();
+      }
+    } catch (error) {
+      if (this.#pullQueue.length > 0) {
+        const { reject } = this.#pullQueue.shift() as PullQueueItem;
+        return reject(error);
+      }
+      throw error;
+    }
+    await this.#eventLoop();
+  };
+
+  #read = async (): Promise<void> => {
+    const buffer = new Uint8Array(8);
+    // Deno.setRaw(Deno.stdin.rid, true, { cbreak: true });
+    Deno.setRaw(Deno.stdin.rid, true);
+    const nread: number | null = await Deno.stdin.read(buffer).catch(
+      (error) => {
+        if (!this.#disposed) {
+          throw error;
+        }
+        return null;
+      },
+    );
+    if (Deno.stdin.rid) {
+      Deno.setRaw(Deno.stdin.rid, false);
+    }
+    if (this.#disposed) {
+      return;
+    }
+
+    let keys;
+    if (nread === null) {
+      keys = KeyCode.parse(buffer);
+    } else {
+      keys = KeyCode.parse(buffer.subarray(0, nread));
+    }
+
+    for (const key of keys) {
+      const event = new KeyPressEvent("keydown", {
+        ...key,
+        cancelable: true,
+        composed: true,
+      });
+      if (this.#pullQueue.length || !this.#hasListeners()) {
+        this.#pushEvent(event);
+      }
+      if (this.#hasListeners()) {
+        const canceled = !this.dispatchEvent(event);
+        if (canceled || this.#disposed) {
+          if (!this.#disposed) {
+            this.dispose();
+          }
+          break;
+        }
+      }
+    }
+  };
 
   #pushEvent = (event: KeyPressEvent): void => {
     if (this.#pullQueue.length > 0) {
@@ -130,58 +221,32 @@ export class KeyPress extends EventTarget
     }
   };
 
-  #pullEvent = (): Promise<KeyPressEvent | null> => {
+  #pullEvent = async (): Promise<KeyPressEvent | null> => {
+    if (!this.#hasListeners()) {
+      await this.#read();
+    }
     return new Promise<KeyPressEvent | null>(
       (resolve: Resolver<KeyPressEvent | null>, reject: Reject) => {
         if (this.#pushQueue.length > 0) {
-          const event: KeyPressEvent | null = this.#pushQueue[0];
-          this.#pushQueue.shift();
+          const event: KeyPressEvent | null = this.#pushQueue.shift() ?? null;
           resolve(event);
         } else {
           this.#pullQueue.push({ resolve, reject });
-          this.#read().catch(reject);
         }
       },
     );
   };
 
-  #read = async (): Promise<void> => {
-    const buffer = new Uint8Array(8);
-    // Deno.setRaw(Deno.stdin.rid, true, { cbreak: true });
-    Deno.setRaw(Deno.stdin.rid, true);
-    const nread: number | null = await Deno.stdin.read(buffer);
-    Deno.setRaw(Deno.stdin.rid, false);
-    let keys;
-    if (nread === null) {
-      keys = KeyCode.parse(buffer);
-    } else {
-      keys = KeyCode.parse(buffer.subarray(0, nread));
-    }
-    for (const key of keys) {
-      this.#pushEvent(
-        new KeyPressEvent({
-          ...key,
-          cancelable: true,
-          composed: true,
-        }),
-      );
-    }
-  };
-
-  #listen = async (): Promise<void> => {
-    if (this.#listening) {
-      return;
-    }
-    this.#listening = true;
-    for await (const event of this) {
-      const canceled = !this.dispatchEvent(event);
-      if (canceled) {
-        break;
-      }
-    }
+  #hasListeners = (): boolean => {
+    return Object.values(this.#listeners).some((listeners) => listeners.size);
   };
 }
 
+let keyPress: KeyPress;
+
 export function keypress(): KeyPress {
-  return new KeyPress();
+  if (!keyPress || keyPress.disposed) {
+    keyPress = new KeyPress();
+  }
+  return keyPress;
 }
