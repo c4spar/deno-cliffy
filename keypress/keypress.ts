@@ -1,12 +1,7 @@
 import { KeyCode } from "../keycode/key_code.ts";
+import { KeyEvent } from "../keycode/key_event.ts";
 
-type Resolver<T> = (value: T | PromiseLike<T>) => void;
-type Reject = (error: Error) => void;
-
-interface PullQueueItem {
-  resolve: Resolver<KeyPressEvent | null>;
-  reject: Reject;
-}
+type KeyPressEventType = "keydown" | "keyup" | "error";
 
 interface KeyCodeOptions {
   name?: string;
@@ -15,6 +10,7 @@ interface KeyCodeOptions {
   ctrl?: boolean;
   meta?: boolean;
   shift?: boolean;
+  repeating?: boolean;
 }
 
 export type KeyPressEventListener = (
@@ -35,35 +31,70 @@ export class KeyPressEvent extends Event {
   public readonly key?: string;
   public readonly sequence?: string;
   public readonly code?: string;
+  public readonly repeating: boolean;
   public readonly ctrlKey: boolean;
   public readonly metaKey: boolean;
   public readonly shiftKey: boolean;
+  // public readonly altKey: boolean;
 
   constructor(
-    type: KeyPressEventType,
+    type: Exclude<KeyPressEventType, "error">,
     eventInitDict: KeyPressEventInit,
   ) {
     super(type, eventInitDict);
     this.key = eventInitDict.name;
     this.sequence = eventInitDict.sequence;
     this.code = eventInitDict.code;
+    this.repeating = eventInitDict.repeating ?? false;
     this.ctrlKey = eventInitDict.ctrl ?? false;
     this.metaKey = eventInitDict.meta ?? false;
     this.shiftKey = eventInitDict.shift ?? false;
   }
 }
 
-type KeyPressEventType = "keydown" | "keyup";
+export type KeyPressErrorEventListener = (
+  evt: KeyPressErrorEvent,
+) => void | Promise<void>;
+
+interface KeyPressErrorEventListenerObject {
+  handleEvent(evt: KeyPressErrorEvent): void | Promise<void>;
+}
+
+export type KeyPressErrorEventInit = ErrorEventInit;
+
+type KeyPressErrorEventListenerOrEventListenerObject =
+  | KeyPressErrorEventListener
+  | KeyPressErrorEventListenerObject;
+
+export class KeyPressErrorEvent extends ErrorEvent {
+  constructor(eventInitDict: KeyPressErrorEventInit) {
+    super("error", eventInitDict);
+  }
+}
+
+type Resolver<T> = (value: T | PromiseLike<T>) => void;
+type Reject = (error: Error) => void;
+
+interface PullQueueItem {
+  resolve: Resolver<KeyPressEvent | null>;
+  reject: Reject;
+}
 
 export class KeyPress extends EventTarget
   implements AsyncIterableIterator<KeyPressEvent>, PromiseLike<KeyPressEvent> {
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
   #pushQueue: (KeyPressEvent | null)[] = [];
-  #listeners: Record<KeyPressEventType, Set<any>> = {
+  #keyUpTimeout?: number;
+  #listeners: Record<
+    KeyPressEventType,
+    Set<EventListenerOrEventListenerObject | null>
+  > = {
     keydown: new Set(),
     keyup: new Set(),
+    error: new Set(),
   };
+  #lastEvent?: KeyPressEvent;
 
   [Symbol.asyncIterator](): AsyncIterableIterator<KeyPressEvent> {
     return this;
@@ -106,6 +137,11 @@ export class KeyPress extends EventTarget
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
+    type: "error",
+    listener: KeyPressErrorEventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  addEventListener(
     type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
@@ -120,6 +156,11 @@ export class KeyPress extends EventTarget
   removeEventListener(
     type: "keydown",
     callback: KeyPressEventListenerOrEventListenerObject | null,
+    options?: EventListenerOptions | boolean,
+  ): void;
+  removeEventListener(
+    type: "error",
+    callback: KeyPressErrorEventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void;
   removeEventListener(
@@ -156,6 +197,18 @@ export class KeyPress extends EventTarget
         this.dispose();
       }
     } catch (error) {
+      if (this.#hasListeners()) {
+        const canceled: boolean = this.dispatchEvent(
+          new ErrorEvent("error", {
+            error,
+            cancelable: true,
+            message: "Some unexpected error happened in keypress event loop",
+          }),
+        );
+        if (canceled) {
+          return this.#eventLoop();
+        }
+      }
       if (this.#pullQueue.length > 0) {
         const { reject } = this.#pullQueue.shift() as PullQueueItem;
         return reject(error);
@@ -183,7 +236,7 @@ export class KeyPress extends EventTarget
       return;
     }
 
-    let keys;
+    let keys: Array<KeyEvent & { repeating?: boolean }>;
     if (nread === null) {
       keys = KeyCode.parse(buffer);
     } else {
@@ -191,24 +244,47 @@ export class KeyPress extends EventTarget
     }
 
     for (const key of keys) {
-      const event = new KeyPressEvent("keydown", {
-        ...key,
-        cancelable: true,
-        composed: true,
-      });
-      if (this.#pullQueue.length || !this.#hasListeners()) {
-        this.#pushEvent(event);
+      clearTimeout(this.#keyUpTimeout);
+      this.#dispatchKeyPressEvent("keydown", key);
+      if (this.#disposed) {
+        break;
       }
-      if (this.#hasListeners()) {
-        const canceled = !this.dispatchEvent(event);
-        if (canceled || this.#disposed) {
-          if (!this.#disposed) {
-            this.dispose();
-          }
-          break;
+      this.#keyUpTimeout = setTimeout(() => {
+        this.#keyUpTimeout = undefined;
+        this.#dispatchKeyPressEvent("keyup", key);
+      }, this.#lastEvent?.repeating ? 100 : 500);
+    }
+  };
+
+  #dispatchKeyPressEvent = (
+    type: Exclude<KeyPressEventType, "error">,
+    key: KeyEvent,
+  ) => {
+    const event = new KeyPressEvent(type, {
+      ...key,
+      cancelable: true,
+      repeating: type === "keydown" && this.#lastEvent?.type === "keydown" &&
+        this.#lastEvent.sequence === key.sequence &&
+        Date.now() - this.#lastEvent.timeStamp <
+          (this.#lastEvent?.repeating ? 100 : 600),
+    });
+    if (
+      type === "keydown" && (this.#pullQueue.length || !this.#hasListeners())
+    ) {
+      this.#pushEvent(event);
+      this.#lastEvent = event;
+    }
+    if (this.#hasListeners()) {
+      const canceled = !this.dispatchEvent(event);
+      if (canceled || this.#disposed) {
+        if (!this.#disposed) {
+          this.dispose();
         }
       }
+      this.#lastEvent = event;
     }
+    // this.#lastEvent = event;
+    // console.log("last event:", this.#lastEvent.type);
   };
 
   #pushEvent = (event: KeyPressEvent): void => {
