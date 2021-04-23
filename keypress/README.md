@@ -42,6 +42,9 @@
 
 - [Install](#-install)
 - [Usage](#-usage)
+  - [Promise](#promise)
+  - [Async Iterator](#async-iterator)
+  - [Event Target](#event-target)
 - [API](#-api)
   - [Keypress](#keypress)
   - [KeyboardEvent](#keyboardevent)
@@ -135,7 +138,7 @@ for await (const event: KeyboardEvent of keypress()) {
 $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/async_iterator.ts
 ```
 
-## Event Listener
+## Event Target
 
 The Keypress class extends from the EventTarget class which provides a
 `.addEventListener()` method that can be used to register event listener.
