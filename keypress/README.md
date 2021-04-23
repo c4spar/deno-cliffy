@@ -95,7 +95,10 @@ The keypress module can be used as promise. The promise reads one chunk from
 stdin and returns and event for the first character from the chunk.
 
 ```typescript
-import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
+import {
+  KeyboardEvent,
+  keypress,
+} from "https://deno.land/x/cliffy/keypress/mod.ts";
 
 const event: KeyboardEvent = await keypress();
 
@@ -112,7 +115,7 @@ console.log(
 ```
 
 ```
-$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/promise.ts
+$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/promise.ts
 ```
 
 ## Async Iterator
@@ -125,7 +128,7 @@ blocked inside your loop. It starts reading again from stdin as soon as the next
 method from the iterator is called.
 
 ```typescript
-import { Keypress, keypress } from "../../keypress/keypress.ts";
+import { Keypress, keypress } from "https://deno.land/x/cliffy/keypress/mod.ts";
 
 for await (const event: KeyboardEvent of keypress()) {
   console.log(
@@ -146,7 +149,7 @@ for await (const event: KeyboardEvent of keypress()) {
 ```
 
 ```
-$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/async_iterator.ts
+$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/async_iterator.ts
 ```
 
 ## Event Target
@@ -160,7 +163,10 @@ and async iterator based solution does not spin up an event loop in the
 background.
 
 ```typescript
-import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
+import {
+  KeyboardEvent,
+  keypress,
+} from "https://deno.land/x/cliffy/keypress/mod.ts";
 
 keypress().addEventListener("keydown", (event: KeyboardEvent) => {
   console.log(
@@ -181,7 +187,7 @@ keypress().addEventListener("keydown", (event: KeyboardEvent) => {
 ```
 
 ```
-$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event_target.ts
+$ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/event_target.ts
 ```
 
 ## ❯ API
