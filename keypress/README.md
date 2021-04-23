@@ -163,15 +163,17 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event
 
 ### KeyPress
 
-- parse( data: Uint8Array | string ): KeyEvent | undefined
+- keypress(): Promise<KeyPressEvent> | AsyncIterator<KeyPressEvent> | EventTarget
+- new KeyPress(): Promise<KeyPressEvent> | AsyncIterator<KeyPressEvent> | EventTarget
 
 ### KeyPressEvent
 
-- name?: string
+- key?: string
 - sequence?: string
-- ctrl: boolean
-- meta: boolean
-- shift: boolean
+- code?: string
+- ctrlKey: boolean
+- metaKey: boolean
+- shiftKey: boolean
 
 ## ❯ Contributing
 
