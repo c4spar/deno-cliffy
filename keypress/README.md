@@ -93,12 +93,14 @@ import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 const event: KeyboardEvent = await keypress();
 
 console.log(
-  "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
+  "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
   event.type,
   event.key,
   event.ctrlKey,
   event.metaKey,
   event.shiftKey,
+  event.altKey,
+  event.repeat,
 );
 ```
 
@@ -113,12 +115,14 @@ import { Keypress, keypress } from "../../keypress/keypress.ts";
 
 for await (const event: KeyboardEvent of keypress()) {
   console.log(
-    "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
+    "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,
     event.key,
     event.ctrlKey,
     event.metaKey,
     event.shiftKey,
+    event.altKey,
+    event.repeat,
   );
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
@@ -141,12 +145,14 @@ import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
 keypress().addEventListener("keydown", (event: KeyboardEvent) => {
   console.log(
-    "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
+    "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,
     event.key,
     event.ctrlKey,
     event.metaKey,
     event.shiftKey,
+    event.altKey,
+    event.repeat,
   );
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");

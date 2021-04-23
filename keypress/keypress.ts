@@ -11,6 +11,7 @@ interface KeyCodeOptions {
   meta?: boolean;
   shift?: boolean;
   alt?: boolean;
+  repeat?: boolean;
 }
 
 export type KeyboardEventListener = (
@@ -35,6 +36,7 @@ export class KeyboardEvent extends Event {
   public readonly metaKey: boolean;
   public readonly shiftKey: boolean;
   public readonly altKey: boolean;
+  public readonly repeat: boolean;
 
   constructor(
     type: KeyboardEventType,
@@ -48,6 +50,7 @@ export class KeyboardEvent extends Event {
     this.metaKey = eventInitDict.meta ?? false;
     this.shiftKey = eventInitDict.shift ?? false;
     this.altKey = eventInitDict.alt ?? false;
+    this.repeat = eventInitDict.repeat ?? false;
   }
 }
 
@@ -64,6 +67,7 @@ export class Keypress extends EventTarget
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
   #pushQueue: (KeyboardEvent | null)[] = [];
+  #lastEvent?: KeyboardEvent;
   #listeners: Record<
     KeyboardEventType,
     Set<EventListenerOrEventListenerObject | null>
@@ -196,6 +200,8 @@ export class Keypress extends EventTarget
       const event = new KeyboardEvent("keydown", {
         ...key,
         cancelable: true,
+        repeat: this.#lastEvent && this.#lastEvent.sequence === key.sequence &&
+          Date.now() - this.#lastEvent.timeStamp < 100,
       });
       if (this.#pullQueue.length || !this.#hasListeners()) {
         this.#pushEvent(event);
@@ -209,6 +215,7 @@ export class Keypress extends EventTarget
           break;
         }
       }
+      this.#lastEvent = event;
     }
   };
 
