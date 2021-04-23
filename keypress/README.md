@@ -35,7 +35,7 @@
 </p>
 
 <p align="center">
-  <b>Keypress module with promise, async iterator and event listener API</b></br>
+  <b>Keypress module with promise, async iterator and event target API</b></br>
 </p>
 
 ## ❯ Content
