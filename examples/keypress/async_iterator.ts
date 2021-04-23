@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
-for await (const event: KeyPressEvent of keypress()) {
+for await (const event: KeyboardEvent of keypress()) {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,

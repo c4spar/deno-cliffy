@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
-keypress().addEventListener("keydown", (event: KeyPressEvent) => {
+keypress().addEventListener("keydown", (event: KeyboardEvent) => {
   console.log("# event");
   if (event.ctrlKey && event.key === "x") {
     console.log("Canceled within event listener.");

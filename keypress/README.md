@@ -1,4 +1,4 @@
-<h1 align="center">Cliffy ❯ KeyPress </h1>
+<h1 align="center">Cliffy ❯ Keypress </h1>
 
 <p align="center" class="badges-container">
   <a href="https://github.com/c4spar/deno-cliffy/releases">
@@ -43,8 +43,8 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [API](#-api)
-  - [KeyPress](#KeyPress)
-  - [KeyPressEvent](#keypressevent)
+  - [Keypress](#keypress)
+  - [KeyboardEvent](#keyboardevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -57,9 +57,9 @@ Deno Registry
 
 ```typescript
 import {
-  KeyPress,
+  KeyboardEvent,
+  Keypress,
   keypress,
-  KeyPressEvent,
 } from "https://deno.land/x/cliffy@<version>/keypress/mod.ts";
 ```
 
@@ -67,9 +67,9 @@ Nest Registry
 
 ```typescript
 import {
-  KeyPress,
+  KeyboardEvent,
+  Keypress,
   keypress,
-  KeyPressEvent,
 } from "https://x.nest.land/cliffy@<version>/keypress/mod.ts";
 ```
 
@@ -77,9 +77,9 @@ Github
 
 ```typescript
 import {
-  KeyPress,
+  KeyboardEvent,
+  Keypress,
   keypress,
-  KeyPressEvent,
 } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keypress/mod.ts";
 ```
 
@@ -88,9 +88,9 @@ import {
 ## Promise
 
 ```typescript
-import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
-const event: KeyPressEvent = await keypress();
+const event: KeyboardEvent = await keypress();
 
 console.log(
   "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
@@ -109,9 +109,9 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/promi
 ## Async Iterator
 
 ```typescript
-import { KeyPress, keypress } from "../../keypress/keypress.ts";
+import { Keypress, keypress } from "../../keypress/keypress.ts";
 
-for await (const event: KeyPressEvent of keypress()) {
+for await (const event: KeyboardEvent of keypress()) {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
@@ -133,13 +133,13 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/async
 
 ## Event Listener
 
-The KeyPress class extends from the EventTarget class which provides a
+The Keypress class extends from the EventTarget class which provides a
 `.addEventListener()` method that can be used to register event listener.
 
 ```typescript
-import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
-keypress().addEventListener("keydown", (event: KeyPressEvent) => {
+keypress().addEventListener("keydown", (event: KeyboardEvent) => {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
@@ -161,12 +161,14 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event
 
 ## ❯ API
 
-### KeyPress
+### Keypress
 
-- keypress(): Promise\<KeyPressEvent> | AsyncIterator\<KeyPressEvent> | EventTarget
-- new KeyPress(): Promise\<KeyPressEvent> | AsyncIterator\<KeyPressEvent> | EventTarget
+- keypress(): Promise\<KeyboardEvent> | AsyncIterator\<KeyboardEvent> |
+  EventTarget
+- new Keypress(): Promise\<KeyboardEvent> | AsyncIterator\<KeyboardEvent> |
+  EventTarget
 
-### KeyPressEvent
+### KeyboardEvent
 
 - key?: string
 - sequence?: string

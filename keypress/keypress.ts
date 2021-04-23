@@ -1,7 +1,7 @@
 import { KeyCode } from "../keycode/key_code.ts";
 import { KeyEvent } from "../keycode/key_event.ts";
 
-type KeyPressEventType = "keydown";
+type KeyboardEventType = "keydown";
 
 interface KeyCodeOptions {
   name?: string;
@@ -10,35 +10,35 @@ interface KeyCodeOptions {
   ctrl?: boolean;
   meta?: boolean;
   shift?: boolean;
+  alt?: boolean;
 }
 
-export type KeyPressEventListener = (
-  evt: KeyPressEvent,
+export type KeyboardEventListener = (
+  evt: KeyboardEvent,
 ) => void | Promise<void>;
 
-interface KeyPressEventListenerObject {
-  handleEvent(evt: KeyPressEvent): void | Promise<void>;
+interface KeyboardEventListenerObject {
+  handleEvent(evt: KeyboardEvent): void | Promise<void>;
 }
 
-export type KeyPressEventInit = EventInit & KeyCodeOptions;
+export type KeyboardEventInit = EventInit & KeyCodeOptions;
 
-type KeyPressEventListenerOrEventListenerObject =
-  | KeyPressEventListener
-  | KeyPressEventListenerObject;
+type KeyboardEventListenerOrEventListenerObject =
+  | KeyboardEventListener
+  | KeyboardEventListenerObject;
 
-export class KeyPressEvent extends Event {
+export class KeyboardEvent extends Event {
   public readonly key?: string;
   public readonly sequence?: string;
   public readonly code?: string;
   public readonly ctrlKey: boolean;
   public readonly metaKey: boolean;
   public readonly shiftKey: boolean;
-
-  // public readonly altKey: boolean;
+  public readonly altKey: boolean;
 
   constructor(
-    type: KeyPressEventType,
-    eventInitDict: KeyPressEventInit,
+    type: KeyboardEventType,
+    eventInitDict: KeyboardEventInit,
   ) {
     super(type, eventInitDict);
     this.key = eventInitDict.name;
@@ -47,6 +47,7 @@ export class KeyPressEvent extends Event {
     this.ctrlKey = eventInitDict.ctrl ?? false;
     this.metaKey = eventInitDict.meta ?? false;
     this.shiftKey = eventInitDict.shift ?? false;
+    this.altKey = eventInitDict.alt ?? false;
   }
 }
 
@@ -54,23 +55,23 @@ type Resolver<T> = (value: T | PromiseLike<T>) => void;
 type Reject = (error: Error) => void;
 
 interface PullQueueItem {
-  resolve: Resolver<KeyPressEvent | null>;
+  resolve: Resolver<KeyboardEvent | null>;
   reject: Reject;
 }
 
-export class KeyPress extends EventTarget
-  implements AsyncIterableIterator<KeyPressEvent>, PromiseLike<KeyPressEvent> {
+export class Keypress extends EventTarget
+  implements AsyncIterableIterator<KeyboardEvent>, PromiseLike<KeyboardEvent> {
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
-  #pushQueue: (KeyPressEvent | null)[] = [];
+  #pushQueue: (KeyboardEvent | null)[] = [];
   #listeners: Record<
-    KeyPressEventType,
+    KeyboardEventType,
     Set<EventListenerOrEventListenerObject | null>
   > = {
     keydown: new Set(),
   };
 
-  [Symbol.asyncIterator](): AsyncIterableIterator<KeyPressEvent> {
+  [Symbol.asyncIterator](): AsyncIterableIterator<KeyboardEvent> {
     return this;
   }
 
@@ -78,8 +79,8 @@ export class KeyPress extends EventTarget
     return this.#disposed;
   }
 
-  async next(): Promise<IteratorResult<KeyPressEvent>> {
-    const event: KeyPressEvent | null | false = !this.#disposed &&
+  async next(): Promise<IteratorResult<KeyboardEvent>> {
+    const event: KeyboardEvent | null | false = !this.#disposed &&
       await this.#pullEvent();
 
     return event && !this.#disposed
@@ -88,7 +89,7 @@ export class KeyPress extends EventTarget
   }
 
   then<T, S>(
-    f: (v: KeyPressEvent) => T | Promise<T>,
+    f: (v: KeyboardEvent) => T | Promise<T>,
     g?: (v: Error) => S | Promise<S>,
   ): Promise<T | S> {
     return this.next()
@@ -102,11 +103,11 @@ export class KeyPress extends EventTarget
 
   addEventListener(
     type: "keydown",
-    listener: KeyPressEventListenerOrEventListenerObject | null,
+    listener: KeyboardEventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
-    type: KeyPressEventType,
+    type: KeyboardEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void {
@@ -119,11 +120,11 @@ export class KeyPress extends EventTarget
 
   removeEventListener(
     type: "keydown",
-    callback: KeyPressEventListenerOrEventListenerObject | null,
+    callback: KeyboardEventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void;
   removeEventListener(
-    type: KeyPressEventType,
+    type: KeyboardEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void {
@@ -192,7 +193,7 @@ export class KeyPress extends EventTarget
 
   #dispatch = (keys: Array<KeyEvent>): void => {
     for (const key of keys) {
-      const event = new KeyPressEvent("keydown", {
+      const event = new KeyboardEvent("keydown", {
         ...key,
         cancelable: true,
       });
@@ -211,7 +212,7 @@ export class KeyPress extends EventTarget
     }
   };
 
-  #pushEvent = (event: KeyPressEvent): void => {
+  #pushEvent = (event: KeyboardEvent): void => {
     if (this.#pullQueue.length > 0) {
       const { resolve } = this.#pullQueue.shift() as PullQueueItem;
       resolve(event);
@@ -220,14 +221,14 @@ export class KeyPress extends EventTarget
     }
   };
 
-  #pullEvent = async (): Promise<KeyPressEvent | null> => {
+  #pullEvent = async (): Promise<KeyboardEvent | null> => {
     if (!this.#hasListeners()) {
       await this.#read();
     }
-    return new Promise<KeyPressEvent | null>(
-      (resolve: Resolver<KeyPressEvent | null>, reject: Reject) => {
+    return new Promise<KeyboardEvent | null>(
+      (resolve: Resolver<KeyboardEvent | null>, reject: Reject) => {
         if (this.#pushQueue.length > 0) {
-          const event: KeyPressEvent | null = this.#pushQueue.shift() ?? null;
+          const event: KeyboardEvent | null = this.#pushQueue.shift() ?? null;
           resolve(event);
         } else {
           this.#pullQueue.push({ resolve, reject });
@@ -241,11 +242,11 @@ export class KeyPress extends EventTarget
   };
 }
 
-let keyPress: KeyPress;
+let keyPress: Keypress;
 
-export function keypress(): KeyPress {
+export function keypress(): Keypress {
   if (!keyPress || keyPress.disposed) {
-    keyPress = new KeyPress();
+    keyPress = new Keypress();
   }
   return keyPress;
 }
