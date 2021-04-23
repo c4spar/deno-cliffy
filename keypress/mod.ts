@@ -175,9 +175,8 @@ export class Keypress extends EventTarget
         return null;
       },
     );
-    if (Deno.stdin.rid) {
-      Deno.setRaw(Deno.stdin.rid, false);
-    }
+    Deno.setRaw(Deno.stdin.rid, false);
+
     if (this.#disposed) {
       return;
     }
