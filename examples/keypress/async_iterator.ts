@@ -3,7 +3,14 @@
 import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
 
 for await (const event: KeyPressEvent of keypress()) {
-  console.log("type: %s, repeating: %s", event.type, event.repeating);
+  console.log(
+    "type: %s, key: %s, ctrlKey: %s, metaKey: %s, shiftKey: %s",
+    event.type,
+    event.key,
+    event.ctrlKey,
+    event.metaKey,
+    event.shiftKey,
+  );
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
     break;

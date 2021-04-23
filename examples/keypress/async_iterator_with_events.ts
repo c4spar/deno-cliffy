@@ -1,31 +1,25 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyPress, KeyPressEvent } from "../../keypress/keypress.ts";
+import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
 
-const keypress: KeyPress = new KeyPress();
-
-const timeout: number = setTimeout(() => {
-  console.log("auto dispose");
-  keypress.dispose();
-  Deno.stdin.close();
-}, 3000);
-
-keypress.addEventListener("keypress", (event: KeyPressEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log("# event");
   if (event.ctrlKey && event.key === "x") {
     console.log("Canceled within event listener.");
+    // Stop event loop and iterator.
     event.preventDefault();
-    // keypress.dispose();
-    clearTimeout(timeout);
+    // same as:
+    // keypress().dispose();
   }
 });
 
-for await (const event of keypress) {
+for await (const event of keypress()) {
   console.log("# iterator");
   if (event.ctrlKey && event.key === "c") {
     console.log("Canceled within for loop.");
-    keypress.dispose();
-    clearTimeout(timeout);
+    // Stop event loop.
+    keypress().dispose();
+    // Stop iterator.
     break;
   }
 }

@@ -1,7 +1,7 @@
 import { KeyCode } from "../keycode/key_code.ts";
 import { KeyEvent } from "../keycode/key_event.ts";
 
-type KeyPressEventType = "keydown" | "keyup" | "error";
+type KeyPressEventType = "keydown";
 
 interface KeyCodeOptions {
   name?: string;
@@ -10,7 +10,6 @@ interface KeyCodeOptions {
   ctrl?: boolean;
   meta?: boolean;
   shift?: boolean;
-  repeating?: boolean;
 }
 
 export type KeyPressEventListener = (
@@ -31,44 +30,23 @@ export class KeyPressEvent extends Event {
   public readonly key?: string;
   public readonly sequence?: string;
   public readonly code?: string;
-  public readonly repeating: boolean;
   public readonly ctrlKey: boolean;
   public readonly metaKey: boolean;
   public readonly shiftKey: boolean;
+
   // public readonly altKey: boolean;
 
   constructor(
-    type: Exclude<KeyPressEventType, "error">,
+    type: KeyPressEventType,
     eventInitDict: KeyPressEventInit,
   ) {
     super(type, eventInitDict);
     this.key = eventInitDict.name;
     this.sequence = eventInitDict.sequence;
     this.code = eventInitDict.code;
-    this.repeating = eventInitDict.repeating ?? false;
     this.ctrlKey = eventInitDict.ctrl ?? false;
     this.metaKey = eventInitDict.meta ?? false;
     this.shiftKey = eventInitDict.shift ?? false;
-  }
-}
-
-export type KeyPressErrorEventListener = (
-  evt: KeyPressErrorEvent,
-) => void | Promise<void>;
-
-interface KeyPressErrorEventListenerObject {
-  handleEvent(evt: KeyPressErrorEvent): void | Promise<void>;
-}
-
-export type KeyPressErrorEventInit = ErrorEventInit;
-
-type KeyPressErrorEventListenerOrEventListenerObject =
-  | KeyPressErrorEventListener
-  | KeyPressErrorEventListenerObject;
-
-export class KeyPressErrorEvent extends ErrorEvent {
-  constructor(eventInitDict: KeyPressErrorEventInit) {
-    super("error", eventInitDict);
   }
 }
 
@@ -85,16 +63,12 @@ export class KeyPress extends EventTarget
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
   #pushQueue: (KeyPressEvent | null)[] = [];
-  #keyUpTimeout?: number;
   #listeners: Record<
     KeyPressEventType,
     Set<EventListenerOrEventListenerObject | null>
   > = {
     keydown: new Set(),
-    keyup: new Set(),
-    error: new Set(),
   };
-  #lastEvent?: KeyPressEvent;
 
   [Symbol.asyncIterator](): AsyncIterableIterator<KeyPressEvent> {
     return this;
@@ -114,7 +88,7 @@ export class KeyPress extends EventTarget
   }
 
   then<T, S>(
-    f: (v: KeyPressEvent | null) => T | Promise<T>,
+    f: (v: KeyPressEvent) => T | Promise<T>,
     g?: (v: Error) => S | Promise<S>,
   ): Promise<T | S> {
     return this.next()
@@ -129,16 +103,6 @@ export class KeyPress extends EventTarget
   addEventListener(
     type: "keydown",
     listener: KeyPressEventListenerOrEventListenerObject | null,
-    options?: boolean | AddEventListenerOptions,
-  ): void;
-  addEventListener(
-    type: "keyup",
-    listener: KeyPressEventListenerOrEventListenerObject | null,
-    options?: boolean | AddEventListenerOptions,
-  ): void;
-  addEventListener(
-    type: "error",
-    listener: KeyPressErrorEventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
@@ -159,11 +123,6 @@ export class KeyPress extends EventTarget
     options?: EventListenerOptions | boolean,
   ): void;
   removeEventListener(
-    type: "error",
-    callback: KeyPressErrorEventListenerOrEventListenerObject | null,
-    options?: EventListenerOptions | boolean,
-  ): void;
-  removeEventListener(
     type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
@@ -172,15 +131,15 @@ export class KeyPress extends EventTarget
     this.#listeners[type].delete(listener);
   }
 
-  dispose() {
+  dispose(error?: Error) {
     if (this.#disposed) {
       throw new Error("KeyCodeStream already disposed");
     }
     this.#disposed = true;
     if (this.#pullQueue.length > 0) {
-      const { resolve } = this.#pullQueue[0];
+      const { resolve, reject } = this.#pullQueue[0];
       this.#pullQueue.shift();
-      resolve(null);
+      error ? reject(error) : resolve(null);
     }
   }
 
@@ -188,32 +147,14 @@ export class KeyPress extends EventTarget
     if (this.#disposed) {
       return;
     }
-    try {
-      await this.#read();
-      await new Promise((resolve) => setTimeout(resolve));
-      if (this.#pullQueue.length || this.#hasListeners()) {
-        await this.#eventLoop();
-      } else {
-        this.dispose();
-      }
-    } catch (error) {
-      if (this.#hasListeners()) {
-        const canceled: boolean = this.dispatchEvent(
-          new ErrorEvent("error", {
-            error,
-            cancelable: true,
-            message: "Some unexpected error happened in keypress event loop",
-          }),
-        );
-        if (canceled) {
-          return this.#eventLoop();
-        }
-      }
-      if (this.#pullQueue.length > 0) {
-        const { reject } = this.#pullQueue.shift() as PullQueueItem;
-        return reject(error);
-      }
-      throw error;
+    await this.#read();
+
+    // Jump into the next cycle of deno's event loop.
+    await new Promise((resolve) => setTimeout(resolve));
+
+    // Stop event loop if there are no listeners available.
+    if (this.#pullQueue.length || this.#hasListeners()) {
+      await this.#eventLoop();
     }
   };
 
@@ -224,7 +165,7 @@ export class KeyPress extends EventTarget
     const nread: number | null = await Deno.stdin.read(buffer).catch(
       (error) => {
         if (!this.#disposed) {
-          throw error;
+          this.dispose(error);
         }
         return null;
       },
@@ -236,55 +177,38 @@ export class KeyPress extends EventTarget
       return;
     }
 
-    let keys: Array<KeyEvent & { repeating?: boolean }>;
-    if (nread === null) {
-      keys = KeyCode.parse(buffer);
-    } else {
-      keys = KeyCode.parse(buffer.subarray(0, nread));
+    let keys: Array<KeyEvent>;
+    try {
+      keys = nread === null
+        ? KeyCode.parse(buffer)
+        : KeyCode.parse(buffer.subarray(0, nread));
+    } catch (_) {
+      // Ignore invalid characters and read again from stdin.
+      return this.#read();
     }
 
-    for (const key of keys) {
-      clearTimeout(this.#keyUpTimeout);
-      this.#dispatchKeyPressEvent("keydown", key);
-      if (this.#disposed) {
-        break;
-      }
-      this.#keyUpTimeout = setTimeout(() => {
-        this.#keyUpTimeout = undefined;
-        this.#dispatchKeyPressEvent("keyup", key);
-      }, this.#lastEvent?.repeating ? 100 : 500);
-    }
+    this.#dispatch(keys);
   };
 
-  #dispatchKeyPressEvent = (
-    type: Exclude<KeyPressEventType, "error">,
-    key: KeyEvent,
-  ) => {
-    const event = new KeyPressEvent(type, {
-      ...key,
-      cancelable: true,
-      repeating: type === "keydown" && this.#lastEvent?.type === "keydown" &&
-        this.#lastEvent.sequence === key.sequence &&
-        Date.now() - this.#lastEvent.timeStamp <
-          (this.#lastEvent?.repeating ? 100 : 600),
-    });
-    if (
-      type === "keydown" && (this.#pullQueue.length || !this.#hasListeners())
-    ) {
-      this.#pushEvent(event);
-      this.#lastEvent = event;
-    }
-    if (this.#hasListeners()) {
-      const canceled = !this.dispatchEvent(event);
-      if (canceled || this.#disposed) {
-        if (!this.#disposed) {
-          this.dispose();
+  #dispatch = (keys: Array<KeyEvent>): void => {
+    for (const key of keys) {
+      const event = new KeyPressEvent("keydown", {
+        ...key,
+        cancelable: true,
+      });
+      if (this.#pullQueue.length || !this.#hasListeners()) {
+        this.#pushEvent(event);
+      }
+      if (this.#hasListeners()) {
+        const canceled = !this.dispatchEvent(event);
+        if (canceled || this.#disposed) {
+          if (!this.#disposed) {
+            this.dispose();
+          }
+          break;
         }
       }
-      this.#lastEvent = event;
     }
-    // this.#lastEvent = event;
-    // console.log("last event:", this.#lastEvent.type);
   };
 
   #pushEvent = (event: KeyPressEvent): void => {
