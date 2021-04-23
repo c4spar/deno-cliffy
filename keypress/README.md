@@ -43,8 +43,8 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [API](#-api)
-  - [KeyCode](#keycode)
-  - [KeyEvent](#keyevent)
+  - [KeyPress](#KeyPress)
+  - [KeyPressEvent](#keypressevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
