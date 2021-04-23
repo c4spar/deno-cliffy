@@ -46,6 +46,7 @@
   - [Async Iterator](#async-iterator)
   - [Event Target](#event-target)
 - [API](#-api)
+  - [keypress](#keypress)
   - [Keypress](#keypress)
   - [KeyboardEvent](#keyboardevent)
 - [Contributing](#-contributing)
@@ -185,10 +186,12 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event
 
 ## ❯ API
 
+### keypress
+
+- keypress(): Keypress
+
 ### Keypress
 
-- keypress(): Promise\<KeyboardEvent> | AsyncIterator\<KeyboardEvent> |
-  EventTarget
 - new Keypress(): Promise\<KeyboardEvent> | AsyncIterator\<KeyboardEvent> |
   EventTarget
 
