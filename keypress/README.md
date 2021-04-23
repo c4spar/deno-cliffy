@@ -47,7 +47,7 @@
   - [Event Target](#event-target)
 - [API](#-api)
   - [keypress](#keypress)
-  - [Keypress](#keypress)
+  - [Keypress](#keypress-1)
   - [KeyboardEvent](#keyboardevent)
 - [Contributing](#-contributing)
 - [License](#-license)
