@@ -203,6 +203,8 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event
 - ctrlKey: boolean
 - metaKey: boolean
 - shiftKey: boolean
+- altKey: boolean
+- repeat: boolean
 
 ## ❯ Contributing
 
