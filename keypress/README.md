@@ -90,6 +90,9 @@ import {
 
 ## Promise
 
+The keypress module can be used as promise. The promise reads one chunk from
+stdin and returns and event for the first character from the chunk.
+
 ```typescript
 import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
 
@@ -112,6 +115,13 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/promi
 ```
 
 ## Async Iterator
+
+The keypress module can be used as async iterator to iterate over all keyboard
+events. The async iterator reads chunk by chunk from stdin. On each step, it
+reads one chunk from stdin and emits for each character a keyboard event. It
+pauses reading from stdin before emitting the keyboard event, so stdin is not
+blocked inside your loop. It starts reading again from stdin as soon as the next
+method from the iterator is called.
 
 ```typescript
 import { Keypress, keypress } from "../../keypress/keypress.ts";
@@ -141,7 +151,12 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/async
 ## Event Target
 
 The Keypress class extends from the EventTarget class which provides a
-`.addEventListener()` method that can be used to register event listener.
+`.addEventListener()` method that can be used to register event listeners. The
+addEventListener method starts an event loop in the background which reads from
+stdin and emits for each input an event. The event loop can to be stopped with
+`event.preventDefault()` and `keypress().dispose()`. For comparison, the promise
+and async iterator based solution does not spin up an event loop in the
+background.
 
 ```typescript
 import { KeyboardEvent, keypress } from "../../keypress/keypress.ts";
