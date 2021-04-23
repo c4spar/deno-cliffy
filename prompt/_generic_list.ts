@@ -1,4 +1,4 @@
-import { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import {
   GenericInput,
   GenericInputKeys,
