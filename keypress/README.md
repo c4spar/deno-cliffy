@@ -163,8 +163,8 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keycode/event
 
 ### KeyPress
 
-- keypress(): Promise<KeyPressEvent> | AsyncIterator<KeyPressEvent> | EventTarget
-- new KeyPress(): Promise<KeyPressEvent> | AsyncIterator<KeyPressEvent> | EventTarget
+- keypress(): Promise\<KeyPressEvent> | AsyncIterator\<KeyPressEvent> | EventTarget
+- new KeyPress(): Promise\<KeyPressEvent> | AsyncIterator\<KeyPressEvent> | EventTarget
 
 ### KeyPressEvent
 
