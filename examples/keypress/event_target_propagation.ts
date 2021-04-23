@@ -5,7 +5,7 @@ import { keypress, KeyPressEvent } from "../../keypress/keypress.ts";
 // Register an event listener that is called an every keydown event.
 keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
-    "# event - type: %s, key: %s, ctrlKey: %s, metaKey: %s, shiftKey: %s",
+    "# event - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
     event.key,
     event.ctrlKey,
@@ -17,7 +17,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
 // Register an event listener that is called only once.
 keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
-    "# first - type: %s, key: %s, ctrlKey: %s, metaKey: %s, shiftKey: %s",
+    "# first - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
     event.key,
     event.ctrlKey,
@@ -33,7 +33,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
 
 keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
-    "# second - type: %s, key: %s, ctrlKey: %s, metaKey: %s, shiftKey: %s",
+    "# second - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
     event.key,
     event.ctrlKey,
