@@ -84,6 +84,16 @@ interface IDefaultOption<
 type OneOf<T, V> = T extends void ? V : T;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 
+type MapOptionTypes<O extends Record<string, unknown> | void> = O extends
+  Record<string, unknown>
+  ? { [K in keyof O]: O[K] extends Type<infer T> ? T : O[K] }
+  : void;
+
+type MapArgumentTypes<A extends Array<unknown>> = A extends Array<unknown>
+  ? { [I in keyof A]: A[I] extends Type<infer T> ? T : A[I] }
+  : // deno-lint-ignore no-explicit-any
+  any;
+
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
@@ -271,7 +281,7 @@ export class Command<
   ): Command<
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
-    A,
+    MapArgumentTypes<A>,
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
     Merge<PG, CG>,
@@ -482,9 +492,10 @@ export class Command<
    */
   public arguments<A extends Array<unknown> = CA>(
     args: string,
-  ): Command<CO, A, CG, PG, P> {
+  ): Command<CO, MapArgumentTypes<A>, CG, PG, P>;
+  public arguments(args: string): Command {
     this.cmd.argsDefinition = args;
-    return this as Command as Command<CO, A, CG, PG, P>;
+    return this;
   }
 
   /**
@@ -665,9 +676,12 @@ export class Command<
     flags: string,
     desc: string,
     opts?:
-      | Omit<ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P>, "global">
+      | Omit<
+        ICommandOption<Partial<CO>, CA, Merge<CG, MapOptionTypes<G>>, PG, P>,
+        "global"
+      >
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P> {
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -684,16 +698,18 @@ export class Command<
     flags: string,
     desc: string,
     opts:
-      | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
+      | ICommandOption<Partial<CO>, CA, Merge<CG, MapOptionTypes<G>>, PG, P> & {
+        global: true;
+      }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P>;
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P>;
   public option<O extends Record<string, unknown> | void = CO>(
     flags: string,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, P>
+      | ICommandOption<Merge<CO, MapOptionTypes<O>>, CA, CG, PG, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, O>, CA, CG, PG, P>;
+  ): Command<Merge<CO, MapOptionTypes<O>>, CA, CG, PG, P>;
   public option(
     flags: string,
     desc: string,
