@@ -1,6 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { IFlagOptions } from "./types.ts";
-import { ITypeInfo } from "./types.ts";
+import type { IFlagOptions, ITypeInfo } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
