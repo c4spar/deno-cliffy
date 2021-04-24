@@ -1,5 +1,6 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
 import type { IFlagOptions } from "./types.ts";
+import { ITypeInfo } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -146,5 +147,19 @@ export class NoArguments extends ValidationError {
   constructor() {
     super(`No arguments.`);
     Object.setPrototypeOf(this, NoArguments.prototype);
+  }
+}
+
+export class InvalidTypeError extends ValidationError {
+  constructor(
+    { label, name, value, type }: ITypeInfo,
+    expected?: Array<string>,
+  ) {
+    super(
+      `${label} "${name}" must be of type "${type}", but got "${value}".` + (
+        expected ? ` Expected values: ${expected.join(", ")}` : ""
+      ),
+    );
+    Object.setPrototypeOf(this, MissingOptionValue.prototype);
   }
 }
