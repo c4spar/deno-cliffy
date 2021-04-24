@@ -156,7 +156,11 @@ export class InvalidTypeError extends ValidationError {
   ) {
     super(
       `${label} "${name}" must be of type "${type}", but got "${value}".` + (
-        expected ? ` Expected values: ${expected.join(", ")}` : ""
+        expected
+          ? ` Expected values: ${
+            expected.map((value) => `"${value}"`).join(", ")
+          }`
+          : ""
       ),
     );
     Object.setPrototypeOf(this, MissingOptionValue.prototype);
