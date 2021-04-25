@@ -3,26 +3,25 @@ import { Command } from "../../command.ts";
 
 const cmd = new Command()
   .throwErrors()
-  .option("-f, --flag [value:number]", "description ...")
-  .option("-F, --flag2 <value:number>", "description ...")
-  .option("--no-flag", "description ...")
+  .option("-f, --flag [value:integer]", "description ...")
+  .option("-F, --flag2 <value:integer>", "description ...")
   .action(() => {});
 
-Deno.test("command - type - number - with no value", async () => {
+Deno.test("command - type - integer - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - number - with valid value", async () => {
+Deno.test("command - type - integer - with valid value", async () => {
   const { options, args } = await cmd.parse(["--flag", "123"]);
 
   assertEquals(options, { flag: 123 });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - number - with argument", async () => {
+Deno.test("command - type - integer - with argument", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["-f", "123", "unknown"]);
@@ -32,7 +31,7 @@ Deno.test("command - type - number - with argument", async () => {
   );
 });
 
-Deno.test("command - type - number - with missing value", async () => {
+Deno.test("command - type - integer - with missing value", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["-F"]);
@@ -42,12 +41,22 @@ Deno.test("command - type - number - with missing value", async () => {
   );
 });
 
-Deno.test("command - type - number - with invalid string value", async () => {
+Deno.test("command - type - integer - with invalid string value", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["-f", "abc"]);
     },
     Error,
-    `Option "--flag" must be of type "number", but got "abc".`,
+    `Option "--flag" must be of type "integer", but got "abc".`,
+  );
+});
+
+Deno.test("command - type - integer - with invalid float value", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await cmd.parse(["-f", "1.23"]);
+    },
+    Error,
+    `Option "--flag" must be of type "integer", but got "1.23".`,
   );
 });

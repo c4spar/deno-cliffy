@@ -1,28 +1,26 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 
 const cmd = new Command()
   .throwErrors()
   .option("-f, --flag", "description ...")
   .action(() => {})
-  .command("help", new HelpCommand())
-  .command("completions", new CompletionsCommand());
+  .command("help", new HelpCommand());
 
-Deno.test("command: types - no value short flag", async () => {
+Deno.test("command - type - no value - short flag without argument", async () => {
   const { options, args } = await cmd.parse(["-f"]);
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command: types - no value long flag", async () => {
+Deno.test("command - type - no value - long flag without argument", async () => {
   const { options, args } = await cmd.parse(["--flag"]);
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command: types - no value short flag invalid arg", async () => {
+Deno.test("command - type - no value - short flag with argument", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["-f", "true"]);
@@ -32,7 +30,7 @@ Deno.test("command: types - no value short flag invalid arg", async () => {
   );
 });
 
-Deno.test("command: types - no value long flag invalid arg", async () => {
+Deno.test("command - type - no value - long flag with argument", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["--flag", "true"]);

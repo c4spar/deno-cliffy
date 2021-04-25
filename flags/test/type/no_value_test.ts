@@ -26,17 +26,17 @@ Deno.test("flags - type - no value - long flag without argument", () => {
 });
 
 Deno.test("flags - type - no value - short flag with argument", () => {
-  const { flags, unknown, literal } = parseFlags(["-f", "123"], options);
+  const { flags, unknown, literal } = parseFlags(["-f", "true"], options);
 
   assertEquals(flags, { flag: true });
-  assertEquals(unknown, ["123"]);
+  assertEquals(unknown, ["true"]);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - type - no value - long flag with argument", () => {
-  const { flags, unknown, literal } = parseFlags(["--flag", "123"], options);
+  const { flags, unknown, literal } = parseFlags(["--flag", "true"], options);
 
   assertEquals(flags, { flag: true });
-  assertEquals(unknown, ["123"]);
+  assertEquals(unknown, ["true"]);
   assertEquals(literal, []);
 });
