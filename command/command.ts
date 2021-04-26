@@ -697,7 +697,10 @@ export class Command<
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
   ): Command {
-    if (typeof opts === "function") {
+    if (
+      typeof opts === "function" || Array.isArray(opts) ||
+      opts instanceof RegExp
+    ) {
       return this.option(flags, desc, { value: opts });
     }
 
@@ -1742,7 +1745,7 @@ export class Command<
    * Get completion by name.
    * @param name Name of the completion.
    */
-  public getCompletion(name: string) {
+  public getCompletion(name: string): ICompletion | undefined {
     return this.getBaseCompletion(name) ?? this.getGlobalCompletion(name);
   }
 

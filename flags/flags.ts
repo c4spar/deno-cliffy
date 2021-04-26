@@ -304,8 +304,24 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             })
             : parseFlagValue(option, arg, value);
 
-          if (typeof option.value === "function") {
+          if (Array.isArray(option.value)) {
+            if (!option.value.includes(result as string)) {
+              throw new InvalidOptionValue(
+                option.name,
+                option.value.toString(),
+                result as string,
+              );
+            }
+          } else if (typeof option.value === "function") {
             result = option.value(result, previous);
+          } else if (option.value instanceof RegExp) {
+            if (!option.value.test(result as string)) {
+              throw new InvalidOptionValue(
+                option.name,
+                option.value.toString(),
+                result as string,
+              );
+            }
           }
 
           if (typeof result === "undefined") {
@@ -316,9 +332,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             );
           }
 
-          if (typeof result !== "undefined") {
-            increase = true;
-          }
+          increase = true;
 
           return result;
         }

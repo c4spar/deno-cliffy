@@ -238,6 +238,15 @@ export class HelpGenerator {
       red(bold(`Conflicts: `)) +
         italic(option.conflicts.map(getFlag).join(", ")),
     );
+    (Array.isArray(option.value) || option.value instanceof RegExp) &&
+      hints.push(
+        bold(`Possible values: `) +
+          italic(
+            (Array.isArray(option.value)
+              ? option.value
+              : [option.value.toString()]).join(", "),
+          ),
+      );
 
     if (hints.length) {
       return `(${hints.join(", ")})`;
