@@ -152,6 +152,16 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       parseNext(option, args);
 
+      if (
+        typeof flags[propName] !== "undefined" &&
+        typeof option.value !== "function" &&
+        option.collect
+      ) {
+        const value: unknown[] = Array.isArray(previous) ? previous : [];
+        value.push(flags[propName]);
+        flags[propName] = value;
+      }
+
       if (typeof flags[propName] === "undefined") {
         if (typeof option.default !== "undefined") {
           flags[propName] = typeof option.default === "function"
@@ -162,12 +172,6 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         } else {
           flags[propName] = true;
         }
-      }
-
-      if (typeof option.value !== "function" && option.collect) {
-        const value: unknown[] = Array.isArray(previous) ? previous : [];
-        value.push(flags[propName]);
-        flags[propName] = value;
       }
 
       optionNames[propName] = option.name;
