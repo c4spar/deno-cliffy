@@ -164,9 +164,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
       }
 
-      if (typeof option.value !== "undefined") {
-        flags[propName] = option.value(flags[propName], previous);
-      } else if (option.collect) {
+      if (typeof option.value !== "function" && option.collect) {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
         value.push(flags[propName]);
         flags[propName] = value;
@@ -297,7 +295,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           value: string,
         ): unknown {
           const type: string = arg.type || OptionType.STRING;
-          const result: unknown = opts.parse
+          let result: unknown = opts.parse
             ? opts.parse({
               label: "Option",
               type,
@@ -305,6 +303,18 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
               value,
             })
             : parseFlagValue(option, arg, value);
+
+          if (typeof option.value === "function") {
+            result = option.value(result, previous);
+          }
+
+          if (typeof result === "undefined") {
+            throw new InvalidOptionValue(
+              option.name,
+              arg.type ?? "?",
+              value,
+            );
+          }
 
           if (typeof result !== "undefined") {
             increase = true;
