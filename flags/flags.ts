@@ -308,8 +308,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             if (!option.value.includes(result as string)) {
               throw new InvalidOptionValue(
                 option.name,
-                option.value.toString(),
-                result as string,
+                option.value.join(", "),
+                value,
               );
             }
           } else if (typeof option.value === "function") {
@@ -319,7 +319,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
               throw new InvalidOptionValue(
                 option.name,
                 option.value.toString(),
-                result as string,
+                value,
               );
             }
           }
