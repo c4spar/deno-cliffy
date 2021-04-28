@@ -20,7 +20,7 @@ const options = <IParseOptions> {
 Deno.test("flags: value handler", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "-F"], options);
 
-  assertEquals(flags, { flag: [true], flag2: true });
+  assertEquals(flags, { flag: true, flag2: true });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
