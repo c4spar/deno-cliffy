@@ -27,6 +27,11 @@ function cmd() {
       collect: true,
       value: /^(foo|bar|baz)$/,
     })
+    .option("-i, --incremental", "...", {
+      collect: true,
+      default: 1,
+      value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
+    })
     .option("-o, --optional", "...");
 }
 
@@ -62,6 +67,12 @@ Deno.test("command - option - value - function validator with invalid value", as
     Error,
     `Option "--function" must be of type "string", but got "fo".`,
   );
+});
+
+Deno.test("command - option - value - function validator with no value", async () => {
+  const { options } = await cmd().parse(["-iii"]);
+
+  assertEquals(options, { incremental: 3 });
 });
 
 Deno.test("command - option - value - array validator with no value", async () => {
