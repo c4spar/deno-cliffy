@@ -153,18 +153,27 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       parseNext(option, args);
 
       if (typeof flags[propName] === "undefined") {
-        if (typeof option.default !== "undefined") {
-          flags[propName] = typeof option.default === "function"
-            ? option.default()
-            : option.default;
-        } else if (args[argIndex].requiredValue) {
+        const hasDefaultValue: boolean = typeof option.default !== "undefined";
+
+        if (!hasDefaultValue && args[argIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
+        } else if (typeof option.value === "function") {
+          flags[propName] = option.value(flags[propName] ?? true, previous) ??
+            true;
+
+          if (typeof flags[propName] === "undefined") {
+            throw new InvalidOptionValue(
+              option.name,
+              args[argIndex].type ?? "?",
+              "",
+            );
+          }
+        } else if (hasDefaultValue) {
+          flags[propName] = getDefaultValue(option);
         } else {
           flags[propName] = true;
         }
-      }
-
-      if (typeof option.value !== "function" && option.collect) {
+      } else if (typeof option.value !== "function" && option.collect) {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
         value.push(flags[propName]);
         flags[propName] = value;
@@ -383,6 +392,12 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }, {});
 
   return { flags: result as O, unknown, literal };
+}
+
+function getDefaultValue(option: IFlagOptions): unknown {
+  return typeof option.default === "function"
+    ? option.default()
+    : option.default;
 }
 
 function parseFlagValue(
