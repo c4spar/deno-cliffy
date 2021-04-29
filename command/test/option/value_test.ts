@@ -29,7 +29,6 @@ function cmd() {
     })
     .option("-i, --incremental", "...", {
       collect: true,
-      default: 1,
       value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
     })
     .option("-o, --optional", "...");

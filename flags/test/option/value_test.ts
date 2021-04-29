@@ -33,10 +33,9 @@ const options = <IParseOptions> {
     collect: true,
     value: /^(foo|bar|baz)$/,
   }, {
-    name: "increment",
+    name: "incremental",
     aliases: ["i"],
     collect: true,
-    default: 1,
     value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
   }, {
     name: "optional",
