@@ -5,10 +5,21 @@ import { OptionType } from "../../flags/types.ts";
 
 const result = parseFlags(Deno.args, {
   flags: [{
+    name: "array",
+    aliases: ["a"],
+    type: OptionType.STRING,
+    // Use array validator to allow only provided values.
+    value: ["foo", "bar", "baz"],
+  }, {
+    name: "regex",
+    aliases: ["r"],
+    type: OptionType.STRING,
+    // Use regex validator to allow only valid values.
+    value: /^(foo|bar|baz)$/,
+  }, {
     name: "function",
     aliases: ["f"],
     type: OptionType.STRING,
-    optionalValue: true,
     // if collect is enabled, the previous value will be passed to the value method.
     collect: true,
     // Function validator can be used:
@@ -27,20 +38,6 @@ const result = parseFlags(Deno.args, {
         `Option "--function" must be one of "foo", "bar" or "baz", but got "${value}".`,
       );
     },
-  }, {
-    name: "array",
-    aliases: ["a"],
-    type: OptionType.STRING,
-    optionalValue: true,
-    // Use array validator to allow only provided values.
-    value: ["foo", "bar", "baz"],
-  }, {
-    name: "regex",
-    aliases: ["r"],
-    type: OptionType.STRING,
-    optionalValue: true,
-    // Use regex validator to allow only provided values.
-    value: /^(foo|bar|baz)$/,
   }],
 });
 
