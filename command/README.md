@@ -561,7 +561,10 @@ value. This allows you to coerce the option value to the desired type, or
 accumulate values, or do entirely custom processing.
 
 ```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import {
+  Command,
+  ValidationError,
+} from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
   .option(
@@ -575,7 +578,7 @@ const { options } = await new Command()
     collect: true,
     value: (value: string, previous: string[] = []): string[] => {
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
-        throw new Error(
+        throw new ValidationError(
           `Color must be one of "blue, yellow or red", but got "${value}".`,
         );
       }
@@ -940,9 +943,9 @@ args: [ "-p", "80" ]
 
 ### Error handling
 
-By default, cliffy calls `Deno.exit` when a `ValidationError` is thrown. You can
-override this behaviour with the `.throwErrors()` method. All other errors will
-be thrown by default.
+By default, cliffy prints the help text and calls `Deno.exit` when a
+`ValidationError` is thrown. You can override this behaviour with the
+`.throwErrors()` method. All other errors will be thrown by default.
 
 **Catch runtime errors**
 
@@ -992,7 +995,7 @@ try {
   cmd.parse();
 } catch (error) {
   if (error instanceof ValidationError) {
-    cmd.help();
+    cmd.showHelp();
     console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
   } else {
     console.error("[CUSTOM_ERROR]", error);
