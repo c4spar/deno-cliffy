@@ -205,7 +205,7 @@ export type ICompleteHandler<
 > = (
   cmd: Command<O, A, G, PG, P>,
   parent?: Command,
-) => string[] | Promise<string[]>;
+) => Array<string | number> | Promise<Array<string | number>>;
 
 /** Help callback method to print the help. Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` method's. */
 export type IHelpHandler<
