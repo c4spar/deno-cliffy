@@ -23,7 +23,7 @@ export class CompleteCommand
 
         const completion: ICompletion | undefined = completeCommand
           .getCompletion(action);
-        const result: Array<string> =
+        const result: Array<string | number> =
           await completion?.complete(completeCommand, parent) ?? [];
 
         if (result?.length) {
