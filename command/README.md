@@ -50,6 +50,7 @@
 - [Options](#-options)
   - [Common option types: boolean, string, number and
     integer](#common-option-types-boolean-string-number-and-integer)
+  - [Enum option type](#enum-option-type)
   - [List option types](#list-option-types)
   - [Variadic options](#variadic-options)
   - [Dotted options](#dotted-options)
@@ -227,10 +228,44 @@ $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -s
 { small: true, pizzaType: "vegetarian", amount: 3 }
 ```
 
+### Enum option type
+
+The enum type can be used to define a list of allowed values. The same can be
+also done with an [array](#array-validator) or
+[regexp validator](#regexp-validator).
+
+Optional you can use the color type as generic type. The type will be inferred
+and used as type for the result in the options object.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const color = new EnumType(["blue", "yellow", "red"]);
+
+await new Command<void>()
+  .type("color", color)
+  .option<{ color: typeof color }>(
+    "-c, --color [method:color]",
+    "choose a color",
+  )
+  .action(({ color }) => {
+    console.log("color: %s", color);
+  })
+  .parse(Deno.args);
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red
+color: red
+
+$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color foo
+error: Option "--color" must be of type "color", but got "foo". Expected values: blue, yellow, red
+```
+
 ### List option types
 
-Each type of option's can be a list of comma seperated items. The default
-seperator is a `,` and can be changed with the `separator` option.
+Each type of option's can be a list of comma separated items. The default
+separator is a `,` and can be changed with the `separator` option.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";

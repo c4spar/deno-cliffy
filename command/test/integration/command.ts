@@ -1,11 +1,14 @@
 import { Command, CompletionsCommand, HelpCommand } from "../../mod.ts";
+import { EnumType } from "../../types/enum.ts";
 
 const cmd = new Command()
   .version("1.0.0")
   .name("completions-test")
   .description("Completions test.")
+  .globalType("color", new EnumType(["blue", "yellow", "red"]))
   .globalOption("-g, --global <val:boolean>", "Foo option.")
   .option("-m, --main <val:boolean>", "Bar option.")
+  .option("-c, --color <val:color>", "Color option.")
   .default("help")
   // foo
   .command(
