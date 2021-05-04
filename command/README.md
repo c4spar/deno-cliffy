@@ -238,7 +238,7 @@ Optional you can use the color type as generic type. The type will be inferred
 and used as type for the result in the options object.
 
 ```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const color = new EnumType(["blue", "yellow", "red"]);
 
