@@ -8,7 +8,7 @@ const color = new EnumType(["blue", "yellow", "red"]);
 await new Command<void>()
   .type("color", color)
   .option<{ color: typeof color }>(
-    "-c, --color [method:color]",
+    "-c, --color [value:color]",
     "choose a color",
   )
   .action(({ color }) => {
