@@ -1,4 +1,4 @@
-import { getOption, paramCaseToCamelCase } from "./_utils.ts";
+import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
   ConflictingOption,
   DependingOption,
@@ -63,15 +63,17 @@ export function validateFlags(
       optionNames[name] = option.name;
     }
 
-    if (
-      typeof values[name] === "undefined" &&
-      (typeof option.default !== "undefined" ||
-        typeof defaultValue !== "undefined")
-    ) {
-      values[name] = typeof option.default === "function"
-        ? option.default()
-        : (option.default ?? defaultValue);
+    const hasDefaultValue: boolean = typeof values[name] === "undefined" && (
+      typeof option.default !== "undefined" ||
+      typeof defaultValue !== "undefined"
+    );
+
+    if (hasDefaultValue) {
+      values[name] = getDefaultValue(option) ?? defaultValue;
       defaultValues[option.name] = true;
+      if (typeof option.value === "function") {
+        values[name] = option.value(values[name]);
+      }
     }
   }
 

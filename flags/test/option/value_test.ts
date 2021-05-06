@@ -38,23 +38,25 @@ const options = <IParseOptions> {
     collect: true,
     value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
   }, {
-    name: "optional",
-    aliases: ["o"],
+    name: "default",
+    aliases: ["d"],
+    default: "foo",
+    value: (value) => value === "foo" ? "bar" : "baz",
   }],
 };
 
 Deno.test("flags - option - value - function validator with no value", () => {
-  const { flags, unknown, literal } = parseFlags(["-f", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-f", "-d"], options);
 
-  assertEquals(flags, { function: true, optional: true });
+  assertEquals(flags, { function: true, default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - function validator with valid value", () => {
-  const { flags, unknown, literal } = parseFlags(["-f", "foo", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-f", "foo", "-d"], options);
 
-  assertEquals(flags, { function: ["foo"], optional: true });
+  assertEquals(flags, { function: ["foo"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
@@ -67,17 +69,17 @@ Deno.test("flags - option - value - function validator with collected values", (
     "bar",
     "-f",
     "baz",
-    "-o",
+    "-d",
   ], options);
 
-  assertEquals(flags, { function: ["foo", "bar", "baz"], optional: true });
+  assertEquals(flags, { function: ["foo", "bar", "baz"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - function validator with invalid value", () => {
   assertThrows(
-    () => parseFlags(["-f", "fo", "-o"], options),
+    () => parseFlags(["-f", "fo", "-d"], options),
     Error,
     `Option "--function" must be of type "string", but got "fo".`,
   );
@@ -85,21 +87,21 @@ Deno.test("flags - option - value - function validator with invalid value", () =
 
 Deno.test("flags - option - value - function validator with incremental value", () => {
   const { flags } = parseFlags(["-iii"], options);
-  assertEquals(flags, { incremental: 3 });
+  assertEquals(flags, { incremental: 3, default: "bar" });
 });
 
 Deno.test("flags - option - value - array validator with no value", () => {
-  const { flags, unknown, literal } = parseFlags(["-a", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-a", "-d"], options);
 
-  assertEquals(flags, { array: true, optional: true });
+  assertEquals(flags, { array: true, default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - array validator with valid value", () => {
-  const { flags, unknown, literal } = parseFlags(["-a", "foo", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-a", "foo", "-d"], options);
 
-  assertEquals(flags, { array: ["foo"], optional: true });
+  assertEquals(flags, { array: ["foo"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
@@ -112,34 +114,34 @@ Deno.test("flags - option - value - array validator with collected values", () =
     "bar",
     "-a",
     "baz",
-    "-o",
+    "-d",
   ], options);
 
-  assertEquals(flags, { array: ["foo", "bar", "baz"], optional: true });
+  assertEquals(flags, { array: ["foo", "bar", "baz"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - array validator with invalid value", () => {
   assertThrows(
-    () => parseFlags(["-a", "fo", "-o"], options),
+    () => parseFlags(["-a", "fo", "-d"], options),
     Error,
     `Option "--array" must be of type "foo, bar, baz", but got "fo".`,
   );
 });
 
 Deno.test("flags - option - value - regex validator with no value", () => {
-  const { flags, unknown, literal } = parseFlags(["-r", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-r", "-d"], options);
 
-  assertEquals(flags, { regex: true, optional: true });
+  assertEquals(flags, { regex: true, default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - regex validator with valid value", () => {
-  const { flags, unknown, literal } = parseFlags(["-r", "foo", "-o"], options);
+  const { flags, unknown, literal } = parseFlags(["-r", "foo", "-d"], options);
 
-  assertEquals(flags, { regex: ["foo"], optional: true });
+  assertEquals(flags, { regex: ["foo"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
@@ -152,17 +154,17 @@ Deno.test("flags - option - value - regex validator with collected values", () =
     "bar",
     "-r",
     "baz",
-    "-o",
+    "-d",
   ], options);
 
-  assertEquals(flags, { regex: ["foo", "bar", "baz"], optional: true });
+  assertEquals(flags, { regex: ["foo", "bar", "baz"], default: "bar" });
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
 
 Deno.test("flags - option - value - regex validator with invalid value", () => {
   assertThrows(
-    () => parseFlags(["-r", "fo", "-o"], options),
+    () => parseFlags(["-r", "fo", "-d"], options),
     Error,
     `Option "--regex" must be of type "/^(foo|bar|baz)$/", but got "fo".`,
   );

@@ -1,4 +1,4 @@
-import { getOption, paramCaseToCamelCase } from "./_utils.ts";
+import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
   DuplicateOptionName,
@@ -154,26 +154,15 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       if (typeof flags[propName] === "undefined") {
         const hasDefaultValue: boolean = typeof option.default !== "undefined";
-
         if (!hasDefaultValue && args[argIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
-        } else if (typeof option.value === "function") {
-          flags[propName] = option.value(flags[propName] ?? true, previous) ??
-            true;
-
-          if (typeof flags[propName] === "undefined") {
-            throw new InvalidOptionValue(
-              option.name,
-              args[argIndex].type ?? "?",
-              "",
-            );
-          }
-        } else if (hasDefaultValue) {
-          flags[propName] = getDefaultValue(option);
-        } else {
-          flags[propName] = true;
         }
-      } else if (typeof option.value !== "function" && option.collect) {
+        flags[propName] = getDefaultValue(option) ?? true;
+
+        if (typeof option.value === "function") {
+          flags[propName] = option.value(flags[propName], previous) ?? true;
+        }
+      } else if (option.collect && typeof option.value !== "function") {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
         value.push(flags[propName]);
         flags[propName] = value;
@@ -392,12 +381,6 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }, {});
 
   return { flags: result as O, unknown, literal };
-}
-
-function getDefaultValue(option: IFlagOptions): unknown {
-  return typeof option.default === "function"
-    ? option.default()
-    : option.default;
 }
 
 function parseFlagValue(

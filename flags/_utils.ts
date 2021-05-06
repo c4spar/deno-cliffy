@@ -89,3 +89,9 @@ function closest(str: string, arr: string[]): string | undefined {
   }
   return arr[minIndex];
 }
+
+export function getDefaultValue(option: IFlagOptions): unknown {
+  return typeof option.default === "function"
+    ? option.default()
+    : option.default;
+}
