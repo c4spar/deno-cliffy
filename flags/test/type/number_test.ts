@@ -24,7 +24,7 @@ const requiredValueOptions = <IParseOptions> {
   }],
 };
 
-Deno.test("flags typeNumber flag", () => {
+Deno.test("flags - type - number - with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], optionalValueOptions);
 
   assertEquals(flags, { flag: true });
@@ -32,7 +32,7 @@ Deno.test("flags typeNumber flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeNumber flagValue", () => {
+Deno.test("flags - type - number - with valid value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "123"],
     optionalValueOptions,
@@ -43,7 +43,7 @@ Deno.test("flags typeNumber flagValue", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeNumber flagValueUnknown", () => {
+Deno.test("flags - type - number - with argument", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "456", "unknown"],
     optionalValueOptions,
@@ -54,7 +54,7 @@ Deno.test("flags typeNumber flagValueUnknown", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeNumber flagMissing", () => {
+Deno.test("flags - type - number - with missing value", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredValueOptions),
     Error,
@@ -62,7 +62,7 @@ Deno.test("flags typeNumber flagMissing", () => {
   );
 });
 
-Deno.test("flags typeNumber flagInvalidType", () => {
+Deno.test("flags - type - number - with invalid string value", () => {
   assertThrows(
     () => parseFlags(["-f", "abc"], requiredValueOptions),
     Error,

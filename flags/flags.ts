@@ -23,10 +23,12 @@ import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
 import { validateFlags } from "./validate_flags.ts";
+import { integer } from "./types/integer.ts";
 
 const Types: Record<string, ITypeHandler<unknown>> = {
   [OptionType.STRING]: string,
   [OptionType.NUMBER]: number,
+  [OptionType.INTEGER]: integer,
   [OptionType.BOOLEAN]: boolean,
 };
 

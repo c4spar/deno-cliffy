@@ -61,6 +61,7 @@ import type {
   ITypeOptions,
   IVersionHandler,
 } from "./types.ts";
+import { IntegerType } from "./types/integer.ts";
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
@@ -916,6 +917,8 @@ export class Command<
       this.type("string", new StringType(), { global: true });
     !this.types.has("number") &&
       this.type("number", new NumberType(), { global: true });
+    !this.types.has("integer") &&
+      this.type("integer", new IntegerType(), { global: true });
     !this.types.has("boolean") &&
       this.type("boolean", new BooleanType(), { global: true });
 

@@ -29,28 +29,28 @@ const cmd = new Command()
   .description("...")
   .action(() => {});
 
-Deno.test("command with custom type", async () => {
+Deno.test("command - type - custom - with valid value", async () => {
   const { options, args } = await cmd.parse(["-e", "my@email.com"]);
 
   assertEquals(options, { email: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("command with global custom type", async () => {
+Deno.test("command - type - custom - long flag with valid value", async () => {
   const { options, args } = await cmd.parse(["-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("sub command global custom type", async () => {
+Deno.test("command - type - custom - child command with valid value", async () => {
   const { options, args } = await cmd.parse(["init", "-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("sub command none global custom type", async () => {
+Deno.test("command - type - custom - with unknown type", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["init", "-e", "my@email.com"]);
@@ -60,7 +60,7 @@ Deno.test("sub command none global custom type", async () => {
   );
 });
 
-Deno.test("sub command with global custom type and invalid value", async () => {
+Deno.test("command - type - custom - with invalid value", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["init", "-E", "my @email.com"]);
