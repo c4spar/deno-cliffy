@@ -153,8 +153,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       parseNext(option, args);
 
       if (typeof flags[propName] === "undefined") {
-        const hasDefaultValue: boolean = typeof option.default === "undefined";
-        if (hasDefaultValue && args[argIndex].requiredValue) {
+        const hasDefaultValue: boolean = typeof option.default !== "undefined";
+        if (!hasDefaultValue && args[argIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
         }
         flags[propName] = getDefaultValue(option) ?? true;
