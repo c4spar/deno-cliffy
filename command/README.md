@@ -48,8 +48,8 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [Options](#-options)
-  - [Common option types: string, number and
-    boolean](#common-option-types-string-number-and-boolean)
+  - [Common option types: boolean, string, number and
+    integer](#common-option-types-boolean-string-number-and-integer)
   - [List option types](#list-option-types)
   - [Variadic options](#variadic-options)
   - [Dotted options](#dotted-options)
@@ -190,17 +190,19 @@ the command in the `options` object, all arguments in the `args` array and all
 literal arguments in the literal array. For all unknown options the command will
 throw an error message and exit the program with `Deno.exit(1)`.
 
-### Common option types: string, number and boolean
+### Common option types: boolean, string, number and integer
 
 Optionally you can declare a type after the argument name, separated by colon
 `<name:type>`. If no type is specified, the type defaults to `string`. Following
 types are availeble per default (_more will be added_):
 
-- **string:** can be any value
+- **boolean:** Can be one of: `true`, `false`, `1` or `0`.
 
-- **number:** can be any numeric value
+- **string:** Can be any value.
 
-- **boolean:** can be one of: `true`, `false`, `1` or `0`,
+- **number:** Can be any numeric value.
+
+- **integer:** Can be any integer value.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -211,7 +213,7 @@ const { options } = await new Command()
   // required string value
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
   // required number value
-  .option("-a, --amount <amount:number>", "Pieces of pizza.")
+  .option("-a, --amount <amount:integer>", "Pieces of pizza.")
   .parse(Deno.args);
 
 console.log(options);

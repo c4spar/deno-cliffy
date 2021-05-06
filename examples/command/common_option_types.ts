@@ -8,7 +8,7 @@ const { options } = await new Command()
   // required string value
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
   // required number value
-  .option("-a, --amount <amount:number>", "Pieces of pizza.")
+  .option("-a, --amount <amount:integer>", "Pieces of pizza.")
   .parse(Deno.args);
 
 console.log(options);

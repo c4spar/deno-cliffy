@@ -239,11 +239,13 @@ $ deno run https://deno.land/x/cliffy/examples/flags/error_handling.ts -d
 
 ### OptionType
 
+- `OptionType.BOOLEAN`
+
 - `OptionType.STRING`
 
 - `OptionType.NUMBER`
 
-- `OptionType.BOOLEAN`
+- `OptionType.INTEGER`
 
 ## ❯ Custom type processing
 
