@@ -13,7 +13,7 @@ import {
   splitArguments,
 } from "./_utils.ts";
 import type { PermissionName } from "./_utils.ts";
-import { bold, existsSync, red } from "./deps.ts";
+import { bold, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
   CommandNotFound,
@@ -1053,8 +1053,13 @@ export class Command<
       });
 
     for (const file of files) {
-      if (!existsSync(file)) {
-        continue;
+      try {
+        Deno.lstatSync(file);
+      } catch (error) {
+        if (error instanceof Deno.errors.NotFound) {
+          return false;
+        }
+        throw error;
       }
 
       const cmd = ["deno", "run", ...denoOpts, file, ...args];
