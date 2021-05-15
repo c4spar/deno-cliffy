@@ -1,5 +1,5 @@
 import type { Command } from "./command.ts";
-import type { ITypeInfo } from "./types.ts";
+import type { CompleteHandlerResult, ITypeInfo } from "./types.ts";
 
 /**
  * Base class for custom types.
@@ -31,5 +31,5 @@ export abstract class Type<T> {
     cmd: Command<any, any, any, any, any>,
     // deno-lint-ignore no-explicit-any
     parent?: Command<any, any, any, any, any>,
-  ): string[];
+  ): CompleteHandlerResult;
 }

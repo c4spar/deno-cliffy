@@ -190,6 +190,10 @@ export interface ICompletion<
   complete: ICompleteHandler<O, A, G, PG, P>;
 }
 
+export type CompleteHandlerResult =
+  | Array<string | number>
+  | Promise<Array<string | number>>;
+
 /** Type parser method. */
 export type ICompleteHandler<
   // deno-lint-ignore no-explicit-any
@@ -202,10 +206,7 @@ export type ICompleteHandler<
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
-> = (
-  cmd: Command<O, A, G, PG, P>,
-  parent?: Command,
-) => Array<string | number> | Promise<Array<string | number>>;
+> = (cmd: Command<O, A, G, PG, P>, parent?: Command) => CompleteHandlerResult;
 
 /** Help callback method to print the help. Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` method's. */
 export type IHelpHandler<
