@@ -8,4 +8,4 @@ export * from "./types/child_command.ts";
 export * from "./types/number.ts";
 export * from "./types/string.ts";
 export * from "./type.ts";
-export { ValidationError } from "../flags/_errors.ts";
+export { ValidationError, ValidationErrorOptions } from "./_errors.ts";

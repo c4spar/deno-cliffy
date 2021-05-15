@@ -1,7 +1,7 @@
 import {
   DuplicateOptionName,
   UnknownType,
-  ValidationError,
+  ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
@@ -33,6 +33,7 @@ import {
   NoArgumentsAllowed,
   TooManyArguments,
   UnknownCommand,
+  ValidationError,
 } from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
@@ -1087,19 +1088,26 @@ export class Command<
   protected parseFlags(
     args: string[],
   ): IFlagsResult & { action?: IAction } {
-    let action: IAction | undefined;
-    const result = parseFlags(args, {
-      stopEarly: this._stopEarly,
-      allowEmpty: this._allowEmpty,
-      flags: this.getOptions(true),
-      parse: (type: ITypeInfo) => this.parseType(type),
-      option: (option: IFlagOptions) => {
-        if (!action && (option as IOption).action) {
-          action = (option as IOption).action;
-        }
-      },
-    });
-    return { ...result, action };
+    try {
+      let action: IAction | undefined;
+      const result = parseFlags(args, {
+        stopEarly: this._stopEarly,
+        allowEmpty: this._allowEmpty,
+        flags: this.getOptions(true),
+        parse: (type: ITypeInfo) => this.parseType(type),
+        option: (option: IFlagOptions) => {
+          if (!action && (option as IOption).action) {
+            action = (option as IOption).action;
+          }
+        },
+      });
+      return { ...result, action };
+    } catch (error) {
+      if (error instanceof FlagsValidationError) {
+        throw new ValidationError(error.message);
+      }
+      throw error;
+    }
   }
 
   /** Parse argument type. */
@@ -1238,7 +1246,7 @@ export class Command<
         red(`  ${bold("error")}: ${error.message}\n`) + "\n",
       ),
     );
-    Deno.exit(1);
+    Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
   /*****************************************************************************

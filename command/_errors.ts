@@ -1,4 +1,3 @@
-import { ValidationError } from "../flags/_errors.ts";
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 
@@ -6,6 +5,20 @@ export class CommandError extends Error {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, CommandError.prototype);
+  }
+}
+
+export interface ValidationErrorOptions {
+  exitCode?: number;
+}
+
+export class ValidationError extends CommandError {
+  public readonly exitCode: number;
+
+  constructor(message: string, { exitCode }: ValidationErrorOptions = {}) {
+    super(message);
+    Object.setPrototypeOf(this, ValidationError.prototype);
+    this.exitCode = exitCode ?? 1;
   }
 }
 
