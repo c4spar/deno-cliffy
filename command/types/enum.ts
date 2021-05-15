@@ -21,8 +21,8 @@ export class EnumType<T extends string | number> extends Type<T> {
     throw new InvalidTypeError(type, this.allowedValues.slice());
   }
 
-  public complete(): string[] {
-    return this.values.slice();
+  public complete(): T[] {
+    return this.allowedValues.slice();
   }
 }
 
