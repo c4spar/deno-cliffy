@@ -582,6 +582,9 @@ const { options } = await new Command()
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
         throw new ValidationError(
           `Color must be one of "blue, yellow or red", but got "${value}".`,
+          // optional you can set the exitCode which is used if .throwErrors()
+          // is not called. Default is: 1
+          { exitCode: 1 },
         );
       }
       previous.push(value);
