@@ -674,13 +674,12 @@ Some info
 
 ## ❯ Commands
 
-The command class acts like as a factory class. It has an internal command
-pointer that points per default to the command instance itself. Each time the
-`.command()` method is called, the internal pointer points to the newly created
-command. All methods such as `.name()`, `.description()`, `.option()`,
-`.action()`, etc... always work on the command to which the pointer points. If
-you need to change the pointer back to the command instance you can call the
-`.reset()` method.
+The command class is a factory class and has an internal command pointer that
+points to the command instance itself by default. Each time the `.command()`
+method is called, the internal pointer points to the newly created command. All
+methods like `.name()`, `.description()`, `.option()`, `.action()`, etc...
+always act on the command the pointer points to. If you need to change the
+pointer back to the command instance, you can call the `.reset()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1500,7 +1499,8 @@ You can also define the types directly in the constructor. The
 
 - `O` Options (defined with `.option()`)
 - `A` Arguments (defined with `.arguments()`)
-- `G` Global options (defined with `.globalOption()`)
+- `G` Global options (defined with `.globalOption()` or
+  `.option(..., { global: true })`)
 - `PG` Global parent command options
 - `P` Parent command
 
@@ -1585,6 +1585,36 @@ await new Command<void>()
   .globalOption<{ debug?: boolean }>("-d, --debug", "...")
   .command("foo", fooCommand)
   .parse(Deno.args);
+```
+
+### Generic custom types
+
+Custom types can be used to define your generic types.
+
+```typescript
+import { Command, NumberType } from "https://deno.land/x/cliffy/command/mod.ts";
+
+// Create an instance of your custom type.
+const amount = new NumberType();
+
+await new Command<void>()
+  // Add the type.
+  .type("amount", amount)
+  // Use the type of your type instance as option type.
+  // The correct type will be infered and used fot the option value.
+  .option<{ amount?: typeof amount }>(
+    "-a, --amount <amount:amount>",
+    "The amount.",
+  )
+  // Same as:
+  .option<{ amount?: TypeValue<typeof amount> }>(
+    "-a, --amount <amount:amount>",
+    "The amount.",
+  )
+  // amount will be of type number.
+  .action(({ amount }) => {
+    console.log("amount:", amount);
+  });
 ```
 
 ## ❯ Version option
