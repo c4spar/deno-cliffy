@@ -28,6 +28,6 @@ Deno.test("command - type - enum - with invalid value", async () => {
       await cmd().parse(["-c", "green"]);
     },
     Error,
-    `Option "--color" must be of type "color", but got "green". Expected values: blue, yellow, red`,
+    `Option "--color" must be of type "color", but got "green". Expected values: "blue", "yellow", "red"`,
   );
 });

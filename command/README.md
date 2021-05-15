@@ -259,7 +259,7 @@ $ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --col
 color: red
 
 $ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color foo
-error: Option "--color" must be of type "color", but got "foo". Expected values: blue, yellow, red
+error: Option "--color" must be of type "color", but got "foo". Expected values: "blue", "yellow", "red"
 ```
 
 ### List option types
