@@ -55,12 +55,14 @@ function _completions_test() {
     '(- *)'{-V,--version}'[Show the version number for this program.]' \
     '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
     '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \
+    '(-h --help -V --version -c --color)'{-c,--color}'[Color option.]:val:->val-color' \
     '1: :_commands' \
     '*:: :->command_args'
 
   case "$state" in
     command_args) _command_args ;;
     val-boolean) __completions_test_complete val boolean  ;;
+    val-color) __completions_test_complete val color  ;;
   esac
 }
 

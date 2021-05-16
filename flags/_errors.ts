@@ -152,7 +152,7 @@ export class NoArguments extends ValidationError {
 export class InvalidTypeError extends ValidationError {
   constructor(
     { label, name, value, type }: ITypeInfo,
-    expected?: Array<string>,
+    expected?: Array<string | number>,
   ) {
     super(
       `${label} "${name}" must be of type "${type}", but got "${value}".` + (
