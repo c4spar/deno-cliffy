@@ -1,6 +1,7 @@
 export {
   blue,
   bold,
+  cyan,
   dim,
   green,
   italic,
