@@ -1,22 +1,22 @@
 
-  [1mUsage:[22m   [35mcompletions-test[39m
-  [1mVersion:[22m [33mv1.0.0[39m          
+  \x1b[1mUsage:\x1b[22m   \x1b[35mcompletions-test\x1b[39m
+  \x1b[1mVersion:\x1b[22m \x1b[33mv1.0.0\x1b[39m          
 
-  [1mDescription:[22m
+  \x1b[1mDescription:\x1b[22m
 
     Completions test.
 
-  [1mOptions:[22m
+  \x1b[1mOptions:\x1b[22m
 
-    [34m-h[39m, [34m--help[39m            [31m[1m-[22m[39m Show this help.                            
-    [34m-V[39m, [34m--version[39m         [31m[1m-[22m[39m Show the version number for this program.  
-    [34m-g[39m, [34m--global[39m   [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Foo option.                                
-    [34m-m[39m, [34m--main[39m     [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Bar option.                                
-    [34m-c[39m, [34m--color[39m    [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Color option.                              
+    \x1b[34m-h\x1b[39m, \x1b[34m--help\x1b[39m            \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Show this help.                                                             
+    \x1b[34m-V\x1b[39m, \x1b[34m--version\x1b[39m         \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Show the version number for this program.                                   
+    \x1b[34m-g\x1b[39m, \x1b[34m--global\x1b[39m   \x1b[33m<\x1b[39m\x1b[35mval\x1b[39m\x1b[33m>\x1b[39m  \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Foo option.                                                                 
+    \x1b[34m-m\x1b[39m, \x1b[34m--main\x1b[39m     \x1b[33m<\x1b[39m\x1b[35mval\x1b[39m\x1b[33m>\x1b[39m  \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Bar option.                                                                 
+    \x1b[34m-c\x1b[39m, \x1b[34m--color\x1b[39m    \x1b[33m<\x1b[39m\x1b[35mval\x1b[39m\x1b[33m>\x1b[39m  \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Color option.                              (\x1b[1mValues: \x1b[22m\x1b[32m"blue"\x1b[39m, \x1b[32m"yellow"\x1b[39m, \x1b[32m"red"\x1b[39m)
 
-  [1mCommands:[22m
+  \x1b[1mCommands:\x1b[22m
 
-    [34mfoo[39m                     [31m[1m-[22m[39m Foo command.                                
-    [34mhelp[39m         [33m[[39m[35mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.
-    [34mcompletions[39m             [31m[1m-[22m[39m Generate shell completions.                 
+    \x1b[34mfoo\x1b[39m                     \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Foo command.                                
+    \x1b[34mhelp\x1b[39m         \x1b[33m[\x1b[39m\x1b[35mcommand\x1b[39m\x1b[33m]\x1b[39m  \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Show this help or the help of a sub-command.
+    \x1b[34mcompletions\x1b[39m             \x1b[31m\x1b[1m-\x1b[22m\x1b[39m Generate shell completions.                 
 

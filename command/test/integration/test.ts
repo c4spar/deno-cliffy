@@ -15,7 +15,12 @@ for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
           Deno.readTextFile(outPath),
         ]);
         const output: string = await runCommand(cmd.split(" "));
-        assertEquals(output, expected);
+        assertEquals(
+          output,
+          expected
+            .replace(/\\x1b/g, "\x1b")
+            .replace(/\r\n/g, "\n"),
+        );
       },
     });
   }
