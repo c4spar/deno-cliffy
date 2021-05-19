@@ -581,7 +581,11 @@ export class Command<
 
     this.cmd.types.set(name, { ...options, name, handler });
 
-    if (handler instanceof Type && typeof handler.complete !== "undefined") {
+    if (
+      handler instanceof Type &&
+      (typeof handler.complete !== "undefined" ||
+        typeof handler.values !== "undefined")
+    ) {
       const completeHandler: ICompleteHandler = (
         cmd: Command,
         parent?: Command,
