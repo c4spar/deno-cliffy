@@ -1662,9 +1662,14 @@ given or latest version.
 COMMAND upgrade --version 1.0.2
 ```
 
-If you register the `upgrade` command you need to register an registry provider.
-Optional you can define the main file of your cli which defaults to the name of
-your cli (`[name].ts`).
+If you register the `upgrade` command you need to register an registry
+`provider`. Optional you can define the `main` file of your cli which defaults
+to the name of your cli (`[name].ts`) and `args` which can be used to define
+permissions that are passed to `deno install`.
+
+If no `args` are defined, following args are set by default: `--no-check`,
+`--quiet`, `--force` and `--name`. `--no-check` and `--quiet` are not set by
+default if `args` are defined. `--force` and `--name` are always set by default.
 
 ```typescript
 import { UpgradeCommand } from "https://deno.land/x/cliffy/command/upgrade/mod.ts";
@@ -1672,7 +1677,7 @@ cmd.command(
   "upgrade",
   new UpgradeCommand({
     main: "cliffy.ts",
-    args: [],
+    args: ["--allow-net", "--unstable"],
     provider: new DenoLandProvider(),
   }),
 );
