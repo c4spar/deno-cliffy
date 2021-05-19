@@ -1,4 +1,4 @@
-import { blue, bold, cyan, green, italic, red, yellow } from "../deps.ts";
+import { blue, bold, cyan, green, red, yellow } from "../deps.ts";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "../../table/table.ts";
 
