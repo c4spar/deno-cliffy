@@ -581,12 +581,17 @@ export class Command<
 
     this.cmd.types.set(name, { ...options, name, handler });
 
-    if (handler instanceof Type && typeof handler.complete !== "undefined") {
-      this.complete(
-        name,
-        (cmd, parent?: Command) => handler.complete?.(cmd, parent) || [],
-        options,
-      );
+    if (
+      handler instanceof Type &&
+      (typeof handler.complete !== "undefined" ||
+        typeof handler.values !== "undefined")
+    ) {
+      const completeHandler: ICompleteHandler = (
+        cmd: Command,
+        parent?: Command,
+      ) =>
+        handler.complete?.(cmd, parent) || handler.values?.(cmd, parent) || [];
+      this.complete(name, completeHandler, options);
     }
 
     return this;
@@ -1703,7 +1708,7 @@ export class Command<
    * Get type by name.
    * @param name Name of the type.
    */
-  protected getType(name: string): IType | undefined {
+  public getType(name: string): IType | undefined {
     return this.getBaseType(name) ?? this.getGlobalType(name);
   }
 
@@ -1711,7 +1716,7 @@ export class Command<
    * Get base type by name.
    * @param name Name of the type.
    */
-  protected getBaseType(name: string): IType | undefined {
+  public getBaseType(name: string): IType | undefined {
     return this.types.get(name);
   }
 
@@ -1719,7 +1724,7 @@ export class Command<
    * Get global type by name.
    * @param name Name of the type.
    */
-  protected getGlobalType(name: string): IType | undefined {
+  public getGlobalType(name: string): IType | undefined {
     if (!this._parent) {
       return;
     }

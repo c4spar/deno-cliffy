@@ -194,6 +194,8 @@ export type CompleteHandlerResult =
   | Array<string | number>
   | Promise<Array<string | number>>;
 
+export type ValuesHandlerResult = Array<string | number>;
+
 /** Type parser method. */
 export type ICompleteHandler<
   // deno-lint-ignore no-explicit-any
