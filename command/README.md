@@ -93,6 +93,7 @@
   - [Generic instance method types](#generic-instance-method-types)
   - [Generic constructor types](#generic-constructor-types)
   - [Generic global parent types](#generic-global-parent-types)
+- [Upgrade command](#-upgrade-command)
 - [Version option](#-version-option)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -1650,6 +1651,107 @@ await new Command<void>()
   .action(({ amount }) => {
     console.log("amount:", amount);
   });
+```
+
+## ❯ Upgrade command
+
+Cliffy provides an `UpgradeCommand` that can be used to upgrade your cli to a
+given or latest version.
+
+```shell
+COMMAND upgrade --version 1.0.2
+```
+
+If you register the `upgrade` command you need to register an registry
+`provider`. Optional you can define the `main` file of your cli which defaults
+to the name of your cli (`[name].ts`) and `args` which can be used to define
+permissions that are passed to `deno install`.
+
+If no `args` are defined, following args are set by default: `--no-check`,
+`--quiet`, `--force` and `--name`. `--no-check` and `--quiet` are not set by
+default if `args` are defined. `--force` and `--name` are always set by default.
+
+```typescript
+import { UpgradeCommand } from "https://deno.land/x/cliffy/command/upgrade/mod.ts";
+cmd.command(
+  "upgrade",
+  new UpgradeCommand({
+    main: "cliffy.ts",
+    args: ["--allow-net", "--unstable"],
+    provider: new DenoLandProvider(),
+  }),
+);
+```
+
+There are three build in providers: `deno.land`, `nest.land` and `github`. If
+multiple providers are registered, you can specify the registry that should be
+used with the `--registry` option. The github provider can also be used to
+`upgrade` to any git branch.
+
+```shell
+COMMAND upgrade --registry github --version main
+```
+
+The `--registry` option is hidden if only one provider is registerd. If the
+`upgrade` command is called without the `--registry` option, the default
+registry is used. The default registry is the first registered provider.
+
+The `GithubProvider` requires the `repository` name as option. The
+`DenoLandProvider` and `NestLandProvider` does not require any options but you
+can optionally pass the registry module name to the provider which defaults to
+the command name.
+
+```typescript
+cmd.command(
+  "upgrade",
+  new UpgradeCommand({
+    provider: [
+      new DenoLandProvider({ name: "cliffy" }),
+      new NestLandProvider({ name: "cliffy" }),
+      new GithubProvider({ repository: "c4spar/deno-cliffy" }),
+    ],
+  }),
+);
+```
+
+The upgrade command can be also used, to list all available versions with the
+`-l` or `--list-versions` option. The current installed version is highlighted
+and prefix with a `*`.
+
+```shell
+COMMAND upgrade -l
+```
+
+```
+* v0.2.2
+  v0.2.1
+  v0.2.0
+  v0.1.0
+```
+
+The github registry shows all available tags and branches. Branches can be
+disabled with the `branches` option `GithubProvider({ branches: false })`. If
+the versions list is larger than `25`, the versions are displayed as table.
+
+```shell
+COMMAND upgrade --registry github --list-versions
+```
+
+```
+Tags:
+
+  v0.18.2   v0.17.0   v0.14.1   v0.11.2   v0.8.2   v0.6.1   v0.3.0
+  v0.18.1 * v0.16.0   v0.14.0   v0.11.1   v0.8.1   v0.6.0   v0.2.0
+  v0.18.0   v0.15.0   v0.13.0   v0.11.0   v0.8.0   v0.5.1   v0.1.0
+  v0.17.2   v0.14.3   v0.12.1   v0.10.0   v0.7.1   v0.5.0
+  v0.17.1   v0.14.2   v0.12.0   v0.9.0    v0.7.0   v0.4.0
+
+Branches:
+
+  main (Protected)
+  keypress/add-keypress-module
+  keycode/refactoring
+  command/upgrade-command
 ```
 
 ## ❯ Version option
