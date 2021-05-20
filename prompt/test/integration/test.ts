@@ -44,7 +44,7 @@ async function runPrompt(file: WalkEntry): Promise<string> {
   const process = Deno.run({
     stdin: "piped",
     stdout: "piped",
-    ignore: lt(Deno.version.deno, "1.10.0"),
+    ignore: lt(Deno.version.deno, "1.4.1"),
     cmd: [
       "deno",
       "run",
