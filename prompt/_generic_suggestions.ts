@@ -16,8 +16,8 @@ interface LocalStorage {
 }
 
 // keep support for deno < 1.10
-// deno-lint-ignore no-explicit-any
 const localStorage: LocalStorage | null = "localStorage" in window
+  // deno-lint-ignore no-explicit-any
   ? (window as any).localStorage
   : null;
 
