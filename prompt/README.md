@@ -410,8 +410,10 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/input.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable
-tab-completions.
+You can provide suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions with the `suggestions` and/or `id` option. If an `id` is
+provided, the suggestions will be saved to the local storage using the `id` as
+local storage key. Both options can be defined at the same time.
 
 ![](assets/img/suggestions.gif)
 
@@ -420,6 +422,7 @@ import { Input } from "https://deno.land/x/cliffy/prompt/input.ts";
 
 const color: string = await Input.prompt({
   message: "Choose a color",
+  id: "<local-storage-key>",
   suggestions: [
     "Abbey",
     "Absolute Zero",
@@ -643,8 +646,10 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable
-tab-completions.
+You can provide suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions with the `suggestions` and/or `id` option. If an `id` is
+provided, the suggestions will be saved to the local storage using the `id` as
+local storage key. Both options can be defined at the same time.
 
 ![](assets/img/suggestions_list_prompt.gif)
 
@@ -653,6 +658,7 @@ import { List } from "https://deno.land/x/cliffy/prompt/list.ts";
 
 const color: string = await List.prompt({
   message: "Choose a color",
+  id: "<local-storage-key>",
   suggestions: [
     "Abbey",
     "Absolute Zero",

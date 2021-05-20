@@ -22,6 +22,7 @@ export interface GenericSuggestionsKeys extends GenericInputKeys {
 export interface GenericSuggestionsOptions<T, V>
   extends GenericInputPromptOptions<T, V> {
   keys?: GenericSuggestionsKeys;
+  id?: string;
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
@@ -33,6 +34,7 @@ export interface GenericSuggestionsOptions<T, V>
 export interface GenericSuggestionsSettings<T, V>
   extends GenericInputPromptSettings<T, V> {
   keys?: GenericSuggestionsKeys;
+  id?: string;
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
@@ -66,8 +68,36 @@ export abstract class GenericSuggestions<
         ...(settings.keys ?? {}),
       },
     });
-    if (this.settings.suggestions) {
-      this.settings.suggestions = this.settings.suggestions.slice();
+    const suggestions: Array<string | number> = this.loadSuggestions();
+    if (suggestions.length || this.settings.suggestions) {
+      this.settings.suggestions = [
+        ...suggestions,
+        ...this.settings.suggestions ?? [],
+      ].filter(uniqueSuggestions);
+    }
+  }
+
+  protected loadSuggestions(): Array<string | number> {
+    if (this.settings.id) {
+      const json = localStorage.getItem(this.settings.id);
+      const suggestions: Array<string | number> = json ? JSON.parse(json) : [];
+      if (!Array.isArray(suggestions)) {
+        return [];
+      }
+      return suggestions;
+    }
+    return [];
+  }
+
+  protected saveSuggestions(...suggestions: Array<string | number>): void {
+    if (this.settings.id) {
+      localStorage.setItem(
+        this.settings.id,
+        JSON.stringify([
+          ...suggestions,
+          ...this.loadSuggestions(),
+        ].filter(uniqueSuggestions)),
+      );
     }
   }
 
@@ -341,4 +371,13 @@ export abstract class GenericSuggestions<
       }
     }
   }
+}
+
+function uniqueSuggestions(
+  value: unknown,
+  index: number,
+  self: Array<unknown>,
+) {
+  return typeof value !== "undefined" && value !== "" &&
+    self.indexOf(value) === index;
 }
