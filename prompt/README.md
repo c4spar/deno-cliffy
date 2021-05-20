@@ -415,6 +415,14 @@ tab-completions with the `suggestions` and/or `id` option. If an `id` is
 provided, the suggestions will be saved to the local storage using the `id` as
 local storage key. Both options can be defined at the same time.
 
+The `id` option requires deno >= `1.10` and the `--location` flag.
+
+```shell
+deno install you/cli.ts --location https://example.com
+# or
+deno run you/cli.ts --location https://example.com
+```
+
 ![](assets/img/suggestions.gif)
 
 ```typescript
@@ -650,6 +658,14 @@ You can provide suggestions to the `Input`, `Number` and `List` prompt to enable
 tab-completions with the `suggestions` and/or `id` option. If an `id` is
 provided, the suggestions will be saved to the local storage using the `id` as
 local storage key. Both options can be defined at the same time.
+
+The `id` option requires deno >= `1.10` and the `--location` flag.
+
+```shell
+deno install you/cli.ts --location https://example.com
+# or
+deno run you/cli.ts --location https://example.com
+```
 
 ![](assets/img/suggestions_list_prompt.gif)
 
