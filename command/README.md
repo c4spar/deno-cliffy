@@ -1219,7 +1219,10 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 ## ❯ Auto generated help
 
 The help information is auto-generated based on the information you have defined
-on your command's.
+on your command's. The main command has a global help option (`-h, --help`)
+defined by default which prints the help text to stdout. You can also print or
+get the help text programmaticly by using the `.showHelp()` or `.getHelp()`
+method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
@@ -1270,10 +1273,10 @@ await new Command()
   .parse();
 ```
 
-You can also override the help output with the `.help()` method. This overrides
-the output of the `.getHelp()` and `.showHelp()` method's which is used by the
-`-h` and `--help` option and the `help` command. The help handler will be used
-for each command, but can be overridden by child commands.
+You can also use the `.help()` method to override the help output. This
+overrides the output of the `.getHelp()` and `.showHelp()` method's which are
+used by the help option and command by default. The help handler will be used
+for each command, but can be overridden in child commands.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
