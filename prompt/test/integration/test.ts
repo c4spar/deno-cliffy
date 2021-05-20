@@ -48,6 +48,8 @@ async function runPrompt(file: WalkEntry): Promise<string> {
       "run",
       "--unstable",
       "--allow-all",
+      "--location",
+      "https://cliffy.io",
       file.path,
     ],
     env: {
