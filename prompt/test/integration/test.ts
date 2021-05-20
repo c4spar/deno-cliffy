@@ -14,6 +14,7 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
     const name = file.name.replace(/_/g, " ").replace(".ts", "");
     Deno.test({
       name: `prompt - integration - ${name}`,
+      ignore: lt(Deno.version.deno, "1.10.0"),
       async fn() {
         const output: string = await runPrompt(file);
         const expectedOutput: string = await getExpectedOutput(file.path);
@@ -44,7 +45,6 @@ async function runPrompt(file: WalkEntry): Promise<string> {
   const process = Deno.run({
     stdin: "piped",
     stdout: "piped",
-    ignore: lt(Deno.version.deno, "1.4.1"),
     cmd: [
       "deno",
       "run",
