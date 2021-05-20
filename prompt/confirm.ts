@@ -81,6 +81,11 @@ export class Confirm
     return defaultMessage ? dim(` (${defaultMessage})`) : "";
   }
 
+  protected success(value: boolean): string | undefined {
+    this.saveSuggestions(this.format(value));
+    return super.success(value);
+  }
+
   /** Get input input. */
   protected getValue(): string {
     return this.inputValue;
