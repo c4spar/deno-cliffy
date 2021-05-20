@@ -3,6 +3,7 @@ import {
   assertEquals,
   dirname,
   expandGlob,
+  lt,
   WalkEntry,
 } from "../../../dev_deps.ts";
 
@@ -43,6 +44,7 @@ async function runPrompt(file: WalkEntry): Promise<string> {
   const process = Deno.run({
     stdin: "piped",
     stdout: "piped",
+    ignore: lt(Deno.version.deno, "1.10.0"),
     cmd: [
       "deno",
       "run",
