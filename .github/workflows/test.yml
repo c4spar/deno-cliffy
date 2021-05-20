@@ -25,7 +25,7 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --allow-all --unstable --location https://cliffy.io
+        run: deno test --allow-all --unstable
         if: ${{ matrix.deno != 'v1.x' }}
 
       - name: Run tests
