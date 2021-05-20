@@ -1220,9 +1220,9 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 
 The help information is auto-generated based on the information you have defined
 on your command's. The main command has a global help option (`-h, --help`)
-defined by default which prints the help text to stdout. You can also print or
-get the help text programmaticly by using the `.showHelp()` or `.getHelp()`
-method.
+defined by default which prints the help text to stdout. You can also output or
+retrieve the help text programmatically by using the `.showHelp()` or
+`.getHelp()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
