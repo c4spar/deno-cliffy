@@ -29,7 +29,7 @@ jobs:
         if: ${{ matrix.deno != 'v1.x' }}
 
       - name: Run tests
-        run: deno test --coverage=./cov --allow-all --unstable
+        run: deno test --coverage=./cov --allow-all --unstable --location https://cliffy.io
         if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Generate lcov

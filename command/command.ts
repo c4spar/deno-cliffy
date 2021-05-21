@@ -1,7 +1,7 @@
 import {
   DuplicateOptionName,
   UnknownType,
-  ValidationError,
+  ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
@@ -13,7 +13,7 @@ import {
   splitArguments,
 } from "./_utils.ts";
 import type { PermissionName } from "./_utils.ts";
-import { bold, existsSync, red } from "./deps.ts";
+import { bold, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
   CommandNotFound,
@@ -33,6 +33,7 @@ import {
   NoArgumentsAllowed,
   TooManyArguments,
   UnknownCommand,
+  ValidationError,
 } from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { NumberType } from "./types/number.ts";
@@ -61,6 +62,7 @@ import type {
   ITypeOptions,
   IVersionHandler,
 } from "./types.ts";
+import { IntegerType } from "./types/integer.ts";
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
@@ -81,6 +83,16 @@ interface IDefaultOption<
 
 type OneOf<T, V> = T extends void ? V : T;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+
+type MapOptionTypes<O extends Record<string, unknown> | void> = O extends
+  Record<string, unknown>
+  ? { [K in keyof O]: O[K] extends Type<infer T> ? T : O[K] }
+  : void;
+
+type MapArgumentTypes<A extends Array<unknown>> = A extends Array<unknown>
+  ? { [I in keyof A]: A[I] extends Type<infer T> ? T : A[I] }
+  : // deno-lint-ignore no-explicit-any
+  any;
 
 export class Command<
   // deno-lint-ignore no-explicit-any
@@ -269,7 +281,7 @@ export class Command<
   ): Command<
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
-    A,
+    MapArgumentTypes<A>,
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
     Merge<PG, CG>,
@@ -480,9 +492,10 @@ export class Command<
    */
   public arguments<A extends Array<unknown> = CA>(
     args: string,
-  ): Command<CO, A, CG, PG, P> {
+  ): Command<CO, MapArgumentTypes<A>, CG, PG, P>;
+  public arguments(args: string): Command {
     this.cmd.argsDefinition = args;
-    return this as Command as Command<CO, A, CG, PG, P>;
+    return this;
   }
 
   /**
@@ -568,12 +581,17 @@ export class Command<
 
     this.cmd.types.set(name, { ...options, name, handler });
 
-    if (handler instanceof Type && typeof handler.complete !== "undefined") {
-      this.complete(
-        name,
-        (cmd, parent?: Command) => handler.complete?.(cmd, parent) || [],
-        options,
-      );
+    if (
+      handler instanceof Type &&
+      (typeof handler.complete !== "undefined" ||
+        typeof handler.values !== "undefined")
+    ) {
+      const completeHandler: ICompleteHandler = (
+        cmd: Command,
+        parent?: Command,
+      ) =>
+        handler.complete?.(cmd, parent) || handler.values?.(cmd, parent) || [];
+      this.complete(name, completeHandler, options);
     }
 
     return this;
@@ -663,9 +681,12 @@ export class Command<
     flags: string,
     desc: string,
     opts?:
-      | Omit<ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P>, "global">
+      | Omit<
+        ICommandOption<Partial<CO>, CA, Merge<CG, MapOptionTypes<G>>, PG, P>,
+        "global"
+      >
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P> {
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -682,16 +703,18 @@ export class Command<
     flags: string,
     desc: string,
     opts:
-      | ICommandOption<Partial<CO>, CA, Merge<CG, G>, PG, P> & { global: true }
+      | ICommandOption<Partial<CO>, CA, Merge<CG, MapOptionTypes<G>>, PG, P> & {
+        global: true;
+      }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, G>, PG, P>;
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P>;
   public option<O extends Record<string, unknown> | void = CO>(
     flags: string,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, P>
+      | ICommandOption<Merge<CO, MapOptionTypes<O>>, CA, CG, PG, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, O>, CA, CG, PG, P>;
+  ): Command<Merge<CO, MapOptionTypes<O>>, CA, CG, PG, P>;
   public option(
     flags: string,
     desc: string,
@@ -916,6 +939,8 @@ export class Command<
       this.type("string", new StringType(), { global: true });
     !this.types.has("number") &&
       this.type("number", new NumberType(), { global: true });
+    !this.types.has("integer") &&
+      this.type("integer", new IntegerType(), { global: true });
     !this.types.has("boolean") &&
       this.type("boolean", new BooleanType(), { global: true });
 
@@ -1050,8 +1075,13 @@ export class Command<
       });
 
     for (const file of files) {
-      if (!existsSync(file)) {
-        continue;
+      try {
+        Deno.lstatSync(file);
+      } catch (error) {
+        if (error instanceof Deno.errors.NotFound) {
+          return false;
+        }
+        throw error;
       }
 
       const cmd = ["deno", "run", ...denoOpts, file, ...args];
@@ -1079,19 +1109,26 @@ export class Command<
   protected parseFlags(
     args: string[],
   ): IFlagsResult & { action?: IAction } {
-    let action: IAction | undefined;
-    const result = parseFlags(args, {
-      stopEarly: this._stopEarly,
-      allowEmpty: this._allowEmpty,
-      flags: this.getOptions(true),
-      parse: (type: ITypeInfo) => this.parseType(type),
-      option: (option: IFlagOptions) => {
-        if (!action && (option as IOption).action) {
-          action = (option as IOption).action;
-        }
-      },
-    });
-    return { ...result, action };
+    try {
+      let action: IAction | undefined;
+      const result = parseFlags(args, {
+        stopEarly: this._stopEarly,
+        allowEmpty: this._allowEmpty,
+        flags: this.getOptions(true),
+        parse: (type: ITypeInfo) => this.parseType(type),
+        option: (option: IFlagOptions) => {
+          if (!action && (option as IOption).action) {
+            action = (option as IOption).action;
+          }
+        },
+      });
+      return { ...result, action };
+    } catch (error) {
+      if (error instanceof FlagsValidationError) {
+        throw new ValidationError(error.message);
+      }
+      throw error;
+    }
   }
 
   /** Parse argument type. */
@@ -1230,7 +1267,7 @@ export class Command<
         red(`  ${bold("error")}: ${error.message}\n`) + "\n",
       ),
     );
-    Deno.exit(1);
+    Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
   /*****************************************************************************
@@ -1671,7 +1708,7 @@ export class Command<
    * Get type by name.
    * @param name Name of the type.
    */
-  protected getType(name: string): IType | undefined {
+  public getType(name: string): IType | undefined {
     return this.getBaseType(name) ?? this.getGlobalType(name);
   }
 
@@ -1679,7 +1716,7 @@ export class Command<
    * Get base type by name.
    * @param name Name of the type.
    */
-  protected getBaseType(name: string): IType | undefined {
+  public getBaseType(name: string): IType | undefined {
     return this.types.get(name);
   }
 
@@ -1687,7 +1724,7 @@ export class Command<
    * Get global type by name.
    * @param name Name of the type.
    */
-  protected getGlobalType(name: string): IType | undefined {
+  public getGlobalType(name: string): IType | undefined {
     if (!this._parent) {
       return;
     }

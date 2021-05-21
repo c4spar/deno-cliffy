@@ -36,6 +36,7 @@ export interface IFlagArgument {
 export enum OptionType {
   STRING = "string",
   NUMBER = "number",
+  INTEGER = "integer",
   BOOLEAN = "boolean",
 }
 

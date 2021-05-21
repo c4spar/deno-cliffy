@@ -69,6 +69,11 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
     GenericPrompt.inject(value);
   }
 
+  protected success(value: number): string | undefined {
+    this.saveSuggestions(value);
+    return super.success(value);
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.

@@ -48,8 +48,9 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [Options](#-options)
-  - [Common option types: string, number and
-    boolean](#common-option-types-string-number-and-boolean)
+  - [Common option types: boolean, string, number and
+    integer](#common-option-types-boolean-string-number-and-integer)
+  - [Enum option type](#enum-option-type)
   - [List option types](#list-option-types)
   - [Variadic options](#variadic-options)
   - [Dotted options](#dotted-options)
@@ -92,6 +93,7 @@
   - [Generic instance method types](#generic-instance-method-types)
   - [Generic constructor types](#generic-constructor-types)
   - [Generic global parent types](#generic-global-parent-types)
+- [Upgrade command](#-upgrade-command)
 - [Version option](#-version-option)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -190,17 +192,19 @@ the command in the `options` object, all arguments in the `args` array and all
 literal arguments in the literal array. For all unknown options the command will
 throw an error message and exit the program with `Deno.exit(1)`.
 
-### Common option types: string, number and boolean
+### Common option types: boolean, string, number and integer
 
 Optionally you can declare a type after the argument name, separated by colon
 `<name:type>`. If no type is specified, the type defaults to `string`. Following
 types are availeble per default (_more will be added_):
 
-- **string:** can be any value
+- **boolean:** Can be one of: `true`, `false`, `1` or `0`.
 
-- **number:** can be any numeric value
+- **string:** Can be any value.
 
-- **boolean:** can be one of: `true`, `false`, `1` or `0`,
+- **number:** Can be any numeric value.
+
+- **integer:** Can be any integer value.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -211,7 +215,7 @@ const { options } = await new Command()
   // required string value
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
   // required number value
-  .option("-a, --amount <amount:number>", "Pieces of pizza.")
+  .option("-a, --amount <amount:integer>", "Pieces of pizza.")
   .parse(Deno.args);
 
 console.log(options);
@@ -225,10 +229,44 @@ $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -s
 { small: true, pizzaType: "vegetarian", amount: 3 }
 ```
 
+### Enum option type
+
+The enum type can be used to define a list of allowed values. The same can be
+also done with an [array](#array-validator) or
+[regexp validator](#regexp-validator).
+
+Optional you can use the color type as generic type. The type will be inferred
+and used as type for the result in the options object.
+
+```typescript
+import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
+
+const color = new EnumType(["blue", "yellow", "red"]);
+
+await new Command<void>()
+  .type("color", color)
+  .option<{ color: typeof color }>(
+    "-c, --color [method:color]",
+    "choose a color",
+  )
+  .action(({ color }) => {
+    console.log("color: %s", color);
+  })
+  .parse(Deno.args);
+```
+
+```
+$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red
+color: red
+
+$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color foo
+error: Option "--color" must be of type "color", but got "foo". Expected values: "blue", "yellow", "red"
+```
+
 ### List option types
 
-Each type of option's can be a list of comma seperated items. The default
-seperator is a `,` and can be changed with the `separator` option.
+Each type of option's can be a list of comma separated items. The default
+separator is a `,` and can be changed with the `separator` option.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -580,6 +618,9 @@ const { options } = await new Command()
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
         throw new ValidationError(
           `Color must be one of "blue, yellow or red", but got "${value}".`,
+          // optional you can set the exitCode which is used if .throwErrors()
+          // is not called. Default is: 1
+          { exitCode: 1 },
         );
       }
       previous.push(value);
@@ -669,13 +710,12 @@ Some info
 
 ## ❯ Commands
 
-The command class acts like as a factory class. It has an internal command
-pointer that points per default to the command instance itself. Each time the
-`.command()` method is called, the internal pointer points to the newly created
-command. All methods such as `.name()`, `.description()`, `.option()`,
-`.action()`, etc... always work on the command to which the pointer points. If
-you need to change the pointer back to the command instance you can call the
-`.reset()` method.
+The command class is a factory class and has an internal command pointer that
+points to the command instance itself by default. Each time the `.command()`
+method is called, the internal pointer points to the newly created command. All
+methods like `.name()`, `.description()`, `.option()`, `.action()`, etc...
+always act on the command the pointer points to. If you need to change the
+pointer back to the command instance, you can call the `.reset()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1179,7 +1219,10 @@ $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 ## ❯ Auto generated help
 
 The help information is auto-generated based on the information you have defined
-on your command's.
+on your command's. The main command has a global help option (`-h, --help`)
+defined by default which prints the help text to stdout. You can also output or
+retrieve the help text programmatically by using the `.showHelp()` or
+`.getHelp()` method.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
@@ -1230,10 +1273,10 @@ await new Command()
   .parse();
 ```
 
-You can also override the help output with the `.help()` method. This overrides
-the output of the `.getHelp()` and `.showHelp()` method's which is used by the
-`-h` and `--help` option and the `help` command. The help handler will be used
-for each command, but can be overridden by child commands.
+You can also use the `.help()` method to override the help output. This
+overrides the output of the `.getHelp()` and `.showHelp()` method's which are
+used by the help option and command by default. The help handler will be used
+for each command, but can be overridden in child commands.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
@@ -1495,7 +1538,8 @@ You can also define the types directly in the constructor. The
 
 - `O` Options (defined with `.option()`)
 - `A` Arguments (defined with `.arguments()`)
-- `G` Global options (defined with `.globalOption()`)
+- `G` Global options (defined with `.globalOption()` or
+  `.option(..., { global: true })`)
 - `PG` Global parent command options
 - `P` Parent command
 
@@ -1580,6 +1624,137 @@ await new Command<void>()
   .globalOption<{ debug?: boolean }>("-d, --debug", "...")
   .command("foo", fooCommand)
   .parse(Deno.args);
+```
+
+### Generic custom types
+
+Custom types can be used to define your generic types.
+
+```typescript
+import { Command, NumberType } from "https://deno.land/x/cliffy/command/mod.ts";
+
+// Create an instance of your custom type.
+const amount = new NumberType();
+
+await new Command<void>()
+  // Add the type.
+  .type("amount", amount)
+  // Use the type of your type instance as option type.
+  // The correct type will be infered and used fot the option value.
+  .option<{ amount?: typeof amount }>(
+    "-a, --amount <amount:amount>",
+    "The amount.",
+  )
+  // Same as:
+  .option<{ amount?: TypeValue<typeof amount> }>(
+    "-a, --amount <amount:amount>",
+    "The amount.",
+  )
+  // amount will be of type number.
+  .action(({ amount }) => {
+    console.log("amount:", amount);
+  });
+```
+
+## ❯ Upgrade command
+
+Cliffy provides an `UpgradeCommand` that can be used to upgrade your cli to a
+given or latest version.
+
+```shell
+COMMAND upgrade --version 1.0.2
+```
+
+If you register the `upgrade` command you need to register an registry
+`provider`. Optional you can define the `main` file of your cli which defaults
+to the name of your cli (`[name].ts`) and `args` which can be used to define
+permissions that are passed to `deno install`.
+
+If no `args` are defined, following args are set by default: `--no-check`,
+`--quiet`, `--force` and `--name`. `--no-check` and `--quiet` are not set by
+default if `args` are defined. `--force` and `--name` are always set by default.
+
+```typescript
+import { UpgradeCommand } from "https://deno.land/x/cliffy/command/upgrade/mod.ts";
+cmd.command(
+  "upgrade",
+  new UpgradeCommand({
+    main: "cliffy.ts",
+    args: ["--allow-net", "--unstable"],
+    provider: new DenoLandProvider(),
+  }),
+);
+```
+
+There are three build in providers: `deno.land`, `nest.land` and `github`. If
+multiple providers are registered, you can specify the registry that should be
+used with the `--registry` option. The github provider can also be used to
+`upgrade` to any git branch.
+
+```shell
+COMMAND upgrade --registry github --version main
+```
+
+The `--registry` option is hidden if only one provider is registerd. If the
+`upgrade` command is called without the `--registry` option, the default
+registry is used. The default registry is the first registered provider.
+
+The `GithubProvider` requires the `repository` name as option. The
+`DenoLandProvider` and `NestLandProvider` does not require any options but you
+can optionally pass the registry module name to the provider which defaults to
+the command name.
+
+```typescript
+cmd.command(
+  "upgrade",
+  new UpgradeCommand({
+    provider: [
+      new DenoLandProvider({ name: "cliffy" }),
+      new NestLandProvider({ name: "cliffy" }),
+      new GithubProvider({ repository: "c4spar/deno-cliffy" }),
+    ],
+  }),
+);
+```
+
+The upgrade command can be also used, to list all available versions with the
+`-l` or `--list-versions` option. The current installed version is highlighted
+and prefix with a `*`.
+
+```shell
+COMMAND upgrade -l
+```
+
+```
+* v0.2.2
+  v0.2.1
+  v0.2.0
+  v0.1.0
+```
+
+The github registry shows all available tags and branches. Branches can be
+disabled with the `branches` option `GithubProvider({ branches: false })`. If
+the versions list is larger than `25`, the versions are displayed as table.
+
+```shell
+COMMAND upgrade --registry github --list-versions
+```
+
+```
+Tags:
+
+  v0.18.2   v0.17.0   v0.14.1   v0.11.2   v0.8.2   v0.6.1   v0.3.0
+  v0.18.1 * v0.16.0   v0.14.0   v0.11.1   v0.8.1   v0.6.0   v0.2.0
+  v0.18.0   v0.15.0   v0.13.0   v0.11.0   v0.8.0   v0.5.1   v0.1.0
+  v0.17.2   v0.14.3   v0.12.1   v0.10.0   v0.7.1   v0.5.0
+  v0.17.1   v0.14.2   v0.12.0   v0.9.0    v0.7.0   v0.4.0
+
+Branches:
+
+  main (Protected)
+  keypress/add-keypress-module
+  keycode/refactoring
+  command/upgrade-command
 ```
 
 ## ❯ Version option

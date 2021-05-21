@@ -52,6 +52,11 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
     GenericPrompt.inject(value);
   }
 
+  protected success(value: string): string | undefined {
+    this.saveSuggestions(value);
+    return super.success(value);
+  }
+
   /** Get input input. */
   protected getValue(): string {
     return this.inputValue;

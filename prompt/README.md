@@ -410,8 +410,18 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/input.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable
-tab-completions.
+You can provide suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions with the `suggestions` and/or `id` option. If an `id` is
+provided, the values will be saved to the local storage using the `id` as local
+storage key. Both options can be defined at the same time.
+
+The `id` option requires deno >= `1.10` and the `--location` flag.
+
+```shell
+deno install you/cli.ts --location https://example.com
+# or
+deno run you/cli.ts --location https://example.com
+```
 
 ![](assets/img/suggestions.gif)
 
@@ -420,6 +430,7 @@ import { Input } from "https://deno.land/x/cliffy/prompt/input.ts";
 
 const color: string = await Input.prompt({
   message: "Choose a color",
+  id: "<local-storage-key>",
   suggestions: [
     "Abbey",
     "Absolute Zero",
@@ -482,15 +493,16 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_lis
 The `Input` prompt has all [base](#base-options) and the following prompt
 specific options.
 
-| Param       |           Type            | Required | Description                                               |
-| ----------- | :-----------------------: | :------: | --------------------------------------------------------- |
-| minLength   |         `number`          |    No    | Min length of value. Defaults to `0`.                     |
-| maxLength   |         `number`          |    No    | Max length of value. Defaults to `infinity`.              |
-| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                               |
-| list        |         `number`          |    No    | Show auto suggestions list.                               |
-| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`. |
-| listPointer |         `string`          |    No    | Change the list pointer icon.                             |
-| info        |         `number`          |    No    | Show some usage information.                              |
+| Param       |           Type            | Required | Description                                                                                                                                                                    |
+| ----------- | :-----------------------: | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| minLength   |         `number`          |    No    | Min length of value. Defaults to `0`.                                                                                                                                          |
+| maxLength   |         `number`          |    No    | Max length of value. Defaults to `infinity`.                                                                                                                                   |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                                                                                                                                                    |
+| id          |         `string`          |    No    | If an id is provided, values are stored in the local storage using the id as local storage key. The stored values are used as suggestions at the next time the prompt is used. |
+| list        |         `number`          |    No    | Show auto suggestions list.                                                                                                                                                    |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`.                                                                                                                      |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                                                                                                                                                  |
+| info        |         `number`          |    No    | Show some usage information.                                                                                                                                                   |
 
 **↑ back to:** [Prompt types](#-types)
 
@@ -517,17 +529,18 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/number.ts
 The `Number` prompt has all [base options](#base-options) and the following
 prompt specific options.
 
-| Param       |           Type            | Required | Description                                               |
-| ----------- | :-----------------------: | :------: | --------------------------------------------------------- |
-| min         |         `number`          |    No    | Min value. Defaults to `-infinity`.                       |
-| max         |         `number`          |    No    | Max value. Defaults to `Infinity`.                        |
-| float       |         `boolean`         |    No    | Allow floating point inputs. Defaults to `false`.         |
-| round       |         `number`          |    No    | Round float values to `x` decimals. Defaults to `2`.      |
-| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                               |
-| list        |         `number`          |    No    | Show auto suggestions list.                               |
-| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`. |
-| listPointer |         `string`          |    No    | Change the list pointer icon.                             |
-| info        |         `number`          |    No    | Show some usage information.                              |
+| Param       |           Type            | Required | Description                                                                                                                                                                    |
+| ----------- | :-----------------------: | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| min         |         `number`          |    No    | Min value. Defaults to `-infinity`.                                                                                                                                            |
+| max         |         `number`          |    No    | Max value. Defaults to `Infinity`.                                                                                                                                             |
+| float       |         `boolean`         |    No    | Allow floating point inputs. Defaults to `false`.                                                                                                                              |
+| round       |         `number`          |    No    | Round float values to `x` decimals. Defaults to `2`.                                                                                                                           |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                                                                                                                                                    |
+| id          |         `string`          |    No    | If an id is provided, values are stored in the local storage using the id as local storage key. The stored values are used as suggestions at the next time the prompt is used. |
+| list        |         `number`          |    No    | Show auto suggestions list.                                                                                                                                                    |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`.                                                                                                                      |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                                                                                                                                                  |
+| info        |         `number`          |    No    | Show some usage information.                                                                                                                                                   |
 
 **↑ back to:** [Prompt types](#-types)
 
@@ -643,8 +656,18 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
 
 #### Auto suggestions
 
-You can add suggestions to the `Input`, `Number` and `List` prompt to enable
-tab-completions.
+You can provide suggestions to the `Input`, `Number` and `List` prompt to enable
+tab-completions with the `suggestions` and/or `id` option. If an `id` is
+provided, the value will be saved to the local storage using the `id` as local
+storage key. Both options can be defined at the same time.
+
+The `id` option requires deno >= `1.10` and the `--location` flag.
+
+```shell
+deno install you/cli.ts --location https://example.com
+# or
+deno run you/cli.ts --location https://example.com
+```
 
 ![](assets/img/suggestions_list_prompt.gif)
 
@@ -653,6 +676,7 @@ import { List } from "https://deno.land/x/cliffy/prompt/list.ts";
 
 const color: string = await List.prompt({
   message: "Choose a color",
+  id: "<local-storage-key>",
   suggestions: [
     "Abbey",
     "Absolute Zero",
@@ -679,18 +703,19 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_lis
 The `List` prompt has all [base options](#base-options) and the following prompt
 specific options.
 
-| Param       |           Type            | Required | Description                                                                                   |
-| ----------- | :-----------------------: | :------: | --------------------------------------------------------------------------------------------- |
-| separator   |         `string`          |    No    | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`. |
-| minLength   |         `number`          |    No    | Min length of a single tag. Defaults to `0`.                                                  |
-| maxLength   |         `number`          |    No    | Max length of a single tag. Defaults to `infinity`.                                           |
-| minTags     |         `number`          |    No    | Min number of tags. Defaults to `0`.                                                          |
-| maxTags     |         `number`          |    No    | Max number of tags. Defaults to `infinity`.                                                   |
-| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                                                                   |
-| list        |         `number`          |    No    | Show auto suggestions list.                                                                   |
-| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`.                                     |
-| listPointer |         `string`          |    No    | Change the list pointer icon.                                                                 |
-| info        |         `number`          |    No    | Show some usage information.                                                                  |
+| Param       |           Type            | Required | Description                                                                                                                                                                    |
+| ----------- | :-----------------------: | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| separator   |         `string`          |    No    | String separator. Will trim all white-spaces from start and end of string. Defaults to `','`.                                                                                  |
+| minLength   |         `number`          |    No    | Min length of a single tag. Defaults to `0`.                                                                                                                                   |
+| maxLength   |         `number`          |    No    | Max length of a single tag. Defaults to `infinity`.                                                                                                                            |
+| minTags     |         `number`          |    No    | Min number of tags. Defaults to `0`.                                                                                                                                           |
+| maxTags     |         `number`          |    No    | Max number of tags. Defaults to `infinity`.                                                                                                                                    |
+| suggestions | `Array<string \| number>` |    No    | A list of auto suggestions.                                                                                                                                                    |
+| id          |         `string`          |    No    | If an id is provided, values are stored in the local storage using the id as local storage key. The stored values are used as suggestions at the next time the prompt is used. |
+| list        |         `number`          |    No    | Show auto suggestions list.                                                                                                                                                    |
+| maxRows     |         `number`          |    No    | Number of options suggestions per page. Defaults to `10`.                                                                                                                      |
+| listPointer |         `string`          |    No    | Change the list pointer icon.                                                                                                                                                  |
+| info        |         `number`          |    No    | Show some usage information.                                                                                                                                                   |
 
 **↑ back to:** [Prompt types](#-types)
 

@@ -7,21 +7,21 @@ const cmd = new Command()
   .option("--no-flag", "description ...")
   .action(() => {});
 
-Deno.test("command typeString flag", async () => {
+Deno.test("command - type - string - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command typeString flagValue", async () => {
+Deno.test("command - type - string - with valid value", async () => {
   const { options, args } = await cmd.parse(["--flag", "value"]);
 
   assertEquals(options, { flag: "value" });
   assertEquals(args, []);
 });
 
-Deno.test("command optionStandalone flagCombineLong", async () => {
+Deno.test("command - type - string - no arguments allowed", async () => {
   await assertThrowsAsync(
     async () => {
       await cmd.parse(["-f", "value", "unknown"]);
