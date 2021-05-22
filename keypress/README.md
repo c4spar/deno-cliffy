@@ -89,10 +89,16 @@ import {
 
 ## ❯ Usage
 
+There are two ways to use this module. You can use the `keypress()` method,
+which returns a global instance of the `KeyPress` class, or you can create a new
+instance of the `KeyPress` class. There is no difference between these two ways,
+except that the `keypress()` method always returns the same instance, unless the
+`.dispose()` method is called. In this case a new instance is returned.
+
 ## Promise
 
-The keypress module can be used as promise. The promise reads one chunk from
-stdin and returns and event for the first character from the chunk.
+The keypress module can be used as promise. It reads one chunk from stdin and
+returns an `KeyboardEvent` for the first parsed character.
 
 ```typescript
 import {
@@ -123,9 +129,8 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/prom
 The keypress module can be used as async iterator to iterate over all keyboard
 events. The async iterator reads chunk by chunk from stdin. On each step, it
 reads one chunk from stdin and emits for each character a keyboard event. It
-pauses reading from stdin before emitting the keyboard event, so stdin is not
-blocked inside your loop. It starts reading again from stdin as soon as the next
-method from the iterator is called.
+pauses reading from stdin before emitting the events, so stdin is not blocked
+inside the for loop.
 
 ```typescript
 import { Keypress, keypress } from "https://deno.land/x/cliffy/keypress/mod.ts";
@@ -154,13 +159,13 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/asyn
 
 ## Event Target
 
-The Keypress class extends from the EventTarget class which provides a
+The Keypress class extends from the EventTarget class that provides a
 `.addEventListener()` method that can be used to register event listeners. The
-addEventListener method starts an event loop in the background which reads from
-stdin and emits for each input an event. The event loop can to be stopped with
-`event.preventDefault()` and `keypress().dispose()`. For comparison, the promise
-and async iterator based solution does not spin up an event loop in the
-background.
+addEventListener method starts an event loop in the background that reads from
+stdin and emits an event for each input. During this time stdin is blocked for
+other resources. The event loop can be stopped with `event.preventDefault()` or
+`keypress().dispose()`. The promise and asynchronous iterator based solution
+does not start an event loop in the background.
 
 ```typescript
 import {
