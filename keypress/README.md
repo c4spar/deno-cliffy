@@ -48,7 +48,7 @@
 - [API](#-api)
   - [keypress](#keypress)
   - [Keypress](#keypress-1)
-  - [KeyboardEvent](#keyboardevent)
+  - [KeyPressEvent](#keypressevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -61,9 +61,9 @@ Deno Registry
 
 ```typescript
 import {
-  KeyboardEvent,
   Keypress,
   keypress,
+  KeyPressEvent,
 } from "https://deno.land/x/cliffy@<version>/keypress/mod.ts";
 ```
 
@@ -71,9 +71,9 @@ Nest Registry
 
 ```typescript
 import {
-  KeyboardEvent,
   Keypress,
   keypress,
+  KeyPressEvent,
 } from "https://x.nest.land/cliffy@<version>/keypress/mod.ts";
 ```
 
@@ -81,9 +81,9 @@ Github
 
 ```typescript
 import {
-  KeyboardEvent,
   Keypress,
   keypress,
+  KeyPressEvent,
 } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keypress/mod.ts";
 ```
 
@@ -98,15 +98,15 @@ except that the `keypress()` method always returns the same instance, unless the
 ## Promise
 
 The keypress module can be used as promise. It reads one chunk from stdin and
-returns an `KeyboardEvent` for the first parsed character.
+returns an `KeyPressEvent` for the first parsed character.
 
 ```typescript
 import {
-  KeyboardEvent,
   keypress,
+  KeyPressEvent,
 } from "https://deno.land/x/cliffy/keypress/mod.ts";
 
-const event: KeyboardEvent = await keypress();
+const event: KeyPressEvent = await keypress();
 
 console.log(
   "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
@@ -126,16 +126,16 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/prom
 
 ## Async Iterator
 
-The keypress module can be used as async iterator to iterate over all keyboard
+The keypress module can be used as async iterator to iterate over all keypress
 events. The async iterator reads chunk by chunk from stdin. On each step, it
-reads one chunk from stdin and emits for each character a keyboard event. It
+reads one chunk from stdin and emits for each character a keypress event. It
 pauses reading from stdin before emitting the events, so stdin is not blocked
 inside the for loop.
 
 ```typescript
 import { Keypress, keypress } from "https://deno.land/x/cliffy/keypress/mod.ts";
 
-for await (const event: KeyboardEvent of keypress()) {
+for await (const event: KeyPressEvent of keypress()) {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,
@@ -169,11 +169,11 @@ does not start an event loop in the background.
 
 ```typescript
 import {
-  KeyboardEvent,
   keypress,
+  KeyPressEvent,
 } from "https://deno.land/x/cliffy/keypress/mod.ts";
 
-keypress().addEventListener("keydown", (event: KeyboardEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,
@@ -203,10 +203,10 @@ $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/even
 
 ### Keypress
 
-- new Keypress(): Promise\<KeyboardEvent> | AsyncIterator\<KeyboardEvent> |
+- new Keypress(): Promise\<KeyPressEvent> | AsyncIterator\<KeyPressEvent> |
   EventTarget
 
-### KeyboardEvent
+### KeyPressEvent
 
 - key?: string
 - sequence?: string

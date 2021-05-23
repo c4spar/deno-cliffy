@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyboardEvent, keypress } from "../../keypress/mod.ts";
+import { keypress, KeyPressEvent } from "../../keypress/mod.ts";
 
-keypress().addEventListener("keydown", (event: KeyboardEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,

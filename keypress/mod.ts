@@ -1,7 +1,7 @@
 import { KeyCode } from "../keycode/key_code.ts";
 import { KeyEvent } from "../keycode/key_event.ts";
 
-type KeyboardEventType = "keydown";
+type KeyPressEventType = "keydown";
 
 interface KeyCodeOptions {
   name?: string;
@@ -14,21 +14,21 @@ interface KeyCodeOptions {
   repeat?: boolean;
 }
 
-export type KeyboardEventListener = (
-  evt: KeyboardEvent,
+export type KeyPressEventListener = (
+  evt: KeyPressEvent,
 ) => void | Promise<void>;
 
-interface KeyboardEventListenerObject {
-  handleEvent(evt: KeyboardEvent): void | Promise<void>;
+interface KeyPressEventListenerObject {
+  handleEvent(evt: KeyPressEvent): void | Promise<void>;
 }
 
-export type KeyboardEventInit = EventInit & KeyCodeOptions;
+export type KeyPressEventInit = EventInit & KeyCodeOptions;
 
-type KeyboardEventListenerOrEventListenerObject =
-  | KeyboardEventListener
-  | KeyboardEventListenerObject;
+type KeyPressEventListenerOrEventListenerObject =
+  | KeyPressEventListener
+  | KeyPressEventListenerObject;
 
-export class KeyboardEvent extends Event {
+export class KeyPressEvent extends Event {
   public readonly key?: string;
   public readonly sequence?: string;
   public readonly code?: string;
@@ -39,8 +39,8 @@ export class KeyboardEvent extends Event {
   public readonly repeat: boolean;
 
   constructor(
-    type: KeyboardEventType,
-    eventInitDict: KeyboardEventInit,
+    type: KeyPressEventType,
+    eventInitDict: KeyPressEventInit,
   ) {
     super(type, eventInitDict);
     this.key = eventInitDict.name;
@@ -58,24 +58,24 @@ type Resolver<T> = (value: T | PromiseLike<T>) => void;
 type Reject = (error: Error) => void;
 
 interface PullQueueItem {
-  resolve: Resolver<KeyboardEvent | null>;
+  resolve: Resolver<KeyPressEvent | null>;
   reject: Reject;
 }
 
 export class Keypress extends EventTarget
-  implements AsyncIterableIterator<KeyboardEvent>, PromiseLike<KeyboardEvent> {
+  implements AsyncIterableIterator<KeyPressEvent>, PromiseLike<KeyPressEvent> {
   #disposed = false;
   #pullQueue: PullQueueItem[] = [];
-  #pushQueue: (KeyboardEvent | null)[] = [];
-  #lastEvent?: KeyboardEvent;
+  #pushQueue: (KeyPressEvent | null)[] = [];
+  #lastEvent?: KeyPressEvent;
   #listeners: Record<
-    KeyboardEventType,
+    KeyPressEventType,
     Set<EventListenerOrEventListenerObject | null>
   > = {
     keydown: new Set(),
   };
 
-  [Symbol.asyncIterator](): AsyncIterableIterator<KeyboardEvent> {
+  [Symbol.asyncIterator](): AsyncIterableIterator<KeyPressEvent> {
     return this;
   }
 
@@ -83,8 +83,8 @@ export class Keypress extends EventTarget
     return this.#disposed;
   }
 
-  async next(): Promise<IteratorResult<KeyboardEvent>> {
-    const event: KeyboardEvent | null | false = !this.#disposed &&
+  async next(): Promise<IteratorResult<KeyPressEvent>> {
+    const event: KeyPressEvent | null | false = !this.#disposed &&
       await this.#pullEvent();
 
     return event && !this.#disposed
@@ -93,7 +93,7 @@ export class Keypress extends EventTarget
   }
 
   then<T, S>(
-    f: (v: KeyboardEvent) => T | Promise<T>,
+    f: (v: KeyPressEvent) => T | Promise<T>,
     g?: (v: Error) => S | Promise<S>,
   ): Promise<T | S> {
     return this.next()
@@ -107,11 +107,11 @@ export class Keypress extends EventTarget
 
   addEventListener(
     type: "keydown",
-    listener: KeyboardEventListenerOrEventListenerObject | null,
+    listener: KeyPressEventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
-    type: KeyboardEventType,
+    type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void {
@@ -124,11 +124,11 @@ export class Keypress extends EventTarget
 
   removeEventListener(
     type: "keydown",
-    callback: KeyboardEventListenerOrEventListenerObject | null,
+    callback: KeyPressEventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void;
   removeEventListener(
-    type: KeyboardEventType,
+    type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void {
@@ -196,7 +196,7 @@ export class Keypress extends EventTarget
 
   #dispatch = (keys: Array<KeyEvent>): void => {
     for (const key of keys) {
-      const event = new KeyboardEvent("keydown", {
+      const event = new KeyPressEvent("keydown", {
         ...key,
         cancelable: true,
         repeat: this.#lastEvent && this.#lastEvent.sequence === key.sequence &&
@@ -218,7 +218,7 @@ export class Keypress extends EventTarget
     }
   };
 
-  #pushEvent = (event: KeyboardEvent): void => {
+  #pushEvent = (event: KeyPressEvent): void => {
     if (this.#pullQueue.length > 0) {
       const { resolve } = this.#pullQueue.shift() as PullQueueItem;
       resolve(event);
@@ -227,14 +227,14 @@ export class Keypress extends EventTarget
     }
   };
 
-  #pullEvent = async (): Promise<KeyboardEvent | null> => {
+  #pullEvent = async (): Promise<KeyPressEvent | null> => {
     if (!this.#hasListeners()) {
       await this.#read();
     }
-    return new Promise<KeyboardEvent | null>(
-      (resolve: Resolver<KeyboardEvent | null>, reject: Reject) => {
+    return new Promise<KeyPressEvent | null>(
+      (resolve: Resolver<KeyPressEvent | null>, reject: Reject) => {
         if (this.#pushQueue.length > 0) {
-          const event: KeyboardEvent | null = this.#pushQueue.shift() ?? null;
+          const event: KeyPressEvent | null = this.#pushQueue.shift() ?? null;
           resolve(event);
         } else {
           this.#pullQueue.push({ resolve, reject });

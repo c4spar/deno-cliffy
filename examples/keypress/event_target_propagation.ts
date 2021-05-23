@@ -1,9 +1,9 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { KeyboardEvent, keypress } from "../../keypress/mod.ts";
+import { keypress, KeyPressEvent } from "../../keypress/mod.ts";
 
 // Register an event listener that is called an every keydown event.
-keypress().addEventListener("keydown", (event: KeyboardEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
     "# event - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
@@ -15,7 +15,7 @@ keypress().addEventListener("keydown", (event: KeyboardEvent) => {
 });
 
 // Register an event listener that is called only once.
-keypress().addEventListener("keydown", (event: KeyboardEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
     "# first - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
@@ -31,7 +31,7 @@ keypress().addEventListener("keydown", (event: KeyboardEvent) => {
   once: true,
 });
 
-keypress().addEventListener("keydown", (event: KeyboardEvent) => {
+keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   console.log(
     "# second - type: %s, key: %s, ctrl: %s, meta: %s, shift: %s",
     event.type,
