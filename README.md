@@ -52,6 +52,9 @@
 
 - **[keycode](keycode/):** Parse ANSI key codes.
 
+- **[keypress](keypress/):** Keypress module with promise, async iterator and
+  event target API.
+
 - **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm,
   input, number, select, etc...
 
