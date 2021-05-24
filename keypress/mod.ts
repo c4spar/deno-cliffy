@@ -18,13 +18,13 @@ export type KeyPressEventListener = (
   evt: KeyPressEvent,
 ) => void | Promise<void>;
 
-interface KeyPressEventListenerObject {
+export interface KeyPressEventListenerObject {
   handleEvent(evt: KeyPressEvent): void | Promise<void>;
 }
 
 export type KeyPressEventInit = EventInit & KeyCodeOptions;
 
-type KeyPressEventListenerOrEventListenerObject =
+export type KeyPressEventListenerOrEventListenerObject =
   | KeyPressEventListener
   | KeyPressEventListenerObject;
 
