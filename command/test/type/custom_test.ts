@@ -1,6 +1,7 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { ITypeHandler, ITypeInfo } from "../../types.ts";
+import { Type } from "../../type.ts";
 
 const email = (): ITypeHandler<string> => {
   const emailRegex =
@@ -29,43 +30,86 @@ const cmd = new Command()
   .description("...")
   .action(() => {});
 
-Deno.test("command with custom type", async () => {
+Deno.test("command - type - custom - with valid value", async () => {
   const { options, args } = await cmd.parse(["-e", "my@email.com"]);
 
   assertEquals(options, { email: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("command with global custom type", async () => {
+Deno.test("command - type - custom - long flag with valid value", async () => {
   const { options, args } = await cmd.parse(["-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("sub command global custom type", async () => {
+Deno.test("command - type - custom - child command with valid value", async () => {
   const { options, args } = await cmd.parse(["init", "-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("sub command none global custom type", async () => {
+Deno.test("command - type - custom - with unknown type", async () => {
   await assertThrowsAsync(
-    async () => {
-      await cmd.parse(["init", "-e", "my@email.com"]);
-    },
+    () => cmd.parse(["init", "-e", "my@email.com"]),
     Error,
     `Unknown type "email". Did you mean type "email2"?`,
   );
 });
 
-Deno.test("sub command with global custom type and invalid value", async () => {
+Deno.test("command - type - custom - with invalid value", async () => {
   await assertThrowsAsync(
-    async () => {
-      await cmd.parse(["init", "-E", "my @email.com"]);
-    },
+    () => cmd.parse(["-E", "my @email.com"]),
     Error,
     `Option "--email2" must be a valid "email", but got "my @email.com".`,
+  );
+});
+
+Deno.test("command - type - custom - with invalid value on child command", async () => {
+  await assertThrowsAsync(
+    () => cmd.parse(["init", "-E", "my @email.com"]),
+    Error,
+    `Option "--email2" must be a valid "email", but got "my @email.com".`,
+  );
+});
+
+class CustomType<T extends string> extends Type<T> {
+  constructor(private formats: Array<T>) {
+    super();
+  }
+
+  parse(type: ITypeInfo): T {
+    if (!this.formats.includes(type.value as T)) {
+      throw new Error(`invalid type: ${type.value}`);
+    }
+    return type.value as T;
+  }
+}
+
+Deno.test("command - type - custom - generic custom type", async () => {
+  const format = new CustomType(["foo", "bar"]);
+  const cmd = new Command<void>()
+    .throwErrors()
+    .type("format", format)
+    .option<{ format: typeof format }>(
+      "-f, --format [format:format]",
+      "...",
+    )
+    .action(({ format }) => {
+      // @ts-expect-error format cannot be xyz
+      format === "xyz";
+      format === "foo";
+      format === "bar";
+    });
+
+  const { options } = await cmd.parse(["-f", "foo"]);
+  assertEquals(options, { format: "foo" });
+
+  await assertThrowsAsync(
+    () => cmd.parse(["-f", "xyz"]),
+    Error,
+    `invalid type: xyz`,
   );
 });

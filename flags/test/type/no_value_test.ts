@@ -9,7 +9,7 @@ const options = <IParseOptions> {
   }],
 };
 
-Deno.test("flags typeBoolean no value - short flag", () => {
+Deno.test("flags - type - no value - short flag without argument", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], options);
 
   assertEquals(flags, { flag: true });
@@ -17,7 +17,7 @@ Deno.test("flags typeBoolean no value - short flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeBoolean no value - long flag", () => {
+Deno.test("flags - type - no value - long flag without argument", () => {
   const { flags, unknown, literal } = parseFlags(["--flag"], options);
 
   assertEquals(flags, { flag: true });
@@ -25,18 +25,18 @@ Deno.test("flags typeBoolean no value - long flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeBoolean no value - short flag - should fail with value", () => {
-  const { flags, unknown, literal } = parseFlags(["-f", "123"], options);
+Deno.test("flags - type - no value - short flag with argument", () => {
+  const { flags, unknown, literal } = parseFlags(["-f", "true"], options);
 
   assertEquals(flags, { flag: true });
-  assertEquals(unknown, ["123"]);
+  assertEquals(unknown, ["true"]);
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeBoolean no value - long flag - should fail with value", () => {
-  const { flags, unknown, literal } = parseFlags(["--flag", "123"], options);
+Deno.test("flags - type - no value - long flag with argument", () => {
+  const { flags, unknown, literal } = parseFlags(["--flag", "true"], options);
 
   assertEquals(flags, { flag: true });
-  assertEquals(unknown, ["123"]);
+  assertEquals(unknown, ["true"]);
   assertEquals(literal, []);
 });

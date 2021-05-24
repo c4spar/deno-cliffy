@@ -14,6 +14,7 @@ import {
 } from "../deps.ts";
 import type { IArgument } from "../types.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
+import { Type } from "../type.ts";
 
 export interface HelpOptions {
   types?: boolean;
@@ -238,15 +239,25 @@ export class HelpGenerator {
       red(bold(`Conflicts: `)) +
         italic(option.conflicts.map(getFlag).join(", ")),
     );
-    (Array.isArray(option.value) || option.value instanceof RegExp) &&
+
+    let possibleValues: Array<string | number | RegExp> | undefined;
+    if (option.value instanceof RegExp) {
+      possibleValues = [option.value];
+    } else if (Array.isArray(option.value)) {
+      possibleValues = option.value;
+    } else {
+      const type = this.cmd.getType(option.args[0]?.type)?.handler;
+      if (type instanceof Type) {
+        possibleValues = type.values?.(this.cmd, this.cmd.getParent());
+      }
+    }
+
+    if (possibleValues) {
       hints.push(
-        bold(`Possible values: `) +
-          italic(
-            (Array.isArray(option.value)
-              ? option.value
-              : [option.value.toString()]).join(", "),
-          ),
+        bold(`Values: `) +
+          possibleValues.map((value: unknown) => inspect(value)).join(", "),
       );
+    }
 
     if (hints.length) {
       return `(${hints.join(", ")})`;

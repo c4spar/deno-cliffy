@@ -3,6 +3,7 @@ import {
   assertEquals,
   dirname,
   expandGlob,
+  lt,
   WalkEntry,
 } from "../../../dev_deps.ts";
 
@@ -13,6 +14,7 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
     const name = file.name.replace(/_/g, " ").replace(".ts", "");
     Deno.test({
       name: `prompt - integration - ${name}`,
+      ignore: lt(Deno.version.deno, "1.10.0"),
       async fn() {
         const output: string = await runPrompt(file);
         const expectedOutput: string = await getExpectedOutput(file.path);
@@ -48,6 +50,8 @@ async function runPrompt(file: WalkEntry): Promise<string> {
       "run",
       "--unstable",
       "--allow-all",
+      "--location",
+      "https://cliffy.io",
       file.path,
     ],
     env: {

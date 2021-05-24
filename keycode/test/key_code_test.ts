@@ -1,16 +1,15 @@
 import { assertEquals } from "../../dev_deps.ts";
-import { KeyCode } from "../key_code.ts";
+import { KeyCode, parse } from "../key_code.ts";
 import {
   KeyMap,
   KeyMapCtrl,
   KeyMapShift,
   SpecialKeyMap,
 } from "../key_codes.ts";
-import type { IKey, KeyEvent } from "../key_event.ts";
 
 const ESC = "\x1B";
 
-const defaults = <IKey> {
+const defaults = <KeyCode> {
   name: undefined,
   sequence: undefined,
   code: undefined,
@@ -21,11 +20,11 @@ const defaults = <IKey> {
 
 for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
   Deno.test(`keycode - parse key - ${char}`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(char);
+    const keys: KeyCode[] = parse(char);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name: char.toLowerCase(),
         sequence: char,
@@ -36,11 +35,11 @@ for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
 
 for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
   Deno.test(`keycode - parse key - shift + ${char}`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(char);
+    const keys: KeyCode[] = parse(char);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name: char.toLowerCase(),
         sequence: char,
@@ -52,11 +51,11 @@ for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 
 for (const char of '!"§$%&/()=?,;.:-_') {
   Deno.test(`keycode - parse special key - ${char}`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(char);
+    const keys: KeyCode[] = parse(char);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name: undefined,
         sequence: char,
@@ -69,12 +68,12 @@ for (const code of Object.keys(SpecialKeyMap)) {
   const name = SpecialKeyMap[code];
 
   Deno.test(`keycode - parse key - SpecialKeyMap - ${name} (${code})`, function () {
-    // const keys: KeyEvent[] = KeyCode.parse( ESC + code );
-    const keys: KeyEvent[] = KeyCode.parse(code);
+    // const keys: KeyEvent[] = parse( ESC + code );
+    const keys: KeyCode[] = parse(code);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name,
         sequence: code,
@@ -87,11 +86,11 @@ for (const code of Object.keys(KeyMap)) {
   const name = KeyMap[code];
 
   Deno.test(`keycode - parse key - KeyMap - ${name} (${code})`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(ESC + code);
+    const keys: KeyCode[] = parse(ESC + code);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -105,11 +104,11 @@ for (const code of Object.keys(KeyMapShift)) {
   const name = KeyMapShift[code];
 
   Deno.test(`keycode - parse key - KeyMapShift - shift + ${name} (${code})`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(ESC + code);
+    const keys: KeyCode[] = parse(ESC + code);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -124,11 +123,11 @@ for (const code of Object.keys(KeyMapCtrl)) {
   const name = KeyMapCtrl[code];
 
   Deno.test(`keycode - parse key - KeyMapCtrl - ctrl + ${name} (${code})`, function () {
-    const keys: KeyEvent[] = KeyCode.parse(ESC + code);
+    const keys: KeyCode[] = parse(ESC + code);
 
     assertEquals(
       keys,
-      <KeyEvent[]> [{
+      <KeyCode[]> [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -140,11 +139,11 @@ for (const code of Object.keys(KeyMapCtrl)) {
 }
 
 Deno.test(`keycode - parse string - abc`, function () {
-  const keys: KeyEvent[] = KeyCode.parse("abc");
+  const keys: KeyCode[] = parse("abc");
 
   assertEquals(
     keys,
-    <KeyEvent[]> [{
+    <KeyCode[]> [{
       ...defaults,
       name: "a",
       sequence: "a",
@@ -161,7 +160,7 @@ Deno.test(`keycode - parse string - abc`, function () {
 });
 
 Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
-  const keys = KeyCode.parse(
+  const keys = parse(
     "\x1b[2P\x1b[3P\x1b[4P\x1b[5P\x1b[6P\x1b[7P\x1b[8P\x1b[3Q\x1b[8Q\x1b[3R\x1b[8R\x1b[3S\x1b[8S",
   );
   assertEquals(keys, [

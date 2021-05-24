@@ -24,7 +24,7 @@ const requiredValueOptions = <IParseOptions> {
   }],
 };
 
-Deno.test("flags typeString flag", () => {
+Deno.test("flags - type - string - with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], optionalValueOptions);
 
   assertEquals(flags, { flag: true });
@@ -32,7 +32,7 @@ Deno.test("flags typeString flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeString flagValue", () => {
+Deno.test("flags - type - string - with valid value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "value"],
     optionalValueOptions,
@@ -43,7 +43,7 @@ Deno.test("flags typeString flagValue", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeString flagValueUnknown", () => {
+Deno.test("flags - type - string - with special chars", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√', "unknown"],
     optionalValueOptions,
@@ -54,7 +54,7 @@ Deno.test("flags typeString flagValueUnknown", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags typeString flagMissing", () => {
+Deno.test("flags - type - string - with missing value", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredValueOptions),
     Error,

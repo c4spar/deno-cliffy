@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 import {
   GenericSuggestions,
@@ -69,11 +69,16 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
     GenericPrompt.inject(value);
   }
 
+  protected success(value: number): string | undefined {
+    this.saveSuggestions(value);
+    return super.success(value);
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.settings.suggestions &&
         this.isKey(this.settings.keys, "next", event):

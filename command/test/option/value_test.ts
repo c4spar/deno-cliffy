@@ -31,19 +31,22 @@ function cmd() {
       collect: true,
       value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
     })
-    .option("-o, --optional", "...");
+    .option("-d, --default", "...", {
+      default: "foo",
+      value: (value) => value === "foo" ? "bar" : "baz",
+    });
 }
 
 Deno.test("command - option - value - function validator with no value", async () => {
-  const { options } = await cmd().parse(["-f", "-o"]);
+  const { options } = await cmd().parse(["-f", "-d"]);
 
-  assertEquals(options, { function: true, optional: true });
+  assertEquals(options, { function: true, default: "bar" });
 });
 
 Deno.test("command - option - value - function validator with valid value", async () => {
-  const { options } = await cmd().parse(["-f", "foo", "-o"]);
+  const { options } = await cmd().parse(["-f", "foo", "-d"]);
 
-  assertEquals(options, { function: ["foo"], optional: true });
+  assertEquals(options, { function: ["foo"], default: "bar" });
 });
 
 Deno.test("command - option - value - function validator with collected values", async () => {
@@ -54,15 +57,15 @@ Deno.test("command - option - value - function validator with collected values",
     "bar",
     "-f",
     "baz",
-    "-o",
+    "-d",
   ]);
 
-  assertEquals(options, { function: ["foo", "bar", "baz"], optional: true });
+  assertEquals(options, { function: ["foo", "bar", "baz"], default: "bar" });
 });
 
 Deno.test("command - option - value - function validator with invalid value", async () => {
   await assertThrowsAsync(
-    () => cmd().parse(["-f", "fo", "-o"]),
+    () => cmd().parse(["-f", "fo", "-d"]),
     Error,
     `Option "--function" must be of type "string", but got "fo".`,
   );
@@ -71,19 +74,19 @@ Deno.test("command - option - value - function validator with invalid value", as
 Deno.test("command - option - value - function validator with no value", async () => {
   const { options } = await cmd().parse(["-iii"]);
 
-  assertEquals(options, { incremental: 3 });
+  assertEquals(options, { incremental: 3, default: "bar" });
 });
 
 Deno.test("command - option - value - array validator with no value", async () => {
-  const { options } = await cmd().parse(["-a", "-o"]);
+  const { options } = await cmd().parse(["-a", "-d"]);
 
-  assertEquals(options, { array: true, optional: true });
+  assertEquals(options, { array: true, default: "bar" });
 });
 
 Deno.test("command - option - value - array validator with valid value", async () => {
-  const { options } = await cmd().parse(["-a", "foo", "-o"]);
+  const { options } = await cmd().parse(["-a", "foo", "-d"]);
 
-  assertEquals(options, { array: ["foo"], optional: true });
+  assertEquals(options, { array: ["foo"], default: "bar" });
 });
 
 Deno.test("command - option - value - array validator with collected values", async () => {
@@ -94,30 +97,30 @@ Deno.test("command - option - value - array validator with collected values", as
     "bar",
     "-a",
     "baz",
-    "-o",
+    "-d",
   ]);
 
-  assertEquals(options, { array: ["foo", "bar", "baz"], optional: true });
+  assertEquals(options, { array: ["foo", "bar", "baz"], default: "bar" });
 });
 
 Deno.test("command - option - value - array validator with invalid value", async () => {
   await assertThrowsAsync(
-    () => cmd().parse(["-a", "fo", "-o"]),
+    () => cmd().parse(["-a", "fo", "-d"]),
     Error,
     `Option "--array" must be of type "foo, bar, baz", but got "fo".`,
   );
 });
 
 Deno.test("command - option - value - regex validator with no value", async () => {
-  const { options } = await cmd().parse(["-r", "-o"]);
+  const { options } = await cmd().parse(["-r", "-d"]);
 
-  assertEquals(options, { regex: true, optional: true });
+  assertEquals(options, { regex: true, default: "bar" });
 });
 
 Deno.test("command - option - value - regex validator with valid value", async () => {
-  const { options } = await cmd().parse(["-r", "foo", "-o"]);
+  const { options } = await cmd().parse(["-r", "foo", "-d"]);
 
-  assertEquals(options, { regex: ["foo"], optional: true });
+  assertEquals(options, { regex: ["foo"], default: "bar" });
 });
 
 Deno.test("command - option - value - regex validator with collected values", async () => {
@@ -128,15 +131,15 @@ Deno.test("command - option - value - regex validator with collected values", as
     "bar",
     "-r",
     "baz",
-    "-o",
+    "-d",
   ]);
 
-  assertEquals(options, { regex: ["foo", "bar", "baz"], optional: true });
+  assertEquals(options, { regex: ["foo", "bar", "baz"], default: "bar" });
 });
 
 Deno.test("command - option - value - regex validator with invalid value", async () => {
   await assertThrowsAsync(
-    () => cmd().parse(["-r", "fo", "-o"]),
+    () => cmd().parse(["-r", "fo", "-d"]),
     Error,
     `Option "--regex" must be of type "/^(foo|bar|baz)$/", but got "fo".`,
   );

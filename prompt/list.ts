@@ -90,6 +90,11 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     );
   }
 
+  protected success(value: string[]): string | undefined {
+    this.saveSuggestions(...value);
+    return super.success(value);
+  }
+
   /** Get input value. */
   protected getValue(): string {
     // Remove trailing comma and spaces.

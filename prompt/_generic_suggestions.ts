@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import {
   GenericInput,
   GenericInputKeys,
@@ -8,6 +8,18 @@ import {
 import { blue, bold, dim, stripColor, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
+
+interface LocalStorage {
+  getItem(key: string): string | null;
+  removeItem(key: string): void;
+  setItem(key: string, value: string): void;
+}
+
+// keep support for deno < 1.10
+const localStorage: LocalStorage | null = "localStorage" in window
+  ? // deno-lint-ignore no-explicit-any
+    (window as any).localStorage
+  : null;
 
 /** Input keys options. */
 export interface GenericSuggestionsKeys extends GenericInputKeys {
@@ -22,6 +34,7 @@ export interface GenericSuggestionsKeys extends GenericInputKeys {
 export interface GenericSuggestionsOptions<T, V>
   extends GenericInputPromptOptions<T, V> {
   keys?: GenericSuggestionsKeys;
+  id?: string;
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
@@ -33,6 +46,7 @@ export interface GenericSuggestionsOptions<T, V>
 export interface GenericSuggestionsSettings<T, V>
   extends GenericInputPromptSettings<T, V> {
   keys?: GenericSuggestionsKeys;
+  id?: string;
   suggestions?: Array<string | number>;
   list?: boolean;
   info?: boolean;
@@ -66,8 +80,36 @@ export abstract class GenericSuggestions<
         ...(settings.keys ?? {}),
       },
     });
-    if (this.settings.suggestions) {
-      this.settings.suggestions = this.settings.suggestions.slice();
+    const suggestions: Array<string | number> = this.loadSuggestions();
+    if (suggestions.length || this.settings.suggestions) {
+      this.settings.suggestions = [
+        ...suggestions,
+        ...this.settings.suggestions ?? [],
+      ].filter(uniqueSuggestions);
+    }
+  }
+
+  protected loadSuggestions(): Array<string | number> {
+    if (this.settings.id) {
+      const json = localStorage?.getItem(this.settings.id);
+      const suggestions: Array<string | number> = json ? JSON.parse(json) : [];
+      if (!Array.isArray(suggestions)) {
+        return [];
+      }
+      return suggestions;
+    }
+    return [];
+  }
+
+  protected saveSuggestions(...suggestions: Array<string | number>): void {
+    if (this.settings.id) {
+      localStorage?.setItem(
+        this.settings.id,
+        JSON.stringify([
+          ...suggestions,
+          ...this.loadSuggestions(),
+        ].filter(uniqueSuggestions)),
+      );
     }
   }
 
@@ -221,7 +263,7 @@ export abstract class GenericSuggestions<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "next", event):
         if (this.settings.list) {
@@ -341,4 +383,13 @@ export abstract class GenericSuggestions<
       }
     }
   }
+}
+
+function uniqueSuggestions(
+  value: unknown,
+  index: number,
+  self: Array<unknown>,
+) {
+  return typeof value !== "undefined" && value !== "" &&
+    self.indexOf(value) === index;
 }
