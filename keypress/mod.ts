@@ -1,5 +1,4 @@
-import { KeyCode } from "../keycode/key_code.ts";
-import { KeyEvent } from "../keycode/key_event.ts";
+import { KeyCode, parse } from "../keycode/mod.ts";
 
 type KeyPressEventType = "keydown";
 
@@ -181,11 +180,9 @@ export class Keypress extends EventTarget
       return;
     }
 
-    let keys: Array<KeyEvent>;
+    let keys: Array<KeyCode>;
     try {
-      keys = nread === null
-        ? KeyCode.parse(buffer)
-        : KeyCode.parse(buffer.subarray(0, nread));
+      keys = nread === null ? parse(buffer) : parse(buffer.subarray(0, nread));
     } catch (_) {
       // Ignore invalid characters and read again from stdin.
       return this.#read();
@@ -194,7 +191,7 @@ export class Keypress extends EventTarget
     this.#dispatch(keys);
   };
 
-  #dispatch = (keys: Array<KeyEvent>): void => {
+  #dispatch = (keys: Array<KeyCode>): void => {
     for (const key of keys) {
       const event = new KeyPressEvent("keydown", {
         ...key,
