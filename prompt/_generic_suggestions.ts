@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import {
   GenericInput,
   GenericInputKeys,
@@ -263,7 +263,7 @@ export abstract class GenericSuggestions<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "next", event):
         if (this.settings.list) {

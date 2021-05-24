@@ -1,4 +1,4 @@
-import type { KeyEvent } from "../keycode/key_event.ts";
+import type { KeyCode } from "../keycode/key_code.ts";
 import { blue, dim, underline } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
@@ -82,7 +82,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyEvent): Promise<void> {
+  protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case event.sequence === this.settings.inactive[0].toLowerCase():
       case this.isKey(this.settings.keys, "inactive", event):

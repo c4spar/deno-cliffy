@@ -44,8 +44,6 @@
 - [Install](#-install)
 - [Usage](#-usage)
 - [API](#-api)
-  - [KeyCode](#keycode)
-  - [KeyEvent](#keyevent)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -57,55 +55,93 @@ registries.
 Deno Registry
 
 ```typescript
-import { KeyCode } from "https://deno.land/x/cliffy@<version>/keycode/mod.ts";
+import {
+  KeyCode,
+  parse,
+} from "https://deno.land/x/cliffy@<version>/keycode/mod.ts";
 ```
 
 Nest Registry
 
 ```typescript
-import { KeyCode } from "https://x.nest.land/cliffy@<version>/keycode/mod.ts";
+import {
+  KeyCode,
+  parse,
+} from "https://x.nest.land/cliffy@<version>/keycode/mod.ts";
 ```
 
 Github
 
 ```typescript
-import { KeyCode } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keycode/mod.ts";
+import {
+  KeyCode,
+  parse,
+} from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<version>/keycode/mod.ts";
 ```
 
 ## ❯ Usage
 
 ```typescript
-import { KeyCode } from "https://deno.land/x/cliffy/keycode/mod.ts";
+import { parse } from "https://deno.land/x/cliffy/keycode/mod.ts";
 
-async function read(): Promise<void> {
-  const buffer = new Uint8Array(8);
+console.log(
+  parse(
+    "\x1b[A\x1b[B\x1b[C\x1b[D\x1b[E\x1b[F\x1b[H",
+  ),
+);
+```
 
-  Deno.setRaw(Deno.stdin.rid, true);
-  const nread = await Deno.stdin.read(buffer);
-  Deno.setRaw(Deno.stdin.rid, false);
+**Output:**
 
-  if (nread === null) {
-    return;
+```json
+[
+  { name: "up", sequence: "\x1b[A", code: "[A", ctrl: false, meta: false, shift: false },
+  { name: "down", sequence: "\x1b[B", code: "[B", ctrl: false, meta: false, shift: false },
+  { name: "right", sequence: "\x1b[C", code: "[C", ctrl: false, meta: false, shift: false },
+  { name: "left", sequence: "\x1b[D", code: "[D", ctrl: false, meta: false, shift: false },
+  { name: "clear", sequence: "\x1b[E", code: "[E", ctrl: false, meta: false, shift: false },
+  { name: "end", sequence: "\x1b[F", code: "[F", ctrl: false, meta: false, shift: false },
+  { name: "home", sequence: "\x1b[H", code: "[H", ctrl: false, meta: false, shift: false }
+]
+```
+
+## ❯ Example
+
+```typescript
+import { KeyCode, parse } from "https://deno.land/x/cliffy/keycode/mod.ts";
+
+async function* keypress(): AsyncGenerator<KeyCode, void> {
+  while (true) {
+    const data = new Uint8Array(8);
+
+    Deno.setRaw(Deno.stdin.rid, true);
+    const nread = await Deno.stdin.read(data);
+    Deno.setRaw(Deno.stdin.rid, false);
+
+    if (nread === null) {
+      return;
+    }
+
+    const keys: Array<KeyCode> = parse(data.subarray(0, nread));
+
+    for (const key of keys) {
+      yield key;
+    }
   }
-
-  const data = buffer.subarray(0, nread);
-
-  const [event] = KeyCode.parse(data);
-
-  if (event?.name === "c" && event.ctrl) {
-    console.log("exit");
-    return;
-  }
-
-  console.log(event);
-
-  await read();
 }
 
 console.log("Hit ctrl + c to exit.");
 
-await read();
+for await (const key of keypress()) {
+  if (key.ctrl && key.name === "c") {
+    console.log("exit");
+    break;
+  }
+  console.log(key);
+}
 ```
+
+> --unstable is required for Deno.setRaw
 
 ```
 $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
@@ -113,17 +149,18 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
 
 ## ❯ API
 
+### parse()
+
+- `parse( data: Uint8Array | string ): Array<KeyCode>`
+
 ### KeyCode
 
-- parse( data: Uint8Array | string ): KeyEvent | undefined
-
-### KeyEvent
-
-- name?: string
-- sequence?: string
-- ctrl: boolean
-- meta: boolean
-- shift: boolean
+- name?: `string`
+- sequence?: `string`
+- code?: `string`
+- ctrl: `boolean`
+- meta: `boolean`
+- shift: `boolean`
 
 ## ❯ Contributing
 
