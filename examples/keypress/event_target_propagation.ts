@@ -41,5 +41,5 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
     event.shiftKey,
   );
   // Stops the event loop.
-  event.preventDefault();
+  keypress().dispose();
 });

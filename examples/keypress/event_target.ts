@@ -15,6 +15,6 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   );
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
-    event.preventDefault();
+    keypress().dispose();
   }
 });

@@ -7,9 +7,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   if (event.ctrlKey && event.key === "x") {
     console.log("Canceled within event listener.");
     // Stop event loop and iterator.
-    event.preventDefault();
-    // same as:
-    // keypress().dispose();
+    keypress().dispose();
   }
 });
 

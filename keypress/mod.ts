@@ -206,11 +206,16 @@ export class Keypress extends EventTarget
         this.#pushEvent(event);
       }
       if (this.#hasListeners()) {
-        const canceled = !this.dispatchEvent(event);
-        if (canceled || this.#disposed) {
-          if (!this.#disposed) {
-            this.dispose();
-          }
+        // const canceled = !this.dispatchEvent(event);
+        // if (canceled || this.#disposed) {
+        // if (this.#disposed) {
+        //   if (!this.#disposed) {
+        //     this.dispose();
+        //   }
+        //   break;
+        // }
+        this.dispatchEvent(event);
+        if (this.#disposed) {
           break;
         }
       }

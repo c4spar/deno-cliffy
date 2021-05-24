@@ -163,9 +163,9 @@ The Keypress class extends from the EventTarget class that provides a
 `.addEventListener()` method that can be used to register event listeners. The
 addEventListener method starts an event loop in the background that reads from
 stdin and emits an event for each input. During this time stdin is blocked for
-other resources. The event loop can be stopped with `event.preventDefault()` or
-`keypress().dispose()`. The promise and asynchronous iterator based solution
-does not start an event loop in the background.
+other resources. The event loop can be stopped with `keypress().dispose()`. The
+promise and async iterator based solution does not start an event loop in the
+background.
 
 ```typescript
 import {
@@ -186,7 +186,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
   );
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
-    event.preventDefault();
+    keypress().dispose();
   }
 });
 ```
