@@ -42,7 +42,7 @@ jobs:
         run: eggs publish --no-check --yes
 
       - name: Publish Vercel
-        run: vercel --prod --scope "${VERCEL_SCOPE}"
+        run: vercel --prod --scope "${VERCEL_SCOPE}" --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
