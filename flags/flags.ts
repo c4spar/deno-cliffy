@@ -165,7 +165,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       }
 
       if (option.value) {
-        flags[propName] = option.value(flags[propName], previous) ?? true;
+        flags[propName] = option.value(flags[propName], previous);
       } else if (option.collect) {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
         value.push(flags[propName]);
