@@ -720,10 +720,7 @@ export class Command<
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
   ): Command {
-    if (
-      typeof opts === "function" || Array.isArray(opts) ||
-      opts instanceof RegExp
-    ) {
+    if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
 
