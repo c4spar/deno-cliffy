@@ -240,23 +240,15 @@ export class HelpGenerator {
         italic(option.conflicts.map(getFlag).join(", ")),
     );
 
-    let possibleValues: Array<string | number | RegExp> | undefined;
-    if (option.value instanceof RegExp) {
-      possibleValues = [option.value];
-    } else if (Array.isArray(option.value)) {
-      possibleValues = option.value;
-    } else {
-      const type = this.cmd.getType(option.args[0]?.type)?.handler;
-      if (type instanceof Type) {
-        possibleValues = type.values?.(this.cmd, this.cmd.getParent());
+    const type = this.cmd.getType(option.args[0]?.type)?.handler;
+    if (type instanceof Type) {
+      const possibleValues = type.values?.(this.cmd, this.cmd.getParent());
+      if (possibleValues?.length) {
+        hints.push(
+          bold(`Values: `) +
+            possibleValues.map((value: unknown) => inspect(value)).join(", "),
+        );
       }
-    }
-
-    if (possibleValues) {
-      hints.push(
-        bold(`Values: `) +
-          possibleValues.map((value: unknown) => inspect(value)).join(", "),
-      );
     }
 
     if (hints.length) {

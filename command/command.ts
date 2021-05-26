@@ -589,8 +589,7 @@ export class Command<
       const completeHandler: ICompleteHandler = (
         cmd: Command,
         parent?: Command,
-      ) =>
-        handler.complete?.(cmd, parent) || handler.values?.(cmd, parent) || [];
+      ) => handler.complete?.(cmd, parent) || [];
       this.complete(name, completeHandler, options);
     }
 
