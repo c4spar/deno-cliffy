@@ -1,3 +1,176 @@
+# [v0.19.0](https://github.com/c4spar/deno-cliffy/compare/v0.18.2...v0.19.0) (2021-05-26)
+
+### BREAKING CHANGES
+
+- **keycode:** refactor keycode module (#186)
+  ([4ac2719](https://github.com/c4spar/deno-cliffy/commit/4ac2719))
+
+  Before:
+  ```ts
+  const key: KeyEvent = KeyCode.parse(
+    "\x1b[A\x1b[B\x1b[C\x1b[D\x1b[E\x1b[F\x1b[H",
+  );
+  ```
+
+  After:
+  ```ts
+  const key: KeyCode = parse("\x1b[A\x1b[B\x1b[C\x1b[D\x1b[E\x1b[F\x1b[H");
+  ```
+
+### Features
+
+- **command:** add exitCode option to ValidationError (#201)
+  ([d4c0f12](https://github.com/c4spar/deno-cliffy/commit/d4c0f12))
+
+  ```ts
+  throw new ValidationError("Some validation error", 2);
+  ```
+
+- **command:** add enum type (#197)
+  ([36289a2](https://github.com/c4spar/deno-cliffy/commit/36289a2))
+
+  ```ts
+  cmd.type("log-level", new EnumType(["debug", "info", 0, 1]))
+    .option("-L, --log-level <level:log-level>");
+  ```
+
+- **command:** improve support for generic custom types (#191)
+  ([59b1a93](https://github.com/c4spar/deno-cliffy/commit/59b1a93))
+
+  ```ts
+  const color = new EnumType(["red", "blue", "yellow"]);
+  cmd.type("color", color)
+    // you can pass the type
+    .option<{ color: typeof color }>("-c, --color <name:color>");
+  ```
+
+- **command:** add upgrade command (#203)
+  ([348f743](https://github.com/c4spar/deno-cliffy/commit/348f743))
+
+  ```ts
+  // single registry with default options
+  cmd.command(
+    "upgrade",
+    new UpgradeCommand({
+      provider: new DenoLandProvider(),
+    }),
+  );
+
+  // multi registry with custom options
+  cmd.command(
+    "upgrade",
+    new UpgradeCommand({
+      main: "cli.ts",
+      args: ["--allow-net", "--unstable"],
+      provider: [
+        new DenoLandProvider({ name: "cliffy" }),
+        new NestLandProvider({ name: "cliffy" }),
+        new GithubProvider({ repository: "c4spar/deno-cliffy" }),
+      ],
+    }),
+  );
+  ```
+
+- **command:** add values method to types to show possible values in help text
+  (#202) ([143eb1b](https://github.com/c4spar/deno-cliffy/commit/143eb1b),
+  [045c56e](https://github.com/c4spar/deno-cli/commit/045c56e))
+- **command:** allow numbers for completions (#195)
+  ([f30b3af](https://github.com/c4spar/deno-cliffy/commit/f30b3af))
+- **command,flags:** add integer type (#190)
+  ([2cc7e57](https://github.com/c4spar/deno-cliffy/commit/2cc7e57))
+
+  ```ts
+  cmd.option("-a, --amount <amount:integer>");
+  ```
+
+- **keycode:** add code property to parse result (#182)
+  ([366683f](https://github.com/c4spar/deno-cliffy/commit/366683f))
+- **keypress:** add keypress module (#187)
+  ([5acf5db](https://github.com/c4spar/deno-cliffy/commit/5acf5db))
+
+  ```ts
+  // promise
+  const event: KeyPressEvent = await keypress();
+
+  // events
+  keypress().addEventListener((event: KeyPressEvent) => {
+    console.log("event:", event);
+    if (event.ctrlKey && event.key === "c") {
+      keypress().dispose();
+    }
+  });
+
+  // async iterator
+  for await (const event: KeyPressEvent of keypress()) {
+    console.log("event:", event);
+    if (event.ctrlKey && event.key === "c") {
+      break;
+    }
+  }
+  ```
+
+- **prompt:** add id option to automatically save suggestions to local storage
+  (#204) ([28f25bd](https://github.com/c4spar/deno-cliffy/commit/28f25bd))
+
+  ```ts
+  await Input.prompt({
+    message: "Enter your name",
+    id: "<local-storage-key>",
+  });
+  ```
+
+### Bug Fixes
+
+- **command,flags:** value handler not called for default value if option is not
+  defined on commandline
+  ([ef3df5e](https://github.com/c4spar/deno-cliffy/commit/ef3df5e))
+- **keycode:** fix esc key and sequence property for escaped keys
+  ([b9eb39b](https://github.com/c4spar/deno-cliffy/commit/b9eb39b))
+- **table:** fix getBody and hasHeaderBorder methods
+  ([2d65cc8](https://github.com/c4spar/deno-cliffy/commit/2d65cc8))
+
+### Code Refactoring
+
+- **command:** add CompleteHandlerResult type (#200)
+  ([ade3c3d](https://github.com/c4spar/deno-cliffy/commit/ade3c3d))
+- **command:** remove unnecessary dependency (#199)
+  ([b26f07c](https://github.com/c4spar/deno-cliffy/commit/b26f07c))
+- **flags:** refactor number type (#196)
+  ([9b57f54](https://github.com/c4spar/deno-cliffy/commit/9b57f54))
+- **flags:** refactor error message for boolean and number types (#189)
+  ([2a19c34](https://github.com/c4spar/deno-cliffy/commit/2a19c34))
+- **keycode:** refactor special key handling
+  ([7aaaec4](https://github.com/c4spar/deno-cliffy/commit/7aaaec4))
+- **prompt:** enable raw mode only if stdin is a tty (#183)
+  ([83c644a](https://github.com/c4spar/deno-cliffy/commit/83c644a))
+
+### Chore
+
+- **ci:** upgrade to eggs@0.3.6
+  ([7a8e3dd](https://github.com/c4spar/deno-cliffy/commit/7a8e3dd))
+- **upgrade:** deno/std v0.97.0 (#207)
+  ([37dc946](https://github.com/c4spar/deno-cli/commit/37dc946))
+
+### Unit/Integration Tests
+
+- **flags:** fix value tests
+  ([5ec86e8](https://github.com/c4spar/deno-cliffy/commit/5ec86e8))
+- **prompt:** add integration tests (#172)
+  ([0031490](https://github.com/c4spar/deno-cliffy/commit/0031490))
+- **table:** add more tests
+  ([3dd6315](https://github.com/c4spar/deno-cliffy/commit/3dd6315))
+
+### Documentation Updates
+
+- **command,flags:** add integer type to readme
+  ([6aec3db](https://github.com/c4spar/deno-cliffy/commit/6aec3db))
+- **command:** fix typo
+  ([a965ea3](https://github.com/c4spar/deno-cliffy/commit/a965ea3))
+- **command:** describe getHelp and showHelp
+  ([0e674c8](https://github.com/c4spar/deno-cliffy/commit/0e674c8))
+- **command:** documentation fixes
+  ([6442ae7](https://github.com/c4spar/deno-cliffy/commit/6442ae7))
+
 # [v0.18.2](https://github.com/c4spar/deno-cliffy/compare/v0.18.1...v0.18.2) (2021-04-14)
 
 ### Features
