@@ -63,7 +63,7 @@
   - [Conflicting options](#conflicting-options)
   - [Depending options](#depending-options)
   - [Collect options](#collect-options)
-  - [Custom option processing and validators](#custom-option-processing-and-validators)
+  - [Custom option processing](#custom-option-processing)
   - [Option action handler](#option-action-handler)
 - [Commands](#-commands)
   - [Argument syntax](#argument-syntax)
@@ -581,22 +581,18 @@ $ deno run https://deno.land/x/cliffy/examples/command/collect_options.ts --colo
 { color: [ "yellow", "red", "blue" ] }
 ```
 
-### Custom option processing and validators
+### Custom option processing
 
-You may specify a `Function`, an `Array` or a `RegExp` to do custom processing
-and validation of option values.
-
-#### Function validator
-
-The function validator receives the user specified value as first argument which
-is already parsed into the target type. If the value is valid, the function
-should return the value. if the value is invalid you can ether return
-`undefined` to print the default error message, or you can throw a custom
-`ValidationError`.
+You may specify a function to do custom processing of option values. The
+callback function receives one parameter, the user specified value which is
+already parsed into the target type, and it returns the new value for the
+option.
 
 If collect is enabled the function receives as second parameter the previous
-value. This allows you to coerce the option value to the desired type, or
-accumulate values, or do entirely custom processing.
+value.
+
+This allows you to coerce the option value to the desired type, or accumulate
+values, or do entirely custom processing.
 
 ```typescript
 import {
@@ -638,50 +634,6 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.
                                                                                    --color yellow \
                                                                                    --color red
 { color: [ "blue", "yellow", "red" ] }
-```
-
-#### Array Validator
-
-```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-
-const { options } = await new Command()
-  .option(
-    "-c, --color <color:string>",
-    "choose a color",
-    ["blue", "yellow", "red"],
-  )
-  .parse();
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/array_validator.ts --color red
-{ object: { value: "a" } }
-
-$ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.ts --color green
-error: Option "--color" must be of type "blue,yellow,red", but got "green".
-```
-
-#### RegExp validator
-
-```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-
-const { options } = await new Command()
-  .option(
-    "-c, --color <color:string>",
-    "choose a color",
-    /^blue|yellow|green$/,
-  )
-  .parse();
-```
-
-```
-$ deno run https://deno.land/x/cliffy/examples/command/array_validator.ts --color red
-{ object: { value: "a" } }
-
-$ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.ts --color green
-error: Option "--color" must be of type "/^(blue|yellow|red)$/", but got "green".
 ```
 
 ### Option action handler

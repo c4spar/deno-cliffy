@@ -155,16 +155,18 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       parseNext(option, args);
 
       if (typeof flags[propName] === "undefined") {
-        const hasDefaultValue: boolean = typeof option.default !== "undefined";
-        if (!hasDefaultValue && args[argIndex].requiredValue) {
+        if (typeof option.default !== "undefined") {
+          flags[propName] = getDefaultValue(option);
+        } else if (args[argIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
+        } else {
+          flags[propName] = true;
         }
-        flags[propName] = getDefaultValue(option) ?? true;
+      }
 
-        if (typeof option.value === "function") {
-          flags[propName] = option.value(flags[propName], previous) ?? true;
-        }
-      } else if (option.collect && typeof option.value !== "function") {
+      if (option.value) {
+        flags[propName] = option.value(flags[propName], previous) ?? true;
+      } else if (option.collect) {
         const value: unknown[] = Array.isArray(previous) ? previous : [];
         value.push(flags[propName]);
         flags[propName] = value;
@@ -295,7 +297,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           value: string,
         ): unknown {
           const type: string = arg.type || OptionType.STRING;
-          let result: unknown = opts.parse
+          const result: unknown = opts.parse
             ? opts.parse({
               label: "Option",
               type,
@@ -304,35 +306,9 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             })
             : parseFlagValue(option, arg, value);
 
-          if (Array.isArray(option.value)) {
-            if (!option.value.includes(result as string)) {
-              throw new InvalidOptionValue(
-                option.name,
-                option.value.join(", "),
-                value,
-              );
-            }
-          } else if (typeof option.value === "function") {
-            result = option.value(result, previous);
-          } else if (option.value instanceof RegExp) {
-            if (!option.value.test(result as string)) {
-              throw new InvalidOptionValue(
-                option.name,
-                option.value.toString(),
-                value,
-              );
-            }
+          if (typeof result !== "undefined") {
+            increase = true;
           }
-
-          if (typeof result === "undefined") {
-            throw new InvalidOptionValue(
-              option.name,
-              arg.type ?? "?",
-              value,
-            );
-          }
-
-          increase = true;
 
           return result;
         }

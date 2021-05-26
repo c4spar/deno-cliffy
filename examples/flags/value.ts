@@ -5,24 +5,12 @@ import { OptionType } from "../../flags/types.ts";
 
 const result = parseFlags(Deno.args, {
   flags: [{
-    name: "array",
-    aliases: ["a"],
+    name: "value",
+    aliases: ["v"],
     type: OptionType.STRING,
-    // Use array validator to allow only provided values.
-    value: ["foo", "bar", "baz"],
-  }, {
-    name: "regex",
-    aliases: ["r"],
-    type: OptionType.STRING,
-    // Use regex validator to allow only valid values.
-    value: /^(foo|bar|baz)$/,
-  }, {
-    name: "function",
-    aliases: ["f"],
-    type: OptionType.STRING,
-    // if collect is enabled, the previous value will be passed to the value method.
+    // if collect is enabled, previous values are passed to the value method.
     collect: true,
-    // Function validator can be used:
+    // Value handler can be used:
     //   * to allow only provided values
     //   * to collect multiple options with the same name if collect is enabled
     //   * and to map the value to any other value.
@@ -35,7 +23,7 @@ const result = parseFlags(Deno.args, {
       // if no value is returned, a default validation error will be thrown.
       // For a more detailed error message you can throw a custom ValidationError.
       throw new Error(
-        `Option "--function" must be one of "foo", "bar" or "baz", but got "${value}".`,
+        `Option "--value" must be one of "foo", "bar" or "baz", but got "${value}".`,
       );
     },
   }],
