@@ -4,14 +4,14 @@ export {
   assertStrictEquals,
   assertThrows,
   assertThrowsAsync,
-} from "https://deno.land/std@0.93.0/testing/asserts.ts";
+} from "https://deno.land/std@0.97.0/testing/asserts.ts";
 export {
   bold,
   red,
   stripColor,
-} from "https://deno.land/std@0.93.0/fmt/colors.ts";
-export { dirname } from "https://deno.land/std@0.93.0/path/mod.ts";
-export { expandGlob } from "https://deno.land/std@0.93.0/fs/mod.ts";
-export type { WalkEntry } from "https://deno.land/std@0.93.0/fs/mod.ts";
+} from "https://deno.land/std@0.97.0/fmt/colors.ts";
+export { dirname } from "https://deno.land/std@0.97.0/path/mod.ts";
+export { expandGlob } from "https://deno.land/std@0.97.0/fs/mod.ts";
+export type { WalkEntry } from "https://deno.land/std@0.97.0/fs/mod.ts";
 
 export { gt, lt } from "https://deno.land/x/semver@v1.3.0/mod.ts";

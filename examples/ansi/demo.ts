@@ -1,4 +1,4 @@
-import * as stdColors from "https://deno.land/std@0.93.0/fmt/colors.ts";
+import * as stdColors from "https://deno.land/std@0.97.0/fmt/colors.ts";
 import * as ansiEscapes from "../../ansi/ansi_escapes.ts";
 
 const ansiEscapeNames1: Array<keyof typeof ansiEscapes> = [
