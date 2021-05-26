@@ -73,7 +73,7 @@
 
 - **command:** add values method to types to show possible values in help text
   (#202) ([143eb1b](https://github.com/c4spar/deno-cliffy/commit/143eb1b),
-  [045c56e](https://github.com/c4spar/deno-cli/commit/045c56e))
+  [045c56e](https://github.com/c4spar/deno-cliffy/commit/045c56e))
 - **command:** allow numbers for completions (#195)
   ([f30b3af](https://github.com/c4spar/deno-cliffy/commit/f30b3af))
 - **command,flags:** add integer type (#190)
@@ -149,7 +149,7 @@
 - **ci:** upgrade to eggs@0.3.6
   ([7a8e3dd](https://github.com/c4spar/deno-cliffy/commit/7a8e3dd))
 - **upgrade:** deno/std v0.97.0 (#207)
-  ([37dc946](https://github.com/c4spar/deno-cli/commit/37dc946))
+  ([37dc946](https://github.com/c4spar/deno-cliffy/commit/37dc946))
 
 ### Unit/Integration Tests
 
