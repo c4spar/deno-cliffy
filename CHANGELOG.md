@@ -1,3 +1,19 @@
+# [v0.19.1](https://github.com/c4spar/deno-cliffy/compare/v0.19.0...v0.19.1) (2021-05-30)
+
+### Bug Fixes
+
+- **prompt:** make `--location` flag optional (#209)
+  ([ae89fdb](https://github.com/c4spar/deno-cliffy/commit/ae89fdb),
+  [5c35a30](https://github.com/c4spar/deno-cliffy/commit/5c35a30),
+  [7c5a678](https://github.com/c4spar/deno-cliffy/commit/7c5a678),
+  [4819e2c](https://github.com/c4spar/deno-cliffy/commit/4819e2c),
+  [a74ae81](https://github.com/c4spar/deno-cliffy/commit/a74ae81))
+
+### Documentation Updates
+
+- **changelog:** fix commit links
+  ([8d8601f](https://github.com/c4spar/deno-cliffy/commit/8d8601f))
+
 # [v0.19.0](https://github.com/c4spar/deno-cliffy/compare/v0.18.2...v0.19.0) (2021-05-26)
 
 ### BREAKING CHANGES
