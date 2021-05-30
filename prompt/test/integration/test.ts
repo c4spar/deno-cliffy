@@ -39,19 +39,33 @@ async function getExpectedOutput(path: string) {
   }
 }
 
+function getCmdFlagsForFile(file: WalkEntry): string[] {
+  if(file.name === "input_no_location_flag.ts") {
+    return [
+      "--unstable",
+      "--allow-all",
+    ];
+  }
+  return [
+    "--unstable",
+    "--allow-all",
+    "--location",
+    "https://cliffy.io",
+  ];
+  
+}
+
 async function runPrompt(file: WalkEntry): Promise<string> {
   const inputPath: string = file.path.replace(/\.ts$/, ".in");
   const inputFile = await Deno.open(inputPath);
+  const flags = getCmdFlagsForFile(file);
   const process = Deno.run({
     stdin: "piped",
     stdout: "piped",
     cmd: [
       "deno",
       "run",
-      "--unstable",
-      "--allow-all",
-      "--location",
-      "https://cliffy.io",
+      ...flags,
       file.path,
     ],
     env: {
