@@ -15,12 +15,6 @@ interface LocalStorage {
   setItem(key: string, value: string): void;
 }
 
-// keep support for deno < 1.10
-const localStorage: LocalStorage | null = "localStorage" in window
-  ? // deno-lint-ignore no-explicit-any
-    (window as any).localStorage
-  : null;
-
 /** Input keys options. */
 export interface GenericSuggestionsKeys extends GenericInputKeys {
   complete?: string[];
@@ -89,9 +83,21 @@ export abstract class GenericSuggestions<
     }
   }
 
+  protected get localStorage(): LocalStorage | null {
+    // Keep support for deno < 1.10.
+    if (this.settings.id && "localStorage" in window) {
+      try {
+        return (window as any).localStorage;
+      } catch (_) {
+        // Ignore error if --location is not set.
+      }
+    }
+    return null;
+  }
+
   protected loadSuggestions(): Array<string | number> {
     if (this.settings.id) {
-      const json = localStorage?.getItem(this.settings.id);
+      const json = this.localStorage?.getItem(this.settings.id);
       const suggestions: Array<string | number> = json ? JSON.parse(json) : [];
       if (!Array.isArray(suggestions)) {
         return [];
@@ -103,7 +109,7 @@ export abstract class GenericSuggestions<
 
   protected saveSuggestions(...suggestions: Array<string | number>): void {
     if (this.settings.id) {
-      localStorage?.setItem(
+      this.localStorage?.setItem(
         this.settings.id,
         JSON.stringify([
           ...suggestions,

@@ -40,7 +40,7 @@ async function getExpectedOutput(path: string) {
 }
 
 function getCmdFlagsForFile(file: WalkEntry): string[] {
-  if(file.name === "input_no_location_flag.ts") {
+  if (file.name === "input_no_location_flag.ts") {
     return [
       "--unstable",
       "--allow-all",
@@ -52,7 +52,6 @@ function getCmdFlagsForFile(file: WalkEntry): string[] {
     "--location",
     "https://cliffy.io",
   ];
-  
 }
 
 async function runPrompt(file: WalkEntry): Promise<string> {
