@@ -87,7 +87,7 @@ export abstract class GenericSuggestions<
     // Keep support for deno < 1.10.
     if (this.settings.id && "localStorage" in window) {
       try {
-        return (window as any).localStorage;
+        return window.localStorage;
       } catch (_) {
         // Ignore error if --location is not set.
       }
