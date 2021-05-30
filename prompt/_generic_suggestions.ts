@@ -87,7 +87,8 @@ export abstract class GenericSuggestions<
     // Keep support for deno < 1.10.
     if (this.settings.id && "localStorage" in window) {
       try {
-        return window.localStorage;
+        // deno-lint-ignore no-explicit-any
+        return (window as any).localStorage;
       } catch (_) {
         // Ignore error if --location is not set.
       }
