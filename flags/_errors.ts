@@ -30,13 +30,6 @@ export class UnknownConflictingOption extends FlagsError {
   }
 }
 
-export class DuplicateOptionName extends FlagsError {
-  constructor(name: string) {
-    super(`Option with name "${getFlag(name)}" already exists.`);
-    Object.setPrototypeOf(this, DuplicateOptionName.prototype);
-  }
-}
-
 export class UnknownType extends FlagsError {
   constructor(type: string, types: Array<string>) {
     super(`Unknown type "${type}".${didYouMeanType(type, types)}`);
@@ -55,6 +48,17 @@ export class ValidationError extends FlagsError {
   constructor(message: string) {
     super(message);
     Object.setPrototypeOf(this, ValidationError.prototype);
+  }
+}
+
+export class DuplicateOption extends ValidationError {
+  constructor(name: string) {
+    super(
+      `Option "${
+        getFlag(name).replace(/^--no-/, "--")
+      }" can only occur once, but was found several times.`,
+    );
+    Object.setPrototypeOf(this, DuplicateOption.prototype);
   }
 }
 
