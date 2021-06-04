@@ -2,11 +2,14 @@
 // deno-lint-ignore ban-types
 export type ICell = number | string | String | Cell;
 
+export type Direction = "left" | "right" | "center";
+
 /** Cell options. */
 export interface ICellOptions {
   border?: boolean;
   colSpan?: number;
   rowSpan?: number;
+  align?: Direction;
 }
 
 /** Cell representation. */
@@ -102,6 +105,18 @@ export class Cell {
   }
 
   /**
+   * Align cell content.
+   * @param direction Align direction.
+   * @param override  Override existing value.
+   */
+  public align(direction: Direction, override = true): this {
+    if (override || typeof this.options.align === "undefined") {
+      this.options.align = direction;
+    }
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
@@ -122,5 +137,10 @@ export class Cell {
     return typeof this.options.rowSpan === "number" && this.options.rowSpan > 0
       ? this.options.rowSpan
       : 1;
+  }
+
+  /** Get row span. */
+  public getAlign(): Direction {
+    return this.options.align ?? "left";
   }
 }

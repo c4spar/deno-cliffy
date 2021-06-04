@@ -1,5 +1,5 @@
 import { border, IBorder } from "./border.ts";
-import { Cell } from "./cell.ts";
+import { Cell, Direction } from "./cell.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
 
@@ -10,6 +10,7 @@ export type IBorderOptions = Partial<IBorder>;
 export interface ITableOptions {
   indent?: number;
   border?: boolean;
+  align?: Direction;
   maxColWidth?: number | number[];
   minColWidth?: number | number[];
   padding?: number | number[];
@@ -17,8 +18,9 @@ export interface ITableOptions {
 }
 
 /** Table settings. */
-export interface ITableSettings extends Required<ITableOptions> {
+export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
   chars: IBorder;
+  align?: Direction;
 }
 
 /** Table type. */
@@ -191,6 +193,18 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /**
+   * Align table content.
+   * @param direction Align direction.
+   * @param override  Override existing value.
+   */
+  public align(direction: Direction, override = true): this {
+    if (override || typeof this.options.align === "undefined") {
+      this.options.align = direction;
+    }
+    return this;
+  }
+
+  /**
    * Set border characters.
    * @param chars Border options.
    */
@@ -253,5 +267,10 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Check if table header or body has border. */
   public hasBorder(): boolean {
     return this.hasHeaderBorder() || this.hasBodyBorder();
+  }
+
+  /** Get table alignment. */
+  public getAlign(): Direction {
+    return this.options.align ?? "left";
   }
 }
