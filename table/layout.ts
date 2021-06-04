@@ -1,4 +1,4 @@
-import { Cell, ICell } from "./cell.ts";
+import { Cell, Direction, ICell } from "./cell.ts";
 import { stripColor } from "./deps.ts";
 import { IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
@@ -153,7 +153,9 @@ export class TableLayout {
    * @param row Original row.
    */
   protected createRow(row: IRow): Row<Cell> {
-    return Row.from(row).border(this.table.getBorder(), false) as Row<Cell>;
+    return Row.from(row)
+      .border(this.table.getBorder(), false)
+      .align(this.table.getAlign(), false) as Row<Cell>;
   }
 
   /**
@@ -162,7 +164,9 @@ export class TableLayout {
    * @param row   Parent row.
    */
   protected createCell(cell: ICell | null, row: Row): Cell {
-    return Cell.from(cell ?? "").border(row.getBorder(), false);
+    return Cell.from(cell ?? "")
+      .border(row.getBorder(), false)
+      .align(row.getAlign(), false);
   }
 
   /**
@@ -353,7 +357,22 @@ export class TableLayout {
     // get next content and remove leading space if breakWord is not true
     const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
     const fillLength = maxLength - stripColor(words).length;
-    const current = words + " ".repeat(fillLength);
+
+    // Align content
+    const align: Direction = cell.getAlign();
+    let current: string;
+    if (fillLength === 0) {
+      current = words;
+    } else if (align === "left") {
+      current = words + " ".repeat(fillLength);
+    } else if (align === "center") {
+      current = " ".repeat(Math.floor(fillLength / 2)) + words +
+        " ".repeat(Math.ceil(fillLength / 2));
+    } else if (align === "right") {
+      current = " ".repeat(fillLength) + words;
+    } else {
+      throw new Error("Unknown direction: " + align);
+    }
 
     return {
       current,

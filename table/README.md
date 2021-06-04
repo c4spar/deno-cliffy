@@ -264,6 +264,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
   - [.indent(width,override)](#indentwidthoverride)
   - [.padding(padding,override)](#paddingpaddingoverride)
   - [.border(enable,override)](#borderenableoverride)
+  - [.align(direction,override)](#borderdirectionoverride)
   - [.chars(chars)](#charschars)
   - [.getHeader()](#getheader)
   - [.getBody()](#getbody)
@@ -272,16 +273,21 @@ $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
   - [.getIndent()](#getindent)
   - [.getPadding()](#getpadding)
   - [.getBorder()](#getborder)
+  - [.getAlign()](#getalign)
 - [Row](#row)
   - [.clone()](#clone-1)
   - [.border(enable,override)](#borderenableoverride-1)
+  - [.align(direction,override)](#borderdirectionoverride-1)
   - [.getBorder()](#getborder-1)
+  - [.getAlign()](#getalign-1)
 - [Cell](#cell)
   - [.clone()](#clone-2)
   - [.border(enable,override)](#borderenableoverride-2)`
+  - [.align(direction,override)](#borderdirectionoverride-2)
   - [.colSpan(span,override)](#colspanspanoverride)
   - [.rowSpan(span,override)](#rowspanspanoverride)
   - [.getBorder()](#getborder-2)
+  - [.getAlign()](#getalign-2)
   - [.getColSpan()](#getcolspan)
   - [.getRowSpan()](#getrowspan)
 
@@ -381,6 +387,17 @@ Enable table border. Doesn't override row and cell settings.
 
 _Return type_: `this`
 
+#### .align(direction,override)
+
+Align table content.
+
+| Argument  |               Type                | Required | Description                                                    |
+| --------- | :-------------------------------: | :------: | -------------------------------------------------------------- |
+| direction | `"left"`, `"center"` or `"right"` |   Yes    | Set alignment direction.                                       |
+| override  |             `boolean`             |    No    | Set override to `false` to prevent overriding existing values. |
+
+_Return type_: `this`
+
 #### .chars(chars)
 
 Override default border characters. Doesn't override row and cell settings. To
@@ -458,6 +475,12 @@ Check if border is enabled on the table.
 
 _Return type_: `boolean`
 
+#### .getAlign()
+
+Get table alignment.
+
+_Return type_: `"left"`, `"center"` or `"right"`
+
 ---
 
 ### Row
@@ -479,11 +502,28 @@ Enable row border. Override table settings but not cell settings.
 
 _Return type_: `this`
 
+#### .align(direction,override)
+
+Align row content.
+
+| Argument  |               Type                | Required | Description                                                    |
+| --------- | :-------------------------------: | :------: | -------------------------------------------------------------- |
+| direction | `"left"`, `"center"` or `"right"` |   Yes    | Set alignment direction.                                       |
+| override  |             `boolean`             |    No    | Set override to `false` to prevent overriding existing values. |
+
+_Return type_: `this`
+
 #### .getBorder()
 
 Check if border is enabled on the row.
 
 _Return type_: `boolean`
+
+#### .getAlign()
+
+Get row alignment.
+
+_Return type_: `"left"`, `"center"` or `"right"`
 
 ---
 
@@ -503,6 +543,17 @@ Enable cell border. Overrides table and row settings.
 | -------- | :-------: | :------: | -------------------------------------------------------------- |
 | enable   | `boolean` |   Yes    | Enable or disable table border.                                |
 | override | `boolean` |    No    | Set override to `false` to prevent overriding existing values. |
+
+_Return type_: `this`
+
+#### .align(direction,override)
+
+Align cell content.
+
+| Argument  |               Type                | Required | Description                                                    |
+| --------- | :-------------------------------: | :------: | -------------------------------------------------------------- |
+| direction | `"left"`, `"center"` or `"right"` |   Yes    | Set alignment direction.                                       |
+| override  |             `boolean`             |    No    | Set override to `false` to prevent overriding existing values. |
 
 _Return type_: `this`
 
@@ -535,6 +586,12 @@ _Return type_: `this`
 Check if border is enabled on the cell.
 
 _Return type_: `boolean`
+
+#### .getAlign()
+
+Get cell alignment.
+
+_Return type_: `"left"`, `"center"` or `"right"`
 
 #### .getColSpan()
 
