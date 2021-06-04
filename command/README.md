@@ -1217,6 +1217,8 @@ await new Command()
     types: true, // default: false
     // Show hints.
     hints: true, // default: true
+    // Enable/disable colors.
+    colors: false, // default: true
   })
   .option("-f, --foo [val:number]", "Some description.", {
     required: true,

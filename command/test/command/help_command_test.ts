@@ -1,4 +1,4 @@
-import { assertEquals, gt, lt, stripColor } from "../../../dev_deps.ts";
+import { assertEquals, gt, lt } from "../../../dev_deps.ts";
 import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
@@ -13,6 +13,7 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
     .help({
       hints: true,
       types: true,
+      colors: false,
     });
 
   if (!defaultOptions) {
@@ -74,7 +75,7 @@ Deno.test({
     const output: string = command(true, false).getHelp();
 
     assertEquals(
-      stripColor(output),
+      output,
       `
   Usage:   COMMAND
   Version: v1.0.0 
@@ -117,7 +118,7 @@ Deno.test({
     const output: string = command(false, false).getHelp();
 
     assertEquals(
-      stripColor(output),
+      output,
       `
   Usage:   COMMAND
   Version: v1.0.0 
@@ -157,7 +158,7 @@ Deno.test({
     const output: string = command(true, true).getHelp();
 
     assertEquals(
-      stripColor(output),
+      output,
       `
   Usage:   COMMAND
   Version: v1.0.0 
@@ -202,7 +203,7 @@ Deno.test({
     const output: string = command(false, true).getHelp();
 
     assertEquals(
-      stripColor(output),
+      output,
       `
   Usage:   COMMAND
   Version: v1.0.0 

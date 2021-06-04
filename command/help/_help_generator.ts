@@ -6,10 +6,12 @@ import {
   blue,
   bold,
   dim,
+  getColorEnabled,
   green,
   italic,
   magenta,
   red,
+  setColorEnabled,
   yellow,
 } from "../deps.ts";
 import type { IArgument } from "../types.ts";
@@ -19,12 +21,13 @@ import { Type } from "../type.ts";
 export interface HelpOptions {
   types?: boolean;
   hints?: boolean;
+  colors?: boolean;
 }
 
 /** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
-  private options: HelpOptions;
+  private options: Required<HelpOptions>;
 
   /** Generate help text for given command. */
   public static generate(cmd: Command, options?: HelpOptions): string {
@@ -35,18 +38,23 @@ export class HelpGenerator {
     this.options = {
       types: false,
       hints: true,
+      colors: true,
       ...options,
     };
   }
 
   private generate(): string {
-    return this.generateHeader() +
+    const areColorsEnabled = getColorEnabled();
+    setColorEnabled(this.options.colors);
+    const result = this.generateHeader() +
       this.generateDescription() +
       this.generateOptions() +
       this.generateCommands() +
       this.generateEnvironmentVariables() +
       this.generateExamples() +
       "\n";
+    setColorEnabled(areColorsEnabled);
+    return result;
   }
 
   private generateHeader(): string {
@@ -229,7 +237,7 @@ export class HelpGenerator {
 
     option.required && hints.push(yellow(`required`));
     typeof option.default !== "undefined" && hints.push(
-      bold(`Default: `) + inspect(option.default),
+      bold(`Default: `) + inspect(option.default, this.options.colors),
     );
     option.depends?.length && hints.push(
       yellow(bold(`Depends: `)) +
@@ -246,7 +254,9 @@ export class HelpGenerator {
       if (possibleValues?.length) {
         hints.push(
           bold(`Values: `) +
-            possibleValues.map((value: unknown) => inspect(value)).join(", "),
+            possibleValues.map((value: unknown) =>
+              inspect(value, this.options.colors)
+            ).join(", "),
         );
       }
     }
@@ -269,11 +279,11 @@ function capitalize(string: string): string {
   return string?.charAt(0).toUpperCase() + string.slice(1) ?? "";
 }
 
-function inspect(value: unknown): string {
+function inspect(value: unknown, colors: boolean): string {
   return Deno.inspect(
     value,
     // deno < 1.4.3 doesn't support the colors property.
-    { depth: 1, colors: true, trailingComma: false } as Deno.InspectOptions,
+    { depth: 1, colors, trailingComma: false } as Deno.InspectOptions,
   );
 }
 
