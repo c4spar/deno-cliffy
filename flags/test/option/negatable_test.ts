@@ -43,7 +43,7 @@ Deno.test("Option with name with negatable flags", () => {
   assertThrows(
     () => parseFlags(["--color", "--no-color", "--no-check"], options),
     Error,
-    `Option with name "--no-color" already exists.`,
+    `Option "--color" can only occur once, but was found several times.`,
   );
 });
 

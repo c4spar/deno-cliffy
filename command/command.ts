@@ -1,5 +1,4 @@
 import {
-  DuplicateOptionName,
   UnknownType,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
@@ -23,6 +22,7 @@ import {
   DuplicateCompletion,
   DuplicateEnvironmentVariable,
   DuplicateExample,
+  DuplicateOptionName,
   DuplicateType,
   EnvironmentVariableOptionalValue,
   EnvironmentVariableSingleValue,

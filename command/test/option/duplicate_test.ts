@@ -13,7 +13,7 @@ Deno.test("command optionDuplicate flag", async () => {
       await cmd.parse(["-f", "-f", "unknown"]);
     },
     Error,
-    `Option with name "-f" already exists.`,
+    `Option "-f" can only occur once, but was found several times.`,
   );
 });
 
@@ -23,7 +23,7 @@ Deno.test("command optionDuplicate flagLong", async () => {
       await cmd.parse(["-f", "--flag"]);
     },
     Error,
-    `Option with name "--flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 
@@ -33,7 +33,7 @@ Deno.test("command optionDuplicate flagTrueLongFalse", async () => {
       await cmd.parse(["-f", "true", "--flag", "false"]);
     },
     Error,
-    `Option with name "--flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 
@@ -43,7 +43,7 @@ Deno.test("command optionDuplicate flagTrueNoFlag", async () => {
       await cmd.parse(["-f", "true", "--no-flag"]);
     },
     Error,
-    `Option with name "--no-flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 
@@ -53,6 +53,6 @@ Deno.test("command optionDuplicate flagTrueNoFlagTrue", async () => {
       await cmd.parse(["-f", "true", "--no-flag", "true"]);
     },
     Error,
-    `Option with name "--no-flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });

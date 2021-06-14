@@ -69,6 +69,6 @@ Deno.test("negatable options should not be combinable with positive options", as
       await command().parse(["--color", "--no-color", "--no-check"]);
     },
     Error,
-    `Option with name "--no-color" already exists.`,
+    `Option "--color" can only occur once, but was found several times.`,
   );
 });
