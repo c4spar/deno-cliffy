@@ -1,3 +1,4 @@
  ? Please confirm (y/N) » 
- ❯ some hint\n\x1b[1A\x1b[1A\x1b[27G\x1b[G\x1b[0J ? Please confirm (y/N) » Yes
+ ❯ some hint
+\x1b[1A\x1b[1A\x1b[27G\x1b[G\x1b[0J ? Please confirm (y/N) » Yes
 \x1b[?25h\x1b[?25h
