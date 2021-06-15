@@ -1,4 +1,6 @@
  ? Enter some keywords (foo, far) » 
- ❯ some hint...\x1b[1A\x1b[37G\x1b[G\x1b[0J ? Enter some keywords (foo, far) » bar, foo
- ❯ some hint...\x1b[1A\x1b[45G\x1b[G\x1b[0J ? Enter some keywords (foo, far) » bar, foo
+ ❯ some hint...
+\x1b[1A\x1b[1A\x1b[37G\x1b[G\x1b[0J ? Enter some keywords (foo, far) » bar, foo
+ ❯ some hint...
+\x1b[1A\x1b[1A\x1b[45G\x1b[G\x1b[0J ? Enter some keywords (foo, far) » bar, foo
 \x1b[?25h\x1b[?25h
