@@ -11,6 +11,7 @@ await new Command()
   .help({
     types: true,
     hints: true,
+    colors: true,
   })
   .env(
     "EXAMPLE_ENVIRONMENT_VARIABLE=<value:boolean>",

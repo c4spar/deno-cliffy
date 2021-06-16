@@ -119,9 +119,7 @@ export abstract class GenericPrompt<
       this.#value,
     );
     if (successMessage) {
-      await Deno.stdout.write(
-        new TextEncoder().encode(successMessage + "\n"),
-      );
+      console.log(successMessage);
     }
 
     GenericPrompt.injectedValue = undefined;
@@ -147,7 +145,12 @@ export abstract class GenericPrompt<
     }
     this.#isFirstRun = false;
 
-    await Deno.stdout.write(new TextEncoder().encode(content));
+    if (Deno.build.os === "windows") {
+      console.log(content);
+      this.tty.cursorUp();
+    } else {
+      Deno.stdout.writeSync(new TextEncoder().encode(content));
+    }
 
     if (y) {
       this.tty.cursorUp(y);

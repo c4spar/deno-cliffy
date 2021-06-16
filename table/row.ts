@@ -1,4 +1,4 @@
-import { Cell, ICell } from "./cell.ts";
+import { Cell, Direction, ICell } from "./cell.ts";
 
 /** Row type */
 export type IRow<T extends ICell = ICell> = T[] | Row<T>;
@@ -9,6 +9,7 @@ export type IDataRow = Record<string, string | number>;
 export interface IRowOptions {
   indent?: number;
   border?: boolean;
+  align?: Direction;
 }
 
 /**
@@ -56,6 +57,18 @@ export class Row<T extends ICell = ICell> extends Array<T> {
   }
 
   /**
+   * Align row content.
+   * @param direction Align direction.
+   * @param override  Override existing value.
+   */
+  public align(direction: Direction, override = true): this {
+    if (override || typeof this.options.align === "undefined") {
+      this.options.align = direction;
+    }
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
@@ -68,5 +81,10 @@ export class Row<T extends ICell = ICell> extends Array<T> {
   public hasBorder(): boolean {
     return this.getBorder() ||
       this.some((cell) => cell instanceof Cell && cell.getBorder());
+  }
+
+  /** Get row alignment. */
+  public getAlign(): Direction {
+    return this.options.align ?? "left";
   }
 }

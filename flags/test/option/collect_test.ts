@@ -35,7 +35,7 @@ Deno.test("flags optionCollect flag", () => {
   assertThrows(
     () => parseFlags(["-f", "-f"], options),
     Error,
-    `Option with name "-f" already exists.`,
+    `Option "-f" can only occur once, but was found several times.`,
   );
 });
 
@@ -43,7 +43,7 @@ Deno.test("flags optionCollect flagLong", () => {
   assertThrows(
     () => parseFlags(["-f", "--flag"], options),
     Error,
-    `Option with name "--flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 
@@ -51,7 +51,7 @@ Deno.test("flags optionCollect flagTrueLongFalse", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--flag", "false"], options),
     Error,
-    `Option with name "--flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 
@@ -59,7 +59,7 @@ Deno.test("flags optionCollect flagTrueNoFlag", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--no-flag"], options),
     Error,
-    `Option with name "--no-flag" already exists.`,
+    `Option "--flag" can only occur once, but was found several times.`,
   );
 });
 

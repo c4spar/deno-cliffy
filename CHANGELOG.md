@@ -1,3 +1,38 @@
+# [v0.19.2](https://github.com/c4spar/deno-cli/compare/v0.19.1...v0.19.2) (2021-06-16)
+
+### Features
+
+- **command:** add colors option to help options (#213)
+  ([eed2e90](https://github.com/c4spar/deno-cli/commit/eed2e90))
+- **table:** add align option (#212)
+  ([9e10c9e](https://github.com/c4spar/deno-cli/commit/9e10c9e))
+
+### Bug Fixes
+
+- **prompt:** unicode characters are not displayed properly on windows (#216)
+  ([fb6a22e](https://github.com/c4spar/deno-cli/commit/fb6a22e))
+
+### Code Refactoring
+
+- **flags:** show better error message if an option occurs to many times (#215)
+  ([8b0dfcb](https://github.com/c4spar/deno-cli/commit/8b0dfcb))
+
+### Documentation Updates
+
+- docs: add keypress module to cliffy.io
+  ([15fe4e0](https://github.com/c4spar/deno-cli/commit/15fe4e0))
+
+### Chore
+
+- update .gitignore
+  ([8053930](https://github.com/c4spar/deno-cli/commit/8053930))
+- **ci:** remove deno 1.4.0 tests (#218)
+  ([f0e2ba8](https://github.com/c4spar/deno-cli/commit/f0e2ba8))
+- **upgrade:** deno/std v0.99.0 (#217)
+  ([578cbda](https://github.com/c4spar/deno-cli/commit/578cbda))
+- **upgrade:** upgrade dev deps (#210)
+  ([d10f20d](https://github.com/c4spar/deno-cli/commit/d10f20d))
+
 # [v0.19.1](https://github.com/c4spar/deno-cliffy/compare/v0.19.0...v0.19.1) (2021-05-30)
 
 ### Bug Fixes

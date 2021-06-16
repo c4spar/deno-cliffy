@@ -1,5 +1,6 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
+import { getFlag } from "../flags/_utils.ts";
 
 export class CommandError extends Error {
   constructor(message: string) {
@@ -19,6 +20,13 @@ export class ValidationError extends CommandError {
     super(message);
     Object.setPrototypeOf(this, ValidationError.prototype);
     this.exitCode = exitCode ?? 1;
+  }
+}
+
+export class DuplicateOptionName extends CommandError {
+  constructor(name: string) {
+    super(`Option with name "${getFlag(name)}" already exists.`);
+    Object.setPrototypeOf(this, DuplicateOptionName.prototype);
   }
 }
 

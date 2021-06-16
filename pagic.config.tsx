@@ -48,8 +48,12 @@ export default {
       link: "/flags/",
     },
     {
-      text: "KeyCode",
+      text: "Keycode",
       link: "/keycode/",
+    },
+    {
+      text: "Keypress",
+      link: "/keypress/",
     },
     {
       text: "Prompt",
@@ -83,8 +87,11 @@ export default {
       text: "Flags",
       link: "flags/README.md",
     }, {
-      text: "KeyCode",
+      text: "Keycode",
       link: "keycode/README.md",
+    }, {
+      text: "Keypress",
+      link: "keypress/README.md",
     }, {
       text: "Prompt",
       link: "prompt/README.md",

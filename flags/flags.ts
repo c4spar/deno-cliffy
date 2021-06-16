@@ -1,7 +1,7 @@
 import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
-  DuplicateOptionName,
+  DuplicateOption,
   InvalidOptionValue,
   MissingOptionValue,
   RequiredArgumentFollowsOptionalArgument,
@@ -136,7 +136,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       const propName: string = paramCaseToCamelCase(positiveName);
 
       if (typeof flags[propName] !== "undefined" && !option.collect) {
-        throw new DuplicateOptionName(current);
+        throw new DuplicateOption(current);
       }
 
       args = option.args?.length ? option.args : [{
