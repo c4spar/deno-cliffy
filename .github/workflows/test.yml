@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno: [v1.4.0, v1.x]
+        deno: [v1.x]
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -25,19 +25,12 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --allow-all --unstable
-        if: ${{ matrix.deno != 'v1.x' }}
-
-      - name: Run tests
         run: deno test --coverage=./cov --allow-all --unstable --location https://cliffy.io
-        if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./cov > cov.lcov
-        if: ${{ matrix.deno == 'v1.x' }}
 
       - name: Upload coverage
-        if: ${{ matrix.deno == 'v1.x' }}
         uses: codecov/codecov-action@v1
         with:
           name: ${{ matrix.os }}-${{ matrix.deno }}

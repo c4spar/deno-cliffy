@@ -1,4 +1,4 @@
-import { assertEquals, dirname, expandGlob, lt } from "../../../dev_deps.ts";
+import { assertEquals, dirname, expandGlob } from "../../../dev_deps.ts";
 
 const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
 
@@ -8,7 +8,7 @@ for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
     const outPath = file.path.replace(/\.in$/, ".out");
     Deno.test({
       name: `command - integration - ${name}`,
-      ignore: Deno.build.os === "windows" || lt(Deno.version.deno, "1.4.1"),
+      ignore: Deno.build.os === "windows",
       async fn() {
         const [cmd, expected] = await Promise.all([
           Deno.readTextFile(file.path),
