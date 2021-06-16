@@ -11,6 +11,7 @@ files:
   - examples/**/*
   - flags/**/*
   - keycode/**/*
+  - keypress/**/*
   - prompt/**/*
   - table/**/*
   - CHANGELOG.md
