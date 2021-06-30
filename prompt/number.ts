@@ -7,7 +7,7 @@ import {
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
-import { blue } from "./deps.ts";
+import { blue, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Number key options. */
@@ -45,6 +45,7 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
       indent: " ",
       listPointer: blue(Figures.POINTER),
       maxRows: 8,

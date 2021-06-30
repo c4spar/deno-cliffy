@@ -1,5 +1,5 @@
 import type { KeyCode } from "../keycode/mod.ts";
-import { blue, dim, green, red } from "./deps.ts";
+import { blue, dim, green, red, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -69,6 +69,7 @@ export class Checkbox
   public static prompt(options: CheckboxOptions): Promise<string[]> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
       indent: " ",
       listPointer: blue(Figures.POINTER),
       maxRows: 10,

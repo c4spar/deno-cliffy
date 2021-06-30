@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { blue, bold, dim, stripColor, yellow } from "./deps.ts";
+import { blue, bold, dim, stripColor } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
@@ -139,7 +139,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   protected message(): string {
-    let message = `${this.settings.indent}${yellow("?")} ` +
+    let message = `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) +
       this.defaults();
     if (this.settings.search) {
