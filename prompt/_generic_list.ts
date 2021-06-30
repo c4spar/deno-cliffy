@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { blue, bold, dim, stripColor, yellow } from "./deps.ts";
+import { blue, bold, dim, stripColor } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
