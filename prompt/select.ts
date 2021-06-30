@@ -1,4 +1,4 @@
-import { blue, underline } from "./deps.ts";
+import { blue, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -53,6 +53,7 @@ export class Select<S extends SelectSettings = SelectSettings>
   public static prompt(options: SelectOptions): Promise<string> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
       indent: " ",
       listPointer: blue(Figures.POINTER),
       maxRows: 10,

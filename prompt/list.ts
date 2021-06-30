@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, underline } from "./deps.ts";
+import { blue, dim, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** List key options. */
@@ -42,6 +42,7 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
       indent: " ",
       listPointer: blue(Figures.POINTER),
       maxRows: 8,

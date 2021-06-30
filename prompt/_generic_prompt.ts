@@ -23,6 +23,7 @@ export interface GenericPromptOptions<T, V> {
   indent?: string;
   keys?: GenericPromptKeys;
   cbreak?: boolean;
+  prefix?: string;
 }
 
 /** Generic prompt settings. */
@@ -30,6 +31,7 @@ export interface GenericPromptSettings<T, V>
   extends GenericPromptOptions<T, V> {
   pointer: string;
   indent: string;
+  prefix: string;
 }
 
 /** Static generic prompt interface. */
@@ -183,7 +185,7 @@ export abstract class GenericPrompt<
   }
 
   protected message(): string {
-    return `${this.settings.indent}${yellow("?")} ` +
+    return `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) + this.defaults();
   }
 
@@ -197,7 +199,7 @@ export abstract class GenericPrompt<
 
   /** Get prompt success message. */
   protected success(value: T): string | undefined {
-    return `${this.settings.indent}${yellow("?")} ` +
+    return `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
       " " + green(this.format(value));

@@ -1,5 +1,5 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
-import { blue, underline } from "./deps.ts";
+import { blue, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericInput,
@@ -40,6 +40,7 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
 
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
       indent: " ",
       label: "Password",
       hidden: false,
