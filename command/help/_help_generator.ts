@@ -72,7 +72,7 @@ export class HelpGenerator {
     ];
     const version: string | undefined = this.cmd.getVersion();
     if (version) {
-      rows.push([bold("Version:"), yellow(`v${this.cmd.getVersion()}`)]);
+      rows.push([bold("Version:"), yellow(`${this.cmd.getVersion()}`)]);
     }
     return "\n" +
       Table.from(rows)
