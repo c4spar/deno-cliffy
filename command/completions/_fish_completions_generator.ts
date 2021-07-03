@@ -111,7 +111,7 @@ ${this.generateCompletions(this.cmd).trim()}
         ? this.getOptionCompletionCommand(
           option.args[0].action + " " + getCompletionsPath(command),
           shortOption,
-          longOption
+          longOption,
         )
         : undefined,
     });
@@ -139,7 +139,11 @@ ${this.generateCompletions(this.cmd).trim()}
     return cmd.join(" ");
   }
 
-  private getOptionCompletionCommand(cmd: string, shortOption: string | undefined, longOption: string | undefined): string {
+  private getOptionCompletionCommand(
+    cmd: string,
+    shortOption: string | undefined,
+    longOption: string | undefined,
+  ): string {
     const makeFilter = (s: string) => `string replace -- ${s} ""`;
     const filters = [];
     shortOption && filters.push(makeFilter(`-${shortOption}`));
@@ -148,8 +152,12 @@ ${this.generateCompletions(this.cmd).trim()}
   }
 
   private getCompletionCommand(cmd: string, filters: string[] = []): string {
-    const cmds = ['commandline -tc', ...filters, `string replace -r -- "^\-*" ""`];
-    const token = cmds.join(' | ');
+    const cmds = [
+      "commandline -tc",
+      ...filters,
+      `string replace -r -- "^\-*" ""`,
+    ];
+    const token = cmds.join(" | ");
     return `'(${this.cmd.getName()} completions complete -t (${token}) ${cmd.trim()})'`;
   }
 }
