@@ -1037,6 +1037,9 @@ export class Command<
     // deno-lint-ignore no-explicit-any
     const parts: string[] = (Deno as any).mainModule.replace(/^file:\/\//g, "")
       .split("/");
+    if (Deno.build.os === "windows" && parts[0] === "") {
+      parts.shift();
+    }
     parts.pop();
     const path: string = parts.join("/");
     files.push(
@@ -1075,7 +1078,7 @@ export class Command<
         Deno.lstatSync(file);
       } catch (error) {
         if (error instanceof Deno.errors.NotFound) {
-          return false;
+          continue;
         }
         throw error;
       }
