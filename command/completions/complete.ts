@@ -4,12 +4,13 @@ import type { ICompletion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
 export class CompleteCommand
-  extends Command<void, [action: string, commandNames?: Array<string>]> {
+  extends Command<{ token: string }, [action: string, commandNames?: Array<string>]> {
   public constructor(cmd?: Command) {
     super();
     this.description("Get completions for given action from given command.")
+      .option("-t, --token [t:string]", "the current cmd token.")
       .arguments("<action:string> [command...:string]")
-      .action(async (_, action: string, commandNames?: Array<string>) => {
+      .action(async ({ token = '' }, action: string, commandNames?: Array<string>) => {
         let parent: Command | undefined;
         const completeCommand: Command = commandNames
           ?.reduce((cmd: Command, name: string): Command => {
@@ -24,7 +25,7 @@ export class CompleteCommand
         const completion: ICompletion | undefined = completeCommand
           .getCompletion(action);
         const result: Array<string | number> =
-          await completion?.complete(completeCommand, parent) ?? [];
+          await completion?.complete(token, completeCommand, parent) ?? [];
 
         if (result?.length) {
           Deno.stdout.writeSync(new TextEncoder().encode(result.join("\n")));
