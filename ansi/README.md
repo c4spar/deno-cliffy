@@ -156,7 +156,7 @@ console.log(
 ```
 
 ```
-$ deno run https://deno.land/x/cliffy/examples/ansi/functional.ts
+$ deno run --allow-net https://deno.land/x/cliffy/examples/ansi/functional.ts
 ```
 
 ### Tty
