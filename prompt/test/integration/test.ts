@@ -1,6 +1,7 @@
 import {
   assert,
   assertEquals,
+  copy,
   dirname,
   expandGlob,
   lt,
@@ -74,7 +75,7 @@ async function runPrompt(file: WalkEntry): Promise<string> {
 
   const [output, bytesCopied] = await Promise.all([
     process.output(),
-    Deno.copy(inputFile, process.stdin),
+    copy(inputFile, process.stdin),
   ]);
   inputFile.close();
   process.stdin.close();
