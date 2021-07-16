@@ -233,7 +233,7 @@ export abstract class GenericPrompt<
       case event.name === "c" && event.ctrl:
         this.clear();
         this.tty.cursorShow();
-        Deno.exit(0);
+        Deno.exit(130);
         return;
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
