@@ -71,9 +71,9 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
   const flags: Record<string, unknown> = {};
   const optionNames: Record<string, string> = {};
-  const literal: string[] = [];
-  const unknown: string[] = [];
-  let stopEarly = false;
+  let literal: string[] = [];
+  let unknown: string[] = [];
+  let stopEarly: string | null = null;
 
   opts.flags.forEach((opt) => {
     opt.depends?.forEach((flag) => {
@@ -107,7 +107,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     const isFlag = current.length > 1 && current[0] === "-";
     const next = () => normalized[i + 1];
 
-    if (isFlag && !stopEarly) {
+    if (isFlag) {
       if (current[2] === "-" || (current[1] === "-" && current.length === 3)) {
         throw new UnknownOption(current, opts.flags);
       }
@@ -315,13 +315,28 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       }
     } else {
       if (opts.stopEarly) {
-        stopEarly = true;
+        stopEarly = current;
+        break;
       }
       unknown.push(current);
     }
   }
 
-  if (opts.flags && opts.flags.length) {
+  if (stopEarly) {
+    const stopEarlyArgIndex: number = args.indexOf(stopEarly);
+    if (stopEarlyArgIndex !== -1) {
+      const doubleDashIndex: number = args.indexOf("--");
+      unknown = args.slice(
+        stopEarlyArgIndex,
+        doubleDashIndex === -1 ? undefined : doubleDashIndex,
+      );
+      if (doubleDashIndex !== -1) {
+        literal = args.slice(doubleDashIndex + 1);
+      }
+    }
+  }
+
+  if (opts.flags?.length) {
     validateFlags(
       opts.flags,
       flags,
