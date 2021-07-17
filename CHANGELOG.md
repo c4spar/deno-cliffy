@@ -1,3 +1,48 @@
+# [v0.19.3](https://github.com/c4spar/deno-cli/compare/v0.19.2...v0.19.3) (2021-07-17)
+
+### Features
+
+- **prompt:** add prefix option (#233)
+  ([a4943cb](https://github.com/c4spar/deno-cli/commit/a4943cb))
+
+### Bug Fixes
+
+- **command:** external commands not working on windows (#224)
+  ([84ac5be](https://github.com/c4spar/deno-cli/commit/84ac5be))
+- **command:** remove v prefix from version in generated help text (#231)
+  ([f882abd](https://github.com/c4spar/deno-cli/commit/f882abd))
+- **command,flags:** don't normalize arguments if stopEarly is enabled (#246)
+  ([2ea4938](https://github.com/c4spar/deno-cli/commit/2ea4938))
+- **prompt:** use exit code 130 for ctrl+c (#242)
+  ([2c014d7](https://github.com/c4spar/deno-cli/commit/2c014d7))
+
+### Code Refactoring
+
+- **command:** export github upgrade provider in upgrade/mod.ts (#232)
+  ([39a8075](https://github.com/c4spar/deno-cli/commit/39a8075))
+- **prompt:** replace deprecated Deno.copy with copy method from std/io (#243)
+  ([f95b317](https://github.com/c4spar/deno-cli/commit/f95b317))
+
+### Chore
+
+- **ci:** use denoland/setup-deno action (#219)
+  ([d93ad7d](https://github.com/c4spar/deno-cli/commit/d93ad7d))
+- **ci:** use latest deno version in release action
+  ([36c1c07](https://github.com/c4spar/deno-cli/commit/36c1c07))
+- **ci:** upgrade eggs to v0.3.8
+  ([1efd809](https://github.com/c4spar/deno-cli/commit/1efd809))
+- **egg:** add keypress module to egg.yaml
+  ([fee6ed4](https://github.com/c4spar/deno-cli/commit/fee6ed4))
+- **upgrade:** deno/std v0.101.0 (#244)
+  ([534094b](https://github.com/c4spar/deno-cli/commit/534094b))
+
+### Documentation Updates
+
+- **ansi:** fix functional example command (#235)
+  ([f3103b9](https://github.com/c4spar/deno-cli/commit/f3103b9))
+- **command:** fix type of args in stopEarly example (#240)
+  ([b909bc6](https://github.com/c4spar/deno-cli/commit/b909bc6))
+
 # [v0.19.2](https://github.com/c4spar/deno-cli/compare/v0.19.1...v0.19.2) (2021-06-16)
 
 ### Features
