@@ -1,7 +1,7 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-Deno.test("flags stopEarly disable", async () => {
+Deno.test("command stopEarly disable", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .option("-f, --flag [value:boolean]", "description ...")
@@ -26,7 +26,7 @@ Deno.test("flags stopEarly disable", async () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("flags stopEarly enabled", async () => {
+Deno.test("command stopEarly enabled", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .stopEarly()
@@ -56,7 +56,7 @@ Deno.test("flags stopEarly enabled", async () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("flags stopEarly unknown option", async () => {
+Deno.test("command stopEarly unknown option", async () => {
   const cmd = new Command()
     .throwErrors()
     .stopEarly()
