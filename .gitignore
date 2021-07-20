@@ -1,6 +1,7 @@
 .idea/
 .vscode/
-.vercel
+.vercel/
+.env
 
 # Files that help ensure VSCode can work but we don't want checked into the repo
 node_modules
