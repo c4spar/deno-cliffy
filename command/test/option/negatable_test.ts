@@ -6,7 +6,7 @@ function command(): Command {
     .throwErrors()
     .allowEmpty()
     .option("--no-check", "No check.")
-    .option("--color <color:string>", "Color name.", { default: "yellow" })
+    .option("--color [color:string]", "Color name.", { default: "yellow" })
     .option("--no-color", "No color.")
     .option("--remote <url:string>", "Remote url.", { depends: ["color"] })
     .option("--no-remote", "No remote.");
