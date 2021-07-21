@@ -25,7 +25,7 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --coverage=./cov --allow-all --unstable --location https://cliffy.io
+        run: deno test --coverage=./cov --allow-all --unstable --location https://cliffy.io --jobs 2
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./cov > cov.lcov
