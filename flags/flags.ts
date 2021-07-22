@@ -63,8 +63,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   opts: IParseOptions = {},
 ): IFlagsResult<O> {
   !opts.flags && (opts.flags = []);
-
-  const normalized = splitValues(args);
+  let normalized: Array<string> = args.slice();
 
   let inLiteral = false;
   let negate = false;
@@ -113,6 +112,18 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       if (!isShort && !isLong) {
         throw new InvalidOption(current, opts.flags);
+      }
+
+      const equalSignIndex = current.indexOf("=");
+      if (equalSignIndex > -1) {
+        const flag = current.slice(0, equalSignIndex);
+        const value = current.slice(equalSignIndex + 1);
+        if (value) {
+          normalized.splice(i, 1, flag, value);
+        } else {
+          normalized[i] = flag;
+        }
+        current = flag;
       }
 
       // normalize short hand flags e.g: -abc => -a -b -c
@@ -395,35 +406,6 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }, {});
 
   return { flags: result as O, unknown, literal };
-}
-
-function splitValues(args: string[]) {
-  const normalized = [];
-  let inLiteral = false;
-
-  for (const arg of args) {
-    if (inLiteral) {
-      normalized.push(arg);
-    } else if (arg === "--") {
-      inLiteral = true;
-      normalized.push(arg);
-    } else if (arg.length > 1 && arg[0] === "-") {
-      if (arg.includes("=")) {
-        const parts = arg.split("=");
-        const flag = parts.shift() as string;
-        normalized.push(flag);
-        if (parts.length) {
-          normalized.push(parts.join("="));
-        }
-      } else {
-        normalized.push(arg);
-      }
-    } else {
-      normalized.push(arg);
-    }
-  }
-
-  return normalized;
 }
 
 function splitFlags(flag: string): Array<string> {
