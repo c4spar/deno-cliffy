@@ -14,13 +14,23 @@ const optionalValueOptions = <IParseOptions> {
   }],
 };
 
-const requiredValueOptions = <IParseOptions> {
+const requiredStringValueOptions = <IParseOptions> {
   stopEarly: false,
   allowEmpty: false,
   flags: [{
     name: "flag",
     aliases: ["f"],
     type: OptionType.STRING,
+  }],
+};
+
+const requiredNumberValueOptions = <IParseOptions> {
+  stopEarly: false,
+  allowEmpty: false,
+  flags: [{
+    name: "flag",
+    aliases: ["f"],
+    type: OptionType.NUMBER,
   }],
 };
 
@@ -56,7 +66,7 @@ Deno.test("flags - type - string - with special chars", () => {
 
 Deno.test("flags - type - string - with missing value", () => {
   assertThrows(
-    () => parseFlags(["-f"], requiredValueOptions),
+    () => parseFlags(["-f"], requiredStringValueOptions),
     Error,
     `Missing value for option "--flag".`,
   );
@@ -65,10 +75,21 @@ Deno.test("flags - type - string - with missing value", () => {
 Deno.test("flags - type - string - value starting with hyphen", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-a", "unknown"],
-    requiredValueOptions,
+    requiredStringValueOptions,
   );
 
   assertEquals(flags, { flag: "-a" });
+  assertEquals(unknown, ["unknown"]);
+  assertEquals(literal, []);
+});
+
+Deno.test("flags - type - string - with numeric value", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-f", "-1", "unknown"],
+    requiredNumberValueOptions,
+  );
+
+  assertEquals(flags, { flag: -1 });
   assertEquals(unknown, ["unknown"]);
   assertEquals(literal, []);
 });
