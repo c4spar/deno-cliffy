@@ -61,3 +61,14 @@ Deno.test("flags - type - string - with missing value", () => {
     `Missing value for option "--flag".`,
   );
 });
+
+Deno.test("flags - type - string - value starting with hyphen", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-f", "-a", "unknown"],
+    requiredValueOptions,
+  );
+
+  assertEquals(flags, { flag: "-a" });
+  assertEquals(unknown, ["unknown"]);
+  assertEquals(literal, []);
+});

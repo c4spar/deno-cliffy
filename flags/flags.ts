@@ -280,14 +280,21 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
         /** Check if current option should have an argument. */
         function hasNext(arg: IFlagArgument): boolean {
-          return !!(
-            normalized[i + 1] &&
-            (arg.optionalValue || arg.requiredValue || arg.variadic) &&
-            (normalized[i + 1][0] !== "-" ||
+          if (!normalized[i + 1]) {
+            return false;
+          }
+
+          if (arg.requiredValue) {
+            return true;
+          }
+
+          if (arg.optionalValue || arg.variadic) {
+            return (normalized[i + 1][0] !== "-" ||
               (arg.type === OptionType.NUMBER &&
-                !isNaN(Number(normalized[i + 1])))) &&
-            arg
-          );
+                !isNaN(Number(normalized[i + 1]))));
+          }
+
+          return false;
         }
 
         /** Parse argument value.  */
