@@ -137,11 +137,17 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         };
       }
 
-      const positiveName: string = option.name.replace(/^no-?/, "");
+      const positiveName: string = negate
+        ? option.name.replace(/^no-?/, "")
+        : option.name;
       const propName: string = paramCaseToCamelCase(positiveName);
 
-      if (typeof flags[propName] !== "undefined" && !option.collect) {
-        throw new DuplicateOption(current);
+      if (typeof flags[propName] !== "undefined") {
+        if (!opts.flags.length) {
+          option.collect = true;
+        } else if (!option.collect) {
+          throw new DuplicateOption(current);
+        }
       }
 
       args = option.args?.length ? option.args : [{
