@@ -49,7 +49,9 @@ export function normalize(args: string[]) {
       flags.forEach((val) => normalized.push(`-${val}`));
     } else {
       normalized.push(`-${flags.shift()}`);
-      normalized.push(flags.join(""));
+      if (flags.length) {
+        normalized.push(flags.join(""));
+      }
     }
   }
 }
