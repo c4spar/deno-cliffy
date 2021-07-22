@@ -62,6 +62,13 @@ export class DuplicateOption extends ValidationError {
   }
 }
 
+export class InvalidOption extends ValidationError {
+  constructor(option: string, options: Array<IFlagOptions>) {
+    super(`Invalid option "${getFlag(option)}".`);
+    Object.setPrototypeOf(this, InvalidOption.prototype);
+  }
+}
+
 export class UnknownOption extends ValidationError {
   constructor(option: string, options: Array<IFlagOptions>) {
     super(

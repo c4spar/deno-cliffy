@@ -2,6 +2,7 @@ import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
   DuplicateOption,
+  InvalidOption,
   InvalidOptionValue,
   MissingOptionValue,
   RequiredArgumentFollowsOptionalArgument,
@@ -10,7 +11,6 @@ import {
   UnknownRequiredOption,
   UnknownType,
 } from "./_errors.ts";
-import { normalize } from "./normalize.ts";
 import type {
   IFlagArgument,
   IFlagOptions,
@@ -64,7 +64,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 ): IFlagsResult<O> {
   !opts.flags && (opts.flags = []);
 
-  const normalized = normalize(args);
+  const normalized = splitValues(args);
 
   let inLiteral = false;
   let negate = false;
@@ -91,7 +91,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   for (let i = 0; i < normalized.length; i++) {
     let option: IFlagOptions | undefined;
     let args: IFlagArgument[] | undefined;
-    const current = normalized[i];
+    let current: string = normalized[i];
 
     // literal args after --
     if (inLiteral) {
@@ -108,17 +108,22 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     const next = () => normalized[i + 1];
 
     if (isFlag) {
-      if (current[2] === "-" || (current[1] === "-" && current.length === 3)) {
-        throw new UnknownOption(current, opts.flags);
+      const isShort = current[1] !== "-";
+      const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
+
+      if (!isShort && !isLong) {
+        throw new InvalidOption(current, opts.flags);
       }
 
-      negate = current.startsWith("--no-");
+      // normalize short hand flags e.g: -abc => -a -b -c
+      if (isShort && current.length > 2 && current[2] !== ".") {
+        normalized.splice(i, 1, ...splitFlags(current));
+        current = normalized[i];
+      } else if (isLong && current.startsWith("--no-")) {
+        negate = true;
+      }
 
       option = getOption(opts.flags, current);
-      // if (option && negate) {
-      //   const positiveName: string = current.replace(/^-+(no-)?/, "");
-      //   option = getOption(opts.flags, positiveName) ?? option;
-      // }
 
       if (!option) {
         if (opts.flags.length) {
@@ -381,6 +386,51 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }, {});
 
   return { flags: result as O, unknown, literal };
+}
+
+function splitValues(args: string[]) {
+  const normalized = [];
+  let inLiteral = false;
+
+  for (const arg of args) {
+    if (inLiteral) {
+      normalized.push(arg);
+    } else if (arg === "--") {
+      inLiteral = true;
+      normalized.push(arg);
+    } else if (arg.length > 1 && arg[0] === "-") {
+      if (arg.includes("=")) {
+        const parts = arg.split("=");
+        const flag = parts.shift() as string;
+        normalized.push(flag);
+        if (parts.length) {
+          normalized.push(parts.join("="));
+        }
+      } else {
+        normalized.push(arg);
+      }
+    } else {
+      normalized.push(arg);
+    }
+  }
+
+  return normalized;
+}
+
+function splitFlags(flag: string): Array<string> {
+  const normalized: Array<string> = [];
+  const flags = flag.slice(1).split("");
+
+  if (isNaN(Number(flag[flag.length - 1]))) {
+    flags.forEach((val) => normalized.push(`-${val}`));
+  } else {
+    normalized.push(`-${flags.shift()}`);
+    if (flags.length) {
+      normalized.push(flags.join(""));
+    }
+  }
+
+  return normalized;
 }
 
 function parseFlagValue(

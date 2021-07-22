@@ -2,7 +2,6 @@ export * from "./ansi/mod.ts";
 export * from "./command/mod.ts";
 export {
   boolean,
-  normalize,
   number,
   // Already exported by command module.
   // ValidationError,
