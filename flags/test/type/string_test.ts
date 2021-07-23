@@ -149,6 +149,28 @@ Deno.test("flags - type - string - with long flag as value", () => {
   assertEquals(literal, []);
 });
 
+Deno.test("flags - type - string - with long flag and value as value", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-f", "--foo=bar", "unknown"],
+    requiredStringValueOptions,
+  );
+
+  assertEquals(flags, { flag: "--foo=bar" });
+  assertEquals(unknown, ["unknown"]);
+  assertEquals(literal, []);
+});
+
+Deno.test("flags - type - string - with short flag and value as value", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-f", "-a=b", "unknown"],
+    requiredStringValueOptions,
+  );
+
+  assertEquals(flags, { flag: "-a=b" });
+  assertEquals(unknown, ["unknown"]);
+  assertEquals(literal, []);
+});
+
 Deno.test("flags - type - string - with only hyphens as value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-------------", "unknown"],
