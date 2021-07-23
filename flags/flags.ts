@@ -62,8 +62,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   args: string[],
   opts: IParseOptions = {},
 ): IFlagsResult<O> {
+  args = args.slice();
   !opts.flags && (opts.flags = []);
-  let normalized: Array<string> = args.slice();
 
   let inLiteral = false;
   let negate = false;
@@ -88,13 +88,13 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
   });
 
   for (
-    let normalizedIndex = 0;
-    normalizedIndex < normalized.length;
-    normalizedIndex++
+    let argsIndex = 0;
+    argsIndex < args.length;
+    argsIndex++
   ) {
     let option: IFlagOptions | undefined;
-    let args: IFlagArgument[] | undefined;
-    let current: string = normalized[normalizedIndex];
+    let optionArgs: IFlagArgument[] | undefined;
+    let current: string = args[argsIndex];
     let currentValue: string | undefined;
 
     // literal args after --
@@ -109,7 +109,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }
 
     const isFlag = current.length > 1 && current[0] === "-";
-    const next = () => currentValue ?? normalized[normalizedIndex + 1];
+    const next = () => currentValue ?? args[argsIndex + 1];
 
     if (isFlag) {
       const isShort = current[1] !== "-";
@@ -119,7 +119,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         throw new InvalidOption(current, opts.flags);
       }
 
-      // split value: --foo="bar=baz" => --foo bar=baz 
+      // split value: --foo="bar=baz" => --foo bar=baz
       const equalSignIndex = current.indexOf("=");
       if (equalSignIndex > -1) {
         currentValue = current.slice(equalSignIndex + 1) || undefined;
@@ -128,8 +128,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       // normalize short flags: -abc => -a -b -c
       if (isShort && current.length > 2 && current[2] !== ".") {
-        normalized.splice(normalizedIndex, 1, ...splitFlags(current));
-        current = normalized[normalizedIndex];
+        args.splice(argsIndex, 1, ...splitFlags(current));
+        current = args[argsIndex];
       } else if (isLong && current.startsWith("--no-")) {
         negate = true;
       }
@@ -161,7 +161,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
       }
 
-      args = option.args?.length ? option.args : [{
+      optionArgs = option.args?.length ? option.args : [{
         type: option.type,
         requiredValue: option.requiredValue,
         optionalValue: option.optionalValue,
@@ -170,14 +170,14 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         separator: option.separator,
       }];
 
-      let argIndex = 0;
+      let optionArgsIndex = 0;
       let inOptionalArg = false;
       const previous = flags[propName];
 
-      parseNext(option, args);
+      parseNext(option, optionArgs);
 
       if (typeof flags[propName] === "undefined") {
-        if (args[argIndex].requiredValue) {
+        if (optionArgs[optionArgsIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
         } else if (typeof option.default !== "undefined") {
           flags[propName] = getDefaultValue(option);
@@ -203,8 +203,11 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
-      function parseNext(option: IFlagOptions, args: IFlagArgument[]): void {
-        const arg: IFlagArgument = args[argIndex];
+      function parseNext(
+        option: IFlagOptions,
+        optionArgs: IFlagArgument[],
+      ): void {
+        const arg: IFlagArgument | undefined = optionArgs[optionArgsIndex];
 
         if (!arg) {
           const flag = next();
@@ -279,16 +282,17 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
 
         if (increase && typeof currentValue === "undefined") {
-          normalizedIndex++;
+          argsIndex++;
           if (!arg.variadic) {
-            argIndex++;
-          } else if (args[argIndex + 1]) {
+            optionArgsIndex++;
+          } else if (optionArgs[optionArgsIndex + 1]) {
             throw new ArgumentFollowsVariadicArgument(next());
           }
         }
 
         if (
-          typeof result !== "undefined" && ((args.length > 1) || arg.variadic)
+          typeof result !== "undefined" &&
+          (optionArgs.length > 1 || arg.variadic)
         ) {
           if (!flags[propName]) {
             flags[propName] = [];
@@ -297,7 +301,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           (flags[propName] as Array<unknown>).push(result);
 
           if (hasNext(arg)) {
-            parseNext(option, args);
+            parseNext(option, optionArgs);
           }
         } else {
           flags[propName] = result;
@@ -305,7 +309,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
         /** Check if current option should have an argument. */
         function hasNext(arg: IFlagArgument): boolean {
-          const nextValue = currentValue ?? normalized[normalizedIndex + 1];
+          const nextValue = currentValue ?? args[argsIndex + 1];
           if (!currentValue && !nextValue) {
             return false;
           }
