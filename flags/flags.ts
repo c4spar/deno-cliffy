@@ -178,7 +178,10 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       if (option.value) {
         flags[propName] = option.value(flags[propName], previous);
       } else if (option.collect) {
-        const value: unknown[] = Array.isArray(previous) ? previous : [];
+        const value: unknown[] = typeof previous !== "undefined"
+          ? (Array.isArray(previous) ? previous : [previous])
+          : [];
+
         value.push(flags[propName]);
         flags[propName] = value;
       }
