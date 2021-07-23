@@ -87,10 +87,15 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     });
   });
 
-  for (let i = 0; i < normalized.length; i++) {
+  for (
+    let normalizedIndex = 0;
+    normalizedIndex < normalized.length;
+    normalizedIndex++
+  ) {
     let option: IFlagOptions | undefined;
     let args: IFlagArgument[] | undefined;
-    let current: string = normalized[i];
+    let current: string = normalized[normalizedIndex];
+    let currentValue: string | undefined;
 
     // literal args after --
     if (inLiteral) {
@@ -104,7 +109,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }
 
     const isFlag = current.length > 1 && current[0] === "-";
-    const next = () => normalized[i + 1];
+    const next = () => currentValue ?? normalized[normalizedIndex + 1];
 
     if (isFlag) {
       const isShort = current[1] !== "-";
@@ -114,22 +119,17 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         throw new InvalidOption(current, opts.flags);
       }
 
+      // split value: --foo="bar=baz" => --foo bar=baz 
       const equalSignIndex = current.indexOf("=");
       if (equalSignIndex > -1) {
-        const flag = current.slice(0, equalSignIndex);
-        const value = current.slice(equalSignIndex + 1);
-        if (value) {
-          normalized.splice(i, 1, flag, value);
-        } else {
-          normalized[i] = flag;
-        }
-        current = flag;
+        currentValue = current.slice(equalSignIndex + 1) || undefined;
+        current = current.slice(0, equalSignIndex);
       }
 
-      // normalize short hand flags e.g: -abc => -a -b -c
+      // normalize short flags: -abc => -a -b -c
       if (isShort && current.length > 2 && current[2] !== ".") {
-        normalized.splice(i, 1, ...splitFlags(current));
-        current = normalized[i];
+        normalized.splice(normalizedIndex, 1, ...splitFlags(current));
+        current = normalized[normalizedIndex];
       } else if (isLong && current.startsWith("--no-")) {
         negate = true;
       }
@@ -278,8 +278,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           }
         }
 
-        if (increase) {
-          i++;
+        if (increase && typeof currentValue === "undefined") {
+          normalizedIndex++;
           if (!arg.variadic) {
             argIndex++;
           } else if (args[argIndex + 1]) {
@@ -305,7 +305,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
         /** Check if current option should have an argument. */
         function hasNext(arg: IFlagArgument): boolean {
-          if (!normalized[i + 1]) {
+          const nextValue = currentValue ?? normalized[normalizedIndex + 1];
+          if (!currentValue && !nextValue) {
             return false;
           }
 
@@ -314,9 +315,8 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
           }
 
           if (arg.optionalValue || arg.variadic) {
-            return (normalized[i + 1][0] !== "-" ||
-              (arg.type === OptionType.NUMBER &&
-                !isNaN(Number(normalized[i + 1]))));
+            return nextValue[0] !== "-" ||
+              (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
           }
 
           return false;
@@ -338,7 +338,9 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             })
             : parseFlagValue(option, arg, value);
 
-          if (typeof result !== "undefined") {
+          if (
+            typeof result !== "undefined"
+          ) {
             increase = true;
           }
 
