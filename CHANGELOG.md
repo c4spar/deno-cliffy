@@ -1,82 +1,102 @@
-# [v0.19.3](https://github.com/c4spar/deno-cli/compare/v0.19.2...v0.19.3) (2021-07-17)
+# [v0.19.4](https://github.com/c4spar/deno-cliffy/compare/v0.19.3...v0.19.4) (2021-07-27)
+
+### Bug Fixes
+
+- **command,flags:** equals sign not supported in option value (#253)
+  ([b074cb3](https://github.com/c4spar/deno-cliffy/commit/b074cb3))
+- **command,flags:** values starting with '-' not supported (#251)
+  ([ab598bf](https://github.com/c4spar/deno-cliffy/commit/ab598bf))
+- **command,flags:** required option value with default value is not required
+  (#249) ([0d3f8fa](https://github.com/c4spar/deno-cliffy/commit/0d3f8fa))
+- **flags:** allow collecting options by default if no flags are set (#252)
+  ([24e3f46](https://github.com/c4spar/deno-cliffy/commit/24e3f46))
+
+### Chore
+
+- **ci:** add --jobs flag to speed up deno test's (#250)
+  ([ce794cf](https://github.com/c4spar/deno-cliffy/commit/ce794cf))
+- **upgrade:** deno/std v0.103.0 (#254)
+  ([ad65b8e](https://github.com/c4spar/deno-cliffy/commit/ad65b8e))
+
+# [v0.19.3](https://github.com/c4spar/deno-cliffy/compare/v0.19.2...v0.19.3) (2021-07-17)
 
 ### Features
 
 - **prompt:** add prefix option (#233)
-  ([a4943cb](https://github.com/c4spar/deno-cli/commit/a4943cb))
+  ([a4943cb](https://github.com/c4spar/deno-cliffy/commit/a4943cb))
 
 ### Bug Fixes
 
 - **command:** external commands not working on windows (#224)
-  ([84ac5be](https://github.com/c4spar/deno-cli/commit/84ac5be))
+  ([84ac5be](https://github.com/c4spar/deno-cliffy/commit/84ac5be))
 - **command:** remove v prefix from version in generated help text (#231)
-  ([f882abd](https://github.com/c4spar/deno-cli/commit/f882abd))
+  ([f882abd](https://github.com/c4spar/deno-cliffy/commit/f882abd))
 - **command,flags:** don't normalize arguments if stopEarly is enabled (#246)
-  ([2ea4938](https://github.com/c4spar/deno-cli/commit/2ea4938))
+  ([2ea4938](https://github.com/c4spar/deno-cliffy/commit/2ea4938))
 - **prompt:** use exit code 130 for ctrl+c (#242)
-  ([2c014d7](https://github.com/c4spar/deno-cli/commit/2c014d7))
+  ([2c014d7](https://github.com/c4spar/deno-cliffy/commit/2c014d7))
 
 ### Code Refactoring
 
 - **command:** export github upgrade provider in upgrade/mod.ts (#232)
-  ([39a8075](https://github.com/c4spar/deno-cli/commit/39a8075))
+  ([39a8075](https://github.com/c4spar/deno-cliffy/commit/39a8075))
 - **prompt:** replace deprecated Deno.copy with copy method from std/io (#243)
-  ([f95b317](https://github.com/c4spar/deno-cli/commit/f95b317))
+  ([f95b317](https://github.com/c4spar/deno-cliffy/commit/f95b317))
 
 ### Chore
 
 - **ci:** use denoland/setup-deno action (#219)
-  ([d93ad7d](https://github.com/c4spar/deno-cli/commit/d93ad7d))
+  ([d93ad7d](https://github.com/c4spar/deno-cliffy/commit/d93ad7d))
 - **ci:** use latest deno version in release action
-  ([36c1c07](https://github.com/c4spar/deno-cli/commit/36c1c07))
+  ([36c1c07](https://github.com/c4spar/deno-cliffy/commit/36c1c07))
 - **ci:** upgrade eggs to v0.3.8
-  ([1efd809](https://github.com/c4spar/deno-cli/commit/1efd809))
+  ([1efd809](https://github.com/c4spar/deno-cliffy/commit/1efd809))
 - **egg:** add keypress module to egg.yaml
-  ([fee6ed4](https://github.com/c4spar/deno-cli/commit/fee6ed4))
+  ([fee6ed4](https://github.com/c4spar/deno-cliffy/commit/fee6ed4))
 - **upgrade:** deno/std v0.101.0 (#244)
-  ([534094b](https://github.com/c4spar/deno-cli/commit/534094b))
+  ([534094b](https://github.com/c4spar/deno-cliffy/commit/534094b))
 
 ### Documentation Updates
 
 - **ansi:** fix functional example command (#235)
-  ([f3103b9](https://github.com/c4spar/deno-cli/commit/f3103b9))
+  ([f3103b9](https://github.com/c4spar/deno-cliffy/commit/f3103b9))
 - **command:** fix type of args in stopEarly example (#240)
-  ([b909bc6](https://github.com/c4spar/deno-cli/commit/b909bc6))
+  ([b909bc6](https://github.com/c4spar/deno-cliffy/commit/b909bc6))
 
-# [v0.19.2](https://github.com/c4spar/deno-cli/compare/v0.19.1...v0.19.2) (2021-06-16)
+# [v0.19.2](https://github.com/c4spar/deno-cliffy/compare/v0.19.1...v0.19.2) (2021-06-16)
 
 ### Features
 
 - **command:** add colors option to help options (#213)
-  ([eed2e90](https://github.com/c4spar/deno-cli/commit/eed2e90))
+  ([eed2e90](https://github.com/c4spar/deno-cliffy/commit/eed2e90))
 - **table:** add align option (#212)
-  ([9e10c9e](https://github.com/c4spar/deno-cli/commit/9e10c9e))
+  ([9e10c9e](https://github.com/c4spar/deno-cliffy/commit/9e10c9e))
 
 ### Bug Fixes
 
 - **prompt:** unicode characters are not displayed properly on windows (#216)
-  ([fb6a22e](https://github.com/c4spar/deno-cli/commit/fb6a22e))
+  ([fb6a22e](https://github.com/c4spar/deno-cliffy/commit/fb6a22e))
 
 ### Code Refactoring
 
 - **flags:** show better error message if an option occurs to many times (#215)
-  ([8b0dfcb](https://github.com/c4spar/deno-cli/commit/8b0dfcb))
+  ([8b0dfcb](https://github.com/c4spar/deno-cliffy/commit/8b0dfcb))
 
 ### Documentation Updates
 
 - docs: add keypress module to cliffy.io
-  ([15fe4e0](https://github.com/c4spar/deno-cli/commit/15fe4e0))
+  ([15fe4e0](https://github.com/c4spar/deno-cliffy/commit/15fe4e0))
 
 ### Chore
 
 - update .gitignore
-  ([8053930](https://github.com/c4spar/deno-cli/commit/8053930))
+  ([8053930](https://github.com/c4spar/deno-cliffy/commit/8053930))
 - **ci:** remove deno 1.4.0 tests (#218)
-  ([f0e2ba8](https://github.com/c4spar/deno-cli/commit/f0e2ba8))
+  ([f0e2ba8](https://github.com/c4spar/deno-cliffy/commit/f0e2ba8))
 - **upgrade:** deno/std v0.99.0 (#217)
-  ([578cbda](https://github.com/c4spar/deno-cli/commit/578cbda))
+  ([578cbda](https://github.com/c4spar/deno-cliffy/commit/578cbda))
 - **upgrade:** upgrade dev deps (#210)
-  ([d10f20d](https://github.com/c4spar/deno-cli/commit/d10f20d))
+  ([d10f20d](https://github.com/c4spar/deno-cliffy/commit/d10f20d))
 
 # [v0.19.1](https://github.com/c4spar/deno-cliffy/compare/v0.19.0...v0.19.1) (2021-05-30)
 
