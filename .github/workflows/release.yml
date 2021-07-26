@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup pagic
         run: >
-          deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.2.0/mod.ts &&
+          deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.4.0/mod.ts &&
           pagic build
 
       - name: Publish Nest.land
