@@ -16,23 +16,6 @@ export type PermissionName =
   | "plugin"
   | "hrtime";
 
-export function getPermissions(): Promise<Record<PermissionName, boolean>> {
-  return hasPermissions([
-    "env",
-    "hrtime",
-    "net",
-    "plugin",
-    "read",
-    "run",
-    "write",
-  ]);
-}
-
-export function isUnstable(): boolean {
-  // deno-lint-ignore no-explicit-any
-  return !!(Deno as any).permissions;
-}
-
 export function didYouMeanCommand(
   command: string,
   commands: Array<Command>,
@@ -54,20 +37,6 @@ export async function hasPermission(
   } catch {
     return false;
   }
-}
-
-async function hasPermissions<K extends PermissionName>(
-  names: K[],
-): Promise<Record<K, boolean>> {
-  const permissions: Record<string, boolean> = {};
-  await Promise.all(
-    names.map((name: K) =>
-      hasPermission(name).then((hasPermission) =>
-        permissions[name] = hasPermission
-      )
-    ),
-  );
-  return permissions as Record<K, boolean>;
 }
 
 const ARGUMENT_REGEX = /^[<\[].+[\]>]$/;

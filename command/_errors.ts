@@ -133,11 +133,9 @@ export class DefaultCommandNotFound extends CommandError {
 }
 
 export class CommandExecutableNotFound extends CommandError {
-  constructor(name: string, files: Array<string>) {
+  constructor(name: string) {
     super(
-      `Command executable not found: ${name}:\n    - ${
-        files.join("\\n    - ")
-      }`,
+      `Command executable not found: ${name}`,
     );
     Object.setPrototypeOf(this, CommandExecutableNotFound.prototype);
   }

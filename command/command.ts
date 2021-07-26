@@ -5,13 +5,10 @@ import {
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
 import {
-  getPermissions,
   hasPermission,
-  isUnstable,
   parseArgumentsDefinition,
   splitArguments,
 } from "./_utils.ts";
-import type { PermissionName } from "./_utils.ts";
 import { bold, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
@@ -1017,88 +1014,24 @@ export class Command<
    * @param args Raw command line arguments.
    */
   protected async executeExecutable(args: string[]) {
-    const permissions = await getPermissions();
-    if (!permissions.read) {
-      // deno-lint-ignore no-explicit-any
-      await (Deno as any).permissions?.request({ name: "read" });
-    }
-    if (!permissions.run) {
-      // deno-lint-ignore no-explicit-any
-      await (Deno as any).permissions?.request({ name: "run" });
-    }
+    const command = this.getPath().replace(/\s+/g, "-");
 
-    const [main, ...names] = this.getPath().split(" ");
+    await Deno.permissions.request({ name: "run", command });
 
-    names.unshift(main.replace(/\.ts$/, ""));
-
-    const executableName = names.join("-");
-    const files: string[] = [];
-
-    // deno-lint-ignore no-explicit-any
-    const parts: string[] = (Deno as any).mainModule.replace(/^file:\/\//g, "")
-      .split("/");
-    if (Deno.build.os === "windows" && parts[0] === "") {
-      parts.shift();
-    }
-    parts.pop();
-    const path: string = parts.join("/");
-    files.push(
-      path + "/" + executableName,
-      path + "/" + executableName + ".ts",
-    );
-
-    files.push(
-      executableName,
-      executableName + ".ts",
-    );
-
-    const denoOpts = [];
-
-    if (isUnstable()) {
-      denoOpts.push("--unstable");
-    }
-
-    denoOpts.push(
-      "--allow-read",
-      "--allow-run",
-    );
-
-    (Object.keys(permissions) as PermissionName[])
-      .forEach((name: PermissionName) => {
-        if (name === "read" || name === "run") {
-          return;
-        }
-        if (permissions[name]) {
-          denoOpts.push(`--allow-${name}`);
-        }
-      });
-
-    for (const file of files) {
-      try {
-        Deno.lstatSync(file);
-      } catch (error) {
-        if (error instanceof Deno.errors.NotFound) {
-          continue;
-        }
-        throw error;
-      }
-
-      const cmd = ["deno", "run", ...denoOpts, file, ...args];
-
+    try {
       const process: Deno.Process = Deno.run({
-        cmd: cmd,
+        cmd: [command, ...args],
       });
-
       const status: Deno.ProcessStatus = await process.status();
-
       if (!status.success) {
         Deno.exit(status.code);
       }
-
-      return;
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        throw new CommandExecutableNotFound(command);
+      }
+      throw error;
     }
-
-    throw new CommandExecutableNotFound(executableName, files);
   }
 
   /**
