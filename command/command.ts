@@ -1374,7 +1374,7 @@ export class Command<
 
   /** Output generated help without exiting. */
   public showVersion(): void {
-    Deno.stdout.writeSync(new TextEncoder().encode(this.getVersion()));
+    console.log(this.getVersion());
   }
 
   /** Output generated help without exiting. */
