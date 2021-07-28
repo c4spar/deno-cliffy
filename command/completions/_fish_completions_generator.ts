@@ -52,8 +52,7 @@ function __fish_${replaceSpecialChars(this.cmd.getName())}_using_command
   return 1
 end
 
-${this.generateCompletions(this.cmd).trim()}
-`;
+${this.generateCompletions(this.cmd).trim()}`;
   }
 
   private generateCompletions(command: Command): string {
