@@ -51,7 +51,6 @@ Deno.test("hidden command help", () => {
 
     help         [command:command]  - Show this help or the help of a sub-command.
     completions                     - Generate shell completions.                 
-
 `,
     stripColor(output),
   );

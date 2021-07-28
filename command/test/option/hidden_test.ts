@@ -39,7 +39,6 @@ Deno.test("hidden option help", () => {
 
     -h, --help     - Show this help.                            
     -V, --version  - Show the version number for this program.  
-
 `,
     stripColor(output),
   );

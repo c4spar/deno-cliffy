@@ -20,9 +20,7 @@ To enable fish completions for this program add following line to your ${
     })
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
-        Deno.stdout.writeSync(new TextEncoder().encode(
-          FishCompletionsGenerator.generate(baseCmd),
-        ));
+        console.log(FishCompletionsGenerator.generate(baseCmd));
       });
   }
 }

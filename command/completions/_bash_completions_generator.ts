@@ -74,8 +74,7 @@ _${replaceSpecialChars(path)}() {
   return 0
 }
 
-complete -F _${replaceSpecialChars(path)} -o bashdefault -o default ${path}
-`;
+complete -F _${replaceSpecialChars(path)} -o bashdefault -o default ${path}`;
   }
 
   /** Generates bash completions method for given command and child commands. */

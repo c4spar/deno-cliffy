@@ -1379,7 +1379,7 @@ export class Command<
 
   /** Output generated help without exiting. */
   public showHelp(): void {
-    Deno.stdout.writeSync(new TextEncoder().encode(this.getHelp()));
+    console.log(this.getHelp());
   }
 
   /** Get generated help. */

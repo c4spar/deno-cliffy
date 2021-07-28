@@ -20,9 +20,7 @@ To enable zsh completions for this program add following line to your ${
     })
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
-        Deno.stdout.writeSync(new TextEncoder().encode(
-          ZshCompletionsGenerator.generate(baseCmd),
-        ));
+        console.log(ZshCompletionsGenerator.generate(baseCmd));
       });
   }
 }

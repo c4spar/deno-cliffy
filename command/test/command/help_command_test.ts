@@ -103,7 +103,6 @@ Deno.test({
 
     SOME_ENV_VAR    <value:number>  - Description ...  
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
-
 `,
     );
   },
@@ -144,7 +143,6 @@ Deno.test({
 
     SOME_ENV_VAR    <value:number>  - Description ...  
     SOME_ENV_VAR_2  <value:string>  - Description 2 ...
-
 `,
     );
   },

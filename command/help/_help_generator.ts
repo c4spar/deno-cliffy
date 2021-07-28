@@ -51,8 +51,7 @@ export class HelpGenerator {
       this.generateOptions() +
       this.generateCommands() +
       this.generateEnvironmentVariables() +
-      this.generateExamples() +
-      "\n";
+      this.generateExamples();
     setColorEnabled(areColorsEnabled);
     return result;
   }
