@@ -128,7 +128,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
 
   /** Write table to stdout. */
   public render(): this {
-    Deno.stdout.writeSync(new TextEncoder().encode(this.toString() + "\n"));
+    console.log(this.toString());
     return this;
   }
 
