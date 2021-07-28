@@ -20,9 +20,7 @@ To enable bash completions for this program add following line to your ${
     })
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
-        Deno.stdout.writeSync(new TextEncoder().encode(
-          BashCompletionsGenerator.generate(baseCmd),
-        ));
+        console.log(BashCompletionsGenerator.generate(baseCmd));
       });
   }
 }

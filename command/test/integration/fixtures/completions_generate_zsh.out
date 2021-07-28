@@ -391,4 +391,3 @@ function _completions_test_completions_zsh_help() {
 # _completions_test "${@}"
 
 compdef _completions_test completions-test
-

@@ -59,9 +59,7 @@ ${this.generateCompletions(this.cmd).trim()}
 
 # _${replaceSpecialChars(path)} "\${@}"
 
-compdef _${replaceSpecialChars(path)} ${path}
-
-`;
+compdef _${replaceSpecialChars(path)} ${path}`;
   }
 
   /** Generates zsh completions method for given command and child commands. */
