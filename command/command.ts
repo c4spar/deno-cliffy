@@ -849,45 +849,34 @@ export class Command<
   /**
    * Parse command line arguments and execute matched command.
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
-   * @param dry Execute command after parsed.
    */
   public async parse(
     args: string[] = Deno.args,
-    dry?: boolean,
   ): Promise<IParseResult<CO, CA, CG, PG, P>> {
     try {
       this.reset();
       this.registerDefaults();
       this.rawArgs = args;
-      const subCommand = args.length > 0 &&
-        this.getCommand(args[0], true);
 
-      if (subCommand) {
-        subCommand._globalParent = this;
-        return await subCommand.parse(
-          this.rawArgs.slice(1),
-          dry,
-        ) as IParseResult<CO, CA, CG, PG, P>;
+      if (args.length > 0) {
+        const subCommand = this.getCommand(args[0], true);
+        if (subCommand) {
+          subCommand._globalParent = this;
+          return subCommand.parse(
+            this.rawArgs.slice(1),
+          );
+        }
       }
 
-      const result: IParseResult<CO, CA, CG, PG, P> = {
-        options: {} as PG & CG & CO,
-        args: this.rawArgs as CA,
-        cmd: this,
-        literal: this.literalArgs,
-      };
-
       if (this.isExecutable) {
-        if (!dry) {
-          await this.executeExecutable(this.rawArgs);
-        }
-
-        return result;
+        await this.executeExecutable(this.rawArgs);
+        return {
+          options: {} as PG & CG & CO,
+          args: [] as unknown as CA,
+          cmd: this,
+          literal: [],
+        };
       } else if (this._useRawArgs) {
-        if (dry) {
-          return result;
-        }
-
         return await this.execute({} as PG & CG & CO, ...this.rawArgs as CA);
       } else {
         const { action, flags, unknown, literal } = this.parseFlags(
@@ -897,13 +886,10 @@ export class Command<
         this.literalArgs = literal;
 
         const params = this.parseArguments(unknown, flags);
-
         await this.validateEnvVars();
 
-        if (dry || action) {
-          if (action) {
-            await action.call(this, flags, ...params);
-          }
+        if (action) {
+          await action.call(this, flags, ...params);
           return {
             options: flags as PG & CG & CO,
             args: params,
