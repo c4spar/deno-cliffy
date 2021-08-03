@@ -840,10 +840,9 @@ remove dir recursively
 > Work in progress
 
 When `.executable()` is invoked on a sub-command, this tells cliffy you're going
-to use a separate executable file for the sub-command. Cliffy will search the
-executable in the directory of the entry script with the name
-program-sub-command, like `pm-install`, `pm-search`. If no command was found
-cliffy looks for a globally installed command.
+to use a separate executable file for the sub-command. Cliffy will look for a
+globally installed program with the name program-sub-command, like
+`deno-install`, `deno-upgrade`.
 
 You handle the options for an executable (sub)command in the executable, and
 don't declare them at the top-level.
