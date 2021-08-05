@@ -2,6 +2,7 @@ import {
   UnknownType,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
+import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
 import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
