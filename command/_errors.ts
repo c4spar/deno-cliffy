@@ -1,6 +1,7 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 import { getFlag } from "../flags/_utils.ts";
+import { IEnvVar } from "./types.ts";
 
 export class CommandError extends Error {
   constructor(message: string) {
@@ -91,6 +92,13 @@ export class DuplicateEnvironmentVariable extends CommandError {
   constructor(name: string) {
     super(`Environment variable with name "${name}" already exists.`);
     Object.setPrototypeOf(this, DuplicateEnvironmentVariable.prototype);
+  }
+}
+
+export class MissingRequiredEnvVar extends ValidationError {
+  constructor(envVar: IEnvVar) {
+    super(`Missing required environment variable "${envVar.names[0]}".`);
+    Object.setPrototypeOf(this, MissingRequiredEnvVar.prototype);
   }
 }
 

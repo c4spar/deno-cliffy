@@ -1128,6 +1128,7 @@ await new Command()
   .env("SOME_ENV_VAR=<value:number>", "Description ...", {
     global: true,
     hidden: false,
+    required: true,
   })
   .command("hello", "world ...")
   .parse(Deno.args);
@@ -1136,11 +1137,14 @@ console.log(Deno.env.get("SOME_ENV_VAR"));
 ```
 
 ```
-$ SOME_ENV_VAR=1 deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment_variables.ts
-1
+$ deno run https://deno.land/x/cliffy/examples/command/environment_variables.ts
+error: Missing required environment variable "SOME_ENV_VAR".
 
 $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/examples/command/environment_variables.ts
 Error: Environment variable "SOME_ENV_VAR" must be of type "number", but got "abc".
+
+$ SOME_ENV_VAR=1 deno run --allow-env https://deno.land/x/cliffy/examples/command/environment_variables.ts
+1
 ```
 
 ## ❯ Add examples

@@ -7,15 +7,6 @@ import { OptionType } from "../flags/types.ts";
 import type { Command } from "./command.ts";
 import type { IArgument } from "./types.ts";
 
-export type PermissionName =
-  | "run"
-  | "read"
-  | "write"
-  | "net"
-  | "env"
-  | "plugin"
-  | "hrtime";
-
 export function didYouMeanCommand(
   command: string,
   commands: Array<Command>,
@@ -25,18 +16,6 @@ export function didYouMeanCommand(
     .map((command) => command.getName())
     .filter((command) => !excludes.includes(command));
   return didYouMean(" Did you mean command", command, commandNames);
-}
-
-export async function hasPermission(
-  permission: PermissionName,
-): Promise<boolean> {
-  try {
-    // deno-lint-ignore no-explicit-any
-    return (await (Deno as any).permissions?.query?.({ name: permission }))
-      ?.state === "granted";
-  } catch {
-    return false;
-  }
 }
 
 const ARGUMENT_REGEX = /^[<\[].+[\]>]$/;
