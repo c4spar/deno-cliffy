@@ -1,6 +1,6 @@
 // deno-fmt-ignore-file
 
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { IEnvVar } from "../../types.ts";
 
@@ -21,6 +21,19 @@ function command(): Command {
         .env("baz_hidden", "...", { hidden: true }),
     );
 }
+
+Deno.test("command - env var - missing required env var", async () => {
+  await assertThrowsAsync(
+    async () => {
+      await new Command()
+        .throwErrors()
+        .env("foo", "...", { required: true })
+        .parse([]);
+    },
+    Error,
+    `Missing required environment variable "foo".`,
+  );
+});
 
 Deno.test("command - env var - env var properties", () => {
   const cmd: Command = new Command()
