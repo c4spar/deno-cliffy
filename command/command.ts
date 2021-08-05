@@ -5,10 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
-import {
-  parseArgumentsDefinition,
-  splitArguments,
-} from "./_utils.ts";
+import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
 import { bold, red } from "./deps.ts";
 import {
   CommandExecutableNotFound,
