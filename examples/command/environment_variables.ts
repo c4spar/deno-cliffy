@@ -6,6 +6,7 @@ await new Command()
   .env("SOME_ENV_VAR=<value:number>", "Description ...", {
     global: true,
     hidden: false,
+    required: true,
   })
   .command("hello", "world ...")
   .parse(Deno.args);
