@@ -1,11 +1,11 @@
 import {
+  MissingRequiredEnvVar,
   UnknownType,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
 import {
-  hasPermission,
   parseArgumentsDefinition,
   splitArguments,
 } from "./_utils.ts";
@@ -1067,18 +1067,21 @@ export class Command<
 
   /** Validate environment variables. */
   protected async validateEnvVars(): Promise<void> {
-    if (!await hasPermission("env")) {
-      return;
-    }
-
     const envVars = this.getEnvVars(true);
 
     if (!envVars.length) {
       return;
     }
 
-    envVars.forEach((env: IEnvVar) => {
-      const name = env.names.find((name) => !!Deno.env.get(name));
+    const hasEnvPermissions = (await Deno.permissions.query({
+      name: "env",
+    })).state === "granted";
+
+    for (const env of envVars) {
+      const name = hasEnvPermissions && env.names.find(
+        (name: string) => !!Deno.env.get(name),
+      );
+
       if (name) {
         this.parseType({
           label: "Environment variable",
@@ -1086,8 +1089,10 @@ export class Command<
           name,
           value: Deno.env.get(name) ?? "",
         });
+      } else if (env.required) {
+        throw new MissingRequiredEnvVar(env);
       }
-    });
+    }
   }
 
   /**
