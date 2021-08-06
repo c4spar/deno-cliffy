@@ -1182,7 +1182,7 @@ retrieve the help text programmatically by using the `.showHelp()` or
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
 import { CompletionsCommand } from "https://deno.land/x/cliffy/command/completions/mod.ts";
-import { CompletionsCommand } from "https://deno.land/x/cliffy/command/help/mod.ts";
+import { HelpCommand } from "https://deno.land/x/cliffy/command/help/mod.ts";
 
 await new Command()
   .name("help-option-and-command")
