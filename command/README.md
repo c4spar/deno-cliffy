@@ -1112,12 +1112,17 @@ $ deno run https://deno.land/x/cliffy/examples/command/global_custom_type.ts log
 
 Environment variables can be defined with the `.env()` method. Environment
 variables are parsed and validated when the command is executed and stored in
-the options object. They are also listed with the
-[help](#help-option-and-command) option and command. An environment variable can
-be marked as `global`, `hidden` and `required`. `hidden` variables are not
-listed in the help output and `global` variables are validated for the command
-for which they are registered and for all nested child commands. Required
-environment variables will throw an error if they are not defined.
+the options object. They are also shown in the generated
+[help](#help-option-and-command).
+
+Environment variable names will be camel cased. For example `SOME_ENV_VAR=true`
+will be parsed to `{ someEnvVar: true }`.
+
+An environment variable has the following options:
+
+- **global:** Not listed in the help output.
+- **hidden:** Also available on child commands.
+- **required:** Throws an error if it's not defined on command execution.
 
 > To allow deno to access environment variables the `--allow-env` flag is
 > required.
