@@ -4,13 +4,27 @@ import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { IEnvVar } from "../../types.ts";
 
-function command(): Command {
-  return new Command()
+function command() {
+  return new Command<void>()
     .throwErrors()
-    .globalEnv("global", "...")
-    .globalEnv("global_hidden", "...", { hidden: true })
-    .env("foo", "...")
-    .env("foo_hidden", "...", { hidden: true })
+    .globalEnv<{ global?: boolean }>("global=<value:boolean>", "...")
+    .globalEnv<{ globalHidden?: boolean }>(
+      "global_hidden=<value:string>",
+      "...",
+      { hidden: true },
+    )
+    .globalEnv<{ globalRequired: boolean }>(
+      "global_required=<value:number>",
+      "...",
+      { required: true },
+    )
+    .env<{ foo?: boolean }>("foo=<value:boolean>", "...")
+    .env<{ fooHidden?: boolean }>("foo_hidden=<value:string>", "...", {
+      hidden: true,
+    })
+    .env<{ fooRequired: boolean }>("foo_required=<value:number>", "...", {
+      required: true,
+    })
     .command(
       "bar",
       new Command()
@@ -20,6 +34,24 @@ function command(): Command {
         .env("baz", "...")
         .env("baz_hidden", "...", { hidden: true }),
     );
+}
+
+function setupEnv() {
+  Deno.env.set("global", "true");
+  Deno.env.set("global_hidden", "foo");
+  Deno.env.set("global_required", "1");
+  Deno.env.set("foo", "true");
+  Deno.env.set("foo_hidden", "foo");
+  Deno.env.set("foo_required", "1");
+}
+
+function clearEnv() {
+  Deno.env.delete("global");
+  Deno.env.delete("global_hidden");
+  Deno.env.delete("global_required");
+  Deno.env.delete("foo");
+  Deno.env.delete("foo_hidden");
+  Deno.env.delete("foo_required");
 }
 
 Deno.test("command - env var - missing required env var", async () => {
@@ -33,6 +65,79 @@ Deno.test("command - env var - missing required env var", async () => {
     Error,
     `Missing required environment variable "foo".`,
   );
+});
+
+Deno.test("command - env var - expect valid values", async () => {
+  setupEnv();
+  let called = 0;
+  await command()
+    .reset()
+    .action((options) => {
+      called++;
+      assertEquals(options, {
+        global: true,
+        globalHidden: "foo",
+        globalRequired: 1,
+        foo: true,
+        fooHidden: "foo",
+        fooRequired: 1,
+      });
+    })
+    .parse([]);
+  assertEquals(called, 1);
+  clearEnv();
+});
+
+Deno.test("command - env var - expect option to throw if value is not a boolean", async () => {
+  setupEnv();
+  Deno.env.set("global", "foo");
+  await assertThrowsAsync(
+    async () => {
+      await command().parse([]);
+    },
+    Error,
+    `Environment variable "global" must be of type "boolean", but got "foo".`,
+  );
+  clearEnv();
+});
+
+Deno.test("command - env var - expect option to throw if value is not a number", async () => {
+  setupEnv();
+  Deno.env.set("global_required", "foo");
+  await assertThrowsAsync(
+    async () => {
+      await command().parse([]);
+    },
+    Error,
+    `Environment variable "global_required" must be of type "number", but got "foo".`,
+  );
+  clearEnv();
+});
+
+Deno.test("command - env var - expect global option to throw if value is not a boolean", async () => {
+  setupEnv();
+  Deno.env.set("global", "foo");
+  await assertThrowsAsync(
+    async () => {
+      await command().parse(["bar"]);
+    },
+    Error,
+    `Environment variable "global" must be of type "boolean", but got "foo".`,
+  );
+  clearEnv();
+});
+
+Deno.test("command - env var - expect global option to throw if value is not a number", async () => {
+  setupEnv();
+  Deno.env.set("global_required", "foo");
+  await assertThrowsAsync(
+    async () => {
+      await command().parse(["bar"]);
+    },
+    Error,
+    `Environment variable "global_required" must be of type "number", but got "foo".`,
+  );
+  clearEnv();
 });
 
 Deno.test("command - env var - env var properties", () => {
@@ -71,8 +176,8 @@ Deno.test("command - env var - has env vars", () => {
 
 Deno.test("command - env var - get env vars", () => {
   const cmd: Command = command();
-  assertEquals(cmd.getEnvVars().length, 2);
-  assertEquals(cmd.getEnvVars(true).length, 4);
+  assertEquals(cmd.getEnvVars().length, 4);
+  assertEquals(cmd.getEnvVars(true).length, 6);
   assertEquals(!!cmd.getEnvVars().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getEnvVars(true).find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getEnvVars().find((opt) => opt.name === "global_hidden"), false);
@@ -85,8 +190,8 @@ Deno.test("command - env var - get env vars", () => {
 
 Deno.test("command - env var - get base env vars", () => {
   const cmd: Command = command();
-  assertEquals(cmd.getBaseEnvVars().length, 2);
-  assertEquals(cmd.getBaseEnvVars(true).length, 4);
+  assertEquals(cmd.getBaseEnvVars().length, 4);
+  assertEquals(cmd.getBaseEnvVars(true).length, 6);
   assertEquals(!!cmd.getBaseEnvVars().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getBaseEnvVars(true).find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getBaseEnvVars().find((opt) => opt.name === "global_hidden"), false);
@@ -99,8 +204,8 @@ Deno.test("command - env var - get base env vars", () => {
 
 Deno.test("command - env var - get global env vars", () => {
   const cmd: Command = command();
-  assertEquals(cmd.getCommand("bar")?.getGlobalEnvVars().length, 1);
-  assertEquals(cmd.getCommand("bar")?.getGlobalEnvVars(true).length, 2);
+  assertEquals(cmd.getCommand("bar")?.getGlobalEnvVars().length, 2);
+  assertEquals(cmd.getCommand("bar")?.getGlobalEnvVars(true).length, 3);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalEnvVars().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalEnvVars(true).find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalEnvVars().find((opt) => opt.name === "global_hidden"), false);

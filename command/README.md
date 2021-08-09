@@ -1110,26 +1110,32 @@ $ deno run https://deno.land/x/cliffy/examples/command/global_custom_type.ts log
 
 ## ❯ Environment variables
 
-You can define environment variables for a command that are validated when the
-command is executed. Environment variables are listed with the
+Environment variables can be defined with the `.env()` method. Environment
+variables are parsed and validated when the command is executed and stored in
+the options object. They are also listed with the
 [help](#help-option-and-command) option and command. An environment variable can
-be marked as `global` and `hidden`. `hidden` variables are not listed in the
-help output and `global` variables are validated for the command for which they
-are registered and for all nested child commands.
+be marked as `global`, `hidden` and `required`. `hidden` variables are not
+listed in the help output and `global` variables are validated for the command
+for which they are registered and for all nested child commands. Required
+environment variables will throw an error if they are not defined.
 
-To allow deno to access environment variables you have to set the `--allow-env`
-flag. At the moment its also required to set the `--unstable` flag because
-deno's permissions api is marked as unstable.
+> To allow deno to access environment variables the `--allow-env` flag is
+> required.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-await new Command()
-  .env("SOME_ENV_VAR=<value:number>", "Description ...", {
-    global: true,
-    hidden: false,
-    required: true,
-  })
+await new Command<void>()
+  .env<{ someEnvVar: number }>(
+    "SOME_ENV_VAR=<value:number>",
+    "Description ...",
+    {
+      global: true,
+      hidden: false,
+      required: true,
+    },
+  )
+  .action((options) => console.log(options.someEnvVar))
   .command("hello", "world ...")
   .parse(Deno.args);
 
