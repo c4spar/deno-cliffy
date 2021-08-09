@@ -57,6 +57,7 @@ import type {
   IVersionHandler,
 } from "./types.ts";
 import { IntegerType } from "./types/integer.ts";
+import { underscoreToCamelCase } from "../flags/_utils.ts";
 
 interface IDefaultOption<
   // deno-lint-ignore no-explicit-any
@@ -786,11 +787,11 @@ export class Command<
     return this;
   }
 
-  public globalEnv(
+  public globalEnv<G extends Record<string, unknown> | void = CG>(
     name: string,
     description: string,
     options?: Omit<IEnvVarOptions, "global">,
-  ): this {
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P> {
     return this.env(name, description, { ...options, global: true });
   }
 
@@ -800,11 +801,21 @@ export class Command<
    * @param description   The description of the environment variable.
    * @param options       Environment variable options.
    */
+  public env<G extends Record<string, unknown> | void = CG>(
+    name: string,
+    description: string,
+    options?: IEnvVarOptions,
+  ): Command<CO, CA, Merge<CG, MapOptionTypes<G>>, PG, P>;
+  public env<O extends Record<string, unknown> | void = CO>(
+    name: string,
+    description: string,
+    options?: IEnvVarOptions,
+  ): Command<Merge<CO, MapOptionTypes<O>>, CA, CG, PG, P>;
   public env(
     name: string,
     description: string,
     options?: IEnvVarOptions,
-  ): this {
+  ): Command {
     const result = splitArguments(name);
 
     if (!result.typeDefinition) {
@@ -874,7 +885,8 @@ export class Command<
           literal: [],
         };
       } else if (this._useRawArgs) {
-        return await this.execute({} as PG & CG & CO, ...this.rawArgs as CA);
+        const env: Record<string, unknown> = await this.parseEnvVars();
+        return await this.execute(env as PG & CG & CO, ...this.rawArgs as CA);
       } else {
         const { action, flags, unknown, literal } = this.parseFlags(
           this.rawArgs,
@@ -882,20 +894,24 @@ export class Command<
 
         this.literalArgs = literal;
 
-        const params = this.parseArguments(unknown, flags);
-        await this.validateEnvVars();
+        const env: Record<string, unknown> = await this.parseEnvVars();
+        const options = { ...env, ...flags } as PG & CG & CO;
+        const params = this.parseArguments(
+          unknown,
+          options as Record<string, unknown>,
+        );
 
         if (action) {
-          await action.call(this, flags, ...params);
+          await action.call(this, options, ...params);
           return {
-            options: flags as PG & CG & CO,
+            options,
             args: params,
             cmd: this,
             literal: this.literalArgs,
           };
         }
 
-        return await this.execute(flags as PG & CG & CO, ...params);
+        return await this.execute(options as PG & CG & CO, ...params);
       }
     } catch (error) {
       throw this.error(error);
@@ -1063,11 +1079,12 @@ export class Command<
   }
 
   /** Validate environment variables. */
-  protected async validateEnvVars(): Promise<void> {
+  protected async parseEnvVars(): Promise<Record<string, unknown>> {
     const envVars = this.getEnvVars(true);
+    const result: Record<string, unknown> = {};
 
     if (!envVars.length) {
-      return;
+      return result;
     }
 
     const hasEnvPermissions = (await Deno.permissions.query({
@@ -1080,7 +1097,8 @@ export class Command<
       );
 
       if (name) {
-        this.parseType({
+        const propertyName = underscoreToCamelCase(env.names[0]);
+        result[propertyName] = this.parseType({
           label: "Environment variable",
           type: env.type,
           name,
@@ -1090,6 +1108,8 @@ export class Command<
         throw new MissingRequiredEnvVar(env);
       }
     }
+
+    return result;
   }
 
   /**

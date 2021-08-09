@@ -9,6 +9,17 @@ export function paramCaseToCamelCase(str: string): string {
   );
 }
 
+/** Convert underscore case string to camel case. */
+export function underscoreToCamelCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(
+      /_([a-z])/g,
+      (g) => g[1].toUpperCase(),
+    );
+}
+
 /**
  * Find option by flag, name or alias.
  *
