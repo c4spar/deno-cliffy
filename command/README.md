@@ -1116,7 +1116,8 @@ the options object. They are also shown in the generated
 [help](#help-option-and-command).
 
 Environment variable names will be camel cased. For example `SOME_ENV_VAR=true`
-will be parsed to `{ someEnvVar: true }`.
+will be parsed to `{ someEnvVar: true }`. If an option with the same name is
+defined, the option will override the environment variable.
 
 An environment variable has the following options:
 
