@@ -9,6 +9,7 @@ export interface UpgradeCommandOptions<
 > {
   provider: V;
   main?: string;
+  importMap?: string;
   args?: Array<string>;
 }
 
@@ -16,7 +17,7 @@ export class UpgradeCommand extends Command<void> {
   private readonly providers: ReadonlyArray<Provider>;
 
   constructor(
-    { provider, main, args }: UpgradeCommandOptions,
+    { provider, main, args, importMap }: UpgradeCommandOptions,
   ) {
     super();
     this.providers = Array.isArray(provider) ? provider : [provider];
@@ -71,6 +72,7 @@ export class UpgradeCommand extends Command<void> {
           await registry.upgrade({
             name,
             main,
+            importMap,
             from: currentVersion,
             to: targetVersion,
             args,

@@ -13,6 +13,7 @@ export interface UpgradeOptions {
   to: string;
   args?: Array<string>;
   main?: string;
+  importMap?: string;
 }
 
 export abstract class Provider {
@@ -76,7 +77,7 @@ export abstract class Provider {
   }
 
   async upgrade(
-    { name, from, to, main = `${name}.ts`, args = [] }: UpgradeOptions,
+    { name, from, to, importMap, main = `${name}.ts`, args = [] }: UpgradeOptions,
   ): Promise<void> {
     if (to === "latest") {
       const { latest } = await this.getVersions(name);
@@ -85,6 +86,13 @@ export abstract class Provider {
     const registry: string = new URL(main, this.getRegistryUrl(name, to)).href;
 
     const cmd = [Deno.execPath(), "install"];
+
+    if (importMap) {
+      const importJson: string = new URL(importMap, this.getRegistryUrl(name, to)).href;
+
+      cmd.push("--import-map", importJson)
+    }
+
     if (args.length) {
       cmd.push(...args, "--force", "--name", name, registry);
     } else {
