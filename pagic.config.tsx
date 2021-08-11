@@ -25,15 +25,17 @@ export default {
     editOnGithub: false,
     backToTop: true,
   },
-  head: (<>
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/docs/assets/favicon.svg"
-      sizes="any"
-    />
-    <link rel="stylesheet" href="/docs/custom.css" />
-  </>),
+  head: (
+    <>
+      <link
+        rel="icon"
+        type="image/svg+xml"
+        href="/docs/assets/favicon.svg"
+        sizes="any"
+      />
+      <link rel="stylesheet" href="/docs/custom.css" />
+    </>
+  ),
   nav: [
     {
       text: "Ansi",
