@@ -33,17 +33,17 @@ jobs:
         env:
           NEST_TOKEN: ${{ secrets.NEST_TOKEN }}
 
-      - name: Setup pagic
-        run: >
-          deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.4.0/mod.ts &&
-          pagic build
+#      - name: Setup pagic
+#        run: >
+#          deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.4.0/mod.ts &&
+#          pagic build
 
       - name: Publish Nest.land
         run: eggs publish --no-check --yes
 
-      - name: Publish Vercel
-        run: vercel --prod --scope "${VERCEL_SCOPE}" --token="${{ secrets.VERCEL_TOKEN }}"
-        env:
-          VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+#      - name: Publish Vercel
+#        run: vercel --prod --scope "${VERCEL_SCOPE}" --token="${{ secrets.VERCEL_TOKEN }}"
+#        env:
+#          VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
+#          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+#          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
