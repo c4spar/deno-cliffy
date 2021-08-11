@@ -77,7 +77,8 @@ export abstract class Provider {
   }
 
   async upgrade(
-    { name, from, to, importMap, main = `${name}.ts`, args = [] }: UpgradeOptions,
+    { name, from, to, importMap, main = `${name}.ts`, args = [] }:
+      UpgradeOptions,
   ): Promise<void> {
     if (to === "latest") {
       const { latest } = await this.getVersions(name);
@@ -88,9 +89,10 @@ export abstract class Provider {
     const cmd = [Deno.execPath(), "install"];
 
     if (importMap) {
-      const importJson: string = new URL(importMap, this.getRegistryUrl(name, to)).href;
+      const importJson: string =
+        new URL(importMap, this.getRegistryUrl(name, to)).href;
 
-      cmd.push("--import-map", importJson)
+      cmd.push("--import-map", importJson);
     }
 
     if (args.length) {
