@@ -11,6 +11,6 @@ await new Command<void>()
       required: true,
     },
   )
-  .action((options) => console.log(options.someEnvVar))
+  .action((options) => console.log(options))
   .command("hello", "world ...")
   .parse(Deno.args);
