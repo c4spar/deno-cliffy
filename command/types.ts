@@ -133,6 +133,7 @@ export interface IEnvVarOptions {
   hidden?: boolean;
   global?: boolean;
   required?: boolean;
+  prefix?: string;
 }
 
 /** Environment variable settings. */
