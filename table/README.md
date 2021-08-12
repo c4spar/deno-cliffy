@@ -99,7 +99,7 @@ const table: Table = new Table(
 console.log(table.toString());
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/basic_usage.ts
 ```
 
@@ -122,7 +122,7 @@ table.sort();
 table.render();
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/using_as_array.ts
 ```
 
@@ -147,7 +147,7 @@ new Table()
   .render();
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/header_and_body.ts
 ```
 
@@ -174,7 +174,7 @@ new Table()
   .render();
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/table_options.ts
 ```
 
@@ -213,7 +213,7 @@ new Table()
   .render();
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/rows_and_cells.ts
 ```
 
@@ -245,7 +245,7 @@ Table.from([
   .render();
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/table/colspan_and_rowspan.ts
 ```
 
@@ -411,7 +411,7 @@ change the default border characters globally you can use the static
 
 Here is an example of the default border characters:
 
-```
+```console
 {
   top: "─",
   topMid: "┬",
@@ -428,7 +428,7 @@ Here is an example of the default border characters:
   right: "│",
   rightMid: "┤",
   middle: "│",
-};
+}
 ```
 
 _Return type_: `this`

@@ -80,12 +80,10 @@ import { parseFlags } from "https://deno.land/x/cliffy/flags/mod.ts";
 console.log(parseFlags(Deno.args));
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -a foo -b bar
 { flags: { a: "foo", b: "bar" }, unknown: [], literal: [] }
-```
 
-```
 $ deno run https://deno.land/x/cliffy/examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
 {
   flags: {
@@ -156,7 +154,7 @@ const result = parseFlags(Deno.args, {
 console.log(result);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/flags/options.ts -vvv -n5 -f ./example.ts -d 1 -s foo bar baz --beep -- --boop
 {
   flags: { verbose: 3, amount: 5, file: "./example.ts", debug: true, silent: true },
@@ -194,7 +192,7 @@ try {
 }
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/flags/error_handling.ts -d
 [VALIDATION_ERROR] Unknown option "-d". Did you mean option "--debug"?
 ```
@@ -273,12 +271,10 @@ parseFlags(Deno.args, {
 });
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts --foo 1.2
 { flags: { foo: 1.2 }, unknown: [], literal: [] }
-```
 
-```
 $ deno run https://deno.land/x/cliffy/examples/flags/custom_option_processing.ts --foo abc
 error: Uncaught Error: Option "--foo" must be of type "float", but got "abc".
 ```
@@ -320,7 +316,7 @@ const result = parseFlags(Deno.args, {
 console.log(result);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/flags/value.ts --value fooo
 error: Uncaught Error: Option "--value" must be one of "foo", "bar" or "baz", but got "fooo".
 ```

@@ -143,7 +143,7 @@ for await (const key of keypress()) {
 
 > --unstable is required for Deno.setRaw
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/keycode/read_key.ts
 ```
 

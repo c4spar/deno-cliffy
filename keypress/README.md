@@ -120,7 +120,7 @@ console.log(
 );
 ```
 
-```
+```console
 $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/promise.ts
 ```
 
@@ -153,7 +153,7 @@ for await (const event: KeyPressEvent of keypress()) {
 }
 ```
 
-```
+```console
 $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/async_iterator.ts
 ```
 
@@ -191,7 +191,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
 });
 ```
 
-```
+```console
 $ deno run --unstable --reload https://deno.land/x/cliffy/examples/keypress/event_target.ts
 ```
 
