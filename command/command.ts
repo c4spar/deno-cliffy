@@ -1097,7 +1097,11 @@ export class Command<
       );
 
       if (name) {
-        const propertyName = underscoreToCamelCase(env.names[0]);
+        const propertyName = underscoreToCamelCase(
+          env.prefix
+            ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
+            : env.names[0],
+        );
         result[propertyName] = this.parseType({
           label: "Environment variable",
           type: env.type,
@@ -1197,6 +1201,9 @@ export class Command<
    * will be called.
    * @param error Error to handle.
    */
+  // protected error(error: Error): Error;
+  // protected error(error: string, options: CommandErrorOptions): Error;
+  // protected error(error: Error | string, options?: CommandErrorOptions): Error {
   protected error(error: Error): Error {
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       return error;

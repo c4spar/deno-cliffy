@@ -1121,9 +1121,11 @@ defined, the option will override the environment variable.
 
 An environment variable has the following options:
 
-- **global:** Not listed in the help output.
-- **hidden:** Also available on child commands.
-- **required:** Throws an error if it's not defined on command execution.
+- **global:** Also available on child commands.
+- **hidden:** Not listed in the help output.
+- **required:** Throws an error if the environment variable is not defined.
+- **prefix:** Trim prefix from environment variable and use result as property
+  name.
 
 > To allow deno to access environment variables the `--allow-env` flag is
 > required.
@@ -1137,18 +1139,15 @@ await new Command<void>()
     "Description ...",
     {
       global: true,
-      hidden: false,
       required: true,
     },
   )
-  .action((options) => console.log(options.someEnvVar))
+  .action((options) => console.log(options))
   .command("hello", "world ...")
   .parse(Deno.args);
-
-console.log(Deno.env.get("SOME_ENV_VAR"));
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/environment_variables.ts
 error: Missing required environment variable "SOME_ENV_VAR".
 
@@ -1156,7 +1155,32 @@ $ SOME_ENV_VAR=abc deno run --allow-env --unstable https://deno.land/x/cliffy/ex
 Error: Environment variable "SOME_ENV_VAR" must be of type "number", but got "abc".
 
 $ SOME_ENV_VAR=1 deno run --allow-env https://deno.land/x/cliffy/examples/command/environment_variables.ts
-1
+{ someEnvVar: 1 }
+```
+
+It is also possible to override an environment variable with an option also if
+the environment variable has a prefix.
+
+```typescript
+await new Command<void>()
+  .env<{ outputFile?: string }>(
+    "FOO_OUTPUT_FILE=<value:string>",
+    "The output file.",
+    { prefix: "FOO_" },
+  )
+  .option<{ outputFile?: string }>(
+    "--output-file <value:string>",
+    "The output file.",
+  )
+  .action((options) => console.log(options))
+  .parse();
+```
+
+```console
+$ FOO_OUTPUT_FILE=example.txt deno run --allow-env https://deno.land/x/cliffy/examples/command/environment_variables_override.ts
+{ outputFile: "example.txt" }
+$ FOO_OUTPUT_FILE=example.txt deno run --allow-env https://deno.land/x/cliffy/examples/command/environment_variables_override.ts --output-file example2.txt
+{ outputFile: "example2.txt" }
 ```
 
 ## ❯ Add examples

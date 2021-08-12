@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run
+#!/usr/bin/env -S deno run -A
 
 import { Command } from "../../command/command.ts";
 
@@ -8,12 +8,9 @@ await new Command<void>()
     "Description ...",
     {
       global: true,
-      hidden: false,
       required: true,
     },
   )
   .action((options) => console.log(options.someEnvVar))
   .command("hello", "world ...")
   .parse(Deno.args);
-
-console.log(Deno.env.get("SOME_ENV_VAR"));
