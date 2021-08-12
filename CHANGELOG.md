@@ -1,3 +1,76 @@
+# [v0.19.5](https://github.com/c4spar/deno-cli/compare/v0.19.4...v0.19.5) (2021-08-12)
+
+### Features
+
+- **command:** support import map in upgrade command (#265)
+  ([b400131](https://github.com/c4spar/deno-cli/commit/b400131))
+- **command:** add support for required env vars (#261)
+  ([ee69526](https://github.com/c4spar/deno-cli/commit/ee69526))
+- **command:** make parsed environment variables available via command options
+  (#263) ([102161e](https://github.com/c4spar/deno-cli/commit/102161e))
+- **command:** add prefix to environment variable options (#268)
+  ([44c80c8](https://github.com/c4spar/deno-cli/commit/44c80c8))
+
+```ts
+await new Command<void>()
+  .env<{ outputFile?: string }>(
+    "CC_OUTPUT_FILE=<value:string>",
+    "The output file.",
+    { prefix: "CC_" },
+  )
+  .option<{ outputFile?: string }>(
+    "--output-file <value:string>",
+    "The output file.",
+  )
+  .action((options) => console.log(options.outputFile))
+  .parse();
+```
+
+```console
+$ CC_OUTPUT_FILE=foo.txt deno run example.ts
+foo.txt
+$ CC_OUTPUT_FILE=foo.txt deno run example.ts --output-file bar.txt
+bar.txt
+```
+
+### Bug Fixes
+
+- **command:** output of --version should end with a new line (#256)
+  ([8107875](https://github.com/c4spar/deno-cli/commit/8107875))
+
+### Code Refactoring
+
+- **command:** refactor executable sub-commands (#259)
+  ([a13c79f](https://github.com/c4spar/deno-cli/commit/a13c79f))
+- **command:** remove extra new line from getHelp() and completion generator
+  methods (#257) ([99ccc2a](https://github.com/c4spar/deno-cli/commit/99ccc2a))
+- **table:** use console.log to render output (#258)
+  ([4f05fad](https://github.com/c4spar/deno-cli/commit/4f05fad))
+
+### Chore
+
+- **ci:** update release workflow
+  ([65ba62a](https://github.com/c4spar/deno-cli/commit/65ba62a),
+  [1c6dc9d](https://github.com/c4spar/deno-cli/commit/1c6dc9d))
+- **ci:** add codecov config (#267)
+  ([c54627a](https://github.com/c4spar/deno-cli/commit/c54627a))
+- **codecov:** upgrade to codecov/codecov-action@v2 (#266)
+  ([18c023c](https://github.com/c4spar/deno-cli/commit/18c023c))
+- **upgrade:** deno/std v0.104.0 (#270)
+  ([15af5bf](https://github.com/c4spar/deno-cli/commit/15af5bf))
+
+### Documentation Updates
+
+- update readme's (#269)
+  ([83644f9](https://github.com/c4spar/deno-cli/commit/83644f9))
+- **command:** update docs for environment variables
+  ([f4cee28](https://github.com/c4spar/deno-cli/commit/f4cee28),
+  [9d025fc](https://github.com/c4spar/deno-cli/commit/9d025fc))
+- **command:** fix incorrectly import module in example (#262)
+  ([3e62ad6](https://github.com/c4spar/deno-cli/commit/3e62ad6))
+- **command:** update docs for executable sub commands
+  ([0b2f3d1](https://github.com/c4spar/deno-cli/commit/0b2f3d1))
+
 # [v0.19.4](https://github.com/c4spar/deno-cliffy/compare/v0.19.3...v0.19.4) (2021-07-27)
 
 ### Bug Fixes
