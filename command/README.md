@@ -142,7 +142,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/usage.ts --help
 ```
 
@@ -182,7 +182,7 @@ const { options } = await new Command()
 console.log("server running at %s:%s", options.host, options.port);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/options.ts -p 80
 server running at localhost:80
 ```
@@ -221,7 +221,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -p
 Error: Missing value for option "--pizza-type".
 
@@ -255,7 +255,7 @@ await new Command<void>()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red
 color: red
 
@@ -285,7 +285,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/list_option_type.ts -l 1,2,3
 { list: [ 1, 2, 3 ] }
 
@@ -311,7 +311,7 @@ console.log(options);
 
 The variadic option is returned as an array.
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/variadic_options.ts -d dir1 dir2 dir3
 { dir: [ "dir1", "dir2", "dir3" ] }
 ```
@@ -338,7 +338,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/dotted_options.ts -b.a 300 -b.v 900
 { bitrate: { audio: 300, video: 900 } }
 
@@ -365,7 +365,7 @@ const { options } = await new Command()
 console.log(`cheese: ${options.cheese}`);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/default_option_value.ts
 cheese: blue
 
@@ -388,7 +388,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/required_options.ts
 Error: Missing required option "--cheese".
 ```
@@ -421,7 +421,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/negatable_options.ts
 { check: true, color: "yellow" }
 
@@ -459,7 +459,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/global_options.ts command1 command2 -g test
 { global: "test" }
 ```
@@ -479,7 +479,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/hidden_options.ts -h
 ```
 
@@ -500,7 +500,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/standalone_options.ts --standalone --other
 Error: Option --standalone cannot be combined with other options.
 ```
@@ -523,7 +523,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/conflicting_options.ts -f file1
 { file: "file1" }
 
@@ -550,7 +550,7 @@ const { options } = await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/depending_options.ts -a aac
 { audioCodec: "aac" }
 
@@ -576,7 +576,7 @@ const { options } = await new Command()
 console.log(options);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/collect_options.ts --color yellow --color red --color blue
 { color: [ "yellow", "red", "blue" ] }
 ```
@@ -626,7 +626,7 @@ const { options } = await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.ts --object a
 { object: { value: "a" } }
 
@@ -655,7 +655,7 @@ await new Command()
 console.log("not executed");
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/action_options.ts -i
 Some info
 ```
@@ -766,7 +766,7 @@ const { args } = await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/arguments_syntax.ts
 Error: Missing argument(s): cmd
 ```
@@ -788,7 +788,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/arguments_syntax_variadic.ts rmdir dir1 dir2 dir3  
 rmdir dir1  
 rmdir dir2  
@@ -827,7 +827,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/action_handler.ts rm dir
 remove dir
 
@@ -882,7 +882,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/global_commands.ts command1 command2 global test
 {} test
 ```
@@ -901,7 +901,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/hidden_commands.ts -h
 ```
 
@@ -925,7 +925,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/stop_early.ts -d warning server -p 80
 options: { debugLevel: "warning" }
 script: server
@@ -957,12 +957,9 @@ try {
 }
 ```
 
-```textile
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts -t
 Unknown option "-t". Did you mean option "-h"?
-```
-
-```textile
 $ deno run https://deno.land/x/cliffy/examples/command/general_error_handling.ts
 [CUSTOM_ERROR] Some error happened.
 ```
@@ -995,7 +992,7 @@ try {
 }
 ```
 
-```textile
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/validation_error_handling.ts -t
 [CUSTOM_VALIDATION_ERROR] Unknown option "-t". Did you mean option "-h"?
 ```
@@ -1035,12 +1032,9 @@ const { options } = await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type.ts -e "my@email.com"
 { email: "my@email.com" }
-```
-
-```
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type.ts -e "my @email.com"
 Error: Option "--email" must be a valid "email", but got "my @email.com".
 ```
@@ -1076,12 +1070,9 @@ const { options } = await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type_class.ts -e "my@email.de"
 { email: "my@email.de" }
-```
-
-```
 $ deno run https://deno.land/x/cliffy/examples/command/custom_option_type_class.ts -e "my @email.de"
 Error: Option "--email" must be a valid "email", but got "my @email.de".
 ```
@@ -1103,7 +1094,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/global_custom_type.ts login --email "my@email.de"
 { email: "my@email.de" }
 ```
@@ -1201,7 +1192,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/examples.ts help
 ```
 
@@ -1237,7 +1228,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts --help
 ```
 
@@ -1343,7 +1334,7 @@ await new Command()
 The `help` command excepts the name of a sub-command as optional argument to
 show the help of the given sub-command.
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts help
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts help completions
 $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.ts completions help
@@ -1355,7 +1346,7 @@ Cliffy has build-in _did-you-mean_ support to improve the user and developer
 experience. For example, cliffy prints some suggestions, when the user executes
 an invalid command, or the developer has a typo in the name of a type.
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/demo.ts -g
 error: Unknown option "-g". Did you mean option "-h"?
 ```
@@ -1714,11 +1705,8 @@ The upgrade command can be also used, to list all available versions with the
 `-l` or `--list-versions` option. The current installed version is highlighted
 and prefix with a `*`.
 
-```shell
-COMMAND upgrade -l
-```
-
-```
+```console
+$ COMMAND upgrade -l
 * v0.2.2
   v0.2.1
   v0.2.0
@@ -1729,11 +1717,8 @@ The github registry shows all available tags and branches. Branches can be
 disabled with the `branches` option `GithubProvider({ branches: false })`. If
 the versions list is larger than `25`, the versions are displayed as table.
 
-```shell
-COMMAND upgrade --registry github --list-versions
-```
-
-```
+```console
+$ COMMAND upgrade --registry github --list-versions
 Tags:
 
   v0.18.2   v0.17.0   v0.14.1   v0.11.2   v0.8.2   v0.6.1   v0.3.0
@@ -1764,7 +1749,7 @@ await new Command()
   .parse(Deno.args);
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/command/version_options.ts -V
 $ deno run https://deno.land/x/cliffy/examples/command/version_options.ts --version
 0.0.1

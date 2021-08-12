@@ -155,7 +155,7 @@ console.log(
 );
 ```
 
-```
+```console
 $ deno run --allow-net https://deno.land/x/cliffy/examples/ansi/functional.ts
 ```
 
@@ -204,7 +204,7 @@ console.log(
 );
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/ansi/colors.ts
 ```
 
@@ -227,7 +227,7 @@ console.log(warn.underline("[WARN]"), "Some warning!");
 console.log(info.underline("[INFO]"), "Some information!");
 ```
 
-```
+```console
 $ deno run https://deno.land/x/cliffy/examples/ansi/color_themes.ts
 ```
 

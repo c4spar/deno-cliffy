@@ -156,7 +156,7 @@ console.log(result);
 // if ( result.age && isNaN( result.age ) ) {} // no error: age is of type number
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt_list.ts
 ```
 
@@ -210,7 +210,7 @@ const result = await prompt([{
 console.log(result);
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/dynamic_prompts.ts
 ```
 
@@ -291,7 +291,7 @@ console.log(result);
 // if ( result.customNumber && isNaN( result.customNumber ) ) {} // no error: customNumber is of type number
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/custom_prompts.ts
 ```
 
@@ -332,7 +332,7 @@ console.log({ confirmed });
 sig.dispose();
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/os_signals.ts
 ```
 
@@ -404,7 +404,7 @@ import { Input } from "https://deno.land/x/cliffy/prompt/input.ts";
 const name: string = await Input.prompt("What's your github user name?");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/input.ts
 ```
 
@@ -448,7 +448,7 @@ const color: string = await Input.prompt({
 console.log({ color });
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions.ts
 ```
 
@@ -484,7 +484,7 @@ const color: string = await Input.prompt({
 console.log({ color });
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_list.ts
 ```
 
@@ -520,7 +520,7 @@ import { Number } from "https://deno.land/x/cliffy/prompt/number.ts";
 const age: number = await Number.prompt("How old are you?");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/number.ts
 ```
 
@@ -558,7 +558,7 @@ import { Secret } from "https://deno.land/x/cliffy/prompt/secret.ts";
 const password: string = await Secret.prompt("Enter your password");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/secret.ts
 ```
 
@@ -590,7 +590,7 @@ import { Confirm } from "https://deno.land/x/cliffy/prompt/confirm.ts";
 const confirmed: boolean = await Confirm.prompt("Can you confirm?");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/confirm.ts
 ```
 
@@ -620,7 +620,7 @@ import { Toggle } from "https://deno.land/x/cliffy/prompt/toggle.ts";
 const confirmed: boolean = await Toggle.prompt("Can you confirm?");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/toggle.ts
 ```
 
@@ -650,7 +650,7 @@ import { List } from "https://deno.land/x/cliffy/prompt/list.ts";
 const keywords: string[] = await List.prompt("Enter some keywords");
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/list.ts
 ```
 
@@ -694,7 +694,7 @@ const color: string = await List.prompt({
 console.log({ color });
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/suggestions_list_prompt.ts
 ```
 
@@ -743,7 +743,7 @@ const color: string = await Select.prompt({
 });
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/select.ts
 ```
 
@@ -794,7 +794,7 @@ const colors: string[] = await Checkbox.prompt({
 });
 ```
 
-```
+```console
 $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/checkbox.ts
 ```
 
