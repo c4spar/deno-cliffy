@@ -169,7 +169,7 @@ The second parameter of the `.options()` method is the help description and the
 thrid parameter can be an options object.
 
 ```typescript
-import { Command } from "https://deno.land/x/cliffy/command";
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const { options } = await new Command()
   .option("-s, --silent", "disable output.")
