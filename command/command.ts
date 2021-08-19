@@ -122,6 +122,7 @@ export class Command<
   private argsDefinition?: string;
   private isExecutable = false;
   private throwOnError = false;
+  private exitOnHelp = true;
   private _allowEmpty = true;
   private _stopEarly = false;
   private defaultCommand?: string;
@@ -666,6 +667,21 @@ export class Command<
     return this;
   }
 
+  /**
+   * Should Cliffy Exit on options such as --help or --version.
+   *
+   * **Example:**
+   *
+   * ```
+   * cmd.dontExitOnHelp()
+   *   .parse();
+   * ```
+   */
+  public dontExitOnHelp(): this {
+    this.cmd.exitOnHelp = false;
+    return this;
+  }
+
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
@@ -953,7 +969,9 @@ export class Command<
           prepend: true,
           action: function () {
             this.showVersion();
-            Deno.exit(0);
+            if (this.exitOnHelp) {
+              Deno.exit(0);
+            }
           },
           ...(this._versionOption?.opts ?? {}),
         },
@@ -970,7 +988,9 @@ export class Command<
           prepend: true,
           action: function () {
             this.showHelp();
-            Deno.exit(0);
+            if (this.exitOnHelp) {
+              Deno.exit(0);
+            }
           },
           ...(this._helpOption?.opts ?? {}),
         },
