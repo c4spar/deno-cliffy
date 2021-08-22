@@ -6,7 +6,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { blue, bold, dim, stripColor } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
 /** Select key options. */
@@ -160,17 +160,20 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     }
     const selected: number = this.listIndex + 1;
     const actions: Array<[string, Array<string>]> = [
-      ["Next", [Figures.ARROW_DOWN]],
-      ["Previous", [Figures.ARROW_UP]],
-      ["Next Page", [Figures.PAGE_DOWN]],
-      ["Previous Page", [Figures.PAGE_UP]],
-      ["Submit", [Figures.ENTER]],
+      ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
+      ["Previous", getFiguresByKeys(this.settings.keys?.previous ?? [])],
+      ["Next Page", getFiguresByKeys(this.settings.keys?.nextPage ?? [])],
+      [
+        "Previous Page",
+        getFiguresByKeys(this.settings.keys?.previousPage ?? []),
+      ],
+      ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
     ];
 
     return "\n" + this.settings.indent + blue(Figures.INFO) +
       bold(` ${selected}/${this.options.length} `) +
       actions
-        .map((cur) => `${cur[0]}: ${bold(cur[1].join(" "))}`)
+        .map((cur) => `${cur[0]}: ${bold(cur[1].join(", "))}`)
         .join(", ");
   }
 

@@ -37,3 +37,24 @@ const win = {
 
 /** Prompt icons. */
 export const Figures = Deno.build.os === "windows" ? win : main;
+
+const keyMap: Record<string, keyof typeof Figures> = {
+  up: "ARROW_UP",
+  down: "ARROW_DOWN",
+  pageup: "PAGE_UP",
+  pagedown: "PAGE_DOWN",
+  tab: "TAB_RIGHT",
+  enter: "ENTER",
+  return: "ENTER",
+};
+
+export function getFiguresByKeys(keys: Array<string>): Array<string> {
+  const figures: Array<string> = [];
+  for (const key of keys) {
+    const figure = Figures[keyMap[key]] ?? key;
+    if (!figures.includes(figure)) {
+      figures.push(figure);
+    }
+  }
+  return figures;
+}
