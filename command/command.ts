@@ -680,7 +680,8 @@ export class Command<
   /** Check wether the command should exit after printing help */
   protected shouldExitOnHelp(): boolean {
     // console.log(this.cmd._name, this.cmd.exitOnHelp, !!this.cmd._parent?.shouldExitOnHelp())
-    return this.cmd.exitOnHelp ?? (this.cmd._parent?.shouldExitOnHelp() ?? true);
+    return this.cmd.exitOnHelp ??
+      (this.cmd._parent?.shouldExitOnHelp() ?? true);
   }
 
   public globalOption<G extends Record<string, unknown> | void = CG>(
