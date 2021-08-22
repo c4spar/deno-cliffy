@@ -959,7 +959,7 @@ export class Command<
           prepend: true,
           action: function () {
             this.showVersion();
-            if(this.exitOnHelp){
+            if (this.exitOnHelp) {
               Deno.exit(0);
             }
           },
@@ -978,7 +978,7 @@ export class Command<
           prepend: true,
           action: function () {
             this.showHelp();
-            if(this.exitOnHelp){
+            if (this.exitOnHelp) {
               Deno.exit(0);
             }
           },

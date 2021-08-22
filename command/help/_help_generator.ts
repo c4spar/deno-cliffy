@@ -34,7 +34,10 @@ export class HelpGenerator {
     return new HelpGenerator(cmd, options).generate();
   }
 
-  private constructor(private cmd: Command, options: HelpGeneratorOptions = {}) {
+  private constructor(
+    private cmd: Command,
+    options: HelpGeneratorOptions = {},
+  ) {
     this.options = {
       types: false,
       hints: true,
