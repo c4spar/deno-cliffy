@@ -34,7 +34,7 @@ import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
-import type { HelpOptions } from "./help/_help_generator.ts";
+import type { HelpGeneratorOptions } from "./help/_help_generator.ts";
 import type {
   IAction,
   IArgument,
@@ -89,6 +89,10 @@ type MapArgumentTypes<A extends Array<unknown>> = A extends Array<unknown>
   : // deno-lint-ignore no-explicit-any
   any;
 
+export interface HelpOptions extends HelpGeneratorOptions {
+  exit?: boolean;
+}
+
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
@@ -133,6 +137,7 @@ export class Command<
   private _versionOption?: IDefaultOption | false;
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
+  private exitOnHelp: undefined | boolean;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -432,7 +437,7 @@ export class Command<
 
   /**
    * Set command help.
-   * @param help Help string or method that returns the help string.
+   * @param help Help string, method, or config for generator that returns the help string.
    */
   public help(
     help:
@@ -445,6 +450,7 @@ export class Command<
     } else if (typeof help === "function") {
       this.cmd._help = help;
     } else {
+      this.cmd.exitOnHelp = help.exit;
       this.cmd._help = (cmd: Command): string =>
         HelpGenerator.generate(cmd, help);
     }
@@ -669,6 +675,12 @@ export class Command<
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+  }
+
+  /** Check wether the command should exit after printing help */
+  protected shouldExitOnHelp(): boolean {
+    return this.cmd.exitOnHelp ??
+      (this.cmd._parent?.shouldExitOnHelp() ?? true);
   }
 
   public globalOption<G extends Record<string, unknown> | void = CG>(
@@ -953,7 +965,9 @@ export class Command<
           prepend: true,
           action: function () {
             this.showVersion();
-            Deno.exit(0);
+            if (this.shouldExitOnHelp()) {
+              Deno.exit(0);
+            }
           },
           ...(this._versionOption?.opts ?? {}),
         },
@@ -970,7 +984,9 @@ export class Command<
           prepend: true,
           action: function () {
             this.showHelp();
-            Deno.exit(0);
+            if (this.shouldExitOnHelp()) {
+              Deno.exit(0);
+            }
           },
           ...(this._helpOption?.opts ?? {}),
         },
