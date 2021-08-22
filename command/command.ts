@@ -137,7 +137,7 @@ export class Command<
   private _versionOption?: IDefaultOption | false;
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
-  private exitOnHelp = true;
+  private exitOnHelp: undefined | boolean;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -450,7 +450,7 @@ export class Command<
     } else if (typeof help === "function") {
       this.cmd._help = help;
     } else {
-      this.exitOnHelp = help.exit ?? true;
+      this.cmd.exitOnHelp = help.exit;
       this.cmd._help = (cmd: Command): string =>
         HelpGenerator.generate(cmd, help);
     }
@@ -675,6 +675,12 @@ export class Command<
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+  }
+
+  /** Check wether the command should exit after printing help */
+  protected shouldExitOnHelp(): boolean {
+    // console.log(this.cmd._name, this.cmd.exitOnHelp, !!this.cmd._parent?.shouldExitOnHelp())
+    return this.cmd.exitOnHelp ?? (this.cmd._parent?.shouldExitOnHelp() ?? true);
   }
 
   public globalOption<G extends Record<string, unknown> | void = CG>(
@@ -959,7 +965,7 @@ export class Command<
           prepend: true,
           action: function () {
             this.showVersion();
-            if (this.exitOnHelp) {
+            if (this.shouldExitOnHelp()) {
               Deno.exit(0);
             }
           },
@@ -978,7 +984,7 @@ export class Command<
           prepend: true,
           action: function () {
             this.showHelp();
-            if (this.exitOnHelp) {
+            if (this.shouldExitOnHelp()) {
               Deno.exit(0);
             }
           },
