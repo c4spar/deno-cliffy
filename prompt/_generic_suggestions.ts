@@ -6,7 +6,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { blue, bold, dim, stripColor, underline } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
 interface LocalStorage {
@@ -183,23 +183,26 @@ export abstract class GenericSuggestions<
     if (this.settings.suggestions?.length) {
       if (this.settings.list) {
         actions.push(
-          ["Next", [Figures.ARROW_DOWN]],
-          ["Previous", [Figures.ARROW_UP]],
-          ["Next Page", [Figures.PAGE_DOWN]],
-          ["Previous Page", [Figures.PAGE_UP]],
+          ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
+          ["Previous", getFiguresByKeys(this.settings.keys?.previous ?? [])],
+          ["Next Page", getFiguresByKeys(this.settings.keys?.nextPage ?? [])],
+          [
+            "Previous Page",
+            getFiguresByKeys(this.settings.keys?.previousPage ?? []),
+          ],
         );
       } else {
         actions.push(
-          ["Next", [Figures.ARROW_UP]],
-          ["Previous", [Figures.ARROW_DOWN]],
+          ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
+          ["Previous", getFiguresByKeys(this.settings.keys?.previous ?? [])],
         );
       }
       actions.push(
-        ["Complete", [Figures.TAB_RIGHT, dim(" or"), Figures.ARROW_RIGHT]],
+        ["Complete", getFiguresByKeys(this.settings.keys?.complete ?? [])],
       );
     }
     actions.push(
-      ["Submit", [Figures.ENTER]],
+      ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
     );
 
     let info = this.settings.indent;
