@@ -1009,7 +1009,7 @@ This example shows you how to use a function as type handler.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
+import { ITypeInfo } from "https://deno.land/x/cliffy/flags/mod.ts";
 
 const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -1045,7 +1045,7 @@ This example shows you how to use a class as type handler.
 
 ```typescript
 import { Command, Type } from "https://deno.land/x/cliffy/command/mod.ts";
-import { IType } from "https://deno.land/x/cliffy/flags/mod.ts";
+import { ITypeInfo } from "https://deno.land/x/cliffy/flags/mod.ts";
 
 class EmailType extends Type<string> {
   protected emailRegex =
