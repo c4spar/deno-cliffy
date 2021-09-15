@@ -110,11 +110,11 @@ const name: string = await Input.prompt({
 ### Prompt List
 
 To execute a list of prompts you can use the `prompt()` method. The prompt
-method accapts an array of [prompt options](#-types) combined with a `name` and
+method accepts an array of [prompt options](#-types) combined with a `name` and
 `type` property. **Make sure to give each prompt a unique name to prevent
 overwriting values!**
 
-Unlike npm's inquerer, the `type` property accepts a prompt object and not the
+Unlike npm's inquirer, the `type` property accepts a prompt object and not the
 name of the prompt. This makes it possible to extract the options and return
 types of each prompt to get typed options for any prompt and a **typed result
 object**. This works also with [custom prompts](#custom-prompts) which are
@@ -162,7 +162,7 @@ $ deno run --unstable https://deno.land/x/cliffy/examples/prompt/prompt_list.ts
 
 ### Dynamic Prompts
 
-You can dynamicly control the flow of the prompt list with the `before` and
+You can dynamically control the flow of the prompt list with the `before` and
 `after` callbacks which works like a middleware function. The first argument is
 the `result` object and the second argument a `next()` method. The next method
 calls the next prompt in the list if no argument is passed to it. To jump to a
