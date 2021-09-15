@@ -7,6 +7,6 @@ await new Command()
   .name("examples")
   .example(
     "example name",
-    `Description ...\n\nCan have mutliple lines and ${red("colors")}.`,
+    `Description ...\n\nCan have multiple lines and ${red("colors")}.`,
   )
   .parse(Deno.args);
