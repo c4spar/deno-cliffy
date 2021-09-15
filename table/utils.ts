@@ -40,7 +40,6 @@ export function consumeWords(length: number, content: string): string {
 
 /**
  * Get longest cell from given row index.
- *
  */
 export function longest(
   index: number,
