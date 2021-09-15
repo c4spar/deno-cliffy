@@ -156,7 +156,7 @@ $ deno run https://deno.land/x/cliffy/examples/table/header_and_body.ts
 ### Table Options
 
 To customize the table, the table class provides a few chainable option methods.
-To see a list of all available options go to the [Talbe](#table) API section.
+To see a list of all available options go to the [Table](#table) API section.
 
 ```typescript
 new Table()
