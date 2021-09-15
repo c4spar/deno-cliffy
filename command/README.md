@@ -166,7 +166,7 @@ Required values are declared using angle brackets `<>` and optional values with
 square brackets `[]`.
 
 The second parameter of the `.options()` method is the help description and the
-thrid parameter can be an options object.
+third parameter can be an options object.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -196,7 +196,7 @@ throw an error message and exit the program with `Deno.exit(1)`.
 
 Optionally you can declare a type after the argument name, separated by colon
 `<name:type>`. If no type is specified, the type defaults to `string`. Following
-types are availeble per default (_more will be added_):
+types are available per default (_more will be added_):
 
 - **boolean:** Can be one of: `true`, `false`, `1` or `0`.
 
@@ -695,8 +695,8 @@ There are three ways to specify sub-commands with the `.command()` method:
 
 In the first parameter to `.command()` you specify the command name and any
 command arguments. The arguments may be `<required>` or `[optional]` and the
-last argument may also be variadic. The second argumend of the `.command()`
-method is optional and can be eather the command description or an instance of a
+last argument may also be variadic. The second argument of the `.command()`
+method is optional and can be either the command description or an instance of a
 `Command` class. The description can be also defined with the `.description()`
 method.
 
@@ -772,7 +772,7 @@ Error: Missing argument(s): cmd
 ```
 
 The last argument of a command can be variadic, and only the last argument. To
-make an argument variadic you can append or prepand `...` to the argument name.
+make an argument variadic you can append or perpend `...` to the argument name.
 The variadic argument is passed to the action handler as an array.
 
 ```typescript
@@ -1187,7 +1187,7 @@ await new Command()
   .name("examples")
   .example(
     "example name",
-    `Description ...\n\nCan have mutliple lines and ${red("colors")}.`,
+    `Description ...\n\nCan have multiple lines and ${red("colors")}.`,
   )
   .parse(Deno.args);
 ```
@@ -1313,7 +1313,7 @@ await new Command()
 ### Help command
 
 There is also a predefined `HelpCommand` which prints the auto generated help.
-The help command must be registered manuelly and can be optionally registered as
+The help command must be registered manually and can be optionally registered as
 global command to make them also available on all child commands.
 
 ```typescript
@@ -1402,8 +1402,7 @@ Enabling auto completion is explained in the
 ### Completions command
 
 The `CompetionsCommand` command generates the shell completions script for your
-program. To do so, you have to register the completions command on your
-programm.
+program. To do so, you have to register the completions command on your program.
 
 ```typescript
 import {
@@ -1626,7 +1625,7 @@ await new Command<void>()
   // Add the type.
   .type("amount", amount)
   // Use the type of your type instance as option type.
-  // The correct type will be infered and used fot the option value.
+  // The correct type will be inferred and used for the option value.
   .option<{ amount?: typeof amount }>(
     "-a, --amount <amount:amount>",
     "The amount.",
@@ -1681,7 +1680,7 @@ used with the `--registry` option. The github provider can also be used to
 COMMAND upgrade --registry github --version main
 ```
 
-The `--registry` option is hidden if only one provider is registerd. If the
+The `--registry` option is hidden if only one provider is registered. If the
 `upgrade` command is called without the `--registry` option, the default
 registry is used. The default registry is the first registered provider.
 
