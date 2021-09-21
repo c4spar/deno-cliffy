@@ -93,7 +93,7 @@ Deno.test("[command] help - help option action", async () => {
   assertEquals(called, 4);
 });
 
-Deno.test("[command] help - should set usage", async () => {
+Deno.test("[command] help - should set usage", () => {
   const cmd = new Command()
     .throwErrors()
     .help({ colors: false })
