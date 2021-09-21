@@ -1,7 +1,7 @@
 import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-Deno.test("command - help - help string", () => {
+Deno.test("[command] help - help string", () => {
   const cmd = new Command()
     .throwErrors()
     .help("help: xxx")
@@ -13,7 +13,7 @@ Deno.test("command - help - help string", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "help: xxx");
 });
 
-Deno.test("command - help - help handler", () => {
+Deno.test("[command] help - help handler", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -29,7 +29,7 @@ Deno.test("command - help - help handler", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "help: bar");
 });
 
-Deno.test("command - help - override help handler", () => {
+Deno.test("[command] help - override help handler", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -47,7 +47,7 @@ Deno.test("command - help - override help handler", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "bar help");
 });
 
-Deno.test("command - help - help option", async () => {
+Deno.test("[command] help - help option", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()
@@ -69,7 +69,7 @@ Deno.test("command - help - help option", async () => {
   assertEquals(called, 4);
 });
 
-Deno.test("command - help - help option action", async () => {
+Deno.test("[command] help - help option action", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()
@@ -91,4 +91,23 @@ Deno.test("command - help - help option action", async () => {
   assertEquals(called, 3);
   await cmd.parse(["bar", "-x"]);
   assertEquals(called, 4);
+});
+
+Deno.test("[command] help - should set usage", async () => {
+  const cmd = new Command()
+    .throwErrors()
+    .help({ colors: false })
+    .usage("foo bar")
+    .arguments("<foo> [bar]");
+
+  assertEquals(
+    `
+  Usage: COMMAND foo bar
+
+  Options:
+
+    -h, --help  - Show this help.  
+`,
+    cmd.getHelp(),
+  );
 });
