@@ -64,11 +64,8 @@ export class HelpGenerator {
       [
         bold("Usage:"),
         magenta(
-          `${this.cmd.getPath()}${
-            this.cmd.getArgsDefinition()
-              ? " " + this.cmd.getArgsDefinition()
-              : ""
-          }`,
+          this.cmd.getPath() +
+            (this.cmd.getUsage() ? " " + this.cmd.getUsage() : ""),
         ),
       ],
     ];
