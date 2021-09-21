@@ -115,6 +115,7 @@ export class Command<
   private _globalParent?: Command;
   private ver?: IVersionHandler;
   private desc: IDescription = "";
+  private _usage?: string;
   private fn?: IAction;
   private options: IOption[] = [];
   private commands: Map<string, Command> = new Map();
@@ -351,20 +352,6 @@ export class Command<
     return this;
   }
 
-  // public static async exists(name: string) {
-  //   const proc = Deno.run({
-  //     cmd: ["sh", "-c", "compgen -c"],
-  //     stdout: "piped",
-  //     stderr: "piped",
-  //   });
-  //   const output: Uint8Array = await proc.output();
-  //   const commands = new TextDecoder().decode(output)
-  //     .trim()
-  //     .split("\n");
-  //
-  //   return commands.indexOf(name) !== -1;
-  // }
-
   /**
    * Add new command alias.
    * @param alias Tha name of the alias.
@@ -463,6 +450,15 @@ export class Command<
    */
   public description(description: IDescription<CO, CA, CG, PG, P>): this {
     this.cmd.desc = description;
+    return this;
+  }
+
+  /**
+   * Set the command usage. Defaults to arguments.
+   * @param usage The command usage.
+   */
+  public usage(usage: string): this {
+    this.cmd._usage = usage;
     return this;
   }
 
@@ -1217,9 +1213,6 @@ export class Command<
    * will be called.
    * @param error Error to handle.
    */
-  // protected error(error: Error): Error;
-  // protected error(error: string, options: CommandErrorOptions): Error;
-  // protected error(error: Error | string, options?: CommandErrorOptions): Error {
   protected error(error: Error): Error {
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       return error;
@@ -1316,6 +1309,10 @@ export class Command<
     return typeof this.desc === "function"
       ? this.desc = this.desc()
       : this.desc;
+  }
+
+  public getUsage() {
+    return this._usage ?? this.argsDefinition;
   }
 
   /** Get short command description. This is the first line of the description. */

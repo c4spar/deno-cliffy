@@ -66,7 +66,10 @@
   - [Custom option processing](#custom-option-processing)
   - [Option action handler](#option-action-handler)
 - [Commands](#-commands)
-  - [Argument syntax](#argument-syntax)
+  - [Name](#name)
+  - [Description](#description)
+  - [Arguments](#arguments)
+  - [Usage](#usage)
   - [Action handler](#action-handler)
   - [Executable sub-commands](#executable-sub-commands)
   - [Global commands](#global-commands)
@@ -750,13 +753,29 @@ await new Command()
   .parse(Deno.args);
 ```
 
-### Argument syntax
+### Name
 
-You can use `.arguments()` to specify the arguments for the top-level and for
-sub-commands. For sub-commands they can also be included in the `.command()`
-call. Angled brackets (e.g. `<required>`) indicate required input and square
-brackets (e.g. `[optional]`) indicate optional input. A required input cannot be
-defined after an optional input.
+With the `.name()` you can define the name of the command. In case of the main
+command it must be the same as the program name. It is displayed in the auto
+generated help and used for shell completions.
+
+### Description
+
+The `.description()` method adds a description for the command that will be
+displayed in the auto generated help.
+
+### Usage
+
+With the `.usage()` method you can override the usage text that is displayed at
+the top of the auto generated help which defaults to the command arguments.
+
+### Arguments
+
+You can use the `.arguments()` method to specify the arguments for the top-level
+and for sub-commands. For sub-commands they can also be included in the
+`.command()` method. Angled brackets (e.g. `<required>`) indicate required input
+and square brackets (e.g. `[optional]`) indicate optional input. A required
+input cannot be defined after an optional input.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
