@@ -1322,8 +1322,7 @@ export class Command<
   public getShortDescription(): string {
     return this.getDescription()
       .trim()
-      .split("\n")
-      .shift() as string;
+      .split("\n", 1)[0];
   }
 
   /** Get original command-line arguments. */

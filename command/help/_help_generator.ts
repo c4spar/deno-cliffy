@@ -120,7 +120,7 @@ export class HelpGenerator {
             red(bold("-")),
             this.options.long
               ? option.description
-              : option.description.split("\n").shift() as string,
+              : option.description.split("\n", 1)[0],
             this.generateHints(option),
           ]),
         ])
@@ -138,7 +138,7 @@ export class HelpGenerator {
           red(bold("-")),
           this.options.long
             ? option.description
-            : option.description.split("\n").shift() as string,
+            : option.description.split("\n", 1)[0],
           this.generateHints(option),
         ]),
       ])
@@ -171,7 +171,7 @@ export class HelpGenerator {
               this.options.types,
             ),
             red(bold("-")),
-            command.getDescription().split("\n").shift() as string,
+            command.getShortDescription(),
           ]),
         ])
           .indent(this.indent * 2)
@@ -187,7 +187,7 @@ export class HelpGenerator {
           [command.getName(), ...command.getAliases()].map((name) => blue(name))
             .join(", "),
           red(bold("-")),
-          command.getDescription().split("\n").shift() as string,
+          command.getShortDescription(),
         ]),
       ])
         .maxColWidth([60, 1, 80])
