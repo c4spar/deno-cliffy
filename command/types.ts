@@ -7,7 +7,8 @@ import type {
   ITypeInfo,
 } from "../flags/types.ts";
 import type { Type } from "./type.ts";
-import type { Command, HelpOptions } from "./command.ts";
+import type { Command } from "./command.ts";
+import type { HelpGeneratorOptions } from "./help/_help_generator.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
@@ -225,7 +226,7 @@ export type IHelpHandler<
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
   C extends Command<O, A, G, PG, P> = Command<O, A, G, PG, P>,
-> = (this: C, cmd: C, options: HelpOptions) => string;
+> = (this: C, cmd: C, options: HelpGeneratorOptions) => string;
 
 /** Version callback method to print the version. Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` method's. */
 export type IVersionHandler<

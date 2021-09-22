@@ -438,7 +438,7 @@ export class Command<
       this.cmd._help = help;
     } else {
       this.cmd.exitOnHelp = help.exit;
-      this.cmd._help = (cmd: Command, options: HelpOptions): string =>
+      this.cmd._help = (cmd: Command, options: HelpGeneratorOptions): string =>
         HelpGenerator.generate(cmd, { ...help, ...options });
     }
     return this;
@@ -1341,12 +1341,12 @@ export class Command<
   }
 
   /** Output generated help without exiting. */
-  public showHelp(options?: HelpOptions): void {
+  public showHelp(options?: HelpGeneratorOptions): void {
     console.log(this.getHelp(options));
   }
 
   /** Get generated help. */
-  public getHelp(options?: HelpOptions): string {
+  public getHelp(options?: HelpGeneratorOptions): string {
     this.registerDefaults();
     return this.getHelpHandler().call(this, this, options ?? {});
   }
