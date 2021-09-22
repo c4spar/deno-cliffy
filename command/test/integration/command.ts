@@ -7,7 +7,10 @@ const cmd = new Command()
   .description("Completions test.")
   .globalType("color", new EnumType(["blue", "yellow", "red"]))
   .globalOption("-g, --global <val:boolean>", "Foo option.")
-  .option("-m, --main <val:boolean>", "Bar option.")
+  .option(
+    "-m, --main <val:boolean>",
+    "Bar option.\nfoo bar baz. foo bar baz.\n\nfoo bar baz.\nfoo bar baz.",
+  )
   .option("-c, --color <val:color>", "Color option.")
   .default("help")
   // foo

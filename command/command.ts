@@ -438,8 +438,8 @@ export class Command<
       this.cmd._help = help;
     } else {
       this.cmd.exitOnHelp = help.exit;
-      this.cmd._help = (cmd: Command): string =>
-        HelpGenerator.generate(cmd, help);
+      this.cmd._help = (cmd: Command, options: HelpGeneratorOptions): string =>
+        HelpGenerator.generate(cmd, { ...help, ...options });
     }
     return this;
   }
@@ -979,7 +979,9 @@ export class Command<
           global: true,
           prepend: true,
           action: function () {
-            this.showHelp();
+            this.showHelp({
+              long: this.getRawArgs().includes(`--${helpOption.name}`),
+            });
             if (this.shouldExitOnHelp()) {
               Deno.exit(0);
             }
@@ -987,6 +989,7 @@ export class Command<
           ...(this._helpOption?.opts ?? {}),
         },
       );
+      const helpOption = this.options[0];
     }
 
     return this;
@@ -1319,8 +1322,7 @@ export class Command<
   public getShortDescription(): string {
     return this.getDescription()
       .trim()
-      .split("\n")
-      .shift() as string;
+      .split("\n", 1)[0];
   }
 
   /** Get original command-line arguments. */
@@ -1339,14 +1341,14 @@ export class Command<
   }
 
   /** Output generated help without exiting. */
-  public showHelp(): void {
-    console.log(this.getHelp());
+  public showHelp(options?: HelpGeneratorOptions): void {
+    console.log(this.getHelp(options));
   }
 
   /** Get generated help. */
-  public getHelp(): string {
+  public getHelp(options?: HelpGeneratorOptions): string {
     this.registerDefaults();
-    return this.getHelpHandler().call(this, this);
+    return this.getHelpHandler().call(this, this, options ?? {});
   }
 
   /** Get help handler method. */
