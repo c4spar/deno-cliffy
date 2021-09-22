@@ -1225,6 +1225,10 @@ defined by default which prints the help text to stdout. You can also output or
 retrieve the help text programmatically by using the `.showHelp()` or
 `.getHelp()` method.
 
+By default, only the first line of each option and command description is
+printed. With the long help flag (`--help`) the full description is printed for
+each option.
+
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/command.ts";
 import { CompletionsCommand } from "https://deno.land/x/cliffy/command/completions/mod.ts";
