@@ -132,7 +132,8 @@ ${this.generateCompletions(this.cmd).trim()}`;
       options.required && cmd.push("-r");
       cmd.push("-a", options.arguments);
     }
-    options.description && cmd.push("-d", `'${options.description}'`);
+    options.description &&
+      cmd.push("-d", `'${options.description.split("\n", 1)[0]}'`);
     return cmd.join(" ");
   }
 

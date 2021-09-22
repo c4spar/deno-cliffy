@@ -438,8 +438,8 @@ export class Command<
       this.cmd._help = help;
     } else {
       this.cmd.exitOnHelp = help.exit;
-      this.cmd._help = (cmd: Command): string =>
-        HelpGenerator.generate(cmd, help);
+      this.cmd._help = (cmd: Command, options: HelpOptions): string =>
+        HelpGenerator.generate(cmd, { ...help, ...options });
     }
     return this;
   }
@@ -979,7 +979,9 @@ export class Command<
           global: true,
           prepend: true,
           action: function () {
-            this.showHelp();
+            this.showHelp({
+              long: this.getRawArgs().includes(`--${helpOption.name}`),
+            });
             if (this.shouldExitOnHelp()) {
               Deno.exit(0);
             }
@@ -987,6 +989,7 @@ export class Command<
           ...(this._helpOption?.opts ?? {}),
         },
       );
+      const helpOption = this.options[0];
     }
 
     return this;
@@ -1339,14 +1342,14 @@ export class Command<
   }
 
   /** Output generated help without exiting. */
-  public showHelp(): void {
-    console.log(this.getHelp());
+  public showHelp(options?: HelpOptions): void {
+    console.log(this.getHelp(options));
   }
 
   /** Get generated help. */
-  public getHelp(): string {
+  public getHelp(options?: HelpOptions): string {
     this.registerDefaults();
-    return this.getHelpHandler().call(this, this);
+    return this.getHelpHandler().call(this, this, options ?? {});
   }
 
   /** Get help handler method. */

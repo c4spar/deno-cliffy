@@ -22,6 +22,7 @@ export interface HelpGeneratorOptions {
   types?: boolean;
   hints?: boolean;
   colors?: boolean;
+  long?: boolean;
 }
 
 /** Help text generator. */
@@ -42,6 +43,7 @@ export class HelpGenerator {
       types: false,
       hints: true,
       colors: true,
+      long: false,
       ...options,
     };
   }
@@ -115,14 +117,16 @@ export class HelpGenerator {
               option.typeDefinition || "",
               this.options.types,
             ),
-            red(bold("-")) + " " +
-            option.description.split("\n").shift() as string,
+            red(bold("-")),
+            this.options.long
+              ? option.description
+              : option.description.split("\n").shift() as string,
             this.generateHints(option),
           ]),
         ])
-          .padding([2, 2, 2])
+          .padding([2, 2, 1, 2])
           .indent(this.indent * 2)
-          .maxColWidth([60, 60, 80, 60])
+          .maxColWidth([60, 60, 1, 80, 60])
           .toString() +
         "\n";
     }
@@ -131,14 +135,16 @@ export class HelpGenerator {
       Table.from([
         ...options.map((option: IOption) => [
           option.flags.map((flag) => blue(flag)).join(", "),
-          red(bold("-")) + " " +
-          option.description.split("\n").shift() as string,
+          red(bold("-")),
+          this.options.long
+            ? option.description
+            : option.description.split("\n").shift() as string,
           this.generateHints(option),
         ]),
       ])
-        .padding([2, 2])
         .indent(this.indent * 2)
-        .maxColWidth([60, 80, 60])
+        .maxColWidth([60, 1, 80, 60])
+        .padding([2, 1, 2])
         .toString() +
       "\n";
   }
@@ -164,12 +170,13 @@ export class HelpGenerator {
               command.getArgsDefinition() || "",
               this.options.types,
             ),
-            red(bold("-")) + " " +
+            red(bold("-")),
             command.getDescription().split("\n").shift() as string,
           ]),
         ])
-          .padding([2, 2, 2])
           .indent(this.indent * 2)
+          .maxColWidth([60, 60, 1, 80])
+          .padding([2, 2, 1, 2])
           .toString() +
         "\n";
     }
@@ -179,11 +186,12 @@ export class HelpGenerator {
         ...commands.map((command: Command) => [
           [command.getName(), ...command.getAliases()].map((name) => blue(name))
             .join(", "),
-          red(bold("-")) + " " +
+          red(bold("-")),
           command.getDescription().split("\n").shift() as string,
         ]),
       ])
-        .padding([2, 2])
+        .maxColWidth([60, 1, 80])
+        .padding([2, 1, 2])
         .indent(this.indent * 2)
         .toString() +
       "\n";
