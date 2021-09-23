@@ -75,7 +75,7 @@
   - [Global commands](#global-commands)
   - [Hidden commands](#hidden-commands)
   - [Stop early](#stop-early)
-  - [Error handling](#error-handling)
+  - [Error and exit handling](#error-and-exit-handling)
 - [Custom types](#-custom-types)
   - [Function types](#function-types)
   - [Class types](#class-types)
@@ -951,11 +951,14 @@ script: server
 args: [ "-p", "80" ]
 ```
 
-### Error handling
+### Error and exit handling
 
 By default, cliffy prints the help text and calls `Deno.exit` when a
 `ValidationError` is thrown. You can override this behaviour with the
 `.throwErrors()` method. All other errors will be thrown by default.
+
+The `.noExit()` method does the same as `.throwErrors()` but also prevents the
+command from calling `Deno.exit` when the help or version option is called.
 
 **Catch runtime errors**
 
@@ -1272,8 +1275,6 @@ await new Command()
     hints: true, // default: true
     // Enable/disable colors.
     colors: false, // default: true
-    // Enable/disable exiting after print
-    exit: true, // default: true
   })
   .option("-f, --foo [val:number]", "Some description.", {
     required: true,

@@ -34,7 +34,7 @@ import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
-import type { HelpGeneratorOptions } from "./help/_help_generator.ts";
+import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   IAction,
   IArgument,
@@ -89,10 +89,6 @@ type MapArgumentTypes<A extends Array<unknown>> = A extends Array<unknown>
   : // deno-lint-ignore no-explicit-any
   any;
 
-export interface HelpOptions extends HelpGeneratorOptions {
-  exit?: boolean;
-}
-
 export class Command<
   // deno-lint-ignore no-explicit-any
   CO extends Record<string, any> | void = any,
@@ -138,7 +134,7 @@ export class Command<
   private _versionOption?: IDefaultOption | false;
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
-  private exitOnHelp: undefined | boolean;
+  private _shouldExit?: boolean;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -437,8 +433,7 @@ export class Command<
     } else if (typeof help === "function") {
       this.cmd._help = help;
     } else {
-      this.cmd.exitOnHelp = help.exit;
-      this.cmd._help = (cmd: Command, options: HelpGeneratorOptions): string =>
+      this.cmd._help = (cmd: Command, options: HelpOptions): string =>
         HelpGenerator.generate(cmd, { ...help, ...options });
     }
     return this;
@@ -668,15 +663,24 @@ export class Command<
     return this;
   }
 
+  /**
+   * Same as `.throwErrors()` but also prevents calling `Deno.exit` after
+   * printing help or version with the --help and --version option.
+   */
+  public noExit(): this {
+    this.cmd._shouldExit = false;
+    this.throwErrors();
+    return this;
+  }
+
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
   }
 
-  /** Check wether the command should exit after printing help */
-  protected shouldExitOnHelp(): boolean {
-    return this.cmd.exitOnHelp ??
-      (this.cmd._parent?.shouldExitOnHelp() ?? true);
+  /** Check whether the command should exit after printing help or version. */
+  protected shouldExit(): boolean {
+    return this.cmd._shouldExit ?? this.cmd._parent?.shouldExit() ?? true;
   }
 
   public globalOption<G extends Record<string, unknown> | void = CG>(
@@ -961,9 +965,7 @@ export class Command<
           prepend: true,
           action: function () {
             this.showVersion();
-            if (this.shouldExitOnHelp()) {
-              Deno.exit(0);
-            }
+            this.exit();
           },
           ...(this._versionOption?.opts ?? {}),
         },
@@ -982,9 +984,7 @@ export class Command<
             this.showHelp({
               long: this.getRawArgs().includes(`--${helpOption.name}`),
             });
-            if (this.shouldExitOnHelp()) {
-              Deno.exit(0);
-            }
+            this.exit();
           },
           ...(this._helpOption?.opts ?? {}),
         },
@@ -1221,11 +1221,7 @@ export class Command<
       return error;
     }
     this.showHelp();
-    Deno.stderr.writeSync(
-      new TextEncoder().encode(
-        red(`  ${bold("error")}: ${error.message}\n`) + "\n",
-      ),
-    );
+    console.error(red(`  ${bold("error")}: ${error.message}\n`));
     Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
@@ -1341,12 +1337,12 @@ export class Command<
   }
 
   /** Output generated help without exiting. */
-  public showHelp(options?: HelpGeneratorOptions): void {
+  public showHelp(options?: HelpOptions): void {
     console.log(this.getHelp(options));
   }
 
   /** Get generated help. */
-  public getHelp(options?: HelpGeneratorOptions): string {
+  public getHelp(options?: HelpOptions): string {
     this.registerDefaults();
     return this.getHelpHandler().call(this, this, options ?? {});
   }
@@ -1354,6 +1350,12 @@ export class Command<
   /** Get help handler method. */
   private getHelpHandler(): IHelpHandler {
     return this._help ?? this._parent?.getHelpHandler() as IHelpHandler;
+  }
+
+  private exit(code = 0) {
+    if (this.shouldExit()) {
+      Deno.exit(code);
+    }
   }
 
   /** ***************************************************************************
