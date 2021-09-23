@@ -18,7 +18,7 @@ import type { IArgument } from "../types.ts";
 import type { IEnvVar, IExample, IOption } from "../types.ts";
 import { Type } from "../type.ts";
 
-export interface HelpGeneratorOptions {
+export interface HelpOptions {
   types?: boolean;
   hints?: boolean;
   colors?: boolean;
@@ -28,16 +28,16 @@ export interface HelpGeneratorOptions {
 /** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
-  private options: Required<HelpGeneratorOptions>;
+  private options: Required<HelpOptions>;
 
   /** Generate help text for given command. */
-  public static generate(cmd: Command, options?: HelpGeneratorOptions): string {
+  public static generate(cmd: Command, options?: HelpOptions): string {
     return new HelpGenerator(cmd, options).generate();
   }
 
   private constructor(
     private cmd: Command,
-    options: HelpGeneratorOptions = {},
+    options: HelpOptions = {},
   ) {
     this.options = {
       types: false,
