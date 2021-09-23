@@ -1,3 +1,29 @@
+# [v0.19.6](https://github.com/c4spar/deno-cli/compare/v0.19.5...v0.19.6) (2021-09-23)
+
+### Features
+
+- **command:** add noExit method (#282, #275)
+  ([bc0c5bb](https://github.com/c4spar/deno-cli/commit/bc0c5bb),
+  [ab38cc7](https://github.com/c4spar/deno-cli/commit/ab38cc7))
+- **command:** show long help with --help option (#281)
+  ([e577f5a](https://github.com/c4spar/deno-cli/commit/e577f5a))
+- **command:** add usage method (#280)
+  ([a32755d](https://github.com/c4spar/deno-cli/commit/a32755d))
+
+### Bug Fixes
+
+- **prompt:** key symbols in prompt info are hardcoded (#274)
+  ([a6138b2](https://github.com/c4spar/deno-cli/commit/a6138b2))
+
+### Documentation Updates
+
+- fix typos (#279)
+  ([d802a15](https://github.com/c4spar/deno-cli/commit/d802a15))
+- **command:** fix incorrectly import module (#276)
+  ([6674ea3](https://github.com/c4spar/deno-cli/commit/6674ea3))
+- **command:** fix import path (#271)
+  ([57e7434](https://github.com/c4spar/deno-cli/commit/57e7434))
+
 # [v0.19.5](https://github.com/c4spar/deno-cli/compare/v0.19.4...v0.19.5) (2021-08-12)
 
 ### Features
