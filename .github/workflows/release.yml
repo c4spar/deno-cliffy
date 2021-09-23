@@ -20,7 +20,7 @@ jobs:
 
       - name: Setup eggs
         run: >
-          deno install --unstable --allow-all https://x.nest.land/eggs@0.3.8/eggs.ts &&
+          deno install --unstable --allow-all https://x.nest.land/eggs@0.3.9/eggs.ts &&
           eggs link "${NEST_TOKEN}"
         env:
           NEST_TOKEN: ${{ secrets.NEST_TOKEN }}
