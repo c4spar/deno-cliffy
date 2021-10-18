@@ -211,11 +211,13 @@ export class HelpGenerator {
             envVar.details,
             this.options.types,
           ),
-          `${red(bold("-"))} ${envVar.description}`,
+          red(bold("-")),
+          envVar.description,
         ]),
       ])
-        .padding(2)
+        .padding([2, 2, 1])
         .indent(this.indent * 2)
+        .maxColWidth([60, 60, 1, 80])
         .toString() +
       "\n";
   }
