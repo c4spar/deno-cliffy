@@ -1305,7 +1305,7 @@ export class Command<
   }
 
   public getUsage() {
-    return this._usage ?? this.argsDefinition;
+    return this._usage ?? this.getArgsDefinition();
   }
 
   /** Get short command description. This is the first line of the description. */

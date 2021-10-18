@@ -62,12 +62,13 @@ export class HelpGenerator {
   }
 
   private generateHeader(): string {
+    const usage = this.cmd.getUsage();
     const rows = [
       [
         bold("Usage:"),
         magenta(
           this.cmd.getPath() +
-            (this.cmd.getUsage() ? " " + this.cmd.getUsage() : ""),
+            (usage ? " " + highlightArguments(usage, this.options.types) : ""),
         ),
       ],
     ];
@@ -210,11 +211,13 @@ export class HelpGenerator {
             envVar.details,
             this.options.types,
           ),
-          `${red(bold("-"))} ${envVar.description}`,
+          red(bold("-")),
+          envVar.description,
         ]),
       ])
-        .padding(2)
+        .padding([2, 2, 1])
         .indent(this.indent * 2)
+        .maxColWidth([60, 60, 1, 80])
         .toString() +
       "\n";
   }
@@ -304,8 +307,11 @@ function highlightArguments(argsDefinition: string, types = true) {
     return "";
   }
 
-  return parseArgumentsDefinition(argsDefinition)
-    .map((arg: IArgument) => highlightArgumentDetails(arg, types)).join(" ");
+  return parseArgumentsDefinition(argsDefinition, false, true)
+    .map((arg: IArgument | string) =>
+      typeof arg === "string" ? arg : highlightArgumentDetails(arg, types)
+    )
+    .join(" ");
 }
 
 /**
@@ -333,10 +339,9 @@ function highlightArgumentDetails(
   if (types) {
     str += yellow(":");
     str += red(arg.type);
-  }
-
-  if (arg.list) {
-    str += green("[]");
+    if (arg.list) {
+      str += green("[]");
+    }
   }
 
   str += yellow(arg.optionalValue ? "]" : ">");
