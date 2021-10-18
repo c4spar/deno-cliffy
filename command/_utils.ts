@@ -57,19 +57,39 @@ export function splitArguments(
  * Parse arguments string.
  * @param argsDefinition Arguments definition: `<color1:string> <color2:string>`
  */
-export function parseArgumentsDefinition(argsDefinition: string): IArgument[] {
-  const argumentDetails: IArgument[] = [];
+export function parseArgumentsDefinition<T extends boolean>(
+  argsDefinition: string,
+  validate: boolean,
+  all: true,
+): Array<IArgument | string>;
+export function parseArgumentsDefinition<T extends boolean>(
+  argsDefinition: string,
+  validate?: boolean,
+  all?: false,
+): Array<IArgument>;
+export function parseArgumentsDefinition<T extends boolean>(
+  argsDefinition: string,
+  validate = true,
+  all?: T,
+): T extends true ? Array<IArgument | string> : Array<IArgument> {
+  const argumentDetails: Array<IArgument | string> = [];
 
   let hasOptional = false;
   let hasVariadic = false;
   const parts: string[] = argsDefinition.split(/ +/);
 
   for (const arg of parts) {
-    if (hasVariadic) {
+    if (validate && hasVariadic) {
       throw new ArgumentFollowsVariadicArgument(arg);
     }
-
     const parts: string[] = arg.split(ARGUMENT_DETAILS_REGEX);
+
+    if (!parts[1]) {
+      if (all) {
+        argumentDetails.push(parts[0]);
+      }
+      continue;
+    }
     const type: string | undefined = parts[2] || OptionType.STRING;
 
     const details: IArgument = {
@@ -81,7 +101,7 @@ export function parseArgumentsDefinition(argsDefinition: string): IArgument[] {
       type,
     };
 
-    if (!details.optionalValue && hasOptional) {
+    if (validate && !details.optionalValue && hasOptional) {
       throw new RequiredArgumentFollowsOptionalArgument(details.name);
     }
 
@@ -102,10 +122,10 @@ export function parseArgumentsDefinition(argsDefinition: string): IArgument[] {
       }
     }
 
-    if (details.name) {
-      argumentDetails.push(details);
-    }
+    argumentDetails.push(details);
   }
 
-  return argumentDetails;
+  return argumentDetails as (
+    T extends true ? Array<IArgument | string> : Array<IArgument>
+  );
 }
