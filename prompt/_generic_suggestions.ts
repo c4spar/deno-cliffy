@@ -207,7 +207,7 @@ export abstract class GenericSuggestions<
 
     let info = this.settings.indent;
     if (this.settings.suggestions?.length) {
-      info += (blue(Figures.INFO) + bold(` ${selected}/${matched} `));
+      info += blue(Figures.INFO) + bold(` ${selected}/${matched} `);
     }
     info += actions
       .map((cur) => `${cur[0]}: ${bold(cur[1].join(" "))}`)

@@ -85,10 +85,10 @@ export function parse(data: Uint8Array | string): KeyCode[] {
 
     if (ch === kEscape && hasNext()) {
       escaped = true;
-      s += (ch = next());
+      s += ch = next();
 
       if (ch === kEscape) {
-        s += (ch = next());
+        s += ch = next();
       }
     }
 
@@ -100,11 +100,11 @@ export function parse(data: Uint8Array | string): KeyCode[] {
       if (ch === "O") {
         // ESC O letter
         // ESC O modifier letter
-        s += (ch = next());
+        s += ch = next();
 
         if (ch >= "0" && ch <= "9") {
           modifier = (Number(ch) >> 0) - 1;
-          s += (ch = next());
+          s += ch = next();
         }
 
         code += ch;
@@ -113,13 +113,13 @@ export function parse(data: Uint8Array | string): KeyCode[] {
         // ESC [ modifier letter
         // ESC [ [ modifier letter
         // ESC [ [ num char
-        s += (ch = next());
+        s += ch = next();
 
         if (ch === "[") {
           // \x1b[[A
           //      ^--- escape codes might have a second bracket
           code += ch;
-          s += (ch = next());
+          s += ch = next();
         }
 
         /*
@@ -153,16 +153,16 @@ export function parse(data: Uint8Array | string): KeyCode[] {
 
         // Skip one or two leading digits
         if (ch >= "0" && ch <= "9") {
-          s += (ch = next());
+          s += ch = next();
 
           if (ch >= "0" && ch <= "9") {
-            s += (ch = next());
+            s += ch = next();
           }
         }
 
         // skip modifier
         if (ch === ";") {
-          s += (ch = next());
+          s += ch = next();
 
           if (ch >= "0" && ch <= "9") {
             s += next();
