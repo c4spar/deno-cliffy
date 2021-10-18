@@ -915,12 +915,6 @@ export class Command<
 
         if (action) {
           await action.call(this, options, ...params);
-          return {
-            options,
-            args: params,
-            cmd: this,
-            literal: this.literalArgs,
-          };
         }
 
         return await this.execute(options as PG & CG & CO, ...params);
