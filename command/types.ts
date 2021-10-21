@@ -129,12 +129,16 @@ export interface IOption<
 
 /* ENV VARS TYPES */
 
+// deno-lint-ignore no-explicit-any
+export type IEnvVarValueHandler<T extends any = any> = (val: T) => unknown;
+
 /** Environment variable options */
 export interface IEnvVarOptions {
   hidden?: boolean;
   global?: boolean;
   required?: boolean;
   prefix?: string;
+  value?: IEnvVarValueHandler;
 }
 
 /** Environment variable settings. */
