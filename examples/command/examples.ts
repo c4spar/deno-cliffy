@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { red } from "https://deno.land/std@0.108.0/fmt/colors.ts";
+import { red } from "https://deno.land/std@0.112.0/fmt/colors.ts";
 import { Command } from "../../command/command.ts";
 
 await new Command()

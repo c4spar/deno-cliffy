@@ -1,4 +1,4 @@
-import * as stdColors from "https://deno.land/std@0.108.0/fmt/colors.ts";
+import * as stdColors from "https://deno.land/std@0.112.0/fmt/colors.ts";
 
 type ExcludedColorMethods = "setColorEnabled" | "getColorEnabled";
 type PropertyNames = keyof typeof stdColors;
