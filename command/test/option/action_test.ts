@@ -1,109 +1,117 @@
-import { assert, assertEquals } from "../../../dev_deps.ts";
+import { assert, assertEquals, sinon } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-interface IStats {
-  context?: null | Command;
-  options?: unknown;
-  args?: unknown;
-}
-
-Deno.test("command option action", async () => {
-  const stats: IStats = {};
+Deno.test("[command] should execute the action from an option", async () => {
+  const optionSpy = sinon.spy();
 
   const cmd = new Command()
     .throwErrors()
     .arguments("[beep:string]")
-    .option("-f, --foo [value:string]", "action ...", {
-      action: function (options, ...args) {
-        stats.context = this;
-        stats.options = options;
-        stats.args = args;
-      },
-    });
+    .option("-f, --foo [value:string]", "action ...", { action: optionSpy });
 
   const { options, args } = await cmd.parse(["--foo", "bar", "beep"]);
 
-  assert(stats.context, "option action not executed");
-  assertEquals(stats.context, cmd);
-  assertEquals(stats.options, { foo: "bar" });
-  assertEquals(stats.args, ["beep"]);
-  assertEquals(stats.options, options);
-  assertEquals(stats.args, args);
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, cmd);
+  assertEquals(optionSpy.firstCall.args, [{ foo: "bar" }, "beep"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("sub-command option action", async () => {
-  const stats: IStats = {};
-  let subCmd: Command;
+Deno.test("[command] should execute the action from an child command option", async () => {
+  const optionSpy = sinon.spy();
+
+  const subCmd: Command = new Command()
+    .arguments("[beep:string]")
+    .option("-b, --bar [value:string]", "action ...", { action: optionSpy });
 
   const cmd = new Command()
     .throwErrors()
-    .command(
-      "foo",
-      subCmd = new Command()
-        .arguments("[beep:string]")
-        .option("-b, --bar [value:string]", "action ...", {
-          action: function (options, ...args) {
-            stats.context = this;
-            stats.options = options;
-            stats.args = args;
-          },
-        }),
-    );
+    .command("foo", subCmd);
 
   const { options, args } = await cmd.parse(["foo", "--bar", "baz", "beep"]);
 
-  assert(stats.context, "option action not executed");
-  assertEquals(stats.context, subCmd);
-  assertEquals(stats.options, { bar: "baz" });
-  assertEquals(stats.args, ["beep"]);
-  assertEquals(stats.options, options);
-  assertEquals(stats.args, args);
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, subCmd);
+  assertEquals(optionSpy.firstCall.args, [{ bar: "baz" }, "beep"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("option action with dashed option name", async () => {
-  const stats: IStats = {};
+Deno.test("[command] should execute the action from an option with dashed option name", async () => {
+  const optionSpy = sinon.spy();
 
   const cmd = new Command()
     .throwErrors()
     .arguments("[beep:string] [boop:string]")
-    .option("-f, --foo-bar", "action ...", {
-      action: function (options, ...args) {
-        stats.context = this;
-        stats.options = options;
-        stats.args = args;
-      },
-    });
+    .option("-f, --foo-bar", "action ...", { action: optionSpy });
 
   const { options, args } = await cmd.parse(["-f", "beep", "boop"]);
 
-  assert(stats.context, "option action not executed");
-  assertEquals(stats.context, cmd);
-  assertEquals(stats.options, { fooBar: true });
-  assertEquals(stats.args, ["beep", "boop"]);
-  assertEquals(stats.options, options);
-  assertEquals(stats.args, args);
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, cmd);
+  assertEquals(optionSpy.firstCall.args, [{ fooBar: true }, "beep", "boop"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("option action with dashed option name and value", async () => {
-  const stats: IStats = {};
+Deno.test("[command] should execute the action from an option with dashed option name and a value", async () => {
+  const optionSpy = sinon.spy();
 
   const cmd = new Command()
     .throwErrors()
     .arguments("[beep:string]")
     .option("-f, --foo-bar [value:string]", "action ...", {
-      action: function (options, ...args) {
-        stats.context = this;
-        stats.options = options;
-        stats.args = args;
-      },
+      action: optionSpy,
     });
 
   const { options, args } = await cmd.parse(["-f", "beep", "boop"]);
 
-  assert(stats.context, "option action not executed");
-  assertEquals(stats.context, cmd);
-  assertEquals(stats.options, { fooBar: "beep" });
-  assertEquals(stats.args, ["boop"]);
-  assertEquals(stats.options, options);
-  assertEquals(stats.args, args);
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, cmd);
+  assertEquals(optionSpy.firstCall.args, [{ fooBar: "beep" }, "boop"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
+});
+
+Deno.test("[command] should execute the action from an option and the command action", async () => {
+  const commandSpy = sinon.spy();
+  const optionSpy = sinon.spy();
+
+  const cmd = new Command()
+    .throwErrors()
+    .arguments("[beep:string]")
+    .option("-f, --foo-bar [value:string]", "action ...", { action: optionSpy })
+    .action(commandSpy);
+
+  const { options, args } = await cmd.parse(["-f", "beep", "boop"]);
+
+  assert(commandSpy.calledOnce, "command action not called");
+  assertEquals(commandSpy.firstCall.thisValue, cmd);
+  assertEquals(commandSpy.firstCall.args, [{ fooBar: "beep" }, "boop"]);
+  assertEquals(commandSpy.firstCall.args, [options, ...args]);
+
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, cmd);
+  assertEquals(optionSpy.firstCall.args, [{ fooBar: "beep" }, "boop"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
+});
+
+Deno.test("[command] should execute the action from an standalon option and but not the command action", async () => {
+  const commandSpy = sinon.spy();
+  const optionSpy = sinon.spy();
+
+  const cmd = new Command()
+    .throwErrors()
+    .arguments("[beep:string]")
+    .option("-f, --foo-bar [value:string]", "action ...", {
+      standalone: true,
+      action: optionSpy,
+    })
+    .action(commandSpy);
+
+  const { options, args } = await cmd.parse(["-f", "beep", "boop"]);
+
+  assert(commandSpy.notCalled, "command action called with standalone option");
+
+  assert(optionSpy.calledOnce, "option action not called");
+  assertEquals(optionSpy.firstCall.thisValue, cmd);
+  assertEquals(optionSpy.firstCall.args, [{ fooBar: "beep" }, "boop"]);
+  assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
