@@ -212,7 +212,9 @@ export class HelpGenerator {
             this.options.types,
           ),
           red(bold("-")),
-          envVar.description,
+          this.options.long
+            ? envVar.description
+            : envVar.description.split("\n", 1)[0],
         ]),
       ])
         .padding([2, 2, 1])
