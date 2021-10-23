@@ -1,3 +1,35 @@
+# [v0.20.0](https://github.com/c4spar/deno-cliffy/compare/v0.19.6...v0.20.0) (Oct 23, 2021)
+
+### Features
+
+- **command:** add value option for env vars (#290)
+  ([e5b2b2b](https://github.com/c4spar/deno-cliffy/commit/e5b2b2b))
+
+### Bug Fixes
+
+- **command:** help text shows always long description for env vars (#289)
+  ([6201e28](https://github.com/c4spar/deno-cliffy/commit/6201e28))
+- **command:** fix description column definition in help text (#286)
+  ([bf727fb](https://github.com/c4spar/deno-cliffy/commit/bf727fb))
+- **command:** highlight command usage in help text (#288)
+  ([7181724](https://github.com/c4spar/deno-cliffy/commit/7181724))
+
+### Chore
+
+- **upgrade:** deno/std v0.112.0 (#291)
+  ([750d70d](https://github.com/c4spar/deno-cliffy/commit/750d70d))
+
+### BREAKING CHANGES
+
+- **command:** execute command action after option action is called (#285)
+  ([9170a65](https://github.com/c4spar/deno-cliffy/commit/9170a65))
+
+  Prior to v0.20.0, when an option action was executed, the command action was
+  not executed. Since v0.20.0, this has changed. The command action is now
+  executed by default. Only standalone options do not execute the command
+  actions (for more informations the
+  [docs](https://github.com/c4spar/deno-cliffy/tree/v0.20.0/command#option-action-handler)).
+
 # [v0.19.6](https://github.com/c4spar/deno-cli/compare/v0.19.5...v0.19.6) (2021-09-23)
 
 ### Features
