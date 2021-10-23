@@ -900,7 +900,7 @@ export class Command<
         const env: Record<string, unknown> = await this.parseEnvVars();
         return await this.execute(env as PG & CG & CO, ...this.rawArgs as CA);
       } else {
-        const { action, flags, unknown, literal } = this.parseFlags(
+        const { actionOption, flags, unknown, literal } = this.parseFlags(
           this.rawArgs,
         );
 
@@ -913,14 +913,16 @@ export class Command<
           options as Record<string, unknown>,
         );
 
-        if (action) {
-          await action.call(this, options, ...params);
-          return {
-            options,
-            args: params,
-            cmd: this,
-            literal: this.literalArgs,
-          };
+        if (actionOption) {
+          await actionOption.action.call(this, options, ...params);
+          if (actionOption.standalone) {
+            return {
+              options,
+              args: params,
+              cmd: this,
+              literal: this.literalArgs,
+            };
+          }
         }
 
         return await this.execute(options as PG & CG & CO, ...params);
@@ -1054,21 +1056,21 @@ export class Command<
    */
   protected parseFlags(
     args: string[],
-  ): IFlagsResult & { action?: IAction } {
+  ): IFlagsResult & { actionOption?: IOption & { action: IAction } } {
     try {
-      let action: IAction | undefined;
+      let actionOption: IOption & { action: IAction } | undefined;
       const result = parseFlags(args, {
         stopEarly: this._stopEarly,
         allowEmpty: this._allowEmpty,
         flags: this.getOptions(true),
         parse: (type: ITypeInfo) => this.parseType(type),
         option: (option: IFlagOptions) => {
-          if (!action && (option as IOption).action) {
-            action = (option as IOption).action;
+          if (!actionOption && (option as IOption).action) {
+            actionOption = option as IOption & { action: IAction };
           }
         },
       });
-      return { ...result, action };
+      return { ...result, actionOption };
     } catch (error) {
       if (error instanceof FlagsValidationError) {
         throw new ValidationError(error.message);

@@ -18,3 +18,4 @@ export { copy } from "https://deno.land/std@0.108.0/io/util.ts";
 
 /* 3rd party */
 export { gt, lt } from "https://deno.land/x/semver@v1.4.0/mod.ts";
+export { default as sinon } from "https://cdn.skypack.dev/sinon@v11.1.2?dts";
