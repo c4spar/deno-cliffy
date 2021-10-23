@@ -91,7 +91,7 @@ function clearEnv() {
   Deno.env.delete("baz_required");
 }
 
-Deno.test("command - env var - missing required env var", async () => {
+Deno.test("[command] - env var - missing required env var", async () => {
   await assertThrowsAsync(
     async () => {
       await new Command()
@@ -104,53 +104,49 @@ Deno.test("command - env var - missing required env var", async () => {
   );
 });
 
-Deno.test("command - env var - expect valid values", async () => {
+Deno.test("[command] - env var - should map the value", async () => {
   setupEnv();
-  let called = 0;
-  await command()
-    .reset()
-    .action((options) => {
-      called++;
-      assertEquals(options, {
-        global: true,
-        globalPrefixed: "global",
-        globalHidden: "global",
-        globalRequired: 1,
-        foo: true,
-        fooPrefixed: "foo",
-        fooHidden: "foo",
-        fooRequired: 1,
-      });
-    })
+  const { options } = await new Command()
+    .throwErrors()
+    .env("foo", "...", { value: (value) => Number(value) })
     .parse([]);
-  assertEquals(called, 1);
+  assertEquals(options, { foo: 1 });
   clearEnv();
 });
 
-Deno.test("command - env var - override env vars with option", async () => {
+Deno.test("[command] - env var - expect valid values", async () => {
   setupEnv();
-  let called = 0;
-  await command()
-    .reset()
-    .action((options) => {
-      called++;
-      assertEquals(options, {
-        global: true,
-        globalPrefixed: "global2",
-        globalHidden: "global",
-        globalRequired: 1,
-        foo: true,
-        fooPrefixed: "foo",
-        fooHidden: "foo",
-        fooRequired: 1,
-      });
-    })
-    .parse(["--global-prefixed", "global2"]);
-  assertEquals(called, 1);
+  const { options } = await command().parse([]);
+  assertEquals(options, {
+    global: true,
+    globalPrefixed: "global",
+    globalHidden: "global",
+    globalRequired: 1,
+    foo: true,
+    fooPrefixed: "foo",
+    fooHidden: "foo",
+    fooRequired: 1,
+  });
   clearEnv();
 });
 
-Deno.test("command - env var - expect option to throw if value is not a boolean", async () => {
+Deno.test("[command] - env var - override env vars with option", async () => {
+  setupEnv();
+  const { options } = await command().parse(["--global-prefixed", "global2"]);
+  assertEquals(options, {
+    global: true,
+    globalPrefixed: "global2",
+    globalHidden: "global",
+    globalRequired: 1,
+    foo: true,
+    fooPrefixed: "foo",
+    fooHidden: "foo",
+    fooRequired: 1,
+  });
+  clearEnv();
+});
+
+Deno.test("[command] - env var - expect option to throw if value is not a boolean", async () => {
   setupEnv();
   Deno.env.set("global", "foo");
   await assertThrowsAsync(
@@ -163,7 +159,7 @@ Deno.test("command - env var - expect option to throw if value is not a boolean"
   clearEnv();
 });
 
-Deno.test("command - env var - expect option to throw if value is not a number", async () => {
+Deno.test("[command] - env var - expect option to throw if value is not a number", async () => {
   setupEnv();
   Deno.env.set("global_required", "foo");
   await assertThrowsAsync(
@@ -176,7 +172,7 @@ Deno.test("command - env var - expect option to throw if value is not a number",
   clearEnv();
 });
 
-Deno.test("command - env var - expect global option to throw if value is not a boolean", async () => {
+Deno.test("[command] - env var - expect global option to throw if value is not a boolean", async () => {
   setupEnv();
   Deno.env.set("global", "foo");
   await assertThrowsAsync(
@@ -189,7 +185,7 @@ Deno.test("command - env var - expect global option to throw if value is not a b
   clearEnv();
 });
 
-Deno.test("command - env var - expect global option to throw if value is not a number", async () => {
+Deno.test("[command] - env var - expect global option to throw if value is not a number", async () => {
   setupEnv();
   Deno.env.set("global_required", "foo");
   await assertThrowsAsync(
@@ -202,7 +198,7 @@ Deno.test("command - env var - expect global option to throw if value is not a n
   clearEnv();
 });
 
-Deno.test("command - env var - env var properties", () => {
+Deno.test("[command] - env var - env var properties", () => {
   const cmd: Command = new Command()
     .throwErrors()
     .globalEnv("global, global2", "global ...")
@@ -228,7 +224,7 @@ Deno.test("command - env var - env var properties", () => {
   assertEquals(fooEnvVar.hidden, true);
 });
 
-Deno.test("command - env var - has env vars", () => {
+Deno.test("[command] - env var - has env vars", () => {
   const cmd: Command = command();
   assertEquals(cmd.hasEnvVars(), true);
   assertEquals(cmd.hasEnvVars(true), true);
@@ -236,7 +232,7 @@ Deno.test("command - env var - has env vars", () => {
   assertEquals(new Command().hasEnvVars(true), false);
 });
 
-Deno.test("command - env var - get env vars", () => {
+Deno.test("[command] - env var - get env vars", () => {
   const cmd: Command = command();
   assertEquals(cmd.getEnvVars().map(env => env.name), [
     "global",
@@ -258,7 +254,7 @@ Deno.test("command - env var - get env vars", () => {
   ]);
 });
 
-Deno.test("command - env var - get base env vars", () => {
+Deno.test("[command] - env var - get base env vars", () => {
   const cmd: Command = command();
   assertEquals(cmd.getBaseEnvVars().map(env => env.name), [
     "global",
@@ -280,7 +276,7 @@ Deno.test("command - env var - get base env vars", () => {
   ]);
 });
 
-Deno.test("command - env var - get global env vars", () => {
+Deno.test("[command] - env var - get global env vars", () => {
   const cmd: Command = command().getCommand("bar") as Command;
   assertEquals(cmd.getGlobalEnvVars().map(env => env.name), [
     "global",
@@ -295,7 +291,7 @@ Deno.test("command - env var - get global env vars", () => {
   ]);
 });
 
-Deno.test("command - env var - has env var", () => {
+Deno.test("[command] - env var - has env var", () => {
   const cmd: Command = command();
   assertEquals(cmd.hasEnvVar("global"), true);
   assertEquals(cmd.hasEnvVar("global_hidden"), false);
@@ -320,7 +316,7 @@ Deno.test("command - env var - has env var", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.hasEnvVar("unknown"), false);
 });
 
-Deno.test("command - env var - get env var", () => {
+Deno.test("[command] - env var - get env var", () => {
   const cmd: Command = command();
   assertEquals(cmd.getEnvVar("global")?.name, "global");
   assertEquals(cmd.getEnvVar("global_hidden")?.name, undefined);
@@ -345,7 +341,7 @@ Deno.test("command - env var - get env var", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getEnvVar("unknown")?.name, undefined);
 });
 
-Deno.test("command - env var - get base env var", () => {
+Deno.test("[command] - env var - get base env var", () => {
   const cmd: Command = command();
   assertEquals(cmd.getBaseEnvVar("global")?.name, "global");
   assertEquals(cmd.getBaseEnvVar("global_hidden")?.name, undefined);
@@ -370,7 +366,7 @@ Deno.test("command - env var - get base env var", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getBaseEnvVar("unknown")?.name, undefined);
 });
 
-Deno.test("command - env var - get global env var", () => {
+Deno.test("[command] - env var - get global env var", () => {
   const cmd: Command = command();
   assertEquals(cmd.getGlobalEnvVar("global")?.name, undefined);
   assertEquals(cmd.getGlobalEnvVar("global_hidden")?.name, undefined);

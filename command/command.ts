@@ -1117,12 +1117,17 @@ export class Command<
             ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
             : env.names[0],
         );
+
         result[propertyName] = this.parseType({
           label: "Environment variable",
           type: env.type,
           name,
           value: Deno.env.get(name) ?? "",
         });
+
+        if (env.value && typeof result[propertyName] !== "undefined") {
+          result[propertyName] = env.value(result[propertyName]);
+        }
       } else if (env.required) {
         throw new MissingRequiredEnvVar(env);
       }
