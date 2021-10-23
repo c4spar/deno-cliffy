@@ -641,8 +641,8 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.
 
 ### Option action handler
 
-Options can have an action handler same as commands by using the `action` option
-for the `.options()` method.
+Options can have an action handler same as commands by passing the `action`
+option to the `.option()` method.
 
 **Prior to v0.20.0**, when an option action was executed, the command action was
 not executed. **Since v0.20.0**, this has changed. The command action is now
