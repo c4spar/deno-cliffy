@@ -641,26 +641,51 @@ $ deno run https://deno.land/x/cliffy/examples/command/custom_option_processing.
 
 ### Option action handler
 
+Options can have an action handler same as commands by using the `action` option
+for the `.options()` method.
+
+**Prior to v0.20.0**, when an option action was executed, the command action was
+not executed. **Since v0.20.0**, this has changed. The command action is now
+executed by default. Only standalone options do not execute the command actions.
+
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
   .version("0.1.0")
-  .option("-i, --info [arg:boolean]", "Print some info.", {
+  .option("--foo", "Foo option.", {
+    action: () => {
+      console.log("--foo action");
+    },
+  })
+  .option("--bar", "Bar option.", {
     standalone: true,
     action: () => {
-      console.log("Some info");
+      console.log("--bar action");
+    },
+  })
+  .option("--baz", "Baz option.", {
+    action: () => {
+      console.log("--baz action");
       Deno.exit(0);
     },
   })
+  .action(() => console.log("main action"))
   .parse(Deno.args);
 
-console.log("not executed");
+console.log("main context");
 ```
 
 ```console
-$ deno run https://deno.land/x/cliffy/examples/command/action_options.ts -i
-Some info
+$ deno run https://deno.land/x/cliffy/examples/command/action_options.ts --foo
+--foo action
+main action
+main context
+$ deno run https://deno.land/x/cliffy/examples/command/action_options.ts --bar
+--bar action
+main context
+$ deno run https://deno.land/x/cliffy/examples/command/action_options.ts --baz
+--baz action
 ```
 
 ## ❯ Commands

@@ -4,13 +4,24 @@ import { Command } from "../../command/command.ts";
 
 await new Command()
   .version("0.1.0")
-  .option("-i, --info [arg:boolean]", "Print some info.", {
+  .option("--foo", "Foo option.", {
+    action: () => {
+      console.log("--foo action");
+    },
+  })
+  .option("--bar", "Bar option.", {
     standalone: true,
     action: () => {
-      console.log("Some info");
+      console.log("--bar action");
+    },
+  })
+  .option("--baz", "Baz option.", {
+    action: () => {
+      console.log("--baz action");
       Deno.exit(0);
     },
   })
+  .action(() => console.log("main action"))
   .parse(Deno.args);
 
-console.log("not executed");
+console.log("main context");
