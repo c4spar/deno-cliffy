@@ -927,8 +927,12 @@ export class Command<
 
         return await this.execute(options as PG & CG & CO, ...params);
       }
-    } catch (error) {
-      throw this.error(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw this.error(error);
+      } else {
+        throw this.error(new Error(`[non-error-thrown] ${error}`));
+      }
     }
   }
 
