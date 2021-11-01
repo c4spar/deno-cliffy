@@ -1,3 +1,15 @@
+# [v0.20.1](https://github.com/c4spar/deno-cliffy/compare/v0.20.0...v0.20.1) (Nov 1, 2021)
+
+### Code Refactoring
+
+* **command:** preparation for the new typescript option --useUnknownInCatchVariables (#294) ([864e915](https://github.com/c4spar/deno-cliffy/commit/864e915))
+
+### Chore
+
+* **upgrade:** deno/std v0.113.0 (#295) ([8d1664a](https://github.com/c4spar/deno-cliffy/commit/8d1664a))
+
+
+
 # [v0.20.0](https://github.com/c4spar/deno-cliffy/compare/v0.19.6...v0.20.0) (Oct 23, 2021)
 
 ### Features
@@ -30,44 +42,44 @@
   actions (for more informations the
   [docs](https://github.com/c4spar/deno-cliffy/tree/v0.20.0/command#option-action-handler)).
 
-# [v0.19.6](https://github.com/c4spar/deno-cli/compare/v0.19.5...v0.19.6) (2021-09-23)
+# [v0.19.6](https://github.com/c4spar/deno-cliffy/compare/v0.19.5...v0.19.6) (2021-09-23)
 
 ### Features
 
 - **command:** add noExit method (#282, #275)
-  ([bc0c5bb](https://github.com/c4spar/deno-cli/commit/bc0c5bb),
-  [ab38cc7](https://github.com/c4spar/deno-cli/commit/ab38cc7))
+  ([bc0c5bb](https://github.com/c4spar/deno-cliffy/commit/bc0c5bb),
+  [ab38cc7](https://github.com/c4spar/deno-cliffy/commit/ab38cc7))
 - **command:** show long help with --help option (#281)
-  ([e577f5a](https://github.com/c4spar/deno-cli/commit/e577f5a))
+  ([e577f5a](https://github.com/c4spar/deno-cliffy/commit/e577f5a))
 - **command:** add usage method (#280)
-  ([a32755d](https://github.com/c4spar/deno-cli/commit/a32755d))
+  ([a32755d](https://github.com/c4spar/deno-cliffy/commit/a32755d))
 
 ### Bug Fixes
 
 - **prompt:** key symbols in prompt info are hardcoded (#274)
-  ([a6138b2](https://github.com/c4spar/deno-cli/commit/a6138b2))
+  ([a6138b2](https://github.com/c4spar/deno-cliffy/commit/a6138b2))
 
 ### Documentation Updates
 
 - fix typos (#279)
-  ([d802a15](https://github.com/c4spar/deno-cli/commit/d802a15))
+  ([d802a15](https://github.com/c4spar/deno-cliffy/commit/d802a15))
 - **command:** fix incorrectly import module (#276)
-  ([6674ea3](https://github.com/c4spar/deno-cli/commit/6674ea3))
+  ([6674ea3](https://github.com/c4spar/deno-cliffy/commit/6674ea3))
 - **command:** fix import path (#271)
-  ([57e7434](https://github.com/c4spar/deno-cli/commit/57e7434))
+  ([57e7434](https://github.com/c4spar/deno-cliffy/commit/57e7434))
 
-# [v0.19.5](https://github.com/c4spar/deno-cli/compare/v0.19.4...v0.19.5) (2021-08-12)
+# [v0.19.5](https://github.com/c4spar/deno-cliffy/compare/v0.19.4...v0.19.5) (2021-08-12)
 
 ### Features
 
 - **command:** support import map in upgrade command (#265)
-  ([b400131](https://github.com/c4spar/deno-cli/commit/b400131))
+  ([b400131](https://github.com/c4spar/deno-cliffy/commit/b400131))
 - **command:** add support for required env vars (#261)
-  ([ee69526](https://github.com/c4spar/deno-cli/commit/ee69526))
+  ([ee69526](https://github.com/c4spar/deno-cliffy/commit/ee69526))
 - **command:** make parsed environment variables available via command options
-  (#263) ([102161e](https://github.com/c4spar/deno-cli/commit/102161e))
+  (#263) ([102161e](https://github.com/c4spar/deno-cliffy/commit/102161e))
 - **command:** add prefix to environment variable options (#268)
-  ([44c80c8](https://github.com/c4spar/deno-cli/commit/44c80c8))
+  ([44c80c8](https://github.com/c4spar/deno-cliffy/commit/44c80c8))
 
 ```ts
 await new Command<void>()
@@ -94,40 +106,40 @@ bar.txt
 ### Bug Fixes
 
 - **command:** output of --version should end with a new line (#256)
-  ([8107875](https://github.com/c4spar/deno-cli/commit/8107875))
+  ([8107875](https://github.com/c4spar/deno-cliffy/commit/8107875))
 
 ### Code Refactoring
 
 - **command:** refactor executable sub-commands (#259)
-  ([a13c79f](https://github.com/c4spar/deno-cli/commit/a13c79f))
+  ([a13c79f](https://github.com/c4spar/deno-cliffy/commit/a13c79f))
 - **command:** remove extra new line from getHelp() and completion generator
-  methods (#257) ([99ccc2a](https://github.com/c4spar/deno-cli/commit/99ccc2a))
+  methods (#257) ([99ccc2a](https://github.com/c4spar/deno-cliffy/commit/99ccc2a))
 - **table:** use console.log to render output (#258)
-  ([4f05fad](https://github.com/c4spar/deno-cli/commit/4f05fad))
+  ([4f05fad](https://github.com/c4spar/deno-cliffy/commit/4f05fad))
 
 ### Chore
 
 - **ci:** update release workflow
-  ([65ba62a](https://github.com/c4spar/deno-cli/commit/65ba62a),
-  [1c6dc9d](https://github.com/c4spar/deno-cli/commit/1c6dc9d))
+  ([65ba62a](https://github.com/c4spar/deno-cliffy/commit/65ba62a),
+  [1c6dc9d](https://github.com/c4spar/deno-cliffy/commit/1c6dc9d))
 - **ci:** add codecov config (#267)
-  ([c54627a](https://github.com/c4spar/deno-cli/commit/c54627a))
+  ([c54627a](https://github.com/c4spar/deno-cliffy/commit/c54627a))
 - **codecov:** upgrade to codecov/codecov-action@v2 (#266)
-  ([18c023c](https://github.com/c4spar/deno-cli/commit/18c023c))
+  ([18c023c](https://github.com/c4spar/deno-cliffy/commit/18c023c))
 - **upgrade:** deno/std v0.104.0 (#270)
-  ([15af5bf](https://github.com/c4spar/deno-cli/commit/15af5bf))
+  ([15af5bf](https://github.com/c4spar/deno-cliffy/commit/15af5bf))
 
 ### Documentation Updates
 
 - update readme's (#269)
-  ([83644f9](https://github.com/c4spar/deno-cli/commit/83644f9))
+  ([83644f9](https://github.com/c4spar/deno-cliffy/commit/83644f9))
 - **command:** update docs for environment variables
-  ([f4cee28](https://github.com/c4spar/deno-cli/commit/f4cee28),
-  [9d025fc](https://github.com/c4spar/deno-cli/commit/9d025fc))
+  ([f4cee28](https://github.com/c4spar/deno-cliffy/commit/f4cee28),
+  [9d025fc](https://github.com/c4spar/deno-cliffy/commit/9d025fc))
 - **command:** fix incorrectly import module in example (#262)
-  ([3e62ad6](https://github.com/c4spar/deno-cli/commit/3e62ad6))
+  ([3e62ad6](https://github.com/c4spar/deno-cliffy/commit/3e62ad6))
 - **command:** update docs for executable sub commands
-  ([0b2f3d1](https://github.com/c4spar/deno-cli/commit/0b2f3d1))
+  ([0b2f3d1](https://github.com/c4spar/deno-cliffy/commit/0b2f3d1))
 
 # [v0.19.4](https://github.com/c4spar/deno-cliffy/compare/v0.19.3...v0.19.4) (2021-07-27)
 
