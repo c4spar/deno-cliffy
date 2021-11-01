@@ -2,13 +2,14 @@
 
 ### Code Refactoring
 
-* **command:** preparation for the new typescript option --useUnknownInCatchVariables (#294) ([864e915](https://github.com/c4spar/deno-cliffy/commit/864e915))
+- **command:** preparation for the new typescript option
+  --useUnknownInCatchVariables (#294)
+  ([864e915](https://github.com/c4spar/deno-cliffy/commit/864e915))
 
 ### Chore
 
-* **upgrade:** deno/std v0.113.0 (#295) ([8d1664a](https://github.com/c4spar/deno-cliffy/commit/8d1664a))
-
-
+- **upgrade:** deno/std v0.113.0 (#295)
+  ([8d1664a](https://github.com/c4spar/deno-cliffy/commit/8d1664a))
 
 # [v0.20.0](https://github.com/c4spar/deno-cliffy/compare/v0.19.6...v0.20.0) (Oct 23, 2021)
 
@@ -113,7 +114,8 @@ bar.txt
 - **command:** refactor executable sub-commands (#259)
   ([a13c79f](https://github.com/c4spar/deno-cliffy/commit/a13c79f))
 - **command:** remove extra new line from getHelp() and completion generator
-  methods (#257) ([99ccc2a](https://github.com/c4spar/deno-cliffy/commit/99ccc2a))
+  methods (#257)
+  ([99ccc2a](https://github.com/c4spar/deno-cliffy/commit/99ccc2a))
 - **table:** use console.log to render output (#258)
   ([4f05fad](https://github.com/c4spar/deno-cliffy/commit/4f05fad))
 
