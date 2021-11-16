@@ -87,11 +87,14 @@ export class HelpGenerator {
 
   private generateMeta(): string {
     const meta = this.cmd.getMeta();
-    if (!meta.length) {
+    if (!meta.size) {
       return "";
     }
 
-    const rows = meta.map(({ name, value }) => [bold(`${name}: `) + value]);
+    const rows = [];
+    for (const [name, value] of meta.entries()) {
+      rows.push([bold(`${name}: `) + value]);
+    }
 
     return "\n" +
       Table.from(rows)
