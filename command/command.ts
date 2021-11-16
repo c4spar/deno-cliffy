@@ -135,6 +135,7 @@ export class Command<
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
+  private _meta = new Map<string, string>();
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -416,6 +417,15 @@ export class Command<
       this.cmd.ver = version;
     }
     return this;
+  }
+
+  public meta(name: string, value: string): this {
+    this.cmd._meta.set(name, value);
+    return this;
+  }
+
+  public getMeta(): Map<string, string> {
+    return this._meta;
   }
 
   /**

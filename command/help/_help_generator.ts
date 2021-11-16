@@ -52,6 +52,7 @@ export class HelpGenerator {
     const areColorsEnabled = getColorEnabled();
     setColorEnabled(this.options.colors);
     const result = this.generateHeader() +
+      this.generateMeta() +
       this.generateDescription() +
       this.generateOptions() +
       this.generateCommands() +
@@ -76,6 +77,22 @@ export class HelpGenerator {
     if (version) {
       rows.push([bold("Version:"), yellow(`${this.cmd.getVersion()}`)]);
     }
+    return "\n" +
+      Table.from(rows)
+        .indent(this.indent)
+        .padding(1)
+        .toString() +
+      "\n";
+  }
+
+  private generateMeta(): string {
+    const meta = this.cmd.getMeta();
+    if (!meta.length) {
+      return "";
+    }
+
+    const rows = meta.map(({ name, value }) => [bold(`${name}: `) + value]);
+
     return "\n" +
       Table.from(rows)
         .indent(this.indent)

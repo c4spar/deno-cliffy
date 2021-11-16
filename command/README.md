@@ -83,6 +83,7 @@
 - [Environment variables](#-environment-variables)
 - [Add examples](#-add-examples)
 - [Auto generated help](#-auto-generated-help)
+  - [Additional info](#additional-info)
   - [Customize help](#customize-help)
   - [Help option](#help-option)
   - [Help command](#help-command)
@@ -797,10 +798,9 @@ the top of the auto generated help which defaults to the command arguments.
 ### Arguments
 
 You can use the `.arguments()` method to specify the arguments for the top-level
-and for sub-commands. For sub-commands they can also be included in the
-`.command()` method. Angled brackets (e.g. `<required>`) indicate required input
-and square brackets (e.g. `[optional]`) indicate optional input. A required
-input cannot be defined after an optional input.
+and for sub-commands. Angled brackets (e.g. `<required>`) indicate required
+input and square brackets (e.g. `[optional]`) indicate optional input. A
+required input cannot be defined after an optional input.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1285,6 +1285,38 @@ $ deno run https://deno.land/x/cliffy/examples/command/help_option_and_command.t
 
 ![](assets/img/help.gif)
 
+### Additional info
+
+You can add some additional information to the help text with the
+`.meta(name, value)` method.
+
+```ts
+new Command()
+  .name("example")
+  .version("1.0.0")
+  .description("Example command.")
+  .meta("deno", Deno.version.deno)
+  .meta("v8", Deno.version.v8)
+  .meta("typescript", Deno.version.typescript)
+  .parse();
+```
+
+The additional information is displayed below the command version and above the
+description.
+
+```console
+  Usage:   example
+  Version: 0.1.0
+
+  deno: 1.16.1
+  v8: 9.7.106.2
+  typescript: 4.4.2
+
+  Description:
+
+    Example command.
+```
+
 ### Customize help
 
 Customize default help with the `.help()` method.
@@ -1330,9 +1362,9 @@ The `--help` and `-h` option flag prints the auto generated help.
 #### Customize help option
 
 The help option is completely customizable with the `.helpOption()` method. The
-first argument are the flags followed by the description. The third argument can
-be an action handler or an options object. The second and third argument's are
-optional.
+first argument is a string with the flags followed by the description. The third
+argument can be an action handler or an options object. The second and third
+arguments are optional.
 
 ```typescript
 await new Command()
