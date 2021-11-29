@@ -2,7 +2,7 @@ import { dirname } from "../../../dev_deps.ts";
 
 export const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
 
-export async function runCommand(cmd: Array<string>): Promise<string> {
+export async function runCommand(args: Array<string>): Promise<string> {
   const process = Deno.run({
     stdout: "piped",
     cmd: [
@@ -11,12 +11,19 @@ export async function runCommand(cmd: Array<string>): Promise<string> {
       "--unstable",
       "--allow-all",
       `${baseDir}/command.ts`,
-      ...cmd,
+      ...args,
     ],
   });
 
-  const output = await process.output();
+  const [status, output] = await Promise.all([
+    process.status(),
+    process.output(),
+  ]);
   process.close();
+
+  if (!status.success) {
+    throw new Error("test command failed");
+  }
 
   return new TextDecoder().decode(output);
 }
