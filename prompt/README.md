@@ -81,6 +81,9 @@ import { prompt } from "https://raw.githubusercontent.com/c4spar/deno-cliffy/<ve
 
 ## ❯ Usage
 
+> ⚠️ This module requires the `--unstable` flag because of the use of
+> `Deno.setRaw`.
+
 ### Single Prompt
 
 Each prompt type is usable as standalone module and can be imported directly
