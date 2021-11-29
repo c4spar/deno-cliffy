@@ -1,6 +1,5 @@
-import { assertEquals, dirname, expandGlob } from "../../../dev_deps.ts";
-
-const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
+import { assertEquals, expandGlob } from "../../../dev_deps.ts";
+import { baseDir, runCommand } from "./utils.ts";
 
 for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
   if (file.isFile) {
@@ -19,23 +18,4 @@ for await (const file of expandGlob(`${baseDir}/fixtures/*.in`)) {
       },
     });
   }
-}
-
-async function runCommand(cmd: Array<string>): Promise<string> {
-  const process = Deno.run({
-    stdout: "piped",
-    cmd: [
-      "deno",
-      "run",
-      "--unstable",
-      "--allow-all",
-      `${baseDir}/command.ts`,
-      ...cmd,
-    ],
-  });
-
-  const output = await process.output();
-  process.close();
-
-  return new TextDecoder().decode(output);
 }
