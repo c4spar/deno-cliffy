@@ -5,7 +5,16 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { blue, bold, dim, stripColor, underline } from "./deps.ts";
+import {
+  blue,
+  bold,
+  dim,
+  dirname,
+  join,
+  normalize,
+  stripColor,
+  underline,
+} from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
@@ -24,12 +33,23 @@ export interface GenericSuggestionsKeys extends GenericInputKeys {
   previousPage?: string[];
 }
 
+export type SuggestionHandler = (
+  input: string,
+) => Array<string | number> | Promise<Array<string | number>>;
+
+export type CompleteHandler = (
+  input: string,
+  suggestion: string,
+) => Promise<string> | string;
+
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<T, V>
   extends GenericInputPromptOptions<T, V> {
   keys?: GenericSuggestionsKeys;
   id?: string;
-  suggestions?: Array<string | number>;
+  suggestions?: Array<string | number> | SuggestionHandler;
+  complete?: CompleteHandler;
+  fileMode?: boolean;
   list?: boolean;
   info?: boolean;
   listPointer?: string;
@@ -41,12 +61,16 @@ export interface GenericSuggestionsSettings<T, V>
   extends GenericInputPromptSettings<T, V> {
   keys?: GenericSuggestionsKeys;
   id?: string;
-  suggestions?: Array<string | number>;
+  suggestions?: Array<string | number> | SuggestionHandler;
+  complete?: CompleteHandler;
+  fileMode?: boolean;
   list?: boolean;
   info?: boolean;
   listPointer: string;
   maxRows: number;
 }
+
+const sep = Deno.build.os === "windows" ? "\\" : "/";
 
 /** Generic input prompt representation. */
 export abstract class GenericSuggestions<
@@ -57,6 +81,7 @@ export abstract class GenericSuggestions<
   protected suggestionsIndex = -1;
   protected suggestionsOffset = 0;
   protected suggestions: Array<string | number> = [];
+  #hasReadPermissions?: boolean;
 
   /**
    * Prompt constructor.
@@ -74,13 +99,6 @@ export abstract class GenericSuggestions<
         ...(settings.keys ?? {}),
       },
     });
-    const suggestions: Array<string | number> = this.loadSuggestions();
-    if (suggestions.length || this.settings.suggestions) {
-      this.settings.suggestions = [
-        ...suggestions,
-        ...this.settings.suggestions ?? [],
-      ].filter(uniqueSuggestions);
-    }
   }
 
   protected get localStorage(): LocalStorage | null {
@@ -120,30 +138,18 @@ export abstract class GenericSuggestions<
     }
   }
 
-  protected render(): Promise<void> {
-    this.match();
+  protected async render(): Promise<void> {
+    if (this.settings.fileMode && this.#hasReadPermissions === undefined) {
+      const status = await Deno.permissions.request({ name: "read" });
+      // disable fileMode if read permissions are denied.
+      this.#hasReadPermissions = status.state === "granted";
+    }
+    await this.match();
     return super.render();
   }
 
-  protected match(): void {
-    if (!this.settings.suggestions?.length) {
-      return;
-    }
-    const input: string = this.getCurrentInputValue().toLowerCase();
-    if (!input.length) {
-      this.suggestions = this.settings.suggestions.slice();
-    } else {
-      this.suggestions = this.settings.suggestions
-        .filter((value: string | number) =>
-          stripColor(value.toString())
-            .toLowerCase()
-            .startsWith(input)
-        )
-        .sort((a: string | number, b: string | number) =>
-          distance((a || a).toString(), input) -
-          distance((b || b).toString(), input)
-        );
-    }
+  protected async match(): Promise<void> {
+    this.suggestions = await this.getSuggestions();
     this.suggestionsIndex = Math.max(
       this.getCurrentInputValue().trim().length === 0 ? -1 : 0,
       Math.min(this.suggestions.length - 1, this.suggestionsIndex),
@@ -168,6 +174,56 @@ export abstract class GenericSuggestions<
       ) ?? "";
   }
 
+  protected async getUserSuggestions(
+    input: string,
+  ): Promise<Array<string | number>> {
+    return typeof this.settings.suggestions === "function"
+      ? await this.settings.suggestions(input)
+      : this.settings.suggestions ?? [];
+  }
+
+  #isFileModeEnabled(): boolean {
+    return this.settings.fileMode === true && this.#hasReadPermissions === true;
+  }
+
+  protected async getFileSuggestions(
+    input: string,
+  ): Promise<Array<string | number>> {
+    if (!this.#isFileModeEnabled()) {
+      return [];
+    }
+
+    const path = await Deno.stat(input)
+      .then((file) => file.isDirectory ? input : dirname(input))
+      .catch(() => dirname(input));
+
+    return await listDir(path);
+  }
+
+  protected async getSuggestions(): Promise<Array<string | number>> {
+    const input = this.getCurrentInputValue().toLowerCase();
+    const suggestions = [
+      ...this.loadSuggestions(),
+      ...await this.getUserSuggestions(input),
+      ...await this.getFileSuggestions(input),
+    ].filter(uniqueSuggestions);
+
+    if (!input.length) {
+      return suggestions;
+    }
+
+    return suggestions
+      .filter((value: string | number) =>
+        stripColor(value.toString())
+          .toLowerCase()
+          .startsWith(input)
+      )
+      .sort((a: string | number, b: string | number) =>
+        distance((a || a).toString(), input) -
+        distance((b || b).toString(), input)
+      );
+  }
+
   protected body(): string | Promise<string> {
     return this.getList() + this.getInfo();
   }
@@ -180,7 +236,7 @@ export abstract class GenericSuggestions<
     const matched: number = this.suggestions.length;
     const actions: Array<[string, Array<string>]> = [];
 
-    if (this.settings.suggestions?.length) {
+    if (this.suggestions.length) {
       if (this.settings.list) {
         actions.push(
           ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
@@ -206,7 +262,7 @@ export abstract class GenericSuggestions<
     );
 
     let info = this.settings.indent;
-    if (this.settings.suggestions?.length) {
+    if (this.suggestions.length) {
       info += blue(Figures.INFO) + bold(` ${selected}/${matched} `);
     }
     info += actions
@@ -217,7 +273,7 @@ export abstract class GenericSuggestions<
   }
 
   protected getList(): string {
-    if (!this.settings.suggestions?.length || !this.settings.list) {
+    if (!this.suggestions.length || !this.settings.list) {
       return "";
     }
     const list: Array<string> = [];
@@ -304,13 +360,13 @@ export abstract class GenericSuggestions<
         }
         break;
       case this.isKey(this.settings.keys, "complete", event):
-        this.complete();
+        await this.#completeValue();
         break;
       case this.isKey(this.settings.keys, "moveCursorRight", event):
         if (this.inputIndex < this.inputValue.length) {
           this.moveCursorRight();
         } else {
-          this.complete();
+          await this.#completeValue();
         }
         break;
       default:
@@ -329,18 +385,44 @@ export abstract class GenericSuggestions<
     }
   }
 
-  protected complete(): void {
-    if (this.suggestions.length && this.suggestions[this.suggestionsIndex]) {
-      this.inputValue = this.suggestions[this.suggestionsIndex].toString();
-      this.inputIndex = this.inputValue.length;
-      this.suggestionsIndex = 0;
-      this.suggestionsOffset = 0;
+  async #completeValue() {
+    this.inputValue = await this.complete();
+    this.inputIndex = this.inputValue.length;
+    this.suggestionsIndex = 0;
+    this.suggestionsOffset = 0;
+  }
+
+  protected async complete(): Promise<string> {
+    let input: string = this.getCurrentInputValue();
+
+    if (!input.length) {
+      return input;
     }
+    const suggestion: string | undefined = this
+      .suggestions[this.suggestionsIndex]?.toString();
+
+    if (suggestion && this.settings.complete) {
+      input = await this.settings.complete(input, suggestion);
+    } else if (
+      this.#isFileModeEnabled() &&
+      input.at(-1) !== sep &&
+      await isDirectory(input) &&
+      (
+        this.getCurrentInputValue().at(-1) !== "." ||
+        this.getCurrentInputValue().endsWith("..")
+      )
+    ) {
+      input += sep;
+    } else if (suggestion) {
+      input = suggestion;
+    }
+
+    return this.#isFileModeEnabled() ? normalize(input) : input;
   }
 
   /** Select previous suggestion. */
   protected selectPreviousSuggestion(): void {
-    if (this.suggestions?.length) {
+    if (this.suggestions.length) {
       if (this.suggestionsIndex > -1) {
         this.suggestionsIndex--;
         if (this.suggestionsIndex < this.suggestionsOffset) {
@@ -352,7 +434,7 @@ export abstract class GenericSuggestions<
 
   /** Select next suggestion. */
   protected selectNextSuggestion(): void {
-    if (this.suggestions?.length) {
+    if (this.suggestions.length) {
       if (this.suggestionsIndex < this.suggestions.length - 1) {
         this.suggestionsIndex++;
         if (
@@ -367,7 +449,7 @@ export abstract class GenericSuggestions<
 
   /** Select previous suggestions page. */
   protected selectPreviousSuggestionsPage(): void {
-    if (this.suggestions?.length) {
+    if (this.suggestions.length) {
       const height: number = this.getListHeight();
       if (this.suggestionsOffset >= height) {
         this.suggestionsIndex -= height;
@@ -381,7 +463,7 @@ export abstract class GenericSuggestions<
 
   /** Select next suggestions page. */
   protected selectNextSuggestionsPage(): void {
-    if (this.suggestions?.length) {
+    if (this.suggestions.length) {
       const height: number = this.getListHeight();
       if (this.suggestionsOffset + height + height < this.suggestions.length) {
         this.suggestionsIndex += height;
@@ -402,4 +484,18 @@ function uniqueSuggestions(
 ) {
   return typeof value !== "undefined" && value !== "" &&
     self.indexOf(value) === index;
+}
+
+function isDirectory(path: string): Promise<boolean> {
+  return Deno.stat(path)
+    .then((file) => file.isDirectory)
+    .catch(() => false);
+}
+
+async function listDir(path: string): Promise<Array<string>> {
+  const fileNames: string[] = [];
+  for await (const file of Deno.readDir(path || ".")) {
+    fileNames.push(join(path, file.name));
+  }
+  return fileNames;
 }

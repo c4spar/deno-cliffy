@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, underline, yellow } from "./deps.ts";
+import { blue, dim, normalize, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** List key options. */
@@ -68,6 +68,10 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     const tags: string[] = this.getTags(oldInput);
     const separator: string = this.settings.separator + " ";
 
+    if (this.settings.fileMode && tags.length > 1) {
+      tags[tags.length - 2] = normalize(tags[tags.length - 2]);
+    }
+
     this.inputValue = tags.join(separator);
 
     const diff = oldInput.length - this.inputValue.length;
@@ -99,7 +103,15 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
   /** Get input value. */
   protected getValue(): string {
     // Remove trailing comma and spaces.
-    return this.inputValue.replace(/,+\s*$/, "");
+    const input = this.inputValue.replace(/,+\s*$/, "");
+
+    if (!this.settings.fileMode) {
+      return input;
+    }
+
+    return this.getTags(input)
+      .map(normalize)
+      .join(this.settings.separator + " ");
   }
 
   protected getCurrentInputValue(): string {
@@ -132,15 +144,10 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     super.deleteChar();
   }
 
-  protected complete(): void {
-    if (this.suggestions.length && this.suggestions[this.suggestionsIndex]) {
-      const tags = this.getTags().slice(0, -1);
-      tags.push(this.suggestions[this.suggestionsIndex].toString());
-      this.inputValue = tags.join(this.settings.separator + " ");
-      this.inputIndex = this.inputValue.length;
-      this.suggestionsIndex = 0;
-      this.suggestionsOffset = 0;
-    }
+  protected async complete(): Promise<string> {
+    const tags = this.getTags().slice(0, -1);
+    tags.push(await super.complete());
+    return tags.join(this.settings.separator + " ");
   }
 
   /**
