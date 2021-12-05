@@ -6,7 +6,8 @@ export {
   assertThrows,
   assertThrowsAsync,
 } from "https://deno.land/std@0.113.0/testing/asserts.ts";
-export { runBenchmarks } from "https://deno.land/std@0.113.0/testing/bench.ts";
+export { bench, runBenchmarks } from "https://deno.land/std@0.113.0/testing/bench.ts";
+export type { BenchmarkTimer } from "https://deno.land/std@0.113.0/testing/bench.ts";
 export {
   bold,
   red,

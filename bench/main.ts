@@ -24,9 +24,7 @@ if (import.meta.main) {
   const outputFile: string | undefined = Deno.args[0];
   const commit = Deno.args[1];
   const timestamp = Date.now();
-  await runBenchmarks({
-    silent: false,
-  }, async (progress) => {
+  await runBenchmarks({}, async (progress) => {
     if (progress.state === "benchmarking_end") {
       const json: string | undefined = outputFile &&
           await Deno.readTextFile(outputFile).catch(() => undefined) ||

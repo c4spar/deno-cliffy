@@ -31,13 +31,14 @@ jobs:
         run: |
           pwd
           ls -la
+          ls -la benchmark_data
           git fetch --tags
           for tag in $(git tag); do
             git checkout $tag
             deno run \
               --no-check \
-              --allow-read benchmark_data/bench.json \
-              --allow-write benchmark_data/bench.json \
+              --allow-read=benchmark_data/bench.json \
+              --allow-write=benchmark_data/bench.json \
               bench/main.ts \
               benchmark_data/bench.json ${tag} || echo "Benchmark for ${tag} failed!"
           done
@@ -55,9 +56,10 @@ jobs:
       - name: Post benchmarks
         run: |
           cd benchmark_data
-          git config user.email "c4spar@gmx.de"
-          git config user.name "cliffy-bot"
-          git add .
-          git commit --message "chore(bench): update benchmarks"
-          git push origin main
+          cat bench.json
+#          git config user.email "c4spar@gmx.de"
+#          git config user.name "cliffy-bot"
+#          git add .
+#          git commit --message "chore(bench): update benchmarks"
+#          git push origin main
 

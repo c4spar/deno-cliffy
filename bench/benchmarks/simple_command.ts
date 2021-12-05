@@ -1,7 +1,4 @@
-import {
-  bench,
-  BenchmarkTimer,
-} from "https://deno.land/std@0.101.0/testing/bench.ts";
+import { bench, BenchmarkTimer } from "../../dev_deps.ts";
 import { Command } from "../../command/command.ts";
 import { benchConfig } from "../config.ts";
 
