@@ -48,10 +48,10 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          git_hash=$(git rev-parse --short "$GITHUB_SHA") &&
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
           deno run \
-            --allow-read benchmark_data/bench.json \
-            --allow-write benchmark_data/bench.json \
+            --allow-read=benchmark_data/bench.json \
+            --allow-write=benchmark_data/bench.json \
             bench/main.ts \
             benchmark_data/bench.json ${git_hash}
 
