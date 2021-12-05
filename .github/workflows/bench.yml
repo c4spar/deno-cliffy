@@ -29,6 +29,7 @@ jobs:
           git clone --depth 1 --branch main \
               https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmarks.git \
               benchmark_data
+          rm -f benchmark_data/bench.json
 
       - name: Run benchmarks (tags)
         run: |
