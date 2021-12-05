@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - bench
+    tags:
+      - 'v*.*.*'
 
 jobs:
   bench:
@@ -28,7 +30,7 @@ jobs:
               https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmarks.git \
               benchmark_data
 
-      - name: Init benchmarks
+      - name: Run benchmarks (tags)
         run: |
           if ! test -f benchmark_data/bench.json; then
             git fetch --tags
@@ -48,22 +50,33 @@ jobs:
             echo bench.json already exists!
           fi
 
-      - name: Run benchmarks
+      - name: Run benchmarks (tag)
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
-          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          release_version=${GITHUB_REF#refs/*/}
           deno run \
             --allow-read=benchmark_data/bench.json \
             --allow-write=benchmark_data/bench.json \
             bench/main.ts \
-            benchmark_data/bench.json ${git_hash}
+            benchmark_data/bench.json ${release_version}
+
+      - name: Run benchmarks (rev)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          rev=$(git rev-parse --short "$GITHUB_SHA")
+          deno run \
+            --allow-read=benchmark_data/bench.json \
+            --allow-write=benchmark_data/bench.json \
+            bench/main.ts \
+            benchmark_data/dev_bench.json ${rev}
 
       - name: Post benchmarks
         run: |
           cd benchmark_data
-          cat bench.json
-#          git config user.email "c4spar@gmx.de"
-#          git config user.name "cliffy-bot"
-#          git add .
-#          git commit --message "chore(bench): update benchmarks"
-#          git push origin main
+          git checkout -b test
+          git config user.email "c4spar@gmx.de"
+          git config user.name "cliffy-bot"
+          git add .
+          git commit --message "chore(bench): update benchmarks"
+          git push origin test
 
