@@ -24,7 +24,7 @@ jobs:
           CLIFFY_BOT_PAT: ${{ secrets.CLIFFY_BOT_PAT }}
         run: |
           git clone --depth 1 --branch main \
-              https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmark.git \
+              https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmarks.git \
               benchmark_data
 
       - name: Run old benchmarks
