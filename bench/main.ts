@@ -1,4 +1,4 @@
-import { runBenchmarks } from "../dev_deps.ts";
+import { runBenchmarks } from "./bench_deps.ts";
 
 import "./benchmarks/simple_command.ts";
 import "./benchmarks/complex_command.ts";

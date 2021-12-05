@@ -1,4 +1,4 @@
-import { bench, BenchmarkTimer } from "../../dev_deps.ts";
+import { bench, BenchmarkTimer } from "../bench_deps.ts";
 import { Command } from "../../command/command.ts";
 import { benchConfig } from "../config.ts";
 
