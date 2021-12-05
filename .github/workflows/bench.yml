@@ -29,6 +29,7 @@ jobs:
 
       - name: Run old benchmarks
         run: |
+          ls -la
           git fetch --tags
           for tag in $(git tag); do
             git checkout $tag
@@ -37,7 +38,7 @@ jobs:
               --allow-read benchmark_data/bench.json \
               --allow-write benchmark_data/bench.json \
               bench/main.ts \
-              benchmark_data/bench.json ${tag} || echo "${tag} failed!"
+              benchmark_data/bench.json ${tag} || echo "Benchmark for ${tag} failed!"
           done
           git checkout main
 
