@@ -1,0 +1,60 @@
+name: Bench
+
+on:
+  push:
+    branches:
+      - main
+      - bench
+
+jobs:
+  bench:
+    name: Bench
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Pre benchmarks
+        env:
+          CLIFFY_BOT_PAT: ${{ secrets.CLIFFY_BOT_PAT }}
+        run: |
+          git clone --depth 1 --branch main \
+              https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmark.git \
+              benchmark_data
+
+      - name: Run old benchmarks
+        run: |
+          for tag in $(git tag); do
+            git checkout $tag
+            deno run \
+              --no-check \
+              --allow-read benchmark_data/bench.json \
+              --allow-write benchmark_data/bench.json \
+              bench/main.ts \
+              benchmark_data/bench.json ${tag}
+          done
+          git checkout main
+
+      - name: Run benchmarks
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA") &&
+          deno run \
+            --allow-read benchmark_data/bench.json \
+            --allow-write benchmark_data/bench.json \
+            bench/main.ts \
+            benchmark_data/bench.json ${git_hash}
+
+      - name: Post benchmarks
+        run: |
+          cd benchmark_data
+          git config user.email "c4spar@gmx.de"
+          git config user.name "cliffy-bot"
+          git add .
+          git commit --message "chore(bench): update benchmarks"
+          git push origin main
+
