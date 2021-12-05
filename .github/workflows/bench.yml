@@ -29,6 +29,7 @@ jobs:
 
       - name: Run old benchmarks
         run: |
+          git fetch --tags
           for tag in $(git tag); do
             git checkout $tag
             deno run \
