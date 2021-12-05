@@ -7,6 +7,9 @@ interface BenchResult {
   totalMs: number;
   runsCount: number;
   measuredRunsAvgMs: number;
+  commit: string;
+  timestamp: number;
+  version: typeof Deno.version
 }
 
 interface TestData {
@@ -41,12 +44,13 @@ if (import.meta.main) {
           moduleName = "default";
         }
 
-        const entry = {
+        const entry: BenchResult = {
           totalMs: result.totalMs,
           runsCount: result.runsCount,
           measuredRunsAvgMs: result.measuredRunsAvgMs,
           commit,
           timestamp,
+          version: Deno.version,
         };
 
         if (outputFile && result.name !== "warmup") {
