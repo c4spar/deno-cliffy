@@ -29,7 +29,7 @@ jobs:
               benchmark_data
 
       - name: Init benchmarks
-        if: ${{ [ ! -f benchmark_data/bench.json ] }}
+        if: ${{ ! test -f benchmark_data/bench.json }}
         run: |
           git fetch --tags
           cp -r bench bench_tmp
