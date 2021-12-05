@@ -37,7 +37,7 @@ jobs:
               --allow-read benchmark_data/bench.json \
               --allow-write benchmark_data/bench.json \
               bench/main.ts \
-              benchmark_data/bench.json ${tag}
+              benchmark_data/bench.json ${tag} || "${tag} failed!"
           done
           git checkout main
 
