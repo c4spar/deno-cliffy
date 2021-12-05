@@ -65,8 +65,8 @@ jobs:
         run: |
           rev=$(git rev-parse --short "$GITHUB_SHA")
           deno run \
-            --allow-read=benchmark_data/bench.json \
-            --allow-write=benchmark_data/bench.json \
+            --allow-read=benchmark_data/dev_bench.json \
+            --allow-write=benchmark_data/dev_bench.json \
             bench/main.ts \
             benchmark_data/dev_bench.json ${rev}
 
