@@ -44,7 +44,7 @@ jobs:
               benchmark_data/bench.json ${tag} || echo "Benchmark for ${tag} failed!"
           done
           rm -rf bench_tmp
-          git checkout main
+          git checkout $GITHUB_SHA
 
       - name: Run benchmarks
         run: |
