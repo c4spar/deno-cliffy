@@ -58,10 +58,11 @@ jobs:
       - name: Post benchmarks
         run: |
           cd benchmark_data
-          cat bench.json
-#          git config user.email "c4spar@gmx.de"
-#          git config user.name "cliffy-bot"
-#          git add .
-#          git commit --message "chore(bench): update benchmarks"
+          git checkout -b test
+          git config user.email "c4spar@gmx.de"
+          git config user.name "cliffy-bot"
+          git add .
+          git commit --message "chore(bench): update benchmarks"
+          git push origin test
 #          git push origin main
 
