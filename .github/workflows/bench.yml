@@ -10,6 +10,7 @@ jobs:
   bench:
     name: Bench
     runs-on: ubuntu-latest
+    if: github.repository == 'c4spar/deno-cliffy'
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -27,8 +28,8 @@ jobs:
               https://${CLIFFY_BOT_PAT}@github.com/c4spar/cliffy-benchmarks.git \
               benchmark_data
 
-      - name: Run old benchmarks
-        if: ${{ !test -f benchmark_data/bench.json }}
+      - name: Init benchmarks
+        if: ${{ test -f benchmark_data/bench.json && "false" || "true" }} == "true"
         run: |
           git fetch --tags
           cp -r bench bench_tmp
