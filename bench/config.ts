@@ -1,3 +1,3 @@
 export const benchConfig = {
-  runs: 100,
+  runs: 10000,
 };
