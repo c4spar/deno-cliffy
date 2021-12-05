@@ -77,7 +77,7 @@ if (import.meta.main) {
       });
 
       if (outputFile) {
-        await Deno.writeTextFile(outputFile, JSON.stringify(data, null, 2), {
+        await Deno.writeTextFile(outputFile, JSON.stringify(data), {
           create: true,
         });
       } else {
