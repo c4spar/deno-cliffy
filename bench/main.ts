@@ -7,7 +7,7 @@ interface BenchResult {
   totalMs: number;
   runsCount: number;
   measuredRunsAvgMs: number;
-  commit: string;
+  rev: string;
   timestamp: number;
   version: typeof Deno.version
 }
@@ -25,7 +25,7 @@ type BenchData = Array<ModuleData>;
 
 if (import.meta.main) {
   const outputFile: string | undefined = Deno.args[0];
-  const commit = Deno.args[1];
+  const rev = Deno.args[1];
   const timestamp = Date.now();
   await runBenchmarks({}, async (progress) => {
     if (progress.state === "benchmarking_end") {
@@ -48,7 +48,7 @@ if (import.meta.main) {
           totalMs: result.totalMs,
           runsCount: result.runsCount,
           measuredRunsAvgMs: result.measuredRunsAvgMs,
-          commit,
+          rev,
           timestamp,
           version: Deno.version,
         };
