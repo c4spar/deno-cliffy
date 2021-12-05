@@ -29,21 +29,24 @@ jobs:
               benchmark_data
 
       - name: Init benchmarks
-        if: ${{ ! test -f benchmark_data/bench.json }}
         run: |
-          git fetch --tags
-          cp -r bench bench_tmp
-          for tag in $(git tag); do
-            git checkout $tag
-            deno run \
-              --no-check \
-              --allow-read=benchmark_data/bench.json \
-              --allow-write=benchmark_data/bench.json \
-              bench_tmp/main.ts \
-              benchmark_data/bench.json ${tag} || echo "Benchmark for ${tag} failed!"
-          done
-          rm -rf bench_tmp
-          git checkout $GITHUB_SHA
+          if ! test -f benchmark_data/bench.json; then
+            git fetch --tags
+            cp -r bench bench_tmp
+            for tag in $(git tag); do
+              git checkout $tag
+              deno run \
+                --no-check \
+                --allow-read=benchmark_data/bench.json \
+                --allow-write=benchmark_data/bench.json \
+                bench_tmp/main.ts \
+                benchmark_data/bench.json ${tag} || echo "Benchmark for ${tag} failed!"
+            done
+            rm -rf bench_tmp
+            git checkout $GITHUB_SHA
+          else
+            echo bench.json already exists!
+          fi
 
       - name: Run benchmarks
         run: |
