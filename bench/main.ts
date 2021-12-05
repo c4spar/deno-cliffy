@@ -1,10 +1,13 @@
 import { runBenchmarks } from "./bench_deps.ts";
 
-import "./benchmarks/simple_command.ts";
-import "./benchmarks/complex_command.ts";
+import "./benchmarks/command_simple.ts";
+import "./benchmarks/command_complex.ts";
 
-import "./benchmarks/simple_table.ts";
-import "./benchmarks/complex_table.ts";
+import "./benchmarks/flags_simple.ts";
+import "./benchmarks/flags_complex.ts";
+
+import "./benchmarks/table_simple.ts";
+import "./benchmarks/table_complex.ts";
 
 interface BenchResult {
   totalMs: number;
@@ -12,7 +15,7 @@ interface BenchResult {
   measuredRunsAvgMs: number;
   rev: string;
   timestamp: number;
-  version: typeof Deno.version
+  version: typeof Deno.version;
 }
 
 interface TestData {
