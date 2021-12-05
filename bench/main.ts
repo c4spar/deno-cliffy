@@ -3,6 +3,9 @@ import { runBenchmarks } from "./bench_deps.ts";
 import "./benchmarks/simple_command.ts";
 import "./benchmarks/complex_command.ts";
 
+import "./benchmarks/simple_table.ts";
+import "./benchmarks/complex_table.ts";
+
 interface BenchResult {
   totalMs: number;
   runsCount: number;
