@@ -790,9 +790,7 @@ export class Command<
         GT,
         PT
       >
-        & {
-          global: true;
-        }
+        & { global: true }
       | IFlagValueHandler,
   ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, P, CT, GT, PT>;
 
@@ -804,9 +802,7 @@ export class Command<
     desc: string,
     opts:
       | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>
-        & {
-          required: true;
-        }
+        & { required: true }
       | IFlagValueHandler,
   ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>;
 
