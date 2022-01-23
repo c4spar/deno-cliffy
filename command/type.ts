@@ -35,10 +35,8 @@ export abstract class Type<T> {
    * these values are also used for shell completions.
    */
   public values?(
-    // deno-lint-ignore no-explicit-any
-    cmd: Command<any, any, any, any, any>,
-    // deno-lint-ignore no-explicit-any
-    parent?: Command<any, any, any, any, any>,
+    cmd: Command,
+    parent?: Command,
   ): ValuesHandlerResult;
 
   /**
@@ -46,9 +44,7 @@ export abstract class Type<T> {
    * values from the values method are used.
    */
   public complete?(
-    // deno-lint-ignore no-explicit-any
-    cmd: Command<any, any, any, any, any>,
-    // deno-lint-ignore no-explicit-any
-    parent?: Command<any, any, any, any, any>,
+    cmd: Command,
+    parent?: Command,
   ): CompleteHandlerResult;
 }

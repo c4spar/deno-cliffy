@@ -1665,7 +1665,11 @@ await new Command<void>()
 Custom types can be used to define your generic types.
 
 ```typescript
-import { Command, NumberType } from "https://deno.land/x/cliffy/command/mod.ts";
+import {
+  Command,
+  NumberType,
+  TypeValue,
+} from "https://deno.land/x/cliffy/command/mod.ts";
 
 // Create an instance of your custom type.
 const amount = new NumberType();

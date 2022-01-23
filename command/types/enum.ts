@@ -29,6 +29,3 @@ export class EnumType<T extends string | number> extends Type<T> {
     return this.values();
   }
 }
-
-export type TypeValue<T extends Type<unknown>> = T extends Type<infer V> ? V
-  : never;

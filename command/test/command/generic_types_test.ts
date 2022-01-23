@@ -103,10 +103,10 @@ test({
 test({
   name: "command - generic types - chained command with generics",
   fn() {
-    const cmd = new Command<void, []>()
+    const cmd = new Command<void>()
       .versionOption("-V, --versionx", "")
-      .option<{ main: boolean }>("--main", "")
-      .globalOption<{ debug: boolean }>("--debug", "", {
+      .option("--main", "")
+      .globalOption("--debug", "", {
         action: (options) => {
           /** valid */
           options.debug &&
@@ -120,7 +120,7 @@ test({
             options.bar && options.barGlobal;
         },
       })
-      .option<{ logLevel: boolean }>("--log-level", "", {
+      .option("--log-level", "", {
         global: true,
         action: (options) => {
           /** valid */
@@ -145,8 +145,8 @@ test({
       });
 
     cmd.command("foo")
-      .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
-      .option<{ foo?: boolean }>("--foo", "")
+      .globalOption("--foo-global", "")
+      .option("--foo", "")
       .action((options) => {
         /** valid */
         options.debug && options.logLevel &&
@@ -159,8 +159,8 @@ test({
       });
 
     cmd.command("bar")
-      .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
-      .option<{ bar?: boolean }>("--bar", "")
+      .globalOption("--bar-global", "")
+      .option("--bar", "")
       .action((options) => {
         /** valid */
         options.debug && options.logLevel &&
@@ -178,8 +178,8 @@ test({
   name: "command - generic types - splitted command with generics",
   fn() {
     const foo = new Command<void, [], { debug?: boolean; logLevel?: boolean }>()
-      .globalOption<{ fooGlobal?: boolean }>("--foo-global", "")
-      .option<{ foo?: boolean }>("--foo", "")
+      .globalOption("--foo-global", "")
+      .option("--foo", "")
       .action((options) => {
         /** valid */
         options.debug && options.logLevel &&
@@ -194,8 +194,8 @@ test({
       })
       .command("bar-bar")
       .command("foo-foo")
-      .globalOption<{ fooFooGlobal?: boolean }>("--foo-foo-global", "")
-      .option<{ fooFoo?: boolean }>("--foo-foo", "")
+      .globalOption("--foo-foo-global", "")
+      .option("--foo-foo", "")
       .action((options) => {
         /** valid */
         options.debug && options.logLevel &&
@@ -213,8 +213,8 @@ test({
       .reset();
 
     const bar = new Command<void, [], { debug?: boolean; logLevel?: boolean }>()
-      .globalOption<{ barGlobal?: boolean }>("--bar-global", "")
-      .option<{ bar: boolean }>("--bar", "")
+      .globalOption("--bar-global", "")
+      .option("--bar", "")
       .versionOption("--versionx", "", {
         global: true,
         action(options) {
@@ -245,9 +245,9 @@ test({
 
     const _main: Command = new Command<void>()
       .arguments<[input: string, output: string]>("<input> [output]")
-      .globalOption<{ debug?: boolean }>("--debug", "")
-      .globalOption<{ logLevel?: boolean }>("--log-level", "")
-      .option<{ main?: boolean }>("--main", "")
+      .globalOption("--debug", "")
+      .globalOption("--log-level", "")
+      .option("--main", "")
       .action((options, ..._args: [input: string, output: string]) => {
         /** valid */
         options.debug && options.logLevel &&
@@ -295,7 +295,7 @@ test({
     const fooCommand = new Command<void, [], void, { main?: boolean }>();
 
     await new Command<void>()
-      .globalOption<{ main?: boolean }>("--main", "")
+      .globalOption("--main", "")
       .command("foo", fooCommand)
       .parse(Deno.args);
   },
@@ -307,7 +307,7 @@ test({
     type GlobalOptions = { main?: boolean };
 
     const foo = new Command<void>()
-      .option<{ foo?: boolean }>("-f, --foo", "");
+      .option("-f, --foo", "");
 
     const cmd = new Command<void>()
       .globalOption<GlobalOptions>("--main", "")
@@ -368,7 +368,7 @@ test({
     const fooCommand = new Command<void, [], void, { main?: number }>();
 
     await new Command<void>()
-      .globalOption<{ main?: boolean }>("--main", "")
+      .globalOption("--main", "")
       // @ts-expect-error main option has incompatible type
       .command("foo", fooCommand)
       .parse(Deno.args);
@@ -381,7 +381,7 @@ test({
     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
 
     await new Command<void>()
-      .option<{ main?: boolean }>("-d, --debug", "...", { global: true })
+      .option("-d, --debug", "...", { global: true })
       // @ts-expect-error unknown global option main2
       .command("foo", fooCommand)
       .parse(Deno.args);
@@ -394,7 +394,7 @@ test({
     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
 
     await new Command<void>()
-      .globalOption<{ main?: boolean }>("-d, --debug", "...")
+      .globalOption("-d, --debug", "...")
       // @ts-expect-error unknown global option main2
       .command("foo", fooCommand)
       .parse(Deno.args);
@@ -407,7 +407,7 @@ test({
     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
 
     await new Command<void>()
-      .option<{ main?: boolean }>("--main", "")
+      .option("--main", "")
       // @ts-expect-error unknown global option main2
       .command("foo", fooCommand)
       .parse(Deno.args);
@@ -420,7 +420,7 @@ test({
     const fooCommand = new Command<void, [], void, { main2?: boolean }>();
 
     await new Command<void>()
-      .option<{ main?: boolean }>("--main", "")
+      .option("--main", "")
       // @ts-expect-error unknown global option main2
       .command("foo", fooCommand)
       .parse(Deno.args);
@@ -433,7 +433,7 @@ test({
     const fooCommand = new Command<void, [], void, { main?: boolean }>();
 
     await new Command<void>()
-      .option<{ main?: boolean }>("--main", "")
+      .option("--main", "")
       // @ts-expect-error unknown global option main
       .command("foo", fooCommand)
       .parse(Deno.args);

@@ -7,50 +7,50 @@ import type { IEnvVar } from "../../types.ts";
 function command() {
   return new Command<void>()
     .throwErrors()
-    .globalEnv<{ global?: boolean }>("global=<value:boolean>", "...")
-    .globalEnv<{ globalHidden?: string }>(
+    .globalEnv("global=<value:boolean>", "...")
+    .globalEnv(
       "global_hidden=<value:string>",
       "...",
       { hidden: true },
     )
-    .globalEnv<{ globalRequired: number }>(
+    .globalEnv(
       "global_required=<value:number>",
       "...",
       { required: true },
     )
-    .globalEnv<{ globalPrefixed?: string }>(
+    .globalEnv(
       "prefix_global_prefixed=<value:string>",
       "...",
       { prefix: "prefix_" },
     )
-    .env<{ foo?: boolean }>("foo=<value:boolean>", "...")
-    .env<{ fooHidden?: string }>("foo_hidden=<value:string>", "...", {
+    .env("foo=<value:boolean>", "...")
+    .env("foo_hidden=<value:string>", "...", {
       hidden: true,
     })
-    .env<{ fooRequired: number }>("foo_required=<value:number>", "...", {
+    .env("foo_required=<value:number>", "...", {
       required: true,
     })
-    .env<{ fooPrefixed: number }>(
+    .env(
       "prefix_foo_prefixed=<value:string>",
       "...",
       {
         prefix: "prefix_",
       },
     )
-    .option<{ globalPrefixed?: string }>(
+    .option(
       "--global-prefixed <value>",
       "...",
     )
     .command(
       "bar",
       new Command<void>()
-        .env<{ bar?: boolean }>("bar", "...")
-        .env<{ barHidden?: boolean }>("bar_hidden", "...", { hidden: true })
-        .env<{ barGlobal?: boolean }>("bar_global", "...", { global: true })
+        .env("bar", "...")
+        .env("bar_hidden", "...", { hidden: true })
+        .env("bar_global", "...", { global: true })
         .command("baz")
-        .env<{ baz?: boolean }>("baz", "...")
-        .env<{ bazHidden?: boolean }>("baz_hidden", "...", { hidden: true })
-        .env<{ bazGlobal?: boolean }>("baz_global", "...", { global: true })
+        .env("baz", "...")
+        .env("baz_hidden", "...", { hidden: true })
+        .env("baz_global", "...", { global: true })
         .reset(),
     );
 }
