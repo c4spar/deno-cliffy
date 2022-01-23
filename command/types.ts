@@ -27,14 +27,14 @@ export type IDescription<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
-> = string | ((this: Command<O, A, G, PG, P, CT, GT, PT>) => string);
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> = string | ((this: Command<O, A, G, PG, CT, GT, PT, P>) => string);
 
 /** Action handler for commands and options. */
 export type IAction<
@@ -47,15 +47,15 @@ export type IAction<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
 > = (
-  this: Command<O, A, G, PG, P, CT, GT, PT>,
+  this: Command<O, A, G, PG, CT, GT, PT, P>,
   options: Merge<Merge<PG, G>, O>,
   ...args: A
 ) => void | Promise<void>;
@@ -81,18 +81,18 @@ export interface IParseResult<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
 > {
   options: PG & G & O;
   args: A;
   literal: string[];
-  cmd: Command<O, A, G, PG, P, CT, GT, PT>;
+  cmd: Command<O, A, G, PG, CT, GT, PT, P>;
 }
 
 /* OPTION TYPES */
@@ -117,18 +117,18 @@ export interface ICommandOption<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   global?: boolean;
-  action?: IAction<O, A, G, PG, P, CT, GT, PT>;
+  action?: IAction<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
 }
 
@@ -143,14 +143,14 @@ export interface IOption<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
-> extends ICommandOption<O, A, G, PG, P, CT, GT, PT>, IFlagOptions {
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, IFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
@@ -221,16 +221,16 @@ export interface ICompletion<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
 > extends ICompleteOptions {
   name: string;
-  complete: ICompleteHandler<O, A, G, PG, P, CT, GT, PT>;
+  complete: ICompleteHandler<O, A, G, PG, CT, GT, PT, P>;
 }
 
 export type CompleteHandlerResult =
@@ -250,15 +250,15 @@ export type ICompleteHandler<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
 > = (
-  cmd: Command<O, A, G, PG, P, CT, GT, PT>,
+  cmd: Command<O, A, G, PG, CT, GT, PT, P>,
   parent?: Command,
 ) => CompleteHandlerResult;
 
@@ -273,22 +273,22 @@ export type IHelpHandler<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
-  C extends Command<O, A, G, PG, P, CT, GT, PT> = Command<
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+  C extends Command<O, A, G, PG, CT, GT, PT, P> = Command<
     O,
     A,
     G,
     PG,
-    P,
     CT,
     GT,
-    PT
+    PT,
+    P
   >,
 > = (this: C, cmd: C, options: HelpOptions) => string;
 
@@ -303,21 +303,21 @@ export type IVersionHandler<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
-  C extends Command<O, A, G, PG, P, CT, GT, PT> = Command<
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = any,
+  C extends Command<O, A, G, PG, CT, GT, PT, P> = Command<
     O,
     A,
     G,
     PG,
-    P,
     CT,
     GT,
-    PT
+    PT,
+    P
   >,
 > = (this: C, cmd: C) => string;

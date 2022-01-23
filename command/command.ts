@@ -69,8 +69,6 @@ export class Command<
   // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = CO extends number ? any : void,
   // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = CO extends number ? any : undefined,
-  // deno-lint-ignore no-explicit-any
   CT extends Record<string, any> | void = CO extends number ? any : {
     number: number;
     string: string;
@@ -80,6 +78,8 @@ export class Command<
   GT extends Record<string, any> | void = CO extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = CO extends number ? any : void,
+  // deno-lint-ignore no-explicit-any
+  P extends Command | undefined = CO extends number ? any : undefined,
 > {
   private types: Map<string, IType> = new Map();
   private rawArgs: string[] = [];
@@ -127,7 +127,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, PG, P, CT, GT, PT> & {
+    opts?: ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
       global: true;
     },
   ): this;
@@ -140,7 +140,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, PG, P, CT, GT, PT>,
+    opts?: ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>,
   ): this;
   /**
    * Set version option.
@@ -151,15 +151,15 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, PG, P, CT, GT, PT>,
+    opts?: IAction<CO, CA, CG, PG, CT, GT, PT, P>,
   ): this;
   public versionOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, PG, P, CT, GT, PT>
-      | ICommandOption<CO, CA, CG, PG, P, CT, GT, PT>
-      | ICommandOption<Partial<CO>, CA, CG, PG, P, CT, GT, PT> & {
+      | IAction<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
         global: true;
       },
   ): this {
@@ -182,7 +182,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, PG, P, CT, GT, PT> & {
+    opts?: ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
       global: true;
     },
   ): this;
@@ -195,7 +195,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, PG, P, CT, GT, PT>,
+    opts?: ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>,
   ): this;
   /**
    * Set help option.
@@ -206,15 +206,15 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, PG, P, CT, GT, PT>,
+    opts?: IAction<CO, CA, CG, PG, CT, GT, PT, P>,
   ): this;
   public helpOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, PG, P, CT, GT, PT>
-      | ICommandOption<CO, CA, CG, PG, P, CT, GT, PT>
-      | ICommandOption<Partial<CO>, CA, CG, PG, P, CT, GT, PT> & {
+      | IAction<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
         global: true;
       },
   ): this {
@@ -240,12 +240,12 @@ export class Command<
       // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
       Merge<PG, CG> | void | undefined,
-      OneOf<P, this> | undefined,
       // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
       // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
-      Merge<PT, CT> | void | undefined
+      Merge<PT, CT> | void | undefined,
+      OneOf<P, this> | undefined
     >),
   >(
     name: string,
@@ -257,10 +257,10 @@ export class Command<
     infer GlobalOptions,
     // deno-lint-ignore no-explicit-any
     any,
-    // deno-lint-ignore no-explicit-any
-    any,
     infer Types,
     infer GlobalTypes,
+    // deno-lint-ignore no-explicit-any
+    any,
     // deno-lint-ignore no-explicit-any
     any
   > ? Command<
@@ -268,10 +268,10 @@ export class Command<
     Arguments,
     GlobalOptions,
     Merge<PG, CG>,
-    OneOf<P, this>,
     Types,
     GlobalTypes,
-    Merge<PT, CT>
+    Merge<PT, CT>,
+    OneOf<P, this>
   >
     : never;
   /**
@@ -294,12 +294,12 @@ export class Command<
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
     Merge<PG, CG>,
-    OneOf<P, this>,
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
     // deno-lint-ignore no-explicit-any
     CO extends number ? any : void,
-    Merge<PT, CT>
+    Merge<PT, CT>,
+    OneOf<P, this>
   >;
   /**
    * Add new sub-command.
@@ -396,7 +396,7 @@ export class Command<
     A extends Array<unknown> = any,
     // deno-lint-ignore no-explicit-any
     G extends Record<string, unknown> | void = any,
-  >(name: string): Command<O, A, G, PG, P, CT, GT, PT> {
+  >(name: string): Command<O, A, G, PG, CT, GT, PT, P> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -425,7 +425,7 @@ export class Command<
   public version(
     version:
       | string
-      | IVersionHandler<Partial<CO>, Partial<CA>, CG, PG, P, CT, GT, PT>,
+      | IVersionHandler<Partial<CO>, Partial<CA>, CG, PG, CT, GT, PT, P>,
   ): this {
     if (typeof version === "string") {
       this.cmd.ver = () => version;
@@ -461,7 +461,7 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: IDescription<CO, CA, CG, PG, P, CT, GT, PT>,
+    description: IDescription<CO, CA, CG, PG, CT, GT, PT, P>,
   ): this {
     this.cmd.desc = description;
     return this;
@@ -506,7 +506,7 @@ export class Command<
     N extends string = string,
   >(
     args: N,
-  ): Command<CO, MapTypes<A>, CG, PG, P, CT, GT, PT> {
+  ): Command<CO, MapTypes<A>, CG, PG, CT, GT, PT, P> {
     this.cmd.argsDefinition = args;
     return this as Command;
   }
@@ -515,7 +515,7 @@ export class Command<
    * Set command callback method.
    * @param fn Command action handler.
    */
-  public action(fn: IAction<CO, CA, CG, PG, P, CT, GT, PT>): this {
+  public action(fn: IAction<CO, CA, CG, PG, CT, GT, PT, P>): this {
     this.cmd.fn = fn;
     return this;
   }
@@ -556,7 +556,7 @@ export class Command<
    */
   public useRawArgs(
     useRawArgs = true,
-  ): Command<CO, Array<string>, CG, PG, P, CT, GT, PT> {
+  ): Command<CO, Array<string>, CG, PG, CT, GT, PT, P> {
     this.cmd._useRawArgs = useRawArgs;
     return this as Command;
   }
@@ -583,10 +583,10 @@ export class Command<
     CA,
     CG,
     PG,
-    P,
     Merge<CT, TypedType<N, H>>,
     GT,
-    PT
+    PT,
+    P
   > {
     return this.type(name, handler, { ...options, global: true });
   }
@@ -609,10 +609,10 @@ export class Command<
     CA,
     CG,
     PG,
-    P,
     Merge<CT, TypedType<N, H>>,
     GT,
-    PT
+    PT,
+    P
   > {
     if (this.cmd.types.get(name) && !options?.override) {
       throw new DuplicateType(name);
@@ -656,22 +656,22 @@ export class Command<
       Partial<CA>,
       CG,
       PG,
-      // deno-lint-ignore no-explicit-any
-      any,
       CT,
       GT,
-      PT
+      PT,
+      // deno-lint-ignore no-explicit-any
+      any
     >,
     options: ICompleteOptions & { global: boolean },
   ): this;
   public complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, PG, P, CT, GT, PT>,
+    complete: ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>,
     options?: ICompleteOptions,
   ): this;
   complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, PG, P, CT, GT, PT>,
+    complete: ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>,
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
@@ -752,15 +752,15 @@ export class Command<
           CA,
           Merge<CG, MapTypes<G>>,
           PG,
-          P,
           CT,
           GT,
-          PT
+          PT,
+          P
         >,
         "global"
       >
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, P, CT, GT, PT> {
+  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -785,14 +785,14 @@ export class Command<
         CA,
         Merge<CG, MapTypes<G>>,
         PG,
-        P,
         CT,
         GT,
-        PT
+        PT,
+        P
       >
         & { global: true }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, P, CT, GT, PT>;
+  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P>;
 
   public option<
     O extends TypedOption<N, Merge<CT, Merge<GT, PT>>>,
@@ -801,10 +801,10 @@ export class Command<
     flags: N,
     desc: string,
     opts:
-      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>
+      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
         & { required: true }
       | IFlagValueHandler,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>;
+  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
 
   public option<
     O extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
@@ -813,9 +813,9 @@ export class Command<
     flags: N,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>
+      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>;
+  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
 
   public option(
     flags: string,
@@ -903,7 +903,7 @@ export class Command<
     name: N,
     description: string,
     options?: Omit<IEnvVarOptions<Prefix>, "global">,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, P, CT, GT, PT> {
+  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P> {
     return this.env(name, description, { ...options, global: true });
   }
 
@@ -921,7 +921,7 @@ export class Command<
     name: N,
     description: string,
     options: IEnvVarOptions<Prefix> & { global: true },
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, P, CT, GT, PT>;
+  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P>;
 
   public env<
     O extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
@@ -931,7 +931,7 @@ export class Command<
     name: N,
     description: string,
     options?: IEnvVarOptions<Prefix>,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, P, CT, GT, PT>;
+  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
 
   public env(
     name: string,
@@ -982,7 +982,7 @@ export class Command<
    */
   public async parse(
     args: string[] = Deno.args,
-  ): Promise<IParseResult<CO, CA, CG, PG, P, CT, GT, PT>> {
+  ): Promise<IParseResult<CO, CA, CG, PG, CT, GT, PT, P>> {
     try {
       this.reset();
       this.registerDefaults();
@@ -1119,7 +1119,7 @@ export class Command<
   protected async execute(
     options: PG & CG & CO,
     ...args: CA
-  ): Promise<IParseResult<CO, CA, CG, PG, P, CT, GT, PT>> {
+  ): Promise<IParseResult<CO, CA, CG, PG, CT, GT, PT, P>> {
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
@@ -2058,7 +2058,7 @@ interface IDefaultOption<
 > {
   flags: string;
   desc?: string;
-  opts?: ICommandOption<O, A, G, PG, P, CT, GT, PT>;
+  opts?: ICommandOption<O, A, G, PG, CT, GT, PT, P>;
 }
 
 type TrimLeft<T extends string, V extends string> = T extends `${V}${infer U}`
