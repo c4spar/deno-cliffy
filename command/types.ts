@@ -14,6 +14,14 @@ export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 
+type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
+
+type MapTypes<
+  T extends Array<unknown> | Record<string, unknown> | void,
+> = T extends (Array<unknown> | Record<string, unknown>)
+  ? { [K in keyof T]: T[K] extends TypeOrTypeHandler<infer V> ? V : T[K] }
+  : T;
+
 /* COMMAND TYPES */
 
 /** Description handler. */
@@ -56,8 +64,8 @@ export type IAction<
   P extends Command | undefined = any,
 > = (
   this: Command<PG, PT, O, A, G, CT, GT, P>,
-  options: Merge<Merge<PG, G>, O>,
-  ...args: A
+  options: MapTypes<Merge<Merge<PG, G>, O>>,
+  ...args: MapTypes<A>
 ) => void | Promise<void>;
 
 /** Argument details. */

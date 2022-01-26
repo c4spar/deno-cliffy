@@ -277,7 +277,7 @@ export class Command<
     Merge<PG, CG>,
     Merge<PT, CT>,
     PG extends number ? any : void,
-    MapTypes<A>,
+    A,
     PG extends number ? any : void,
     PG extends number ? any : void,
     PG extends number ? any : void,
@@ -485,7 +485,7 @@ export class Command<
     N extends string = string,
   >(
     args: N,
-  ): Command<PG, PT, CO, MapTypes<A>, CG, CT, GT, P> {
+  ): Command<PG, PT, CO, A, CG, CT, GT, P> {
     this.cmd.argsDefinition = args;
     return this as Command<any>;
   }
@@ -728,7 +728,7 @@ export class Command<
         ICommandOption<
           Partial<CO>,
           CA,
-          Merge<CG, MapTypes<G>>,
+          Merge<CG, G>,
           PG,
           CT,
           GT,
@@ -738,7 +738,7 @@ export class Command<
         "global"
       >
       | IFlagValueHandler,
-  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P> {
+  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -761,7 +761,7 @@ export class Command<
       | ICommandOption<
         Partial<CO>,
         CA,
-        Merge<CG, MapTypes<G>>,
+        Merge<CG, G>,
         PG,
         CT,
         GT,
@@ -770,7 +770,7 @@ export class Command<
       >
         & { global: true }
       | IFlagValueHandler,
-  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P>;
+  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
 
   public option<
     O extends TypedOption<N, Merge<CT, Merge<GT, PT>>>,
@@ -779,10 +779,10 @@ export class Command<
     flags: N,
     desc: string,
     opts:
-      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
         & { required: true }
       | IFlagValueHandler,
-  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
+  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
 
   public option<
     O extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
@@ -791,9 +791,9 @@ export class Command<
     flags: N,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
       | IFlagValueHandler,
-  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
+  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
 
   public option(
     flags: string,
@@ -881,7 +881,7 @@ export class Command<
     name: N,
     description: string,
     options?: Omit<IEnvVarOptions<Prefix>, "global">,
-  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P> {
+  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P> {
     return this.env(name, description, { ...options, global: true });
   }
 
@@ -899,7 +899,7 @@ export class Command<
     name: N,
     description: string,
     options: IEnvVarOptions<Prefix> & { global: true },
-  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P>;
+  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
 
   public env<
     O extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
@@ -909,7 +909,7 @@ export class Command<
     name: N,
     description: string,
     options?: IEnvVarOptions<Prefix>,
-  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
+  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
 
   public env(
     name: string,
@@ -2047,12 +2047,6 @@ type CamelCase<T extends string> = T extends `${infer V}_${infer Rest}`
 
 type OneOf<T, V> = T extends void ? V : T;
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
-
-type MapTypes<
-  T extends Array<unknown> | Record<string, unknown> | void,
-> = T extends (Array<unknown> | Record<string, unknown>)
-  ? { [K in keyof T]: T[K] extends TypeOrTypeHandler<infer V> ? V : T[K] }
-  : never;
 
 type OptionalOrRequiredValue<T extends string> = `[${T}]` | `<${T}>`;
 
