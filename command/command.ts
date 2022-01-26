@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import {
   UnknownType,
   ValidationError as FlagsValidationError,
@@ -60,26 +61,18 @@ import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
 
 export class Command<
-  // deno-lint-ignore no-explicit-any
-  CO extends Record<string, any> | void = any,
-  // deno-lint-ignore no-explicit-any
-  CA extends Array<unknown> = CO extends number ? any : [],
-  // deno-lint-ignore no-explicit-any
-  CG extends Record<string, any> | void = CO extends number ? any : void,
-  // deno-lint-ignore no-explicit-any
-  PG extends Record<string, any> | void = CO extends number ? any : void,
-  // deno-lint-ignore no-explicit-any
-  CT extends Record<string, any> | void = CO extends number ? any : {
+  PG extends Record<string, any> | void = void,
+  PT extends Record<string, any> | void = PG extends number ? any : void,
+  CO extends Record<string, any> | void = PG extends number ? any : void,
+  CA extends Array<unknown> = PG extends number ? any : [],
+  CG extends Record<string, any> | void = PG extends number ? any : void,
+  CT extends Record<string, any> | void = PG extends number ? any : {
     number: number;
     string: string;
     boolean: boolean;
   },
-  // deno-lint-ignore no-explicit-any
-  GT extends Record<string, any> | void = CO extends number ? any : void,
-  // deno-lint-ignore no-explicit-any
-  PT extends Record<string, any> | void = CO extends number ? any : void,
-  // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = CO extends number ? any : undefined,
+  GT extends Record<string, any> | void = PG extends number ? any : void,
+  P extends Command<any> | undefined = PG extends number ? any : undefined,
 > {
   private types: Map<string, IType> = new Map();
   private rawArgs: string[] = [];
@@ -88,18 +81,18 @@ export class Command<
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
   private _parent?: P;
-  private _globalParent?: Command;
+  private _globalParent?: Command<any>;
   private ver?: IVersionHandler;
   private desc: IDescription = "";
   private _usage?: string;
   private fn?: IAction;
   private options: IOption[] = [];
-  private commands: Map<string, Command> = new Map();
+  private commands: Map<string, Command<any>> = new Map();
   private examples: IExample[] = [];
   private envVars: IEnvVar[] = [];
   private aliases: string[] = [];
   private completions: Map<string, ICompletion> = new Map();
-  private cmd: Command = this;
+  private cmd: Command<any> = this;
   private argsDefinition?: string;
   private isExecutable = false;
   private throwOnError = false;
@@ -233,18 +226,14 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    C extends (CO extends number ? Command : Command<
-      // deno-lint-ignore no-explicit-any
+    C extends (PG extends number ? Command<any> : Command<
+      Merge<PG, CG> | void | undefined,
+      Merge<PT, CT> | void | undefined,
       Record<string, any> | void,
       Array<unknown>,
-      // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
-      Merge<PG, CG> | void | undefined,
-      // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
-      // deno-lint-ignore no-explicit-any
       Record<string, any> | void,
-      Merge<PT, CT> | void | undefined,
       OneOf<P, this> | undefined
     >),
   >(
@@ -252,25 +241,22 @@ export class Command<
     cmd: C,
     override?: boolean,
   ): C extends Command<
+    any,
+    any,
     infer Options,
     infer Arguments,
     infer GlobalOptions,
-    // deno-lint-ignore no-explicit-any
-    any,
     infer Types,
     infer GlobalTypes,
-    // deno-lint-ignore no-explicit-any
-    any,
-    // deno-lint-ignore no-explicit-any
     any
   > ? Command<
+    Merge<PG, CG>,
+    Merge<PT, CT>,
     Options,
     Arguments,
     GlobalOptions,
-    Merge<PG, CG>,
     Types,
     GlobalTypes,
-    Merge<PT, CT>,
     OneOf<P, this>
   >
     : never;
@@ -288,17 +274,13 @@ export class Command<
     desc?: string,
     override?: boolean,
   ): Command<
-    // deno-lint-ignore no-explicit-any
-    CO extends number ? any : void,
-    MapTypes<A>,
-    // deno-lint-ignore no-explicit-any
-    CO extends number ? any : void,
     Merge<PG, CG>,
-    // deno-lint-ignore no-explicit-any
-    CO extends number ? any : void,
-    // deno-lint-ignore no-explicit-any
-    CO extends number ? any : void,
     Merge<PT, CT>,
+    PG extends number ? any : void,
+    MapTypes<A>,
+    PG extends number ? any : void,
+    PG extends number ? any : void,
+    PG extends number ? any : void,
     OneOf<P, this>
   >;
   /**
@@ -309,9 +291,9 @@ export class Command<
    */
   command(
     nameAndArguments: string,
-    cmdOrDescription?: Command | string,
+    cmdOrDescription?: Command<any> | string,
     override?: boolean,
-  ): Command {
+  ): Command<any> {
     const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
@@ -329,7 +311,7 @@ export class Command<
     }
 
     let description: string | undefined;
-    let cmd: Command;
+    let cmd: Command<any>;
 
     if (typeof cmdOrDescription === "string") {
       description = cmdOrDescription;
@@ -390,13 +372,10 @@ export class Command<
    * @param name The name of the command to select.
    */
   public select<
-    // deno-lint-ignore no-explicit-any
     O extends Record<string, unknown> | void = any,
-    // deno-lint-ignore no-explicit-any
     A extends Array<unknown> = any,
-    // deno-lint-ignore no-explicit-any
     G extends Record<string, unknown> | void = any,
-  >(name: string): Command<O, A, G, PG, CT, GT, PT, P> {
+  >(name: string): Command<PG, PT, O, A, G, CT, GT, P> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -405,7 +384,7 @@ export class Command<
 
     this.cmd = cmd;
 
-    return this as Command;
+    return this as Command<any>;
   }
 
   /** ***************************************************************************
@@ -506,9 +485,9 @@ export class Command<
     N extends string = string,
   >(
     args: N,
-  ): Command<CO, MapTypes<A>, CG, PG, CT, GT, PT, P> {
+  ): Command<PG, PT, CO, MapTypes<A>, CG, CT, GT, P> {
     this.cmd.argsDefinition = args;
-    return this as Command;
+    return this as Command<any>;
   }
 
   /**
@@ -556,9 +535,9 @@ export class Command<
    */
   public useRawArgs(
     useRawArgs = true,
-  ): Command<CO, Array<string>, CG, PG, CT, GT, PT, P> {
+  ): Command<PG, PT, CO, Array<string>, CG, CT, GT, P> {
     this.cmd._useRawArgs = useRawArgs;
-    return this as Command;
+    return this as Command<any>;
   }
 
   /**
@@ -579,13 +558,13 @@ export class Command<
     handler: H,
     options?: Omit<ITypeOptions, "global">,
   ): Command<
+    PG,
+    PT,
     CO,
     CA,
     CG,
-    PG,
     Merge<CT, TypedType<N, H>>,
     GT,
-    PT,
     P
   > {
     return this.type(name, handler, { ...options, global: true });
@@ -605,13 +584,13 @@ export class Command<
     handler: H,
     options?: ITypeOptions,
   ): Command<
+    PG,
+    PT,
     CO,
     CA,
     CG,
-    PG,
     Merge<CT, TypedType<N, H>>,
     GT,
-    PT,
     P
   > {
     if (this.cmd.types.get(name) && !options?.override) {
@@ -632,7 +611,7 @@ export class Command<
       this.complete(name, completeHandler, options);
     }
 
-    return this as Command;
+    return this as Command<any>;
   }
 
   public globalComplete(
@@ -659,7 +638,6 @@ export class Command<
       CT,
       GT,
       PT,
-      // deno-lint-ignore no-explicit-any
       any
     >,
     options: ICompleteOptions & { global: boolean },
@@ -760,7 +738,7 @@ export class Command<
         "global"
       >
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P> {
+  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -792,7 +770,7 @@ export class Command<
       >
         & { global: true }
       | IFlagValueHandler,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P>;
+  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P>;
 
   public option<
     O extends TypedOption<N, Merge<CT, Merge<GT, PT>>>,
@@ -804,7 +782,7 @@ export class Command<
       | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
         & { required: true }
       | IFlagValueHandler,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
+  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
 
   public option<
     O extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
@@ -815,13 +793,13 @@ export class Command<
     opts?:
       | ICommandOption<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>
       | IFlagValueHandler,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
+  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
 
   public option(
     flags: string,
     desc: string,
     opts?: ICommandOption | IFlagValueHandler,
-  ): Command {
+  ): Command<any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
     }
@@ -903,7 +881,7 @@ export class Command<
     name: N,
     description: string,
     options?: Omit<IEnvVarOptions<Prefix>, "global">,
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P> {
+  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P> {
     return this.env(name, description, { ...options, global: true });
   }
 
@@ -921,7 +899,7 @@ export class Command<
     name: N,
     description: string,
     options: IEnvVarOptions<Prefix> & { global: true },
-  ): Command<CO, CA, Merge<CG, MapTypes<G>>, PG, CT, GT, PT, P>;
+  ): Command<PG, PT, CO, CA, Merge<CG, MapTypes<G>>, CT, GT, P>;
 
   public env<
     O extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
@@ -931,13 +909,13 @@ export class Command<
     name: N,
     description: string,
     options?: IEnvVarOptions<Prefix>,
-  ): Command<Merge<CO, MapTypes<O>>, CA, CG, PG, CT, GT, PT, P>;
+  ): Command<PG, PT, Merge<CO, MapTypes<O>>, CA, CG, CT, GT, P>;
 
   public env(
     name: string,
     description: string,
     options?: IEnvVarOptions,
-  ): Command {
+  ): Command<any> {
     const result = splitArguments(name);
 
     if (!result.typeDefinition) {
@@ -1365,12 +1343,12 @@ export class Command<
    * Be sure, to call this method only inside an action handler. Unless this or any child command was executed,
    * this method returns always undefined.
    */
-  public getGlobalParent(): Command | undefined {
+  public getGlobalParent(): Command<any> | undefined {
     return this._globalParent;
   }
 
   /** Get main command. */
-  public getMainCommand(): Command {
+  public getMainCommand(): Command<any> {
     return this._parent?.getMainCommand() ?? this;
   }
 
@@ -1519,7 +1497,7 @@ export class Command<
    */
   public getGlobalOptions(hidden?: boolean): IOption[] {
     const getOptions = (
-      cmd: Command | undefined,
+      cmd: Command<any> | undefined,
       options: IOption[] = [],
       names: string[] = [],
     ): IOption[] => {
@@ -1625,7 +1603,7 @@ export class Command<
    * Get commands.
    * @param hidden Include hidden commands.
    */
-  public getCommands(hidden?: boolean): Array<Command> {
+  public getCommands(hidden?: boolean): Array<Command<any>> {
     return this.getGlobalCommands(hidden).concat(this.getBaseCommands(hidden));
   }
 
@@ -1633,7 +1611,7 @@ export class Command<
    * Get base commands.
    * @param hidden Include hidden commands.
    */
-  public getBaseCommands(hidden?: boolean): Array<Command> {
+  public getBaseCommands(hidden?: boolean): Array<Command<any>> {
     const commands = Array.from(this.commands.values());
     return hidden ? commands : commands.filter((cmd) => !cmd.isHidden);
   }
@@ -1642,15 +1620,15 @@ export class Command<
    * Get global commands.
    * @param hidden Include hidden commands.
    */
-  public getGlobalCommands(hidden?: boolean): Array<Command> {
+  public getGlobalCommands(hidden?: boolean): Array<Command<any>> {
     const getCommands = (
-      cmd: Command | undefined,
-      commands: Array<Command> = [],
+      cmd: Command<any> | undefined,
+      commands: Array<Command<any>> = [],
       names: string[] = [],
-    ): Array<Command> => {
+    ): Array<Command<any>> => {
       if (cmd) {
         if (cmd.commands.size) {
-          cmd.commands.forEach((cmd: Command) => {
+          cmd.commands.forEach((cmd: Command<any>) => {
             if (
               cmd.isGlobal &&
               this !== cmd &&
@@ -1690,7 +1668,7 @@ export class Command<
   public getCommand(
     name: string,
     hidden?: boolean,
-  ): Command | undefined {
+  ): Command<any> | undefined {
     return this.getBaseCommand(name, hidden) ??
       this.getGlobalCommand(name, hidden);
   }
@@ -1703,7 +1681,7 @@ export class Command<
   public getBaseCommand(
     name: string,
     hidden?: boolean,
-  ): Command | undefined {
+  ): Command<any> | undefined {
     for (const cmd of this.commands.values()) {
       if (cmd._name === name || cmd.aliases.includes(name)) {
         return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
@@ -1721,7 +1699,7 @@ export class Command<
   public getGlobalCommand(
     name: string,
     hidden?: boolean,
-  ): Command | undefined {
+  ): Command<any> | undefined {
     if (!this._parent) {
       return;
     }
@@ -1739,7 +1717,7 @@ export class Command<
    * Remove sub-command by name or alias.
    * @param name Name or alias of the command.
    */
-  public removeCommand(name: string): Command | undefined {
+  public removeCommand(name: string): Command<any> | undefined {
     const command = this.getBaseCommand(name, true);
 
     if (command) {
@@ -1762,7 +1740,7 @@ export class Command<
   /** Get global types. */
   public getGlobalTypes(): IType[] {
     const getTypes = (
-      cmd: Command | undefined,
+      cmd: Command<any> | undefined,
       types: IType[] = [],
       names: string[] = [],
     ): IType[] => {
@@ -1836,7 +1814,7 @@ export class Command<
   /** Get global completions. */
   public getGlobalCompletions(): ICompletion[] {
     const getCompletions = (
-      cmd: Command | undefined,
+      cmd: Command<any> | undefined,
       completions: ICompletion[] = [],
       names: string[] = [],
     ): ICompletion[] => {
@@ -1935,7 +1913,7 @@ export class Command<
    */
   public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
     const getEnvVars = (
-      cmd: Command | undefined,
+      cmd: Command<any> | undefined,
       envVars: IEnvVar[] = [],
       names: string[] = [],
     ): IEnvVar[] => {
@@ -2039,21 +2017,13 @@ export class Command<
 }
 
 interface IDefaultOption<
-  // deno-lint-ignore no-explicit-any
   O extends Record<string, any> | void = any,
-  // deno-lint-ignore no-explicit-any
   A extends Array<unknown> = any,
-  // deno-lint-ignore no-explicit-any
   G extends Record<string, any> | void = any,
-  // deno-lint-ignore no-explicit-any
   PG extends Record<string, any> | void = any,
-  // deno-lint-ignore no-explicit-any
-  P extends Command | undefined = any,
-  // deno-lint-ignore no-explicit-any
+  P extends Command<any> | undefined = any,
   CT extends Record<string, any> | void = O extends number ? any : void,
-  // deno-lint-ignore no-explicit-any
   GT extends Record<string, any> | void = void,
-  // deno-lint-ignore no-explicit-any
   PT extends Record<string, any> | void = O extends number ? any : void,
 > {
   flags: string;

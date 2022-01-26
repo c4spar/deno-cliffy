@@ -34,7 +34,7 @@ export type IDescription<
   PT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
-> = string | ((this: Command<O, A, G, PG, CT, GT, PT, P>) => string);
+> = string | ((this: Command<PG, PT, O, A, G, CT, GT, P>) => string);
 
 /** Action handler for commands and options. */
 export type IAction<
@@ -55,7 +55,7 @@ export type IAction<
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
 > = (
-  this: Command<O, A, G, PG, CT, GT, PT, P>,
+  this: Command<PG, PT, O, A, G, CT, GT, P>,
   options: Merge<Merge<PG, G>, O>,
   ...args: A
 ) => void | Promise<void>;
@@ -92,7 +92,7 @@ export interface IParseResult<
   options: PG & G & O;
   args: A;
   literal: string[];
-  cmd: Command<O, A, G, PG, CT, GT, PT, P>;
+  cmd: Command<PG, PT, O, A, G, CT, GT, P>;
 }
 
 /* OPTION TYPES */
@@ -258,7 +258,7 @@ export type ICompleteHandler<
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
 > = (
-  cmd: Command<O, A, G, PG, CT, GT, PT, P>,
+  cmd: Command<PG, PT, O, A, G, CT, GT, P>,
   parent?: Command,
 ) => CompleteHandlerResult;
 
@@ -280,14 +280,14 @@ export type IHelpHandler<
   PT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
-  C extends Command<O, A, G, PG, CT, GT, PT, P> = Command<
+  C extends Command<PG, PT, O, A, G, CT, GT, P> = Command<
+    PG,
+    PT,
     O,
     A,
     G,
-    PG,
     CT,
     GT,
-    PT,
     P
   >,
 > = (this: C, cmd: C, options: HelpOptions) => string;
@@ -310,14 +310,14 @@ export type IVersionHandler<
   PT extends Record<string, any> | void = O extends number ? any : void,
   // deno-lint-ignore no-explicit-any
   P extends Command | undefined = any,
-  C extends Command<O, A, G, PG, CT, GT, PT, P> = Command<
+  C extends Command<PG, PT, O, A, G, CT, GT, P> = Command<
+    PG,
+    PT,
     O,
     A,
     G,
-    PG,
     CT,
     GT,
-    PT,
     P
   >,
 > = (this: C, cmd: C) => string;
