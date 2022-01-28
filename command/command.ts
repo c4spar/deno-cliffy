@@ -56,6 +56,7 @@ import type {
   ITypeInfo,
   ITypeOptions,
   IVersionHandler,
+  MapTypes,
 } from "./types.ts";
 import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
@@ -226,7 +227,7 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    C extends (PG extends number ? Command<any> : Command<
+    C extends Command<
       Merge<PG, CG> | void | undefined,
       Merge<PT, CT> | void | undefined,
       Record<string, any> | void,
@@ -235,7 +236,7 @@ export class Command<
       Record<string, any> | void,
       Record<string, any> | void,
       OneOf<P, this> | undefined
-    >),
+    >,
   >(
     name: string,
     cmd: C,
@@ -649,7 +650,18 @@ export class Command<
   ): this;
   complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>,
+    complete:
+      | ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICompleteHandler<
+        Partial<CO>,
+        Partial<CA>,
+        CG,
+        PG,
+        CT,
+        GT,
+        PT,
+        any
+      >,
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
@@ -738,7 +750,16 @@ export class Command<
         "global"
       >
       | IFlagValueHandler,
-  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P> {
+  ): Command<
+    PG,
+    PT,
+    CO,
+    CA,
+    N extends `--no-${string}` ? SpreadMerge<CG, G> : Merge<CG, G>,
+    CT,
+    GT,
+    P
+  > {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts, global: true });
     }
@@ -770,7 +791,16 @@ export class Command<
       >
         & { global: true }
       | IFlagValueHandler,
-  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
+  ): Command<
+    PG,
+    PT,
+    CO,
+    CA,
+    N extends `--no-${string}` ? SpreadMerge<CG, G> : Merge<CG, G>,
+    CT,
+    GT,
+    P
+  >;
 
   public option<
     O extends TypedOption<N, Merge<CT, Merge<GT, PT>>>,
@@ -782,7 +812,16 @@ export class Command<
       | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
         & { required: true }
       | IFlagValueHandler,
-  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
+  ): Command<
+    PG,
+    PT,
+    N extends `--no-${string}` ? SpreadMerge<CO, O> : Merge<CO, O>,
+    CA,
+    CG,
+    CT,
+    GT,
+    P
+  >;
 
   public option<
     O extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
@@ -793,7 +832,16 @@ export class Command<
     opts?:
       | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
       | IFlagValueHandler,
-  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
+  ): Command<
+    PG,
+    PT,
+    N extends `--no-${string}` ? SpreadMerge<CO, O> : Merge<CO, O>,
+    CA,
+    CG,
+    CT,
+    GT,
+    P
+  >;
 
   public option(
     flags: string,
@@ -960,7 +1008,18 @@ export class Command<
    */
   public async parse(
     args: string[] = Deno.args,
-  ): Promise<IParseResult<CO, CA, CG, PG, CT, GT, PT, P>> {
+  ): Promise<
+    P extends Command<any> ? ReturnType<P["parse"]> : IParseResult<
+      MapTypes<CO>,
+      MapTypes<CA>,
+      MapTypes<CG>,
+      MapTypes<PG>,
+      CT,
+      GT,
+      PT,
+      P
+    >
+  > {
     try {
       this.reset();
       this.registerDefaults();
@@ -979,14 +1038,14 @@ export class Command<
       if (this.isExecutable) {
         await this.executeExecutable(this.rawArgs);
         return {
-          options: {} as PG & CG & CO,
-          args: [] as unknown as CA,
+          options: {},
+          args: [],
           cmd: this,
           literal: [],
-        };
+        } as any;
       } else if (this._useRawArgs) {
         const env: Record<string, unknown> = await this.parseEnvVars();
-        return await this.execute(env as PG & CG & CO, ...this.rawArgs as CA);
+        return this.execute(env, ...this.rawArgs) as any;
       } else {
         const { actionOption, flags, unknown, literal } = this.parseFlags(
           this.rawArgs,
@@ -995,25 +1054,22 @@ export class Command<
         this.literalArgs = literal;
 
         const env: Record<string, unknown> = await this.parseEnvVars();
-        const options = { ...env, ...flags } as PG & CG & CO;
-        const params = this.parseArguments(
-          unknown,
-          options as Record<string, unknown>,
-        );
+        const options: Record<string, unknown> = { ...env, ...flags };
+        const params = this.parseArguments(unknown, options);
 
         if (actionOption) {
           await actionOption.action.call(this, options, ...params);
           if (actionOption.standalone) {
             return {
-              options,
+              options: options,
               args: params,
               cmd: this,
               literal: this.literalArgs,
-            };
+            } as any;
           }
         }
 
-        return await this.execute(options as PG & CG & CO, ...params);
+        return this.execute(options, ...params) as any;
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -1095,9 +1151,9 @@ export class Command<
    * @param args Command arguments.
    */
   protected async execute(
-    options: PG & CG & CO,
-    ...args: CA
-  ): Promise<IParseResult<CO, CA, CG, PG, CT, GT, PT, P>> {
+    options: Record<string, unknown>,
+    ...args: Array<unknown>
+  ): Promise<IParseResult> {
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
@@ -1114,7 +1170,12 @@ export class Command<
       await cmd.execute(options, ...args);
     }
 
-    return { options, args, cmd: this, literal: this.literalArgs };
+    return {
+      options,
+      args,
+      cmd: this,
+      literal: this.literalArgs,
+    };
   }
 
   /**
@@ -2046,7 +2107,10 @@ type CamelCase<T extends string> = T extends `${infer V}_${infer Rest}`
   : Lowercase<T>;
 
 type OneOf<T, V> = T extends void ? V : T;
-type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+
+type Merge<L, R> = L extends void ? R
+  : R extends void ? L
+  : Omit<L, keyof R> & R;
 
 type OptionalOrRequiredValue<T extends string> = `[${T}]` | `<${T}>`;
 
@@ -2102,8 +2166,10 @@ type ArgumentDefinition<T extends string> = T extends `-${string} ${infer Rest}`
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
 
-type BooleanOption<T extends string> = T extends `${infer Name}.${infer Rest}`
-  ? { [N in OptionName<Name>]: BooleanOption<Rest> }
+type BooleanOption<T extends string> = T extends `no-${infer Name}`
+  ? { [N in OptionName<Name>]: false }
+  : T extends `${infer Name}.${infer Rest}`
+    ? { [N in OptionName<Name>]: BooleanOption<Rest> }
   : { [N in OptionName<T>]: boolean };
 
 type ValueOption<T extends string, Rest extends string, V> = T extends
@@ -2112,7 +2178,7 @@ type ValueOption<T extends string, Rest extends string, V> = T extends
 }
   : {
     [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? true | ArgumentType<ArgumentDefinition<Rest>, V>
+      ? boolean | ArgumentType<ArgumentDefinition<Rest>, V>
       : ArgumentType<ArgumentDefinition<Rest>, V>;
   };
 
@@ -2122,7 +2188,7 @@ type ValuesOption<T extends string, Rest extends string, V> = T extends
 }
   : {
     [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? true | ArgumentTypes<ArgumentDefinition<Rest>, V>
+      ? boolean | ArgumentTypes<ArgumentDefinition<Rest>, V>
       : ArgumentTypes<ArgumentDefinition<Rest>, V>;
   };
 
@@ -2138,15 +2204,18 @@ type TypedOption<T extends string, V> = string extends T
   : T extends `-${infer Name}` ? BooleanOption<Name>
   : Record<string, unknown>;
 
-type TypedArguments<T extends string, V> = string extends T ? Array<unknown>
-  : T extends `${infer Arg} ${infer Rest}`
-    ? (Arg extends `[${string}]`
-      ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
-      : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>])
-  : T extends `${infer Arg}`
-    ? (Arg extends `[${string}]` ? [ArgumentType<Arg, V>?]
-      : [ArgumentType<Arg, V>])
-  : [];
+type TypedArguments<T extends string, V extends Record<string, any> | void> =
+  number extends V ? any
+    : string extends T ? Array<unknown>
+    : void extends V ? Array<unknown>
+    : T extends `${infer Arg} ${infer Rest}`
+      ? Arg extends `[${string}]`
+        ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
+      : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
+    : T extends `${infer Arg}`
+      ? Arg extends `[${string}]` ? [ArgumentType<Arg, V>?]
+      : [ArgumentType<Arg, V>]
+    : [];
 
 type TypedCommandArguments<T extends string, V> = string extends T
   ? Array<unknown>
@@ -2171,3 +2240,45 @@ type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
 
 export type TypeValue<T extends TypeOrTypeHandler<unknown>> = T extends
   TypeOrTypeHandler<infer V> ? V : never;
+
+type RequiredKeys<T> = {
+  // deno-lint-ignore ban-types
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
+}[keyof T];
+
+type OptionalKeys<T> = {
+  // deno-lint-ignore ban-types
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+}[keyof T];
+
+type SpreadRequiredProperties<
+  L,
+  R,
+  K extends keyof L & keyof R,
+> = {
+  [P in K]: Exclude<L[P], undefined> | Exclude<R[P], undefined>;
+};
+
+type SpreadOptionalProperties<
+  L,
+  R,
+  K extends keyof L & keyof R,
+> = {
+  [P in K]?: L[P] | R[P];
+};
+
+type SpreadMerge<L, R> = L extends void ? R : R extends void ? L
+: // Properties in L that don't exist in R.
+& Omit<L, keyof R>
+// Properties in R that don't exist in L.
+& Omit<R, keyof L>
+// Required properties in R that exist in L.
+& SpreadRequiredProperties<L, R, RequiredKeys<R> & keyof L>
+// Required properties in L that exist in R.
+& SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
+// Optional properties in L and R.
+& SpreadOptionalProperties<
+  L,
+  R,
+  OptionalKeys<L> & OptionalKeys<R>
+>;
