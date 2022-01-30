@@ -1,7 +1,7 @@
 import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-function command(): Command {
+function command() {
   return new Command()
     .throwErrors()
     .option("-f, --flag1", "flag 1")

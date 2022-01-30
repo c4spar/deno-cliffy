@@ -185,7 +185,7 @@ test({
 test({
   name: "command - generic types - splitted command with generics",
   fn() {
-    const foo = new Command<{ debug?: boolean; logLevel?: boolean }>()
+    const foo = new Command<{ debug?: true; logLevel?: true }>()
       .globalOption("--foo-global", "")
       .option("--foo", "")
       .action((options) => {
@@ -220,7 +220,7 @@ test({
       .select("bar-bar")
       .reset();
 
-    const bar = new Command<{ debug?: boolean; logLevel?: boolean }>()
+    const bar = new Command<{ debug?: true; logLevel?: true }>()
       .globalOption("--bar-global", "")
       .option("--bar", "")
       .versionOption("--versionx", "", {
@@ -301,7 +301,7 @@ test({
 test({
   name: "command - generic types - child command with parent option 1",
   async fn() {
-    const fooCommand = new Command<{ main?: boolean }>();
+    const fooCommand = new Command<{ main?: true }>();
 
     await new Command()
       .globalOption("--main", "")
@@ -357,12 +357,11 @@ test({
         /** invalid */
         // @ts-expect-error option foo not exists
         options.bar;
-      });
-
-    cmd.command("5", new Command<{ main?: boolean }>());
+      })
+      .command("5", new Command<{ main?: true }>());
 
     // @ts-expect-error unknown global option main2
-    cmd.command("6", new Command<{ main2?: boolean }>());
+    cmd.command("6", new Command<{ main2?: true }>());
 
     await cmd.parse(Deno.args);
   },
@@ -385,7 +384,7 @@ test({
 test({
   name: "command - generic types - child command with invalid parent option 1",
   async fn() {
-    const fooCommand = new Command<{ main2?: boolean }>();
+    const fooCommand = new Command<{ main2?: true }>();
 
     await new Command()
       .option("-d, --debug", "...", { global: true })
@@ -398,7 +397,7 @@ test({
 test({
   name: "command - generic types - child command with invalid parent option 2",
   async fn() {
-    const fooCommand = new Command<{ main2?: boolean }>();
+    const fooCommand = new Command<{ main2?: true }>();
 
     await new Command()
       .globalOption("-d, --debug", "...")
@@ -411,7 +410,7 @@ test({
 test({
   name: "command - generic types - child command with invalid parent option 3",
   async fn() {
-    const fooCommand = new Command<{ main2?: boolean }>();
+    const fooCommand = new Command<{ main2?: true }>();
 
     await new Command()
       .option("--main", "")
@@ -424,7 +423,7 @@ test({
 test({
   name: "command - generic types - child command with invalid parent option 4",
   async fn() {
-    const fooCommand = new Command<{ main2?: boolean }>();
+    const fooCommand = new Command<{ main2?: true }>();
 
     await new Command()
       .option("--main", "")
@@ -437,7 +436,7 @@ test({
 test({
   name: "command - generic types - child command with invalid parent option 5",
   async fn() {
-    const fooCommand = new Command<{ main?: boolean }>();
+    const fooCommand = new Command<{ main?: true }>();
 
     await new Command()
       .option("--main", "")
@@ -452,7 +451,7 @@ test({
   async fn() {
     await new Command()
       // @ts-expect-error unknown global option main
-      .command("foo", new Command<{ main?: boolean }>())
+      .command("foo", new Command<{ main?: true }>())
       .parse(Deno.args);
   },
 });

@@ -261,6 +261,7 @@ export class Command<
     OneOf<P, this>
   >
     : never;
+
   /**
    * Add new sub-command.
    * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
@@ -284,6 +285,7 @@ export class Command<
     PG extends number ? any : void,
     OneOf<P, this>
   >;
+
   /**
    * Add new sub-command.
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
@@ -740,7 +742,7 @@ export class Command<
         ICommandOption<
           Partial<CO>,
           CA,
-          Merge<CG, G>,
+          MergeOptions<N, CG, G>,
           PG,
           CT,
           GT,
@@ -755,7 +757,7 @@ export class Command<
     PT,
     CO,
     CA,
-    N extends `--no-${string}` ? SpreadMerge<CG, G> : Merge<CG, G>,
+    MergeOptions<N, CG, G>,
     CT,
     GT,
     P
@@ -782,7 +784,7 @@ export class Command<
       | ICommandOption<
         Partial<CO>,
         CA,
-        Merge<CG, G>,
+        MergeOptions<N, CG, G>,
         PG,
         CT,
         GT,
@@ -796,7 +798,7 @@ export class Command<
     PT,
     CO,
     CA,
-    N extends `--no-${string}` ? SpreadMerge<CG, G> : Merge<CG, G>,
+    MergeOptions<N, CG, G>,
     CT,
     GT,
     P
@@ -809,13 +811,13 @@ export class Command<
     flags: N,
     desc: string,
     opts:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
         & { required: true }
       | IFlagValueHandler,
   ): Command<
     PG,
     PT,
-    N extends `--no-${string}` ? SpreadMerge<CO, O> : Merge<CO, O>,
+    MergeOptions<N, CO, O>,
     CA,
     CG,
     CT,
@@ -830,12 +832,12 @@ export class Command<
     flags: N,
     desc: string,
     opts?:
-      | ICommandOption<Merge<CO, O>, CA, CG, PG, CT, GT, PT, P>
+      | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
       | IFlagValueHandler,
   ): Command<
     PG,
     PT,
-    N extends `--no-${string}` ? SpreadMerge<CO, O> : Merge<CO, O>,
+    MergeOptions<N, CO, O>,
     CA,
     CG,
     CT,
@@ -2112,6 +2114,10 @@ type Merge<L, R> = L extends void ? R
   : R extends void ? L
   : Omit<L, keyof R> & R;
 
+type MergeRecursive<L, R> = L extends void ? R
+  : R extends void ? L
+  : L & R;
+
 type OptionalOrRequiredValue<T extends string> = `[${T}]` | `<${T}>`;
 
 type ArgumentType<T extends string | undefined, V> = T extends undefined ? T
@@ -2170,7 +2176,7 @@ type BooleanOption<T extends string> = T extends `no-${infer Name}`
   ? { [N in OptionName<Name>]: false }
   : T extends `${infer Name}.${infer Rest}`
     ? { [N in OptionName<Name>]: BooleanOption<Rest> }
-  : { [N in OptionName<T>]: boolean };
+  : { [N in OptionName<T>]: true };
 
 type ValueOption<T extends string, Rest extends string, V> = T extends
   `${infer Name}.${infer RestName}` ? {
@@ -2178,7 +2184,7 @@ type ValueOption<T extends string, Rest extends string, V> = T extends
 }
   : {
     [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? boolean | ArgumentType<ArgumentDefinition<Rest>, V>
+      ? true | ArgumentType<ArgumentDefinition<Rest>, V>
       : ArgumentType<ArgumentDefinition<Rest>, V>;
   };
 
@@ -2188,7 +2194,7 @@ type ValuesOption<T extends string, Rest extends string, V> = T extends
 }
   : {
     [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? boolean | ArgumentTypes<ArgumentDefinition<Rest>, V>
+      ? true | ArgumentTypes<ArgumentDefinition<Rest>, V>
       : ArgumentTypes<ArgumentDefinition<Rest>, V>;
   };
 
@@ -2203,6 +2209,28 @@ type TypedOption<T extends string, V> = string extends T
   : T extends `-${infer Name} ${infer Rest}` ? ValuesOption<Name, Rest, V>
   : T extends `-${infer Name}` ? BooleanOption<Name>
   : Record<string, unknown>;
+
+type GetOptionName<T> = T extends
+  `${string}--${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
+  : T extends `${string}--${infer Name}` ? Name
+  : T extends `-${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
+  : T extends `-${infer Name}` ? Name
+  : unknown;
+
+type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
+  ? Spread<CO, O>
+  : N extends `${string}.${string}` ? MergeRecursive<CO, O>
+  : Merge<CO, O>;
+
+// type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
+//   ? Spread<CO, O>
+//   : N extends `${infer Name}.${infer Child}`
+//     ? (OptionName<Name> extends keyof Merge<CO, O>
+//       ? OptionName<Child> extends
+//         keyof NonNullable<Merge<CO, O>[OptionName<Name>]> ? SpreadTwo<CO, O>
+//       : MergeRecursive<CO, O>
+//       : MergeRecursive<CO, O>)
+//   : Merge<CO, O>;
 
 type TypedArguments<T extends string, V extends Record<string, any> | void> =
   number extends V ? any
@@ -2267,7 +2295,7 @@ type SpreadOptionalProperties<
   [P in K]?: L[P] | R[P];
 };
 
-type SpreadMerge<L, R> = L extends void ? R : R extends void ? L
+type Spread<L, R> = L extends void ? R : R extends void ? L
 : // Properties in L that don't exist in R.
 & Omit<L, keyof R>
 // Properties in R that don't exist in L.

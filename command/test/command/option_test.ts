@@ -4,7 +4,7 @@ import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { IOption } from "../../types.ts";
 
-function command(): Command {
+function command() {
   return new Command()
     .throwErrors()
     .globalOption("-g, --global", "...")
@@ -18,7 +18,8 @@ function command(): Command {
         .option("-B, --bar-hidden", "...", { hidden: true })
         .command("baz")
         .option("-z, --baz", "...")
-        .option("-Z, --baz-hidden", "...", { hidden: true }),
+        .option("-Z, --baz-hidden", "...", { hidden: true })
+        .reset(),
     );
 }
 
@@ -75,7 +76,7 @@ Deno.test("command - option - option properties", () => {
 });
 
 Deno.test("command - option - has options", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.hasOptions(), true);
   assertEquals(cmd.hasOptions(true), true);
   assertEquals(new Command().hasOptions(), false);
@@ -83,7 +84,7 @@ Deno.test("command - option - has options", () => {
 });
 
 Deno.test("command - option - get options", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getOptions().length, 2);
   assertEquals(cmd.getOptions(true).length, 4);
   assertEquals(!!cmd.getOptions().find((opt) => opt.name === "global"), true);
@@ -97,7 +98,7 @@ Deno.test("command - option - get options", () => {
 });
 
 Deno.test("command - option - get base options", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getBaseOptions().length, 2);
   assertEquals(cmd.getBaseOptions(true).length, 4);
   assertEquals(!!cmd.getBaseOptions().find((opt) => opt.name === "global"), true);
@@ -111,7 +112,7 @@ Deno.test("command - option - get base options", () => {
 });
 
 Deno.test("command - option - get global options", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getCommand("bar")?.getGlobalOptions().length, 1);
   assertEquals(cmd.getCommand("bar")?.getGlobalOptions(true).length, 2);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalOptions().find((opt) => opt.name === "global"), true);
@@ -125,7 +126,7 @@ Deno.test("command - option - get global options", () => {
 });
 
 Deno.test("command - option - has option", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.hasOption("global"), true);
   assertEquals(cmd.hasOption("global-hidden"), false);
   assertEquals(cmd.hasOption("global-hidden", true), true);
@@ -150,7 +151,7 @@ Deno.test("command - option - has option", () => {
 });
 
 Deno.test("command - option - get option", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getOption("global")?.name, "global");
   assertEquals(cmd.getOption("global-hidden")?.name, undefined);
   assertEquals(cmd.getOption("global-hidden", true)?.name, "global-hidden");
@@ -175,7 +176,7 @@ Deno.test("command - option - get option", () => {
 });
 
 Deno.test("command - option - get base option", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getBaseOption("global")?.name, "global");
   assertEquals(cmd.getBaseOption("global-hidden")?.name, undefined);
   assertEquals(cmd.getBaseOption("global-hidden", true)?.name, "global-hidden");
@@ -200,7 +201,7 @@ Deno.test("command - option - get base option", () => {
 });
 
 Deno.test("command - option - get global option", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getGlobalOption("global")?.name, undefined);
   assertEquals(cmd.getGlobalOption("global-hidden")?.name, undefined);
   assertEquals(cmd.getGlobalOption("global-hidden", true)?.name, undefined);
@@ -225,7 +226,7 @@ Deno.test("command - option - get global option", () => {
 });
 
 Deno.test("command - option - remove option", () => {
-  const cmd: Command = command();
+  const cmd = command();
   assertEquals(cmd.getOption("foo")?.name, "foo");
   assertEquals(cmd.removeOption("foo")?.name, "foo");
   assertEquals(cmd.getOption("foo"), undefined);

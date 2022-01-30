@@ -20,7 +20,7 @@ Deno.test("[command] should execute the action from an option", async () => {
 Deno.test("[command] should execute the action from an child command option", async () => {
   const optionSpy = sinon.spy();
 
-  const subCmd: Command = new Command()
+  const subCmd = new Command()
     .arguments("[beep:string]")
     .option("-b, --bar [value:string]", "action ...", { action: optionSpy });
 

@@ -29,7 +29,8 @@ const cmd = new Command()
             "Only available on this command.",
           )
           .description("Some nested sub command."),
-      ),
+      )
+      .reset(),
   );
 
 Deno.test("command with global option", async () => {

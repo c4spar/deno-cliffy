@@ -2,7 +2,8 @@ import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 interface IStats {
-  context: null | Command;
+  // deno-lint-ignore no-explicit-any
+  context: null | Command<any>;
   options: unknown;
   args: unknown;
 }
@@ -18,7 +19,7 @@ function createStats(): IStats {
 Deno.test("flags allowEmpty enabled", async () => {
   const stats: IStats = createStats();
 
-  const cmd: Command = new Command()
+  const cmd = new Command()
     .throwErrors()
     .arguments("[beep:string]")
     .option("-f, --foo [value:string]", "description ...")
@@ -39,9 +40,10 @@ Deno.test("flags allowEmpty enabled", async () => {
 
 Deno.test("flags allowEmpty enabled", async () => {
   const stats: IStats = createStats();
-  let subCmd: Command;
+  // deno-lint-ignore no-explicit-any
+  let subCmd: Command<any>;
 
-  const cmd: Command = new Command()
+  const cmd = new Command()
     .throwErrors()
     .command(
       "foo",
