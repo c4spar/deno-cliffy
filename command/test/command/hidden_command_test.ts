@@ -19,6 +19,7 @@ function command() {
 }
 
 Deno.test("hidden command", async () => {
+  // deno-lint-ignore no-explicit-any
   const cmd: Command<any> = command();
   const { options, args } = await cmd.parse(
     ["hidden-command", "input-path", "output-path"],
