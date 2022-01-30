@@ -12,6 +12,10 @@ import type { HelpOptions } from "./help/_help_generator.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
+type Id<T> = T extends Record<string, unknown>
+  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
+  : T;
+
 type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
 
 type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
@@ -64,7 +68,7 @@ export type IAction<
   P extends Command<any> | undefined = any,
 > = (
   this: Command<PG, PT, O, A, G, CT, GT, P>,
-  options: MapTypes<Merge<Merge<PG, G>, O>>,
+  options: Id<MapTypes<Merge<Merge<PG, G>, O>>>,
   ...args: MapTypes<A>
 ) => void | Promise<void>;
 
@@ -97,7 +101,7 @@ export interface IParseResult<
   // deno-lint-ignore no-explicit-any
   P extends Command<any> | undefined = any,
 > {
-  options: Merge<Merge<PG, G>, O>;
+  options: Id<Merge<Merge<PG, G>, O>>;
   args: A;
   // options: MapTypes<Merge<Merge<PG, G>, O>>;
   // args: MapTypes<A>;
