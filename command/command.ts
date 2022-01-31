@@ -269,7 +269,7 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    A extends TypedCommandArguments<N, Merge<CT, Merge<GT, PT>>>,
+    A extends TypedCommandArguments<N, Merge<GT, PT>>,
     N extends string = string,
   >(
     name: N,
