@@ -2079,19 +2079,10 @@ export class Command<
   }
 }
 
-interface IDefaultOption<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = any,
-  G extends Record<string, any> | void = any,
-  PG extends Record<string, any> | void = any,
-  P extends Command<any> | undefined = any,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-> {
+interface IDefaultOption {
   flags: string;
   desc?: string;
-  opts?: ICommandOption<O, A, G, PG, CT, GT, PT, P>;
+  opts?: ICommandOption;
 }
 
 type TrimLeft<T extends string, V extends string> = T extends `${V}${infer U}`
