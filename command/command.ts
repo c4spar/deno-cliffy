@@ -566,8 +566,8 @@ export class Command<
     CO,
     CA,
     CG,
-    Merge<CT, TypedType<N, H>>,
-    GT,
+    CT,
+    Merge<GT, TypedType<N, H>>,
     P
   > {
     return this.type(name, handler, { ...options, global: true });
