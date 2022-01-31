@@ -275,14 +275,14 @@ export class Command<
     name: N,
     desc?: string,
     override?: boolean,
-  ): Command<
+  ): PG extends number ? Command<any> : Command<
     Merge<PG, CG>,
     Merge<PT, CT>,
-    PG extends number ? any : void,
+    void,
     A,
-    PG extends number ? any : void,
-    PG extends number ? any : void,
-    PG extends number ? any : void,
+    void,
+    void,
+    void,
     OneOf<P, this>
   >;
 
