@@ -2093,11 +2093,14 @@ type TrimRight<T extends string, V extends string> = T extends `${infer U}${V}`
   ? U
   : T;
 
+type Lower<V extends string> = V extends Uppercase<V> ? Lowercase<V>
+  : Uncapitalize<V>;
+
 type CamelCase<T extends string> = T extends `${infer V}_${infer Rest}`
-  ? `${Lowercase<V>}${Capitalize<CamelCase<Rest>>}`
+  ? `${Lower<V>}${Capitalize<CamelCase<Rest>>}`
   : T extends `${infer V}-${infer Rest}`
-    ? `${Lowercase<V>}${Capitalize<CamelCase<Rest>>}`
-  : Lowercase<T>;
+    ? `${Lower<V>}${Capitalize<CamelCase<Rest>>}`
+  : Lower<T>;
 
 type OneOf<T, V> = T extends void ? V : T;
 
