@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, yellow } from "./deps.ts";
+import { blue, normalize, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 export type InputKeys = GenericSuggestionsKeys;
@@ -58,9 +58,9 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
     return super.success(value);
   }
 
-  /** Get input input. */
+  /** Get input value. */
   protected getValue(): string {
-    return this.inputValue;
+    return this.settings.files ? normalize(this.inputValue) : this.inputValue;
   }
 
   /**
