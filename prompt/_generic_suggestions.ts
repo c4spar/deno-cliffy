@@ -49,7 +49,7 @@ export interface GenericSuggestionsOptions<T, V>
   id?: string;
   suggestions?: Array<string | number> | SuggestionHandler;
   complete?: CompleteHandler;
-  fileMode?: boolean;
+  files?: boolean | RegExp;
   list?: boolean;
   info?: boolean;
   listPointer?: string;
@@ -63,7 +63,7 @@ export interface GenericSuggestionsSettings<T, V>
   id?: string;
   suggestions?: Array<string | number> | SuggestionHandler;
   complete?: CompleteHandler;
-  fileMode?: boolean;
+  files?: boolean | RegExp;
   list?: boolean;
   info?: boolean;
   listPointer: string;
@@ -139,9 +139,9 @@ export abstract class GenericSuggestions<
   }
 
   protected async render(): Promise<void> {
-    if (this.settings.fileMode && this.#hasReadPermissions === undefined) {
+    if (this.settings.files && this.#hasReadPermissions === undefined) {
       const status = await Deno.permissions.request({ name: "read" });
-      // disable fileMode if read permissions are denied.
+      // disable path completion if read permissions are denied.
       this.#hasReadPermissions = status.state === "granted";
     }
     await this.match();
@@ -183,7 +183,7 @@ export abstract class GenericSuggestions<
   }
 
   #isFileModeEnabled(): boolean {
-    return this.settings.fileMode === true && this.#hasReadPermissions === true;
+    return !!this.settings.files && this.#hasReadPermissions === true;
   }
 
   protected async getFileSuggestions(
@@ -197,7 +197,7 @@ export abstract class GenericSuggestions<
       .then((file) => file.isDirectory ? input : dirname(input))
       .catch(() => dirname(input));
 
-    return await listDir(path);
+    return await listDir(path, this.settings.files);
   }
 
   protected async getSuggestions(): Promise<Array<string | number>> {
@@ -492,10 +492,27 @@ function isDirectory(path: string): Promise<boolean> {
     .catch(() => false);
 }
 
-async function listDir(path: string): Promise<Array<string>> {
+async function listDir(
+  path: string,
+  mode?: boolean | RegExp,
+): Promise<Array<string>> {
   const fileNames: string[] = [];
+
   for await (const file of Deno.readDir(path || ".")) {
-    fileNames.push(join(path, file.name));
+    if (
+      mode === true && (file.name.startsWith(".") || file.name.endsWith("~"))
+    ) {
+      continue;
+    }
+    const filePath = join(path, file.name);
+
+    if (mode instanceof RegExp && !mode.test(filePath)) {
+      continue;
+    }
+    fileNames.push(filePath);
   }
-  return fileNames;
+
+  return fileNames.sort(function (a, b) {
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+  });
 }

@@ -68,7 +68,7 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     const tags: string[] = this.getTags(oldInput);
     const separator: string = this.settings.separator + " ";
 
-    if (this.settings.fileMode && tags.length > 1) {
+    if (this.settings.files && tags.length > 1) {
       tags[tags.length - 2] = normalize(tags[tags.length - 2]);
     }
 
@@ -105,7 +105,7 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     // Remove trailing comma and spaces.
     const input = this.inputValue.replace(/,+\s*$/, "");
 
-    if (!this.settings.fileMode) {
+    if (!this.settings.files) {
       return input;
     }
 

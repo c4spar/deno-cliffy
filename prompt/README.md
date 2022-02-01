@@ -420,7 +420,7 @@ storage key. Both options can be defined at the same time.
 
 The `id` option requires deno >= `1.10` and the `--location` flag.
 
-You can also enable path completion for local files with the `fileMode` option
+You can also enable path completion for local files with the `files` option
 (_Requires read permissions_).
 
 ```shell
@@ -505,7 +505,7 @@ specific options.
 | maxLength   |                                `number`                                 |    No    | Max length of value. Defaults to `infinity`.                                                                                                                                   |
 | suggestions | `Array<string \| number> \| (input: string) => Array<string \| number>` |    No    | A list or a function that returns a list of auto suggestions                                                                                                                   |
 | complete    |             `(input: string, suggestion: string) => string`             |    No    | A custom handler that is called when the input value gets completed with a suggestion.                                                                                         |
-| fileMode    |                                `boolean`                                |    No    | If enabled, files from the local disk will be added to the suggestions list. (_Requires read permissions_)                                                                     |
+| files       |                           `boolean \| RegExp`                           |    No    | If enabled, files from the local disk will be added to the suggestions list. (_Requires read permissions_)                                                                     |
 | id          |                                `string`                                 |    No    | If an id is provided, values are stored in the local storage using the id as local storage key. The stored values are used as suggestions at the next time the prompt is used. |
 | list        |                                `number`                                 |    No    | Show auto suggestions list.                                                                                                                                                    |
 | maxRows     |                                `number`                                 |    No    | Number of options suggestions per page. Defaults to `10`.                                                                                                                      |
@@ -672,7 +672,8 @@ storage key. Both options can be defined at the same time.
 
 The `id` option requires deno >= `1.10` and the `--location` flag.
 
-You can also enable path completion for local files with the `fileMode` option.
+You can also enable path completion for local files with the `files` option.
+(_Requires read permissions_).
 
 ```shell
 deno install you/cli.ts --location https://example.com
@@ -723,7 +724,7 @@ specific options.
 | maxTags     |                                `number`                                 |    No    | Max number of tags. Defaults to `infinity`.                                                                                                                                    |
 | suggestions | `Array<string \| number> \| (input: string) => Array<string \| number>` |    No    | A list or a function that returns a list of auto suggestions                                                                                                                   |
 | complete    |             `(input: string, suggestion: string) => string`             |    No    | A custom handler that is called when the input value gets completed with a suggestion.                                                                                         |
-| fileMode    |                                `boolean`                                |    No    | If enabled, files from the local disk will be added to the suggestions list.                                                                                                   |
+| files       |                           `boolean \| RegExp`                           |    No    | If enabled, files from the local disk will be added to the suggestions list.                                                                                                   |
 | id          |                                `string`                                 |    No    | If an id is provided, values are stored in the local storage using the id as local storage key. The stored values are used as suggestions at the next time the prompt is used. |
 | list        |                                `number`                                 |    No    | Show auto suggestions list.                                                                                                                                                    |
 | maxRows     |                                `number`                                 |    No    | Number of options suggestions per page. Defaults to `10`.                                                                                                                      |

@@ -16,7 +16,7 @@ export interface NumberKeys extends GenericSuggestionsKeys {
   decreaseValue?: string[];
 }
 
-type UnsupportedOptions = "fileMode";
+type UnsupportedOptions = "files";
 
 /** Number prompt options. */
 export interface NumberOptions
@@ -56,7 +56,7 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
       float: false,
       round: 2,
       ...options,
-      fileMode: false,
+      files: false,
       keys: {
         increaseValue: ["up", "u", "+"],
         decreaseValue: ["down", "d", "-"],

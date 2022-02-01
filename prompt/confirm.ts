@@ -11,7 +11,7 @@ import { Figures } from "./figures.ts";
 export type ConfirmKeys = GenericSuggestionsKeys;
 
 type UnsupportedOptions =
-  | "fileMode"
+  | "files"
   | "complete"
   | "suggestions"
   | "list"
@@ -52,7 +52,7 @@ export class Confirm
       active: "Yes",
       inactive: "No",
       ...options,
-      fileMode: false,
+      files: false,
       complete: undefined,
       suggestions: [
         options.active ?? "Yes",
