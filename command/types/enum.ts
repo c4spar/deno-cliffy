@@ -6,9 +6,9 @@ import { InvalidTypeError } from "../../flags/_errors.ts";
 export class EnumType<T extends string | number> extends Type<T> {
   private readonly allowedValues: ReadonlyArray<T>;
 
-  constructor(values: ReadonlyArray<T>) {
+  constructor(values: ReadonlyArray<T> | Record<string, T>) {
     super();
-    this.allowedValues = values;
+    this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
   public parse(type: ITypeInfo): T {
