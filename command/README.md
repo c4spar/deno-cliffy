@@ -244,33 +244,6 @@ the help text.
 The types will be automatically infered and applied to the values of the command
 options and arguments.
 
-#### Array enum type
-
-```typescript
-import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
-
-const color = new EnumType(["blue", "yellow", "red"]);
-
-await new Command()
-  .type("color", color)
-  .option(
-    "-c, --color [method:color]",
-    "choose a color",
-  )
-  .action(({ color }) => {
-    console.log("color: %s", color);
-  })
-  .parse(Deno.args);
-```
-
-```console
-$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red
-color: red
-
-$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color foo
-error: Option "--color" must be of type "color", but got "foo". Expected values: "blue", "yellow", "red"
-```
-
 ```typescript
 import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
 
