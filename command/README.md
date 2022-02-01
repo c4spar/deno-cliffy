@@ -234,33 +234,52 @@ $ deno run https://deno.land/x/cliffy/examples/command/common_option_types.ts -s
 
 ### Enum option type
 
-The enum type can be used to define a list of allowed values. The same can be
-also done with an [array](#array-validator) or
-[regexp validator](#regexp-validator).
+The `EnumType` can be used to define a list of allowed values.
 
-Optional you can use the color type as generic type. The type will be inferred
-and used as type for the result in the options object.
+The constructor accapts eather an `Array<string | number>` or an `enum`.
+
+The values are used for input validation and shell completions and displayed in
+the help text.
+
+The types will be automatically infered and applied to the values of the command
+options and arguments.
 
 ```typescript
 import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
 
+enum Animal {
+  Dog = "dog",
+  Cat = "cat",
+}
+
+// Enum type with array
 const color = new EnumType(["blue", "yellow", "red"]);
 
-await new Command<void>()
+// Enum type with enum
+const animal = new EnumType(Animal);
+
+await new Command()
   .type("color", color)
-  .option<{ color: typeof color }>(
-    "-c, --color [method:color]",
-    "choose a color",
+  .type("animal", animal)
+  .option(
+    "-c, --color [name:color]",
+    "Choose a color.",
   )
-  .action(({ color }) => {
+  .option(
+    "-a, --animal [name:animal]",
+    "Choose an animal.",
+  )
+  .action(({ color, animal }) => {
     console.log("color: %s", color);
+    console.log("animal: %s", animal);
   })
   .parse(Deno.args);
 ```
 
 ```console
-$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red
+$ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color red --animal dog
 color: red
+animal: dog
 
 $ deno run https://deno.land/x/cliffy/examples/command/enum_option_type.ts --color foo
 error: Option "--color" must be of type "color", but got "foo". Expected values: "blue", "yellow", "red"
