@@ -3,15 +3,31 @@
 import { Command } from "../../command/command.ts";
 import { EnumType } from "../../command/types/enum.ts";
 
+// Enum enum type
+enum Animal {
+  Dog = "dog",
+  Cat = "cat",
+}
+
+// Array enum type
 const color = new EnumType(["blue", "yellow", "red"]);
 
-await new Command<void>()
+// Array enum type
+const animal = new EnumType(Animal);
+
+await new Command()
   .type("color", color)
-  .option<{ color: typeof color }>(
-    "-c, --color [value:color]",
-    "choose a color",
+  .type("animal", animal)
+  .option(
+    "-c, --color [name:color]",
+    "Choose a color.",
   )
-  .action(({ color }) => {
+  .option(
+    "-a, --animal [name:animal]",
+    "Choose an animal.",
+  )
+  .action(({ color, animal }) => {
     console.log("color: %s", color);
+    console.log("animal: %s", animal);
   })
   .parse(Deno.args);

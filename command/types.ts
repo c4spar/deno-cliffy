@@ -62,7 +62,7 @@ export type IAction<
   this: Command<PG, PT, O, A, G, CT, GT, P>,
   options: Id<MapTypes<Merge<Merge<PG, G>, O>>>,
   ...args: MapTypes<A>
-) => void | Promise<void>;
+) => unknown | Promise<unknown>;
 
 /** Argument details. */
 export interface IArgument extends IFlagArgument {
