@@ -39,7 +39,7 @@ export type SuggestionHandler = (
 
 export type CompleteHandler = (
   input: string,
-  suggestion: string,
+  suggestion?: string,
 ) => Promise<string> | string;
 
 /** Generic input prompt options. */
@@ -401,7 +401,7 @@ export abstract class GenericSuggestions<
     const suggestion: string | undefined = this
       .suggestions[this.suggestionsIndex]?.toString();
 
-    if (suggestion && this.settings.complete) {
+    if (this.settings.complete) {
       input = await this.settings.complete(input, suggestion);
     } else if (
       this.#isFileModeEnabled() &&
