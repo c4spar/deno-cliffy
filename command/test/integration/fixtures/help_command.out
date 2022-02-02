@@ -2,6 +2,10 @@
   [1mUsage:[22m   [35mcompletions-test[39m
   [1mVersion:[22m [33m1.0.0[39m           
 
+  [1mmeta1: [22mvalue1
+  [1mmeta2: [22mvalue2
+  [1mmeta3: [22mvalue3
+
   [1mDescription:[22m
 
     Completions test.
