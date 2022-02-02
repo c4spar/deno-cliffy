@@ -1320,8 +1320,7 @@ new Command()
   .parse();
 ```
 
-The additional information is displayed below the command version and above the
-description.
+The additional information is displayed below the command version.
 
 ```console
   Usage:   example
