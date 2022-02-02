@@ -109,6 +109,7 @@ export class Command<
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
+  private _meta: Record<string, string> = {};
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -415,6 +416,17 @@ export class Command<
       this.cmd.ver = version;
     }
     return this;
+  }
+
+  public meta(name: string, value: string): this {
+    this.cmd._meta[name] = value;
+    return this;
+  }
+
+  public getMeta(): Record<string, string>;
+  public getMeta(name: string): string;
+  public getMeta(name?: string): Record<string, string> | string {
+    return typeof name === "undefined" ? this._meta : this._meta[name];
   }
 
   /**
