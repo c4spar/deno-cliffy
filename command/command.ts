@@ -427,7 +427,7 @@ export class Command<
   public getMeta(): Record<string, string>;
   public getMeta(name: string): string;
   public getMeta(name?: string): Record<string, string> | string {
-    return name ? this._meta[name] : this._meta;
+    return typeof name === "undefined" ? this._meta : this._meta[name];
   }
 
   /**

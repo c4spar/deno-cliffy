@@ -86,13 +86,13 @@ export class HelpGenerator {
   }
 
   private generateMeta(): string {
-    const meta = this.cmd.getMeta();
-    if (!meta.size) {
+    const meta = Object.entries(this.cmd.getMeta());
+    if (!meta.length) {
       return "";
     }
 
     const rows = [];
-    for (const [name, value] of Object.entries(meta)) {
+    for (const [name, value] of meta) {
       rows.push([bold(`${name}: `) + value]);
     }
 
