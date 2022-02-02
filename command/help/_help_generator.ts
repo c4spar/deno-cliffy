@@ -92,7 +92,7 @@ export class HelpGenerator {
     }
 
     const rows = [];
-    for (const [name, value] of meta.entries()) {
+    for (const [name, value] of Object.entries(meta)) {
       rows.push([bold(`${name}: `) + value]);
     }
 

@@ -135,7 +135,7 @@ export class Command<
   private _helpOption?: IDefaultOption | false;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
-  private _meta = new Map<string, string>();
+  private _meta: Record<string, string> = {};
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -420,12 +420,14 @@ export class Command<
   }
 
   public meta(name: string, value: string): this {
-    this.cmd._meta.set(name, value);
+    this.cmd._meta[name] = value;
     return this;
   }
 
-  public getMeta(): Map<string, string> {
-    return this._meta;
+  public getMeta(): Record<string, string>;
+  public getMeta(name: string): string;
+  public getMeta(name?: string): Record<string, string> | string {
+    return name ? this._meta[name] : this._meta;
   }
 
   /**
