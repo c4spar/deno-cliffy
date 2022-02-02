@@ -46,7 +46,7 @@ export type IAction<
   this: Command<O, A, G, PG, P>,
   options: Merge<Merge<PG, G>, O>,
   ...args: A
-) => void | Promise<void>;
+) => unknown | Promise<unknown>;
 
 /** Argument details. */
 export interface IArgument extends IFlagArgument {

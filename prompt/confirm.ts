@@ -10,12 +10,16 @@ import { Figures } from "./figures.ts";
 
 export type ConfirmKeys = GenericSuggestionsKeys;
 
-type UnsupportedInputOptions = "suggestions" | "list" | "info";
+type UnsupportedOptions =
+  | "files"
+  | "complete"
+  | "suggestions"
+  | "list"
+  | "info";
 
 /** Confirm prompt options. */
 export interface ConfirmOptions
-  extends
-    Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedInputOptions> {
+  extends Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedOptions> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
@@ -48,6 +52,8 @@ export class Confirm
       active: "Yes",
       inactive: "No",
       ...options,
+      files: false,
+      complete: undefined,
       suggestions: [
         options.active ?? "Yes",
         options.inactive ?? "No",
