@@ -270,7 +270,7 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    A extends TypedCommandArguments<N, Merge<GT, PT>>,
+    A extends TypedCommandArguments<N, Merge<PT, GT>>,
     N extends string = string,
   >(
     name: N,
@@ -496,7 +496,7 @@ export class Command<
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
   public arguments<
-    A extends TypedArguments<N, Merge<CT, Merge<GT, PT>>>,
+    A extends TypedArguments<N, Merge<PT, Merge<GT, CT>>>,
     N extends string = string,
   >(
     args: N,
@@ -744,7 +744,7 @@ export class Command<
   }
 
   public globalOption<
-    G extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
+    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
   >(
     flags: N,
@@ -787,7 +787,7 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    G extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
+    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
   >(
     flags: N,
@@ -817,7 +817,7 @@ export class Command<
   >;
 
   public option<
-    O extends TypedOption<N, Merge<CT, Merge<GT, PT>>>,
+    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>>,
     N extends string = string,
   >(
     flags: N,
@@ -838,7 +838,7 @@ export class Command<
   >;
 
   public option<
-    O extends Partial<TypedOption<N, Merge<CT, Merge<GT, PT>>>>,
+    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
   >(
     flags: N,
@@ -936,7 +936,7 @@ export class Command<
   }
 
   public globalEnv<
-    G extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
+    G extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
     Prefix extends string = "",
   >(
@@ -954,7 +954,7 @@ export class Command<
    * @param options       Environment variable options.
    */
   public env<
-    G extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
+    G extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
     Prefix extends string = "",
   >(
@@ -964,7 +964,7 @@ export class Command<
   ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
 
   public env<
-    O extends Partial<TypedEnv<N, Prefix, Merge<CT, Merge<GT, PT>>>>,
+    O extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
     Prefix extends string = "",
   >(
