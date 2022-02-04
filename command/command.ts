@@ -52,11 +52,11 @@ import type {
   IOption,
   IParseResult,
   IType,
-  ITypeHandler,
   ITypeInfo,
   ITypeOptions,
   IVersionHandler,
   MapTypes,
+  TypeOrTypeHandler,
 } from "./types.ts";
 import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
@@ -2268,12 +2268,7 @@ type TypedEnv<T extends string, P extends string, V> = string extends T
 type TypedType<
   Name extends string,
   Handler extends TypeOrTypeHandler<unknown>,
-> = { [N in Name]: TypeValue<Handler> };
-
-type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
-
-export type TypeValue<T extends TypeOrTypeHandler<unknown>> = T extends
-  TypeOrTypeHandler<infer V> ? V : never;
+> = { [N in Name]: Handler };
 
 type RequiredKeys<T> = {
   // deno-lint-ignore ban-types

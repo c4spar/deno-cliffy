@@ -14,19 +14,15 @@ import type { HelpOptions } from "./help/_help_generator.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
-type Id<T> = T extends Record<string, unknown>
-  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
-  : T;
+type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
-type Merge<T, V> = T extends void ? V : (V extends void ? T : T & V);
+export type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
 
-type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
+export type TypeValue<T, U = T> = T extends TypeOrTypeHandler<infer V> ? V : U;
 
-export type MapTypes<
-  T extends Array<unknown> | Record<string, unknown> | void,
-> = T extends (Array<unknown> | Record<string, unknown>)
-  ? { [K in keyof T]: T[K] extends TypeOrTypeHandler<infer V> ? V : T[K] }
-  : T;
+export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
+  ? { [K in keyof T]: MapTypes<T[K]> }
+  : TypeValue<T>;
 
 type DefaultTypes = {
   number: number;
@@ -60,7 +56,7 @@ export type IAction<
   P extends Command<any> | undefined = O extends number ? any : undefined,
 > = (
   this: Command<PG, PT, O, A, G, CT, GT, P>,
-  options: Id<MapTypes<Merge<Merge<PG, G>, O>>>,
+  options: MapTypes<Merge<PG, Merge<G, O>>>,
   ...args: MapTypes<A>
 ) => unknown | Promise<unknown>;
 
@@ -85,10 +81,8 @@ export interface IParseResult<
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
 > {
-  options: Id<Merge<Merge<PG, G>, O>>;
+  options: Merge<Merge<PG, G>, O>;
   args: A;
-  // options: MapTypes<Merge<Merge<PG, G>, O>>;
-  // args: MapTypes<A>;
   literal: string[];
   cmd: Command<PG, PT, O, A, G, CT, GT, P>;
 }
