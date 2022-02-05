@@ -11,9 +11,6 @@ import type {
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
-import type { StringType } from "./types/string.ts";
-import type { NumberType } from "./types/number.ts";
-import type { BooleanType } from "./types/boolean.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
@@ -31,12 +28,6 @@ export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
   : TypeValue<T>;
 
-type DefaultTypes = {
-  number: NumberType;
-  string: StringType;
-  boolean: BooleanType;
-};
-
 /* COMMAND TYPES */
 
 /** Description handler. */
@@ -45,7 +36,7 @@ export type IDescription<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -57,7 +48,7 @@ export type IAction<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -83,7 +74,7 @@ export interface IParseResult<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -111,7 +102,7 @@ export interface ICommandOption<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -129,7 +120,7 @@ export interface IOption<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -198,7 +189,7 @@ export interface ICompletion<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -219,7 +210,7 @@ export type ICompleteHandler<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -237,7 +228,7 @@ export type IHelpHandler<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
@@ -262,7 +253,7 @@ export type IVersionHandler<
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
   PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : DefaultTypes,
+  CT extends Record<string, any> | void = O extends number ? any : void,
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,

@@ -2241,27 +2241,34 @@ type SingleArg = OptionalOrRequiredValue<
   `${string}`
 >;
 
-type ArgumentType<T extends string | undefined, V> = T extends undefined ? T
-  : string extends T ? unknown
-  : T extends RestArgsListTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : T extends RestArgsListType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : T extends RestArgsTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends RestArgsType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends RestArgs ? Array<string>
-  : T extends SingleArgListTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends SingleArgListType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends SingleArgTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? R : unknown
-  : T extends SingleArgType<infer Type>
-    ? V extends Record<Type, infer R> ? R : unknown
-  : T extends SingleArg ? string
-  : unknown;
+type DefaultTypes = {
+  number: NumberType;
+  string: StringType;
+  boolean: BooleanType;
+};
+
+type ArgumentType<T extends string | undefined, U, V = Merge<DefaultTypes, U>> =
+  T extends undefined ? T
+    : string extends T ? unknown
+    : T extends RestArgsListTypeCompletion<infer Type>
+      ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+    : T extends RestArgsListType<infer Type>
+      ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+    : T extends RestArgsTypeCompletion<infer Type>
+      ? V extends Record<Type, infer R> ? Array<R> : unknown
+    : T extends RestArgsType<infer Type>
+      ? V extends Record<Type, infer R> ? Array<R> : unknown
+    : T extends RestArgs ? Array<string>
+    : T extends SingleArgListTypeCompletion<infer Type>
+      ? V extends Record<Type, infer R> ? Array<R> : unknown
+    : T extends SingleArgListType<infer Type>
+      ? V extends Record<Type, infer R> ? Array<R> : unknown
+    : T extends SingleArgTypeCompletion<infer Type>
+      ? V extends Record<Type, infer R> ? R : unknown
+    : T extends SingleArgType<infer Type>
+      ? V extends Record<Type, infer R> ? R : unknown
+    : T extends SingleArg ? string
+    : unknown;
 
 type GetArgumentTypes<T extends string, V> = T extends
   `${infer Arg} ${infer Rest}`
