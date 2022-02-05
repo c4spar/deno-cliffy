@@ -626,6 +626,7 @@ import {
         .globalType("lang", new EnumType(["js", "rust"]))
         .option("--foo-bar <val:color>", "")
         .env("FOO_BAR <val:color>", "")
+        .env("FOO_BAR_BAZ=<val:number>", "", { required: true })
         .globalEnv("GLOBAL_FOO_BAR <val:lang>", "")
         .action((options, ...args) => {
           assert<IsExact<typeof args, []>>(true);
@@ -633,6 +634,7 @@ import {
             IsExact<typeof options, {
               globalFooBar?: "js" | "rust";
               fooBar?: "red" | "blue";
+              fooBarBaz: number;
             }>
           >(true);
         })

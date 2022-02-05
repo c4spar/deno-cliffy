@@ -969,6 +969,16 @@ export class Command<
   ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
 
   public env<
+    O extends TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>,
+    N extends string = string,
+    Prefix extends string = "",
+  >(
+    name: N,
+    description: string,
+    options: IEnvVarOptions<Prefix> & { required: true },
+  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
+
+  public env<
     O extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
     Prefix extends string = "",
