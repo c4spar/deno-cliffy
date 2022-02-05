@@ -11,6 +11,9 @@ import type {
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
+import type { StringType } from "./types/string.ts";
+import type { NumberType } from "./types/number.ts";
+import type { BooleanType } from "./types/boolean.ts";
 
 export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
 
@@ -20,14 +23,18 @@ export type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
 
 export type TypeValue<T, U = T> = T extends TypeOrTypeHandler<infer V> ? V : U;
 
+type Id<T> = T extends Record<string, unknown>
+  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
+  : T;
+
 export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
   : TypeValue<T>;
 
 type DefaultTypes = {
-  number: number;
-  string: string;
-  boolean: boolean;
+  number: NumberType;
+  string: StringType;
+  boolean: BooleanType;
 };
 
 /* COMMAND TYPES */
@@ -81,7 +88,7 @@ export interface IParseResult<
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
 > {
-  options: Merge<Merge<PG, G>, O>;
+  options: Id<Merge<Merge<PG, G>, O>>;
   args: A;
   literal: string[];
   cmd: Command<PG, PT, O, A, G, CT, GT, P>;
