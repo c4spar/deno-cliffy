@@ -131,8 +131,8 @@ import {
       cmd.command("foo")
         .globalOption("--foo-global", "")
         .option("--foo", "")
-        .action((options, ..._args) => {
-          // assert<IsExact<typeof args, []>>(true);
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
           assert<
             IsExact<typeof options, {
               debug?: true;
@@ -146,8 +146,8 @@ import {
       cmd.command("bar")
         .globalOption("--bar-global", "")
         .option("--bar", "")
-        .action((options, ..._args) => {
-          // assert<IsExact<typeof args, []>>(true);
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
           assert<
             IsExact<typeof options, {
               debug?: true;
@@ -181,8 +181,8 @@ import {
         .command("foo-foo")
         .globalOption("--foo-foo-global", "")
         .option("--foo-foo", "")
-        .action((options, ..._args) => {
-          // assert<IsExact<typeof args, []>>(true);
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
           assert<
             IsExact<typeof options, {
               debug?: true;
@@ -255,16 +255,16 @@ import {
           >(true);
         })
         .command("bar", bar)
-        .action((_options, ...args) => {
+        .action((options, ...args) => {
           assert<IsExact<typeof args, []>>(true);
-          // assert<
-          //   IsExact<typeof options, {
-          //     debug?: true;
-          //     logLevel?: true;
-          //     barGlobal?: true;
-          //     bar?: true;
-          //   }>
-          // >(true);
+          assert<
+            IsExact<typeof options, {
+              debug?: true;
+              logLevel?: true;
+              barGlobal?: true;
+              bar?: true;
+            }>
+          >(true);
         });
     },
   });
