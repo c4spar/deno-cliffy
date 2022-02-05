@@ -229,8 +229,8 @@ export class Command<
    */
   public command<
     C extends Command<
-      Merge<PG, CG> | void | undefined,
-      Merge<PT, CT> | void | undefined,
+      (P extends Command<any> ? PG : Merge<PG, CG>) | void | undefined,
+      (P extends Command<any> ? PT : Merge<PT, CT>) | void | undefined,
       Record<string, any> | void,
       Array<unknown>,
       Record<string, any> | void,
@@ -252,8 +252,8 @@ export class Command<
     infer GlobalTypes,
     any
   > ? Command<
-    Merge<PG, CG>,
-    Merge<PT, CT>,
+    P extends Command<any> ? PG : Merge<PG, CG>,
+    P extends Command<any> ? PT : Merge<PT, CT>,
     Options,
     Arguments,
     GlobalOptions,
@@ -270,15 +270,18 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    A extends TypedCommandArguments<N, Merge<PT, GT>>,
+    A extends TypedCommandArguments<
+      N,
+      P extends Command<any> ? PT : Merge<PT, GT>
+    >,
     N extends string = string,
   >(
     name: N,
     desc?: string,
     override?: boolean,
   ): PG extends number ? Command<any> : Command<
-    Merge<PG, CG>,
-    Merge<PT, CT>,
+    P extends Command<any> ? PG : Merge<PG, CG>,
+    P extends Command<any> ? PT : Merge<PT, GT>,
     void,
     A,
     void,
@@ -2254,7 +2257,7 @@ type TypedArguments<T extends string, V extends Record<string, any> | void> =
 type TypedCommandArguments<T extends string, V> = string extends T
   ? Array<unknown>
   : T extends `${string} ${infer Args}` ? TypedArguments<Args, V>
-  : Array<unknown>;
+  : [];
 
 type TypedEnv<T extends string, P extends string, V> = string extends T
   ? Record<string, unknown>
