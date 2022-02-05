@@ -229,8 +229,8 @@ export class Command<
    */
   public command<
     C extends Command<
-      (P extends Command<any> ? PG : Merge<PG, CG>) | void | undefined,
-      (P extends Command<any> ? PT : Merge<PT, CT>) | void | undefined,
+      G | void | undefined,
+      T | void | undefined,
       Record<string, any> | void,
       Array<unknown>,
       Record<string, any> | void,
@@ -238,6 +238,8 @@ export class Command<
       Record<string, any> | void,
       OneOf<P, this> | undefined
     >,
+    G extends (P extends Command<any> ? PG : Merge<PG, CG>),
+    T extends (P extends Command<any> ? PT : Merge<PT, CT>),
   >(
     name: string,
     cmd: C,
@@ -252,8 +254,8 @@ export class Command<
     infer GlobalTypes,
     any
   > ? Command<
-    P extends Command<any> ? PG : Merge<PG, CG>,
-    P extends Command<any> ? PT : Merge<PT, CT>,
+    G,
+    T,
     Options,
     Arguments,
     GlobalOptions,
@@ -2128,42 +2130,137 @@ type MergeRecursive<L, R> = L extends void ? R
   : L & R;
 
 type OptionalOrRequiredValue<T extends string> = `[${T}]` | `<${T}>`;
+type RestValue = `...${string}` | `${string}...`;
+
+/**
+ * Rest args with list type and completions.
+ *
+ * - `[...name:type[]:completion]`
+ * - `<...name:type[]:completion>`
+ * - `[name...:type[]:completion]`
+ * - `<name...:type[]:completion>`
+ */
+type RestArgsListTypeCompletion<T extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${T}[]:${string}`
+>;
+
+/**
+ * Rest args with list type.
+ *
+ * - `[...name:type[]]`
+ * - `<...name:type[]>`
+ * - `[name...:type[]]`
+ * - `<name...:type[]>`
+ */
+type RestArgsListType<T extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${T}[]`
+>;
+
+/**
+ * Rest args with type and completions.
+ *
+ * - `[...name:type:completion]`
+ * - `<...name:type:completion>`
+ * - `[name...:type:completion]`
+ * - `<name...:type:completion>`
+ */
+type RestArgsTypeCompletion<T extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${T}:${string}`
+>;
+
+/**
+ * Rest args with type.
+ *
+ * - `[...name:type]`
+ * - `<...name:type>`
+ * - `[name...:type]`
+ * - `<name...:type>`
+ */
+type RestArgsType<T extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${T}`
+>;
+
+/**
+ * Rest args.
+ * - `[...name]`
+ * - `<...name>`
+ * - `[name...]`
+ * - `<name...>`
+ */
+type RestArgs = OptionalOrRequiredValue<
+  `${RestValue}`
+>;
+
+/**
+ * Single arg with list type and completions.
+ *
+ * - `[name:type[]:completion]`
+ * - `<name:type[]:completion>`
+ */
+type SingleArgListTypeCompletion<T extends string> = OptionalOrRequiredValue<
+  `${string}:${T}[]:${string}`
+>;
+
+/**
+ * Single arg with list type.
+ *
+ * - `[name:type[]]`
+ * - `<name:type[]>`
+ */
+type SingleArgListType<T extends string> = OptionalOrRequiredValue<
+  `${string}:${T}[]`
+>;
+
+/**
+ * Single arg  with type and completion.
+ *
+ * - `[name:type:completion]`
+ * - `<name:type:completion>`
+ */
+type SingleArgTypeCompletion<T extends string> = OptionalOrRequiredValue<
+  `${string}:${T}:${string}`
+>;
+
+/**
+ * Single arg with type.
+ *
+ * - `[name:type]`
+ * - `<name:type>`
+ */
+type SingleArgType<T extends string> = OptionalOrRequiredValue<
+  `${string}:${T}`
+>;
+
+/**
+ * Single arg.
+ *
+ * - `[name]`
+ * - `<name>`
+ */
+type SingleArg = OptionalOrRequiredValue<
+  `${string}`
+>;
 
 type ArgumentType<T extends string | undefined, V> = T extends undefined ? T
   : string extends T ? unknown
-  : // rest args / type / completion / list
-  T extends OptionalOrRequiredValue<
-    `${`...${string}` | `${string}...`}:${infer Type}[]:${string}`
-  > ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : // rest args / type / list
-  T extends OptionalOrRequiredValue<
-    `${`...${string}` | `${string}...`}:${infer Type}[]`
-  > ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : // rest args / type / completion
-  T extends OptionalOrRequiredValue<
-    `${`...${string}` | `${string}...`}:${infer Type}:${string}`
-  > ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : // rest args / type
-  T extends
-    OptionalOrRequiredValue<`${`...${string}` | `${string}...`}:${infer Type}`>
+  : T extends RestArgsListTypeCompletion<infer Type>
+    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : T extends RestArgsListType<infer Type>
+    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : T extends RestArgsTypeCompletion<infer Type>
     ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : // rest args
-  T extends OptionalOrRequiredValue<`${`...${string}` | `${string}...`}`>
-    ? Array<string>
-  : // single arg / type / completion / list
-  T extends OptionalOrRequiredValue<`${string}:${infer Type}[]:${string}`>
+  : T extends RestArgsType<infer Type>
     ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : // single arg / type / list
-  T extends OptionalOrRequiredValue<`${string}:${infer Type}[]`>
+  : T extends RestArgs ? Array<string>
+  : T extends SingleArgListTypeCompletion<infer Type>
     ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : // single arg / type / completion
-  T extends OptionalOrRequiredValue<`${string}:${infer Type}:${string}`>
+  : T extends SingleArgListType<infer Type>
+    ? V extends Record<Type, infer R> ? Array<R> : unknown
+  : T extends SingleArgTypeCompletion<infer Type>
     ? V extends Record<Type, infer R> ? R : unknown
-  : // single arg / type
-  T extends OptionalOrRequiredValue<`${string}:${infer Type}`>
+  : T extends SingleArgType<infer Type>
     ? V extends Record<Type, infer R> ? R : unknown
-  : // single arg
-  T extends OptionalOrRequiredValue<`${string}`> ? string
+  : T extends SingleArg ? string
   : unknown;
 
 type GetArgumentTypes<T extends string, V> = T extends
@@ -2299,6 +2396,7 @@ type SpreadOptionalProperties<
   [P in K]?: L[P] | R[P];
 };
 
+/** Merge types of two objects. */
 type Spread<L, R> = L extends void ? R : R extends void ? L
 : // Properties in L that don't exist in R.
 & Omit<L, keyof R>
