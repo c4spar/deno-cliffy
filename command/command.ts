@@ -2247,26 +2247,26 @@ type DefaultTypes = {
   boolean: BooleanType;
 };
 
-type ArgumentType<T extends string, U, V = Merge<DefaultTypes, U>> =
-  T extends RestArgsListTypeCompletion<infer Type>
+type ArgumentType<T extends string, U, V = Merge<DefaultTypes, U>> = T extends
+  RestArgsListTypeCompletion<infer Type>
+  ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : T extends RestArgsListType<infer Type>
     ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-    : T extends RestArgsListType<infer Type>
-      ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-    : T extends RestArgsTypeCompletion<infer Type>
-      ? V extends Record<Type, infer R> ? Array<R> : unknown
-    : T extends RestArgsType<infer Type>
-      ? V extends Record<Type, infer R> ? Array<R> : unknown
-    : T extends RestArgs ? Array<string>
-    : T extends SingleArgListTypeCompletion<infer Type>
-      ? V extends Record<Type, infer R> ? Array<R> : unknown
-    : T extends SingleArgListType<infer Type>
-      ? V extends Record<Type, infer R> ? Array<R> : unknown
-    : T extends SingleArgTypeCompletion<infer Type>
-      ? V extends Record<Type, infer R> ? R : unknown
-    : T extends SingleArgType<infer Type>
-      ? V extends Record<Type, infer R> ? R : unknown
-    : T extends SingleArg ? string
-    : unknown;
+  : T extends RestArgsTypeCompletion<infer Type>
+    ? V extends Record<Type, infer R> ? Array<R> : unknown
+  : T extends RestArgsType<infer Type>
+    ? V extends Record<Type, infer R> ? Array<R> : unknown
+  : T extends RestArgs ? Array<string>
+  : T extends SingleArgListTypeCompletion<infer Type>
+    ? V extends Record<Type, infer R> ? Array<R> : unknown
+  : T extends SingleArgListType<infer Type>
+    ? V extends Record<Type, infer R> ? Array<R> : unknown
+  : T extends SingleArgTypeCompletion<infer Type>
+    ? V extends Record<Type, infer R> ? R : unknown
+  : T extends SingleArgType<infer Type>
+    ? V extends Record<Type, infer R> ? R : unknown
+  : T extends SingleArg ? string
+  : unknown;
 
 type GetArgumentTypes<T extends string, V> = T extends
   `${infer Arg} ${infer Rest}`
@@ -2342,10 +2342,11 @@ type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //   : Merge<CO, O>;
 
 type TypedArguments<T extends string, V extends Record<string, any> | void> =
-  T extends `${infer Arg} ${infer Rest}`
-    ? Arg extends `[${string}]`
-      ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
-    : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
+  number extends V ? any
+    : T extends `${infer Arg} ${infer Rest}`
+      ? Arg extends `[${string}]`
+        ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
+      : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
     : T extends `${infer Arg}`
       ? Arg extends `[${string}]` ? [ArgumentType<Arg, V>?]
       : [ArgumentType<Arg, V>]

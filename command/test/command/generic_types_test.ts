@@ -20,6 +20,22 @@ import {
   });
 
   Deno.test({
+    name:
+      "[command] - generic types - options and args should be of type any 2",
+    fn() {
+      // deno-lint-ignore no-explicit-any
+      new Command<any>()
+        .option("-f, --foo, [val:string]", "...")
+        .arguments("<val:string> [val:string]")
+        .env("FOO_BAR [val:number]", "")
+        .action((options, ...args) => {
+          assert<IsAny<typeof options>>(true);
+          assert<IsAny<typeof args>>(true);
+        });
+    },
+  });
+
+  Deno.test({
     name: "[command] - generic types - command with void options",
     fn() {
       new Command()
@@ -597,6 +613,37 @@ import {
           >(true);
 
           assert<IsExact<typeof options, void>>(true);
+        })
+        .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - environment variables",
+    async fn() {
+      await new Command()
+        .globalType("color", new EnumType(["red", "blue"]))
+        .globalType("lang", new EnumType(["js", "rust"]))
+        .option("--foo-bar <val:color>", "")
+        .env("FOO_BAR <val:color>", "")
+        .globalEnv("GLOBAL_FOO_BAR <val:lang>", "")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              globalFooBar?: "js" | "rust";
+              fooBar?: "red" | "blue";
+            }>
+          >(true);
+        })
+        .command("foo")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              globalFooBar?: "js" | "rust";
+            }>
+          >(true);
         })
         .parse(Deno.args);
     },
