@@ -2247,11 +2247,9 @@ type DefaultTypes = {
   boolean: BooleanType;
 };
 
-type ArgumentType<T extends string | undefined, U, V = Merge<DefaultTypes, U>> =
-  T extends undefined ? T
-    : string extends T ? unknown
-    : T extends RestArgsListTypeCompletion<infer Type>
-      ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
+type ArgumentType<T extends string, U, V = Merge<DefaultTypes, U>> =
+  T extends RestArgsListTypeCompletion<infer Type>
+    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
     : T extends RestArgsListType<infer Type>
       ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
     : T extends RestArgsTypeCompletion<infer Type>
@@ -2311,10 +2309,8 @@ type ValuesOption<T extends string, Rest extends string, V> = T extends
       : ArgumentTypes<ArgumentDefinition<Rest>, V>;
   };
 
-type TypedOption<T extends string, V> = string extends T
-  ? Record<string, unknown>
-  : T extends `${string}--${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, V>
+type TypedOption<T extends string, V> = T extends
+  `${string}--${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V>
   : T extends `${string}--${infer Name} ${infer Rest}`
     ? ValuesOption<Name, Rest, V>
   : T extends `${string}--${infer Name}` ? BooleanOption<Name>
@@ -2346,27 +2342,21 @@ type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //   : Merge<CO, O>;
 
 type TypedArguments<T extends string, V extends Record<string, any> | void> =
-  number extends V ? any
-    : string extends T ? Array<unknown>
-    : void extends V ? Array<unknown>
-    : T extends `${infer Arg} ${infer Rest}`
-      ? Arg extends `[${string}]`
-        ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
-      : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
+  T extends `${infer Arg} ${infer Rest}`
+    ? Arg extends `[${string}]`
+      ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
+    : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
     : T extends `${infer Arg}`
       ? Arg extends `[${string}]` ? [ArgumentType<Arg, V>?]
       : [ArgumentType<Arg, V>]
     : [];
 
-type TypedCommandArguments<T extends string, V> = string extends T
-  ? Array<unknown>
-  : T extends `${string} ${infer Args}` ? TypedArguments<Args, V>
+type TypedCommandArguments<T extends string, V> = T extends
+  `${string} ${infer Args}` ? TypedArguments<Args, V>
   : [];
 
-type TypedEnv<T extends string, P extends string, V> = string extends T
-  ? Record<string, unknown>
-  : T extends `${infer Name}=${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V>
+type TypedEnv<T extends string, P extends string, V> = T extends
+  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V>
   : T extends `${infer Name} ${infer Rest}`
     ? ValueOption<TrimLeft<Name, P>, Rest, V>
   : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>>

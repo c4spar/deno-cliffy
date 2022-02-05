@@ -563,4 +563,42 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - command arguments",
+    async fn() {
+      await new Command()
+        .command("foo <val:number>")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, [number]>>(true);
+          assert<IsExact<typeof options, void>>(true);
+        })
+        .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - command arguments with custom types",
+    async fn() {
+      await new Command()
+        .globalType("color", new EnumType(["red", "blue"]))
+        .globalType("lang", new EnumType(["js", "rust"]))
+        .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
+        .action((options, ...args) => {
+          assert<
+            IsExact<
+              typeof args,
+              [
+                string,
+                ("red" | "blue")?,
+                Array<Array<"js" | "rust">>?,
+              ]
+            >
+          >(true);
+
+          assert<IsExact<typeof options, void>>(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
