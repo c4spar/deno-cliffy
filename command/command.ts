@@ -5,7 +5,11 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IFlagOptions, IFlagsResult } from "../flags/types.ts";
+import type {
+  IDefaultValue,
+  IFlagOptions,
+  IFlagsResult,
+} from "../flags/types.ts";
 import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
 import { bold, red } from "./deps.ts";
 import {
@@ -843,13 +847,15 @@ export class Command<
   >;
 
   public option<
-    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
+    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
+    D = undefined,
     N extends string = string,
   >(
     flags: N,
     desc: string,
     opts?:
       | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
+        & { default?: IDefaultValue<D> }
       | IFlagValueHandler,
   ): Command<
     PG,
@@ -2289,40 +2295,42 @@ type GetArguments<T extends string> = T extends `-${string} ${infer Rest}`
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
 
-type BooleanOption<T extends string> = T extends `no-${infer Name}`
+type BooleanOption<T extends string, D> = T extends `no-${infer Name}`
   ? { [N in OptionName<Name>]: false }
   : T extends `${infer Name}.${infer Rest}`
-    ? { [N in OptionName<Name>]: BooleanOption<Rest> }
-  : { [N in OptionName<T>]: true };
+    ? { [N in OptionName<Name>]: BooleanOption<Rest, D> }
+  : { [N in OptionName<T>]: true | D };
 
-type ValueOption<T extends string, Rest extends string, V> = T extends
+type NoUndefined<T, V> = undefined extends T ? V : T | V;
+
+type ValueOption<T extends string, Rest extends string, V, D> = T extends
   `${infer Name}.${infer RestName}` ? {
-  [N in OptionName<Name>]: ValueOption<RestName, Rest, V>;
+  [N in OptionName<Name>]: ValueOption<RestName, Rest, V, D>;
 }
   : {
     [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? true | ArgumentType<GetArguments<Rest>, V>
-      : ArgumentType<GetArguments<Rest>, V>;
+      ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
+      : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
   };
 
-type ValuesOption<T extends string, Rest extends string, V> = T extends
+type ValuesOption<T extends string, Rest extends string, V, D> = T extends
   `${infer Name}.${infer RestName}` ? {
-  [N in OptionName<Name>]: ValuesOption<RestName, Rest, V>;
+  [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, D>;
 }
   : {
     [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? true | ArgumentTypes<GetArguments<Rest>, V>
-      : ArgumentTypes<GetArguments<Rest>, V>;
+      ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
+      : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
   };
 
-type TypedOption<T extends string, V> = T extends
-  `${string}--${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V>
+type TypedOption<T extends string, V, D = undefined> = T extends
+  `${string}--${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V, D>
   : T extends `${string}--${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V>
-  : T extends `${string}--${infer Name}` ? BooleanOption<Name>
-  : T extends `-${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V>
-  : T extends `-${infer Name} ${infer Rest}` ? ValuesOption<Name, Rest, V>
-  : T extends `-${infer Name}` ? BooleanOption<Name>
+    ? ValuesOption<Name, Rest, V, D>
+  : T extends `${string}--${infer Name}` ? BooleanOption<Name, D>
+  : T extends `-${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V, D>
+  : T extends `-${infer Name} ${infer Rest}` ? ValuesOption<Name, Rest, V, D>
+  : T extends `-${infer Name}` ? BooleanOption<Name, D>
   : Record<string, unknown>;
 
 type GetOptionName<T> = T extends
@@ -2360,11 +2368,11 @@ type TypedCommandArguments<T extends string, V> = T extends
   `${string} ${infer Args}` ? TypedArguments<Args, V>
   : [];
 
-type TypedEnv<T extends string, P extends string, V> = T extends
-  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V>
+type TypedEnv<T extends string, P extends string, V, D = undefined> = T extends
+  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V, D>
   : T extends `${infer Name} ${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V>
-  : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>>
+    ? ValueOption<TrimLeft<Name, P>, Rest, V, D>
+  : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, D>
   : Record<string, unknown>;
 
 type TypedType<

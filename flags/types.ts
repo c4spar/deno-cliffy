@@ -41,7 +41,7 @@ export enum OptionType {
 }
 
 /** Default flag value */
-export type IDefaultValue = unknown | (() => unknown);
+export type IDefaultValue<T = unknown> = T | (() => T);
 
 // @TODO: make return type of IFlagValueHandler generic
 /** Value handler for custom value processing. */
