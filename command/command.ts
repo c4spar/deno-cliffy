@@ -2278,17 +2278,13 @@ type ArgumentType<T extends string, U, V = Merge<DefaultTypes, U>> = T extends
   : T extends SingleArg ? string
   : unknown;
 
-type GetArgumentTypes<T extends string, V> = T extends
-  `${infer Arg} ${infer Rest}`
-  ? [ArgumentType<Arg, V>, ...GetArgumentTypes<Rest, V>]
-  : [ArgumentType<T, V>];
-
-type ArgumentTypes<T extends string, V> = T extends `${infer Arg} ${infer Rest}`
-  ? [ArgumentType<Arg, V>, ...GetArgumentTypes<Rest, V>]
+type ArgumentTypes<T extends string, V> = T extends `${string} ${string}`
+  ? TypedArguments<T, V>
   : ArgumentType<T, V>;
 
-type ArgumentDefinition<T extends string> = T extends `-${string} ${infer Rest}`
-  ? ArgumentDefinition<Rest>
+type GetArguments<T extends string> = T extends `-${string} ${infer Rest}`
+  ? GetArguments<Rest>
+  : T extends `-${string}=${infer Rest}` ? GetArguments<Rest>
   : T;
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
@@ -2304,9 +2300,9 @@ type ValueOption<T extends string, Rest extends string, V> = T extends
   [N in OptionName<Name>]: ValueOption<RestName, Rest, V>;
 }
   : {
-    [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? true | ArgumentType<ArgumentDefinition<Rest>, V>
-      : ArgumentType<ArgumentDefinition<Rest>, V>;
+    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      ? true | ArgumentType<GetArguments<Rest>, V>
+      : ArgumentType<GetArguments<Rest>, V>;
   };
 
 type ValuesOption<T extends string, Rest extends string, V> = T extends
@@ -2314,9 +2310,9 @@ type ValuesOption<T extends string, Rest extends string, V> = T extends
   [N in OptionName<Name>]: ValuesOption<RestName, Rest, V>;
 }
   : {
-    [N in OptionName<T>]: ArgumentDefinition<Rest> extends `[${string}]`
-      ? true | ArgumentTypes<ArgumentDefinition<Rest>, V>
-      : ArgumentTypes<ArgumentDefinition<Rest>, V>;
+    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      ? true | ArgumentTypes<GetArguments<Rest>, V>
+      : ArgumentTypes<GetArguments<Rest>, V>;
   };
 
 type TypedOption<T extends string, V> = T extends
@@ -2357,10 +2353,8 @@ type TypedArguments<T extends string, V extends Record<string, any> | void> =
       ? Arg extends `[${string}]`
         ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
       : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
-    : T extends `${infer Arg}`
-      ? Arg extends `[${string}]` ? [ArgumentType<Arg, V>?]
-      : [ArgumentType<Arg, V>]
-    : [];
+    : T extends `[${string}]` ? [ArgumentType<T, V>?]
+    : [ArgumentType<T, V>];
 
 type TypedCommandArguments<T extends string, V> = T extends
   `${string} ${infer Args}` ? TypedArguments<Args, V>

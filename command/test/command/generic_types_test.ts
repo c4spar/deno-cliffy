@@ -650,4 +650,42 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - option with multiple values",
+    async fn() {
+      await new Command()
+        .option("--foo-bar <val:string> <val:boolean> [val:number]", "")
+        .option("--foo-bar-baz=<val:string> [val:number]", "")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              fooBar?: [string, boolean, number?];
+              fooBarBaz?: [string, number?];
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - option with equal sign",
+    async fn() {
+      await new Command()
+        .option("--foo-bar=<val:string>", "")
+        .option("--foo-bar-baz=<val:string> [val:number]", "")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              fooBar?: string;
+              fooBarBaz?: [string, number?];
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
