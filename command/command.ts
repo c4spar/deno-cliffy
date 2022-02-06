@@ -753,14 +753,15 @@ export class Command<
   }
 
   public globalOption<
-    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
+    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
     N extends string = string,
+    D = undefined,
   >(
     flags: N,
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<
+        & ICommandOption<
           Partial<CO>,
           CA,
           MergeOptions<N, CG, G>,
@@ -769,7 +770,8 @@ export class Command<
           GT,
           PT,
           P
-        >,
+        >
+        & { default?: IDefaultValue<D> },
         "global"
       >
       | IFlagValueHandler,
@@ -784,7 +786,9 @@ export class Command<
     P
   > {
     if (typeof opts === "function") {
-      return this.option(flags, desc, { value: opts, global: true });
+      return this.option(flags, desc, { value: opts, global: true }) as Command<
+        any
+      >;
     }
     return this.option(flags, desc, { ...opts, global: true });
   }
@@ -796,8 +800,9 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
+    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
     N extends string = string,
+    D = undefined,
   >(
     flags: N,
     desc: string,
@@ -812,7 +817,7 @@ export class Command<
         PT,
         P
       >
-        & { global: true }
+        & { global: true; default?: IDefaultValue<D> }
       | IFlagValueHandler,
   ): Command<
     PG,
@@ -826,14 +831,15 @@ export class Command<
   >;
 
   public option<
-    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>>,
+    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D>,
     N extends string = string,
+    D = undefined,
   >(
     flags: N,
     desc: string,
     opts:
       | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
-        & { required: true }
+        & ({ default: IDefaultValue<D> } | { required: true })
       | IFlagValueHandler,
   ): Command<
     PG,
@@ -847,15 +853,14 @@ export class Command<
   >;
 
   public option<
-    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
-    D = undefined,
+    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
     N extends string = string,
+    D = undefined,
   >(
     flags: N,
     desc: string,
     opts?:
       | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
-        & { default?: IDefaultValue<D> }
       | IFlagValueHandler,
   ): Command<
     PG,
@@ -2295,33 +2300,33 @@ type GetArguments<T extends string> = T extends `-${string} ${infer Rest}`
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
 
-type BooleanOption<T extends string, D> = T extends `no-${infer Name}`
-  ? { [N in OptionName<Name>]: false }
+type BooleanOption<T extends string, D = undefined> = T extends
+  `no-${infer Name}` ? { [N in OptionName<Name>]: false }
   : T extends `${infer Name}.${infer Rest}`
     ? { [N in OptionName<Name>]: BooleanOption<Rest, D> }
   : { [N in OptionName<T>]: true | D };
 
 type NoUndefined<T, V> = undefined extends T ? V : T | V;
 
-type ValueOption<T extends string, Rest extends string, V, D> = T extends
-  `${infer Name}.${infer RestName}` ? {
-  [N in OptionName<Name>]: ValueOption<RestName, Rest, V, D>;
-}
-  : {
-    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
-      : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
-  };
+type ValueOption<T extends string, Rest extends string, V, D = undefined> =
+  T extends `${infer Name}.${infer RestName}` ? {
+    [N in OptionName<Name>]: ValueOption<RestName, Rest, V, D>;
+  }
+    : {
+      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+        ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
+        : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
+    };
 
-type ValuesOption<T extends string, Rest extends string, V, D> = T extends
-  `${infer Name}.${infer RestName}` ? {
-  [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, D>;
-}
-  : {
-    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
-      : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
-  };
+type ValuesOption<T extends string, Rest extends string, V, D = undefined> =
+  T extends `${infer Name}.${infer RestName}` ? {
+    [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, D>;
+  }
+    : {
+      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+        ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
+        : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
+    };
 
 type TypedOption<T extends string, V, D = undefined> = T extends
   `${string}--${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V, D>
@@ -2368,11 +2373,11 @@ type TypedCommandArguments<T extends string, V> = T extends
   `${string} ${infer Args}` ? TypedArguments<Args, V>
   : [];
 
-type TypedEnv<T extends string, P extends string, V, D = undefined> = T extends
-  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V, D>
+type TypedEnv<T extends string, P extends string, V> = T extends
+  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V>
   : T extends `${infer Name} ${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V, D>
-  : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, D>
+    ? ValueOption<TrimLeft<Name, P>, Rest, V>
+  : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>>
   : Record<string, unknown>;
 
 type TypedType<
