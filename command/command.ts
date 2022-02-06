@@ -753,9 +753,13 @@ export class Command<
   }
 
   public globalOption<
-    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
+    G extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
+      : D extends undefined
+        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
+      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
     N extends string = string,
     D = undefined,
+    R = undefined,
   >(
     flags: N,
     desc: string,
@@ -771,7 +775,7 @@ export class Command<
           PT,
           P
         >
-        & { default?: IDefaultValue<D> },
+        & { default?: IDefaultValue<D>; required?: R },
         "global"
       >
       | IFlagValueHandler,
@@ -790,7 +794,11 @@ export class Command<
         any
       >;
     }
-    return this.option(flags, desc, { ...opts, global: true });
+    return this.option(
+      flags,
+      desc,
+      { ...opts, global: true } as any,
+    ) as Command<any>;
   }
 
   /**
@@ -800,9 +808,13 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    G extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>,
+    G extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
+      : D extends undefined
+        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
+      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
     N extends string = string,
     D = undefined,
+    R = undefined,
   >(
     flags: N,
     desc: string,
@@ -817,7 +829,7 @@ export class Command<
         PT,
         P
       >
-        & { global: true; default?: IDefaultValue<D> }
+        & { global: true; default?: IDefaultValue<D>; required?: R }
       | IFlagValueHandler,
   ): Command<
     PG,
@@ -831,36 +843,19 @@ export class Command<
   >;
 
   public option<
-    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D>,
+    O extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
+      : D extends undefined
+        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
+      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
     N extends string = string,
     D = undefined,
-  >(
-    flags: N,
-    desc: string,
-    opts:
-      | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
-        & ({ default: IDefaultValue<D> } | { required: true })
-      | IFlagValueHandler,
-  ): Command<
-    PG,
-    PT,
-    MergeOptions<N, CO, O>,
-    CA,
-    CG,
-    CT,
-    GT,
-    P
-  >;
-
-  public option<
-    O extends Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>>>,
-    N extends string = string,
-    D = undefined,
+    R = undefined,
   >(
     flags: N,
     desc: string,
     opts?:
       | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
+        & { default?: IDefaultValue<D>; required?: R }
       | IFlagValueHandler,
   ): Command<
     PG,

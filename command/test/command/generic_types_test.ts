@@ -705,4 +705,34 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - default value",
+    async fn() {
+      await new Command()
+        .option("--foo [val:string]", "...")
+        .option("--bar [val:string]", "...", { default: 4 })
+        .option("--baz <val:string>", "...", { default: 4 })
+        .option("--beep <val:string> [val:string]", "...", {
+          default: new Date(),
+          global: true,
+        })
+        .globalOption("--boop <val:string> [val:string]", "...", {
+          default: new Date(),
+        })
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              foo?: string | true;
+              bar: string | number | true;
+              baz: string | number;
+              beep: Date | [string, string?];
+              boop: Date | [string, string?];
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
