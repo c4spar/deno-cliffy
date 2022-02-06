@@ -688,4 +688,21 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - env var prefix",
+    async fn() {
+      await new Command()
+        .env("FOO_BAR_BAZ=<val:string>", "", { prefix: "FOO_" })
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              barBaz?: string;
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
