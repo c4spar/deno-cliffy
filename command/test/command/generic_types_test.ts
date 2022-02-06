@@ -436,7 +436,7 @@ import {
           assert<
             IsExact<typeof options, {
               debug?: true;
-              debugLevel?: string;
+              debugLevel: string;
               name: string;
               age: number;
               email?: string;

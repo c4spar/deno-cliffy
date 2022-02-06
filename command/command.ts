@@ -753,10 +753,7 @@ export class Command<
   }
 
   public globalOption<
-    G extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
-      : D extends undefined
-        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
-      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
+    G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
     N extends string = string,
     D = undefined,
     R = undefined,
@@ -808,10 +805,7 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    G extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
-      : D extends undefined
-        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
-      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
+    G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
     N extends string = string,
     D = undefined,
     R = undefined,
@@ -843,10 +837,7 @@ export class Command<
   >;
 
   public option<
-    O extends (R extends true ? TypedOption<N, Merge<PT, Merge<GT, CT>>, D>
-      : D extends undefined
-        ? Partial<TypedOption<N, Merge<PT, Merge<GT, CT>>, D>>
-      : TypedOption<N, Merge<PT, Merge<GT, CT>>, D>),
+    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
     N extends string = string,
     D = undefined,
     R = undefined,
@@ -2323,15 +2314,27 @@ type ValuesOption<T extends string, Rest extends string, V, D = undefined> =
         : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
     };
 
-type TypedOption<T extends string, V, D = undefined> = T extends
-  `${string}--${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V, D>
-  : T extends `${string}--${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V, D>
-  : T extends `${string}--${infer Name}` ? BooleanOption<Name, D>
-  : T extends `-${infer Name}=${infer Rest}` ? ValuesOption<Name, Rest, V, D>
-  : T extends `-${infer Name} ${infer Rest}` ? ValuesOption<Name, Rest, V, D>
-  : T extends `-${infer Name}` ? BooleanOption<Name, D>
-  : Record<string, unknown>;
+type MaybeRequiredOption<Default, Required, Options> = Required extends true
+  ? Options
+  : Default extends undefined ? Partial<Options>
+  : Options;
+
+type TypedOption<T extends string, V, D = undefined, R = undefined> =
+  MaybeRequiredOption<
+    D,
+    R,
+    T extends `${string}--${infer Name}=${infer Rest}`
+      ? ValuesOption<Name, Rest, V, D>
+      : T extends `${string}--${infer Name} ${infer Rest}`
+        ? ValuesOption<Name, Rest, V, D>
+      : T extends `${string}--${infer Name}` ? BooleanOption<Name, D>
+      : T extends `-${infer Name}=${infer Rest}`
+        ? ValuesOption<Name, Rest, V, D>
+      : T extends `-${infer Name} ${infer Rest}`
+        ? ValuesOption<Name, Rest, V, D>
+      : T extends `-${infer Name}` ? BooleanOption<Name, D>
+      : Record<string, unknown>
+  >;
 
 type GetOptionName<T> = T extends
   `${string}--${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
