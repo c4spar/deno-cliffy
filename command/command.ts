@@ -753,16 +753,22 @@ export class Command<
   }
 
   public globalOption<
+    N extends string,
     G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    N extends string = string,
     D = undefined,
-    R = undefined,
+    R extends boolean | undefined = undefined,
+    V = undefined,
+    MG = V extends undefined ? G
+      : R extends undefined
+        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
+        : RecordOption<GetOptionName<N>, V>
+      : RecordOption<GetOptionName<N>, V>,
   >(
     flags: N,
     desc: string,
     opts?:
       | Omit<
-        & ICommandOption<
+        ICommandOption<
           Partial<CO>,
           CA,
           MergeOptions<N, CG, G>,
@@ -771,87 +777,120 @@ export class Command<
           GT,
           PT,
           P
-        >
-        & { default?: IDefaultValue<D>; required?: R },
-        "global"
+        >,
+        "global" | "value"
       >
-      | IFlagValueHandler,
+        & {
+          default?: IDefaultValue<D>;
+          required?: R;
+          value?: IFlagValueHandler<ValueOf<G>, V>;
+        }
+      | IFlagValueHandler<ValueOf<G>, V>,
   ): Command<
     PG,
     PT,
     CO,
     CA,
-    MergeOptions<N, CG, G>,
+    MergeOptions<N, CG, MG>,
     CT,
     GT,
     P
   > {
     if (typeof opts === "function") {
-      return this.option(flags, desc, { value: opts, global: true }) as Command<
-        any
-      >;
+      return this.option(
+        flags,
+        desc,
+        { value: opts, global: true } as ICommandOption,
+      ) as Command<any>;
     }
     return this.option(
       flags,
       desc,
-      { ...opts, global: true } as any,
+      { ...opts, global: true } as ICommandOption,
     ) as Command<any>;
   }
 
   /**
    * Add a new option.
-   * @param flags Flags string like: -h, --help, --manual <requiredArg:string> [optionalArg: number] [...restArgs:string]
+   * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
    * @param desc Flag description.
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
+    N extends string,
     G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    N extends string = string,
     D = undefined,
     R = undefined,
+    V = undefined,
+    MG = V extends undefined ? G
+      : R extends undefined
+        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
+        : RecordOption<GetOptionName<N>, V>
+      : RecordOption<GetOptionName<N>, V>,
   >(
     flags: N,
     desc: string,
     opts:
-      | ICommandOption<
-        Partial<CO>,
-        CA,
-        MergeOptions<N, CG, G>,
-        PG,
-        CT,
-        GT,
-        PT,
-        P
+      | Omit<
+        ICommandOption<
+          Partial<CO>,
+          CA,
+          MergeOptions<N, CG, G>,
+          PG,
+          CT,
+          GT,
+          PT,
+          P
+        >,
+        "value"
       >
-        & { global: true; default?: IDefaultValue<D>; required?: R }
-      | IFlagValueHandler,
+        & {
+          global: true;
+          default?: IDefaultValue<D>;
+          required?: R;
+          value?: IFlagValueHandler<ValueOf<G>, V>;
+        }
+      | IFlagValueHandler<ValueOf<G>, V>,
   ): Command<
     PG,
     PT,
     CO,
     CA,
-    MergeOptions<N, CG, G>,
+    MergeOptions<N, CG, MG>,
     CT,
     GT,
     P
   >;
 
   public option<
+    N extends string,
     O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    N extends string = string,
     D = undefined,
     R = undefined,
+    V = undefined,
+    MO = V extends undefined ? O
+      : R extends undefined
+        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
+        : RecordOption<GetOptionName<N>, V>
+      : RecordOption<GetOptionName<N>, V>,
   >(
     flags: N,
     desc: string,
     opts?:
-      | ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>
-        & { default?: IDefaultValue<D>; required?: R }
-      | IFlagValueHandler,
+      | Omit<
+        ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>,
+        "value"
+      >
+        & {
+          default?: IDefaultValue<D>;
+          required?: R;
+          value?: IFlagValueHandler<ValueOf<O>, V>;
+        }
+      | IFlagValueHandler<ValueOf<O>, V>,
   ): Command<
     PG,
     PT,
-    MergeOptions<N, CO, O>,
+    MergeOptions<N, CO, MO>,
     CA,
     CG,
     CT,
@@ -2336,6 +2375,11 @@ type TypedOption<T extends string, V, D = undefined, R = undefined> =
       : Record<string, unknown>
   >;
 
+type RecordOption<N, V> = N extends `${infer Name}.${infer Rest}`
+  ? Record<CamelCase<Name>, RecordOption<Rest, V>>
+  : N extends string ? Record<CamelCase<N>, V>
+  : never;
+
 type GetOptionName<T> = T extends
   `${string}--${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
   : T extends `${string}--${infer Name}` ? Name
@@ -2425,3 +2469,10 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
   R,
   OptionalKeys<L> & OptionalKeys<R>
 >;
+
+type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
+
+type NestedPartial<T> = {
+  [P in keyof T]?: T[P] extends Record<string, unknown> ? NestedPartial<T[P]>
+    : T[P];
+};

@@ -92,6 +92,7 @@ type ExcludedCommandOptions =
   | "args"
   | "type"
   | "optionalValue"
+  | "requiredValue"
   | "aliases"
   | "variadic"
   | "list";

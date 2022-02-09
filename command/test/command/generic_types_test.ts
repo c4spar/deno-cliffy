@@ -652,6 +652,23 @@ import {
   });
 
   Deno.test({
+    name: "[command] - generic types - env var prefix",
+    async fn() {
+      await new Command()
+        .env("FOO_BAR_BAZ=<val:string>", "", { prefix: "FOO_" })
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              barBaz?: string;
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
     name: "[command] - generic types - option with multiple values",
     async fn() {
       await new Command()
@@ -690,23 +707,6 @@ import {
   });
 
   Deno.test({
-    name: "[command] - generic types - env var prefix",
-    async fn() {
-      await new Command()
-        .env("FOO_BAR_BAZ=<val:string>", "", { prefix: "FOO_" })
-        .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
-            IsExact<typeof options, {
-              barBaz?: string;
-            }>
-          >(true);
-        })
-        .parse(Deno.args);
-    },
-  });
-
-  Deno.test({
     name: "[command] - generic types - default value",
     async fn() {
       await new Command()
@@ -720,6 +720,7 @@ import {
         .globalOption("--boop <val:string> [val:string]", "...", {
           default: new Date(),
         })
+        .option("--one.two <val:string>", "...", { default: 4 })
         .action((options, ...args) => {
           assert<IsExact<typeof args, []>>(true);
           assert<
@@ -729,6 +730,62 @@ import {
               baz: string | number;
               beep: Date | [string, string?];
               boop: Date | [string, string?];
+              one: { two: string | number };
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - value option",
+    async fn() {
+      await new Command()
+        .option("--foo [val:string]", "...")
+        .option("--bar [val:string]", "...", { default: 4 })
+        .option("--baz <val:string>", "...", { default: 4 })
+        .option("--beep <val:string> [val:string]", "...", {
+          default: new Date(),
+          global: true,
+          value: (value) => {
+            assert<IsExact<typeof value, Date | [string, string?]>>(true);
+            return new Map<string, number>();
+          },
+        })
+        .globalOption("--boop <val:string> [val:string]", "...", {
+          default: /.*/g,
+          required: true,
+          collect: true,
+          value(value, val: Array<Date> = []) {
+            assert<IsExact<typeof value, RegExp | [string, string?]>>(true);
+            return [...val, new Date()];
+          },
+        })
+        .option("--one.two <val:string>", "...", {
+          default: 4,
+          value: (value) => {
+            assert<IsExact<typeof value, number | string>>(true);
+            return new Date();
+          },
+        })
+        .option("--three.four <val:string>", "...", {
+          value: (value) => {
+            assert<IsExact<typeof value, string>>(true);
+            return 2;
+          },
+        })
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              beep: Map<string, number>;
+              boop: Array<Date>;
+              foo?: string | true;
+              bar: string | number | true;
+              baz: string | number;
+              one: { two: Date };
+              three?: { four?: number };
             }>
           >(true);
         })
