@@ -755,14 +755,14 @@ export class Command<
   public globalOption<
     N extends string,
     G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    D = undefined,
-    R extends boolean | undefined = undefined,
-    V = undefined,
-    MG = V extends undefined ? G
+    MG extends V extends undefined ? G
       : R extends undefined
         ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
         : RecordOption<GetOptionName<N>, V>
       : RecordOption<GetOptionName<N>, V>,
+    R extends ICommandOption["required"] = undefined,
+    D = undefined,
+    V = undefined,
   >(
     flags: N,
     desc: string,
@@ -783,9 +783,9 @@ export class Command<
         & {
           default?: IDefaultValue<D>;
           required?: R;
-          value?: IFlagValueHandler<ValueOf<G>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<ValueOf<G>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     PG,
     PT,
@@ -819,14 +819,14 @@ export class Command<
   public option<
     N extends string,
     G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    D = undefined,
-    R = undefined,
-    V = undefined,
-    MG = V extends undefined ? G
+    MG extends V extends undefined ? G
       : R extends undefined
         ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
         : RecordOption<GetOptionName<N>, V>
       : RecordOption<GetOptionName<N>, V>,
+    R extends ICommandOption["required"] = undefined,
+    D = undefined,
+    V = undefined,
   >(
     flags: N,
     desc: string,
@@ -848,9 +848,9 @@ export class Command<
           global: true;
           default?: IDefaultValue<D>;
           required?: R;
-          value?: IFlagValueHandler<ValueOf<G>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<ValueOf<G>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     PG,
     PT,
@@ -865,14 +865,14 @@ export class Command<
   public option<
     N extends string,
     O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    D = undefined,
-    R = undefined,
-    V = undefined,
-    MO = V extends undefined ? O
+    MO extends V extends undefined ? O
       : R extends undefined
         ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
         : RecordOption<GetOptionName<N>, V>
       : RecordOption<GetOptionName<N>, V>,
+    R extends ICommandOption["required"] = undefined,
+    D = undefined,
+    V = undefined,
   >(
     flags: N,
     desc: string,
@@ -884,9 +884,9 @@ export class Command<
         & {
           default?: IDefaultValue<D>;
           required?: R;
-          value?: IFlagValueHandler<ValueOf<O>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
-      | IFlagValueHandler<ValueOf<O>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
   ): Command<
     PG,
     PT,
@@ -2169,7 +2169,11 @@ type OneOf<T, V> = T extends void ? V : T;
 
 type Merge<L, R> = L extends void ? R
   : R extends void ? L
-  : Omit<L, keyof R> & R;
+  : L & R;
+
+// type Merge<L, R> = L extends void ? R
+//   : R extends void ? L
+//   : Omit<L, keyof R> & R;
 
 type MergeRecursive<L, R> = L extends void ? R
   : R extends void ? L
@@ -2380,10 +2384,12 @@ type RecordOption<N, V> = N extends `${infer Name}.${infer Rest}`
   : N extends string ? Record<CamelCase<N>, V>
   : never;
 
-type GetOptionName<T> = T extends
-  `${string}--${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
+type GetOptionName<T> = T extends `${string}--${infer Name}=${string}`
+  ? TrimRight<Name, ",">
+  : T extends `${string}--${infer Name} ${string}` ? TrimRight<Name, ",">
   : T extends `${string}--${infer Name}` ? Name
-  : T extends `-${infer Name}${"=" | " "}${string}` ? TrimRight<Name, ",">
+  : T extends `-${infer Name}=${string}` ? TrimRight<Name, ",">
+  : T extends `-${infer Name} ${string}` ? TrimRight<Name, ",">
   : T extends `-${infer Name}` ? Name
   : unknown;
 
