@@ -526,9 +526,13 @@ import {
   Deno.test({
     name: "[command] - generic types - many arguments",
     async fn() {
+      enum Lang {
+        JS = "js",
+        Rust = "rust",
+      }
       const { args, options } = await new Command()
         .type("color", new EnumType(["red", "blue"]))
-        .type("lang", new EnumType(["js", "rust"]))
+        .type("lang", new EnumType(Lang))
         .arguments(
           "<arg1> <arg2:string> <arg3:number> <arg4:boolean> [arg5] [arg6:string] [arg7:number] [arg8:boolean] [arg9:color] [...rest:lang[]]",
         )
@@ -547,7 +551,7 @@ import {
             number?,
             boolean?,
             ("red" | "blue")?,
-            Array<Array<"js" | "rust">>?,
+            Array<Array<Lang>>?,
           ]
         >
       >(true);
@@ -711,14 +715,15 @@ import {
     name: "[command] - generic types - default value",
     async fn() {
       await new Command()
+        .type("color", new EnumType(["red", "blue"]))
         .option("--foo [val:string]", "...")
         .option("--bar [val:string]", "...", { default: 4 })
-        .option("--baz <val:string>", "...", { default: 4 })
+        .option("--baz <val:color>", "...", { default: "red" as const })
         .option("--beep <val:string> [val:string]", "...", {
           default: new Date(),
           global: true,
         })
-        .globalOption("--boop <val:string> [val:string]", "...", {
+        .globalOption("--boop <val:string> [val:number]", "...", {
           default: new Date(),
         })
         .option("--one.two <val:string>", "...", { default: 4 })
@@ -728,9 +733,9 @@ import {
             IsExact<typeof options, {
               foo?: string | true;
               bar: string | number | true;
-              baz: string | number;
+              baz: "red" | "blue";
               beep: Date | [string, string?];
-              boop: Date | [string, string?];
+              boop: Date | [string, number?];
               one: { two: string | number };
             }>
           >(true);
