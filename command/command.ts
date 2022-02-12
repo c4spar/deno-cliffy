@@ -2384,24 +2384,6 @@ type ValuesOption<
         : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
     });
 
-type TypedOption<
-  T extends string,
-  V,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = T extends `${string}--${infer Name}=${infer Rest}`
-  ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `${string}--${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `${string}--${infer Name}`
-    ? BooleanOption<Name, IsRequired<R, D>, D>
-  : T extends `-${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `-${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `-${infer Name}` ? BooleanOption<Name, IsRequired<R, D>, D>
-  : Record<string, unknown>;
-
 type MapValue<O, V> = {
   [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
     ? MapValue<O[K], V>
@@ -2432,6 +2414,25 @@ type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //       : MergeRecursive<CO, O>)
 //   : Merge<CO, O>;
 
+type TypedOption<
+  T extends string,
+  V,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = number extends V ? any
+  : T extends `${string}--${infer Name}=${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `${string}--${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `${string}--${infer Name}`
+    ? BooleanOption<Name, IsRequired<R, D>, D>
+  : T extends `-${infer Name}=${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `-${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `-${infer Name}` ? BooleanOption<Name, IsRequired<R, D>, D>
+  : Record<string, unknown>;
+
 type TypedArguments<T extends string, V extends Record<string, any> | void> =
   number extends V ? any
     : T extends `${infer Arg} ${infer Rest}`
@@ -2441,8 +2442,8 @@ type TypedArguments<T extends string, V extends Record<string, any> | void> =
     : T extends `[${string}]` ? [ArgumentType<T, V>?]
     : [ArgumentType<T, V>];
 
-type TypedCommandArguments<T extends string, V> = T extends
-  `${string} ${infer Args}` ? TypedArguments<Args, V>
+type TypedCommandArguments<T extends string, V> = number extends V ? any
+  : T extends `${string} ${infer Args}` ? TypedArguments<Args, V>
   : [];
 
 type TypedEnv<
@@ -2451,8 +2452,9 @@ type TypedEnv<
   V,
   R extends boolean | undefined = undefined,
   D = undefined,
-> = N extends `${infer Name}=${infer Rest}`
-  ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
+> = number extends V ? any
+  : N extends `${infer Name}=${infer Rest}`
+    ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
   : N extends `${infer Name} ${infer Rest}`
     ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
   : N extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, R, D>
