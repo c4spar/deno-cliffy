@@ -863,12 +863,14 @@ import {
         .option("--no-check", "No check.")
         .option("--remote <url:string>", "Remote url.", { depends: ["color"] })
         .option("--no-remote", "No remote.")
+        .option("--no-default-value", "No remote.", { default: 5 })
         .action((options) => {
           assert<
             IsExact<typeof options, {
               color: string | false;
               check: boolean;
               remote?: string | false;
+              defaultValue: number | false;
             }>
           >(true);
         })

@@ -2336,15 +2336,18 @@ type IsRequired<R extends boolean | undefined, D> = R extends true ? true
 type NegatableOption<
   F extends string,
   CO,
+  D,
   N extends string = OptionName<F>,
-> = N extends keyof CO ? { [K in N]?: false } : { [K in N]: boolean };
+> = D extends undefined
+  ? N extends keyof CO ? { [K in N]?: false } : { [K in N]: boolean }
+  : { [K in N]: NonNullable<D> | false };
 
 type BooleanOption<
   N extends string,
   CO,
   R extends boolean | undefined = undefined,
   D = undefined,
-> = N extends `no-${infer Name}` ? NegatableOption<Name, CO>
+> = N extends `no-${infer Name}` ? NegatableOption<Name, CO, D>
   : N extends `${infer Name}.${infer Rest}`
     ? (R extends true
       ? { [K in OptionName<Name>]: BooleanOption<Rest, CO, R, D> }
