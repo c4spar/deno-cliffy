@@ -751,7 +751,7 @@ export class Command<
 
   public globalOption<
     F extends string,
-    G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    G extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
     MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
@@ -813,7 +813,7 @@ export class Command<
    */
   public option<
     F extends string,
-    G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    G extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
     MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
@@ -857,7 +857,7 @@ export class Command<
 
   public option<
     F extends string,
-    O extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    O extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
     MO extends MapValue<O, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
@@ -969,7 +969,7 @@ export class Command<
 
   public globalEnv<
     N extends string,
-    G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
@@ -996,7 +996,7 @@ export class Command<
    */
   public env<
     N extends string,
-    G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
@@ -1012,7 +1012,7 @@ export class Command<
 
   public env<
     N extends string,
-    O extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    O extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MO extends MapValue<O, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
@@ -1449,8 +1449,8 @@ export class Command<
     Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
-  /** ***************************************************************************
-   * *** GETTER *****************************************************************
+  /** ************************************************************************** *
+   * *** GETTER **************************************************************** *
    * *************************************************************************** */
 
   /** Get command name. */
@@ -1582,8 +1582,8 @@ export class Command<
     }
   }
 
-  /** ***************************************************************************
-   * *** Object GETTER **********************************************************
+  /** ************************************************************************** *
+   * *** Options GETTER ******************************************************** *
    * *************************************************************************** */
 
   /**
@@ -2297,74 +2297,82 @@ type DefaultTypes = {
   boolean: BooleanType;
 };
 
-type ArgumentType<T extends string, U, V = Merge<DefaultTypes, U>> = T extends
+type ArgumentType<A extends string, U, T = Merge<DefaultTypes, U>> = A extends
   RestArgsListTypeCompletion<infer Type>
-  ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : T extends RestArgsListType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : T extends RestArgsTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends RestArgsType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends RestArgs ? Array<string>
-  : T extends SingleArgListTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends SingleArgListType<infer Type>
-    ? V extends Record<Type, infer R> ? Array<R> : unknown
-  : T extends SingleArgTypeCompletion<infer Type>
-    ? V extends Record<Type, infer R> ? R : unknown
-  : T extends SingleArgType<infer Type>
-    ? V extends Record<Type, infer R> ? R : unknown
-  : T extends SingleArg ? string
+  ? T extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : A extends RestArgsListType<infer Type>
+    ? T extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : A extends RestArgsTypeCompletion<infer Type>
+    ? T extends Record<Type, infer R> ? Array<R> : unknown
+  : A extends RestArgsType<infer Type>
+    ? T extends Record<Type, infer R> ? Array<R> : unknown
+  : A extends RestArgs ? Array<string>
+  : A extends SingleArgListTypeCompletion<infer Type>
+    ? T extends Record<Type, infer R> ? Array<R> : unknown
+  : A extends SingleArgListType<infer Type>
+    ? T extends Record<Type, infer R> ? Array<R> : unknown
+  : A extends SingleArgTypeCompletion<infer Type>
+    ? T extends Record<Type, infer R> ? R : unknown
+  : A extends SingleArgType<infer Type>
+    ? T extends Record<Type, infer R> ? R : unknown
+  : A extends SingleArg ? string
   : unknown;
 
-type ArgumentTypes<T extends string, V> = T extends `${string} ${string}`
-  ? TypedArguments<T, V>
-  : ArgumentType<T, V>;
+type ArgumentTypes<A extends string, T> = A extends `${string} ${string}`
+  ? TypedArguments<A, T>
+  : ArgumentType<A, T>;
 
-type GetArguments<T extends string> = T extends `-${string}=${infer Rest}`
+type GetArguments<A extends string> = A extends `-${string}=${infer Rest}`
   ? GetArguments<Rest>
-  : T extends `-${string} ${infer Rest}` ? GetArguments<Rest>
-  : T;
+  : A extends `-${string} ${infer Rest}` ? GetArguments<Rest>
+  : A;
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
-
-type BooleanOption<
-  T extends string,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = T extends `no-${infer Name}` ? { [N in OptionName<Name>]: false }
-  : T extends `${infer Name}.${infer Rest}`
-    ? (R extends true ? { [N in OptionName<Name>]: BooleanOption<Rest, R, D> }
-      : { [N in OptionName<Name>]?: BooleanOption<Rest, R, D> })
-  : (R extends true ? { [N in OptionName<T>]: true | D }
-    : { [N in OptionName<T>]?: true | D });
 
 type IsRequired<R extends boolean | undefined, D> = R extends true ? true
   : D extends undefined ? false
   : true;
 
+type NegatableOption<
+  F extends string,
+  CO,
+  N extends string = OptionName<F>,
+> = N extends keyof CO ? { [K in N]?: false } : { [K in N]: boolean };
+
+type BooleanOption<
+  N extends string,
+  CO,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = N extends `no-${infer Name}` ? NegatableOption<Name, CO>
+  : N extends `${infer Name}.${infer Rest}`
+    ? (R extends true
+      ? { [K in OptionName<Name>]: BooleanOption<Rest, CO, R, D> }
+      : { [K in OptionName<Name>]?: BooleanOption<Rest, CO, R, D> })
+  : (R extends true ? { [K in OptionName<N>]: true | D }
+    : { [K in OptionName<N>]?: true | D });
+
 type ValueOption<
-  T extends string,
-  Rest extends string,
+  N extends string,
+  F extends string,
   V,
   R extends boolean | undefined = undefined,
   D = undefined,
-> = T extends `${infer Name}.${infer RestName}` ? (R extends true ? {
-  [N in OptionName<Name>]: ValueOption<RestName, Rest, V, R, D>;
+> = N extends `${infer Name}.${infer RestName}` ? (R extends true ? {
+  [K in OptionName<Name>]: ValueOption<RestName, F, V, R, D>;
 }
   : {
-    [N in OptionName<Name>]?: ValueOption<RestName, Rest, V, R, D>;
+    [K in OptionName<Name>]?: ValueOption<RestName, F, V, R, D>;
   })
   : (R extends true ? {
-    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NonNullable<D> | true | ArgumentType<GetArguments<Rest>, V>
-      : NonNullable<D> | ArgumentType<GetArguments<Rest>, V>;
+    [K in OptionName<N>]: GetArguments<F> extends `[${string}]`
+      ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
+      : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
   }
     : {
-      [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
-        ? NonNullable<D> | true | ArgumentType<GetArguments<Rest>, V>
-        : NonNullable<D> | ArgumentType<GetArguments<Rest>, V>;
+      [K in OptionName<N>]?: GetArguments<F> extends `[${string}]`
+        ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
+        : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
     });
 
 type ValuesOption<
@@ -2427,49 +2435,51 @@ type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //   : Merge<CO, O>;
 
 type TypedOption<
-  T extends string,
-  V,
+  F extends string,
+  CO,
+  T,
   R extends boolean | undefined = undefined,
   D = undefined,
-> = number extends V ? any
-  : T extends `${string}--${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `${string}--${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `${string}--${infer Name}`
-    ? BooleanOption<Name, IsRequired<R, D>, D>
-  : T extends `-${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `-${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
-  : T extends `-${infer Name}` ? BooleanOption<Name, IsRequired<R, D>, D>
+> = number extends T ? any
+  : F extends `${string}--${infer Name}=${infer Rest}`
+    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
+  : F extends `${string}--${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
+  : F extends `${string}--${infer Name}`
+    ? BooleanOption<Name, CO, IsRequired<R, D>, D>
+  : F extends `-${infer Name}=${infer Rest}`
+    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
+  : F extends `-${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
+  : F extends `-${infer Name}` ? BooleanOption<Name, CO, IsRequired<R, D>, D>
   : Record<string, unknown>;
 
-type TypedArguments<T extends string, V extends Record<string, any> | void> =
-  number extends V ? any
-    : T extends `${infer Arg} ${infer Rest}`
+type TypedArguments<A extends string, T extends Record<string, any> | void> =
+  number extends T ? any
+    : A extends `${infer Arg} ${infer Rest}`
       ? Arg extends `[${string}]`
-        ? [ArgumentType<Arg, V>?, ...TypedArguments<Rest, V>]
-      : [ArgumentType<Arg, V>, ...TypedArguments<Rest, V>]
-    : T extends `[${string}]` ? [ArgumentType<T, V>?]
-    : [ArgumentType<T, V>];
+        ? [ArgumentType<Arg, T>?, ...TypedArguments<Rest, T>]
+      : [ArgumentType<Arg, T>, ...TypedArguments<Rest, T>]
+    : A extends `[${string}]` ? [ArgumentType<A, T>?]
+    : [ArgumentType<A, T>];
 
-type TypedCommandArguments<T extends string, V> = number extends V ? any
-  : T extends `${string} ${infer Args}` ? TypedArguments<Args, V>
+type TypedCommandArguments<N extends string, T> = number extends T ? any
+  : N extends `${string} ${infer Args}` ? TypedArguments<Args, T>
   : [];
 
 type TypedEnv<
   N extends string,
   P extends string,
-  V,
+  CO,
+  T,
   R extends boolean | undefined = undefined,
   D = undefined,
-> = number extends V ? any
+> = number extends T ? any
   : N extends `${infer Name}=${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
+    ? ValueOption<TrimLeft<Name, P>, Rest, T, R, D>
   : N extends `${infer Name} ${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
-  : N extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, R, D>
+    ? ValueOption<TrimLeft<Name, P>, Rest, T, R, D>
+  : N extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, CO, R, D>
   : Record<string, unknown>;
 
 type TypedType<

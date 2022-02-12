@@ -853,4 +853,26 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - negatable option",
+    async fn() {
+      await new Command()
+        .option("--color <color:string>", "Color name.", { default: "yellow" })
+        .option("--no-color", "No color.")
+        .option("--no-check", "No check.")
+        .option("--remote <url:string>", "Remote url.", { depends: ["color"] })
+        .option("--no-remote", "No remote.")
+        .action((options) => {
+          assert<
+            IsExact<typeof options, {
+              color: string | false;
+              check: boolean;
+              remote?: string | false;
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
