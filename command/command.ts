@@ -752,8 +752,9 @@ export class Command<
   public globalOption<
     F extends string,
     G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
-    MG extends V extends undefined ? G : MapValue<G, V>,
+    MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
+    C extends ICommandOption["collect"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -776,6 +777,7 @@ export class Command<
         & {
           default?: IDefaultValue<D>;
           required?: R;
+          collect?: C;
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
@@ -812,8 +814,9 @@ export class Command<
   public option<
     F extends string,
     G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
-    MG extends V extends undefined ? G : MapValue<G, V>,
+    MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
+    C extends ICommandOption["collect"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -837,6 +840,7 @@ export class Command<
           global: true;
           default?: IDefaultValue<D>;
           required?: R;
+          collect?: C;
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
@@ -854,8 +858,9 @@ export class Command<
   public option<
     F extends string,
     O extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
-    MO extends V extends undefined ? O : MapValue<O, V>,
+    MO extends MapValue<O, V, C>,
     R extends ICommandOption["required"] = undefined,
+    C extends ICommandOption["collect"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -869,6 +874,7 @@ export class Command<
         & {
           default?: IDefaultValue<D>;
           required?: R;
+          collect?: C;
           value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
@@ -964,7 +970,7 @@ export class Command<
   public globalEnv<
     N extends string,
     G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
-    MG extends V extends undefined ? G : MapValue<G, V>,
+    MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
     P extends string = "",
@@ -991,7 +997,7 @@ export class Command<
   public env<
     N extends string,
     G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
-    MG extends V extends undefined ? G : MapValue<G, V>,
+    MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
     P extends string = "",
@@ -1007,7 +1013,7 @@ export class Command<
   public env<
     N extends string,
     O extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
-    MO extends V extends undefined ? O : MapValue<O, V>,
+    MO extends MapValue<O, V>,
     R extends IEnvVarOptions["required"] = undefined,
     V = undefined,
     P extends string = "",
@@ -2352,13 +2358,13 @@ type ValueOption<
   })
   : (R extends true ? {
     [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
-      : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
+      ? NonNullable<D> | true | ArgumentType<GetArguments<Rest>, V>
+      : NonNullable<D> | ArgumentType<GetArguments<Rest>, V>;
   }
     : {
       [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
-        ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
-        : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
+        ? NonNullable<D> | true | ArgumentType<GetArguments<Rest>, V>
+        : NonNullable<D> | ArgumentType<GetArguments<Rest>, V>;
     });
 
 type ValuesOption<
@@ -2375,20 +2381,26 @@ type ValuesOption<
   })
   : (R extends true ? {
     [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
-      : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
+      ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
+      : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
   }
     : {
       [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
-        ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
-        : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
+        ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
+        : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
     });
 
-type MapValue<O, V> = {
+type MapValue<O, V, C = undefined> = V extends undefined ? C extends true ? {
   [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
     ? MapValue<O[K], V>
-    : V;
-};
+    : Array<NonNullable<O[K]>>;
+}
+: O
+  : {
+    [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
+      ? MapValue<O[K], V>
+      : V;
+  };
 
 type GetOptionName<T> = T extends `${string}--${infer Name}=${string}`
   ? TrimRight<Name, ",">
@@ -2509,5 +2521,3 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
 >;
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
-
-type NoUndefined<T, V> = T extends undefined ? V : T | V;

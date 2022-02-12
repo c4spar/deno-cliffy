@@ -818,4 +818,39 @@ import {
         .parse(Deno.args);
     },
   });
+
+  Deno.test({
+    name: "[command] - generic types - collect option",
+    async fn() {
+      await new Command()
+        .option("--beep <val:string>", "...", {
+          collect: true,
+        })
+        .globalOption("--boop <val:integer>", "...", {
+          collect: true,
+        })
+        .option("--beep2 <val:string>", "...", {
+          collect: true,
+          // deno-lint-ignore no-inferrable-types
+          value: (val: string, prev: string = "") => val + prev,
+        })
+        .globalOption("--boop2 <val:integer>", "...", {
+          collect: false,
+          // deno-lint-ignore no-inferrable-types
+          value: (val: number, prev: number = 1) => val + prev,
+        })
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, []>>(true);
+          assert<
+            IsExact<typeof options, {
+              beep?: Array<string>;
+              boop?: Array<number>;
+              beep2?: string;
+              boop2?: number;
+            }>
+          >(true);
+        })
+        .parse(Deno.args);
+    },
+  });
 });
