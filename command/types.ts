@@ -98,7 +98,7 @@ type ExcludedCommandOptions =
   | "list";
 
 /** Command option options. */
-export interface ICommandOption<
+export interface ICommandGlobalOption<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -110,9 +110,21 @@ export interface ICommandOption<
 > extends Omit<IFlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
-  global?: boolean;
   action?: IAction<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
+}
+
+export interface ICommandOption<
+  O extends Record<string, any> | void = any,
+  A extends Array<unknown> = O extends number ? any : [],
+  G extends Record<string, any> | void = O extends number ? any : void,
+  PG extends Record<string, any> | void = O extends number ? any : void,
+  CT extends Record<string, any> | void = O extends number ? any : void,
+  GT extends Record<string, any> | void = O extends number ? any : void,
+  PT extends Record<string, any> | void = O extends number ? any : void,
+  P extends Command<any> | undefined = O extends number ? any : undefined,
+> extends ICommandGlobalOption<O, A, G, PG, CT, GT, PT, P> {
+  global?: boolean;
 }
 
 /** Command option settings. */
@@ -134,19 +146,24 @@ export interface IOption<
 
 /* ENV VARS TYPES */
 
-export type IEnvVarValueHandler<T extends any = any> = (val: T) => unknown;
+export type IEnvVarValueHandler<T = any, V = unknown> = (val: T) => V;
 
 /** Environment variable options */
-export interface IEnvVarOptions<P extends string = string> {
+export interface IEnvVarOptions<
+  T = any,
+  V = unknown,
+  P extends string = string,
+> {
   hidden?: boolean;
   global?: boolean;
   required?: boolean;
   prefix?: P | undefined;
-  value?: IEnvVarValueHandler;
+  value?: IEnvVarValueHandler<T, V>;
 }
 
 /** Environment variable settings. */
-export interface IEnvVar<P extends string = string> extends IEnvVarOptions<P> {
+export interface IEnvVar<T = any, V = unknown, P extends string = string>
+  extends IEnvVarOptions<T, V, P> {
   name: string;
   names: string[];
   description: string;

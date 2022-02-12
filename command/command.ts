@@ -43,6 +43,7 @@ import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   IAction,
   IArgument,
+  ICommandGlobalOption,
   ICommandOption,
   ICompleteHandler,
   ICompleteOptions,
@@ -66,18 +67,18 @@ import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
 
 export class Command<
-  PG extends Record<string, any> | void = void,
-  PT extends Record<string, any> | void = PG extends number ? any : void,
-  CO extends Record<string, any> | void = PG extends number ? any : void,
-  CA extends Array<unknown> = PG extends number ? any : [],
-  CG extends Record<string, any> | void = PG extends number ? any : void,
-  CT extends Record<string, any> | void = PG extends number ? any : {
+  CPG extends Record<string, any> | void = void,
+  CPT extends Record<string, any> | void = CPG extends number ? any : void,
+  CO extends Record<string, any> | void = CPG extends number ? any : void,
+  CA extends Array<unknown> = CPG extends number ? any : [],
+  CG extends Record<string, any> | void = CPG extends number ? any : void,
+  CT extends Record<string, any> | void = CPG extends number ? any : {
     number: number;
     string: string;
     boolean: boolean;
   },
-  GT extends Record<string, any> | void = PG extends number ? any : void,
-  P extends Command<any> | undefined = PG extends number ? any : undefined,
+  CGT extends Record<string, any> | void = CPG extends number ? any : void,
+  CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
   private types: Map<string, IType> = new Map();
   private rawArgs: string[] = [];
@@ -85,7 +86,7 @@ export class Command<
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
-  private _parent?: P;
+  private _parent?: CP;
   private _globalParent?: Command<any>;
   private ver?: IVersionHandler;
   private desc: IDescription = "";
@@ -126,7 +127,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
+    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
       global: true;
     },
   ): this;
@@ -139,7 +140,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>,
+    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
   /**
    * Set version option.
@@ -150,15 +151,15 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, PG, CT, GT, PT, P>,
+    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
   public versionOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, PG, CT, GT, PT, P>
-      | ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>
-      | ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
+      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
         global: true;
       },
   ): this {
@@ -181,7 +182,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
+    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
       global: true;
     },
   ): this;
@@ -194,7 +195,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>,
+    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
   /**
    * Set help option.
@@ -205,15 +206,15 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, PG, CT, GT, PT, P>,
+    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
   public helpOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, PG, CT, GT, PT, P>
-      | ICommandOption<CO, CA, CG, PG, CT, GT, PT, P>
-      | ICommandOption<Partial<CO>, CA, CG, PG, CT, GT, PT, P> & {
+      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
         global: true;
       },
   ): this {
@@ -240,10 +241,10 @@ export class Command<
       Record<string, any> | void,
       Record<string, any> | void,
       Record<string, any> | void,
-      OneOf<P, this> | undefined
+      OneOf<CP, this> | undefined
     >,
-    G extends (P extends Command<any> ? PG : Merge<PG, CG>),
-    T extends (P extends Command<any> ? PT : Merge<PT, CT>),
+    G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
+    T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
   >(
     name: string,
     cmd: C,
@@ -265,7 +266,7 @@ export class Command<
     GlobalOptions,
     Types,
     GlobalTypes,
-    OneOf<P, this>
+    OneOf<CP, this>
   >
     : never;
 
@@ -278,22 +279,22 @@ export class Command<
   public command<
     A extends TypedCommandArguments<
       N,
-      P extends Command<any> ? PT : Merge<PT, GT>
+      CP extends Command<any> ? CPT : Merge<CPT, CGT>
     >,
     N extends string = string,
   >(
     name: N,
     desc?: string,
     override?: boolean,
-  ): PG extends number ? Command<any> : Command<
-    P extends Command<any> ? PG : Merge<PG, CG>,
-    P extends Command<any> ? PT : Merge<PT, GT>,
+  ): CPG extends number ? Command<any> : Command<
+    CP extends Command<any> ? CPG : Merge<CPG, CG>,
+    CP extends Command<any> ? CPT : Merge<CPT, CGT>,
     void,
     A,
     void,
     void,
     void,
-    OneOf<P, this>
+    OneOf<CP, this>
   >;
 
   /**
@@ -347,10 +348,6 @@ export class Command<
       cmd.arguments(result.typeDefinition);
     }
 
-    // if (name === "*" && !cmd.isExecutable) {
-    //   cmd.isExecutable = true;
-    // }
-
     aliases.forEach((alias: string) => cmd.alias(alias));
 
     this.commands.set(name, cmd);
@@ -375,9 +372,9 @@ export class Command<
   }
 
   /** Reset internal command reference to main command. */
-  public reset(): OneOf<P, this> {
+  public reset(): OneOf<CP, this> {
     this.cmd = this;
-    return this as OneOf<P, this>;
+    return this as OneOf<CP, this>;
   }
 
   /**
@@ -388,7 +385,7 @@ export class Command<
     O extends Record<string, unknown> | void = any,
     A extends Array<unknown> = any,
     G extends Record<string, unknown> | void = any,
-  >(name: string): Command<PG, PT, O, A, G, CT, GT, P> {
+  >(name: string): Command<CPG, CPT, O, A, G, CT, CGT, CP> {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
@@ -417,7 +414,7 @@ export class Command<
   public version(
     version:
       | string
-      | IVersionHandler<Partial<CO>, Partial<CA>, CG, PG, CT, GT, PT, P>,
+      | IVersionHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, CP>,
   ): this {
     if (typeof version === "string") {
       this.cmd.ver = () => version;
@@ -445,7 +442,7 @@ export class Command<
   public help(
     help:
       | string
-      | IHelpHandler<Partial<CO>, Partial<CA>, CG, PG>
+      | IHelpHandler<Partial<CO>, Partial<CA>, CG, CPG>
       | HelpOptions,
   ): this {
     if (typeof help === "string") {
@@ -464,7 +461,7 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: IDescription<CO, CA, CG, PG, CT, GT, PT, P>,
+    description: IDescription<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this {
     this.cmd.desc = description;
     return this;
@@ -505,11 +502,11 @@ export class Command<
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
   public arguments<
-    A extends TypedArguments<N, Merge<PT, Merge<GT, CT>>>,
+    A extends TypedArguments<N, Merge<CPT, Merge<CGT, CT>>>,
     N extends string = string,
   >(
     args: N,
-  ): Command<PG, PT, CO, A, CG, CT, GT, P> {
+  ): Command<CPG, CPT, CO, A, CG, CT, CGT, CP> {
     this.cmd.argsDefinition = args;
     return this as Command<any>;
   }
@@ -518,7 +515,7 @@ export class Command<
    * Set command callback method.
    * @param fn Command action handler.
    */
-  public action(fn: IAction<CO, CA, CG, PG, CT, GT, PT, P>): this {
+  public action(fn: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>): this {
     this.cmd.fn = fn;
     return this;
   }
@@ -559,7 +556,7 @@ export class Command<
    */
   public useRawArgs(
     useRawArgs = true,
-  ): Command<PG, PT, CO, Array<string>, CG, CT, GT, P> {
+  ): Command<CPG, CPT, CO, Array<string>, CG, CT, CGT, CP> {
     this.cmd._useRawArgs = useRawArgs;
     return this as Command<any>;
   }
@@ -582,14 +579,14 @@ export class Command<
     handler: H,
     options?: Omit<ITypeOptions, "global">,
   ): Command<
-    PG,
-    PT,
+    CPG,
+    CPT,
     CO,
     CA,
     CG,
     CT,
-    Merge<GT, TypedType<N, H>>,
-    P
+    Merge<CGT, TypedType<N, H>>,
+    CP
   > {
     return this.type(name, handler, { ...options, global: true });
   }
@@ -608,14 +605,14 @@ export class Command<
     handler: H,
     options?: ITypeOptions,
   ): Command<
-    PG,
-    PT,
+    CPG,
+    CPT,
     CO,
     CA,
     CG,
     Merge<CT, TypedType<N, H>>,
-    GT,
-    P
+    CGT,
+    CP
   > {
     if (this.cmd.types.get(name) && !options?.override) {
       throw new DuplicateType(name);
@@ -658,31 +655,31 @@ export class Command<
       Partial<CO>,
       Partial<CA>,
       CG,
-      PG,
+      CPG,
       CT,
-      GT,
-      PT,
+      CGT,
+      CPT,
       any
     >,
     options: ICompleteOptions & { global: boolean },
   ): this;
   public complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>,
+    complete: ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
     options?: ICompleteOptions,
   ): this;
   complete(
     name: string,
     complete:
-      | ICompleteHandler<CO, CA, CG, PG, CT, GT, PT, P>
+      | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
       | ICompleteHandler<
         Partial<CO>,
         Partial<CA>,
         CG,
-        PG,
+        CPG,
         CT,
-        GT,
-        PT,
+        CGT,
+        CPT,
         any
       >,
     options?: ICompleteOptions,
@@ -753,32 +750,28 @@ export class Command<
   }
 
   public globalOption<
-    N extends string,
-    G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    MG extends V extends undefined ? G
-      : R extends undefined
-        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
-        : RecordOption<GetOptionName<N>, V>
-      : RecordOption<GetOptionName<N>, V>,
+    F extends string,
+    G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    MG extends V extends undefined ? G : MapValue<G, V>,
     R extends ICommandOption["required"] = undefined,
     D = undefined,
     V = undefined,
   >(
-    flags: N,
+    flags: F,
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<
+        ICommandGlobalOption<
           Partial<CO>,
           CA,
-          MergeOptions<N, CG, G>,
-          PG,
+          MergeOptions<F, CG, G>,
+          CPG,
           CT,
-          GT,
-          PT,
-          P
+          CGT,
+          CPT,
+          CP
         >,
-        "global" | "value"
+        "value"
       >
         & {
           default?: IDefaultValue<D>;
@@ -787,14 +780,14 @@ export class Command<
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
-    PG,
-    PT,
+    CPG,
+    CPT,
     CO,
     CA,
-    MergeOptions<N, CG, MG>,
+    MergeOptions<F, CG, MG>,
     CT,
-    GT,
-    P
+    CGT,
+    CP
   > {
     if (typeof opts === "function") {
       return this.option(
@@ -817,30 +810,26 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    N extends string,
-    G extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    MG extends V extends undefined ? G
-      : R extends undefined
-        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
-        : RecordOption<GetOptionName<N>, V>
-      : RecordOption<GetOptionName<N>, V>,
+    F extends string,
+    G extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    MG extends V extends undefined ? G : MapValue<G, V>,
     R extends ICommandOption["required"] = undefined,
     D = undefined,
     V = undefined,
   >(
-    flags: N,
+    flags: F,
     desc: string,
     opts:
       | Omit<
         ICommandOption<
           Partial<CO>,
           CA,
-          MergeOptions<N, CG, G>,
-          PG,
+          MergeOptions<F, CG, G>,
+          CPG,
           CT,
-          GT,
-          PT,
-          P
+          CGT,
+          CPT,
+          CP
         >,
         "value"
       >
@@ -852,33 +841,29 @@ export class Command<
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
-    PG,
-    PT,
+    CPG,
+    CPT,
     CO,
     CA,
-    MergeOptions<N, CG, MG>,
+    MergeOptions<F, CG, MG>,
     CT,
-    GT,
-    P
+    CGT,
+    CP
   >;
 
   public option<
-    N extends string,
-    O extends TypedOption<N, Merge<PT, Merge<GT, CT>>, D, R>,
-    MO extends V extends undefined ? O
-      : R extends undefined
-        ? D extends undefined ? NestedPartial<RecordOption<GetOptionName<N>, V>>
-        : RecordOption<GetOptionName<N>, V>
-      : RecordOption<GetOptionName<N>, V>,
+    F extends string,
+    O extends TypedOption<F, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    MO extends V extends undefined ? O : MapValue<O, V>,
     R extends ICommandOption["required"] = undefined,
     D = undefined,
     V = undefined,
   >(
-    flags: N,
+    flags: F,
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<MergeOptions<N, CO, O>, CA, CG, PG, CT, GT, PT, P>,
+        ICommandOption<MergeOptions<F, CO, O>, CA, CG, CPG, CT, CGT, CPT, CP>,
         "value"
       >
         & {
@@ -888,14 +873,14 @@ export class Command<
         }
       | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
   ): Command<
-    PG,
-    PT,
-    MergeOptions<N, CO, MO>,
+    CPG,
+    CPT,
+    MergeOptions<F, CO, MO>,
     CA,
     CG,
     CT,
-    GT,
-    P
+    CGT,
+    CP
   >;
 
   public option(
@@ -977,15 +962,24 @@ export class Command<
   }
 
   public globalEnv<
-    G extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
-    N extends string = string,
-    Prefix extends string = "",
+    N extends string,
+    G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    MG extends V extends undefined ? G : MapValue<G, V>,
+    R extends IEnvVarOptions["required"] = undefined,
+    V = undefined,
+    P extends string = "",
   >(
     name: N,
     description: string,
-    options?: Omit<IEnvVarOptions<Prefix>, "global">,
-  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P> {
-    return this.env(name, description, { ...options, global: true });
+    options?: Omit<IEnvVarOptions<MapTypes<ValueOf<G>>, V, P>, "global"> & {
+      required?: R;
+    },
+  ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP> {
+    return this.env(
+      name,
+      description,
+      { ...options, global: true } as IEnvVarOptions,
+    ) as Command<any>;
   }
 
   /**
@@ -995,34 +989,33 @@ export class Command<
    * @param options       Environment variable options.
    */
   public env<
-    G extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
-    N extends string = string,
-    Prefix extends string = "",
+    N extends string,
+    G extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    MG extends V extends undefined ? G : MapValue<G, V>,
+    R extends IEnvVarOptions["required"] = undefined,
+    V = undefined,
+    P extends string = "",
   >(
     name: N,
     description: string,
-    options: IEnvVarOptions<Prefix> & { global: true },
-  ): Command<PG, PT, CO, CA, Merge<CG, G>, CT, GT, P>;
+    options: IEnvVarOptions<MapTypes<ValueOf<G>>, V, P> & {
+      global: true;
+      required?: R;
+    },
+  ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP>;
 
   public env<
-    O extends TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>,
-    N extends string = string,
-    Prefix extends string = "",
+    N extends string,
+    O extends TypedEnv<N, P, Merge<CPT, Merge<CGT, CT>>, R>,
+    MO extends V extends undefined ? O : MapValue<O, V>,
+    R extends IEnvVarOptions["required"] = undefined,
+    V = undefined,
+    P extends string = "",
   >(
     name: N,
     description: string,
-    options: IEnvVarOptions<Prefix> & { required: true },
-  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
-
-  public env<
-    O extends Partial<TypedEnv<N, Prefix, Merge<PT, Merge<GT, CT>>>>,
-    N extends string = string,
-    Prefix extends string = "",
-  >(
-    name: N,
-    description: string,
-    options?: IEnvVarOptions<Prefix>,
-  ): Command<PG, PT, Merge<CO, O>, CA, CG, CT, GT, P>;
+    options?: IEnvVarOptions<MapTypes<ValueOf<O>>, V, P> & { required?: R },
+  ): Command<CPG, CPT, Merge<CO, MO>, CA, CG, CT, CGT, CP>;
 
   public env(
     name: string,
@@ -1074,15 +1067,15 @@ export class Command<
   public async parse(
     args: string[] = Deno.args,
   ): Promise<
-    P extends Command<any> ? ReturnType<P["parse"]> : IParseResult<
+    CP extends Command<any> ? ReturnType<CP["parse"]> : IParseResult<
       MapTypes<CO>,
       MapTypes<CA>,
       MapTypes<CG>,
-      MapTypes<PG>,
+      MapTypes<CPG>,
       CT,
-      GT,
-      PT,
-      P
+      CGT,
+      CPT,
+      CP
     >
   > {
     try {
@@ -1460,8 +1453,8 @@ export class Command<
   }
 
   /** Get parent command. */
-  public getParent(): P {
-    return this._parent as P;
+  public getParent(): CP {
+    return this._parent as CP;
   }
 
   /**
@@ -2148,8 +2141,8 @@ interface IDefaultOption {
   opts?: ICommandOption;
 }
 
-type TrimLeft<T extends string, V extends string> = T extends `${V}${infer U}`
-  ? U
+type TrimLeft<T extends string, V extends string | undefined> = T extends
+  `${V}${infer U}` ? U
   : T;
 
 type TrimRight<T extends string, V extends string> = T extends `${infer U}${V}`
@@ -2293,6 +2286,7 @@ type SingleArg = OptionalOrRequiredValue<
 
 type DefaultTypes = {
   number: NumberType;
+  integer: IntegerType;
   string: StringType;
   boolean: BooleanType;
 };
@@ -2322,67 +2316,97 @@ type ArgumentTypes<T extends string, V> = T extends `${string} ${string}`
   ? TypedArguments<T, V>
   : ArgumentType<T, V>;
 
-type GetArguments<T extends string> = T extends `-${string} ${infer Rest}`
+type GetArguments<T extends string> = T extends `-${string}=${infer Rest}`
   ? GetArguments<Rest>
-  : T extends `-${string}=${infer Rest}` ? GetArguments<Rest>
+  : T extends `-${string} ${infer Rest}` ? GetArguments<Rest>
   : T;
 
 type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
 
-type BooleanOption<T extends string, D = undefined> = T extends
-  `no-${infer Name}` ? { [N in OptionName<Name>]: false }
+type BooleanOption<
+  T extends string,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = T extends `no-${infer Name}` ? { [N in OptionName<Name>]: false }
   : T extends `${infer Name}.${infer Rest}`
-    ? { [N in OptionName<Name>]: BooleanOption<Rest, D> }
-  : { [N in OptionName<T>]: true | D };
+    ? (R extends true ? { [N in OptionName<Name>]: BooleanOption<Rest, R, D> }
+      : { [N in OptionName<Name>]?: BooleanOption<Rest, R, D> })
+  : (R extends true ? { [N in OptionName<T>]: true | D }
+    : { [N in OptionName<T>]?: true | D });
 
-type NoUndefined<T, V> = undefined extends T ? V : T | V;
+type IsRequired<R extends boolean | undefined, D> = R extends true ? true
+  : D extends undefined ? false
+  : true;
 
-type ValueOption<T extends string, Rest extends string, V, D = undefined> =
-  T extends `${infer Name}.${infer RestName}` ? {
-    [N in OptionName<Name>]: ValueOption<RestName, Rest, V, D>;
+type ValueOption<
+  T extends string,
+  Rest extends string,
+  V,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = T extends `${infer Name}.${infer RestName}` ? (R extends true ? {
+  [N in OptionName<Name>]: ValueOption<RestName, Rest, V, R, D>;
+}
+  : {
+    [N in OptionName<Name>]?: ValueOption<RestName, Rest, V, R, D>;
+  })
+  : (R extends true ? {
+    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
+      : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
   }
     : {
-      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
         ? NoUndefined<D, true | ArgumentType<GetArguments<Rest>, V>>
         : NoUndefined<D, ArgumentType<GetArguments<Rest>, V>>;
-    };
+    });
 
-type ValuesOption<T extends string, Rest extends string, V, D = undefined> =
-  T extends `${infer Name}.${infer RestName}` ? {
-    [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, D>;
+type ValuesOption<
+  T extends string,
+  Rest extends string,
+  V,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = T extends `${infer Name}.${infer RestName}` ? (R extends true ? {
+  [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, R, D>;
+}
+  : {
+    [N in OptionName<Name>]?: ValuesOption<RestName, Rest, V, R, D>;
+  })
+  : (R extends true ? {
+    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
+      : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
   }
     : {
-      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+      [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
         ? NoUndefined<D, true | ArgumentTypes<GetArguments<Rest>, V>>
         : NoUndefined<D, ArgumentTypes<GetArguments<Rest>, V>>;
-    };
+    });
 
-type MaybeRequiredOption<Default, Required, Options> = Required extends true
-  ? Options
-  : Default extends undefined ? Partial<Options>
-  : Options;
+type TypedOption<
+  T extends string,
+  V,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = T extends `${string}--${infer Name}=${infer Rest}`
+  ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `${string}--${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `${string}--${infer Name}`
+    ? BooleanOption<Name, IsRequired<R, D>, D>
+  : T extends `-${infer Name}=${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `-${infer Name} ${infer Rest}`
+    ? ValuesOption<Name, Rest, V, IsRequired<R, D>, D>
+  : T extends `-${infer Name}` ? BooleanOption<Name, IsRequired<R, D>, D>
+  : Record<string, unknown>;
 
-type TypedOption<T extends string, V, D = undefined, R = undefined> =
-  MaybeRequiredOption<
-    D,
-    R,
-    T extends `${string}--${infer Name}=${infer Rest}`
-      ? ValuesOption<Name, Rest, V, D>
-      : T extends `${string}--${infer Name} ${infer Rest}`
-        ? ValuesOption<Name, Rest, V, D>
-      : T extends `${string}--${infer Name}` ? BooleanOption<Name, D>
-      : T extends `-${infer Name}=${infer Rest}`
-        ? ValuesOption<Name, Rest, V, D>
-      : T extends `-${infer Name} ${infer Rest}`
-        ? ValuesOption<Name, Rest, V, D>
-      : T extends `-${infer Name}` ? BooleanOption<Name, D>
-      : Record<string, unknown>
-  >;
-
-type RecordOption<N, V> = N extends `${infer Name}.${infer Rest}`
-  ? Record<CamelCase<Name>, RecordOption<Rest, V>>
-  : N extends string ? Record<CamelCase<N>, V>
-  : never;
+type MapValue<O, V> = {
+  [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
+    ? MapValue<O[K], V>
+    : V;
+};
 
 type GetOptionName<T> = T extends `${string}--${infer Name}=${string}`
   ? TrimRight<Name, ",">
@@ -2421,11 +2445,17 @@ type TypedCommandArguments<T extends string, V> = T extends
   `${string} ${infer Args}` ? TypedArguments<Args, V>
   : [];
 
-type TypedEnv<T extends string, P extends string, V> = T extends
-  `${infer Name}=${infer Rest}` ? ValueOption<TrimLeft<Name, P>, Rest, V>
-  : T extends `${infer Name} ${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, V>
-  : T extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>>
+type TypedEnv<
+  N extends string,
+  P extends string,
+  V,
+  R extends boolean | undefined = undefined,
+  D = undefined,
+> = N extends `${infer Name}=${infer Rest}`
+  ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
+  : N extends `${infer Name} ${infer Rest}`
+    ? ValueOption<TrimLeft<Name, P>, Rest, V, R, D>
+  : N extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, R, D>
   : Record<string, unknown>;
 
 type TypedType<
@@ -2478,7 +2508,4 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
 
-type NestedPartial<T> = {
-  [P in keyof T]?: T[P] extends Record<string, unknown> ? NestedPartial<T[P]>
-    : T[P];
-};
+type NoUndefined<T, V> = T extends undefined ? V : T | V;

@@ -88,14 +88,61 @@ import {
         void,
         { foo?: boolean },
         [bar?: number],
-        { bar?: boolean }
+        { bar?: true }
       >()
         .action((options, ...args) => {
           assert<IsExact<typeof args, [bar?: number]>>(true);
           assert<
             IsExact<typeof options, {
-              bar?: boolean;
+              bar?: true;
               foo?: boolean;
+            }>
+          >(true);
+        });
+    },
+  });
+
+  Deno.test({
+    name:
+      "[command] - generic types - pre-defined constructor types with options",
+    fn() {
+      type Arguments = [input: string, output?: string, level?: number];
+      type Options = {
+        name: string;
+        age: number;
+        email?: string;
+      };
+      type GlobalOptions = {
+        debug?: true;
+        debugLevel: "debug" | "info" | "warn" | "error";
+      };
+
+      new Command<
+        void,
+        void,
+        Options,
+        Arguments,
+        GlobalOptions
+      >()
+        .arguments("<input:string> [output:string] [level:number]")
+        .globalOption("-d, --debug", "description ...")
+        .globalOption("-l, --debug-level <string>", "description ...", {
+          default: "warn",
+        })
+        .option("-n, --name <name:string>", "description ...", {
+          required: true,
+        })
+        .option("-a, --age <age:number>", "description ...", { required: true })
+        .option("-e, --email <email:string>", "description ...")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, [string, string?, number?]>>(true);
+          assert<
+            IsExact<typeof options, {
+              debug?: true;
+              debugLevel: "debug" | "info" | "warn" | "error";
+              name: string;
+              age: number;
+              email?: string;
             }>
           >(true);
         });
@@ -397,52 +444,6 @@ import {
         // @ts-expect-error unknown global option main2
         .command("foo", fooCommand)
         .parse(Deno.args);
-    },
-  });
-
-  Deno.test({
-    name: "[command] - generic types - pre-defined constructor types",
-    fn() {
-      type Arguments = [input: string, output?: string, level?: number];
-      interface Options {
-        name: string;
-        age: number;
-        email?: string;
-      }
-      interface GlobalOptions {
-        debug?: boolean;
-        debugLevel: "debug" | "info" | "warn" | "error";
-      }
-
-      new Command<
-        void,
-        void,
-        Options,
-        Arguments,
-        GlobalOptions
-      >()
-        .arguments("<input:string> [output:string] [level:number]")
-        .globalOption("-d, --debug", "description ...")
-        .globalOption("-l, --debug-level <string>", "description ...", {
-          default: "warn",
-        })
-        .option("-n, --name <name:string>", "description ...", {
-          required: true,
-        })
-        .option("-a, --age <age:number>", "description ...", { required: true })
-        .option("-e, --email <email:string>", "description ...")
-        .action((options, ...args) => {
-          assert<IsExact<typeof args, [string, string?, number?]>>(true);
-          assert<
-            IsExact<typeof options, {
-              debug?: true;
-              debugLevel: string;
-              name: string;
-              age: number;
-              email?: string;
-            }>
-          >(true);
-        });
     },
   });
 
@@ -762,17 +763,40 @@ import {
             return [...val, new Date()];
           },
         })
-        .option("--one.two <val:string>", "...", {
+        .option("--one.foo <val:string>", "...", {
           default: 4,
           value: (value) => {
             assert<IsExact<typeof value, number | string>>(true);
             return new Date();
           },
         })
+        .option("--one.bar <val:string>", "...", {
+          value: (value) => {
+            assert<IsExact<typeof value, string>>(true);
+            return /.*/;
+          },
+        })
         .option("--three.four <val:string>", "...", {
           value: (value) => {
             assert<IsExact<typeof value, string>>(true);
             return 2;
+          },
+        })
+        .env("ENV_VAR=<val:number>", "...", {
+          required: true,
+          value(value) {
+            assert<IsExact<typeof value, number>>(true);
+            return new Date();
+          },
+        })
+        .option("--env-var-2 <val:string>", "...", (value) => {
+          assert<IsExact<typeof value, string>>(true);
+          return new Date();
+        })
+        .env("ENV_VAR_2=<val:string>", "...", {
+          value(value) {
+            assert<IsExact<typeof value, string>>(true);
+            return new Date();
           },
         })
         .action((options, ...args) => {
@@ -784,8 +808,10 @@ import {
               foo?: string | true;
               bar: string | number | true;
               baz: string | number;
-              one: { two: Date };
+              one: { foo: Date; bar?: RegExp };
               three?: { four?: number };
+              envVar: Date;
+              envVar2?: Date;
             }>
           >(true);
         })
