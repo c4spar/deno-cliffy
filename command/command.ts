@@ -51,8 +51,10 @@ import type {
   IDescription,
   IEnvVar,
   IEnvVarOptions,
+  IEnvVarValueHandler,
   IExample,
   IFlagValueHandler,
+  IGlobalEnvVarOptions,
   IHelpHandler,
   IOption,
   IParseResult,
@@ -972,13 +974,15 @@ export class Command<
     G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
+    P extends IEnvVarOptions["prefix"] = undefined,
     V = undefined,
-    P extends string = "",
   >(
     name: N,
     description: string,
-    options?: Omit<IEnvVarOptions<MapTypes<ValueOf<G>>, V, P>, "global"> & {
+    options?: Omit<IGlobalEnvVarOptions, "value"> & {
       required?: R;
+      prefix?: P;
+      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
     },
   ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP> {
     return this.env(
@@ -999,14 +1003,16 @@ export class Command<
     G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
     R extends IEnvVarOptions["required"] = undefined,
+    P extends IEnvVarOptions["prefix"] = undefined,
     V = undefined,
-    P extends string = "",
   >(
     name: N,
     description: string,
-    options: IEnvVarOptions<MapTypes<ValueOf<G>>, V, P> & {
+    options: Omit<IEnvVarOptions, "value"> & {
       global: true;
       required?: R;
+      prefix?: P;
+      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
     },
   ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP>;
 
@@ -1015,12 +1021,16 @@ export class Command<
     O extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MO extends MapValue<O, V>,
     R extends IEnvVarOptions["required"] = undefined,
+    P extends IEnvVarOptions["prefix"] = undefined,
     V = undefined,
-    P extends string = "",
   >(
     name: N,
     description: string,
-    options?: IEnvVarOptions<MapTypes<ValueOf<O>>, V, P> & { required?: R },
+    options?: Omit<IEnvVarOptions, "value"> & {
+      required?: R;
+      prefix?: P;
+      value?: IEnvVarValueHandler<MapTypes<ValueOf<O>>, V>;
+    },
   ): Command<CPG, CPT, Merge<CO, MO>, CA, CG, CT, CGT, CP>;
 
   public env(
@@ -2472,7 +2482,7 @@ type TypedCommandArguments<N extends string, T> = number extends T ? any
 
 type TypedEnv<
   N extends string,
-  P extends string,
+  P extends string | undefined,
   CO,
   T,
   R extends boolean | undefined = undefined,

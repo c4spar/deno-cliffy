@@ -149,21 +149,20 @@ export interface IOption<
 export type IEnvVarValueHandler<T = any, V = unknown> = (val: T) => V;
 
 /** Environment variable options */
-export interface IEnvVarOptions<
-  T = any,
-  V = unknown,
-  P extends string = string,
-> {
+export interface IGlobalEnvVarOptions {
   hidden?: boolean;
-  global?: boolean;
   required?: boolean;
-  prefix?: P | undefined;
-  value?: IEnvVarValueHandler<T, V>;
+  prefix?: string | undefined;
+  value?: IEnvVarValueHandler;
+}
+
+/** Environment variable options */
+export interface IEnvVarOptions extends IGlobalEnvVarOptions {
+  global?: boolean;
 }
 
 /** Environment variable settings. */
-export interface IEnvVar<T = any, V = unknown, P extends string = string>
-  extends IEnvVarOptions<T, V, P> {
+export interface IEnvVar extends IEnvVarOptions {
   name: string;
   names: string[];
   description: string;
