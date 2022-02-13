@@ -35,8 +35,8 @@
 </p>
 
 <p align="center">
-  <b> The complete solution for <a href="https://deno.land/">Deno</a> command-line interfaces </b></br>
-  <sub>>_ Create flexible command line interfaces with type checking, auto generated help and out of the box support for shell completions </sub>
+  <b> The complete & type safe solution for <a href="https://deno.land/">Deno</a> command-line interfaces </b></br>
+  <sub>Automatically typed options and arguments - input validation - auto generated help - build-in shell completions - and more.</sub>
 </p>
 
 <p align="center">
@@ -193,8 +193,11 @@ server running at localhost:80
 
 The `.parse()` method processes all arguments, leaving any options consumed by
 the command in the `options` object, all arguments in the `args` array and all
-literal arguments in the literal array. For all unknown options the command will
-throw an error message and exit the program with `Deno.exit(1)`.
+literal arguments in the `literal` array. For all unknown options the command
+will throw an error message and exit the program with `Deno.exit(1)`.
+
+All types and names for options, arguments and environemnt variables are
+automatically infered and properly typed!
 
 ### Common option types: boolean, string, number and integer
 
@@ -1191,7 +1194,7 @@ An environment variable has the following options:
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command<void>()
-  .env<{ someEnvVar: number }>(
+  .env(
     "SOME_ENV_VAR=<value:number>",
     "Description ...",
     {
@@ -1220,12 +1223,12 @@ the environment variable has a prefix.
 
 ```typescript
 await new Command<void>()
-  .env<{ outputFile?: string }>(
+  .env(
     "FOO_OUTPUT_FILE=<value:string>",
     "The output file.",
     { prefix: "FOO_" },
   )
-  .option<{ outputFile?: string }>(
+  .option(
     "--output-file <value:string>",
     "The output file.",
   )
@@ -1546,136 +1549,11 @@ source <(command-name completions zsh)
 
 ## ❯ Generic options and arguments
 
-By default, options and arguments are of type `any`. You can define strict types
-by passing the types to the constructor `new Command<O, A, G, PG, P>()` or to
-the instance methods `.option<O>()`, `.arguments<A>()` and `.globalOption<O>()`.
-
-Options must be compatible to `Record<string, unknown>` (or `void` for no
-options) and argument to `Array<unknown>` (or an empty tuple `[]` for no
-arguments).
-
-> ⚠️ Don't use the `{}` type to define an empty options object, because it
-> doesn't mean to be an empty object. (see
-> [here](https://github.com/typescript-eslint/typescript-eslint/issues/2063#issuecomment-675156492)
-> for more information), instead use `void`.
-
-### Generic instance method types
-
-By default, options and arguments are of type `any`. To start with an empty
-command with no options and no arguments, you can pass the `void` type to the
-`new Command<void>()` constructor. Then you can add dynamically new option and
-argument types by passing the types to the `.option<O>()`, `.arguments<A>()` and
-`.globalOption<O>()` method's.
-
-```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
-
-const cmd = new Command<void>()
-  .arguments<[input: string, output?: string]>("<input> [output]")
-  .globalOption<{ debug?: boolean }>("-d, --debug", "...")
-  .option<{ logLevel?: boolean }>("-L, --log-level", "...", { global: true })
-  .option<{ main?: boolean }>("-m, --main", "...")
-  .action((options) => {
-    /** valid options */
-    options.debug && options.logLevel &&
-      options.main;
-    /** invalid options */
-    // @ts-expect-error foo & fooGlobal option's only exists on foo command.
-    options.foo && options.fooGlobal &&
-      // @ts-expect-error bar & barGlobal option's only exists on bar command.
-      options.bar && options.barGlobal;
-  });
-
-cmd.command("foo")
-  .globalOption<{ fooGlobal?: boolean }>("-F, --foo-global", "...")
-  .option<{ foo?: boolean }>("-f, --foo", "...")
-  .action((options) => {
-    /** valid options */
-    options.debug && options.logLevel &&
-      options.foo && options.fooGlobal;
-    /** invalid options */
-    // @ts-expect-error main option only exists on main command.
-    options.main &&
-      // @ts-expect-error bar & barGlobal option's only exists on bar command.
-      options.bar && options.barGlobal;
-  });
-
-cmd.command("bar")
-  .globalOption<{ barGlobal?: boolean }>("-B, --bar-global", "...")
-  .option<{ bar?: boolean }>("-b, --bar", "...")
-  .action((options) => {
-    /** valid options */
-    options.debug && options.logLevel &&
-      options.bar && options.barGlobal;
-    /** invalid options */
-    // @ts-expect-error main option only exists on main command.
-    options.main &&
-      // @ts-expect-error foo & fooGlobal option's only exists on foo command.
-      options.foo && options.fooGlobal;
-  });
-```
-
-### Generic constructor types
-
-You can also define the types directly in the constructor. The
-`Command<O, A, G, PG, P>` constructor takes multiple generic types.
-
-- `O` Options (defined with `.option()`)
-- `A` Arguments (defined with `.arguments()`)
-- `G` Global options (defined with `.globalOption()` or
-  `.option(..., { global: true })`)
-- `PG` Global parent command options
-- `P` Parent command
-
-Global parent options are only needed, if you want to split your command into
-multiple command instances (see
-[Generic global parent types](#generic-global-parent-types)). The parent command
-is mostly used internally.
-
-```typescript
-import {
-  Command,
-  IParseResult,
-} from "https://deno.land/x/cliffy/command/mod.ts";
-
-// Define your argument types.
-type Arguments = [input: string, output?: string];
-
-// Define your option types.
-interface Options {
-  name: string;
-  age: number;
-  email?: string;
-}
-
-// Define your global option types.
-interface GlobalOptions {
-  debug?: boolean;
-  debugLevel: "debug" | "info" | "warn" | "error";
-}
-
-await new Command<
-  Options,
-  Arguments,
-  GlobalOptions
->()
-  .arguments("<input:string> [output:string]")
-  .globalOption("-d, --debug", "description ...")
-  .globalOption("-l, --debug-level <string>", "description ...", {
-    default: "warn",
-  })
-  .option("-n, --name <name:string>", "description ...", { required: true })
-  .option("-a, --age <age:number>", "description ...", { required: true })
-  .option("-e, --email <email:string>", "description ...")
-  .action((options: Options, input: string, output?: string) => {
-    /** valid options */
-    options.name && options.age && options.email;
-    /** invalid options */
-    // @ts-expect-error option foo does not exist.
-    options.foo;
-  })
-  .parse(Deno.args);
-```
+Since `v0.21.0`, cliffy has strict types by default. All types, option and
+environment-variable names will be automatically magically infered 🪄. **It is no
+longer recommanded to define the types manuelly with the generic parameters**.
+The only exceptions are the first two generic constructor parameters which are
+used do define required global options and types.
 
 ### Generic global parent types
 
@@ -1683,19 +1561,31 @@ If you want to split up your command into different command instances, to
 organize your commands into different files, you can define required global
 parent options in the constructor of the child command.
 
+The first parameter defines required global options ir environment variables.
+The second parameter defines required global custom types.
+
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
+const colorType = new EnumType(["red", "blue"]);
+
 // Define global parent option `debug`.
-const fooCommand = new Command<void, [], void, { debug?: boolean }>()
+const fooCommand = new Command<
+  { debug?: true },
+  { color?: typeof colorType }
+>()
   // Add foo command options.
-  .option<{ bar?: boolean }>("-b, --bar", "...")
+  .option("-b, --bar", "...")
+  .option("-c, --color <color-name:color>", "...")
   .action((options) => {
     if (options.debug) {
       console.log("debug");
     }
     if (options.bar) {
       console.log("bar");
+    }
+    if (options.color) {
+      console.log("color", options.color);
     }
     // @ts-expect-error option foo does not exist.
     if (options.foo) {
@@ -1704,44 +1594,10 @@ const fooCommand = new Command<void, [], void, { debug?: boolean }>()
   });
 
 await new Command<void>()
-  // Add global option.
-  .globalOption<{ debug?: boolean }>("-d, --debug", "...")
+  .globalType("color", colorType)
+  .globalOption("-d, --debug", "...")
   .command("foo", fooCommand)
   .parse(Deno.args);
-```
-
-### Generic custom types
-
-Custom types can be used to define your generic types.
-
-```typescript
-import {
-  Command,
-  NumberType,
-  TypeValue,
-} from "https://deno.land/x/cliffy/command/mod.ts";
-
-// Create an instance of your custom type.
-const amount = new NumberType();
-
-await new Command<void>()
-  // Add the type.
-  .type("amount", amount)
-  // Use the type of your type instance as option type.
-  // The correct type will be inferred and used for the option value.
-  .option<{ amount?: typeof amount }>(
-    "-a, --amount <amount:amount>",
-    "The amount.",
-  )
-  // Same as:
-  .option<{ amount?: TypeValue<typeof amount> }>(
-    "-a, --amount <amount:amount>",
-    "The amount.",
-  )
-  // amount will be of type number.
-  .action(({ amount }) => {
-    console.log("amount:", amount);
-  });
 ```
 
 ## ❯ Upgrade command
