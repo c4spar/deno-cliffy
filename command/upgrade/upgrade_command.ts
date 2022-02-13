@@ -13,7 +13,7 @@ export interface UpgradeCommandOptions<
   args?: Array<string>;
 }
 
-export class UpgradeCommand extends Command<void> {
+export class UpgradeCommand extends Command {
   private readonly providers: ReadonlyArray<Provider>;
 
   constructor(
@@ -29,7 +29,7 @@ export class UpgradeCommand extends Command<void> {
         `Upgrade ${this.getMainCommand().getName()} executable to latest or given version.`
       )
       .type("provider", new EnumType(this.getProviderNames()))
-      .option<{ registry: Provider }>(
+      .option(
         "-r, --registry <name:provider>",
         `The registry name from which to upgrade.`,
         {
@@ -38,7 +38,7 @@ export class UpgradeCommand extends Command<void> {
           value: (registry) => this.getProvider(registry),
         },
       )
-      .option<{ listVersions?: boolean }>(
+      .option(
         "-l, --list-versions",
         "Show available versions.",
         {
@@ -51,12 +51,12 @@ export class UpgradeCommand extends Command<void> {
           },
         },
       )
-      .option<{ version: string }>(
+      .option(
         "--version <version:string:version>",
         "The version to upgrade to.",
         { default: "latest" },
       )
-      .option<{ force?: boolean }>(
+      .option(
         "-f, --force",
         "Replace current installation even if not out-of-date.",
       )

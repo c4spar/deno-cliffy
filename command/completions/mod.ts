@@ -6,27 +6,28 @@ import { FishCompletionsCommand } from "./fish.ts";
 import { ZshCompletionsCommand } from "./zsh.ts";
 
 /** Generates shell completion scripts for various shell's. */
-export class CompletionsCommand extends Command<void> {
+export class CompletionsCommand extends Command {
   #cmd?: Command;
 
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;
-    this.description(() => {
-      const baseCmd = this.#cmd || this.getMainCommand();
-      return `Generate shell completions.
+    return this
+      .description(() => {
+        const baseCmd = this.#cmd || this.getMainCommand();
+        return `Generate shell completions.
 
 To enable shell completions for this program add the following line to your ${
-        dim(italic("~/.bashrc"))
-      } or similar:
+          dim(italic("~/.bashrc"))
+        } or similar:
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions [shell])`))}
 
     For more information run ${
-        dim(italic(`${baseCmd.getPath()} completions [shell] --help`))
-      }
+          dim(italic(`${baseCmd.getPath()} completions [shell] --help`))
+        }
 `;
-    })
+      })
       .action(() => this.showHelp())
       .command("bash", new BashCompletionsCommand(this.#cmd))
       .command("fish", new FishCompletionsCommand(this.#cmd))

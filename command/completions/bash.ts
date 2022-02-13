@@ -3,21 +3,22 @@ import { dim, italic } from "../deps.ts";
 import { BashCompletionsGenerator } from "./_bash_completions_generator.ts";
 
 /** Generates bash completions script. */
-export class BashCompletionsCommand extends Command<void> {
+export class BashCompletionsCommand extends Command {
   #cmd?: Command;
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;
-    this.description(() => {
-      const baseCmd = this.#cmd || this.getMainCommand();
-      return `Generate shell completions for bash.
+    return this
+      .description(() => {
+        const baseCmd = this.#cmd || this.getMainCommand();
+        return `Generate shell completions for bash.
 
 To enable bash completions for this program add following line to your ${
-        dim(italic("~/.bashrc"))
-      }:
+          dim(italic("~/.bashrc"))
+        }:
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions bash)`))}`;
-    })
+      })
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
         console.log(BashCompletionsGenerator.generate(baseCmd));

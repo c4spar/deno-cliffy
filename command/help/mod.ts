@@ -4,10 +4,11 @@ import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
 export class HelpCommand
-  extends Command<void, void, void, [command?: CommandType]> {
+  extends Command<void, void, void, [commandName?: CommandType]> {
   public constructor(cmd?: Command) {
     super();
-    return this.type("command", new CommandType())
+    return this
+      .type("command", new CommandType())
       .arguments("[command:command]")
       .description("Show this help or the help of a sub-command.")
       .action((_, name?: string) => {
