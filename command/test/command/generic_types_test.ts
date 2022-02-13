@@ -497,7 +497,7 @@ import {
   Deno.test({
     name: "[command] - generic types - return types",
     async fn() {
-      const { args, options } = await new Command()
+      await new Command()
         .type("color", new EnumType(["red", "blue"]))
         .option("--num [val:number]", "")
         .option("--str [val:string]", "")
@@ -506,20 +506,20 @@ import {
         .option("--req <val:string>", "", { required: true })
         .option("-f", "")
         .arguments("<arg1:color> [arg2:string]")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, ["red" | "blue", string?]>>(true);
+          assert<
+            IsExact<typeof options, {
+              color?: true | "red" | "blue";
+              num?: number | true;
+              str?: string | true;
+              bool?: boolean;
+              req: string;
+              f?: true;
+            }>
+          >(true);
+        })
         .parse(Deno.args);
-
-      assert<IsExact<typeof args, ["red" | "blue", string?]>>(true);
-
-      assert<
-        IsExact<typeof options, {
-          color?: true | "red" | "blue";
-          num?: number | true;
-          str?: string | true;
-          bool?: boolean;
-          req: string;
-          f?: true;
-        }>
-      >(true);
     },
   });
 
@@ -530,33 +530,33 @@ import {
         JS = "js",
         Rust = "rust",
       }
-      const { args, options } = await new Command()
+      await new Command()
         .type("color", new EnumType(["red", "blue"]))
         .type("lang", new EnumType(Lang))
         .arguments(
           "<arg1> <arg2:string> <arg3:number> <arg4:boolean> [arg5] [arg6:string] [arg7:number] [arg8:boolean] [arg9:color] [...rest:lang[]]",
         )
+        .action((options, ...args) => {
+          assert<
+            IsExact<
+              typeof args,
+              [
+                string,
+                string,
+                number,
+                boolean,
+                string?,
+                string?,
+                number?,
+                boolean?,
+                ("red" | "blue")?,
+                Array<Array<Lang>>?,
+              ]
+            >
+          >(true);
+          assert<IsExact<typeof options, void>>(true);
+        })
         .parse(Deno.args);
-
-      assert<
-        IsExact<
-          typeof args,
-          [
-            string,
-            string,
-            number,
-            boolean,
-            string?,
-            string?,
-            number?,
-            boolean?,
-            ("red" | "blue")?,
-            Array<Array<Lang>>?,
-          ]
-        >
-      >(true);
-
-      assert<IsExact<typeof options, void>>(true);
     },
   });
 
@@ -880,6 +880,88 @@ import {
           >(true);
         })
         .parse(Deno.args);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - parse() return value",
+    async fn() {
+      const { args, cmd, literal, options } = await new Command()
+        .option("--foo", "...")
+        .option("--bar <value:number>", "...")
+        .option("--barbaz <value:number>", "...", {
+          value: (value) => new Date(value),
+        })
+        .arguments("<foo:string> [bar:number]")
+        .parse(Deno.args);
+
+      assert<IsExact<typeof args, [string, number?]>>(true);
+      assert<
+        IsExact<
+          typeof cmd,
+          Command<
+            void,
+            void,
+            {
+              foo?: true;
+              bar?: number;
+              barbaz?: Date;
+            },
+            [string, number?],
+            void,
+            {
+              number: number;
+              integer: number;
+              string: string;
+              boolean: boolean;
+            },
+            void,
+            undefined
+          >
+        >
+      >(true);
+      assert<IsExact<typeof literal, Array<string>>>(true);
+      assert<
+        IsExact<typeof options, {
+          foo?: true;
+          bar?: number;
+          barbaz?: Date;
+        }>
+      >(true);
+    },
+  });
+
+  Deno.test({
+    name:
+      "[command] - generic types - parse() return value with child commands",
+    async fn() {
+      const { args, cmd, literal, options } = await new Command()
+        .option("--foo", "...")
+        .option("--bar <value:number>", "...")
+        .option("--barbaz <value:number>", "...", {
+          value: (value) => new Date(value),
+        })
+        .command("foo", "...")
+        .parse(Deno.args);
+
+      assert<IsExact<typeof args, Array<unknown>>>(true);
+      assert<
+        IsExact<
+          typeof cmd,
+          Command<
+            Record<string, unknown>,
+            Record<string, unknown>,
+            Record<string, unknown>,
+            Array<unknown>,
+            Record<string, unknown>,
+            Record<string, unknown>,
+            Record<string, unknown>,
+            undefined
+          >
+        >
+      >(true);
+      assert<IsExact<typeof literal, Array<string>>>(true);
+      assert<IsExact<typeof options, Record<string, unknown>>>(true);
     },
   });
 });

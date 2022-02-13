@@ -76,6 +76,7 @@ export class Command<
   CG extends Record<string, any> | void = CPG extends number ? any : void,
   CT extends Record<string, any> | void = CPG extends number ? any : {
     number: number;
+    integer: number;
     string: string;
     boolean: boolean;
   },
@@ -1083,16 +1084,26 @@ export class Command<
   public async parse(
     args: string[] = Deno.args,
   ): Promise<
-    CP extends Command<any> ? ReturnType<CP["parse"]> : IParseResult<
-      MapTypes<CO>,
-      MapTypes<CA>,
-      MapTypes<CG>,
-      MapTypes<CPG>,
-      CT,
-      CGT,
-      CPT,
-      CP
+    CP extends Command<any> ? IParseResult<
+      Record<string, unknown>,
+      Array<unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      undefined
     >
+      : IParseResult<
+        MapTypes<CO>,
+        MapTypes<CA>,
+        MapTypes<CG>,
+        MapTypes<CPG>,
+        CT,
+        CGT,
+        CPT,
+        CP
+      >
   > {
     try {
       this.reset();
@@ -1105,7 +1116,7 @@ export class Command<
           subCommand._globalParent = this;
           return subCommand.parse(
             this.rawArgs.slice(1),
-          );
+          ) as any;
         }
       }
 
