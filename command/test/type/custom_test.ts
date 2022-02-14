@@ -89,7 +89,7 @@ class CustomType<T extends string> extends Type<T> {
 }
 
 Deno.test("command - type - custom - generic custom type", async () => {
-  const cmd = new Command<void>()
+  const cmd = new Command()
     .throwErrors()
     .type("format", new CustomType(["foo", "bar"]))
     .option(

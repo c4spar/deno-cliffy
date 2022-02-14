@@ -43,7 +43,7 @@ function command() {
     )
     .command(
       "bar",
-      new Command<void>()
+      new Command()
         .env("bar", "...")
         .env("bar_hidden", "...", { hidden: true })
         .env("bar_global", "...", { global: true })

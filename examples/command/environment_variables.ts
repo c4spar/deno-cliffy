@@ -2,8 +2,8 @@
 
 import { Command } from "../../command/command.ts";
 
-await new Command<void>()
-  .env<{ someEnvVar: number }>(
+await new Command()
+  .env(
     "SOME_ENV_VAR=<value:number>",
     "Description ...",
     {

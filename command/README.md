@@ -1191,7 +1191,7 @@ An environment variable has the following options:
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
 
-await new Command<void>()
+await new Command()
   .env(
     "SOME_ENV_VAR=<value:number>",
     "Description ...",
@@ -1220,7 +1220,7 @@ It is also possible to override an environment variable with an option also if
 the environment variable has a prefix.
 
 ```typescript
-await new Command<void>()
+await new Command()
   .env(
     "FOO_OUTPUT_FILE=<value:string>",
     "The output file.",
@@ -1564,7 +1564,7 @@ The first parameter defines required global options and/or environment
 variables. The second parameter defines required global custom types.
 
 ```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
 
 const colorType = new EnumType(["red", "blue"]);
 
@@ -1592,11 +1592,21 @@ const fooCommand = new Command<
     }
   });
 
-await new Command<void>()
+await new Command()
   .globalType("color", colorType)
   .globalOption("-d, --debug", "...")
   .command("foo", fooCommand)
   .parse(Deno.args);
+```
+
+The types of the options object will look like this:
+
+```ts
+{
+  debug?: true | undefined;
+  bar?: true | undefined;
+  color?: "red" | "blue" | undefined;
+}
 ```
 
 ## ❯ Upgrade command
