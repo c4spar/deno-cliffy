@@ -130,9 +130,12 @@ module `https://deno.land/x/cliffy/command/mod.ts` or directly from the command
 module `https://deno.land/x/cliffy/command/command.ts`.
 
 The `Command` class is used to create a new command or sub-command. The main
-command has two predefined options, a global `--help` option which is available
-on all child commands and a `--version` option which is only available on the
-main command.
+command has two predefined options, a global `-h, --help` option which is
+available on all child commands and a `-V, --version` option which is only
+available on the main command.
+
+It is required to define the name for the main command manually since cliffy
+cannot know the name of the installed script.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -144,11 +147,57 @@ await new Command()
   .parse(Deno.args);
 ```
 
+You can run this example and print the auto-generated help by executing the
+following command:
+
 ```console
 $ deno run https://deno.land/x/cliffy/examples/command/usage.ts --help
 ```
 
+This shows you the default help if no additional options and arguments are
+defined.
+
 ![](assets/img/usage.gif)
+
+The following example shows you a command with two options, two arguments, one
+environment variable and a custom type.
+
+Cliffy inferes magically all types and names from arguments, options and
+environment variable and applies them propperly to the options object and
+arguments array.
+
+```typescript
+import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+
+await new Command()
+  .name("cliffy")
+  .version("0.1.0")
+  .description("Command line framework for Deno")
+  .type("log-level", new EnumType(["debug", "info", "warn", "error"]))
+  .env("DEBUG", "Enable debug output.")
+  .option("-d, --debug", "Enable debug output.")
+  .option("-l, --log-level <level:log-level>", "Set log level.", {
+    default: "info" as const,
+  })
+  .arguments("<input:string> [output:string]")
+  .action((options, ...args) => {})
+  .parse(Deno.args);
+```
+
+The types of the options object will look like this:
+
+```ts
+{
+  debug?: true | undefined;
+  logLevel: "debug" | "info" | "warn" | "error";
+}
+```
+
+and the types of the arguments array will look like this:
+
+```ts
+[string, (string | undefined)?]
+```
 
 ## ❯ Options
 
