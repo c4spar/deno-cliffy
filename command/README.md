@@ -159,22 +159,18 @@ defined.
 
 ![](assets/img/usage.gif)
 
-The following example shows you a command with two options, two arguments, one
-environment variables and a custom type.
-
-Cliffy inferes magically all types and names from arguments, options and
-environment variable and applies them propperly to the options object and
-arguments array.
+The following example shows you a command with three options, two arguments, one
+environment variable and one custom type.
 
 ```typescript
-import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
 
 await new Command()
   .name("cliffy")
   .version("0.1.0")
   .description("Command line framework for Deno")
   .type("log-level", new EnumType(["debug", "info", "warn", "error"]))
-  .env("DEBUG", "Enable debug output.")
+  .env("DEBUG=<enable:boolean>", "Enable debug output.")
   .option("-d, --debug", "Enable debug output.")
   .option("-l, --log-level <level:log-level>", "Set log level.", {
     default: "info" as const,
@@ -184,11 +180,15 @@ await new Command()
   .parse(Deno.args);
 ```
 
+Cliffy inferes magically all types and names from arguments, options and
+environment variables and applies them properly to the options object and
+arguments array.
+
 The types of the options object will look like this:
 
 ```ts
 {
-  debug?: true | undefined;
+  debug?: boolean | undefined;
   logLevel: "debug" | "info" | "warn" | "error";
 }
 ```
