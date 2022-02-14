@@ -160,7 +160,7 @@ defined.
 ![](assets/img/usage.gif)
 
 The following example shows you a command with two options, two arguments, one
-environment variable and a custom type.
+environment variables and a custom type.
 
 Cliffy inferes magically all types and names from arguments, options and
 environment variable and applies them propperly to the options object and
