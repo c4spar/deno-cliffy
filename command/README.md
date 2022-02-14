@@ -93,10 +93,8 @@
     - [Bash Completions](#bash-completions)
     - [Fish Completions](#fish-completions)
     - [Zsh Completions](#zsh-completions)
-- [Generic options and arguments](#-generic-options-and-arguments)
-  - [Generic instance method types](#generic-instance-method-types)
-  - [Generic constructor types](#generic-constructor-types)
-  - [Generic global parent types](#generic-global-parent-types)
+- [Generic types](#-generic-types)
+  - [Generic parent types](#generic-parent-types)
 - [Upgrade command](#-upgrade-command)
 - [Version option](#-version-option)
 - [Contributing](#-contributing)
@@ -1547,22 +1545,23 @@ To enable zsh completions for your program add the following line to your
 source <(command-name completions zsh)
 ```
 
-## ❯ Generic options and arguments
+## ❯ Generic types
 
 Since `v0.21.0`, cliffy has strict types by default. All types, option and
 environment-variable names will be automatically magically infered 🪄. **It is no
 longer recommanded to define the types manuelly with the generic parameters**.
-The only exceptions are the first two generic constructor parameters which are
+The only exceptions is when you want to organize your sub commands in separate
+files, than you can use the first two generic constructor parameters which are
 used do define required global options and types.
 
-### Generic global parent types
+### Generic parent types
 
-If you want to split up your command into different command instances, to
-organize your commands into different files, you can define required global
-parent options in the constructor of the child command.
+If you want to organize your sub commands into different files, you can define
+required global parent options and types in the constructor of the child
+command.
 
-The first parameter defines required global options ir environment variables.
-The second parameter defines required global custom types.
+The first parameter defines required global options and/or environment
+variables. The second parameter defines required global custom types.
 
 ```typescript
 import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1572,7 +1571,7 @@ const colorType = new EnumType(["red", "blue"]);
 // Define global parent option `debug`.
 const fooCommand = new Command<
   { debug?: true },
-  { color?: typeof colorType }
+  { color: typeof colorType }
 >()
   // Add foo command options.
   .option("-b, --bar", "...")
