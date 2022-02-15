@@ -159,8 +159,14 @@ defined.
 
 ![](assets/img/usage.gif)
 
-The following example shows you a command with three options, two arguments, one
-environment variable and one custom type.
+You can than add options, environemnt variables, arguments and custom types to
+your command as many you want.
+
+The `action` method allows you to define a callback function that will be called
+when the command is executed. All options and environment variables are
+available in the options object, the first argument of the action handler,
+followed by the command arguments in the same order they were defined with the
+`arguments` method.
 
 ```typescript
 import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -180,9 +186,9 @@ await new Command()
   .parse(Deno.args);
 ```
 
-Cliffy inferes magically all types and names from arguments, options and
-environment variables and applies them properly to the options object and
-arguments array.
+Cliffy automatically infers all types and names from arguments, options and
+environment variable definitions and applies them properly to the options object
+and arguments array.
 
 The types of the options object will look like this:
 
@@ -244,7 +250,7 @@ literal arguments in the `literal` array. For all unknown options the command
 will throw an error message and exit the program with `Deno.exit(1)`.
 
 All types and names for options, arguments and environemnt variables are
-automatically infered and properly typed!
+automatically inferred and properly typed!
 
 ### Common option types: boolean, string, number and integer
 
@@ -292,8 +298,8 @@ The constructor accapts eather an `Array<string | number>` or an `enum`.
 The values are used for input validation and shell completions and displayed in
 the help text.
 
-The types will be automatically infered and applied to the values of the command
-options and arguments.
+The types will be automatically inferred and applied to the values of the
+command options and arguments.
 
 ```typescript
 import { Command, EnumType } from "https://deno.land/x/cliffy/command/mod.ts";
@@ -1597,11 +1603,11 @@ source <(command-name completions zsh)
 ## ❯ Generic types
 
 Since `v0.21.0`, cliffy has strict types by default. All types, option and
-environment-variable names will be automatically magically infered 🪄. **It is no
-longer recommanded to define the types manuelly with the generic parameters**.
-The only exceptions is when you want to organize your sub commands in separate
-files, than you can use the first two generic constructor parameters which are
-used do define required global options and types.
+environment-variable names will be automatically magically inferred 🪄. **It is
+no longer recommended to define the types manually with the generic
+parameters**. The only exceptions is when you want to organize your sub commands
+in separate files, than you can use the first two generic constructor parameters
+which are used do define required global options and types.
 
 ### Generic parent types
 
