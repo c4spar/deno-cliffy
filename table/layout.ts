@@ -50,10 +50,8 @@ export class TableLayout {
     const hasHeaderBorder: boolean = this.table.hasHeaderBorder();
     const hasBorder: boolean = hasHeaderBorder || hasBodyBorder;
 
-    const header: Row | undefined = this.table.getHeader();
-    const rows: Row<Cell>[] = this.spanRows(
-      header ? [header, ...this.table] : this.table.slice(),
-    );
+    const rows = this.#getRows();
+
     const columns: number = Math.max(...rows.map((row) => row.length));
     for (const row of rows) {
       const length: number = row.length;
@@ -90,6 +88,25 @@ export class TableLayout {
       hasBodyBorder,
       hasHeaderBorder,
     };
+  }
+
+  #getRows() {
+    const header: Row | undefined = this.table.getHeader();
+    const rows = header ? [header, ...this.table] : this.table.slice();
+    const hasSpan = rows.some((row) =>
+      row.some((cell) =>
+        cell instanceof Cell && (cell.getColSpan() > 1 || cell.getRowSpan() > 1)
+      )
+    );
+
+    if (hasSpan) {
+      return this.spanRows(rows);
+    }
+
+    return rows.map((row) => {
+      const newRow = this.createRow(row);
+      return newRow.map((cell) => this.createCell(cell, newRow));
+    }) as Array<Row<Cell>>;
   }
 
   /**
