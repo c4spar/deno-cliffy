@@ -1219,7 +1219,7 @@ export class Command<
             });
           }
 
-          if (arg) {
+          if (typeof arg !== "undefined") {
             params.push(arg);
           }
         }
