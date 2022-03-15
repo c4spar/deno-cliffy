@@ -87,7 +87,7 @@ export class Select<S extends SelectSettings = SelectSettings>
     let line = this.settings.indent;
     line += isSelected ? `${this.settings.listPointer} ` : "  ";
     line += `${
-      isSelected
+      isSelected && !item.disabled
         ? this.highlight(item.name, (val) => val)
         : this.highlight(item.name)
     }`;

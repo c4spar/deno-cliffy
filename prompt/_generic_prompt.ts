@@ -224,6 +224,10 @@ export abstract class GenericPrompt<
       : undefined;
   }
 
+  protected setErrorMessage(message: string) {
+    this.#lastError = message;
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
