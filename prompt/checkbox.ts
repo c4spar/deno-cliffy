@@ -146,7 +146,7 @@ export class Checkbox
 
     // value
     line += `${
-      isSelected
+      isSelected && !item.disabled
         ? this.highlight(item.name, (val) => val)
         : this.highlight(item.name)
     }`;
@@ -178,7 +178,11 @@ export class Checkbox
   /** Check selected option. */
   protected checkValue(): void {
     const item = this.options[this.listIndex];
-    item.checked = !item.checked;
+    if (item.disabled) {
+      this.setErrorMessage("This option is disabled and cannot be changed.");
+    } else {
+      item.checked = !item.checked;
+    }
   }
 
   /**

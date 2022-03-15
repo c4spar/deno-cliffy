@@ -216,13 +216,16 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
   }
 
   protected getListIndex(value?: string) {
-    return typeof value === "undefined"
-      ? this.options.findIndex((item: GenericListOptionSettings) =>
-        !item.disabled
-      ) || 0
-      : this.options.findIndex((item: GenericListOptionSettings) =>
-        item.value === value
-      ) || 0;
+    return Math.max(
+      0,
+      typeof value === "undefined"
+        ? this.options.findIndex((item: GenericListOptionSettings) =>
+          !item.disabled
+        ) || 0
+        : this.options.findIndex((item: GenericListOptionSettings) =>
+          item.value === value
+        ) || 0,
+    );
   }
 
   protected getPageOffset(index: number) {
