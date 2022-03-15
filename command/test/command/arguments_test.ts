@@ -28,6 +28,11 @@ Deno.test("valid command argument types", async () => {
   assertEquals(args, ["abc", 123, true, "red"]);
 });
 
+Deno.test("command - arguments - with integer value", async () => {
+  const { args } = await cmd().parse(["abc", "0"]);
+  assertEquals(args, ["abc", 0]);
+});
+
 Deno.test("invalid number command argument type", async () => {
   await assertThrowsAsync(
     async () => {
