@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -23,7 +23,7 @@ Deno.test("command - type - number - with valid value", async () => {
 });
 
 Deno.test("command - type - number - with argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "123", "unknown"]);
     },
@@ -33,7 +33,7 @@ Deno.test("command - type - number - with argument", async () => {
 });
 
 Deno.test("command - type - number - with missing value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-F"]);
     },
@@ -43,7 +43,7 @@ Deno.test("command - type - number - with missing value", async () => {
 });
 
 Deno.test("command - type - number - with invalid string value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "abc"]);
     },

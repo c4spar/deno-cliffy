@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import { HelpCommand } from "../../help/mod.ts";
 
@@ -21,7 +21,7 @@ Deno.test("command - type - no value - long flag without argument", async () => 
 });
 
 Deno.test("command - type - no value - short flag with argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "true"]);
     },
@@ -31,7 +31,7 @@ Deno.test("command - type - no value - short flag with argument", async () => {
 });
 
 Deno.test("command - type - no value - long flag with argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["--flag", "true"]);
     },

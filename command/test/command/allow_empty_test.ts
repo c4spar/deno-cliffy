@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 Deno.test("flags allowEmpty enabled", async () => {
@@ -31,7 +31,7 @@ Deno.test("flags allowEmpty disabled", async () => {
     .option("-f, --flag [value:boolean]", "description ...")
     .action(() => {});
 
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse([]);
     },

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 Deno.test("command - version - version string", () => {
@@ -60,7 +60,7 @@ Deno.test("command - version - version option", async () => {
   await cmd.parse(["-x"]);
   assertEquals(called, 1);
 
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd.parse(["foo", "-x"]),
     Error,
     `Unknown option "-x". Did you mean option "-h"?`,

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 function command(): Command {
@@ -64,7 +64,7 @@ Deno.test("negatable flags should negate value", async () => {
 });
 
 Deno.test("negatable options should not be combinable with positive options", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["--color", "--no-color", "--no-check"]);
     },

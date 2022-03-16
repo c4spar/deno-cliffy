@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 function cmd(): Command {
@@ -52,7 +52,7 @@ Deno.test("command: dotted aliases", async () => {
 });
 
 Deno.test("command: dotted aliases", () => {
-  assertThrowsAsync(
+  assertRejects(
     () => cmd().parse(["--audio-bitrate", "300"]),
     Error,
     `Option "--bitrate.audio" depends on option "--bitrate.video".`,
@@ -60,7 +60,7 @@ Deno.test("command: dotted aliases", () => {
 });
 
 Deno.test("command: dotted option with invalid value", () => {
-  assertThrowsAsync(
+  assertRejects(
     () => cmd().parse(["--bitrate.audio", "300", "--bitrate.video", "900k"]),
     Error,
     `Option "--bitrate.video" must be of type "number", but got "900k".`,

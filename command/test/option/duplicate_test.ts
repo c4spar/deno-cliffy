@@ -1,4 +1,4 @@
-import { assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -8,7 +8,7 @@ const cmd = new Command()
   .action(() => {});
 
 Deno.test("command optionDuplicate flag", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "-f", "unknown"]);
     },
@@ -18,7 +18,7 @@ Deno.test("command optionDuplicate flag", async () => {
 });
 
 Deno.test("command optionDuplicate flagLong", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "--flag"]);
     },
@@ -28,7 +28,7 @@ Deno.test("command optionDuplicate flagLong", async () => {
 });
 
 Deno.test("command optionDuplicate flagTrueLongFalse", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--flag", "false"]);
     },
@@ -38,7 +38,7 @@ Deno.test("command optionDuplicate flagTrueLongFalse", async () => {
 });
 
 Deno.test("command optionDuplicate flagTrueNoFlag", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--no-flag"]);
     },
@@ -48,7 +48,7 @@ Deno.test("command optionDuplicate flagTrueNoFlag", async () => {
 });
 
 Deno.test("command optionDuplicate flagTrueNoFlagTrue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--no-flag", "true"]);
     },
