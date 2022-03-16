@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -15,7 +15,7 @@ Deno.test("command optionRequired", async () => {
 });
 
 Deno.test("command optionRequired noArguments", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse([]);
     },

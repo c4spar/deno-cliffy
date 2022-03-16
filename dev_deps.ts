@@ -2,19 +2,19 @@
 export {
   assert,
   assertEquals,
+  assertRejects,
   assertStrictEquals,
   assertThrows,
-  assertThrowsAsync,
-} from "https://deno.land/std@0.113.0/testing/asserts.ts";
+} from "https://deno.land/std@0.130.0/testing/asserts.ts";
 export {
   bold,
   red,
   stripColor,
-} from "https://deno.land/std@0.113.0/fmt/colors.ts";
-export { dirname } from "https://deno.land/std@0.113.0/path/mod.ts";
-export { expandGlob } from "https://deno.land/std@0.113.0/fs/mod.ts";
-export type { WalkEntry } from "https://deno.land/std@0.113.0/fs/mod.ts";
-export { copy } from "https://deno.land/std@0.113.0/io/util.ts";
+} from "https://deno.land/std@0.130.0/fmt/colors.ts";
+export { dirname } from "https://deno.land/std@0.130.0/path/mod.ts";
+export { expandGlob } from "https://deno.land/std@0.130.0/fs/mod.ts";
+export type { WalkEntry } from "https://deno.land/std@0.130.0/fs/mod.ts";
+export { copy } from "https://deno.land/std@0.130.0/streams/conversion.ts";
 
 /* 3rd party */
 export { gt, lt } from "https://deno.land/x/semver@v1.4.0/mod.ts";

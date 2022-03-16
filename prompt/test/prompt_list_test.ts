@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../dev_deps.ts";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";
 import { Confirm } from "../confirm.ts";
@@ -78,7 +78,7 @@ Deno.test("prompt - prompt list", async () => {
 });
 
 Deno.test("prompt - prompt list - before next callback", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       inject({
         name: "foo",
@@ -102,7 +102,7 @@ Deno.test("prompt - prompt list - before next callback", async () => {
 });
 
 Deno.test("prompt - prompt list - after next callback", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       inject({
         name: "foo",

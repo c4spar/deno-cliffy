@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -15,7 +15,7 @@ Deno.test("command optionStandalone flag", async () => {
 });
 
 Deno.test("command optionStandalone flagCombine", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "-a"]);
     },
@@ -25,7 +25,7 @@ Deno.test("command optionStandalone flagCombine", async () => {
 });
 
 Deno.test("command optionStandalone flagCombineLong", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["--flag", "--all"]);
     },

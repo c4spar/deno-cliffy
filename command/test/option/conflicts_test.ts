@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -26,7 +26,7 @@ const cmd = new Command()
   .action(() => {});
 
 Deno.test("command optionConflicts noArguments", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse([]);
     },
@@ -55,7 +55,7 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
 });
 
 Deno.test("command optionConflicts videoAudioImageType", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);
     },

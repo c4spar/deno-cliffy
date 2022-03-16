@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Toggle } from "../toggle.ts";
 
 Deno.test("prompt toggle: yes", async () => {
@@ -17,7 +17,7 @@ Deno.test("prompt toggle: no", async () => {
 
 Deno.test("prompt toggle: empty value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Toggle.inject("");
       await Toggle.prompt("message");
@@ -33,7 +33,7 @@ Deno.test("prompt toggle: empty value", async () => {
 
 Deno.test("prompt toggle: invalid value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Toggle.inject("aaa");
       await Toggle.prompt("message");
@@ -49,7 +49,7 @@ Deno.test("prompt toggle: invalid value", async () => {
 
 Deno.test("prompt toggle: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Toggle.inject(null as any);

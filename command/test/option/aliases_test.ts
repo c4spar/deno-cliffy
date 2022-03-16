@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -35,7 +35,7 @@ Deno.test("command optionAliases flags", async () => {
 });
 
 Deno.test("command optionAliases fInvalidValie", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "value"]);
     },
@@ -45,7 +45,7 @@ Deno.test("command optionAliases fInvalidValie", async () => {
 });
 
 Deno.test("command optionAliases flInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["--fl", "value"]);
     },
@@ -55,7 +55,7 @@ Deno.test("command optionAliases flInvalidValue", async () => {
 });
 
 Deno.test("command optionAliases flagInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["--flag", "value"]);
     },
@@ -65,7 +65,7 @@ Deno.test("command optionAliases flagInvalidValue", async () => {
 });
 
 Deno.test("command optionAliases flagsInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["--flags", "value"]);
     },

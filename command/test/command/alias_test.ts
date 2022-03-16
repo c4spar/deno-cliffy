@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 Deno.test("command - alias - command with alias 1", async () => {
@@ -29,7 +29,7 @@ Deno.test("command - alias - command with alias 2", async () => {
 });
 
 Deno.test("command - alias - duplicate command alias name 1", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await new Command()
         .throwErrors()
@@ -42,7 +42,7 @@ Deno.test("command - alias - duplicate command alias name 1", async () => {
 });
 
 Deno.test("command - alias - duplicate command alias name 2", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await new Command()
         .throwErrors()

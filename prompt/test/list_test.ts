@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { List } from "../list.ts";
 
 Deno.test('prompt list: , separator option: ","', async () => {
@@ -40,7 +40,7 @@ Deno.test('prompt list: separator option: "-"', async () => {
 
 Deno.test("prompt list: empty value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       List.inject(null as any);
@@ -60,7 +60,7 @@ Deno.test("prompt list: empty value", async () => {
 
 Deno.test("prompt list: min length", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       List.inject("12");
       await List.prompt({
@@ -79,7 +79,7 @@ Deno.test("prompt list: min length", async () => {
 
 Deno.test("prompt list: max length", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       List.inject("123");
       await List.prompt({
@@ -98,7 +98,7 @@ Deno.test("prompt list: max length", async () => {
 
 Deno.test("prompt list: min tags", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       List.inject("");
       await List.prompt({
@@ -117,7 +117,7 @@ Deno.test("prompt list: min tags", async () => {
 
 Deno.test("prompt list: max tags", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       List.inject("123, 456, 789");
       await List.prompt({
@@ -137,7 +137,7 @@ Deno.test("prompt list: max tags", async () => {
 // @TODO: add maxLength option to list pormpt
 Deno.test("prompt list: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       List.inject(null as any);

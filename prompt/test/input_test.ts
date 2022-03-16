@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Input } from "../input.ts";
 
 Deno.test("prompt input: value", async () => {
@@ -31,7 +31,7 @@ Deno.test("prompt input: default value", async () => {
 
 Deno.test("prompt input: empty value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Input.inject("");
       await Input.prompt({
@@ -50,7 +50,7 @@ Deno.test("prompt input: empty value", async () => {
 
 Deno.test("prompt input: invalid value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Input.inject("a".repeat(10));
       await Input.prompt({
@@ -69,7 +69,7 @@ Deno.test("prompt input: invalid value", async () => {
 
 Deno.test("prompt input: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Input.inject(null as any);

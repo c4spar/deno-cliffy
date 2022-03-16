@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -40,7 +40,7 @@ Deno.test("command optionRequire videoAudioImageType", async () => {
 });
 
 Deno.test("command optionRequire videoType", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-v", "value"]);
     },
@@ -50,7 +50,7 @@ Deno.test("command optionRequire videoType", async () => {
 });
 
 Deno.test("command optionRequire audioType", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-a", "value"]);
     },
@@ -60,7 +60,7 @@ Deno.test("command optionRequire audioType", async () => {
 });
 
 Deno.test("command optionRequire imageType", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-i", "value"]);
     },
@@ -70,7 +70,7 @@ Deno.test("command optionRequire imageType", async () => {
 });
 
 Deno.test("command optionRequire videoAudio", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);
     },
@@ -80,7 +80,7 @@ Deno.test("command optionRequire videoAudio", async () => {
 });
 
 Deno.test("command optionRequire audioVideo", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-a", "value", "-v", "value"]);
     },
@@ -90,7 +90,7 @@ Deno.test("command optionRequire audioVideo", async () => {
 });
 
 Deno.test("command optionRequire imageVideo", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-i", "value", "-v", "value"]);
     },

@@ -1,8 +1,7 @@
 import { Cell, Direction, ICell } from "./cell.ts";
-import { stripColor } from "./deps.ts";
 import { IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
-import { consumeWords, longest } from "./utils.ts";
+import { consumeWords, longest, strLength } from "./utils.ts";
 
 /** Layout render settings. */
 interface IRenderSettings {
@@ -50,10 +49,8 @@ export class TableLayout {
     const hasHeaderBorder: boolean = this.table.hasHeaderBorder();
     const hasBorder: boolean = hasHeaderBorder || hasBodyBorder;
 
-    const header: Row | undefined = this.table.getHeader();
-    const rows: Row<Cell>[] = this.spanRows(
-      header ? [header, ...this.table] : this.table.slice(),
-    );
+    const rows = this.#getRows();
+
     const columns: number = Math.max(...rows.map((row) => row.length));
     for (const row of rows) {
       const length: number = row.length;
@@ -90,6 +87,25 @@ export class TableLayout {
       hasBodyBorder,
       hasHeaderBorder,
     };
+  }
+
+  #getRows() {
+    const header: Row | undefined = this.table.getHeader();
+    const rows = header ? [header, ...this.table] : this.table.slice();
+    const hasSpan = rows.some((row) =>
+      row.some((cell) =>
+        cell instanceof Cell && (cell.getColSpan() > 1 || cell.getRowSpan() > 1)
+      )
+    );
+
+    if (hasSpan) {
+      return this.spanRows(rows);
+    }
+
+    return rows.map((row) => {
+      const newRow = this.createRow(row);
+      return newRow.map((cell) => this.createCell(cell, newRow));
+    }) as Array<Row<Cell>>;
   }
 
   /**
@@ -344,19 +360,19 @@ export class TableLayout {
   ): { current: string; next: Cell } {
     const length: number = Math.min(
       maxLength,
-      stripColor(cell.toString()).length,
+      strLength(cell.toString()),
     );
     let words: string = consumeWords(length, cell.toString());
 
     // break word if word is longer than max length
-    const breakWord = stripColor(words).length > length;
+    const breakWord = strLength(words) > length;
     if (breakWord) {
       words = words.slice(0, length);
     }
 
     // get next content and remove leading space if breakWord is not true
     const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
-    const fillLength = maxLength - stripColor(words).length;
+    const fillLength = maxLength - strLength(words);
 
     // Align content
     const align: Direction = cell.getAlign();

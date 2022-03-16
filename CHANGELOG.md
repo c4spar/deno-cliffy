@@ -1,3 +1,54 @@
+# [v0.20.2](https://github.com/c4spar/deno-cliffy/compare/v0.20.1...v0.20.2) (Mar 16, 2022)
+
+### Features
+
+- **command:** add support to show additional information in help text (#300)
+  ([e32f826](https://github.com/c4spar/deno-cliffy/commit/e32f826))
+- **command:** add support for enum's in EnumType (#316)
+  ([d71071e](https://github.com/c4spar/deno-cliffy/commit/d71071e))
+- **prompt:** add support for path completion and dynamic suggestions (#306)
+  ([0be6da7](https://github.com/c4spar/deno-cliffy/commit/0be6da7))
+
+### Bug Fixes
+
+- **command:** only first missing required variadic option throws an error
+  (#331) ([cf487de](https://github.com/c4spar/deno-cliffy/commit/cf487de))
+- **command:** integer argument with value 0 is ignored (#329)
+  ([11b824c](https://github.com/c4spar/deno-cliffy/commit/11b824c))
+- **prompt:** checkbox and select prompt fails with only one disabled option
+  (#328) ([683f260](https://github.com/c4spar/deno-cliffy/commit/683f260))
+- **table:** chinese characters are not aligned correctly (#330)
+  ([e31b680](https://github.com/c4spar/deno-cliffy/commit/e31b680))
+
+### Performance Improvements
+
+- **table:** improve performance for tables without col and row span (#327)
+  ([29bcfd6](https://github.com/c4spar/deno-cliffy/commit/29bcfd6))
+
+### Code Refactoring
+
+- **command:** change return type of action handler to unknown (#315)
+  ([04e6917](https://github.com/c4spar/deno-cliffy/commit/04e6917))
+
+### Chore
+
+- add funding ([ebafd0e](https://github.com/c4spar/deno-cliffy/commit/ebafd0e))
+- **ci:** use denoland/setup-deno in lint workflow (#332)
+  ([63b47d0](https://github.com/c4spar/deno-cliffy/commit/63b47d0))
+- **command:** add script to update all test fixtures (#301)
+  ([89cc617](https://github.com/c4spar/deno-cliffy/commit/89cc617))
+- **fmt:** fmt readme (#305)
+  ([8c63fd8](https://github.com/c4spar/deno-cliffy/commit/8c63fd8))
+- **fmt:** fmt changelog
+  ([6d51275](https://github.com/c4spar/deno-cliffy/commit/6d51275))
+- **upgrade:** deno/std0.130.0 (#333)
+  ([336f0a1](https://github.com/c4spar/deno-cliffy/commit/336f0a1))
+
+### Documentation Updates
+
+- **prompt:** add info for required --unstable flag
+  ([beca790](https://github.com/c4spar/deno-cliffy/commit/beca790))
+
 # [v0.20.1](https://github.com/c4spar/deno-cliffy/compare/v0.20.0...v0.20.1) (Nov 1, 2021)
 
 ### Code Refactoring

@@ -1,3 +1,3 @@
 export {
   encode as encodeBase64,
-} from "https://deno.land/std@0.113.0/encoding/base64.ts";
+} from "https://deno.land/std@0.130.0/encoding/base64.ts";

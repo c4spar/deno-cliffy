@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 function command() {
@@ -45,7 +45,7 @@ Deno.test("command depends option with default value: should accept --flag1 --fl
 });
 
 Deno.test("command depends option with default value: should not accept --flag2 test", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["--flag2", "test"]);
     },

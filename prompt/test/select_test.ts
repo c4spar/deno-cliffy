@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Select } from "../select.ts";
 
 Deno.test("prompt select: value", async () => {
@@ -12,7 +12,7 @@ Deno.test("prompt select: value", async () => {
 });
 
 Deno.test("prompt select: empty value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Select.inject("");
       await Select.prompt({
@@ -30,7 +30,7 @@ Deno.test("prompt select: empty value", async () => {
 });
 
 Deno.test("prompt select: invalid value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Select.inject("value4");
       await Select.prompt({
@@ -48,7 +48,7 @@ Deno.test("prompt select: invalid value", async () => {
 });
 
 Deno.test("prompt select: null value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Select.inject(null as any);

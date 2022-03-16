@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -93,7 +93,7 @@ Deno.test("command - type - boolean - negatable option with argument", async () 
 });
 
 Deno.test("command - type - boolean - with invalid value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-f", "unknown"]);
     },
@@ -103,7 +103,7 @@ Deno.test("command - type - boolean - with invalid value", async () => {
 });
 
 Deno.test("command - type - boolean - no arguments allowed", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd2.parse(["-f", "true", "unknown"]);
     },

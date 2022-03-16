@@ -63,6 +63,7 @@ Deno.test("command - option - option properties", () => {
     list: false,
     name: "baz",
     optionalValue: false,
+    requiredValue: true,
     type: "boolean",
     variadic: false,
   }, {
@@ -70,6 +71,7 @@ Deno.test("command - option - option properties", () => {
     list: false,
     name: "baz",
     optionalValue: true,
+    requiredValue: false,
     type: "string",
     variadic: false,
   }]);
