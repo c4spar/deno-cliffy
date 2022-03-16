@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Confirm } from "../confirm.ts";
 
 Deno.test("prompt confirm: y", async () => {
@@ -31,7 +31,7 @@ Deno.test("prompt confirm: no", async () => {
 
 Deno.test("prompt confirm: empty value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Confirm.inject("");
       await Confirm.prompt("message");
@@ -47,7 +47,7 @@ Deno.test("prompt confirm: empty value", async () => {
 
 Deno.test("prompt confirm: invalid value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Confirm.inject("noo");
       await Confirm.prompt("message");
@@ -63,7 +63,7 @@ Deno.test("prompt confirm: invalid value", async () => {
 
 Deno.test("prompt confirm: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Confirm.inject(null as any);

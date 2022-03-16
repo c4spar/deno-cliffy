@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import { EnumType } from "../../types/enum.ts";
 
@@ -39,7 +39,7 @@ Deno.test("command - type - enum - with enum", async () => {
 });
 
 Deno.test("command - type - enum - with array value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse(["--array-color", "green"]);
     },
@@ -49,7 +49,7 @@ Deno.test("command - type - enum - with array value", async () => {
 });
 
 Deno.test("command - type - enum - with enum value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse(["--enum-color", "green"]);
     },

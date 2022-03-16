@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Secret } from "../secret.ts";
 
 Deno.test("prompt secret: value", async () => {
@@ -20,7 +20,7 @@ Deno.test("prompt secret: validate option", async () => {
 
 Deno.test("prompt secret: empty value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Secret.inject("");
       await Secret.prompt({
@@ -39,7 +39,7 @@ Deno.test("prompt secret: empty value", async () => {
 
 Deno.test("prompt secret: invalid value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Secret.inject("a".repeat(10));
       await Secret.prompt({
@@ -58,7 +58,7 @@ Deno.test("prompt secret: invalid value", async () => {
 
 Deno.test("prompt secret: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Secret.inject(null as any);

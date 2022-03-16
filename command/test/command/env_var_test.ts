@@ -1,6 +1,6 @@
 // deno-fmt-ignore-file
 
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { IEnvVar } from "../../types.ts";
 
@@ -92,7 +92,7 @@ function clearEnv() {
 }
 
 Deno.test("[command] - env var - missing required env var", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await new Command()
         .throwErrors()
@@ -149,7 +149,7 @@ Deno.test("[command] - env var - override env vars with option", async () => {
 Deno.test("[command] - env var - expect option to throw if value is not a boolean", async () => {
   setupEnv();
   Deno.env.set("global", "foo");
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse([]);
     },
@@ -162,7 +162,7 @@ Deno.test("[command] - env var - expect option to throw if value is not a boolea
 Deno.test("[command] - env var - expect option to throw if value is not a number", async () => {
   setupEnv();
   Deno.env.set("global_required", "foo");
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse([]);
     },
@@ -175,7 +175,7 @@ Deno.test("[command] - env var - expect option to throw if value is not a number
 Deno.test("[command] - env var - expect global option to throw if value is not a boolean", async () => {
   setupEnv();
   Deno.env.set("global", "foo");
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["bar"]);
     },
@@ -188,7 +188,7 @@ Deno.test("[command] - env var - expect global option to throw if value is not a
 Deno.test("[command] - env var - expect global option to throw if value is not a number", async () => {
   setupEnv();
   Deno.env.set("global_required", "foo");
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["bar"]);
     },

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { ITypeHandler, ITypeInfo } from "../../types.ts";
 import { Type } from "../../type.ts";
@@ -52,7 +52,7 @@ Deno.test("command - type - custom - child command with valid value", async () =
 });
 
 Deno.test("command - type - custom - with unknown type", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd.parse(["init", "-e", "my@email.com"]),
     Error,
     `Unknown type "email". Did you mean type "email2"?`,
@@ -60,7 +60,7 @@ Deno.test("command - type - custom - with unknown type", async () => {
 });
 
 Deno.test("command - type - custom - with invalid value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd.parse(["-E", "my @email.com"]),
     Error,
     `Option "--email2" must be a valid "email", but got "my @email.com".`,
@@ -68,7 +68,7 @@ Deno.test("command - type - custom - with invalid value", async () => {
 });
 
 Deno.test("command - type - custom - with invalid value on child command", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd.parse(["init", "-E", "my @email.com"]),
     Error,
     `Option "--email2" must be a valid "email", but got "my @email.com".`,
@@ -107,7 +107,7 @@ Deno.test("command - type - custom - generic custom type", async () => {
   const { options } = await cmd.parse(["-f", "foo"]);
   assertEquals(options, { format: "foo" });
 
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd.parse(["-f", "xyz"]),
     Error,
     `invalid type: xyz`,

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -32,7 +32,7 @@ Deno.test("command optionVariadic boolean", async () => {
 });
 
 Deno.test("command optionVariadic booleanInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-b", "1", "0", "true", "false", "2"]);
     },
@@ -60,7 +60,7 @@ Deno.test("command optionVariadic number", async () => {
 });
 
 Deno.test("command optionVariadic numberInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-n", "1", "0", "654", "abc", "1,2"]);
     },
@@ -79,7 +79,7 @@ Deno.test("command optionVariadic exact", async () => {
 });
 
 Deno.test("command optionVariadic exactInvalidValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-v", "abc", "abc", "1"]);
     },
@@ -89,7 +89,7 @@ Deno.test("command optionVariadic exactInvalidValue", async () => {
 });
 
 Deno.test("command optionVariadic exactMissingValue", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd.parse(["-v", "1"]);
     },

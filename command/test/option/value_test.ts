@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 function cmd() {
@@ -68,7 +68,7 @@ Deno.test("command - option - value - function validator with collected values",
 });
 
 Deno.test("command - option - value - function validator with invalid value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     () => cmd().parse(["-f", "fo", "-d"]),
     Error,
     `invalid value`,

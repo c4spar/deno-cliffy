@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import type { ITypeInfo } from "../../../flags/types.ts";
 import { Command } from "../../command.ts";
 
@@ -34,7 +34,7 @@ Deno.test("command - arguments - with integer value", async () => {
 });
 
 Deno.test("invalid number command argument type", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse(["abc", "xyz", "true", "red"]);
     },
@@ -44,7 +44,7 @@ Deno.test("invalid number command argument type", async () => {
 });
 
 Deno.test("missing command arguments", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse();
     },
@@ -54,7 +54,7 @@ Deno.test("missing command arguments", async () => {
 });
 
 Deno.test("invalid boolean command argument type", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse(["abc", "123", "xyz", "red"]);
     },
@@ -64,7 +64,7 @@ Deno.test("invalid boolean command argument type", async () => {
 });
 
 Deno.test("invalid custom command argument type", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await cmd().parse(["abc", "123", "true", "xyz"]);
     },

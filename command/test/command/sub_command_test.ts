@@ -1,7 +1,7 @@
 import {
   assertEquals,
+  assertRejects,
   assertThrows,
-  assertThrowsAsync,
 } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
@@ -83,7 +83,7 @@ Deno.test("command - sub command - nested child command with arguments", async (
 });
 
 Deno.test("command - sub command - sub-command with missing argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["sub-command", "input-path"]);
     },
@@ -93,7 +93,7 @@ Deno.test("command - sub command - sub-command with missing argument", async () 
 });
 
 Deno.test("command - sub command - sub-command 2 with missing argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["sub-command2", "input-path"]);
     },
@@ -103,7 +103,7 @@ Deno.test("command - sub command - sub-command 2 with missing argument", async (
 });
 
 Deno.test("command - sub command - nested sub-command with missing argument", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await command().parse(["sub-command2", "sub-command3", "input-path"]);
     },
@@ -113,7 +113,7 @@ Deno.test("command - sub command - nested sub-command with missing argument", as
 });
 
 Deno.test("command - sub command - command with empty name", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await new Command()
         .command("")
@@ -132,7 +132,7 @@ Deno.test("command - sub command - override child command", async () => {
 });
 
 Deno.test("command - sub command - duplicate command name", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       await new Command()
         .command("foo")

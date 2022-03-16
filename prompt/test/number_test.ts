@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Number } from "../number.ts";
 
 Deno.test("prompt number: value", async () => {
@@ -23,7 +23,7 @@ Deno.test("prompt number: number value", async () => {
 });
 
 Deno.test("prompt number: empty value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Number.inject("");
       await Number.prompt("message");
@@ -38,7 +38,7 @@ Deno.test("prompt number: empty value", async () => {
 });
 
 Deno.test("prompt number: invalid value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Number.inject("abc");
       await Number.prompt("message");
@@ -53,7 +53,7 @@ Deno.test("prompt number: invalid value", async () => {
 });
 
 Deno.test("prompt number: null value", async () => {
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Number.inject(null as any);

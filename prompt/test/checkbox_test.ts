@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
 import { Checkbox } from "../checkbox.ts";
 
 Deno.test("prompt checkbox: valid value", async () => {
@@ -23,7 +23,7 @@ Deno.test("prompt checkbox: empty value", async () => {
 
 Deno.test("prompt checkbox: invalid value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Checkbox.inject(["value3", "value4"]);
       await Checkbox.prompt({
@@ -42,7 +42,7 @@ Deno.test("prompt checkbox: invalid value", async () => {
 
 Deno.test("prompt checkbox: null value", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
       Checkbox.inject(null as any);
@@ -62,7 +62,7 @@ Deno.test("prompt checkbox: null value", async () => {
 
 Deno.test("prompt checkbox: min options", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Checkbox.inject(["value1", "value2"]);
       await Checkbox.prompt({
@@ -82,7 +82,7 @@ Deno.test("prompt checkbox: min options", async () => {
 
 Deno.test("prompt checkbox: max options", async () => {
   console.log();
-  await assertThrowsAsync(
+  await assertRejects(
     async () => {
       Checkbox.inject(["value1", "value2"]);
       await Checkbox.prompt({
