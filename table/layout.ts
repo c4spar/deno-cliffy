@@ -1,8 +1,7 @@
 import { Cell, Direction, ICell } from "./cell.ts";
-import { stripColor } from "./deps.ts";
 import { IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
-import { consumeWords, longest } from "./utils.ts";
+import { consumeWords, longest, strLength } from "./utils.ts";
 
 /** Layout render settings. */
 interface IRenderSettings {
@@ -361,19 +360,19 @@ export class TableLayout {
   ): { current: string; next: Cell } {
     const length: number = Math.min(
       maxLength,
-      stripColor(cell.toString()).length,
+      strLength(cell.toString()),
     );
     let words: string = consumeWords(length, cell.toString());
 
     // break word if word is longer than max length
-    const breakWord = stripColor(words).length > length;
+    const breakWord = strLength(words) > length;
     if (breakWord) {
       words = words.slice(0, length);
     }
 
     // get next content and remove leading space if breakWord is not true
     const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
-    const fillLength = maxLength - stripColor(words).length;
+    const fillLength = maxLength - strLength(words);
 
     // Align content
     const align: Direction = cell.getAlign();
