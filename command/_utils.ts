@@ -93,7 +93,8 @@ export function parseArgumentsDefinition<T extends boolean>(
     const type: string | undefined = parts[2] || OptionType.STRING;
 
     const details: IArgument = {
-      optionalValue: arg[0] !== "<",
+      optionalValue: arg[0] === "[",
+      requiredValue: arg[0] === "<",
       name: parts[1],
       action: parts[3] || type,
       variadic: false,
