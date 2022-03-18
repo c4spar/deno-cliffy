@@ -1,3 +1,7 @@
+import {
+  assert,
+  IsExact,
+} from "https://deno.land/x/conditional_type_checks@1.0.5/mod.ts";
 import { assertEquals, assertRejects } from "../../dev_deps.ts";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";
@@ -41,12 +45,30 @@ Deno.test("prompt - prompt list", async () => {
     message: "Please confirm?",
     type: Confirm,
     after: async (result, next) => {
+      assert<
+        IsExact<typeof result, {
+          animals?: Array<string>;
+          name?: string;
+          confirmed?: boolean;
+          age?: number;
+          unknown?: number;
+        }>
+      >(true);
       afterCalled++;
       assertEquals(result, expectedConfirmedResult);
       await next();
     },
   }, {
     before: async (result, next) => {
+      assert<
+        IsExact<typeof result, {
+          animals?: Array<string>;
+          name?: string;
+          confirmed?: boolean;
+          age?: number;
+          unknown?: number;
+        }>
+      >(true);
       assertEquals(result, expectedConfirmedResult);
       beforeCalled++;
       await next();
@@ -55,7 +77,32 @@ Deno.test("prompt - prompt list", async () => {
     message: "How old are you?",
     type: Number,
   }, {
-    before: (result, _) => {
+    before: (result, next) => {
+      assert<
+        IsExact<typeof result, {
+          animals?: Array<string>;
+          name?: string;
+          confirmed?: boolean;
+          age?: number;
+          unknown?: number;
+        }>
+      >(true);
+      assert<
+        IsExact<
+          typeof next,
+          (
+            next?:
+              | "animals"
+              | "name"
+              | "confirmed"
+              | "age"
+              | "unknown"
+              | number
+              | true
+              | null,
+          ) => Promise<void>
+        >
+      >(true);
       assertEquals(result, expectedResult);
       /** skip unknown */
     },
@@ -64,17 +111,18 @@ Deno.test("prompt - prompt list", async () => {
     type: Number,
   }]);
 
+  assert<
+    IsExact<typeof result, {
+      animals?: Array<string>;
+      name?: string;
+      confirmed?: boolean;
+      age?: number;
+      unknown?: number;
+    }>
+  >(true);
   assertEquals(result, expectedResult);
   assertEquals(beforeCalled, 1);
   assertEquals(afterCalled, 1);
-
-  // @ts-expect-error Foo is not defined.
-  assertEquals(result.foo, undefined);
-  // @ts-expect-error Type string is not assignable to type number.
-  result.animals && isNaN(result.animals[0]);
-  // @ts-expect-error Type string is not assignable to type number.
-  result.name && isNaN(result.name);
-  result.age && isNaN(result.age);
 });
 
 Deno.test("prompt - prompt list - before next callback", async () => {
@@ -88,9 +136,14 @@ Deno.test("prompt - prompt list - before next callback", async () => {
         name: "name",
         message: `Enter your name`,
         type: Input,
-        before: async ({ name }, next) => {
-          // @ts-expect-error name is not a number.
-          isNaN(name);
+        before: async (result, next) => {
+          assert<IsExact<typeof result, { name?: string }>>(true);
+          assert<
+            IsExact<
+              typeof next,
+              (next?: "name" | number | true | null) => Promise<void>
+            >
+          >(true);
           // @ts-expect-error Foo does not exist.
           await next("foo");
         },
