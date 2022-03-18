@@ -111,17 +111,18 @@ Deno.test("prompt - prompt list", async () => {
     type: Number,
   }]);
 
+  assert<
+    IsExact<typeof result, {
+      animals?: Array<string>;
+      name?: string;
+      confirmed?: boolean;
+      age?: number;
+      unknown?: number;
+    }>
+  >(true);
   assertEquals(result, expectedResult);
   assertEquals(beforeCalled, 1);
   assertEquals(afterCalled, 1);
-
-  // @ts-expect-error Foo is not defined.
-  assertEquals(result.foo, undefined);
-  // @ts-expect-error Type string is not assignable to type number.
-  result.animals && isNaN(result.animals[0]);
-  // @ts-expect-error Type string is not assignable to type number.
-  result.name && isNaN(result.name);
-  result.age && isNaN(result.age);
 });
 
 Deno.test("prompt - prompt list - before next callback", async () => {
