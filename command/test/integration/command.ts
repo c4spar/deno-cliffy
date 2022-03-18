@@ -24,7 +24,8 @@ const cmd = new Command()
       .option("-f, --foo", "Foo option.")
       // bar
       .command("bar", "Bar command.")
-      .option("-b, --bar", "Bar option."),
+      .option("-b, --bar", "Bar option.")
+      .reset(),
   )
   .command("help", new HelpCommand().global())
   .command("completions", new CompletionsCommand());

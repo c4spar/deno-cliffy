@@ -2,13 +2,13 @@
 
 import { Command } from "../../command/command.ts";
 
-await new Command<void>()
-  .env<{ outputFile?: string }>(
+await new Command()
+  .env(
     "FOO_OUTPUT_FILE=<value:string>",
     "The output file.",
     { prefix: "FOO_" },
   )
-  .option<{ outputFile?: string }>(
+  .option(
     "--output-file <value:string>",
     "The output file.",
   )

@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-function cmd(): Command {
+function cmd() {
   return new Command()
     .throwErrors()
     .option(

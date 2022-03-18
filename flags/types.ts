@@ -41,12 +41,11 @@ export enum OptionType {
 }
 
 /** Default flag value */
-export type IDefaultValue = unknown | (() => unknown);
+export type IDefaultValue<T = unknown> = T | (() => T);
 
-// @TODO: make return type of IFlagValueHandler generic
 /** Value handler for custom value processing. */
 // deno-lint-ignore no-explicit-any
-export type IFlagValueHandler = (val: any, previous?: any) => any;
+export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
 
 /** Result of the parseFlags method. */
 export interface IFlagsResult<

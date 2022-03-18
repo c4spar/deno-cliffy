@@ -3,7 +3,7 @@ import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command } from "../../command.ts";
 
-function command(): Command {
+function command() {
   return new Command()
     .throwErrors()
     .version("1.0.0")
@@ -19,7 +19,8 @@ function command(): Command {
 }
 
 Deno.test("hidden command", async () => {
-  const cmd: Command = command();
+  // deno-lint-ignore no-explicit-any
+  const cmd: Command<any> = command();
   const { options, args } = await cmd.parse(
     ["hidden-command", "input-path", "output-path"],
   );
@@ -30,7 +31,7 @@ Deno.test("hidden command", async () => {
 });
 
 Deno.test("hidden command help", () => {
-  const cmd: Command = command();
+  const cmd = command();
   const output: string = cmd.getHelp();
 
   assertEquals(

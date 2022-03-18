@@ -1,7 +1,7 @@
 import { assertEquals, stripColor } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
-function command(): Command {
+function command() {
   return new Command()
     .throwErrors()
     .version("1.0.0")
@@ -15,7 +15,7 @@ function command(): Command {
 }
 
 Deno.test("hidden option", async () => {
-  const cmd: Command = command();
+  const cmd = command();
   const { options, args } = await cmd.parse(["--hidden", "test"]);
 
   assertEquals(options, { hidden: "test" });
@@ -23,7 +23,7 @@ Deno.test("hidden option", async () => {
 });
 
 Deno.test("hidden option help", () => {
-  const cmd: Command = command();
+  const cmd = command();
   const output: string = cmd.getHelp();
 
   assertEquals(

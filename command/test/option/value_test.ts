@@ -11,12 +11,12 @@ function cmd() {
         collect: true,
         value(
           value: string | boolean,
-          previous: Array<string> = [],
+          previous: Array<string> | boolean = [],
         ): Array<string> | boolean {
           if (typeof value === "boolean") {
             return value;
           } else if (["foo", "bar", "baz"].includes(value)) {
-            return [...previous, value];
+            return Array.isArray(previous) ? [...previous, value] : [value];
           }
           throw new Error("invalid value");
         },
@@ -24,7 +24,8 @@ function cmd() {
     )
     .option("-i, --incremental", "...", {
       collect: true,
-      value: (val: boolean, previous = 0) => val ? previous + 1 : 0,
+      // deno-lint-ignore no-inferrable-types
+      value: (val: boolean, previous: number = 0) => val ? previous + 1 : 0,
     })
     .option("-b, --boolean", "...", {
       collect: true,

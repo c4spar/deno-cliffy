@@ -76,7 +76,7 @@ Deno.test("command - type - custom - with invalid value on child command", async
 });
 
 class CustomType<T extends string> extends Type<T> {
-  constructor(private formats: Array<T>) {
+  constructor(private formats: ReadonlyArray<T>) {
     super();
   }
 
@@ -89,11 +89,10 @@ class CustomType<T extends string> extends Type<T> {
 }
 
 Deno.test("command - type - custom - generic custom type", async () => {
-  const format = new CustomType(["foo", "bar"]);
-  const cmd = new Command<void>()
+  const cmd = new Command()
     .throwErrors()
-    .type("format", format)
-    .option<{ format: typeof format }>(
+    .type("format", new CustomType(["foo", "bar"]))
+    .option(
       "-f, --format [format:format]",
       "...",
     )

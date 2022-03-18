@@ -10,7 +10,7 @@ const description = "Test description ...";
 
 type States = Record<string, boolean>;
 
-function command(states: States = {}): Command {
+function command(states: States = {}) {
   return new Command()
     .throwErrors()
     .version(version)
@@ -39,7 +39,8 @@ function command(states: States = {}): Command {
 
 Deno.test("command - sub command - sub-command with arguments", async () => {
   const stats: States = {};
-  const cmd: Command = command(stats);
+  // deno-lint-ignore no-explicit-any
+  const cmd: Command<any> = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command", "input-path", "output-path"],
   );
@@ -54,7 +55,8 @@ Deno.test("command - sub command - sub-command with arguments", async () => {
 
 Deno.test("command - sub command - sub-command2 with arguments", async () => {
   const stats: States = {};
-  const cmd: Command = command(stats);
+  // deno-lint-ignore no-explicit-any
+  const cmd: Command<any> = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command2", "input-path", "output-path"],
   );
@@ -69,7 +71,8 @@ Deno.test("command - sub command - sub-command2 with arguments", async () => {
 
 Deno.test("command - sub command - nested child command with arguments", async () => {
   const stats: States = {};
-  const cmd: Command = command(stats);
+  // deno-lint-ignore no-explicit-any
+  const cmd: Command<any> = command(stats);
   const { options, args } = await cmd.parse(
     ["sub-command2", "sub-command3", "input-path", "output-path"],
   );
