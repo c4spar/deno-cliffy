@@ -1,24 +1,26 @@
 <img src="logo.png" style="width: 100%" />
 
+**Cliffy** is a _simple_ and _type-safe_ commandline framework for building
+complex commandline tools with [deno](https://deno.land).
+
 [![Latest version](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=Latest)](https://github.com/c4spar/deno-cliffy/releases)
 [![Build status](https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main)](https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml)
 [![Code coverage](https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg)](https://codecov.io/gh/c4spar/deno-cliffy)
 [![Issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?label=issues&logo=github)](https://github.com/c4spar/deno-cliffy/issues)
-[![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
 [![License](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)](./LICENSE)
 
+[![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
 [![deno.land](https://img.shields.io/badge/Published%20on%20deno.land-blue?logo=deno&logoColor=959DA6&color=272727)](https://deno.land/x/cliffy)
 [![nest.land](https://nest.land/badge.svg)](https://nest.land/package/cliffy)
 
 > ⚠️ This project is still under development. Expect breaking changes.
 
-**Cliffy** is a _simple_ and _type-safe_ commandline framework for building
-complex commandline tools with [deno](https://deno.land).
+## Documentation
 
 The [documentation](https://cliffy.io/docs) is available on
 [cliffy.io](https://cliffy.io).
 
-### Modules
+## Modules
 
 Following modules are included in cliffy:
 
@@ -42,11 +44,11 @@ Following modules are included in cliffy:
 - **[table](https://cliffy.io/docs/table/):** Create cli table's with border,
   padding, nested table's, etc...
 
-### Contributing
+## Contributing
 
 Any kind of contribution is welcome! Please take a look at the
 [contributing guidelines](CONTRIBUTING.md).
 
-### License
+## License
 
 [MIT](LICENSE)
