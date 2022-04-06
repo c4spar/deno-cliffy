@@ -26,7 +26,7 @@ interface IFlagOptionsMap {
  * @param optionNames   Mapped option names of negatable options.
  */
 export function validateFlags<T extends IFlagOptions = IFlagOptions>(
-  { flags, allowEmpty, ignoreDefaults }: IParseOptions,
+  { flags, allowEmpty, ignoreDefaults }: IParseOptions<T>,
   values: Record<string, unknown>,
   optionNames: Record<string, string> = {},
 ): void {
