@@ -1128,13 +1128,15 @@ export class Command<
         const env: Record<string, unknown> = await this.parseEnvVars();
         return this.execute(env, ...this.rawArgs) as any;
       } else {
-        const { actionOption, flags, unknown, literal } = this.parseFlags(
-          this.rawArgs,
-        );
+        const env: Record<string, unknown> = await this.parseEnvVars();
+        const { actionOption, flags, unknown, literal } = this
+          .parseFlags(
+            this.rawArgs,
+            env,
+          );
 
         this.literalArgs = literal;
 
-        const env: Record<string, unknown> = await this.parseEnvVars();
         const options: Record<string, unknown> = { ...env, ...flags };
         const params = this.parseArguments(unknown, options);
 
@@ -1142,7 +1144,7 @@ export class Command<
           await actionOption.action.call(this, options, ...params);
           if (actionOption.standalone) {
             return {
-              options: options,
+              options,
               args: params,
               cmd: this,
               literal: this.literalArgs,
@@ -1297,6 +1299,7 @@ export class Command<
    */
   protected parseFlags(
     args: string[],
+    env: Record<string, unknown>,
   ): IFlagsResult & { actionOption?: IOption & { action: IAction } } {
     try {
       let actionOption: IOption & { action: IAction } | undefined;
@@ -1304,6 +1307,7 @@ export class Command<
         stopEarly: this._stopEarly,
         allowEmpty: this._allowEmpty,
         flags: this.getOptions(true),
+        ignoreDefaults: env,
         parse: (type: ITypeInfo) => this.parseType(type),
         option: (option: IOption) => {
           if (!actionOption && option.action) {
