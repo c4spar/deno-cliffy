@@ -390,3 +390,16 @@ Deno.test("[command] - env var - get global env var", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalEnvVar("baz_hidden", true)?.name, undefined);
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalEnvVar("unknown")?.name, undefined);
 });
+
+Deno.test({
+  name: "[command] - env var - should override default value from option",
+  async fn() {
+    Deno.env.set("FOO_BAR", "baz");
+    const { options } = await new Command()
+      .env("FOO_BAR=<val>", "...", {prefix: "FOO_"})
+      .option("--bar <val>", "...", {default: "beep"})
+      .parse();
+    Deno.env.delete("FOO_BAR");
+    assertEquals(options, {bar: "baz"})
+  }
+});
