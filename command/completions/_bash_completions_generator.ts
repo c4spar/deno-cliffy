@@ -1,5 +1,6 @@
 import type { Command } from "../command.ts";
 import type { IArgument } from "../types.ts";
+import { FileType } from "../types/file.ts";
 
 /** Generates bash completions script. */
 export class BashCompletionsGenerator {
@@ -21,13 +22,14 @@ export class BashCompletionsGenerator {
 # bash completion support for ${path}${version}
 
 _${replaceSpecialChars(path)}() {
-  local word cur prev
+  local word cur prev listFiles
   local -a opts
   COMPREPLY=()
   cur="\${COMP_WORDS[COMP_CWORD]}"
   prev="\${COMP_WORDS[COMP_CWORD-1]}"
   cmd="_"
   opts=()
+  listFiles=0
 
   _${replaceSpecialChars(this.cmd.getName())}_complete() {
     local action="$1"; shift
@@ -35,6 +37,36 @@ _${replaceSpecialChars(path)}() {
     for i in "\${values[@]}"; do
       opts+=("$i")
     done
+  }
+
+  _${replaceSpecialChars(this.cmd.getName())}_expand() {
+    [ "$cur" != "\${cur%\\\\}" ] && cur="$cur\\\\"
+  
+    # expand ~username type directory specifications
+    if [[ "$cur" == \\~*/* ]]; then
+      eval cur=$cur
+      
+    elif [[ "$cur" == \\~* ]]; then
+      cur=\${cur#\\~}
+      COMPREPLY=( $( compgen -P '~' -u $cur ) )
+      return \${#COMPREPLY[@]}
+    fi
+  }
+
+  _${replaceSpecialChars(this.cmd.getName())}_file_dir() {
+    listFiles=1
+    local IFS=$'\\t\\n' xspec #glob
+    _${replaceSpecialChars(this.cmd.getName())}_expand || return 0
+  
+    if [ "\${1:-}" = -d ]; then
+      COMPREPLY=( \${COMPREPLY[@]:-} $( compgen -d -- $cur ) )
+      #eval "$glob"    # restore glob setting.
+      return 0
+    fi
+  
+    xspec=\${1:+"!*.$1"}	# set only if glob passed in as $1
+    COMPREPLY=( \${COMPREPLY[@]:-} $( compgen -f -X "$xspec" -- "$cur" ) \
+          $( compgen -d -- "$cur" ) )
   }
 
   ${this.generateCompletions(this.cmd).trim()}
@@ -51,6 +83,10 @@ _${replaceSpecialChars(path)}() {
   done
 
   \${cmd}
+
+  if [[ listFiles -eq 1 ]]; then
+    return 0
+  fi
 
   if [[ \${#opts[@]} -eq 0 ]]; then
     # shellcheck disable=SC2207
@@ -117,7 +153,7 @@ ${childCommandCompletions}`;
     );
 
     const completionsCmd: string = this.generateCommandCompletionsCommand(
-      command.getArguments(),
+      command,
       completionsPath,
     );
 
@@ -151,6 +187,7 @@ ${childCommandCompletions}`;
           .join("|");
 
         const completionsCmd: string = this.generateOptionCompletionsCommand(
+          command,
           option.args,
           completionsPath,
           { standalone: option.standalone },
@@ -165,10 +202,15 @@ ${childCommandCompletions}`;
   }
 
   private generateCommandCompletionsCommand(
-    args: IArgument[],
+    command: Command,
     path: string,
   ) {
+    const args: IArgument[] = command.getArguments();
     if (args.length) {
+      const type = command.getType(args[0].type);
+      if (type && type.handler instanceof FileType) {
+        return `_${replaceSpecialChars(this.cmd.getName())}_file_dir`;
+      }
       // @TODO: add support for multiple arguments
       return `_${replaceSpecialChars(this.cmd.getName())}_complete ${
         args[0].action
@@ -179,11 +221,16 @@ ${childCommandCompletions}`;
   }
 
   private generateOptionCompletionsCommand(
+    command: Command,
     args: IArgument[],
     path: string,
     opts?: { standalone?: boolean },
   ) {
     if (args.length) {
+      const type = command.getType(args[0].type);
+      if (type && type.handler instanceof FileType) {
+        return `opts=(); _${replaceSpecialChars(this.cmd.getName())}_file_dir`;
+      }
       // @TODO: add support for multiple arguments
       return `opts=(); _${replaceSpecialChars(this.cmd.getName())}_complete ${
         args[0].action

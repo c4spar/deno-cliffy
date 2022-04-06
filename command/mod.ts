@@ -6,6 +6,7 @@ export * from "./types/action_list.ts";
 export * from "./types/boolean.ts";
 export * from "./types/child_command.ts";
 export * from "./types/enum.ts";
+export * from "./types/file.ts";
 export * from "./types/number.ts";
 export * from "./types/string.ts";
 export * from "./type.ts";
