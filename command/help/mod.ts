@@ -11,7 +11,7 @@ export class HelpCommand
       .type("command", new CommandType())
       .arguments("[command:command]")
       .description("Show this help or the help of a sub-command.")
-      .action((_, name?: string) => {
+      .action(async (_, name?: string) => {
         if (!cmd) {
           cmd = name
             ? this.getGlobalParent()?.getBaseCommand(name)
@@ -24,6 +24,7 @@ export class HelpCommand
             ...this.getAliases(),
           ]);
         }
+        await cmd.checkVersion();
         cmd.showHelp();
         Deno.exit(0);
       });
