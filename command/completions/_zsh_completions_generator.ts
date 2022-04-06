@@ -294,8 +294,9 @@ function _${replaceSpecialChars(path)}() {` +
     if (!(type.handler instanceof FileType)) {
       return "";
     }
+    return "_files";
     // const fileOpts = type.handler.getOptions();
-    let fileCompletions = "_files";
+    // let fileCompletions = "_files";
     // if (fileOpts.dirsOnly) {
     //   fileCompletions += " -/";
     // }
@@ -305,7 +306,7 @@ function _${replaceSpecialChars(path)}() {` +
     // if (fileOpts.ignore) {
     //   fileCompletions += " -F " + fileOpts.ignore;
     // }
-    return fileCompletions;
+    // return fileCompletions;
   }
 
   private addAction(arg: IArgument, cmd: string): ICompletionAction {
