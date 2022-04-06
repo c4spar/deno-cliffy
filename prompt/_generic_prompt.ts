@@ -16,6 +16,7 @@ export interface GenericPromptKeys {
 export interface GenericPromptOptions<T, V> {
   message: string;
   default?: T;
+  hideDefault?: boolean;
   validate?: (value: V) => ValidateResult;
   transform?: (value: V) => T | undefined;
   hint?: string;
@@ -202,7 +203,9 @@ export abstract class GenericPrompt<
 
   protected defaults(): string {
     let defaultMessage = "";
-    if (typeof this.settings.default !== "undefined") {
+    if (
+      typeof this.settings.default !== "undefined" && !this.settings.hideDefault
+    ) {
       defaultMessage += dim(` (${this.format(this.settings.default)})`);
     }
     return defaultMessage;

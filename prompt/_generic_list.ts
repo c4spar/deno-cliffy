@@ -96,10 +96,10 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     super({
       ...settings,
       keys: {
-        previous: settings.search ? ["up"] : ["up", "u", "8"],
-        next: settings.search ? ["down"] : ["down", "d", "2"],
-        previousPage: ["pageup"],
-        nextPage: ["pagedown"],
+        previous: settings.search ? ["up"] : ["up", "u", "p", "8"],
+        next: settings.search ? ["down"] : ["down", "d", "n", "2"],
+        previousPage: ["pageup", "left"],
+        nextPage: ["pagedown", "right"],
         ...(settings.keys ?? {}),
       },
     });
