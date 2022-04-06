@@ -57,8 +57,8 @@ const Types: Record<string, ITypeHandler<unknown>> = {
  * }
  * ```
  */
-// deno-lint-ignore no-explicit-any
 export function parseFlags<
+  // deno-lint-ignore no-explicit-any
   O extends Record<string, any> = Record<string, any>,
   T extends IFlagOptions = IFlagOptions,
 >(
