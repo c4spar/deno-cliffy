@@ -201,7 +201,7 @@ export abstract class GenericSuggestions<
   }
 
   protected async getSuggestions(): Promise<Array<string | number>> {
-    const input = this.getCurrentInputValue().toLowerCase();
+    const input = this.getCurrentInputValue();
     const suggestions = [
       ...this.loadSuggestions(),
       ...await this.getUserSuggestions(input),

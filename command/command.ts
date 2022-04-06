@@ -5,13 +5,9 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type {
-  IDefaultValue,
-  IFlagOptions,
-  IFlagsResult,
-} from "../flags/types.ts";
+import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
 import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
-import { bold, red } from "./deps.ts";
+import { blue, bold, red, yellow } from "./deps.ts";
 import {
   CommandExecutableNotFound,
   CommandNotFound,
@@ -1132,13 +1128,15 @@ export class Command<
         const env: Record<string, unknown> = await this.parseEnvVars();
         return this.execute(env, ...this.rawArgs) as any;
       } else {
-        const { actionOption, flags, unknown, literal } = this.parseFlags(
-          this.rawArgs,
-        );
+        const env: Record<string, unknown> = await this.parseEnvVars();
+        const { actionOption, flags, unknown, literal } = this
+          .parseFlags(
+            this.rawArgs,
+            env,
+          );
 
         this.literalArgs = literal;
 
-        const env: Record<string, unknown> = await this.parseEnvVars();
         const options: Record<string, unknown> = { ...env, ...flags };
         const params = this.parseArguments(unknown, options);
 
@@ -1146,7 +1144,7 @@ export class Command<
           await actionOption.action.call(this, options, ...params);
           if (actionOption.standalone) {
             return {
-              options: options,
+              options,
               args: params,
               cmd: this,
               literal: this.literalArgs,
@@ -1198,13 +1196,20 @@ export class Command<
         {
           standalone: true,
           prepend: true,
-          action: function () {
-            this.showVersion();
+          action: async function () {
+            const long = this.getRawArgs().includes(`--${versionOption.name}`);
+            if (long) {
+              await this.checkVersion();
+              this.showLongVersion();
+            } else {
+              this.showVersion();
+            }
             this.exit();
           },
           ...(this._versionOption?.opts ?? {}),
         },
       );
+      const versionOption = this.options[0];
     }
 
     if (this._helpOption !== false) {
@@ -1215,10 +1220,10 @@ export class Command<
           standalone: true,
           global: true,
           prepend: true,
-          action: function () {
-            this.showHelp({
-              long: this.getRawArgs().includes(`--${helpOption.name}`),
-            });
+          action: async function () {
+            const long = this.getRawArgs().includes(`--${helpOption.name}`);
+            await this.checkVersion();
+            this.showHelp({ long });
             this.exit();
           },
           ...(this._helpOption?.opts ?? {}),
@@ -1294,6 +1299,7 @@ export class Command<
    */
   protected parseFlags(
     args: string[],
+    env: Record<string, unknown>,
   ): IFlagsResult & { actionOption?: IOption & { action: IAction } } {
     try {
       let actionOption: IOption & { action: IAction } | undefined;
@@ -1301,9 +1307,10 @@ export class Command<
         stopEarly: this._stopEarly,
         allowEmpty: this._allowEmpty,
         flags: this.getOptions(true),
+        ignoreDefaults: env,
         parse: (type: ITypeInfo) => this.parseType(type),
-        option: (option: IFlagOptions) => {
-          if (!actionOption && (option as IOption).action) {
+        option: (option: IOption) => {
+          if (!actionOption && option.action) {
             actionOption = option as IOption & { action: IAction };
           }
         },
@@ -1581,6 +1588,21 @@ export class Command<
     console.log(this.getVersion());
   }
 
+  /** Returns command name, version and meta data. */
+  public getLongVersion(): string {
+    return `${bold(this.getMainCommand().getName())} ${
+      blue(this.getVersion() ?? "")
+    }` +
+      Object.entries(this.getMeta()).map(
+        ([k, v]) => `\n${bold(k)} ${blue(v)}`,
+      ).join("");
+  }
+
+  /** Outputs command name, version and meta data. */
+  public showLongVersion(): void {
+    console.log(this.getLongVersion());
+  }
+
   /** Output generated help without exiting. */
   public showHelp(options?: HelpOptions): void {
     console.log(this.getHelp(options));
@@ -1600,6 +1622,27 @@ export class Command<
   private exit(code = 0) {
     if (this.shouldExit()) {
       Deno.exit(code);
+    }
+  }
+
+  /** Check if new version is available and add hint to version. */
+  public async checkVersion(): Promise<void> {
+    const mainCommand = this.getMainCommand();
+    const upgradeCommand = mainCommand.getCommand("upgrade");
+    if (isUpgradeCommand(upgradeCommand)) {
+      const latestVersion = await upgradeCommand.getLatestVersion();
+      const currentVersion = mainCommand.getVersion();
+      if (currentVersion !== latestVersion) {
+        mainCommand.version(
+          `${currentVersion}  ${
+            bold(
+              yellow(
+                `(New version available: ${latestVersion}. Run '${mainCommand.getName()} upgrade' to upgrade to the latest version!)`,
+              ),
+            )
+          }`,
+        );
+      }
     }
   }
 
@@ -1811,10 +1854,10 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getCommand(
+  public getCommand<C extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): Command<any> | undefined {
+  ): C | undefined {
     return this.getBaseCommand(name, hidden) ??
       this.getGlobalCommand(name, hidden);
   }
@@ -1824,14 +1867,14 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getBaseCommand(
+  public getBaseCommand<C extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): Command<any> | undefined {
+  ): C | undefined {
     for (const cmd of this.commands.values()) {
       if (cmd._name === name || cmd.aliases.includes(name)) {
         return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
-          | Command
+          | C
           | undefined;
       }
     }
@@ -1842,10 +1885,10 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getGlobalCommand(
+  public getGlobalCommand<C extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): Command<any> | undefined {
+  ): C | undefined {
     if (!this._parent) {
       return;
     }
@@ -1856,7 +1899,7 @@ export class Command<
       return this._parent.getGlobalCommand(name, hidden);
     }
 
-    return cmd;
+    return cmd as C;
   }
 
   /**
@@ -2160,6 +2203,14 @@ export class Command<
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
   }
+}
+
+function isUpgradeCommand(command: unknown): command is UpgradeCommandImpl {
+  return command instanceof Command && "getLatestVersion" in command;
+}
+
+interface UpgradeCommandImpl {
+  getLatestVersion(): Promise<string>;
 }
 
 interface IDefaultOption {
