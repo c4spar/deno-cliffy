@@ -58,9 +58,12 @@ const Types: Record<string, ITypeHandler<unknown>> = {
  * ```
  */
 // deno-lint-ignore no-explicit-any
-export function parseFlags<O extends Record<string, any> = Record<string, any>>(
+export function parseFlags<
+  O extends Record<string, any> = Record<string, any>,
+  T extends IFlagOptions = IFlagOptions,
+>(
   args: string[],
-  opts: IParseOptions = {},
+  opts: IParseOptions<T> = {},
 ): IFlagsResult<O> {
   args = args.slice();
   !opts.flags && (opts.flags = []);
@@ -199,7 +202,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
 
       optionNames[propName] = option.name;
 
-      opts.option?.(option, flags[propName]);
+      opts.option?.(option as T, flags[propName]);
 
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations

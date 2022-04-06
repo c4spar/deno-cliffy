@@ -5,11 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type {
-  IDefaultValue,
-  IFlagOptions,
-  IFlagsResult,
-} from "../flags/types.ts";
+import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
 import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
 import { bold, red } from "./deps.ts";
 import {
@@ -1302,8 +1298,8 @@ export class Command<
         allowEmpty: this._allowEmpty,
         flags: this.getOptions(true),
         parse: (type: ITypeInfo) => this.parseType(type),
-        option: (option: IFlagOptions) => {
-          if (!actionOption && (option as IOption).action) {
+        option: (option: IOption) => {
+          if (!actionOption && option.action) {
             actionOption = option as IOption & { action: IAction };
           }
         },
