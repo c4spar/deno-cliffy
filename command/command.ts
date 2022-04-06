@@ -11,7 +11,7 @@ import type {
   IFlagsResult,
 } from "../flags/types.ts";
 import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
-import { bold, red, yellow } from "./deps.ts";
+import { blue, bold, red, yellow } from "./deps.ts";
 import {
   CommandExecutableNotFound,
   CommandNotFound,
@@ -1198,13 +1198,20 @@ export class Command<
         {
           standalone: true,
           prepend: true,
-          action: function () {
-            this.showVersion();
+          action: async function () {
+            const long = this.getRawArgs().includes(`--${versionOption.name}`);
+            if (long) {
+              await this.checkVersion();
+              this.showLongVersion();
+            } else {
+              this.showVersion();
+            }
             this.exit();
           },
           ...(this._versionOption?.opts ?? {}),
         },
       );
+      const versionOption = this.options[0];
     }
 
     if (this._helpOption !== false) {
@@ -1579,6 +1586,24 @@ export class Command<
   /** Output generated help without exiting. */
   public showVersion(): void {
     console.log(this.getVersion());
+  }
+
+  /** Returns command name, version and meta data. */
+  public getLongVersion(): string {
+    return Table.from([
+      [
+        `${bold(this.getMainCommand().getName())}:`,
+        blue(this.getVersion()),
+      ],
+      ...Object.entries(this.getMeta()).map(
+        ([k, v]) => [`${bold(k)}:`, blue(v)],
+      ),
+    ]).toString();
+  }
+
+  /** Outputs command name, version and meta data. */
+  public showLongVersion(): void {
+    console.log(this.getLongVersion());
   }
 
   /** Output generated help without exiting. */
