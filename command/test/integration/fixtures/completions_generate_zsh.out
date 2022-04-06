@@ -111,10 +111,12 @@ function _completions_test_foo_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean foo help ;;
+    command-command) __completions_test_complete command command foo help ;;
   esac
 }
 
@@ -161,10 +163,12 @@ function _completions_test_foo_bar_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean foo bar help ;;
+    command-command) __completions_test_complete command command foo bar help ;;
   esac
 }
 
@@ -173,16 +177,18 @@ function _completions_test_foo_bar_help() {
 function _completions_test_help() {
 
   function _commands() {
-    __completions_test_complete command command help
+    __completions_test_complete command command foo bar help
   }
 
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean help ;;
+    command-command) __completions_test_complete command command help ;;
   esac
 }
 
@@ -234,10 +240,12 @@ function _completions_test_completions_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean completions help ;;
+    command-command) __completions_test_complete command command completions help ;;
   esac
 }
 
@@ -283,10 +291,12 @@ function _completions_test_completions_bash_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean completions bash help ;;
+    command-command) __completions_test_complete command command completions bash help ;;
   esac
 }
 
@@ -332,10 +342,12 @@ function _completions_test_completions_fish_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean completions fish help ;;
+    command-command) __completions_test_complete command command completions fish help ;;
   esac
 }
 
@@ -381,10 +393,12 @@ function _completions_test_completions_zsh_help() {
   _arguments -w -s -S -C \
     '(- *)'{-h,--help}'[Show this help.]' \
     '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
-    '1: :_commands'
+    '1: :_commands'\
+    '2:: :command-command'
 
   case "$state" in
     val-boolean) __completions_test_complete val boolean completions zsh help ;;
+    command-command) __completions_test_complete command command completions zsh help ;;
   esac
 }
 
