@@ -1,7 +1,7 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
-import { blue, bold, dim, green, italic, red } from "./deps.ts";
+import { blue, bold, dim, green, italic, red, stripColor } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Prompt validation return tape. */
@@ -9,13 +9,14 @@ export type ValidateResult = string | boolean | Promise<string | boolean>;
 
 /** Input keys options. */
 export interface GenericPromptKeys {
-  submit?: string[];
+  submit?: Array<string>;
 }
 
 /** Generic prompt options. */
 export interface GenericPromptOptions<T, V> {
   message: string;
   default?: T;
+  hideDefault?: boolean;
   validate?: (value: V) => ValidateResult;
   transform?: (value: V) => T | undefined;
   hint?: string;
@@ -64,6 +65,7 @@ export abstract class GenericPrompt<
   #value: T | undefined;
   #lastError: string | undefined;
   #isFirstRun = true;
+  #encoder = new TextEncoder();
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -140,7 +142,17 @@ export abstract class GenericPrompt<
       ]);
 
     const content: string = result.filter(Boolean).join("\n");
-    const y: number = content.split("\n").length - this.cursor.y - 1;
+    const lines = content.split("\n");
+
+    const columns = getColumns();
+    const linesCount: number = columns
+      ? lines.reduce((prev, next) => {
+        const length = stripColor(next).length;
+        return prev + (length > columns ? Math.ceil(length / columns) : 1);
+      }, 0)
+      : content.split("\n").length;
+
+    const y: number = linesCount - this.cursor.y - 1;
 
     if (!this.#isFirstRun || this.#lastError) {
       this.clear();
@@ -151,7 +163,7 @@ export abstract class GenericPrompt<
       console.log(content);
       this.tty.cursorUp();
     } else {
-      Deno.stdout.writeSync(new TextEncoder().encode(content));
+      Deno.stdout.writeSync(this.#encoder.encode(content));
     }
 
     if (y) {
@@ -166,7 +178,7 @@ export abstract class GenericPrompt<
       const value: V = GenericPrompt.injectedValue as V;
       await this.#validateValue(value);
     } else {
-      const events: KeyCode[] = await this.#readKey();
+      const events: Array<KeyCode> = await this.#readKey();
 
       if (!events.length) {
         return false;
@@ -191,7 +203,9 @@ export abstract class GenericPrompt<
 
   protected defaults(): string {
     let defaultMessage = "";
-    if (typeof this.settings.default !== "undefined") {
+    if (
+      typeof this.settings.default !== "undefined" && !this.settings.hideDefault
+    ) {
       defaultMessage += dim(` (${this.format(this.settings.default)})`);
     }
     return defaultMessage;
@@ -269,7 +283,7 @@ export abstract class GenericPrompt<
   protected abstract getValue(): V;
 
   /** Read user input from stdin and pars ansi codes. */
-  #readKey = async (): Promise<KeyCode[]> => {
+  #readKey = async (): Promise<Array<KeyCode>> => {
     const data: Uint8Array = await this.#readChar();
 
     return data.length ? parse(data) : [];
@@ -373,3 +387,11 @@ type setRaw = (
   mode: boolean,
   options?: { cbreak?: boolean },
 ) => void;
+
+function getColumns(): number | null {
+  try {
+    return Deno.consoleSize(Deno.stdout.rid).columns;
+  } catch (_error) {
+    return null;
+  }
+}
