@@ -1,5 +1,6 @@
 import type { Command } from "../command.ts";
-import type { IArgument, IOption } from "../types.ts";
+import type { IArgument, IOption, IType } from "../types.ts";
+import { FileType } from "../types/file.ts";
 
 interface ICompletionAction {
   arg: IArgument;
@@ -181,14 +182,22 @@ function _${replaceSpecialChars(path)}() {` +
     if (command.hasArguments() || command.hasCommands(false)) {
       const args: string[] = [];
 
-      for (const arg of command.getArguments().slice(1)) {
-        const completionsPath: string = path.split(" ").slice(1).join(" ");
-
-        const action = this.addAction(arg, completionsPath);
-
-        args.push(
-          `${++argIndex}${arg.optionalValue ? "::" : ":"}${action.name}`,
-        );
+      for (const arg of command.getArguments()) {
+        const type = command.getType(arg.type);
+        if (type && type.handler instanceof FileType) {
+          const fileCompletions = this.getFileCompletions(type);
+          args.push(
+            `${++argIndex}${
+              arg.optionalValue ? "::" : ":"
+            } :${fileCompletions}`,
+          );
+        } else {
+          const completionsPath: string = path.split(" ").slice(1).join(" ");
+          const action = this.addAction(arg, completionsPath);
+          args.push(
+            `${++argIndex}${arg.optionalValue ? "::" : ":"} :${action.name}`,
+          );
+        }
       }
 
       argsCommand += args.map((arg: string) => `\\\n    '${arg}'`).join("");
@@ -213,13 +222,16 @@ function _${replaceSpecialChars(path)}() {` +
       .filter((flag) => typeof flag === "string") as string[];
 
     for (const option of command.getOptions(false)) {
-      options.push(this.generateOption(option, completionsPath, excludedFlags));
+      options.push(
+        this.generateOption(command, option, completionsPath, excludedFlags),
+      );
     }
 
     return options;
   }
 
   private generateOption(
+    command: Command,
     option: IOption,
     completionsPath: string,
     excludedOptions: string[],
@@ -238,11 +250,14 @@ function _${replaceSpecialChars(path)}() {` +
 
     let args = "";
     for (const arg of option.args) {
-      const action = this.addAction(arg, completionsPath);
-
-      if (arg.variadic) {
-        args += `${arg.optionalValue ? "::" : ":"}${arg.name}:->${action.name}`;
+      const type = command.getType(arg.type);
+      if (type && type.handler instanceof FileType) {
+        const fileCompletions = this.getFileCompletions(type);
+        args += `${
+          arg.optionalValue ? "::" : ":"
+        }${arg.name}:${fileCompletions}`;
       } else {
+        const action = this.addAction(arg, completionsPath);
         args += `${arg.optionalValue ? "::" : ":"}${arg.name}:->${action.name}`;
       }
     }
@@ -273,6 +288,24 @@ function _${replaceSpecialChars(path)}() {` +
         return `${excluded}${flags}'[${description}]${args}'`;
       }
     }
+  }
+
+  private getFileCompletions(type: IType) {
+    if (!(type.handler instanceof FileType)) {
+      return "";
+    }
+    // const fileOpts = type.handler.getOptions();
+    let fileCompletions = "_files";
+    // if (fileOpts.dirsOnly) {
+    //   fileCompletions += " -/";
+    // }
+    // if (fileOpts.pattern) {
+    //   fileCompletions += ' -g "' + fileOpts.pattern + '"';
+    // }
+    // if (fileOpts.ignore) {
+    //   fileCompletions += " -F " + fileOpts.ignore;
+    // }
+    return fileCompletions;
   }
 
   private addAction(arg: IArgument, cmd: string): ICompletionAction {

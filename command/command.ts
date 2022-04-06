@@ -31,6 +31,7 @@ import {
   ValidationError,
 } from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
+import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
 import { StringType } from "./types/string.ts";
 import { Type } from "./type.ts";
@@ -1180,6 +1181,8 @@ export class Command<
       this.type("integer", new IntegerType(), { global: true });
     !this.types.has("boolean") &&
       this.type("boolean", new BooleanType(), { global: true });
+    !this.types.has("file") &&
+      this.type("file", new FileType(), { global: true });
 
     if (!this._help) {
       this.help({

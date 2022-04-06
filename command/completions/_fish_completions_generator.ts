@@ -1,5 +1,6 @@
 import type { Command } from "../command.ts";
-import type { IOption } from "../types.ts";
+import type { IArgument, IOption } from "../types.ts";
+import { FileType } from "../types/file.ts";
 
 /** Generates fish completions script. */
 interface CompleteOptions {
@@ -72,9 +73,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
     if (commandArgs.length) {
       result += "\n" + this.complete(command, {
         arguments: commandArgs.length
-          ? this.getCompletionCommand(
-            commandArgs[0].action + " " + getCompletionsPath(command),
-          )
+          ? this.getCompletionCommand(command, commandArgs[0])
           : undefined,
       });
     }
@@ -107,9 +106,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
       required: true,
       standalone: option.standalone,
       arguments: option.args.length
-        ? this.getCompletionCommand(
-          option.args[0].action + " " + getCompletionsPath(command),
-        )
+        ? this.getCompletionCommand(command, option.args[0])
         : undefined,
     });
   }
@@ -137,8 +134,14 @@ ${this.generateCompletions(this.cmd).trim()}`;
     return cmd.join(" ");
   }
 
-  private getCompletionCommand(cmd: string): string {
-    return `'(${this.cmd.getName()} completions complete ${cmd.trim()})'`;
+  private getCompletionCommand(cmd: Command, arg: IArgument): string {
+    const type = cmd.getType(arg.type);
+    if (type && type.handler instanceof FileType) {
+      return `'(__fish_complete_path)'`;
+    }
+    return `'(${this.cmd.getName()} completions complete ${
+      arg.action + " " + getCompletionsPath(cmd)
+    })'`;
   }
 }
 
