@@ -77,7 +77,8 @@ export function parseFlags<
   let negate = false;
 
   const flags: Record<string, unknown> = {};
-  const optionNames: Record<string, string> = {};
+  /** Option name mapping: propertyName -> option.name */
+  const optionNameMap: Record<string, string> = {};
   let literal: string[] = [];
   let unknown: string[] = [];
   let stopEarly: string | null = null;
@@ -209,7 +210,7 @@ export function parseFlags<
         flags[propName] = value;
       }
 
-      optionNames[propName] = option.name;
+      optionNameMap[propName] = option.name;
 
       opts.option?.(option as T, flags[propName]);
 
@@ -386,7 +387,7 @@ export function parseFlags<
     }
   }
 
-  validateFlags(opts, flags, optionNames);
+  validateFlags(opts, flags, optionNameMap);
 
   // convert dotted option keys into nested objects
   const result = Object.keys(flags)

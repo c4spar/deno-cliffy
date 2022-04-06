@@ -4,7 +4,6 @@ import {
   DependingOption,
   MissingOptionValue,
   MissingRequiredOption,
-  NoArguments,
   OptionNotCombinable,
   UnknownOption,
 } from "./_errors.ts";
@@ -20,23 +19,64 @@ interface IFlagOptionsMap {
 /**
  * Flags post validation. Validations that are not already done by the parser.
  *
- * @param flags         Available flag options.
- * @param values        Flag to validate.
- * @param allowEmpty    Don't throw an error if values is empty.
- * @param optionNames   Mapped option names of negatable options.
+ * @param opts            Parse options.
+ * @param values          Flag values.
+ * @param optionNameMap   Option name mappings: propertyName -> option.name
  */
 export function validateFlags<T extends IFlagOptions = IFlagOptions>(
-  { flags, allowEmpty, ignoreDefaults }: IParseOptions<T>,
+  opts: IParseOptions<T>,
   values: Record<string, unknown>,
-  optionNames: Record<string, string> = {},
+  optionNameMap: Record<string, string> = {},
 ): void {
-  if (!flags?.length) {
+  if (!opts.flags?.length) {
     return;
   }
+  const defaultValues = setDefaultValues(opts, values, optionNameMap);
+
+  const optionNames = Object.keys(values);
+  if (!optionNames.length && opts.allowEmpty) {
+    return;
+  }
+
+  const options: Array<IFlagOptionsMap> = optionNames.map((name) => ({
+    name,
+    option: getOption(opts.flags!, optionNameMap[name]),
+  }));
+
+  for (const { name, option } of options) {
+    if (!option) {
+      throw new UnknownOption(name, opts.flags);
+    }
+    if (validateStandaloneOption(option, options, optionNames, defaultValues)) {
+      return;
+    }
+    validateConflictingOptions(option, values);
+    validateDependingOptions(option, values, defaultValues);
+    validateRequiredValues(option, values, name);
+  }
+  validateRequiredOptions(options, values, opts);
+}
+
+/**
+ * Adds all default values on the values object and returns a new object with
+ * only the default values.
+ *
+ * @param opts
+ * @param values
+ * @param optionNameMap
+ */
+function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
+  opts: IParseOptions<T>,
+  values: Record<string, unknown>,
+  optionNameMap: Record<string, string> = {},
+) {
   const defaultValues: Record<string, boolean> = {};
+  if (!opts.flags?.length) {
+    return defaultValues;
+  }
 
   // Set default value's
-  for (const option of flags) {
+  for (const option of opts.flags) {
     let name: string | undefined;
     let defaultValue: unknown = undefined;
 
@@ -46,7 +86,7 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
       if (propName in values) {
         continue;
       }
-      const positiveOption = getOption(flags, propName);
+      const positiveOption = getOption(opts.flags, propName);
       if (positiveOption) {
         continue;
       }
@@ -58,12 +98,12 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
       name = paramCaseToCamelCase(option.name);
     }
 
-    if (!(name in optionNames)) {
-      optionNames[name] = option.name;
+    if (!(name in optionNameMap)) {
+      optionNameMap[name] = option.name;
     }
 
-    const hasDefaultValue: boolean = (!ignoreDefaults ||
-      typeof ignoreDefaults[name] === "undefined") &&
+    const hasDefaultValue: boolean = (!opts.ignoreDefaults ||
+      typeof opts.ignoreDefaults[name] === "undefined") &&
       typeof values[name] === "undefined" && (
         typeof option.default !== "undefined" ||
         typeof defaultValue !== "undefined"
@@ -78,69 +118,88 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
     }
   }
 
-  const keys = Object.keys(values);
+  return defaultValues;
+}
 
-  if (keys.length === 0 && allowEmpty) {
+function validateStandaloneOption(
+  option: IFlagOptions,
+  options: Array<IFlagOptionsMap>,
+  optionNames: Array<string>,
+  defaultValues: Record<string, boolean>,
+): boolean {
+  if (!option.standalone) {
+    return false;
+  }
+  if (optionNames.length === 1) {
+    return true;
+  }
+
+  // don't throw an error if all values are coming from the default option.
+  if (
+    options.every((opt) =>
+      opt.option &&
+      (option === opt.option || defaultValues[opt.option.name])
+    )
+  ) {
+    return true;
+  }
+
+  throw new OptionNotCombinable(option.name);
+}
+
+function validateConflictingOptions(
+  option: IFlagOptions,
+  values: Record<string, unknown>,
+): void {
+  option.conflicts?.forEach((flag: string) => {
+    if (isset(flag, values)) {
+      throw new ConflictingOption(option.name, flag);
+    }
+  });
+}
+
+function validateDependingOptions(
+  option: IFlagOptions,
+  values: Record<string, unknown>,
+  defaultValues: Record<string, boolean>,
+): void {
+  option.depends?.forEach((flag: string) => {
+    // don't throw an error if the value is coming from the default option.
+    if (!isset(flag, values) && !defaultValues[option.name]) {
+      throw new DependingOption(option.name, flag);
+    }
+  });
+}
+
+function validateRequiredValues(
+  option: IFlagOptions,
+  values: Record<string, unknown>,
+  name: string,
+): void {
+  const isArray = (option.args?.length || 0) > 1;
+  option.args?.forEach((arg: IFlagArgument, i: number) => {
+    if (
+      arg.requiredValue &&
+      (
+        typeof values[name] === "undefined" ||
+        (isArray &&
+          typeof (values[name] as Array<unknown>)[i] === "undefined")
+      )
+    ) {
+      throw new MissingOptionValue(option.name);
+    }
+  });
+}
+
+function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
+  options: Array<IFlagOptionsMap>,
+  values: Record<string, unknown>,
+  opts: IParseOptions<T>,
+): void {
+  if (!opts.flags?.length) {
     return;
   }
-
-  const options: IFlagOptionsMap[] = keys.map((name) => ({
-    name,
-    option: getOption(flags, optionNames[name]),
-  }));
-
-  for (const { name, option } of options) {
-    if (!option) {
-      throw new UnknownOption(name, flags);
-    }
-
-    if (option.standalone) {
-      if (keys.length > 1) {
-        // don't throw an error if all values are coming from the default option.
-        if (
-          options.every(({ option: opt }) =>
-            opt &&
-            (option === opt || defaultValues[opt.name])
-          )
-        ) {
-          return;
-        }
-
-        throw new OptionNotCombinable(option.name);
-      }
-      return;
-    }
-
-    option.conflicts?.forEach((flag: string) => {
-      if (isset(flag, values)) {
-        throw new ConflictingOption(option.name, flag);
-      }
-    });
-
-    option.depends?.forEach((flag: string) => {
-      // don't throw an error if the value is coming from the default option.
-      if (!isset(flag, values) && !defaultValues[option.name]) {
-        throw new DependingOption(option.name, flag);
-      }
-    });
-
-    const isArray = (option.args?.length || 0) > 1;
-
-    option.args?.forEach((arg: IFlagArgument, i: number) => {
-      if (
-        arg.requiredValue &&
-        (
-          typeof values[name] === "undefined" ||
-          (isArray &&
-            typeof (values[name] as Array<unknown>)[i] === "undefined")
-        )
-      ) {
-        throw new MissingOptionValue(option.name);
-      }
-    });
-  }
-
-  for (const option of flags) {
+  for (const option of opts.flags) {
     if (option.required && !(paramCaseToCamelCase(option.name) in values)) {
       if (
         (
@@ -154,10 +213,6 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
         throw new MissingRequiredOption(option.name);
       }
     }
-  }
-
-  if (keys.length === 0 && !allowEmpty) {
-    throw new NoArguments();
   }
 }
 

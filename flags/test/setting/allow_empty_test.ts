@@ -1,41 +1,44 @@
-import { assertThrows } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { parseFlags } from "../../flags.ts";
 
-Deno.test("flags allowEmpty enabled", () => {
-  parseFlags([], {
-    allowEmpty: true,
-    flags: [{
-      name: "flag",
-      aliases: ["f"],
-    }],
-  });
+Deno.test("[flags] should not allow empty by default", () => {
+  assertThrows(
+    () =>
+      parseFlags([], {
+        flags: [{
+          name: "flag",
+          required: true,
+        }],
+      }),
+    Error,
+    'Missing required option "--flag".',
+  );
 });
 
-Deno.test("flags allowEmpty noFlags", () => {
-  parseFlags([], {
-    allowEmpty: true,
-    flags: [],
-  });
-});
-
-Deno.test("flags allowEmpty disabledNoFlags", () => {
-  parseFlags([], {
-    allowEmpty: false,
-    flags: [],
-  });
-});
-
-Deno.test("flags allowEmpty disabled", () => {
+Deno.test("[flags] should not allow empty if disabled", () => {
   assertThrows(
     () =>
       parseFlags([], {
         allowEmpty: false,
         flags: [{
           name: "flag",
-          aliases: ["f"],
+          required: true,
         }],
       }),
     Error,
-    "No arguments.",
+    'Missing required option "--flag".',
   );
+});
+
+Deno.test("[flags] should allow empty if enabled", () => {
+  const { flags, unknown } = parseFlags([], {
+    allowEmpty: true,
+    flags: [{
+      name: "flag",
+      required: true,
+    }],
+  });
+
+  assertEquals(flags, {});
+  assertEquals(unknown, []);
 });
