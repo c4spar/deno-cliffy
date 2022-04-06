@@ -192,7 +192,9 @@ export abstract class GenericPrompt<
 
   protected defaults(): string {
     let defaultMessage = "";
-    if (typeof this.settings.default !== "undefined" && !this.settings.hideDefault) {
+    if (
+      typeof this.settings.default !== "undefined" && !this.settings.hideDefault
+    ) {
       defaultMessage += dim(` (${this.format(this.settings.default)})`);
     }
     return defaultMessage;
