@@ -142,11 +142,14 @@ export abstract class GenericPrompt<
 
     const content: string = result.filter(Boolean).join("\n");
     const lines = content.split("\n");
-    const { columns } = Deno.consoleSize(Deno.stdout.rid);
-    const linesCount: number = lines.reduce((prev, next) => {
-      const length = stripColor(next).length;
-      return prev + (length > columns ? Math.ceil(length / columns) : 1);
-    }, 0);
+
+    const columns = getColumns();
+    const linesCount: number = columns
+      ? lines.reduce((prev, next) => {
+        const length = stripColor(next).length;
+        return prev + (length > columns ? Math.ceil(length / columns) : 1);
+      }, 0)
+      : content.split("\n").length;
 
     const y: number = linesCount - this.cursor.y - 1;
 
@@ -381,3 +384,11 @@ type setRaw = (
   mode: boolean,
   options?: { cbreak?: boolean },
 ) => void;
+
+function getColumns(): number | null {
+  try {
+    return Deno.consoleSize(Deno.stdout.rid).columns;
+  } catch (e) {
+    return null;
+  }
+}
