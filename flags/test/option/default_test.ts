@@ -110,3 +110,23 @@ Deno.test("flags optionDefault override default value with optional value", () =
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
+
+Deno.test("flags ignore defaults", () => {
+  const { flags, unknown, literal } = parseFlags([], {
+    ...options,
+    ignoreDefaults: {
+      boolean: true,
+      number: 0,
+      string2: "foo",
+    },
+  });
+
+  assertEquals(flags, {
+    string: "0",
+    boolean2: true,
+    number2: 1,
+    method: 1,
+  });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
