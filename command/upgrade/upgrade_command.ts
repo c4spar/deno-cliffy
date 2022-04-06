@@ -1,6 +1,6 @@
 import { Command } from "../command.ts";
 import { ValidationError } from "../../flags/_errors.ts";
-import type { Provider } from "./provider.ts";
+import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
 
 export interface UpgradeCommandOptions<
@@ -60,7 +60,7 @@ export class UpgradeCommand extends Command {
         "-f, --force",
         "Replace current installation even if not out-of-date.",
       )
-      .complete("version", () => this.getVersions())
+      .complete("version", () => this.getAllVersions())
       .action(async ({ registry, version: targetVersion, force }) => {
         const name: string = this.getMainCommand().getName();
         const currentVersion: string | undefined = this.getVersion();
@@ -81,11 +81,20 @@ export class UpgradeCommand extends Command {
       });
   }
 
-  private async getVersions(): Promise<Array<string>> {
-    const { versions } = await this.getProvider().getVersions(
+  public async getAllVersions(): Promise<Array<string>> {
+    const { versions } = await this.getVersions();
+    return versions;
+  }
+
+  public async getLatestVersion(): Promise<string> {
+    const { latest } = await this.getVersions();
+    return latest;
+  }
+
+  public getVersions(): Promise<Versions> {
+    return this.getProvider().getVersions(
       this.getMainCommand().getName(),
     );
-    return versions;
   }
 
   private getProvider(name?: string): Provider {
