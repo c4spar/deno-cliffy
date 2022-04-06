@@ -88,6 +88,41 @@ function isOption(option: IFlagOptions, name: string) {
     (option.aliases && option.aliases.indexOf(name) !== -1);
 }
 
+export function matchWildCardOptions(
+  name: string,
+  flags: Array<IFlagOptions>,
+): IFlagOptions | undefined {
+  for (const option of flags) {
+    if (option.name.indexOf("*") === -1) {
+      continue;
+    }
+    let matched = matchWildCardOption(name, option);
+    if (matched) {
+      matched = { ...matched, name };
+      flags.push(matched);
+      return matched;
+    }
+  }
+}
+
+function matchWildCardOption(
+  name: string,
+  option: IFlagOptions,
+): IFlagOptions | false {
+  const parts = option.name.split(".");
+  const parts2 = name.split(".");
+  if (parts.length !== parts2.length) {
+    return false;
+  }
+  const count = Math.max(parts.length, parts2.length);
+  for (let i = 0; i < count; i++) {
+    if (parts[i] !== parts2[i] && parts[i] !== "*") {
+      return false;
+    }
+  }
+  return option;
+}
+
 function closest(str: string, arr: string[]): string | undefined {
   let minDistance = Infinity;
   let minIndex = 0;

@@ -1,4 +1,9 @@
-import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
+import {
+  getDefaultValue,
+  getOption,
+  matchWildCardOptions,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
   DuplicateOption,
@@ -133,19 +138,23 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
       } else if (isLong && current.startsWith("--no-")) {
         negate = true;
       }
-
       option = getOption(opts.flags, current);
 
       if (!option) {
         if (opts.flags.length) {
-          throw new UnknownOption(current, opts.flags);
+          const name = current.replace(/^-+/g, "");
+          option = matchWildCardOptions(name, opts.flags);
+          if (!option) {
+            throw new UnknownOption(current, opts.flags);
+          }
         }
-
-        option = {
-          name: current.replace(/^-+/, ""),
-          optionalValue: true,
-          type: OptionType.STRING,
-        };
+        if (!option) {
+          option = {
+            name: current.replace(/^-+/, ""),
+            optionalValue: true,
+            type: OptionType.STRING,
+          };
+        }
       }
 
       const positiveName: string = negate

@@ -84,8 +84,8 @@ export class Command<
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
   private types: Map<string, IType> = new Map();
-  private rawArgs: string[] = [];
-  private literalArgs: string[] = [];
+  private rawArgs: Array<string> = [];
+  private literalArgs: Array<string> = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
@@ -95,11 +95,11 @@ export class Command<
   private desc: IDescription = "";
   private _usage?: string;
   private fn?: IAction;
-  private options: IOption[] = [];
+  private options: Array<IOption> = [];
   private commands: Map<string, Command<any>> = new Map();
-  private examples: IExample[] = [];
-  private envVars: IEnvVar[] = [];
-  private aliases: string[] = [];
+  private examples: Array<IExample> = [];
+  private envVars: Array<IEnvVar> = [];
+  private aliases: Array<string> = [];
   private completions: Map<string, ICompletion> = new Map();
   private cmd: Command<any> = this;
   private argsDefinition?: string;
@@ -109,7 +109,7 @@ export class Command<
   private _stopEarly = false;
   private defaultCommand?: string;
   private _useRawArgs = false;
-  private args: IArgument[] = [];
+  private args: Array<IArgument> = [];
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
@@ -2348,7 +2348,8 @@ type GetArguments<A extends string> = A extends `-${string}=${infer Rest}`
   : A extends `-${string} ${infer Rest}` ? GetArguments<Rest>
   : A;
 
-type OptionName<Name extends string> = CamelCase<TrimRight<Name, ",">>;
+type OptionName<Name extends string> = Name extends "*" ? string
+  : CamelCase<TrimRight<Name, ",">>;
 
 type IsRequired<R extends boolean | undefined, D> = R extends true ? true
   : D extends undefined ? false
