@@ -3,6 +3,7 @@ import {
   UnknownType,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
+import { Table } from "../table/table.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type {
@@ -1593,7 +1594,7 @@ export class Command<
     return Table.from([
       [
         `${bold(this.getMainCommand().getName())}:`,
-        blue(this.getVersion()),
+        blue(this.getVersion() ?? ""),
       ],
       ...Object.entries(this.getMeta()).map(
         ([k, v]) => [`${bold(k)}:`, blue(v)],

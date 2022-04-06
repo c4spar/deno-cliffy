@@ -1,1 +1,4 @@
-1.0.0
+completions-test: 1.0.0
+meta1:            value1
+meta2:            value2
+meta3:            value3
