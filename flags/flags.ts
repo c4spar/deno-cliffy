@@ -219,7 +219,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
         }
 
         if (option.args?.length) {
-          // make all value's required per default
+          // make all value's required by default
           if (
             (typeof arg.optionalValue === "undefined" ||
               arg.optionalValue === false) &&
@@ -228,7 +228,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
             arg.requiredValue = true;
           }
         } else {
-          // make non boolean value required per default
+          // make non boolean value required by default
           if (
             arg.type !== OptionType.BOOLEAN &&
             (typeof arg.optionalValue === "undefined" ||
@@ -374,15 +374,7 @@ export function parseFlags<O extends Record<string, any> = Record<string, any>>(
     }
   }
 
-  if (opts.flags?.length) {
-    validateFlags(
-      opts.flags,
-      flags,
-      opts.knownFlaks,
-      opts.allowEmpty,
-      optionNames,
-    );
-  }
+  validateFlags(opts, flags, optionNames);
 
   // convert dotted option keys into nested objects
   const result = Object.keys(flags)

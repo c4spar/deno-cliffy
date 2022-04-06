@@ -8,9 +8,8 @@ import {
   OptionNotCombinable,
   UnknownOption,
 } from "./_errors.ts";
+import { IParseOptions } from "./types.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
-
-// @TODO: add support for knownFlaks
 
 /** Flag option map. */
 interface IFlagOptionsMap {
@@ -23,17 +22,17 @@ interface IFlagOptionsMap {
  *
  * @param flags         Available flag options.
  * @param values        Flag to validate.
- * @param _knownFlaks    Don't throw an error if a missing flag is defined in knownFlags (currently not implemented).
  * @param allowEmpty    Don't throw an error if values is empty.
  * @param optionNames   Mapped option names of negatable options.
  */
-export function validateFlags(
-  flags: IFlagOptions[],
+export function validateFlags<T extends IFlagOptions = IFlagOptions>(
+  { flags, allowEmpty, ignoreDefaults }: IParseOptions,
   values: Record<string, unknown>,
-  _knownFlaks?: Record<string, unknown>,
-  allowEmpty?: boolean,
   optionNames: Record<string, string> = {},
 ): void {
+  if (!flags?.length) {
+    return;
+  }
   const defaultValues: Record<string, boolean> = {};
 
   // Set default value's
@@ -63,10 +62,12 @@ export function validateFlags(
       optionNames[name] = option.name;
     }
 
-    const hasDefaultValue: boolean = typeof values[name] === "undefined" && (
-      typeof option.default !== "undefined" ||
-      typeof defaultValue !== "undefined"
-    );
+    const hasDefaultValue: boolean = (!ignoreDefaults ||
+      typeof ignoreDefaults[name] === "undefined") &&
+      typeof values[name] === "undefined" && (
+        typeof option.default !== "undefined" ||
+        typeof defaultValue !== "undefined"
+      );
 
     if (hasDefaultValue) {
       values[name] = getDefaultValue(option) ?? defaultValue;

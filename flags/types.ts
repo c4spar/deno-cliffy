@@ -6,6 +6,7 @@ export interface IParseOptions {
   knownFlaks?: Record<string, unknown>;
   stopEarly?: boolean;
   allowEmpty?: boolean;
+  ignoreDefaults?: Record<string, unknown>;
 }
 
 /** Flag options. */
