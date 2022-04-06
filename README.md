@@ -1,71 +1,52 @@
-<h1 align="center">❯ Cliffy</h1>
+<img src="logo.png" style="width: 100%" />
 
-<p align="center" class="badges-container">
-  <a href="https://github.com/c4spar/deno-cliffy/releases">
-    <img alt="Version" src="https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue" />
-  </a>
-  <a href="https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml">
-    <img alt="Build status" src="https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main" />
-  </a>
-  <a href="https://codecov.io/gh/c4spar/deno-cliffy">
-    <img src="https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg"/>
-  </a>
-  <a href="https://github.com/c4spar/deno-cliffy/issues">
-    <img alt="issues" src="https://img.shields.io/github/issues/c4spar/deno-cliffy?label=issues&logo=github">
-  </a>
-  <a href="https://deno.land/">
-    <img alt="Deno version" src="https://img.shields.io/badge/deno-^1.4.0-blue?logo=deno" />
-  </a>
-  <a href="https://discord.gg/ghFYyP53jb">
-    <img alt="Discord" src="https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white" />
-  </a>
-  <a href="./LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github" />
-  </a>
-  <br>
-  <a href="https://deno.land/x/cliffy">
-    <img alt="deno.land" src="https://img.shields.io/badge/Published on deno.land-blue?logo=deno&logoColor=959DA6&color=272727" />
-  </a>
-  <a href="https://nest.land/package/cliffy">
-    <img alt="nest.land" src="https://nest.land/badge.svg">
-  </a>
-</p>
+[![Latest version](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=Latest)](https://github.com/c4spar/deno-cliffy/releases)
+[![Build status](https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main)](https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml)
+[![Code coverage](https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg)](https://codecov.io/gh/c4spar/deno-cliffy)
+[![Issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?label=issues&logo=github)](https://github.com/c4spar/deno-cliffy/issues)
+[![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
+[![License](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)](./LICENSE)
 
-<p align="center">
-  <b>Command line framework for Deno</b></br>
-  <sub>>_ A collection of modules for creating interactive command line tools.</sub>
-</p>
+[![deno.land](https://img.shields.io/badge/Published%20on%20deno.land-blue?logo=deno&logoColor=959DA6&color=272727)](https://deno.land/x/cliffy)
+[![nest.land](https://nest.land/badge.svg)](https://nest.land/package/cliffy)
 
 > ⚠️ This project is still under development. Expect breaking changes.
 
-## ❯ Modules
+**Cliffy** is a _simple_ and _type-safe_ commandline framework for building
+complex commandline tools with [deno](https://deno.land).
 
-- **[ansi](ansi/):** Chainable ansi escape sequences to show, hide and move cli
-  cursor, erase output and scroll window.
+The [documentation](https://cliffy.io/docs) is available on
+[cliffy.io](https://cliffy.io).
 
-- **[command](command/):** Create flexible command line interfaces with type
-  checking, auto generated help and out of the box support for shell completions
-  (inspired by [node.js's](http://nodejs.org)
-  [commander.js](https://github.com/tj/commander.js/blob/master/Readme.md)).
+### Modules
 
-- **[flags](flags/):** Parse command line arguments.
+Following modules are included in cliffy:
 
-- **[keycode](keycode/):** Parse ANSI key codes.
+- **[ansi](https://cliffy.io/docs/ansi/):** Chainable ansi _escape sequences_.
 
-- **[keypress](keypress/):** Keypress module with promise, async iterator and
-  event target API.
+- **[command](https://cliffy.io/docs/command/):** Create _complex_ and
+  _type-safe_ commandline tools with build-in _input validation_, _auto
+  generated help_, _shell completions_ and more.
 
-- **[prompt](prompt/):** Create interactive prompts like: checkbox, confirm,
-  input, number, select, etc...
+- **[flags](https://cliffy.io/docs/flags/):** Parse command line arguments (used
+  by the _command_ module).
 
-- **[table](table/):** Create cli table's with border, padding, nested table's,
-  etc...
+- **[keycode](https://cliffy.io/docs/keycode/):** Parser ansi key codes.
 
-## ❯ Contributing
+- **[keypress](https://cliffy.io/docs/keypress/):** Listen to keypress events
+  with _Promise_, _AsyncIterator_ and _EventTarget_ API's.
+
+- **[prompt](https://cliffy.io/docs/prompt/):** Create _simple_ and _powerful_
+  interactive prompts.
+
+- **[table](https://cliffy.io/docs/table/):** Create cli table's with border,
+  padding, nested table's, etc...
+
+### Contributing
 
 Any kind of contribution is welcome! Please take a look at the
 [contributing guidelines](CONTRIBUTING.md).
 
-## ❯ License
+### License
 
 [MIT](LICENSE)

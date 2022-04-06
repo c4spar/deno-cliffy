@@ -11,10 +11,11 @@ try {
   cmd.parse();
 } catch (error) {
   if (error instanceof ValidationError) {
-    cmd.help();
-    console.error("[CUSTOM_VALIDATION_ERROR]", error.message);
+    cmd.showHelp();
+    console.error("Usage error: %s", error.message);
+    Deno.exit(error.exitCode);
   } else {
-    console.error("[CUSTOM_ERROR]", error);
+    console.error("Runtime error: %s", error);
+    Deno.exit(1);
   }
-  Deno.exit(1);
 }

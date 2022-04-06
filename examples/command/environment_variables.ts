@@ -3,14 +3,6 @@
 import { Command } from "../../command/command.ts";
 
 await new Command()
-  .env(
-    "SOME_ENV_VAR=<value:number>",
-    "Description ...",
-    {
-      global: true,
-      required: true,
-    },
-  )
+  .env("SOME_ENV_VAR=<value:number>", "Description ...")
   .action((options) => console.log(options))
-  .command("hello", "world ...")
   .parse(Deno.args);

@@ -13,6 +13,7 @@ for await (const event: KeyPressEvent of keypress()) {
     event.altKey,
     event.repeat,
   );
+
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
     break;

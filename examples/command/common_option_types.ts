@@ -3,12 +3,18 @@
 import { Command } from "../../command/command.ts";
 
 const { options } = await new Command()
-  // optional boolean value
+  // Env value must be always required.
+  .env("DEBUG=<debug:boolean>", "Enable debugging.")
+  // Option with no value.
+  .option("-d, --debug", "Enable debugging.")
+  // Option with optional boolean value.
   .option("-s, --small [small:boolean]", "Small pizza size.")
-  // required string value
+  // Option with required string value.
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
-  // required number value
+  // Option with required number value.
   .option("-a, --amount <amount:integer>", "Pieces of pizza.")
+  // One required and one optional command arguemnt.
+  .arguments("<input:string> [output:string]")
   .parse(Deno.args);
 
 console.log(options);

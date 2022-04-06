@@ -10,11 +10,11 @@ try {
   });
   console.log(flags);
 } catch (error) {
-  // Command validation error.
+  // Flags validation error.
   if (error instanceof ValidationError) {
     console.log("[VALIDATION_ERROR] %s", error.message);
     Deno.exit(1);
   }
-  // General error or invalid configuration.
+  // General error.
   throw error;
 }

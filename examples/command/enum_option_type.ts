@@ -3,17 +3,16 @@
 import { Command } from "../../command/command.ts";
 import { EnumType } from "../../command/types/enum.ts";
 
-// Enum enum type
 enum Animal {
   Dog = "dog",
   Cat = "cat",
 }
 
-// Array enum type
-const color = new EnumType(["blue", "yellow", "red"]);
-
-// Array enum type
+// Enum type with enum.
 const animal = new EnumType(Animal);
+
+// Enum type with array.
+const color = new EnumType(["blue", "yellow", "red"]);
 
 await new Command()
   .type("color", color)

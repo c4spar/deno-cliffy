@@ -4,10 +4,9 @@ import { Command } from "../../command/command.ts";
 
 await new Command()
   .option("-l, --local [val:string]", "Only available on this command.")
-  .option(
+  .globalOption(
     "-g, --global [val:string]",
     "Available on this and all nested child command's.",
-    { global: true },
   )
   .action(console.log)
   .command(

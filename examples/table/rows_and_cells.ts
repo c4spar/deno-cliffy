@@ -9,7 +9,7 @@ new Table()
   .body([
     [
       "Baxter Herman",
-      Cell.from("Oct 1, 2020").border(true),
+      new Cell("Oct 1, 2020").border(true),
       "Row 1 Column 3",
       "Harderwijk",
       "Slovenia",
@@ -21,4 +21,3 @@ new Table()
     ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
   ])
   .render();
-console.log();

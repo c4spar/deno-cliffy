@@ -3,7 +3,7 @@
 import { Command } from "../../command/command.ts";
 
 const { args } = await new Command()
-  .arguments("<cmd> [env]")
+  .arguments("<input> [output:string]")
   .parse(Deno.args);
 
 console.log(args);

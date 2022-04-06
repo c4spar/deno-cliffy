@@ -1,15 +1,21 @@
 #!/usr/bin/env -S deno run
 
-import { Command, ITypeInfo, Type } from "../../command/mod.ts";
+import {
+  Command,
+  ITypeInfo,
+  Type,
+  ValidationError,
+} from "../../command/mod.ts";
 
-class EmailType extends Type<string> {
-  protected emailRegex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+class ColorType extends Type<string> {
+  private readonly colors = ["red", "blue", "yellow"];
 
   public parse({ label, name, value }: ITypeInfo): string {
-    if (!this.emailRegex.test(value.toLowerCase())) {
-      throw new Error(
-        `${label} "${name}" must be a valid "email", but got "${value}".`,
+    if (!this.colors.includes(value)) {
+      throw new ValidationError(
+        `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${
+          this.colors.join(", ")
+        }`,
       );
     }
 
@@ -18,10 +24,10 @@ class EmailType extends Type<string> {
 }
 
 const { options } = await new Command()
-  .type("email", new EmailType())
-  .arguments("[email:email]")
-  .option("-e, --email <value:email>", "Your email address.")
-  .command("email [email:email]", "Your email address.")
+  .type("color", new ColorType())
+  .arguments("[color-name:color]")
+  .option("-c, --color <name:color>", "...")
+  .command("foo [color-name:color]", "...")
   .parse(Deno.args);
 
 console.log(options);

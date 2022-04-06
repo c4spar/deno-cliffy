@@ -1,26 +1,13 @@
 #!/usr/bin/env -S deno run
 
-import { Command, ITypeInfo } from "../../command/mod.ts";
-
-const emailRegex =
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-function emailType({ label, name, value }: ITypeInfo): string {
-  if (!emailRegex.test(value.toLowerCase())) {
-    throw new Error(
-      `${label} "${name}" must be a valid "email", but got "${value}".`,
-    );
-  }
-
-  return value;
-}
+import { Command, EnumType } from "../../command/mod.ts";
 
 await new Command()
-  .type("email", emailType, { global: true })
-  .command("login", "Login with email.")
-  .option("-e, --email <email:email>", "Your email address.")
+  .globalType("color", new EnumType(["red", "blue", "yellow"]))
+  .command("foo", "...")
+  .option("-c, --color <name:color>", "Chose a color.")
   .action(console.log)
-  .command("config", "Manage config.")
-  .option("-a, --admin-email [email:email]", "Get or set admin email address.")
+  .command("bar", "...")
+  .option("-b, --background-color [name:color]", "Choose a background color.")
   .action(console.log)
   .parse(Deno.args);

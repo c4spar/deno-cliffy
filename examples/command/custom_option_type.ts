@@ -2,13 +2,14 @@
 
 import { Command, ITypeInfo } from "../../command/mod.ts";
 
-const emailRegex =
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const colors = ["red", "blue", "yellow"];
 
-function emailType({ label, name, value }: ITypeInfo): string {
-  if (!emailRegex.test(value.toLowerCase())) {
+function colorType({ label, name, value }: ITypeInfo): string {
+  if (!colors.includes(value.toLowerCase())) {
     throw new Error(
-      `${label} "${name}" must be a valid "email", but got "${value}".`,
+      `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${
+        colors.join(", ")
+      }`,
     );
   }
 
@@ -16,10 +17,10 @@ function emailType({ label, name, value }: ITypeInfo): string {
 }
 
 const { options } = await new Command()
-  .type("email", emailType)
-  .arguments("[email:email]")
-  .option("-e, --email <value:email>", "Your email address.")
-  .command("email [email:email]", "Your email address.")
+  .type("color", colorType)
+  .arguments("[color-name:color]")
+  .option("-c, --color <name:color>", "...")
+  .command("foo [color-name:color]", "...")
   .parse(Deno.args);
 
 console.log(options);

@@ -13,6 +13,7 @@ keypress().addEventListener("keydown", (event: KeyPressEvent) => {
     event.altKey,
     event.repeat,
   );
+
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");
     keypress().dispose();
