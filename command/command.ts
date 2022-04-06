@@ -101,7 +101,7 @@ export class Command<
   private argsDefinition?: string;
   private isExecutable = false;
   private throwOnError = false;
-  private _allowEmpty = true;
+  private _allowEmpty = false;
   private _stopEarly = false;
   private defaultCommand?: string;
   private _useRawArgs = false;

@@ -19,14 +19,12 @@ Deno.test("command depends option with default value: should accept no arguments
   assertEquals(args, []);
 });
 
-// disabled because the -h flag call's Deno.exit() and stops the test's.
-// Deno.test( 'command depends option with default value: should accept -h', async () => {
-//
-//     const { options, args } = await cmd().parse( [ '-h' ] );
-//
-//     assertEquals( options, { flag2: 'example' } );
-//     assertEquals( args, [] );
-// } );
+Deno.test("command depends option with default value: should accept -h", async () => {
+  const { options, args } = await command().noExit().parse(["-h"]);
+
+  assertEquals(options, { flag2: "example", help: true });
+  assertEquals(args, []);
+});
 
 Deno.test("command depends option with default value: should accept --flag1", async () => {
   const { options, args } = await command().parse(["--flag1"]);

@@ -20,13 +20,6 @@ const cmd = new Command()
   )
   .action(() => {});
 
-Deno.test("command optionRequire noArguments", async () => {
-  const { options, args } = await cmd.parse([]);
-
-  assertEquals(options, {});
-  assertEquals(args, []);
-});
-
 Deno.test("command optionRequire videoAudioImageType", async () => {
   const { options, args } = await cmd.parse(
     ["-v", "value", "-a", "value", "--image-type", "value"],
