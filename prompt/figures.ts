@@ -41,6 +41,8 @@ export const Figures = Deno.build.os === "windows" ? win : main;
 const keyMap: Record<string, keyof typeof Figures> = {
   up: "ARROW_UP",
   down: "ARROW_DOWN",
+  left: "ARROW_LEFT",
+  right: "ARROW_RIGHT",
   pageup: "PAGE_UP",
   pagedown: "PAGE_DOWN",
   tab: "TAB_RIGHT",
