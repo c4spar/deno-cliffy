@@ -388,7 +388,7 @@ type setRaw = (
 function getColumns(): number | null {
   try {
     return Deno.consoleSize(Deno.stdout.rid).columns;
-  } catch (e) {
+  } catch (_error) {
     return null;
   }
 }
