@@ -1,4 +1,4 @@
-# [v0.23.0](https://github.com/c4spar/deno-cliffy/compare/v0.22.2...v0.23.0) (Apr 6, 2022)
+# [v0.23.0](https://github.com/c4spar/deno-cliffy/compare/v0.22.2...v0.23.0) (Apr 11, 2022)
 
 ### BREAKING CHANGES
 
