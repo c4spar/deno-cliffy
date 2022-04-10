@@ -4,13 +4,13 @@ import { Command } from "../../command/command.ts";
 
 await new Command()
   .env(
-    "FOO_OUTPUT_FILE=<value:string>",
-    "The output file.",
-    { prefix: "FOO_" },
+    "DENO_INSTALL_ROOT=<path:string>",
+    "Set install root.",
+    { prefix: "DENO_" },
   )
   .option(
-    "--output-file <value:string>",
-    "The output file.",
+    "--install-root <path:string>",
+    "Set install root.",
   )
   .action((options) => console.log(options))
   .parse();

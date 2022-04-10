@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
+import { Command, ValidationError } from "../../command/mod.ts";
 
 const { options } = await new Command()
   .option(
@@ -12,10 +12,13 @@ const { options } = await new Command()
   )
   .option("-C, --color <item:string>", "collect colors", {
     collect: true,
-    value: (value: string, previous: string[] = []): string[] => {
+    value: (value: string, previous: Array<string> = []): Array<string> => {
       if (["blue", "yellow", "red"].indexOf(value) === -1) {
-        throw new Error(
-          `Option "color" must be one of "blue, yellow or red", but got "${value}".`,
+        throw new ValidationError(
+          `Color must be one of "blue, yellow or red", but got "${value}".`,
+          // optional you can set the exitCode which is used if .throwErrors()
+          // is not called. Default is: 1
+          { exitCode: 1 },
         );
       }
       previous.push(value);

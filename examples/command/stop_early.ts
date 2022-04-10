@@ -3,11 +3,11 @@
 import { Command } from "../../command/command.ts";
 
 await new Command()
-  .stopEarly() // <-- enable stop early
   .option("-d, --debug-level <level:string>", "Debug level.")
-  .arguments("[script:string] [...args:string]")
+  .arguments("[script] [args...]")
+  .stopEarly() // <-- enable stop early
   // deno-lint-ignore no-explicit-any
-  .action((options: any, script: string, args: string[]) => {
+  .action((options: any, script: string, args: Array<string>) => {
     console.log("options:", options);
     console.log("script:", script);
     console.log("args:", args);

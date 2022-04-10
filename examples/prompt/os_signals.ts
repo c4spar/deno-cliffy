@@ -3,14 +3,11 @@
 import { tty } from "../../ansi/tty.ts";
 import { Toggle } from "../../prompt/toggle.ts";
 
-const sig = Deno.signals.interrupt();
-(async () => {
-  for await (const _ of sig) {
-    tty.cursorLeft.eraseDown.cursorShow();
-    console.log("\nSigint received. Exiting deno process!");
-    Deno.exit(1);
-  }
-})();
+Deno.addSignalListener("SIGINT", () => {
+  tty.cursorLeft.eraseDown.cursorShow();
+  console.log("interrupted!");
+  Deno.exit(1);
+});
 
 const confirmed: boolean = await Toggle.prompt({
   message: "Please confirm",
@@ -18,5 +15,3 @@ const confirmed: boolean = await Toggle.prompt({
 });
 
 console.log({ confirmed });
-
-sig.dispose();
