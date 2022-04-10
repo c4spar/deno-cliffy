@@ -1,7 +1,7 @@
 name: cliffy
 description: Command line framework for Deno 🦕
 unstable: true
-version: 0.20.2
+version: 0.23.0
 repository: https://github.com/c4spar/deno-cliffy/
 homepage: https://cliffy.io
 files:
