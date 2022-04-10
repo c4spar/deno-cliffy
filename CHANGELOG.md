@@ -1,3 +1,127 @@
+# [v0.23.0](https://github.com/c4spar/deno-cliffy/compare/v0.22.2...v0.23.0) (Apr 6, 2022)
+
+### BREAKING CHANGES
+
+- **command:** infer types and option names (#312)
+  ([efcad62](https://github.com/c4spar/deno-cliffy/commit/efcad62))
+
+  With this release the `Command` class is now strict by default. All names and
+  types from option, argument and environment variable definitions will be now
+  automatically inferred 🚀
+
+  Previously it was necessary to pass the `void` type as first generic argument
+  to the command class `Command<void>` (which is now the default) to enable
+  strict typings. The name and the type could than be specified by passing them
+  to the `option`, `arguments` or `env` methods:
+
+  ```ts
+  new Command<void>()
+    .option<{ foo?: string }>("--foo <value:string>")
+    .arguments<[string, string?]>("<input> [output]");
+  ```
+
+  This is no longer necessary. Names and types are now automatically inferred
+  from the definitions `"--foo <value:string>"` and you can define it just like
+  the following example. Options and arguments will be automatically typed.
+
+  ```ts
+  new Command()
+    .option("--foo <value:string>")
+    .arguments("<input> [output]");
+  ```
+
+  Dotted options, custom types like `EnumType` and options like `default`,
+  `value` and `prefix` are supported as well.
+
+  To disable strict types you can pass the `any` type to the command class
+  `Command<any>` which was previously the default._
+- **command:** fix allowEmpty and disable it by default (#352)
+  ([c17718d](https://github.com/c4spar/deno-cliffy/commit/c17718d))
+
+  Previously `.allowEmpty()` was enabled by default, which means if an required
+  option was registered no error was thrown if the command was called without
+  any arguments. `.allowEmpty()` is now disabled by default and has to be
+  enabled manually.
+
+### Features
+
+- **command:** add new file type with path completion support (#353)
+  ([969f2dd](https://github.com/c4spar/deno-cliffy/commit/969f2dd))
+
+  If the `CompletionCommand` is registered, path completions will be enabled for
+  arguments and options with the `file` type. The new `file` type can be used as
+  following:
+  ```ts
+  new Command()
+    .option("--input-file <path:file>", "The input file.")`
+  ```
+
+- **command:** show long version format with long --version option (#343)
+  ([079b4ba](https://github.com/c4spar/deno-cliffy/commit/079b4ba))
+- **command:** show hint in help if a new version is available (#342)
+  ([bc9cfbf](https://github.com/c4spar/deno-cliffy/commit/bc9cfbf))
+- **command,flags:** add support for wildcard options (#351)
+  ([e604e44](https://github.com/c4spar/deno-cliffy/commit/e604e44))
+
+  Wildcard options can be used to allow options with dynamic names. You can
+  register them as following:
+
+  ```ts
+  new Command()
+    .option("--foo.*", "This options allows any name on the foo option.")
+    .option(
+      "--bar.*.*",
+      "This options allows any nested name on the bar option.",
+    );
+  ```
+
+  Following options are valid options for the `--foo.*` option:
+
+  - `--foo.bar`
+  - `--foo.baz`
+
+  Following options are valid options for the `--bar.*.*` option:
+
+  - `--foo.bar.baz`
+  - `--foo.beep.boop`
+
+- **flags:** add `ignoreDefaults` option (#349)
+  ([22178af](https://github.com/c4spar/deno-cliffy/commit/22178af))
+- **prompt:** add n & p keys for next & previous and left & right for next &
+  prev page (#345)
+  ([d568f37](https://github.com/c4spar/deno-cliffy/commit/d568f37))
+- **prompt:** add hideDefault option (#344)
+  ([dc460b6](https://github.com/c4spar/deno-cliffy/commit/dc460b6))
+
+### Bug Fixes
+
+- suggestions value is always lower cased (#346)
+  ([5d1e3a7](https://github.com/c4spar/deno-cliffy/commit/5d1e3a7))
+- **command:** default value from option overrides env var (#350)
+  ([2cd7735](https://github.com/c4spar/deno-cliffy/commit/2cd7735))
+- **prompt:** prompt is not rendered properly if content is longer than the
+  terminal (#347)
+  ([56755e1](https://github.com/c4spar/deno-cliffy/commit/56755e1))
+
+### Code Refactoring
+
+- **flags:** infer option types in option callback method (#348)
+  ([483bbf7](https://github.com/c4spar/deno-cliffy/commit/483bbf7))
+- **prompt:** improve generic types for prompt methd (#335)
+  ([42e21f6](https://github.com/c4spar/deno-cliffy/commit/42e21f6))
+
+### Documentation Updates
+
+- update readme
+  ([afc7774](https://github.com/c4spar/deno-cliffy/commit/afc7774))
+- remove old docs
+  ([d674dfb](https://github.com/c4spar/deno-cliffy/commit/d674dfb))
+
+### Chore
+
+- **upgrade:** deno/std@0.134.0 & sinon@v13.0.1 (#354)
+  ([f63b687](https://github.com/c4spar/deno-cliffy/commit/f63b687))
+
 # [v0.20.2](https://github.com/c4spar/deno-cliffy/compare/v0.20.1...v0.20.2) (Mar 16, 2022)
 
 ### Features
