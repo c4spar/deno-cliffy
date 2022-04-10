@@ -10,4 +10,4 @@ export {
   red,
   setColorEnabled,
   yellow,
-} from "https://deno.land/std@0.130.0/fmt/colors.ts";
+} from "https://deno.land/std@0.134.0/fmt/colors.ts";
