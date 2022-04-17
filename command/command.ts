@@ -556,7 +556,7 @@ export class Command<
    */
   public useRawArgs(
     useRawArgs = true,
-  ): Command<CPG, CPT, CO, Array<string>, CG, CT, CGT, CP> {
+  ): Command<void, void, void, Array<string>, void, void, void, CP> {
     this.cmd._useRawArgs = useRawArgs;
     return this as Command<any>;
   }

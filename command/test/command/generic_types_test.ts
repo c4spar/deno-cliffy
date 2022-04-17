@@ -27,7 +27,7 @@ import {
       new Command<any>()
         .option("-f, --foo, [val:string]", "...")
         .arguments("<val:string> [val:string]")
-        .env("FOO_BAR [val:number]", "")
+        .env("FOO_BAR <val:number>", "")
         .action((options, ...args) => {
           assert<IsAny<typeof options>>(true);
           assert<IsAny<typeof args>>(true);
@@ -117,13 +117,7 @@ import {
         debugLevel: "debug" | "info" | "warn" | "error";
       };
 
-      new Command<
-        void,
-        void,
-        Options,
-        Arguments,
-        GlobalOptions
-      >()
+      new Command<void, void, Options, Arguments, GlobalOptions>()
         .arguments("<input:string> [output:string] [level:number]")
         .globalOption("-d, --debug", "description ...")
         .globalOption("-l, --debug-level <string>", "description ...", {
@@ -333,19 +327,18 @@ import {
 
   Deno.test({
     name: "[command] - generic types - simple child command with parent option",
-    async fn() {
+    fn() {
       const fooCommand = new Command<{ main?: true }>();
 
-      await new Command()
+      new Command()
         .globalOption("--main", "")
-        .command("foo", fooCommand)
-        .parse(Deno.args);
+        .command("foo", fooCommand);
     },
   });
 
   Deno.test({
     name: "[command] - generic types - child command with parent option",
-    async fn() {
+    fn() {
       const foo = new Command()
         .option("-f, --foo", "");
 
@@ -391,80 +384,72 @@ import {
 
       // @ts-expect-error unknown global option main2
       cmd.command("5", new Command<{ main2?: true }>());
-
-      await cmd.parse(Deno.args);
     },
   });
 
   Deno.test({
     name: "[command] - generic types - unkown parent option",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         // @ts-expect-error unknown global option main
-        .command("foo", new Command<{ main?: true }>())
-        .parse(Deno.args);
+        .command("foo", new Command<{ main?: true }>());
     },
   });
 
   Deno.test({
     name: "[command] - generic types - incompatible parent option type",
-    async fn() {
+    fn() {
       const fooCommand = new Command<{ main?: number }>();
 
-      await new Command()
+      new Command()
         .globalOption("--main", "")
         // @ts-expect-error main option has incompatible type
-        .command("foo", fooCommand)
-        .parse(Deno.args);
+        .command("foo", fooCommand);
     },
   });
 
   Deno.test({
     name:
       "[command] - generic types - unkown parent option on command with global option",
-    async fn() {
+    fn() {
       const fooCommand = new Command<{ main2?: true }>();
 
-      await new Command()
+      new Command()
         .option("-d, --debug", "...", { global: true })
         // @ts-expect-error unknown global option main2
-        .command("foo", fooCommand)
-        .parse(Deno.args);
+        .command("foo", fooCommand);
     },
   });
 
   Deno.test({
     name:
       "[command] - generic types - unkown parent option on command with global option 2",
-    async fn() {
+    fn() {
       const fooCommand = new Command<{ main2?: true }>();
 
-      await new Command()
+      new Command()
         .globalOption("-d, --debug", "...")
         // @ts-expect-error unknown global option main2
-        .command("foo", fooCommand)
-        .parse(Deno.args);
+        .command("foo", fooCommand);
     },
   });
 
   Deno.test({
     name: "[command] - generic types - simple extended command",
-    async fn() {
+    fn() {
       class Foo extends Command {}
 
-      await new Command()
-        .command("foo", new Foo())
-        .parse(Deno.args);
+      new Command().command("foo", new Foo());
     },
   });
 
   Deno.test({
     name: "[command] - generic types - extended command",
-    async fn() {
+    fn() {
       class Foo
         extends Command<{ main?: true }, void, { foo?: true }, [string]> {}
 
-      await new Command()
+      new Command()
         .globalOption("--main", "...")
         .command("foo", new Foo())
         .action((options, ...args) => {
@@ -475,29 +460,27 @@ import {
               foo?: true;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name:
       "[command] - generic types - extended command with incompatible parent option type",
-    async fn() {
+    fn() {
       class Foo extends Command<{ main?: boolean }, void, { foo?: true }, []> {}
 
-      await new Command()
+      new Command()
         .globalOption("--main", "...")
         // @ts-expect-error boolean is not compatible to true
-        .command("foo", new Foo())
-        .parse(Deno.args);
+        .command("foo", new Foo());
     },
   });
 
   Deno.test({
     name: "[command] - generic types - return types",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .type("color", new EnumType(["red", "blue"]))
         .option("--num [val:number]", "")
         .option("--str [val:string]", "")
@@ -518,19 +501,19 @@ import {
               f?: true;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - many arguments",
-    async fn() {
+    fn() {
       enum Lang {
         JS = "js",
         Rust = "rust",
       }
-      await new Command()
+
+      new Command()
         .type("color", new EnumType(["red", "blue"]))
         .type("lang", new EnumType(Lang))
         .arguments(
@@ -538,95 +521,82 @@ import {
         )
         .action((options, ...args) => {
           assert<
-            IsExact<
-              typeof args,
-              [
-                string,
-                string,
-                number,
-                boolean,
-                string?,
-                string?,
-                number?,
-                boolean?,
-                ("red" | "blue")?,
-                Array<Array<Lang>>?,
-              ]
-            >
+            IsExact<typeof args, [
+              string,
+              string,
+              number,
+              boolean,
+              string?,
+              string?,
+              number?,
+              boolean?,
+              ("red" | "blue")?,
+              Array<Array<Lang>>?,
+            ]>
           >(true);
           assert<IsExact<typeof options, void>>(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - command arguments",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .globalType("color", new EnumType(["red", "blue"]))
         .globalType("lang", new EnumType(["js", "rust"]))
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
           assert<
-            IsExact<
-              typeof args,
-              [
-                string,
-                ("red" | "blue")?,
-                Array<Array<"js" | "rust">>?,
-              ]
-            >
+            IsExact<typeof args, [
+              string,
+              ("red" | "blue")?,
+              Array<Array<"js" | "rust">>?,
+            ]>
           >(true);
 
           assert<IsExact<typeof options, void>>(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - command arguments",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .command("foo <val:number>")
         .action((options, ...args) => {
           assert<IsExact<typeof args, [number]>>(true);
           assert<IsExact<typeof options, void>>(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - command arguments with custom types",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .globalType("color", new EnumType(["red", "blue"]))
         .globalType("lang", new EnumType(["js", "rust"]))
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
           assert<
-            IsExact<
-              typeof args,
-              [
-                string,
-                ("red" | "blue")?,
-                Array<Array<"js" | "rust">>?,
-              ]
-            >
+            IsExact<typeof args, [
+              string,
+              ("red" | "blue")?,
+              Array<Array<"js" | "rust">>?,
+            ]>
           >(true);
 
           assert<IsExact<typeof options, void>>(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - environment variables",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .globalType("color", new EnumType(["red", "blue"]))
         .globalType("lang", new EnumType(["js", "rust"]))
         .option("--foo-bar <val:color>", "")
@@ -651,15 +621,14 @@ import {
               globalFooBar?: "js" | "rust";
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - env var prefix",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .env("FOO_BAR_BAZ=<val:string>", "", { prefix: "FOO_" })
         .action((options, ...args) => {
           assert<IsExact<typeof args, []>>(true);
@@ -668,15 +637,14 @@ import {
               barBaz?: string;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - option with multiple values",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .option("--foo-bar <val:string> <val:boolean> [val:number]", "")
         .option("--foo-bar-baz=<val:string> [val:number]", "")
         .action((options, ...args) => {
@@ -687,15 +655,14 @@ import {
               fooBarBaz?: [string, number?];
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - option with equal sign",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .option("--foo-bar=<val:string>", "")
         .option("--foo-bar-baz=<val:string> [val:number]", "")
         .action((options, ...args) => {
@@ -706,15 +673,14 @@ import {
               fooBarBaz?: [string, number?];
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - default value",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .type("color", new EnumType(["red", "blue"]))
         .option("--foo [val:string]", "...")
         .option("--bar [val:string]", "...", { default: 4 })
@@ -739,15 +705,14 @@ import {
               one: { two: string | number };
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - value option",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .option("--foo [val:string]", "...")
         .option("--bar [val:string]", "...", { default: 4 })
         .option("--baz <val:string>", "...", { default: 4 })
@@ -819,15 +784,14 @@ import {
               envVar2?: Date;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - collect option",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .option("--beep <val:string>", "...", {
           collect: true,
         })
@@ -854,15 +818,14 @@ import {
               boop2?: number;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
   Deno.test({
     name: "[command] - generic types - negatable option",
-    async fn() {
-      await new Command()
+    fn() {
+      new Command()
         .option("--color <color:string>", "Color name.", { default: "yellow" })
         .option("--no-color", "No color.")
         .option("--no-check", "No check.")
@@ -878,8 +841,7 @@ import {
               defaultValue: number | false;
             }>
           >(true);
-        })
-        .parse(Deno.args);
+        });
     },
   });
 
@@ -887,13 +849,14 @@ import {
     name: "[command] - generic types - parse() return value",
     async fn() {
       const { args, cmd, literal, options } = await new Command()
+        .throwErrors()
         .option("--foo", "...")
         .option("--bar <value:number>", "...")
         .option("--barbaz <value:number>", "...", {
           value: (value) => new Date(value),
         })
         .arguments("<foo:string> [bar:number]")
-        .parse(Deno.args);
+        .parse(["abc"]);
 
       assert<IsExact<typeof args, [string, number?]>>(true);
       assert<
@@ -962,6 +925,20 @@ import {
       >(true);
       assert<IsExact<typeof literal, Array<string>>>(true);
       assert<IsExact<typeof options, Record<string, unknown>>>(true);
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - useRawArgs()",
+    fn() {
+      new Command()
+        .option("-f, --foo, [val:string]", "...")
+        .arguments("<val:string> [val:string]")
+        .useRawArgs()
+        .action((options, ...args) => {
+          assert<IsExact<typeof options, void>>(true);
+          assert<IsExact<typeof args, Array<string>>>(true);
+        });
     },
   });
 });
