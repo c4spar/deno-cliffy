@@ -15,6 +15,8 @@ const cmd = new Command()
     "Bar option.\nfoo bar baz. foo bar baz.\n\nfoo bar baz.\nfoo bar baz.",
   )
   .option("-c, --color <val:color>", "Color option.")
+  .option("-C, --colors <val...:color>", "Color option.")
+  .arguments("<color:color> [path...:file]")
   .default("help")
   // foo
   .command(

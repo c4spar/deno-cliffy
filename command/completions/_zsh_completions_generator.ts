@@ -187,11 +187,22 @@ function _${replaceSpecialChars(path)}() {` +
         const type = command.getType(arg.type);
         if (type && type.handler instanceof FileType) {
           const fileCompletions = this.getFileCompletions(type);
-          args.push(
-            `${++argIndex}${
-              arg.optionalValue ? "::" : ":"
-            }${arg.name}:${fileCompletions}`,
-          );
+          if (arg.variadic) {
+            argIndex++;
+            for (let i = 0; i < 5; i++) {
+              args.push(
+                `${argIndex + i}${
+                  arg.optionalValue ? "::" : ":"
+                }${arg.name}:${fileCompletions}`,
+              );
+            }
+          } else {
+            args.push(
+              `${++argIndex}${
+                arg.optionalValue ? "::" : ":"
+              }${arg.name}:${fileCompletions}`,
+            );
+          }
         } else {
           const completionsPath: string = path.split(" ").slice(1).join(" ");
           const action = this.addAction(arg, completionsPath);
