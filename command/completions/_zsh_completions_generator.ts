@@ -113,9 +113,9 @@ function _${replaceSpecialChars(path)}() {` +
     _describe 'command' commands`;
     }
 
+    // only complete first argument, rest arguments are completed with _arguments.
     if (command.hasArguments()) {
       const completionsPath: string = path.split(" ").slice(1).join(" ");
-      // @TODO: support multiple arguments zsh completions
       const arg: IArgument = command.getArguments()[0];
       const action = this.addAction(arg, completionsPath);
       if (action && command.getCompletion(arg.action)) {
@@ -176,26 +176,29 @@ function _${replaceSpecialChars(path)}() {` +
           .filter((arg) => command.getCompletion(arg.action)).length
       )
     ) {
-      argsCommand += ` \\\n    '${++argIndex}: :_commands'`;
+      argsCommand += ` \\\n    '${++argIndex}:command:_commands'`;
     }
 
     if (command.hasArguments() || command.hasCommands(false)) {
       const args: string[] = [];
 
-      for (const arg of command.getArguments()) {
+      // first argument is completed together with commands.
+      for (const arg of command.getArguments().slice(1)) {
         const type = command.getType(arg.type);
         if (type && type.handler instanceof FileType) {
           const fileCompletions = this.getFileCompletions(type);
           args.push(
             `${++argIndex}${
               arg.optionalValue ? "::" : ":"
-            } :${fileCompletions}`,
+            }${arg.name}:${fileCompletions}`,
           );
         } else {
           const completionsPath: string = path.split(" ").slice(1).join(" ");
           const action = this.addAction(arg, completionsPath);
           args.push(
-            `${++argIndex}${arg.optionalValue ? "::" : ":"} :->${action.name}`,
+            `${++argIndex}${
+              arg.optionalValue ? "::" : ":"
+            }${arg.name}:->${action.name}`,
           );
         }
       }
@@ -203,7 +206,7 @@ function _${replaceSpecialChars(path)}() {` +
       argsCommand += args.map((arg: string) => `\\\n    '${arg}'`).join("");
 
       if (command.hasCommands(false)) {
-        argsCommand += ` \\\n    '*:: :->command_args'`;
+        argsCommand += ` \\\n    '*::sub command:->command_args'`;
       }
     }
 
