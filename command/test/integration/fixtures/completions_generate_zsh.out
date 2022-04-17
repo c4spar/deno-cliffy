@@ -40,6 +40,7 @@ function _completions_test() {
       'completions:Generate shell completions.'
     )
     _describe 'command' commands
+    __completions_test_complete color color 
   }
 
   function _command_args() {
@@ -56,7 +57,13 @@ function _completions_test() {
     '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \
     '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \
     '(-h --help -V --version -c --color)'{-c,--color}'[Color option.]:val:->val-color' \
-    '1:command:_commands' \
+    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \
+    '1:command:_commands'\
+    '2::path:_files'\
+    '3::path:_files'\
+    '4::path:_files'\
+    '5::path:_files'\
+    '6::path:_files' \
     '*::sub command:->command_args'
 
   case "$state" in

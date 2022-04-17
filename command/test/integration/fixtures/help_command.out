@@ -1,6 +1,6 @@
 
-  [1mUsage:[22m   [35mcompletions-test[39m
-  [1mVersion:[22m [33m1.0.0[39m           
+  [1mUsage:[22m   [35mcompletions-test [33m<[35m[35mcolor[35m[33m>[35m [33m[[35m[35mpath...[35m[33m][35m[39m
+  [1mVersion:[22m [33m1.0.0[39m                             
 
   [1mmeta1: [22mvalue1
   [1mmeta2: [22mvalue2
@@ -12,11 +12,12 @@
 
   [1mOptions:[22m
 
-    [34m-h[39m, [34m--help[39m            [31m[1m-[22m[39m Show this help.                                                             
-    [34m-V[39m, [34m--version[39m         [31m[1m-[22m[39m Show the version number for this program.                                   
-    [34m-g[39m, [34m--global[39m   [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Foo option.                                                                 
-    [34m-m[39m, [34m--main[39m     [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Bar option.                                                                 
-    [34m-c[39m, [34m--color[39m    [33m<[39m[35mval[39m[33m>[39m  [31m[1m-[22m[39m Color option.                              ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
+    [34m-h[39m, [34m--help[39m               [31m[1m-[22m[39m Show this help.                                                             
+    [34m-V[39m, [34m--version[39m            [31m[1m-[22m[39m Show the version number for this program.                                   
+    [34m-g[39m, [34m--global[39m   [33m<[39m[35mval[39m[33m>[39m     [31m[1m-[22m[39m Foo option.                                                                 
+    [34m-m[39m, [34m--main[39m     [33m<[39m[35mval[39m[33m>[39m     [31m[1m-[22m[39m Bar option.                                                                 
+    [34m-c[39m, [34m--color[39m    [33m<[39m[35mval[39m[33m>[39m     [31m[1m-[22m[39m Color option.                              ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
+    [34m-C[39m, [34m--colors[39m   [33m<[39m[35mval...[39m[33m>[39m  [31m[1m-[22m[39m Color option.                              ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
 
   [1mCommands:[22m
 

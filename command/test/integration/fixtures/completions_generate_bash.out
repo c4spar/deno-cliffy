@@ -49,8 +49,8 @@ _completions_test() {
   }
 
   __completions_test() {
-    opts=(-h --help -V --version -g --global -m --main -c --color foo help completions)
-    
+    opts=(-h --help -V --version -g --global -m --main -c --color -C --colors foo help completions)
+    _completions_test_complete color
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
       return 0
     fi
@@ -60,6 +60,7 @@ _completions_test() {
       -g|--global) opts=(); _completions_test_complete boolean ;;
       -m|--main) opts=(); _completions_test_complete boolean ;;
       -c|--color) opts=(); _completions_test_complete color ;;
+      -C|--colors) opts=(); _completions_test_complete color ;;
     esac
   }
 
