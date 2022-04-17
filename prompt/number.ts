@@ -154,8 +154,9 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
 
     this.inputValue = !dec
       ? value
-      : (this.inputIndex > decimalIndex ? abs + "." + value
-      : value + "." + dec);
+      : (this.inputIndex > decimalIndex
+        ? abs + "." + value
+        : value + "." + dec);
 
     if (this.inputValue.length > oldLength) {
       this.inputIndex++;
