@@ -195,7 +195,7 @@ function _${replaceSpecialChars(path)}() {` +
           const completionsPath: string = path.split(" ").slice(1).join(" ");
           const action = this.addAction(arg, completionsPath);
           args.push(
-            `${++argIndex}${arg.optionalValue ? "::" : ":"} :${action.name}`,
+            `${++argIndex}${arg.optionalValue ? "::" : ":"} :->${action.name}`,
           );
         }
       }
