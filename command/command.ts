@@ -76,6 +76,7 @@ export class Command<
     integer: number;
     string: string;
     boolean: boolean;
+    file: string;
   },
   CGT extends Record<string, any> | void = CPG extends number ? any : void,
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
@@ -2370,6 +2371,7 @@ type DefaultTypes = {
   integer: IntegerType;
   string: StringType;
   boolean: BooleanType;
+  file: FileType;
 };
 
 type ArgumentType<A extends string, U, T = Merge<DefaultTypes, U>> = A extends
