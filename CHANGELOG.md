@@ -1,3 +1,24 @@
+# [v0.23.1](https://github.com/c4spar/deno-cliffy/compare/v0.23.0...v0.23.1) (Apr 26, 2022)
+
+### Bug Fixes
+
+- **command:** add missing default types for the FileType type (#361)
+  ([559bb4a](https://github.com/c4spar/deno-cliffy/commit/559bb4a))
+- **command:** only first argument of rest arguments is completed with zsh
+  completions (#359)
+  ([dc0c1de](https://github.com/c4spar/deno-cliffy/commit/dc0c1de))
+- **command:** first argument is also completed on index two (#358)
+  ([1784eef](https://github.com/c4spar/deno-cliffy/commit/1784eef))
+- **command:** zsh completion action not called for arguments (#357)
+  ([1a62fe8](https://github.com/c4spar/deno-cliffy/commit/1a62fe8))
+- **command:** fix option types for useRawArgs (#356)
+  ([7acac27](https://github.com/c4spar/deno-cliffy/commit/7acac27))
+
+### Chore
+
+- **upgrade:** deno/std@0.136.0, sinon@v13.0.2 (#362)
+  ([a6e4b45](https://github.com/c4spar/deno-cliffy/commit/a6e4b45))
+
 # [v0.23.0](https://github.com/c4spar/deno-cliffy/compare/v0.22.2...v0.23.0) (Apr 11, 2022)
 
 ### BREAKING CHANGES
