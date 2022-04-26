@@ -1,11 +1,5 @@
 name: Test
-
-on:
-  push:
-  pull_request:
-  schedule:
-    - cron: 0 0 * * *
-
+on: [push]
 jobs:
   stable:
     name: Deno Stable
@@ -17,7 +11,7 @@ jobs:
         deno: [v1.x]
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -25,13 +19,13 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --coverage=./cov --allow-all --unstable --location https://cliffy.io --jobs 2
+        run: deno test --unstable --coverage=./cov --allow-all --jobs 8
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./cov > cov.lcov
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.os }}-${{ matrix.deno }}
           files: cov.lcov
