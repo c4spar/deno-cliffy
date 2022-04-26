@@ -1,15 +1,12 @@
 name: Lint
-
-on: [push, pull_request]
-
+on: [push]
 jobs:
-
   lint:
     name: Lint source
     runs-on: ubuntu-latest
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -29,7 +26,7 @@ jobs:
         run: deno fmt --check
 
       - name: Run linter
-        run: deno lint --unstable
+        run: deno lint
 
       - name: Run bash check
         run: ./shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions bash)

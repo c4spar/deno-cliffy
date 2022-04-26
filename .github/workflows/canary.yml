@@ -1,13 +1,10 @@
-name: Nightly Test
-
+name: Canary
 on:
   schedule:
-    - cron: 0 0 * * *
-
+    - cron: 0 3 * * *
 jobs:
-
-  nightly:
-    name: Deno Nightly
+  canary:
+    name: Deno Canary
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,7 +13,7 @@ jobs:
         deno_version: [ canary ]
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -24,4 +21,4 @@ jobs:
           deno-version: ${{ matrix.deno_version }}
 
       - name: Run tests
-        run: deno test --allow-all --unstable --location https://cliffy.io
+        run: deno test --allow-all --unstable

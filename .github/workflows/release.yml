@@ -1,17 +1,15 @@
 name: Release
-
 on:
   release:
     types:
       - created
-
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -20,30 +18,10 @@ jobs:
 
       - name: Setup eggs
         run: >
-          deno install --unstable --allow-all https://x.nest.land/eggs@0.3.9/eggs.ts &&
+          deno install --unstable --allow-all https://x.nest.land/eggs@0.3.10/eggs.ts &&
           eggs link "${NEST_TOKEN}"
         env:
           NEST_TOKEN: ${{ secrets.NEST_TOKEN }}
 
       - name: Publish Nest.land
         run: eggs publish --no-check --yes
-
-#      - name: Setup Node
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: v15.x
-#
-#      - name: Setup Vercel
-#        run: npm install -g vercel
-#
-#      - name: Setup pagic
-#        run: >
-#          deno install -f --unstable --allow-read --allow-write --allow-net --allow-run --name pagic https://deno.land/x/pagic@v1.4.0/mod.ts &&
-#          pagic build
-#
-#      - name: Publish Vercel
-#        run: vercel --prod --scope "${VERCEL_SCOPE}" --token="${{ secrets.VERCEL_TOKEN }}"
-#        env:
-#          VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
-#          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-#          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
