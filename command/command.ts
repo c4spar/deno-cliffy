@@ -116,6 +116,7 @@ export class Command<
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
+  private _groupName?: string;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -309,6 +310,8 @@ export class Command<
     cmdOrDescription?: Command<any> | string,
     override?: boolean,
   ): Command<any> {
+    this.reset();
+
     const result = splitArguments(nameAndArguments);
 
     const name: string | undefined = result.flags.shift();
@@ -374,6 +377,7 @@ export class Command<
 
   /** Reset internal command reference to main command. */
   public reset(): OneOf<CP, this> {
+    this._groupName = undefined;
     this.cmd = this;
     return this as OneOf<CP, this>;
   }
@@ -807,6 +811,19 @@ export class Command<
   }
 
   /**
+   * Enable grouping of options and set the name of the group.
+   * All option which are added after calling the `.group()` method will be
+   * grouped in the help output. If the `.group()` method can be use multiple
+   * times to create more groups.
+   *
+   * @param name The name of the option group.
+   */
+  public group(name: string): this {
+    this.cmd._groupName = name;
+    return this;
+  }
+
+  /**
    * Add a new option.
    * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
    * @param desc Flag description.
@@ -912,6 +929,7 @@ export class Command<
       args,
       flags: result.flags,
       typeDefinition: result.typeDefinition,
+      groupName: this._groupName,
     };
 
     if (option.separator) {

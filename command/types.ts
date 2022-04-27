@@ -142,6 +142,7 @@ export interface IOption<
   flags: Array<string>;
   typeDefinition?: string;
   args: IArgument[];
+  groupName?: string;
 }
 
 /* ENV VARS TYPES */
