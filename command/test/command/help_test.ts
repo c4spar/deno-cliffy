@@ -115,6 +115,7 @@ Deno.test("[command] help - should set usage", () => {
 Deno.test("[command] help - should group options", () => {
   const cmd = new Command()
     .throwErrors()
+    .help({ colors: false })
     .option("--foo", "Foo option.")
     .group("Other options")
     .option("--bar", "Bar option.")
@@ -125,22 +126,22 @@ Deno.test("[command] help - should group options", () => {
 
   assertEquals(
     `
-  Usage: COMMAND foo bar
+  Usage: COMMAND
 
   Options:
 
-    -h, --help     - Show this help.
-    --foo          - Foo option.
+    -h, --help  - Show this help.  
+    --foo       - Foo option.      
 
   Other options:
 
-    --bar  - Bar option.
-    --baz  - Baz option.
+    --bar  - Bar option.  
+    --baz  - Baz option.  
 
   Other options 2:
 
-    --beep  - Beep option.
-    --boop  - Boop option.
+    --beep  - Beep option.  
+    --boop  - Boop option.  
 `,
     cmd.getHelp(),
   );
