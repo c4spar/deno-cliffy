@@ -25,6 +25,11 @@ export interface HelpOptions {
   long?: boolean;
 }
 
+interface OptionGroup {
+  name?: string;
+  options: Array<IOption>;
+}
+
 /** Help text generator. */
 export class HelpGenerator {
   private indent = 2;
@@ -51,6 +56,7 @@ export class HelpGenerator {
   private generate(): string {
     const areColorsEnabled = getColorEnabled();
     setColorEnabled(this.options.colors);
+
     const result = this.generateHeader() +
       this.generateMeta() +
       this.generateDescription() +
@@ -58,7 +64,9 @@ export class HelpGenerator {
       this.generateCommands() +
       this.generateEnvironmentVariables() +
       this.generateExamples();
+
     setColorEnabled(areColorsEnabled);
+
     return result;
   }
 
@@ -125,14 +133,47 @@ export class HelpGenerator {
       return "";
     }
 
-    const hasTypeDefinitions = !!options.find((option) =>
+    let groups: Array<OptionGroup> = [];
+    const hasGroups = options.some((option) => option.groupName);
+    if (hasGroups) {
+      for (const option of options) {
+        let group = groups.find((group) => group.name === option.groupName);
+        if (!group) {
+          group = {
+            name: option.groupName,
+            options: [],
+          };
+          groups.push(group);
+        }
+        group.options.push(option);
+      }
+    } else {
+      groups = [{
+        name: "Options",
+        options,
+      }];
+    }
+
+    let result = "";
+    for (const group of groups) {
+      result += this.generateOptionGroup(group);
+    }
+
+    return result;
+  }
+
+  private generateOptionGroup(group: OptionGroup): string {
+    if (!group.options.length) {
+      return "";
+    }
+    const hasTypeDefinitions = !!group.options.find((option) =>
       !!option.typeDefinition
     );
 
     if (hasTypeDefinitions) {
-      return this.label("Options") +
+      return this.label(group.name ?? "Options") +
         Table.from([
-          ...options.map((option: IOption) => [
+          ...group.options.map((option: IOption) => [
             option.flags.map((flag) => blue(flag)).join(", "),
             highlightArguments(
               option.typeDefinition || "",
@@ -152,9 +193,9 @@ export class HelpGenerator {
         "\n";
     }
 
-    return this.label("Options") +
+    return this.label(group.name ?? "Options") +
       Table.from([
-        ...options.map((option: IOption) => [
+        ...group.options.map((option: IOption) => [
           option.flags.map((flag) => blue(flag)).join(", "),
           red(bold("-")),
           this.options.long
