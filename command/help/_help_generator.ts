@@ -1,6 +1,6 @@
 import { getFlag } from "../../flags/_utils.ts";
 import { Table } from "../../table/table.ts";
-import { parseArgumentsDefinition } from "../_utils.ts";
+import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import {
   blue,
@@ -14,9 +14,8 @@ import {
   setColorEnabled,
   yellow,
 } from "../deps.ts";
-import type { IArgument } from "../types.ts";
-import type { IEnvVar, IExample, IOption } from "../types.ts";
 import { Type } from "../type.ts";
+import type { IArgument, IEnvVar, IExample, IOption } from "../types.ts";
 
 export interface HelpOptions {
   types?: boolean;
@@ -118,7 +117,7 @@ export class HelpGenerator {
     }
     return this.label("Description") +
       Table.from([
-        [this.cmd.getDescription()],
+        [dedent(this.cmd.getDescription())],
       ])
         .indent(this.indent * 2)
         .maxColWidth(140)
@@ -180,9 +179,7 @@ export class HelpGenerator {
               this.options.types,
             ),
             red(bold("-")),
-            this.options.long
-              ? option.description
-              : option.description.split("\n", 1)[0],
+            getDescription(option.description, !this.options.long),
             this.generateHints(option),
           ]),
         ])
@@ -198,9 +195,7 @@ export class HelpGenerator {
         ...group.options.map((option: IOption) => [
           option.flags.map((flag) => blue(flag)).join(", "),
           red(bold("-")),
-          this.options.long
-            ? option.description
-            : option.description.split("\n", 1)[0],
+          getDescription(option.description, !this.options.long),
           this.generateHints(option),
         ]),
       ])
@@ -274,8 +269,8 @@ export class HelpGenerator {
           ),
           red(bold("-")),
           this.options.long
-            ? envVar.description
-            : envVar.description.split("\n", 1)[0],
+            ? dedent(envVar.description)
+            : envVar.description.trim().split("\n", 1)[0],
         ]),
       ])
         .padding([2, 2, 1])
@@ -293,7 +288,7 @@ export class HelpGenerator {
     return this.label("Examples") +
       Table.from(examples.map((example: IExample) => [
         dim(bold(`${capitalize(example.name)}:`)),
-        example.description,
+        dedent(example.description),
       ]))
         .padding(1)
         .indent(this.indent * 2)

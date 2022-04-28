@@ -1,8 +1,8 @@
-import { didYouMean } from "../flags/_utils.ts";
 import {
   ArgumentFollowsVariadicArgument,
   RequiredArgumentFollowsOptionalArgument,
 } from "../flags/_errors.ts";
+import { didYouMean } from "../flags/_utils.ts";
 import { OptionType } from "../flags/types.ts";
 import type { Command } from "./command.ts";
 import type { IArgument } from "./types.ts";
@@ -129,4 +129,31 @@ export function parseArgumentsDefinition<T extends boolean>(
   return argumentDetails as (
     T extends true ? Array<IArgument | string> : Array<IArgument>
   );
+}
+
+export function dedent(str: string): string {
+  const lines = str.split(/\r?\n|\r/g);
+  let text = "";
+  let indent = 0;
+
+  for (const line of lines) {
+    if (text || line.trim()) {
+      if (!text) {
+        text = line.trimStart();
+        indent = line.length - text.length;
+      } else {
+        text += line.slice(indent);
+      }
+      text += "\n";
+    }
+  }
+
+  return text.trimEnd();
+}
+
+export function getDescription(
+  description: string,
+  short?: boolean,
+): string {
+  return short ? description.trim().split("\n", 1)[0] : dedent(description);
 }

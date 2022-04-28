@@ -4,7 +4,12 @@ import { EnumType } from "../../types/enum.ts";
 const cmd = new Command()
   .version("1.0.0")
   .name("completions-test")
-  .description("Completions test.")
+  .description(`
+    Completions test.
+    
+      Completions test.
+    Completions test.
+  `)
   .meta("meta1", "value1")
   .meta("meta2", "value2")
   .meta("meta3", "value3")
@@ -12,7 +17,13 @@ const cmd = new Command()
   .globalOption("-g, --global <val:boolean>", "Foo option.")
   .option(
     "-m, --main <val:boolean>",
-    "Bar option.\nfoo bar baz. foo bar baz.\n\nfoo bar baz.\nfoo bar baz.",
+    `
+          Bar option.
+            foo bar baz. foo bar baz.
+          
+          foo bar baz.
+          foo bar baz.
+  `,
   )
   .option("-c, --color <val:color>", "Color option.")
   .option("-C, --colors <val...:color>", "Color option.")

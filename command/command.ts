@@ -6,7 +6,11 @@ import {
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
-import { parseArgumentsDefinition, splitArguments } from "./_utils.ts";
+import {
+  getDescription,
+  parseArgumentsDefinition,
+  splitArguments,
+} from "./_utils.ts";
 import { blue, bold, red, yellow } from "./deps.ts";
 import {
   CommandExecutableNotFound,
@@ -1590,9 +1594,7 @@ export class Command<
 
   /** Get short command description. This is the first line of the description. */
   public getShortDescription(): string {
-    return this.getDescription()
-      .trim()
-      .split("\n", 1)[0];
+    return getDescription(this.getDescription(), true);
   }
 
   /** Get original command-line arguments. */
