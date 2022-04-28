@@ -1,3 +1,4 @@
+import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import type { IArgument, IOption, IType } from "../types.ts";
 import { FileType } from "../types/file.ts";
@@ -276,13 +277,8 @@ function _${replaceSpecialChars(path)}() {` +
       }
     }
 
-    let description: string = option.description
-      .trim()
-      .split("\n")
-      .shift() as string;
-
-    // escape brackets and quotes
-    description = description
+    const description: string = getDescription(option.description, true)
+      // escape brackets and quotes
       .replace(/\[/g, "\\[")
       .replace(/]/g, "\\]")
       .replace(/"/g, '\\"')

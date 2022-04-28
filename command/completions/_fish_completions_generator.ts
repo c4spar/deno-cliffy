@@ -1,3 +1,4 @@
+import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import type { IArgument, IOption } from "../types.ts";
 import { FileType } from "../types/file.ts";
@@ -99,7 +100,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
       ?.replace(/^(-)+/, "");
 
     return this.complete(command, {
-      description: option.description,
+      description: getDescription(option.description),
       shortOption: shortOption,
       longOption: longOption,
       // required: option.requiredValue,
@@ -130,7 +131,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
       cmd.push("-a", options.arguments);
     }
     options.description &&
-      cmd.push("-d", `'${options.description.split("\n", 1)[0]}'`);
+      cmd.push("-d", `'${getDescription(options.description, true)}'`);
     return cmd.join(" ");
   }
 
