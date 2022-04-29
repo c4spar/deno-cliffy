@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { BufReader } from "https://deno.land/std@0.136.0/io/bufio.ts";
+import { BufReader } from "https://deno.land/std@0.137.0/io/bufio.ts";
 import { tty } from "../../ansi/tty.ts";
 import { Figures } from "../../prompt/figures.ts";
 import { prompt } from "../../prompt/prompt.ts";
