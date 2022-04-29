@@ -6,6 +6,8 @@ export {
   assertStrictEquals,
   assertThrows,
 } from "https://deno.land/std@0.137.0/testing/asserts.ts";
+export { assertSnapshot } from "https://deno.land/std@0.137.0/testing/snapshot.ts";
+export { describe, it } from "https://deno.land/std@0.137.0/testing/bdd.ts";
 export {
   bold,
   red,
