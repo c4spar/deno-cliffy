@@ -3,7 +3,7 @@ import { runCommand } from "./utils.ts";
 
 describe({
   name: "command integration",
-  ignore: Deno.build.os !== "windows",
+  ignore: Deno.build.os === "windows",
   fn() {
     it("should complete boolean arg", async (t) => {
       const output: string = await runCommand("completions complete boolean");
