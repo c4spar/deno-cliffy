@@ -46,7 +46,7 @@ Deno.test("invalid number command argument type", async () => {
 Deno.test("missing command arguments", async () => {
   await assertRejects(
     async () => {
-      await cmd().parse();
+      await cmd().parse([]);
     },
     Error,
     "Missing argument(s): foo",

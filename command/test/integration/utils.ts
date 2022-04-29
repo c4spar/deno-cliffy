@@ -2,7 +2,12 @@ import { dirname } from "../../../dev_deps.ts";
 
 export const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
 
-export async function runCommand(args: Array<string>): Promise<string> {
+export async function runCommand(
+  args: Array<string> | string,
+): Promise<string> {
+  if (typeof args === "string") {
+    args = args.split(" ");
+  }
   const process = Deno.run({
     stdout: "piped",
     cmd: [

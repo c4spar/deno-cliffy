@@ -398,7 +398,7 @@ Deno.test({
     const { options } = await new Command()
       .env("FOO_BAR=<val>", "...", {prefix: "FOO_"})
       .option("--bar <val>", "...", {default: "beep"})
-      .parse();
+      .parse([]);
     Deno.env.delete("FOO_BAR");
     assertEquals(options, {bar: "baz"})
   }
