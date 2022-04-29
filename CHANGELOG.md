@@ -1,3 +1,24 @@
+# [v0.23.2](https://github.com/c4spar/deno-cliffy/compare/v0.23.1...v0.23.2) (Apr 29, 2022)
+
+### Features
+
+- **command:** dedent description for better multiline support (#365)
+  ([87976a6](https://github.com/c4spar/deno-cliffy/commit/87976a6))
+- **command:** add support for grouped options (#364)
+  ([9d00c61](https://github.com/c4spar/deno-cliffy/commit/9d00c61))
+
+### Chore
+
+- **ci:** upgrade github actions (#363)
+  ([2639872](https://github.com/c4spar/deno-cliffy/commit/2639872))
+- **upgrade:** deno/std@0.137.0 (#366)
+  ([a5fc61d](https://github.com/c4spar/deno-cliffy/commit/a5fc61d))
+
+### Unit/Integration Tests
+
+- **command:** use assertSnapshot for integration tests (#367)
+  ([2dc7872](https://github.com/c4spar/deno-cliffy/commit/2dc7872))
+
 # [v0.23.1](https://github.com/c4spar/deno-cliffy/compare/v0.23.0...v0.23.1) (Apr 26, 2022)
 
 ### Bug Fixes
