@@ -323,14 +323,15 @@ export function parseFlags<
         /** Check if current option should have an argument. */
         function hasNext(arg: IFlagArgument): boolean {
           const nextValue = currentValue ?? args[argsIndex + 1];
-          if (!currentValue && !nextValue) {
+          if (!nextValue) {
             return false;
           }
-
+          if (optionArgs.length > 1 && optionArgsIndex >= optionArgs.length) {
+            return false;
+          }
           if (arg.requiredValue) {
             return true;
           }
-
           if (arg.optionalValue || arg.variadic) {
             return nextValue[0] !== "-" ||
               (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
