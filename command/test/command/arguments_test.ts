@@ -41,8 +41,14 @@ describe("command arguments", () => {
   });
 
   it("should parse multi argument option", async () => {
-    const { options, args } = await cmd().parse(["-f", "1", "2", "3", "mod.ts"]);
-    assertEquals(options, {foo: ["1", "2", "3"]});
+    const { options, args } = await cmd().parse([
+      "-f",
+      "1",
+      "2",
+      "3",
+      "mod.ts",
+    ]);
+    assertEquals(options, { foo: ["1", "2", "3"] });
     assertEquals(args, ["mod.ts"]);
   });
 
