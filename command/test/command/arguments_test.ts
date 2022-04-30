@@ -1,4 +1,9 @@
-import { assertEquals, assertRejects } from "../../../dev_deps.ts";
+import {
+  assertEquals,
+  assertRejects,
+  describe,
+  it,
+} from "../../../dev_deps.ts";
 import type { ITypeInfo } from "../../../flags/types.ts";
 import { Command } from "../../command.ts";
 
@@ -13,62 +18,77 @@ function cmd() {
       }
       return value;
     })
+    .option("-f, --foo <foo> <bar> <baz>", "...")
     .arguments("<foo:string> [bar:number] [baz:boolean] [color:color]");
 }
 
-Deno.test("'-' as argument", async () => {
-  const { args } = await new Command()
-    .arguments("<input:string>")
-    .parse(["-"]);
-  assertEquals(args, ["-"]);
-});
+describe("command arguments", () => {
+  it("should accepts a dash as argument", async () => {
+    const { args } = await new Command()
+      .arguments("<input:string>")
+      .parse(["-"]);
+    assertEquals(args, ["-"]);
+  });
 
-Deno.test("valid command argument types", async () => {
-  const { args } = await cmd().parse(["abc", "123", "true", "red"]);
-  assertEquals(args, ["abc", 123, true, "red"]);
-});
+  it("should parse correctly argument types", async () => {
+    const { args } = await cmd().parse(["abc", "123", "true", "red"]);
+    assertEquals(args, ["abc", 123, true, "red"]);
+  });
 
-Deno.test("command - arguments - with integer value", async () => {
-  const { args } = await cmd().parse(["abc", "0"]);
-  assertEquals(args, ["abc", 0]);
-});
+  it("should not throw for missing optional values", async () => {
+    const { args } = await cmd().parse(["abc", "0"]);
+    assertEquals(args, ["abc", 0]);
+  });
 
-Deno.test("invalid number command argument type", async () => {
-  await assertRejects(
-    async () => {
-      await cmd().parse(["abc", "xyz", "true", "red"]);
-    },
-    Error,
-    `Argument "bar" must be of type "number", but got "xyz".`,
-  );
-});
+  it("should parse multi argument option", async () => {
+    const { options, args } = await cmd().parse([
+      "-f",
+      "1",
+      "2",
+      "3",
+      "mod.ts",
+    ]);
+    assertEquals(options, { foo: ["1", "2", "3"] });
+    assertEquals(args, ["mod.ts"]);
+  });
 
-Deno.test("missing command arguments", async () => {
-  await assertRejects(
-    async () => {
-      await cmd().parse([]);
-    },
-    Error,
-    "Missing argument(s): foo",
-  );
-});
+  it("should throw an error for invalid number types", async () => {
+    await assertRejects(
+      async () => {
+        await cmd().parse(["abc", "xyz", "true", "red"]);
+      },
+      Error,
+      `Argument "bar" must be of type "number", but got "xyz".`,
+    );
+  });
 
-Deno.test("invalid boolean command argument type", async () => {
-  await assertRejects(
-    async () => {
-      await cmd().parse(["abc", "123", "xyz", "red"]);
-    },
-    Error,
-    `Argument "baz" must be of type "boolean", but got "xyz".`,
-  );
-});
+  it("should throw an error for missing required arguments", async () => {
+    await assertRejects(
+      async () => {
+        await cmd().parse([]);
+      },
+      Error,
+      "Missing argument(s): foo",
+    );
+  });
 
-Deno.test("invalid custom command argument type", async () => {
-  await assertRejects(
-    async () => {
-      await cmd().parse(["abc", "123", "true", "xyz"]);
-    },
-    Error,
-    `Argument "color" must be a valid "color", but got "xyz".`,
-  );
+  it("should throw an error for invalid boolean types", async () => {
+    await assertRejects(
+      async () => {
+        await cmd().parse(["abc", "123", "xyz", "red"]);
+      },
+      Error,
+      `Argument "baz" must be of type "boolean", but got "xyz".`,
+    );
+  });
+
+  it("should throw an error for invalid custom type value", async () => {
+    await assertRejects(
+      async () => {
+        await cmd().parse(["abc", "123", "true", "xyz"]);
+      },
+      Error,
+      `Argument "color" must be a valid "color", but got "xyz".`,
+    );
+  });
 });
