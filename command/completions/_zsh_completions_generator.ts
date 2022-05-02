@@ -285,7 +285,7 @@ function _${replaceSpecialChars(path)}() {` +
 
     const collect: string = option.collect ? "*" : "";
     const equalsSign = option.equalsSign ? "=" : "";
-    const flags = option.flags.map(flag => `${flag}${equalsSign}`).join(",");
+    const flags = option.flags.map((flag) => `${flag}${equalsSign}`).join(",");
 
     if (option.standalone) {
       return `'(- *)'{${collect}${flags}}'[${description}]${args}'`;
