@@ -21,6 +21,12 @@ export function didYouMeanCommand(
 const ARGUMENT_REGEX = /^[<\[].+[\]>]$/;
 const ARGUMENT_DETAILS_REGEX = /[<\[:>\]]/;
 
+interface SplitArgumentsResult {
+  flags: string[];
+  typeDefinition: string;
+  equalsSign: boolean;
+}
+
 /**
  * Split options and arguments.
  * @param args Arguments definition: `--color, -c <color1:string> <color2:string>`
@@ -37,7 +43,7 @@ const ARGUMENT_DETAILS_REGEX = /[<\[:>\]]/;
  */
 export function splitArguments(
   args: string,
-): { flags: string[]; typeDefinition: string } {
+): SplitArgumentsResult {
   const parts = args.trim().split(/[, =] */g);
   const typeParts = [];
 
@@ -50,7 +56,7 @@ export function splitArguments(
 
   const typeDefinition: string = typeParts.join(" ");
 
-  return { flags: parts, typeDefinition };
+  return { flags: parts, typeDefinition, equalsSign: args.includes("=") };
 }
 
 /**

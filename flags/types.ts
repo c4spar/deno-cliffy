@@ -21,6 +21,7 @@ export interface IFlagOptions extends IFlagArgument {
   conflicts?: string[];
   value?: IFlagValueHandler;
   collect?: boolean;
+  equalsSign?: boolean;
 }
 
 /** Flag argument definition. */

@@ -332,6 +332,13 @@ export function parseFlags<
           if (arg.requiredValue) {
             return true;
           }
+          // require optional values to be called with an equal sign: foo=bar
+          if (
+            option.equalsSign && arg.optionalValue && !arg.variadic &&
+            typeof currentValue === "undefined"
+          ) {
+            return false;
+          }
           if (arg.optionalValue || arg.variadic) {
             return nextValue[0] !== "-" ||
               (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));

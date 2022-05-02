@@ -932,6 +932,7 @@ export class Command<
       description: desc,
       args,
       flags: result.flags,
+      equalsSign: result.equalsSign,
       typeDefinition: result.typeDefinition,
       groupName: this._groupName,
     };
