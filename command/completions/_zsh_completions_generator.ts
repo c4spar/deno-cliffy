@@ -251,7 +251,6 @@ function _${replaceSpecialChars(path)}() {` +
     completionsPath: string,
     excludedOptions: string[],
   ): string {
-    const flags = option.flags;
     let excludedFlags = option.conflicts?.length
       ? [
         ...excludedOptions,
@@ -260,7 +259,7 @@ function _${replaceSpecialChars(path)}() {` +
       : excludedOptions;
     excludedFlags = option.collect ? excludedFlags : [
       ...excludedFlags,
-      ...flags,
+      ...option.flags,
     ];
 
     let args = "";
@@ -285,6 +284,8 @@ function _${replaceSpecialChars(path)}() {` +
       .replace(/'/g, "'\"'\"'");
 
     const collect: string = option.collect ? "*" : "";
+    const equalsSign = option.equalsSign ? "=" : "";
+    const flags = option.flags.map(flag => `${flag}${equalsSign}`).join(",");
 
     if (option.standalone) {
       return `'(- *)'{${collect}${flags}}'[${description}]${args}'`;
