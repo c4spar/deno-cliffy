@@ -1,3 +1,24 @@
+# [v0.24.0](https://github.com/c4spar/deno-cliffy/compare/v0.23.2...v0.24.0) (May 2, 2022)
+
+### BREAKING CHANGES
+
+- **command:** refactor handling of optional options defined with an equals sign
+  (#369) ([a51e230](https://github.com/c4spar/deno-cliffy/commit/a51e230))
+
+This is a breaking change for the command module. Options defined with an equal
+sign must now also be called with an equal sign. Options defined without an
+equal sign can be called with and without an equal sign as it was before.
+
+### Features
+
+- **flags:** add equalsSing option (#368)
+  ([eb75c0a](https://github.com/c4spar/deno-cliffy/commit/eb75c0a))
+
+### Bug Fixes
+
+- **command,flags:** fix handling of multi option arguments (#368)
+  ([eb75c0a](https://github.com/c4spar/deno-cliffy/commit/eb75c0a))
+
 # [v0.23.2](https://github.com/c4spar/deno-cliffy/compare/v0.23.1...v0.23.2) (Apr 29, 2022)
 
 ### Features
