@@ -239,7 +239,7 @@ export type ICompleteHandler<
 
 /**
  * Help callback method to print the help.
- * Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` method's.
+ * Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` methods.
  */
 export type IHelpHandler<
   O extends Record<string, any> | void = any,
@@ -264,7 +264,7 @@ export type IHelpHandler<
 
 /**
  * Version callback method to print the version.
- * Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` method's.
+ * Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` methods.
  */
 export type IVersionHandler<
   O extends Record<string, any> | void = any,

@@ -20,13 +20,13 @@ export interface AnsiChain extends Chain<AnsiChain> {
 export type AnsiFactory = () => Ansi;
 
 /**
- * Chainable ansi escape sequence's.
+ * Chainable ansi escape sequences.
  * If invoked as method, a new Ansi instance will be returned.
  */
 export type Ansi = AnsiFactory & AnsiChain;
 
 /**
- * Chainable ansi escape sequence's.
+ * Chainable ansi escape sequences.
  * If invoked as method, a new Ansi instance will be returned.
  * ```
  * await Deno.stdout.write(

@@ -707,8 +707,8 @@ export class Command<
   }
 
   /**
-   * Throw validation error's instead of calling `Deno.exit()` to handle
-   * validation error's manually.
+   * Throw validation errors instead of calling `Deno.exit()` to handle
+   * validation errors manually.
    *
    * A validation error is thrown when the command is wrongly used by the user.
    * For example: If the user passes some invalid options or arguments to the
@@ -1770,7 +1770,7 @@ export class Command<
   }
 
   /**
-   * Get global option from parent command's by name.
+   * Get global option from parent commands by name.
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */

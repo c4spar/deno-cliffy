@@ -23,7 +23,7 @@ export function underscoreToCamelCase(str: string): string {
 /**
  * Find option by flag, name or alias.
  *
- * @param flags Source option's array.
+ * @param flags Source options array.
  * @param name  Name of the option.
  */
 export function getOption<O extends IFlagOptions>(

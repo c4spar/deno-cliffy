@@ -25,13 +25,13 @@ export interface TtyChain extends Exclude<Chain<TtyChain>, "cursorPosition"> {
 export type TtyFactory = (options?: TtyOptions) => Tty;
 
 /**
- * Chainable ansi escape sequence's.
+ * Chainable ansi escape sequences.
  * If invoked as method, a new Tty instance will be returned.
  */
 export type Tty = TtyFactory & TtyChain;
 
 /**
- * Chainable ansi escape sequence's.
+ * Chainable ansi escape sequences.
  * If invoked as method, a new Tty instance will be returned.
  * ```
  * tty.cursorTo(0, 0).eraseScreen();

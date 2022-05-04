@@ -12,10 +12,10 @@ const cmd = new Command()
   )
   .option(
     "-g, --global [val:custom]",
-    "Available on all command's.",
+    "Available on all commands.",
     { global: true },
   )
-  .globalOption("-G, --global2 [val:string]", "Available on all command's.")
+  .globalOption("-G, --global2 [val:string]", "Available on all commands.")
   .command(
     "sub-command",
     new Command()

@@ -232,7 +232,7 @@ export function parseFlags<
         }
 
         if (option.args?.length) {
-          // make all value's required by default
+          // make all values required by default
           if (
             (typeof arg.optionalValue === "undefined" ||
               arg.optionalValue === false) &&

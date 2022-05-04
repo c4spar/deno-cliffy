@@ -33,7 +33,7 @@ const result = await prompt([{
   })),
 }, {
   name: "animals",
-  message: "Select some animal's",
+  message: "Select some animals",
   type: Checkbox,
   options: [{
     name: "🦕 Dino",
