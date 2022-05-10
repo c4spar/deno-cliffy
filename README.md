@@ -36,13 +36,13 @@ Following modules are included in cliffy:
 - **[keycode](https://cliffy.io/docs/keycode/):** Parser ansi key codes.
 
 - **[keypress](https://cliffy.io/docs/keypress/):** Listen to keypress events
-  with _Promise_, _AsyncIterator_ and _EventTarget_ API's.
+  with _Promise_, _AsyncIterator_ and _EventTarget_ APIs.
 
 - **[prompt](https://cliffy.io/docs/prompt/):** Create _simple_ and _powerful_
   interactive prompts.
 
-- **[table](https://cliffy.io/docs/table/):** Create cli table's with border,
-  padding, nested table's, etc...
+- **[table](https://cliffy.io/docs/table/):** Create cli tables with border,
+  padding, nested tables, etc...
 
 ## Contributing
 

@@ -6,7 +6,7 @@ await new Command()
   .option("-l, --local [val:string]", "Only available on this command.")
   .globalOption(
     "-g, --global [val:string]",
-    "Available on this and all nested child command's.",
+    "Available on this and all nested child commands.",
   )
   .action(console.log)
   .command(

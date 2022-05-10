@@ -191,7 +191,7 @@ equal sign can be called with and without an equal sign as it was before.
 
 - **command:** add support to show additional information in help text (#300)
   ([e32f826](https://github.com/c4spar/deno-cliffy/commit/e32f826))
-- **command:** add support for enum's in EnumType (#316)
+- **command:** add support for enums in EnumType (#316)
   ([d71071e](https://github.com/c4spar/deno-cliffy/commit/d71071e))
 - **prompt:** add support for path completion and dynamic suggestions (#306)
   ([0be6da7](https://github.com/c4spar/deno-cliffy/commit/0be6da7))
@@ -371,7 +371,7 @@ bar.txt
 
 ### Documentation Updates
 
-- update readme's (#269)
+- update readmes (#269)
   ([83644f9](https://github.com/c4spar/deno-cliffy/commit/83644f9))
 - **command:** update docs for environment variables
   ([f4cee28](https://github.com/c4spar/deno-cliffy/commit/f4cee28),
@@ -396,7 +396,7 @@ bar.txt
 
 ### Chore
 
-- **ci:** add --jobs flag to speed up deno test's (#250)
+- **ci:** add --jobs flag to speed up deno tests (#250)
   ([ce794cf](https://github.com/c4spar/deno-cliffy/commit/ce794cf))
 - **upgrade:** deno/std v0.103.0 (#254)
   ([ad65b8e](https://github.com/c4spar/deno-cliffy/commit/ad65b8e))
@@ -733,7 +733,7 @@ bar.txt
 
 ### Documentation Updates
 
-- update readme's
+- update readmes
   ([933c3ed](https://github.com/c4spar/deno-cliffy/commit/933c3ed),
   [62a009c](https://github.com/c4spar/deno-cliffy/commit/62a009c))
 
@@ -746,7 +746,7 @@ bar.txt
   [e143799](https://github.com/c4spar/deno-cliffy/commit/e143799),
   [406afc2](https://github.com/c4spar/deno-cliffy/commit/406afc2))
 - **command:** add globalOption, globalType, globalComplete and globalEnv alias
-  method's (#152)
+  methods (#152)
   ([e1a6bb2](https://github.com/c4spar/deno-cliffy/commit/e1a6bb2))
 - **prompt:** improve search and auto suggestions (#153)
   ([6597205](https://github.com/c4spar/deno-cliffy/commit/6597205))
@@ -809,7 +809,7 @@ bar.txt
 
 - fix sidebar width
   ([98dfe3b](https://github.com/c4spar/deno-cliffy/commit/98dfe3b))
-- fmt reamde's and add discord budget (#140)
+- fmt reamdes and add discord budget (#140)
   ([821f13d](https://github.com/c4spar/deno-cliffy/commit/821f13d))
 
 # [v0.17.0](https://github.com/c4spar/deno-cliffy/compare/v0.16.0...v0.17.0) (2021-01-11)
@@ -825,7 +825,7 @@ bar.txt
 - **prompt:** add cbreak option to support custom signal handling (#106)
   ([a637b54](https://github.com/c4spar/deno-cliffy/commit/a637b54))
 - **prompt:** add auto suggestion support to Input, Number, Confirm and List
-  prompt's ([7dd6660](https://github.com/c4spar/deno-cliffy/commit/7dd6660),
+  prompts ([7dd6660](https://github.com/c4spar/deno-cliffy/commit/7dd6660),
   [a67dc53](https://github.com/c4spar/deno-cliffy/commit/a67dc53))
 - **prompt:** add search option to Select and Checkbox prompt
   ([7d09739](https://github.com/c4spar/deno-cliffy/commit/7d09739),
@@ -888,7 +888,7 @@ bar.txt
 
 - **command:** remove duplication description from completions command (#118)
   ([d116c73](https://github.com/c4spar/deno-cliffy/commit/d116c73))
-- **prompt:** refactor prompt's (#122, #120, #119, #117)
+- **prompt:** refactor prompts (#122, #120, #119, #117)
   ([63351d0](https://github.com/c4spar/deno-cliffy/commit/63351d0),
   [2fda6e0](https://github.com/c4spar/deno-cliffy/commit/2fda6e0),
   [b5ecced](https://github.com/c4spar/deno-cliffy/commit/b5ecced),
@@ -906,7 +906,7 @@ bar.txt
 
 - fix discord channel invite link
   ([2b9df6d](https://github.com/c4spar/deno-cliffy/commit/2b9df6d))
-- update jsdoc's (#109)
+- update jsdocs (#109)
   ([27ee6b1](https://github.com/c4spar/deno-cliffy/commit/27ee6b1))
 
 # [v0.15.0](https://github.com/c4spar/deno-cliffy/compare/v0.14.3...v0.15.0) (2020-10-24)
@@ -1252,7 +1252,7 @@ bar.txt
   ([16ae13d](https://github.com/c4spar/deno-cliffy/commit/16ae13d))
 - **table:** add `TableLayout` class
   ([699c0d1](https://github.com/c4spar/deno-cliffy/commit/699c0d1))
-- **table:** refactor `.from()` and `.clone()` method's
+- **table:** refactor `.from()` and `.clone()` methods
   ([ddee9d7](https://github.com/c4spar/deno-cliffy/commit/ddee9d7))
 
 ### Chore
@@ -1268,7 +1268,7 @@ bar.txt
 
 ### Unit/Integration Tests
 
-- **table:** add colspan and rowspan test's
+- **table:** add colspan and rowspan tests
   ([d8df570](https://github.com/c4spar/deno-cliffy/commit/d8df570))
 
 ### Documentation Updates
@@ -1308,7 +1308,7 @@ bar.txt
 
 ### Features
 
-- **command:** add `.versionOption()` and `.helpOption()` method's
+- **command:** add `.versionOption()` and `.helpOption()` methods
   ([85d66b9](https://github.com/c4spar/deno-cliffy/commit/85d66b9))
 
 ### Code Refactoring
@@ -1334,7 +1334,7 @@ bar.txt
 
 ### Documentation Updates
 
-- **command:** fix options type in action handler example's (#44)
+- **command:** fix options type in action handler examples (#44)
   ([d661cc4](https://github.com/c4spar/deno-cliffy/commit/d661cc4))
 
 # [v0.10.0](https://github.com/c4spar/deno-cliffy/compare/v0.9.0...v0.10.0) (2020-06-30)
@@ -1349,7 +1349,7 @@ bar.txt
   and `completions` commands are now optional and can be registered as
   descripted in the example below. The `--help` and `--version` option will be
   registered only on the main command for now. The `--help` option is a global
-  option and available on all child-command's.
+  option and available on all child-commands.
 
       ```typescript
       import {
@@ -1389,11 +1389,11 @@ bar.txt
   ([1e8d51b](https://github.com/c4spar/deno-cliffy/commit/1e8d51b))
 - **command:** add support for function as description parameter
   ([8dfe004](https://github.com/c4spar/deno-cliffy/commit/8dfe004))
-- **command:** add `.getParent()` and `.getMainCommand()` method's
+- **command:** add `.getParent()` and `.getMainCommand()` methods
   ([1a900be](https://github.com/c4spar/deno-cliffy/commit/1a900be))
 - **command:** make executed command accessible with `this` in action handler
   (#28) ([461145f](https://github.com/c4spar/deno-cliffy/commit/461145f))
-- **flags:** add support for shorthand flag's with value e.g. `-n5` results in
+- **flags:** add support for shorthand flags with value e.g. `-n5` results in
   `{n: 5}` but `-abc` will still result in `{a: true, b: true, c: true}`
   ([775c528](https://github.com/c4spar/deno-cliffy/commit/775c528))
 - **flags:** add support for equal sign in flags e.g. `--foo=bar`
@@ -1424,7 +1424,7 @@ bar.txt
   ([c30e474](https://github.com/c4spar/deno-cliffy/commit/c30e474))
 - **command:** pass parent command to completion handler
   ([8e4167f](https://github.com/c4spar/deno-cliffy/commit/8e4167f))
-- **command:** make `.complete()` method optional in custom type's
+- **command:** make `.complete()` method optional in custom types
   ([53a9af7](https://github.com/c4spar/deno-cliffy/commit/53a9af7))
 - **prompt:** remove generic options from `Select` prompt
   ([a694881](https://github.com/c4spar/deno-cliffy/commit/a694881))
@@ -1439,15 +1439,15 @@ bar.txt
 
 ### Documentation Updates
 
-- **command:** update readme and example's
+- **command:** update readme and examples
   ([0918d76](https://github.com/c4spar/deno-cliffy/commit/0918d76),
   [9b76c92](https://github.com/c4spar/deno-cliffy/commit/9b76c92),
   [ae371d9](https://github.com/c4spar/deno-cliffy/commit/ae371d9),
   [fe9e06c](https://github.com/c4spar/deno-cliffy/commit/fe9e06c),
   [ddd8208](https://github.com/c4spar/deno-cliffy/commit/ddd8208))
-- **flags:** update readme and example's
+- **flags:** update readme and examples
   ([5ed1ec7](https://github.com/c4spar/deno-cliffy/commit/5ed1ec7))
-- **prompt:** update readme and example's
+- **prompt:** update readme and examples
   ([edfae8b](https://github.com/c4spar/deno-cliffy/commit/edfae8b))
 
 # [v0.9.0](https://github.com/c4spar/deno-cliffy/compare/v0.8.2...v0.9.0) (2020-06-05)
@@ -1463,14 +1463,14 @@ bar.txt
   ([385f38f](https://github.com/c4spar/deno-cliffy/commit/385f38f))
 - **flags:** implement `stopEarly` option (#39)
   ([ee683d3](https://github.com/c4spar/deno-cliffy/commit/ee683d3))
-- **prompt:** add `minOptions` and `maxOptions` option's to `Checkbox` prompt
+- **prompt:** add `minOptions` and `maxOptions` options to `Checkbox` prompt
   (#38) ([0980b42](https://github.com/c4spar/deno-cliffy/commit/0980b42))
 - **prompt:** add `minLength`, `maxLength`, `minTags` and `maxTags` option to
   `List` prompt (#37)
   ([6836a7d](https://github.com/c4spar/deno-cliffy/commit/6836a7d))
 - **prompt:** add `label` option to `Secret` prompt
   ([9127471](https://github.com/c4spar/deno-cliffy/commit/9127471))
-- **prompt:** add `minLength` and `maxLength` to `Input` and `Secret` prompt's
+- **prompt:** add `minLength` and `maxLength` to `Input` and `Secret` prompts
   (#36) ([2b13fab](https://github.com/c4spar/deno-cliffy/commit/2b13fab))
 - **prompt:** add secret prompt (#35)
   ([9aaa740](https://github.com/c4spar/deno-cliffy/commit/9aaa740))
@@ -1489,7 +1489,7 @@ bar.txt
 
 ### Code Refactoring
 
-- **prompt:** remove `undefined` return type from `.prompt()` method's (#25)
+- **prompt:** remove `undefined` return type from `.prompt()` methods (#25)
   ([15f707a](https://github.com/c4spar/deno-cliffy/commit/15f707a))
 - **table:** remove unused method
   ([6d00cc3](https://github.com/c4spar/deno-cliffy/commit/6d00cc3))
@@ -1498,24 +1498,24 @@ bar.txt
 
 ### Bug Fixes
 
-- **prompt:** ignore ctrl and meta keys in input prompt's
+- **prompt:** ignore ctrl and meta keys in input prompts
   ([1f266b6](https://github.com/c4spar/deno-cliffy/commit/1f266b6))
-- **prompt:** `c` character is not working in input prompt's
+- **prompt:** `c` character is not working in input prompts
   ([a0d6545](https://github.com/c4spar/deno-cliffy/commit/a0d6545))
 
 # [v0.8.0](https://github.com/c4spar/deno-cliffy/compare/v0.7.1...v0.8.0) (2020-05-29)
 
 ### Features
 
-- **command:** add support for global and hidden environment variable's
+- **command:** add support for global and hidden environment variables
   ([9e98940](https://github.com/c4spar/deno-cliffy/commit/9e98940))
-- **command:** add support for global command's
+- **command:** add support for global commands
   ([ec42c7a](https://github.com/c4spar/deno-cliffy/commit/ec42c7a))
-- **command:** add support for global completion's
+- **command:** add support for global completions
   ([1d814e2](https://github.com/c4spar/deno-cliffy/commit/1d814e2))
-- **command:** add support for global type's
+- **command:** add support for global types
   ([91c1569](https://github.com/c4spar/deno-cliffy/commit/91c1569))
-- **command:** add support for global option's (#2)
+- **command:** add support for global options (#2)
   ([7d6e7cf](https://github.com/c4spar/deno-cliffy/commit/7d6e7cf))
 - **command:** make `args` parameter optional in `.parse()` method
   ([fabfd32](https://github.com/c4spar/deno-cliffy/commit/fabfd32))
@@ -1534,16 +1534,16 @@ bar.txt
 
 ### Chore
 
-- **ci:** test's in `packages/command/test/command` were not executed
+- **ci:** tests in `packages/command/test/command` were not executed
   ([2436fd2](https://github.com/c4spar/deno-cliffy/commit/2436fd2))
 
 # [v0.7.0](https://github.com/c4spar/deno-cliffy/compare/v0.6.1...v0.7.0) (2020-05-22)
 
 ### Features
 
-- **command:** add support for hidden options's #23
+- **command:** add support for hidden options #23
   ([42f701f](https://github.com/c4spar/deno-cliffy/commit/42f701f))
-- **command:** add support for hidden command's #22
+- **command:** add support for hidden commands #22
   ([1866b75](https://github.com/c4spar/deno-cliffy/commit/1866b75))
 - **command:** add `.getHelp()` method to `HelpCommand`
   ([9b96d10](https://github.com/c4spar/deno-cliffy/commit/9b96d10))
@@ -1598,7 +1598,7 @@ bar.txt
   ([c64282e](https://github.com/c4spar/deno-cliffy/commit/c64282e))
 - **command:** add executable example commands
   ([8fbe263](https://github.com/c4spar/deno-cliffy/commit/8fbe263))
-- **command:** add documentation and example's for hidden command's and option's
+- **command:** add documentation and examples for hidden commands and options
   ([0c2f400](https://github.com/c4spar/deno-cliffy/commit/0c2f400))
 - **command:** add generic types example and documentation
   ([0998f55](https://github.com/c4spar/deno-cliffy/commit/0998f55))
@@ -1621,7 +1621,7 @@ bar.txt
 
 ### Code Refactoring
 
-- **command:** make command's executable without --allow-env flag #11
+- **command:** make commands executable without --allow-env flag #11
   ([03117ed](https://github.com/c4spar/deno-cliffy/commit/03117ed))
 - **x:** make format executable without --allow-env flag #11
   ([2db057e](https://github.com/c4spar/deno-cliffy/commit/2db057e))
@@ -1633,7 +1633,7 @@ bar.txt
 
 ### Documentation Updates
 
-- update readme's
+- update readmes
   ([7e549c9](https://github.com/c4spar/deno-cliffy/commit/7e549c9))
 
 ### BREAKING CHANGES
@@ -1645,7 +1645,7 @@ bar.txt
 
 ### Bug Fixes
 
-- **flags:** default option incompatible with depends option and boolean flag's
+- **flags:** default option incompatible with depends option and boolean flags
   ([b76a9a7](https://github.com/c4spar/deno-cliffy/commit/b76a9a7))
 
 # [v0.5.0](https://github.com/c4spar/deno-cliffy/compare/v0.4.0...v0.5.0) (2020-05-03)
@@ -1663,7 +1663,7 @@ bar.txt
 
 ### Code Refactoring
 
-- use explicit version of deno std module's
+- use explicit version of deno std modules
   ([fcdf97a](https://github.com/c4spar/deno-cliffy/commit/fcdf97a))
 - use utf8 encoding module instead of `TextEncoder` for text encoding
   ([b29e1ba](https://github.com/c4spar/deno-cliffy/commit/b29e1ba))
@@ -1694,7 +1694,7 @@ bar.txt
 - **table:** rewrite table module
   ([65988b7](https://github.com/c4spar/deno-cliffy/commit/65988b7))
 
-  Old table method's like `table` and `renderTable` are replaced by the new
+  Old table methods like `table` and `renderTable` are replaced by the new
   `Table` class.
 
 # [v0.4.0](https://github.com/c4spar/deno-cliffy/compare/v0.3.0...v0.4.0) (2020-04-04)
@@ -1732,7 +1732,7 @@ bar.txt
 
 - **command:** export default types
   ([34fcddd](https://github.com/c4spar/deno-cliffy/commit/34fcddd))
-- **command:** make `complete` method in custom type class's optional.
+- **command:** make `complete` method in custom type classes optional.
   ([253cd74](https://github.com/c4spar/deno-cliffy/commit/253cd74))
 - **command:** update `completions` description
   ([a3c5c72](https://github.com/c4spar/deno-cliffy/commit/a3c5c72))
@@ -1752,9 +1752,9 @@ bar.txt
 
 - **command:** update sub-command test
   ([0939b6d](https://github.com/c4spar/deno-cliffy/commit/0939b6d))
-- **command,flags:** don't call `Deno.runTests()` in test's
+- **command,flags:** don't call `Deno.runTests()` in tests
   ([57f3a34](https://github.com/c4spar/deno-cliffy/commit/57f3a34))
-- **flags:** refactor test's
+- **flags:** refactor tests
   ([cf97a15](https://github.com/c4spar/deno-cliffy/commit/cf97a15),
   [c021659](https://github.com/c4spar/deno-cliffy/commit/c021659))
 - **flags:** add value test
@@ -1794,7 +1794,7 @@ bar.txt
   ([80d7ba4](https://github.com/c4spar/deno-cliffy/commit/80d7ba4),
   [9824899](https://github.com/c4spar/deno-cliffy/commit/9824899),
   [26b58be](https://github.com/c4spar/deno-cliffy/commit/26b58be))
-- **command:** add support for custom type class's
+- **command:** add support for custom type classes
   ([7006a67](https://github.com/c4spar/deno-cliffy/commit/7006a67))
 - **flags:** add `parse` and remove `types` option to simplify custom types
   ([d1bc510](https://github.com/c4spar/deno-cliffy/commit/d1bc510))

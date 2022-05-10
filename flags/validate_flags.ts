@@ -75,7 +75,7 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
     return defaultValues;
   }
 
-  // Set default value's
+  // Set default values
   for (const option of opts.flags) {
     let name: string | undefined;
     let defaultValue: unknown = undefined;

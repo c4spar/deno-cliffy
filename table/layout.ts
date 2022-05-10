@@ -34,7 +34,7 @@ export class TableLayout {
 
   /**
    * Generates table layout including row and col span, converts all none
-   * Cell/Row values to Cell's and Row's and returns the layout rendering
+   * Cell/Row values to Cells and Rows and returns the layout rendering
    * settings.
    */
   protected createLayout(): IRenderSettings {

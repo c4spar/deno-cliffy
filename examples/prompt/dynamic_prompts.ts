@@ -7,12 +7,12 @@ import { Number } from "../../prompt/number.ts";
 
 const result = await prompt([{
   name: "animals",
-  message: `Select some animal's`,
+  message: `Select some animals`,
   type: Checkbox,
   options: ["dog", "cat", "snake"],
 }, {
   name: "like",
-  message: `Do you like animal's?`,
+  message: `Do you like animals?`,
   type: Confirm,
   after: async ({ like }, next) => { // executed after like prompt
     if (like) {

@@ -1,4 +1,4 @@
-/** Chainable ansi escape sequence's. */
+/** Chainable ansi escape sequences. */
 import type { ImageOptions } from "./ansi_escapes.ts";
 
 /** Chainable ansi escape method declarations. */

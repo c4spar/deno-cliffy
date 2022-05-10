@@ -16,11 +16,11 @@ const result = await prompt([{
   type: Number,
 }, {
   name: "like",
-  message: "Do you like animal's?",
+  message: "Do you like animals?",
   type: Confirm,
 }, {
   name: "animals",
-  message: "Select some animal's",
+  message: "Select some animals",
   type: Checkbox,
   options: ["dog", "cat", "snake"],
 }]);

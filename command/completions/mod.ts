@@ -5,7 +5,7 @@ import { CompleteCommand } from "./complete.ts";
 import { FishCompletionsCommand } from "./fish.ts";
 import { ZshCompletionsCommand } from "./zsh.ts";
 
-/** Generates shell completion scripts for various shell's. */
+/** Generates shell completion scripts for various shells. */
 export class CompletionsCommand extends Command {
   #cmd?: Command;
 
