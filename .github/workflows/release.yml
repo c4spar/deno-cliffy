@@ -7,6 +7,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      RUST_BACKTRACE: full
     steps:
       - name: Setup repo
         uses: actions/checkout@v3

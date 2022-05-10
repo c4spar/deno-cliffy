@@ -1,5 +1,8 @@
 name: Test
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
 jobs:
   stable:
     name: Deno Stable
@@ -9,6 +12,8 @@ jobs:
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         deno: [v1.x]
+    env:
+      RUST_BACKTRACE: full
     steps:
       - name: Setup repo
         uses: actions/checkout@v3

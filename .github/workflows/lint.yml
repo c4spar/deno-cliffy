@@ -1,9 +1,14 @@
 name: Lint
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
 jobs:
   lint:
     name: Lint source
     runs-on: ubuntu-latest
+    env:
+      RUST_BACKTRACE: full
     steps:
       - name: Setup repo
         uses: actions/checkout@v3
