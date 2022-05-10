@@ -1,3 +1,15 @@
+# [v0.24.2](https://github.com/c4spar/deno-cliffy/compare/v0.24.1...v0.24.2) (May 10, 2022)
+
+### Bug Fixes
+
+- **command:** list type not working in env vars (#379)
+  ([9d24d78](https://github.com/c4spar/deno-cliffy/commit/9d24d78))
+
+### Chore
+
+- **upgrade:** deno/std@0.138.0 (#380)
+  ([f1f1c4d](https://github.com/c4spar/deno-cliffy/commit/f1f1c4d))
+
 # [v0.24.1](https://github.com/c4spar/deno-cliffy/compare/v0.24.0...v0.24.1) (May 10, 2022)
 
 ### Features
