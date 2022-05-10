@@ -807,7 +807,39 @@ import {
           collect: false,
           // deno-lint-ignore no-inferrable-types
           value: (val: number, prev: number = 1) => val + prev,
+          action(options, ...args) {
+            assert<IsExact<typeof args, []>>(true);
+            assert<
+              IsExact<typeof options, {
+                beep?: Array<string>;
+                boop?: Array<number>;
+                beep2?: string;
+                boop2?: number;
+              }>
+            >(true);
+          },
         })
+        .option(
+          "-v, --verbose",
+          "Increase debug output.",
+          {
+            collect: true,
+            // deno-lint-ignore no-inferrable-types
+            value: (_: number | true, previus: number = 0) => ++previus,
+            action(options, ...args) {
+              assert<IsExact<typeof args, []>>(true);
+              assert<
+                IsExact<typeof options, {
+                  beep?: Array<string>;
+                  boop?: Array<number>;
+                  beep2?: string;
+                  boop2?: number;
+                  verbose?: number;
+                }>
+              >(true);
+            },
+          },
+        )
         .action((options, ...args) => {
           assert<IsExact<typeof args, []>>(true);
           assert<
@@ -816,6 +848,7 @@ import {
               boop?: Array<number>;
               beep2?: string;
               boop2?: number;
+              verbose?: number;
             }>
           >(true);
         });

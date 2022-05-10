@@ -890,7 +890,7 @@ export class Command<
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<MergeOptions<F, CO, O>, CA, CG, CPG, CT, CGT, CPT, CP>,
+        ICommandOption<MergeOptions<F, CO, MO>, CA, CG, CPG, CT, CGT, CPT, CP>,
         "value"
       >
         & {
