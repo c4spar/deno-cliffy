@@ -20,6 +20,7 @@ Before you submit your PR please consider the following guidelines:
   [style guide](https://deno.land/manual/contributing/style_guide#typescript).
 - ✨ Make sure to run `deno fmt` before committing.
 - 📄 [Conventional Commits](https://conventionalcommits.org) are appreciated.
-- ⚙️ Test your changes locally with `deno test -r --allow-env --unstable`.
+- ⚙️ Test your changes locally with
+  `deno test --allow-env --allow-read --allow-run --unstable`.
 
 > If you need any help, feel free to ask!
