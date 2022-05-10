@@ -403,3 +403,22 @@ Deno.test({
     assertEquals(options, {bar: "baz"})
   }
 });
+
+Deno.test({
+  name: "[command] - env var - should parse list type",
+  async fn() {
+    Deno.env.set("FOO_BAR", "1,2,3");
+    Deno.env.set("FOO_BAR_BAZ", "1,2,3");
+    const { options } = await new Command()
+      .type("test", (type) => [type.value + "!"])
+      .env("FOO_BAR=<val:number[]>", "...")
+      .env("FOO_BAR_BAZ=<val2:test[]>", "...")
+      .parse([]);
+    Deno.env.delete("FOO_BAR");
+    Deno.env.delete("FOO_BAR_BAZ");
+    assertEquals(options, {
+      fooBar: [1, 2, 3],
+      fooBarBaz: [["1!"], ["2!"], ["3!"]],
+    });
+  }
+});
