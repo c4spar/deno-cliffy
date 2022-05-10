@@ -30,7 +30,7 @@ export class CompleteCommand extends Command<
 
         const completion: ICompletion | undefined = completeCommand
           .getCompletion(action);
-        const result: Array<string | number> =
+        const result: Array<string | number | boolean> =
           await completion?.complete(completeCommand, parent) ?? [];
 
         if (result?.length) {

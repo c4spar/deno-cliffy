@@ -217,10 +217,10 @@ export interface ICompletion<
 }
 
 export type CompleteHandlerResult =
-  | Array<string | number>
-  | Promise<Array<string | number>>;
+  | Array<string | number | boolean>
+  | Promise<Array<string | number | boolean>>;
 
-export type ValuesHandlerResult = Array<string | number>;
+export type ValuesHandlerResult = Array<string | number | boolean>;
 
 /** Type parser method. */
 export type ICompleteHandler<
