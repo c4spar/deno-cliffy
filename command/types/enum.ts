@@ -3,7 +3,7 @@ import type { ITypeInfo } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
-export class EnumType<T extends string | number> extends Type<T> {
+export class EnumType<T extends string | number | boolean> extends Type<T> {
   private readonly allowedValues: ReadonlyArray<T>;
 
   constructor(values: ReadonlyArray<T> | Record<string, T>) {
@@ -21,11 +21,11 @@ export class EnumType<T extends string | number> extends Type<T> {
     throw new InvalidTypeError(type, this.allowedValues.slice());
   }
 
-  public values(): T[] {
+  public override values(): Array<T> {
     return this.allowedValues.slice();
   }
 
-  public complete(): T[] {
+  public override complete(): Array<T> {
     return this.values();
   }
 }
