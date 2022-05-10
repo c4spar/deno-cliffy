@@ -11,7 +11,7 @@ enum Color {
 const cmd = () =>
   new Command()
     .throwErrors()
-    .type("array-color", new EnumType(["blue", "yellow", "red"]))
+    .type("array-color", new EnumType(["blue", "yellow", "red", 1, true]))
     .option("--array-color [value:array-color]", "description ...")
     .type("enum-color", new EnumType(Color))
     .option("--enum-color [value:enum-color]", "description ...")
@@ -24,10 +24,24 @@ Deno.test("command - type - enum - with no value", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with array", async () => {
+Deno.test("command - type - enum - with array and string value", async () => {
   const { options, args } = await cmd().parse(["--array-color", "red"]);
 
   assertEquals(options, { arrayColor: "red" });
+  assertEquals(args, []);
+});
+
+Deno.test("command - type - enum - with array and number value", async () => {
+  const { options, args } = await cmd().parse(["--array-color", "1"]);
+
+  assertEquals(options, { arrayColor: 1 });
+  assertEquals(args, []);
+});
+
+Deno.test("command - type - enum - with array and boolean value", async () => {
+  const { options, args } = await cmd().parse(["--array-color", "true"]);
+
+  assertEquals(options, { arrayColor: true });
   assertEquals(args, []);
 });
 
