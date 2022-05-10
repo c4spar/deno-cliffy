@@ -1,3 +1,29 @@
+# [v0.24.1](https://github.com/c4spar/deno-cliffy/compare/v0.24.0...v0.24.1) (May 10, 2022)
+
+### Features
+
+- **command:** allow boolean values in enum type (#377)
+  ([1f3d47e](https://github.com/c4spar/deno-cliffy/commit/1f3d47e))
+
+### Bug Fixes
+
+- **command:** mapped value not correctly infered in option action handler
+  (#378) ([dbde261](https://github.com/c4spar/deno-cliffy/commit/dbde261))
+
+### Chore
+
+- **ci:** run lint and test workflows on pull requests (#374)
+  ([cb2bb7e](https://github.com/c4spar/deno-cliffy/commit/cb2bb7e))
+- **ci:** disable temporarily the --jobs flag on ci (#376)
+  ([235838b](https://github.com/c4spar/deno-cliffy/commit/235838b))
+
+### Documentation Updates
+
+- correct plural/possessive usage of "'s" (#371)
+  ([3964dfe](https://github.com/c4spar/deno-cliffy/commit/3964dfe))
+- **contributing:** update test command to run successfully (#373) (#375)
+  ([23d5436](https://github.com/c4spar/deno-cliffy/commit/23d5436))
+
 # [v0.24.0](https://github.com/c4spar/deno-cliffy/compare/v0.23.2...v0.24.0) (May 2, 2022)
 
 ### BREAKING CHANGES
