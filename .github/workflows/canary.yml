@@ -11,6 +11,8 @@ jobs:
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         deno_version: [ canary ]
+    env:
+      RUST_BACKTRACE: full
     steps:
       - name: Setup repo
         uses: actions/checkout@v3
