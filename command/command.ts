@@ -1392,12 +1392,26 @@ export class Command<
             : env.names[0],
         );
 
-        result[propertyName] = this.parseType({
-          label: "Environment variable",
-          type: env.type,
-          name,
-          value: Deno.env.get(name) ?? "",
-        });
+        if (env.details.list) {
+          const values = Deno.env.get(name)
+            ?.split(env.details.separator ?? ",") ?? [""];
+
+          result[propertyName] = values.map((value) =>
+            this.parseType({
+              label: "Environment variable",
+              type: env.type,
+              name,
+              value,
+            })
+          );
+        } else {
+          result[propertyName] = this.parseType({
+            label: "Environment variable",
+            type: env.type,
+            name,
+            value: Deno.env.get(name) ?? "",
+          });
+        }
 
         if (env.value && typeof result[propertyName] !== "undefined") {
           result[propertyName] = env.value(result[propertyName]);
