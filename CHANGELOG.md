@@ -1541,7 +1541,7 @@ bar.txt
 
 ### Features
 
-- **command:** add support for hidden optionss #23
+- **command:** add support for hidden options #23
   ([42f701f](https://github.com/c4spar/deno-cliffy/commit/42f701f))
 - **command:** add support for hidden commands #22
   ([1866b75](https://github.com/c4spar/deno-cliffy/commit/1866b75))
@@ -1732,7 +1732,7 @@ bar.txt
 
 - **command:** export default types
   ([34fcddd](https://github.com/c4spar/deno-cliffy/commit/34fcddd))
-- **command:** make `complete` method in custom type classs optional.
+- **command:** make `complete` method in custom type classes optional.
   ([253cd74](https://github.com/c4spar/deno-cliffy/commit/253cd74))
 - **command:** update `completions` description
   ([a3c5c72](https://github.com/c4spar/deno-cliffy/commit/a3c5c72))
