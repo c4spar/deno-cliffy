@@ -247,8 +247,7 @@ export class Command<
       Record<string, unknown> | void,
       Record<string, unknown> | void,
       Record<string, unknown> | void,
-      | OneOf<CP, this>
-      | Command<
+      Command<
         G | void | undefined,
         T | void | undefined,
         Record<string, unknown> | void,
@@ -258,7 +257,6 @@ export class Command<
         Record<string, unknown> | void,
         undefined
       >
-      | undefined
     >,
     G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
     T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
@@ -267,6 +265,50 @@ export class Command<
     cmd: C,
     override?: boolean,
   ): ReturnType<C["reset"]> extends Command<
+    Record<string, unknown> | void,
+    Record<string, unknown> | void,
+    infer Options,
+    infer Arguments,
+    infer GlobalOptions,
+    infer Types,
+    infer GlobalTypes,
+    undefined
+  > ? Command<
+    G,
+    T,
+    Options,
+    Arguments,
+    GlobalOptions,
+    Types,
+    GlobalTypes,
+    OneOf<CP, this>
+  >
+    : never;
+
+  /**
+   * Add new sub-command.
+   * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
+   * @param cmd       The new child command to register.
+   * @param override  Override existing child command.
+   */
+  public command<
+    C extends Command<
+      G | void | undefined,
+      T | void | undefined,
+      Record<string, unknown> | void,
+      Array<unknown>,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
+      OneOf<CP, this> | undefined
+    >,
+    G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
+    T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
+  >(
+    name: string,
+    cmd: C,
+    override?: boolean,
+  ): C extends Command<
     Record<string, unknown> | void,
     Record<string, unknown> | void,
     infer Options,
