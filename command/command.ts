@@ -1180,64 +1180,68 @@ export class Command<
       >
   > {
     try {
-      this.reset();
-      this.registerDefaults();
-      this.rawArgs = args;
-
-      if (args.length > 0) {
-        const subCommand = this.getCommand(args[0], true);
-        if (subCommand) {
-          subCommand._globalParent = this;
-          return subCommand.parse(
-            this.rawArgs.slice(1),
-          ) as any;
-        }
-      }
-
-      if (this.isExecutable) {
-        await this.executeExecutable(this.rawArgs);
-        return {
-          options: {},
-          args: [],
-          cmd: this,
-          literal: [],
-        } as any;
-      } else if (this._useRawArgs) {
-        const env: Record<string, unknown> = await this.parseEnvVars();
-        return this.execute(env, ...this.rawArgs) as any;
-      } else {
-        const env: Record<string, unknown> = await this.parseEnvVars();
-        const { actionOption, flags, unknown, literal } = this
-          .parseFlags(
-            this.rawArgs,
-            env,
-          );
-
-        this.literalArgs = literal;
-
-        const options: Record<string, unknown> = { ...env, ...flags };
-        const params = this.parseArguments(unknown, options);
-
-        if (actionOption) {
-          await actionOption.action.call(this, options, ...params);
-          if (actionOption.standalone) {
-            return {
-              options,
-              args: params,
-              cmd: this,
-              literal: this.literalArgs,
-            } as any;
-          }
-        }
-
-        return this.execute(options, ...params) as any;
-      }
+      return await this.parseCommand(args) as any;
     } catch (error: unknown) {
       if (error instanceof Error) {
         throw this.error(error);
       } else {
         throw this.error(new Error(`[non-error-thrown] ${error}`));
       }
+    }
+  }
+
+  private async parseCommand(args: Array<string>): Promise<IParseResult> {
+    this.reset();
+    this.registerDefaults();
+    this.rawArgs = args;
+
+    if (args.length > 0) {
+      const subCommand = this.getCommand(args[0], true);
+      if (subCommand) {
+        subCommand._globalParent = this;
+        return subCommand.parseCommand(
+          this.rawArgs.slice(1),
+        );
+      }
+    }
+
+    if (this.isExecutable) {
+      await this.executeExecutable(this.rawArgs);
+      return {
+        options: {},
+        args: [],
+        cmd: this,
+        literal: [],
+      } as any;
+    } else if (this._useRawArgs) {
+      const env: Record<string, unknown> = await this.parseEnvVars();
+      return await this.execute(env, ...this.rawArgs) as any;
+    } else {
+      const env: Record<string, unknown> = await this.parseEnvVars();
+      const { actionOption, flags, unknown, literal } = this
+        .parseFlags(
+          this.rawArgs,
+          env,
+        );
+
+      this.literalArgs = literal;
+
+      const options: Record<string, unknown> = { ...env, ...flags };
+      const params = this.parseArguments(unknown, options);
+
+      if (actionOption) {
+        await actionOption.action.call(this, options, ...params);
+        if (actionOption.standalone) {
+          return {
+            options,
+            args: params,
+            cmd: this,
+            literal: this.literalArgs,
+          } as any;
+        }
+      }
+
+      return await this.execute(options, ...params) as any;
     }
   }
 
