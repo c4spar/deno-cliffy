@@ -240,7 +240,7 @@ export class Command<
    */
   public command<
     C extends Command<
-      G | void | undefined,
+      (G & Record<string, unknown>) | void | undefined,
       T | void | undefined,
       Record<string, unknown> | void,
       Array<unknown>,
