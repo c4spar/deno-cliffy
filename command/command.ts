@@ -265,15 +265,15 @@ export class Command<
     infer GlobalTypes,
     any
   > ? Command<
-    G,
-    T,
-    Options,
-    Arguments,
-    GlobalOptions,
-    Types,
-    GlobalTypes,
-    OneOf<CP, this>
-  >
+      G,
+      T,
+      Options,
+      Arguments,
+      GlobalOptions,
+      Types,
+      GlobalTypes,
+      OneOf<CP, this>
+    >
     : never;
 
   /**
@@ -1106,15 +1106,15 @@ export class Command<
     args: string[] = Deno.args,
   ): Promise<
     CP extends Command<any> ? IParseResult<
-      Record<string, unknown>,
-      Array<unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-      undefined
-    >
+        Record<string, unknown>,
+        Array<unknown>,
+        Record<string, unknown>,
+        Record<string, unknown>,
+        Record<string, unknown>,
+        Record<string, unknown>,
+        Record<string, unknown>,
+        undefined
+      >
       : IParseResult<
         MapTypes<CO>,
         MapTypes<CA>,
@@ -2479,16 +2479,16 @@ type ValueOption<
   R extends boolean | undefined = undefined,
   D = undefined,
 > = N extends `${infer Name}.${infer RestName}` ? (R extends true ? {
-  [K in OptionName<Name>]: ValueOption<RestName, F, V, R, D>;
-}
-  : {
-    [K in OptionName<Name>]?: ValueOption<RestName, F, V, R, D>;
-  })
+      [K in OptionName<Name>]: ValueOption<RestName, F, V, R, D>;
+    }
+    : {
+      [K in OptionName<Name>]?: ValueOption<RestName, F, V, R, D>;
+    })
   : (R extends true ? {
-    [K in OptionName<N>]: GetArguments<F> extends `[${string}]`
-      ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
-      : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
-  }
+      [K in OptionName<N>]: GetArguments<F> extends `[${string}]`
+        ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
+        : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
+    }
     : {
       [K in OptionName<N>]?: GetArguments<F> extends `[${string}]`
         ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
@@ -2502,16 +2502,16 @@ type ValuesOption<
   R extends boolean | undefined = undefined,
   D = undefined,
 > = T extends `${infer Name}.${infer RestName}` ? (R extends true ? {
-  [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, R, D>;
-}
-  : {
-    [N in OptionName<Name>]?: ValuesOption<RestName, Rest, V, R, D>;
-  })
+      [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, R, D>;
+    }
+    : {
+      [N in OptionName<Name>]?: ValuesOption<RestName, Rest, V, R, D>;
+    })
   : (R extends true ? {
-    [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-      ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
-      : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
-  }
+      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
+        ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
+        : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
+    }
     : {
       [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
         ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
@@ -2519,11 +2519,11 @@ type ValuesOption<
     });
 
 type MapValue<O, V, C = undefined> = V extends undefined ? C extends true ? {
-  [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
-    ? MapValue<O[K], V>
-    : Array<NonNullable<O[K]>>;
-}
-: O
+      [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
+        ? MapValue<O[K], V>
+        : Array<NonNullable<O[K]>>;
+    }
+  : O
   : {
     [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
       ? MapValue<O[K], V>

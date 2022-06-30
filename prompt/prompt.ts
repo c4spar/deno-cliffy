@@ -19,28 +19,28 @@ type PromptOptions<
     ? Parameters<G0["prompt"]>[0]
     : never,
 > = G0 extends StaticGenericPrompt<any, any, any, any, any> ? 
-  & {
-    name: N0;
-    type: G0;
-    before?: (
-      opts: R,
-      next: Next<Exclude<keyof R, symbol>>,
-    ) => void | Promise<void>;
-    after?: (
-      opts: R,
-      next: Next<Exclude<keyof R, symbol>>,
-    ) => void | Promise<void>;
-  }
-  // exclude none options parameter
-  & (U extends GenericPromptOptions<any, any> ? U : {})
+    & {
+      name: N0;
+      type: G0;
+      before?: (
+        opts: R,
+        next: Next<Exclude<keyof R, symbol>>,
+      ) => void | Promise<void>;
+      after?: (
+        opts: R,
+        next: Next<Exclude<keyof R, symbol>>,
+      ) => void | Promise<void>;
+    }
+    // exclude none options parameter
+    & (U extends GenericPromptOptions<any, any> ? U : {})
   : never;
 
 type PromptResult<
   N extends string,
   G extends StaticGenericPrompt<any, any, any, any, any> | void,
 > = G extends StaticGenericPrompt<any, any, any, any, any> ? {
-  [K in N]?: Awaited<ReturnType<G["prompt"]>>;
-}
+    [K in N]?: Awaited<ReturnType<G["prompt"]>>;
+  }
   : {};
 
 interface PromptListOptions<R, N extends keyof R = keyof R> {

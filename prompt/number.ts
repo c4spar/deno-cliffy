@@ -242,6 +242,6 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
   }
 }
 
-function isNumeric(value: string | number): value is (number | string) {
+function isNumeric(value: string | number): value is number | string {
   return typeof value === "number" || (!!value && !isNaN(parseNumber(value)));
 }
