@@ -271,11 +271,12 @@ export class HelpGenerator {
           this.options.long
             ? dedent(envVar.description)
             : envVar.description.trim().split("\n", 1)[0],
+          envVar.required ? `(${yellow(`required`)})` : "",
         ]),
       ])
-        .padding([2, 2, 1])
+        .padding([2, 2, 1, 2])
         .indent(this.indent * 2)
-        .maxColWidth([60, 60, 1, 80])
+        .maxColWidth([60, 60, 1, 80, 10])
         .toString() +
       "\n";
   }
