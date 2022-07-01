@@ -54,6 +54,9 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
   cmd
     .env("SOME_ENV_VAR=<value:number>", "Description ...")
     .env("SOME_ENV_VAR_2 <value>", "Description 2 ...")
+    .env("SOME_REQUIRED_ENV_VAR=<value>", "This one is required!", {
+      required: true,
+    })
     .command("help", new HelpCommand())
     .command("completions", new CompletionsCommand())
     .command("sub-command <input:string> <output:string>")
@@ -101,8 +104,9 @@ Deno.test({
 
   Environment variables:
 
-    SOME_ENV_VAR    <value:number>  - Description ...  
-    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
+    SOME_ENV_VAR           <value:number>  - Description ...                  
+    SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
+    SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
 `,
     );
   },
@@ -141,8 +145,9 @@ Deno.test({
 
   Environment variables:
 
-    SOME_ENV_VAR    <value:number>  - Description ...  
-    SOME_ENV_VAR_2  <value:string>  - Description 2 ...
+    SOME_ENV_VAR           <value:number>  - Description ...                  
+    SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
+    SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
 `,
     );
   },
