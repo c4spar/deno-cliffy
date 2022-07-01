@@ -44,27 +44,32 @@ _${replaceSpecialChars(path)}() {
   
     # expand ~username type directory specifications
     if [[ "$cur" == \\~*/* ]]; then
+      # shellcheck disable=SC2086
       eval cur=$cur
       
     elif [[ "$cur" == \\~* ]]; then
       cur=\${cur#\\~}
+      # shellcheck disable=SC2086,SC2207
       COMPREPLY=( $( compgen -P '~' -u $cur ) )
       return \${#COMPREPLY[@]}
     fi
   }
 
+  # shellcheck disable=SC2120
   _${replaceSpecialChars(this.cmd.getName())}_file_dir() {
     listFiles=1
     local IFS=$'\\t\\n' xspec #glob
     _${replaceSpecialChars(this.cmd.getName())}_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
+      # shellcheck disable=SC2206,SC2207,SC2086
       COMPREPLY=( \${COMPREPLY[@]:-} $( compgen -d -- $cur ) )
       #eval "$glob"    # restore glob setting.
       return 0
     fi
   
     xspec=\${1:+"!*.$1"}	# set only if glob passed in as $1
+    # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} $( compgen -f -X "$xspec" -- "$cur" ) \
           $( compgen -d -- "$cur" ) )
   }
