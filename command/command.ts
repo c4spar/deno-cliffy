@@ -1166,7 +1166,7 @@ export class Command<
         args = args.slice(1);
       } else {
         // Only pre parse globals if first arg ist a global option.
-        preParseGlobals = this.getBaseOption(args[0].replace(/^-+/, ""))
+        preParseGlobals = this.getOption(args[0].replace(/^-+/, ""), true)
           ?.global === true;
 
         if (preParseGlobals) {
@@ -1182,7 +1182,10 @@ export class Command<
             actionOption: globalAction = undefined,
           } = subCommand ? {} : this.parseOptions(
             this.rawArgs,
-            this.options.filter((option) => option.global),
+            [
+              ...this.options.filter((option) => option.global),
+              ...this.getGlobalOptions(true),
+            ],
             globalEnv,
             true,
           );
