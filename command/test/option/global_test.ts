@@ -3,6 +3,7 @@ import { Command } from "../../command.ts";
 import type { ITypeInfo } from "../../types.ts";
 
 const cmd = new Command()
+  .throwErrors()
   .version("0.1.0")
   .option("-b, --base", "Only available on this command.")
   .type(

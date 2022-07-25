@@ -1159,9 +1159,10 @@ export class Command<
     let subCommand: Command<any> | undefined;
 
     // Pre parse globals to support: cmd --global-option sub-command --option
-    if (preParseGlobals && args.length > 0) {
+    if (args.length > 0) {
       // Detect sub command.
       subCommand = this.getCommand(args[0], true);
+
       if (subCommand) {
         args = args.slice(1);
       } else {
