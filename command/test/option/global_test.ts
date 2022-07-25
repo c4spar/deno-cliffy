@@ -17,12 +17,12 @@ const cmd = new Command()
   )
   .globalOption("-G, --global2 [val:string]", "Available on all commands.")
   .command(
-    "sub-command",
+    "cmd1",
     new Command()
       .option("-l, --level2 [val:custom]", "Only available on this command.")
       .description("Some sub command.")
       .command(
-        "sub-command",
+        "cmd2",
         new Command()
           .option(
             "-L, --level3 [val:custom]",
@@ -42,7 +42,7 @@ Deno.test("command with global option", async () => {
 
 Deno.test("sub command with global option", async () => {
   const { options, args } = await cmd.parse([
-    "sub-command",
+    "cmd1",
     "-g",
     "halo",
     "-G",
@@ -53,9 +53,31 @@ Deno.test("sub command with global option", async () => {
   assertEquals(args, []);
 });
 
+Deno.test("sub command with global option before sub command", async () => {
+  const { options, args } = await cmd.parse([
+    "-g",
+    "halo",
+    "cmd1",
+    "-G",
+    "halo",
+  ]);
+
+  assertEquals(options, { global: "HALO", global2: "halo" });
+  assertEquals(args, []);
+});
+
 Deno.test("nested sub command with global option", async () => {
   const { options, args } = await cmd.parse(
-    ["sub-command", "sub-command", "-g", "halo", "-G", "halo"],
+    ["cmd1", "cmd2", "-g", "halo", "-G", "halo"],
+  );
+
+  assertEquals(options, { global: "HALO", global2: "halo" });
+  assertEquals(args, []);
+});
+
+Deno.test("nested sub command with global option before sub command", async () => {
+  const { options, args } = await cmd.parse(
+    ["-g", "halo", "cmd1", "-G", "halo", "cmd2"],
   );
 
   assertEquals(options, { global: "HALO", global2: "halo" });
@@ -63,7 +85,7 @@ Deno.test("nested sub command with global option", async () => {
 });
 
 Deno.test("sub command with global option", async () => {
-  const { options, args } = await cmd.parse(["sub-command", "-l", "halo"]);
+  const { options, args } = await cmd.parse(["cmd1", "-l", "halo"]);
 
   assertEquals(options, { level2: "HALO" });
   assertEquals(args, []);
@@ -71,7 +93,7 @@ Deno.test("sub command with global option", async () => {
 
 Deno.test("nested sub command with global option", async () => {
   const { options, args } = await cmd.parse(
-    ["sub-command", "sub-command", "-L", "halo"],
+    ["cmd1", "cmd2", "-L", "halo"],
   );
 
   assertEquals(options, { level3: "HALO" });
