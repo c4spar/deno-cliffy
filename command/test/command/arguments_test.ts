@@ -19,11 +19,26 @@ function cmd() {
       return value;
     })
     .option("-f, --foo <foo> <bar> <baz>", "...")
-    .arguments("<foo:string> [bar:number] [baz:boolean] [color:color]");
+    .arguments("<foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]");
+}
+
+function cmd2() {
+  return new Command()
+    .throwErrors()
+    .command("foo <foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]")
+    .type("color", ({ label, name, type, value }: ITypeInfo) => {
+      if (!["red", "blue", "yellow"].includes(value)) {
+        throw new Error(
+          `${label} "${name}" must be a valid "${type}", but got "${value}".`,
+        );
+      }
+      return value;
+    })
+    .option("-f, --foo <foo> <bar> <baz>", "...");
 }
 
 describe("command arguments", () => {
-  it("should accepts a dash as argument", async () => {
+  it("should accept a dash as argument", async () => {
     const { args } = await new Command()
       .arguments("<input:string>")
       .parse(["-"]);
@@ -31,8 +46,13 @@ describe("command arguments", () => {
   });
 
   it("should parse correctly argument types", async () => {
-    const { args } = await cmd().parse(["abc", "123", "true", "red"]);
-    assertEquals(args, ["abc", 123, true, "red"]);
+    const { args } = await cmd().parse(["abc", "123", "true", "red", "1,2,3,4"]);
+    assertEquals(args, ["abc", 123, true, "red", [1, 2, 3, 4]]);
+  });
+
+  it("should parse correctly argument types with sub command arguments", async () => {
+    const { args } = await cmd2().parse(["foo", "abc", "123", "true", "red", "1,2,3,4"]);
+    assertEquals(args, ["abc", 123, true, "red", [1, 2, 3, 4]]);
   });
 
   it("should not throw for missing optional values", async () => {
@@ -59,6 +79,26 @@ describe("command arguments", () => {
       },
       Error,
       `Argument "bar" must be of type "number", but got "xyz".`,
+    );
+  });
+
+  it("should throw an error for invalid list types", async () => {
+    await assertRejects(
+      async () => {
+        await cmd().parse(["abc", "123", "true", "red", "1,2,3,four"]);
+      },
+      Error,
+      `Argument "list" must be of type "number", but got "four".`,
+    );
+  });
+
+  it("should throw an error for invalid list types with sub command arguments", async () => {
+    await assertRejects(
+      async () => {
+        await cmd2().parse(["foo", "abc", "123", "true", "red", "1,2,3,four"]);
+      },
+      Error,
+      `Argument "list" must be of type "number", but got "four".`,
     );
   });
 
