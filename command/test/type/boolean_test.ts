@@ -15,6 +15,14 @@ const cmd2 = new Command()
   .option("-f, --flag [value:boolean]", "description ...")
   .action(() => {});
 
+const cmd3 = new Command()
+  .throwErrors()
+  .name("test-command")
+  .option("-f, --check", "description ...")
+  .option("-f, --no-check", "description ...")
+  .option("-a, --color <color>", "description ...")
+  .action(() => {});
+
 Deno.test("command - type - boolean - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
@@ -110,4 +118,18 @@ Deno.test("command - type - boolean - no arguments allowed", async () => {
     Error,
     `No arguments allowed for command "test-command".`,
   );
+});
+
+Deno.test("command - type - boolean - negatable option last", async () => {
+  const { options, args } = await cmd3.parse(["--color", "red", "--no-check"]);
+
+  assertEquals(options, { color: "red", check: false });
+  assertEquals(args, []);
+});
+
+Deno.test("command - type - boolean - negatable option first", async () => {
+  const { options, args } = await cmd3.parse(["--no-check", "--color", "red"]);
+
+  assertEquals(options, { color: "red", check: false });
+  assertEquals(args, []);
 });

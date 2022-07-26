@@ -262,7 +262,6 @@ export function parseFlags<
 
         if (negate) {
           flags[propName] = false;
-          return;
         }
 
         let result: unknown;
@@ -317,7 +316,9 @@ export function parseFlags<
             parseNext(option, optionArgs);
           }
         } else {
-          flags[propName] = result;
+          if (typeof result !== 'undefined' || option.collect) {
+            flags[propName] = result;
+          }
         }
 
         /** Check if current option should have an argument. */
