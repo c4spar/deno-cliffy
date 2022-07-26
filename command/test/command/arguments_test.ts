@@ -19,13 +19,17 @@ function cmd() {
       return value;
     })
     .option("-f, --foo <foo> <bar> <baz>", "...")
-    .arguments("<foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]");
+    .arguments(
+      "<foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]",
+    );
 }
 
 function cmd2() {
   return new Command()
     .throwErrors()
-    .command("foo <foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]")
+    .command(
+      "foo <foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]",
+    )
     .type("color", ({ label, name, type, value }: ITypeInfo) => {
       if (!["red", "blue", "yellow"].includes(value)) {
         throw new Error(
@@ -46,12 +50,25 @@ describe("command arguments", () => {
   });
 
   it("should parse correctly argument types", async () => {
-    const { args } = await cmd().parse(["abc", "123", "true", "red", "1,2,3,4"]);
+    const { args } = await cmd().parse([
+      "abc",
+      "123",
+      "true",
+      "red",
+      "1,2,3,4",
+    ]);
     assertEquals(args, ["abc", 123, true, "red", [1, 2, 3, 4]]);
   });
 
   it("should parse correctly argument types with sub command arguments", async () => {
-    const { args } = await cmd2().parse(["foo", "abc", "123", "true", "red", "1,2,3,4"]);
+    const { args } = await cmd2().parse([
+      "foo",
+      "abc",
+      "123",
+      "true",
+      "red",
+      "1,2,3,4",
+    ]);
     assertEquals(args, ["abc", 123, true, "red", [1, 2, 3, 4]]);
   });
 
