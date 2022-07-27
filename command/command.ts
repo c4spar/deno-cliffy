@@ -274,15 +274,15 @@ export class Command<
     infer GlobalTypes,
     undefined
   > ? Command<
-    G,
-    T,
-    Options,
-    Arguments,
-    GlobalOptions,
-    Types,
-    GlobalTypes,
-    OneOf<CP, this>
-  >
+      G,
+      T,
+      Options,
+      Arguments,
+      GlobalOptions,
+      Types,
+      GlobalTypes,
+      OneOf<CP, this>
+    >
     : never;
 
   /**
