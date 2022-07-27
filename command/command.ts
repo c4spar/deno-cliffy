@@ -1232,14 +1232,13 @@ export class Command<
     };
 
     // Parse rest options.
-    const { flags, unknown, actionOption, literal } = this
-      .parseOptions(
-        args,
-        preParseGlobals
-          ? this.options.filter((option) => !option.global)
-          : this.getOptions(true),
-        env,
-      );
+    const { flags, unknown, actionOption, literal } = this.parseOptions(
+      args,
+      preParseGlobals
+        ? this.options.filter((option) => !option.global)
+        : this.getOptions(true),
+      env,
+    );
 
     this.literalArgs = literal;
 
