@@ -1173,7 +1173,10 @@ export class Command<
         if (preParseGlobals) {
           // Parse global env vars.
           const globalEnv = await this.parseEnvVars(
-            this.envVars.filter((envVar) => envVar.global),
+            [
+              ...this.envVars.filter((envVar) => envVar.global),
+              ...this.getGlobalEnvVars(true),
+            ],
           );
 
           // Parse global options.
