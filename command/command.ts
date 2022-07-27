@@ -1366,9 +1366,16 @@ export class Command<
       );
     }
 
-    return typeSettings.handler instanceof Type
-      ? typeSettings.handler.parse(type)
-      : typeSettings.handler(type);
+    try {
+      return typeSettings.handler instanceof Type
+        ? typeSettings.handler.parse(type)
+        : typeSettings.handler(type);
+    } catch (error) {
+      if (error instanceof FlagsValidationError) {
+        throw new ValidationError(error.message);
+      }
+      throw error;
+    }
   }
 
   /** Validate environment variables. */
@@ -1474,23 +1481,27 @@ export class Command<
 
           let arg: unknown;
 
-          if (expectedArg.variadic) {
-            arg = args.splice(0, args.length)
-              .map((value) =>
-                this.parseType({
-                  label: "Argument",
-                  type: expectedArg.type,
-                  name: expectedArg.name,
-                  value,
-                })
-              );
-          } else {
-            arg = this.parseType({
+          const parseArgValue = (value: string) => {
+            return expectedArg.list
+              ? value.split(",").map((value) => parseArgType(value))
+              : parseArgType(value);
+          };
+
+          const parseArgType = (value: string) => {
+            return this.parseType({
               label: "Argument",
               type: expectedArg.type,
               name: expectedArg.name,
-              value: args.shift() as string,
+              value,
             });
+          };
+
+          if (expectedArg.variadic) {
+            arg = args.splice(0, args.length).map((value) =>
+              parseArgValue(value)
+            );
+          } else {
+            arg = parseArgValue(args.shift() as string);
           }
 
           if (typeof arg !== "undefined") {
