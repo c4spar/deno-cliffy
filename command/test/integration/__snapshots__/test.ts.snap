@@ -54,15 +54,18 @@ _completions_test() {
   
     # expand ~username type directory specifications
     if [[ "\$cur" == \\\\~*/* ]]; then
+      # shellcheck disable=SC2086
       eval cur=\$cur
       
     elif [[ "\$cur" == \\\\~* ]]; then
       cur=\${cur#\\\\~}
+      # shellcheck disable=SC2086,SC2207
       COMPREPLY=( \$( compgen -P '~' -u \$cur ) )
       return \${#COMPREPLY[@]}
     fi
   }
 
+  # shellcheck disable=SC2120
   _completions_test_file_dir() {
     listFiles=1
     local IFS=\$'\\\\t\\
@@ -70,12 +73,14 @@ _completions_test() {
     _completions_test_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
+      # shellcheck disable=SC2206,SC2207,SC2086
       COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -d -- \$cur ) )
       #eval "\$glob"    # restore glob setting.
       return 0
     fi
   
     xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
 
@@ -304,22 +309,22 @@ snapshot[`command integration > should generate fish completions 1`] = `
 # fish completion support for completions-test v1.0.0
 
 function __fish_completions_test_using_command
-  set cmds __completions_test __completions_test_foo __completions_test_help __completions_test_foo_bar __completions_test_help __completions_test_help __completions_test_completions __completions_test_help __completions_test_completions_bash __completions_test_help __completions_test_completions_fish __completions_test_help __completions_test_completions_zsh __completions_test_help
-  set words (commandline -opc)
-  set cmd "_"
+  set -l cmds __completions_test __completions_test_foo __completions_test_help __completions_test_foo_bar __completions_test_help __completions_test_help __completions_test_completions __completions_test_help __completions_test_completions_bash __completions_test_help __completions_test_completions_fish __completions_test_help __completions_test_completions_zsh __completions_test_help
+  set -l words (commandline -opc)
+  set -l cmd "_"
   for word in \$words
     switch \$word
       case '-*'
         continue
       case '*'
         set word (string replace -r -a '\\\\W' '_' \$word)
-        set cmd_tmp \$cmd"_\$word"
+        set -l cmd_tmp \$cmd"_\$word"
         if contains \$cmd_tmp \$cmds
           set cmd \$cmd_tmp
         end
     end
   end
-  if [ "\$cmd" = "\$argv[1]" ]
+  if test "\$cmd" = "\$argv[1]"
     return 0
   end
   return 1
