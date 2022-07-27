@@ -1184,7 +1184,7 @@ export class Command<
             flags: globalOptions = {},
             unknown: restArgs = [],
             actionOption: globalAction = undefined,
-          } = subCommand ? {} : this.parseOptions(
+          } = this.parseOptions(
             this.rawArgs,
             [
               ...this.options.filter((option) => option.global),
