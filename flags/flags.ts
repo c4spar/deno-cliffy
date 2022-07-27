@@ -316,7 +316,7 @@ export function parseFlags<
             parseNext(option, optionArgs);
           }
         } else {
-          if (typeof result !== 'undefined' || option.collect) {
+          if (typeof result !== "undefined" || option.collect) {
             flags[propName] = result;
           }
         }
