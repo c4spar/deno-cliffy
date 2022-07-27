@@ -1481,13 +1481,13 @@ export class Command<
 
           let arg: unknown;
 
-          const parseTypeValue = (value: string) => {
+          const parseArgValue = (value: string) => {
             return expectedArg.list
-              ? value.split(",").map((value) => parseType(value))
-              : parseType(value);
+              ? value.split(",").map((value) => parseArgType(value))
+              : parseArgType(value);
           };
 
-          const parseType = (value: string) => {
+          const parseArgType = (value: string) => {
             return this.parseType({
               label: "Argument",
               type: expectedArg.type,
@@ -1498,10 +1498,10 @@ export class Command<
 
           if (expectedArg.variadic) {
             arg = args.splice(0, args.length).map((value) =>
-              parseTypeValue(value)
+              parseArgValue(value)
             );
           } else {
-            arg = parseTypeValue(args.shift() as string);
+            arg = parseArgValue(args.shift() as string);
           }
 
           if (typeof arg !== "undefined") {
