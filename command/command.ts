@@ -1366,9 +1366,16 @@ export class Command<
       );
     }
 
-    return typeSettings.handler instanceof Type
-      ? typeSettings.handler.parse(type)
-      : typeSettings.handler(type);
+    try {
+      return typeSettings.handler instanceof Type
+        ? typeSettings.handler.parse(type)
+        : typeSettings.handler(type);
+    } catch (error) {
+      if (error instanceof FlagsValidationError) {
+        throw new ValidationError(error.message);
+      }
+      throw error;
+    }
   }
 
   /** Validate environment variables. */
