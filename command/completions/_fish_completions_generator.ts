@@ -33,22 +33,22 @@ export class FishCompletionsGenerator {
 # fish completion support for ${path}${version}
 
 function __fish_${replaceSpecialChars(this.cmd.getName())}_using_command
-  set cmds ${getCommandFnNames(this.cmd).join(" ")}
-  set words (commandline -opc)
-  set cmd "_"
+  set -l cmds ${getCommandFnNames(this.cmd).join(" ")}
+  set -l words (commandline -opc)
+  set -l cmd "_"
   for word in $words
     switch $word
       case '-*'
         continue
       case '*'
         set word (string replace -r -a '\\W' '_' $word)
-        set cmd_tmp $cmd"_$word"
+        set -l cmd_tmp $cmd"_$word"
         if contains $cmd_tmp $cmds
           set cmd $cmd_tmp
         end
     end
   end
-  if [ "$cmd" = "$argv[1]" ]
+  if test "$cmd" = "$argv[1]"
     return 0
   end
   return 1
