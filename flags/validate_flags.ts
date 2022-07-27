@@ -28,7 +28,7 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
   values: Record<string, unknown>,
   optionNameMap: Record<string, string> = {},
 ): void {
-  if (!opts.flags?.length) {
+  if (!opts.flags) {
     return;
   }
   const defaultValues = setDefaultValues(opts, values, optionNameMap);
