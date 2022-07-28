@@ -74,7 +74,6 @@ export function parseFlags<
   !opts.flags && (opts.flags = []);
 
   let inLiteral = false;
-  let negate = false;
 
   const flags: Record<string, unknown> = {};
   /** Option name mapping: propertyName -> option.name */
@@ -105,6 +104,7 @@ export function parseFlags<
     let optionArgs: IFlagArgument[] | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
+    let negate = false;
 
     // literal args after --
     if (inLiteral) {
@@ -262,6 +262,7 @@ export function parseFlags<
 
         if (negate) {
           flags[propName] = false;
+          return;
         }
 
         let result: unknown;
@@ -316,9 +317,7 @@ export function parseFlags<
             parseNext(option, optionArgs);
           }
         } else {
-          if (typeof result !== "undefined" || option.collect) {
-            flags[propName] = result;
-          }
+          flags[propName] = result;
         }
 
         /** Check if current option should have an argument. */
