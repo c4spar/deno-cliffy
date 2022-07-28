@@ -85,7 +85,7 @@ export class Command<
   CGT extends Record<string, any> | void = CPG extends number ? any : void,
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
-  private types: Map<string, IType> = new Map();
+  private types: Record<string, IType> = {};
   private rawArgs: Array<string> = [];
   private literalArgs: Array<string> = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
@@ -115,12 +115,14 @@ export class Command<
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
-  private _versionOption?: IDefaultOption | false;
-  private _helpOption?: IDefaultOption | false;
+  private versionOptions?: IDefaultOption | false;
+  private helpOptions?: IDefaultOption | false;
+  private _helpOption?: IOption;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
   private _groupName?: string;
+  private _noGlobals = false;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -169,7 +171,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._versionOption = flags === false ? flags : {
+    this.versionOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -224,7 +226,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._helpOption = flags === false ? flags : {
+    this.helpOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -623,11 +625,11 @@ export class Command<
     CGT,
     CP
   > {
-    if (this.cmd.types.get(name) && !options?.override) {
+    if (this.cmd.types[name] && !options?.override) {
       throw new DuplicateType(name);
     }
 
-    this.cmd.types.set(name, { ...options, name, handler });
+    this.cmd.types[name] = { ...options, name, handler };
 
     if (
       handler instanceof Type &&
@@ -748,14 +750,25 @@ export class Command<
     return this;
   }
 
+  /** Disable global options and environment variables for this command. */
+  public noGlobals(): this {
+    this.cmd._noGlobals = true;
+    return this;
+  }
+
+  /** Check whether the command should throw errors or exit. */
+  protected areGlobalsDisabled(): boolean {
+    return this._noGlobals || !!this._parent?.areGlobalsDisabled();
+  }
+
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
-    return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+    return this.throwOnError || !!this._parent?.shouldThrowErrors();
   }
 
   /** Check whether the command should exit after printing help or version. */
   protected shouldExit(): boolean {
-    return this.cmd._shouldExit ?? this.cmd._parent?.shouldExit() ?? true;
+    return this._shouldExit ?? this._parent?.shouldExit() ?? true;
   }
 
   public globalOption<
@@ -1127,6 +1140,7 @@ export class Command<
       >
   > {
     try {
+      this.registerDefaults();
       return await this.parseCommand(args) as any;
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -1144,7 +1158,6 @@ export class Command<
     action?: ActionOption,
   ): Promise<IParseResult> {
     this.reset();
-    this.registerDefaults();
     this.rawArgs = args;
 
     if (this.isExecutable) {
@@ -1281,15 +1294,15 @@ export class Command<
 
     this.reset();
 
-    !this.types.has("string") &&
+    !this.types.string &&
       this.type("string", new StringType(), { global: true });
-    !this.types.has("number") &&
+    !this.types.number &&
       this.type("number", new NumberType(), { global: true });
-    !this.types.has("integer") &&
+    !this.types.integer &&
       this.type("integer", new IntegerType(), { global: true });
-    !this.types.has("boolean") &&
+    !this.types.boolean &&
       this.type("boolean", new BooleanType(), { global: true });
-    !this.types.has("file") &&
+    !this.types.file &&
       this.type("file", new FileType(), { global: true });
 
     if (!this._help) {
@@ -1299,10 +1312,10 @@ export class Command<
       });
     }
 
-    if (this._versionOption !== false && (this._versionOption || this.ver)) {
+    if (this.versionOptions !== false && (this.versionOptions || this.ver)) {
       this.option(
-        this._versionOption?.flags || "-V, --version",
-        this._versionOption?.desc ||
+        this.versionOptions?.flags || "-V, --version",
+        this.versionOptions?.desc ||
           "Show the version number for this program.",
         {
           standalone: true,
@@ -1317,16 +1330,16 @@ export class Command<
             }
             this.exit();
           },
-          ...(this._versionOption?.opts ?? {}),
+          ...(this.versionOptions?.opts ?? {}),
         },
       );
       const versionOption = this.options[0];
     }
 
-    if (this._helpOption !== false) {
+    if (this.helpOptions !== false) {
       this.option(
-        this._helpOption?.flags || "-h, --help",
-        this._helpOption?.desc || "Show this help.",
+        this.helpOptions?.flags || "-h, --help",
+        this.helpOptions?.desc || "Show this help.",
         {
           standalone: true,
           global: true,
@@ -1337,10 +1350,11 @@ export class Command<
             this.showHelp({ long });
             this.exit();
           },
-          ...(this._helpOption?.opts ?? {}),
+          ...(this.helpOptions?.opts ?? {}),
         },
       );
       const helpOption = this.options[0];
+      this._helpOption = helpOption;
     }
 
     return this;
@@ -1829,17 +1843,22 @@ export class Command<
     ): IOption[] => {
       if (cmd) {
         if (cmd.options.length) {
-          cmd.options.forEach((option: IOption) => {
+          const areGlobalsDisabled = this.areGlobalsDisabled();
+          for (const option of cmd.options) {
             if (
               option.global &&
               !this.options.find((opt) => opt.name === option.name) &&
               names.indexOf(option.name) === -1 &&
               (hidden || !option.hidden)
             ) {
+              if (areGlobalsDisabled && option !== cmd._helpOption) {
+                continue;
+              }
+
               names.push(option.name);
               options.push(option);
             }
-          });
+          }
         }
 
         return getOptions(cmd._parent, options, names);
@@ -1900,6 +1919,10 @@ export class Command<
 
     if (!option || !option.global) {
       return this._parent.getGlobalOption(name, hidden);
+    }
+
+    if (this.areGlobalsDisabled() && option !== this._parent._helpOption) {
+      return;
     }
 
     return option;
@@ -2062,7 +2085,7 @@ export class Command<
 
   /** Get base types. */
   public getBaseTypes(): IType[] {
-    return Array.from(this.types.values());
+    return Object.values(this.types);
   }
 
   /** Get global types. */
@@ -2073,17 +2096,15 @@ export class Command<
       names: string[] = [],
     ): IType[] => {
       if (cmd) {
-        if (cmd.types.size) {
-          cmd.types.forEach((type: IType) => {
-            if (
-              type.global &&
-              !this.types.has(type.name) &&
-              names.indexOf(type.name) === -1
-            ) {
-              names.push(type.name);
-              types.push(type);
-            }
-          });
+        for (const type of Object.values(cmd.types)) {
+          if (
+            type.global &&
+            !this.types[type.name] &&
+            names.indexOf(type.name) === -1
+          ) {
+            names.push(type.name);
+            types.push(type);
+          }
         }
 
         return getTypes(cmd._parent, types, names);
@@ -2108,7 +2129,7 @@ export class Command<
    * @param name Name of the type.
    */
   public getBaseType(name: string): IType | undefined {
-    return this.types.get(name);
+    return this.types[name];
   }
 
   /**
@@ -2240,6 +2261,10 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
+    if (this.areGlobalsDisabled()) {
+      return [];
+    }
+
     const getEnvVars = (
       cmd: Command<any> | undefined,
       envVars: IEnvVar[] = [],
@@ -2307,7 +2332,7 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
-    if (!this._parent) {
+    if (!this._parent || this.areGlobalsDisabled()) {
       return;
     }
 

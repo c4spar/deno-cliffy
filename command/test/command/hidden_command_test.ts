@@ -35,6 +35,7 @@ Deno.test("hidden command help", () => {
   const output: string = cmd.getHelp();
 
   assertEquals(
+    stripColor(output),
     `
   Usage:   COMMAND
   Version: 1.0.0  
@@ -53,6 +54,5 @@ Deno.test("hidden command help", () => {
     help         [command:command]  - Show this help or the help of a sub-command.
     completions                     - Generate shell completions.                 
 `,
-    stripColor(output),
   );
 });
