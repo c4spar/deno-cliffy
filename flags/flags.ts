@@ -71,7 +71,6 @@ export function parseFlags<
   opts: IParseOptions<T> = {},
 ): IFlagsResult<O> {
   args = args.slice();
-  !opts.flags && (opts.flags = []);
 
   let inLiteral = false;
 
@@ -82,7 +81,7 @@ export function parseFlags<
   let unknown: string[] = [];
   let stopEarly: string | null = null;
 
-  opts.flags.forEach((opt) => {
+  opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
         throw new UnknownRequiredOption(flag, opts.flags ?? []);
@@ -125,7 +124,7 @@ export function parseFlags<
       const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
 
       if (!isShort && !isLong) {
-        throw new InvalidOption(current, opts.flags);
+        throw new InvalidOption(current, opts.flags ?? []);
       }
 
       // split value: --foo="bar=baz" => --foo bar=baz
@@ -142,10 +141,10 @@ export function parseFlags<
       } else if (isLong && current.startsWith("--no-")) {
         negate = true;
       }
-      option = getOption(opts.flags, current);
+      option = opts.flags && getOption(opts.flags, current);
 
       if (!option) {
-        if (opts.flags.length) {
+        if (opts.flags?.length) {
           const name = current.replace(/^-+/g, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
@@ -167,7 +166,7 @@ export function parseFlags<
       const propName: string = paramCaseToCamelCase(positiveName);
 
       if (typeof flags[propName] !== "undefined") {
-        if (!opts.flags.length) {
+        if (!opts.flags?.length) {
           option.collect = true;
         } else if (!option.collect) {
           throw new DuplicateOption(current);

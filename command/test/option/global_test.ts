@@ -3,6 +3,7 @@ import { Command } from "../../command.ts";
 import type { ITypeInfo } from "../../types.ts";
 
 const cmd = new Command()
+  .throwErrors()
   .version("0.1.0")
   .option("-b, --base", "Only available on this command.")
   .type(
@@ -16,13 +17,14 @@ const cmd = new Command()
     { global: true },
   )
   .globalOption("-G, --global2 [val:string]", "Available on all commands.")
+  .globalOption("-o, --global3 [val:string]", "Available on all commands.")
   .command(
-    "sub-command",
+    "cmd1",
     new Command()
       .option("-l, --level2 [val:custom]", "Only available on this command.")
       .description("Some sub command.")
       .command(
-        "sub-command",
+        "cmd2",
         new Command()
           .option(
             "-L, --level3 [val:custom]",
@@ -42,28 +44,54 @@ Deno.test("command with global option", async () => {
 
 Deno.test("sub command with global option", async () => {
   const { options, args } = await cmd.parse([
-    "sub-command",
+    "cmd1",
     "-g",
-    "halo",
+    "foo",
     "-G",
-    "halo",
+    "bar",
+    "-o",
+    "baz",
   ]);
 
-  assertEquals(options, { global: "HALO", global2: "halo" });
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
+  assertEquals(args, []);
+});
+
+Deno.test("sub command with global option before sub command", async () => {
+  const { options, args } = await cmd.parse([
+    "-g",
+    "foo",
+    "cmd1",
+    "-G",
+    "bar",
+    "-o",
+    "baz",
+  ]);
+
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
   assertEquals(args, []);
 });
 
 Deno.test("nested sub command with global option", async () => {
   const { options, args } = await cmd.parse(
-    ["sub-command", "sub-command", "-g", "halo", "-G", "halo"],
+    ["cmd1", "cmd2", "-g", "foo", "-G", "bar", "-o", "baz"],
   );
 
-  assertEquals(options, { global: "HALO", global2: "halo" });
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
+  assertEquals(args, []);
+});
+
+Deno.test("nested sub command with global option before sub command", async () => {
+  const { options, args } = await cmd.parse(
+    ["-g", "foo", "cmd1", "-G", "bar", "cmd2", "-o", "baz"],
+  );
+
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
   assertEquals(args, []);
 });
 
 Deno.test("sub command with global option", async () => {
-  const { options, args } = await cmd.parse(["sub-command", "-l", "halo"]);
+  const { options, args } = await cmd.parse(["cmd1", "-l", "halo"]);
 
   assertEquals(options, { level2: "HALO" });
   assertEquals(args, []);
@@ -71,7 +99,7 @@ Deno.test("sub command with global option", async () => {
 
 Deno.test("nested sub command with global option", async () => {
   const { options, args } = await cmd.parse(
-    ["sub-command", "sub-command", "-L", "halo"],
+    ["cmd1", "cmd2", "-L", "halo"],
   );
 
   assertEquals(options, { level3: "HALO" });
