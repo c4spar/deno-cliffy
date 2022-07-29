@@ -1779,7 +1779,7 @@ export class Command<
   }
 
   /** Check if new version is available and add hint to version. */
-  private async checkVersion(): Promise<void> {
+  public async checkVersion(): Promise<void> {
     const mainCommand = this.getMainCommand();
     const upgradeCommand = mainCommand.getCommand("upgrade");
 
