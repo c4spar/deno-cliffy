@@ -30,6 +30,7 @@ Deno.test("[flags] should allow empty if enabled", async () => {
     .allowEmpty(true)
     .parse([]);
 
-  assertEquals(options, {});
+  // @TODO: fix types for allowEmpty. (make all options optional)
+  assertEquals(options, {} as unknown);
   assertEquals(args, []);
 });

@@ -38,7 +38,8 @@ Deno.test("command optionConflicts noArguments", async () => {
 Deno.test("command optionConflicts type", async () => {
   const { options, args } = await cmd.parse(["-t", "value"]);
 
-  assertEquals(options, { type: "value" });
+  // @TODO: fix types for conflicting options. (make them optional)
+  assertEquals(options, { type: "value" } as unknown);
   assertEquals(args, []);
 });
 
@@ -49,7 +50,8 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
 
   assertEquals(
     options,
-    { videoType: "value", audioType: "value", imageType: "value" },
+    // @TODO: fix types for conflicting options. (make them optional)
+    { videoType: "value", audioType: "value", imageType: "value" } as unknown,
   );
   assertEquals(args, []);
 });
@@ -62,4 +64,25 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
     Error,
     `Option "--video-type" depends on option "--image-type".`,
   );
+});
+
+Deno.test("command optionConflicts type", async () => {
+  const { options, args } = await new Command()
+    .option("--foo [value]", "description ...", {
+      required: true,
+      conflicts: ["bar", "baz"],
+    })
+    .option("--bar", "description ...", {
+      required: true,
+      conflicts: ["foo"],
+    })
+    .option("--baz", "description ...", {
+      required: true,
+      conflicts: ["foo"],
+    })
+    .parse(["--foo", "value"]);
+
+  // @TODO: fix types for conflicting options. (make them optional)
+  assertEquals(options, { foo: "value" } as unknown);
+  assertEquals(args, []);
 });

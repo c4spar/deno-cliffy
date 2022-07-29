@@ -29,11 +29,11 @@ Deno.test("command - raw args - command with useRawArgs disabled", async () => {
 Deno.test("command - raw args - command with useRawArgs enabled", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
-    .useRawArgs()
     .option("-f, --flag [value:boolean]", "description ...")
     .option("-s, --script-arg1 [value:boolean]", "description ...")
     .option("-S, --script-arg2 [value:boolean]", "description ...")
     .arguments("[script:string] [args...:string]")
+    .useRawArgs()
     .action(() => {})
     .parse([
       "-f",
@@ -48,7 +48,8 @@ Deno.test("command - raw args - command with useRawArgs enabled", async () => {
       "--literal-arg2",
     ]);
 
-  assertEquals(options, {});
+  // TODO: fix empty options type.
+  assertEquals(options, {} as unknown as void);
   assertEquals(
     args,
     [
