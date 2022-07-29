@@ -537,7 +537,7 @@ export class Command<
     allowEmpty?: T,
   ): false extends T ? this
     : Command<Partial<CPG>, CPT, Partial<CO>, CA, CG, CT, CGT, CP> {
-    this.cmd._allowEmpty = allowEmpty === true;
+    this.cmd._allowEmpty = allowEmpty !== false;
     return this;
   }
 
@@ -2775,3 +2775,52 @@ interface ParseCommandContext {
   action?: ActionOption;
   literal?: string[];
 }
+
+// type ParseOptionsAndEnvVarsResult =
+//   | ParseOptionsResult & { error: null }
+//   | Record<keyof ParseOptionsResult, null> & { error: ValidationError };
+
+// type ParseGlobalOptionsAndEnvVarsResult =
+//   | ParseOptionsResult & { env: Record<string, unknown>; error: null }
+//   | Record<keyof ParseOptionsResult, null> & {
+//     env: null;
+//     error: ValidationError;
+//   };
+
+// try {
+//   return {
+//     ...this.parseOptions(this.rawArgs, options, parsedEnv, true),
+//     env: parsedEnv,
+//     error: null,
+//   };
+// } catch (error) {
+//   if (!(error instanceof ValidationError)) {
+//     throw error;
+//   }
+//   return {
+//     flags: null,
+//     unknown: null,
+//     actionOption: null,
+//     literal: null,
+//     env: null,
+//     error,
+//   };
+// }
+
+// try {
+//   return {
+//     ...this.parseOptions(args, options, parsedEnv),
+//     error: null,
+//   };
+// } catch (error) {
+//   if (!(error instanceof ValidationError)) {
+//     throw error;
+//   }
+//   return {
+//     flags: null,
+//     unknown: null,
+//     actionOption: null,
+//     literal: null,
+//     error,
+//   };
+// }
