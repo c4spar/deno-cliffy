@@ -19,7 +19,7 @@ const cmd3 = new Command()
   .throwErrors()
   .name("test-command")
   .option("-f, --check", "description ...")
-  .option("-f, --no-check", "description ...")
+  .option("--no-check", "description ...")
   .option("-a, --color <color>", "description ...")
   .action(() => {});
 
