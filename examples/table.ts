@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell, Table } from "https://deno.land/x/cliffy@v0.20.1/table/mod.ts";
+import { Cell, Table } from "https://deno.land/x/cliffy@v0.24.3/table/mod.ts";
 
 const table = new Table(
   [

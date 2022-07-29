@@ -5,7 +5,7 @@ import {
   Input,
   Number,
   Secret,
-} from "https://deno.land/x/cliffy@v0.20.1/prompt/mod.ts";
+} from "https://deno.land/x/cliffy@v0.24.3/prompt/mod.ts";
 
 let hostname: string, port: number, password: string;
 

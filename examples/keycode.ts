@@ -3,7 +3,7 @@
 import {
   KeyCode,
   parse,
-} from "https://deno.land/x/cliffy@v0.20.1/keycode/mod.ts";
+} from "https://deno.land/x/cliffy@v0.24.3/keycode/mod.ts";
 
 while (true) {
   const data = new Uint8Array(8);

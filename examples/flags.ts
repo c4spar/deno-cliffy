@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags } from "https://deno.land/x/cliffy@v0.20.1/flags/mod.ts";
+import { parseFlags } from "https://deno.land/x/cliffy@v0.24.3/flags/mod.ts";
 
 const { flags } = parseFlags(Deno.args, {
   stopEarly: true,

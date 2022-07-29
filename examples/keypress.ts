@@ -3,7 +3,7 @@
 import {
   keypress,
   KeyPressEvent,
-} from "https://deno.land/x/cliffy@v0.20.1/keypress/mod.ts";
+} from "https://deno.land/x/cliffy@v0.24.3/keypress/mod.ts";
 
 /** Promise */
 const event: KeyPressEvent = await keypress();
