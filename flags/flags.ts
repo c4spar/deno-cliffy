@@ -73,7 +73,6 @@ export function parseFlags<
   args = args.slice();
 
   let inLiteral = false;
-  let negate = false;
 
   const flags: Record<string, unknown> = {};
   /** Option name mapping: propertyName -> option.name */
@@ -104,6 +103,7 @@ export function parseFlags<
     let optionArgs: IFlagArgument[] | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
+    let negate = false;
 
     // literal args after --
     if (inLiteral) {
