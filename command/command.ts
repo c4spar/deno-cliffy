@@ -533,7 +533,7 @@ export class Command<
    * Don't throw an error if the command was called without arguments.
    * @param allowEmpty Enable/disable allow empty.
    */
-  public allowEmpty<T extends boolean | undefined>(
+  public allowEmpty<T extends boolean | undefined = undefined>(
     allowEmpty?: T,
   ): false extends T ? this
     : Command<Partial<CPG>, CPT, Partial<CO>, CA, CG, CT, CGT, CP> {
