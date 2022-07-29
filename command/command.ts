@@ -533,7 +533,9 @@ export class Command<
    * Don't throw an error if the command was called without arguments.
    * @param allowEmpty Enable/disable allow empty.
    */
-  public allowEmpty(allowEmpty = true): this {
+  public allowEmpty(
+    allowEmpty = true,
+  ): Command<Partial<CPG>, CPT, Partial<CO>, CA, CG, CT, CGT, CP> {
     this.cmd._allowEmpty = allowEmpty;
     return this;
   }
