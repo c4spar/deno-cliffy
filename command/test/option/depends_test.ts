@@ -22,7 +22,8 @@ Deno.test("command depends option with default value: should accept no arguments
 Deno.test("command depends option with default value: should accept -h", async () => {
   const { options, args } = await command().noExit().parse(["-h"]);
 
-  assertEquals(options, { flag2: "example", help: true });
+  // @TODO: add help & version option types to command.
+  assertEquals(options, { flag2: "example", help: true } as unknown);
   assertEquals(args, []);
 });
 
