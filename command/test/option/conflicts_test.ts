@@ -65,24 +65,3 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
     `Option "--video-type" depends on option "--image-type".`,
   );
 });
-
-Deno.test("command optionConflicts type", async () => {
-  const { options, args } = await new Command()
-    .option("--foo [value]", "description ...", {
-      required: true,
-      conflicts: ["bar", "baz"],
-    })
-    .option("--bar", "description ...", {
-      required: true,
-      conflicts: ["foo"],
-    })
-    .option("--baz", "description ...", {
-      required: true,
-      conflicts: ["foo"],
-    })
-    .parse(["--foo", "value"]);
-
-  // @TODO: fix types for conflicting options. (make them optional)
-  assertEquals(options, { foo: "value" } as unknown);
-  assertEquals(args, []);
-});
