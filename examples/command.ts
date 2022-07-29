@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-net=localhost:8080,deno.land
 
-import { Command } from "https://deno.land/x/cliffy@v0.20.1/command/mod.ts";
+import { Command } from "https://deno.land/x/cliffy@v0.24.3/command/mod.ts";
 import { serve } from "https://deno.land/std@0.150.0/http/server.ts";
 
 await new Command()
@@ -10,7 +10,7 @@ await new Command()
   .option("-p, --port <port:number>", "The port number for the local server.", {
     default: 8080,
   })
-  .option("-h, --host [hostname]", "The host name for the local server.", {
+  .option("--host <hostname>", "The host name for the local server.", {
     default: "localhost",
   })
   .arguments("[domain]")
@@ -28,6 +28,6 @@ await new Command()
         method: req.method,
         body: req.body,
       });
-    }, { addr: `${host}:${port}` });
+    }, { hostname: host, port });
   })
   .parse();
