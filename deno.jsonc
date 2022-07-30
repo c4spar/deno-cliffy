@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "lint": "deno lint && deno fmt --check",
+    "fmt": "deno fmt",
+    "test": "deno test --allow-env --allow-read --allow-run --unstable --parallel",
+    "coverage": "deno task test --coverage=./cov && deno coverage --unstable --lcov ./cov > cov.lcov",
+    "eggs": "deno run -A --unstable https://x.nest.land/eggs@0.3.10/eggs.ts"
+  }
+}

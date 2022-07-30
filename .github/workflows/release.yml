@@ -19,11 +19,9 @@ jobs:
           deno-version: v1.x
 
       - name: Setup eggs
-        run: >
-          deno install --unstable --allow-all https://x.nest.land/eggs@0.3.10/eggs.ts &&
-          eggs link "${NEST_TOKEN}"
+        run: deno task eggs link "${NEST_TOKEN}"
         env:
           NEST_TOKEN: ${{ secrets.NEST_TOKEN }}
 
       - name: Publish Nest.land
-        run: eggs publish --no-check --yes
+        run: deno task eggs publish --no-check --yes
