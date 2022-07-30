@@ -18,13 +18,11 @@ import { Table } from "../../table/table.ts";
 
 tty.cursorHide();
 
-const sig = Deno.signals.interrupt();
-(async () => {
-  for await (const _ of sig) {
-    tty.cursorShow();
-    Deno.exit(0);
-  }
-})();
+Deno.addSignalListener("SIGINT", () => {
+  console.log("interrupted!");
+  tty.cursorShow();
+  Deno.exit();
+});
 
 loop();
 

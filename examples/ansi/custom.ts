@@ -6,13 +6,11 @@ import { tty } from "../../ansi/tty.ts";
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();
 
-(async () => {
-  const sig = Deno.signals.interrupt();
-  for await (const _ of sig) {
-    tty.cursorShow();
-    Deno.exit(0);
-  }
-})();
+Deno.addSignalListener("SIGINT", () => {
+  console.log("interrupted!");
+  tty.cursorShow();
+  Deno.exit();
+});
 
 tty.clearScreen
   .cursorHide
