@@ -1,11 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import {
-  Confirm,
-  Input,
-  Number,
-  Secret,
-} from "https://deno.land/x/cliffy@v0.20.1/prompt/mod.ts";
+import { Confirm, Input, Number, Secret } from "../prompt/mod.ts";
 
 let hostname: string, port: number, password: string;
 
