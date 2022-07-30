@@ -1,9 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import {
-  keypress,
-  KeyPressEvent,
-} from "https://deno.land/x/cliffy@v0.24.3/keypress/mod.ts";
+import { keypress, KeyPressEvent } from "../keypress/mod.ts";
 
 /** Promise */
 const event: KeyPressEvent = await keypress();

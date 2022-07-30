@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { colors, tty } from "https://deno.land/x/cliffy@v0.24.3/ansi/mod.ts";
+import { colors, tty } from "../ansi/mod.ts";
 
 const error = colors.bold.red;
 const warn = colors.bold.yellow;
