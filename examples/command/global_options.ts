@@ -19,6 +19,7 @@ await new Command()
         new Command()
           .description("Some nested sub command.")
           .action(console.log),
-      ),
+      )
+      .reset(),
   )
   .parse(Deno.args);

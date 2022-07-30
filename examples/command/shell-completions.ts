@@ -13,7 +13,8 @@ await new Command()
   .option(
     "-v, --verbose <verbosity:number:verbose>",
     "Increase verbosity.",
-    { global: true, value: (cur, prev = 0) => prev + cur },
+    // deno-lint-ignore no-inferrable-types
+    { global: true, value: (cur, prev: number = 0) => prev + cur },
   )
   .option(
     "-s, --silent <val:string:my-type>",
@@ -47,7 +48,8 @@ await new Command()
       .action(({ color }, model: string) => console.log({ color, model }))
       .command("porsche <model:string:porsche>")
       .complete("porsche", () => ["911 GT3 RS", "718 Spyder"])
-      .action(({ color }, model: string) => console.log({ color, model })),
+      .action(({ color }, model: string) => console.log({ color, model }))
+      .reset(),
   )
   .command("completions", new CompletionsCommand())
   .parse();

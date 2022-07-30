@@ -26,6 +26,11 @@ jobs:
       - name: Run tests
         run: deno task coverage
 
+      - name: Type-check examples
+        run: deno check --unstable examples/*{.ts,/*.ts}
+        # @TODO: Use deno task as soon as globs are supported.
+        # run: deno task check:examples
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
