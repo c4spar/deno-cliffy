@@ -1,3 +1,45 @@
+# [v0.24.3](https://github.com/c4spar/deno-cliffy/compare/v0.24.2...v0.24.3) (Jul 29, 2022)
+
+### Features
+
+- **command:** support passing global options before sub-command (#388)
+  ([ecbbcc0](https://github.com/c4spar/deno-cliffy/commit/ecbbcc0))
+- **command:** add support for list type in arguments (#402)
+  ([6dd3a6c](https://github.com/c4spar/deno-cliffy/commit/6dd3a6c))
+- **command:** indicate required env vars in help text (#394)
+  ([8f51cca](https://github.com/c4spar/deno-cliffy/commit/8f51cca))
+
+### Bug Fixes
+
+- **command:** all options should be optional if `.allowEmpty()` is called
+  (#408) ([2ba7386](https://github.com/c4spar/deno-cliffy/commit/2ba7386))
+- **command:** negatable option causes parsing issues when positioned before
+  non-negatable options (#400)
+  ([751e1aa](https://github.com/c4spar/deno-cliffy/commit/751e1aa))
+- **command:** explicitly scope fish variables in completion script (#397)
+  ([2048a1e](https://github.com/c4spar/deno-cliffy/commit/2048a1e))
+- **command:** help text not always shown for validation error (#401)
+  ([e7bc0e8](https://github.com/c4spar/deno-cliffy/commit/e7bc0e8))
+- **command:** error handling not working correctly (#389)
+  ([0d66e88](https://github.com/c4spar/deno-cliffy/commit/0d66e88))
+
+### Code Refactoring
+
+- **command:** refactor `.parseCommand()` method (#404)
+  ([60b9dd7](https://github.com/c4spar/deno-cliffy/commit/60b9dd7))
+
+### Chore
+
+- **shellcheck:** disable shellcheck warnings temporarily (#395)
+  ([f7cccc6](https://github.com/c4spar/deno-cliffy/commit/f7cccc6))
+- **upgrade:** std@0.150.0 (#407)
+  ([41f3b69](https://github.com/c4spar/deno-cliffy/commit/41f3b69))
+
+### Documentation Updates
+
+- fix typo (#383)
+  ([8f3b27f](https://github.com/c4spar/deno-cliffy/commit/8f3b27f))
+
 # [v0.24.2](https://github.com/c4spar/deno-cliffy/compare/v0.24.1...v0.24.2) (May 10, 2022)
 
 ### Bug Fixes

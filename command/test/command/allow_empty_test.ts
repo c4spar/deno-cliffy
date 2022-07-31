@@ -27,10 +27,18 @@ Deno.test("[flags] should not allow empty if disabled", async () => {
 
 Deno.test("[flags] should allow empty if enabled", async () => {
   const { options, args } = await cmd()
+    .allowEmpty()
+    .parse([]);
+
+  assertEquals(options, {});
+  assertEquals(args, []);
+});
+
+Deno.test("[flags] should allow empty if enabled with true", async () => {
+  const { options, args } = await cmd()
     .allowEmpty(true)
     .parse([]);
 
-  // @TODO: fix types for allowEmpty. (make all options optional)
-  assertEquals(options, {} as unknown);
+  assertEquals(options, {});
   assertEquals(args, []);
 });

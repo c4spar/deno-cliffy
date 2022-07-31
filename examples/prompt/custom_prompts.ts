@@ -12,20 +12,21 @@ const result = await prompt([{
   // build-in prompt
   type: Input,
 }, {
-  name: "customText",
-  message: `Enter more text`,
-  // using an object/method as custom prompt
-  type: {
-    async prompt(options: { message: string }): Promise<string> {
-      const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
-      await Deno.stdout.write(new TextEncoder().encode(message));
-
-      const result = await new BufReader(Deno.stdin).readLine();
-
-      return result ? new TextDecoder().decode(result.line) : "";
-    },
-  },
-}, {
+  // @TODO: Fix custom prompt example.
+  //   name: "customText",
+  //   message: `Enter more text`,
+  //   // using an object/method as custom prompt
+  //   type: {
+  //     async prompt(options: { message: string }): Promise<string> {
+  //       const message = ` ? ${options.message} ${Figures.POINTER_SMALL} `;
+  //       await Deno.stdout.write(new TextEncoder().encode(message));
+  //
+  //       const result = await new BufReader(Deno.stdin).readLine();
+  //
+  //       return result ? new TextDecoder().decode(result.line) : "";
+  //     },
+  //   },
+  // }, {
   name: "customNumber",
   message: `Enter a number`,
   // using a class as custom prompt

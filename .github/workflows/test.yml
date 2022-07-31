@@ -24,10 +24,7 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run tests
-        run: deno test --unstable --coverage=./cov --allow-all
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./cov > cov.lcov
+        run: deno task coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

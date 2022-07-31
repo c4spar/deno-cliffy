@@ -126,6 +126,7 @@ export class Command<
 
   /** Disable version option. */
   public versionOption(enable: false): this;
+
   /**
    * Set global version option.
    * @param flags The flags of the version option.
@@ -139,6 +140,7 @@ export class Command<
       global: true;
     },
   ): this;
+
   /**
    * Set version option.
    * @param flags The flags of the version option.
@@ -150,6 +152,7 @@ export class Command<
     desc?: string,
     opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
+
   /**
    * Set version option.
    * @param flags The flags of the version option.
@@ -161,6 +164,7 @@ export class Command<
     desc?: string,
     opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
+
   public versionOption(
     flags: string | false,
     desc?: string,
@@ -181,6 +185,7 @@ export class Command<
 
   /** Disable help option. */
   public helpOption(enable: false): this;
+
   /**
    * Set global help option.
    * @param flags The flags of the help option.
@@ -194,6 +199,7 @@ export class Command<
       global: true;
     },
   ): this;
+
   /**
    * Set help option.
    * @param flags The flags of the help option.
@@ -205,6 +211,7 @@ export class Command<
     desc?: string,
     opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
+
   /**
    * Set help option.
    * @param flags The flags of the help option.
@@ -216,6 +223,7 @@ export class Command<
     desc?: string,
     opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
+
   public helpOption(
     flags: string | false,
     desc?: string,
@@ -535,8 +543,11 @@ export class Command<
    * Don't throw an error if the command was called without arguments.
    * @param allowEmpty Enable/disable allow empty.
    */
-  public allowEmpty(allowEmpty = true): this {
-    this.cmd._allowEmpty = allowEmpty;
+  public allowEmpty<T extends boolean | undefined = undefined>(
+    allowEmpty?: T,
+  ): false extends T ? this
+    : Command<Partial<CPG>, CPT, Partial<CO>, CA, CG, CT, CGT, CP> {
+    this.cmd._allowEmpty = allowEmpty !== false;
     return this;
   }
 
@@ -679,7 +690,8 @@ export class Command<
     complete: ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
     options?: ICompleteOptions,
   ): this;
-  complete(
+
+  public complete(
     name: string,
     complete:
       | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
@@ -1143,15 +1155,15 @@ export class Command<
       this.registerDefaults();
       return await this.parseCommand({ args }) as any;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw this.error(error);
-      } else {
-        throw this.error(new Error(`[non-error-thrown] ${error}`));
-      }
+      this.throw(
+        error instanceof Error
+          ? error
+          : new Error(`[non-error-thrown] ${error}`),
+      );
     }
   }
 
-  private async parseCommand(ctx: ParseCommandContext): Promise<IParseResult> {
+  private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
     this.reset();
     this.rawArgs = ctx.args;
 
@@ -1193,12 +1205,15 @@ export class Command<
     if (subCommand || ctx.args.length > 0) {
       if (!subCommand) {
         subCommand = this.getCommand(ctx.args[0], true);
+
         if (subCommand) {
           ctx.args = ctx.args.slice(1);
         }
       }
+
       if (subCommand) {
         subCommand._globalParent = this;
+
         return subCommand.parseCommand(ctx);
       }
     }
@@ -1217,6 +1232,7 @@ export class Command<
     // Execute option action.
     if (ctx.action) {
       await ctx.action.action.call(this, options, ...params);
+
       if (ctx.action.standalone) {
         return {
           options,
@@ -1231,8 +1247,8 @@ export class Command<
   }
 
   private async parseGlobalOptionsAndEnvVars(
-    ctx: ParseCommandContext,
-  ): Promise<ParseCommandContext> {
+    ctx: ParseContext,
+  ): Promise<ParseContext> {
     // Parse global env vars.
     const envVars = [
       ...this.envVars.filter((envVar) => envVar.global),
@@ -1246,16 +1262,14 @@ export class Command<
       ...this.options.filter((option) => option.global),
       ...this.getGlobalOptions(true),
     ];
-    const result = this.parseOptions(ctx.args, options, env, true);
 
-    // Merge context.
-    return this.mergeContext(ctx, result, env);
+    return this.parseOptions(ctx, options, env, true);
   }
 
   private async parseOptionsAndEnvVars(
-    ctx: ParseCommandContext,
+    ctx: ParseContext,
     preParseGlobals: boolean,
-  ): Promise<ParseCommandContext> {
+  ): Promise<ParseContext> {
     // Parse env vars.
     const envVars = preParseGlobals
       ? this.envVars.filter((envVar) => !envVar.global)
@@ -1268,24 +1282,7 @@ export class Command<
       ? this.options.filter((option) => !option.global)
       : this.getOptions(true);
 
-    const result = this.parseOptions(ctx.args, options, env);
-
-    // Merge context.
-    return this.mergeContext(ctx, result, env);
-  }
-
-  private mergeContext(
-    ctx: ParseCommandContext,
-    result: ParseOptionsResult,
-    env: Record<string, unknown>,
-  ): ParseCommandContext {
-    return {
-      args: result.args,
-      options: { ...ctx.options, ...result.options },
-      env: { ...ctx.env, ...env },
-      action: ctx.action ?? result.action,
-      literal: result.literal,
-    };
+    return this.parseOptions(ctx, options, env);
   }
 
   /** Register default options like `--version` and `--help`. */
@@ -1410,6 +1407,7 @@ export class Command<
         cmd: [command, ...args],
       });
       const status: Deno.ProcessStatus = await process.status();
+
       if (!status.success) {
         Deno.exit(status.code);
       }
@@ -1426,35 +1424,40 @@ export class Command<
    * @param args Raw command line arguments.
    */
   protected parseOptions(
-    args: string[],
+    ctx: ParseContext,
     options: IOption[],
     env: Record<string, unknown>,
     stopEarly: boolean = this._stopEarly,
-  ): ParseOptionsResult {
+  ): ParseContext {
     try {
-      let actionOption: ActionOption | undefined;
-      const result = parseFlags(args, {
+      let action: ActionOption | undefined;
+
+      const parseResult = parseFlags(ctx.args, {
         stopEarly,
         allowEmpty: this._allowEmpty,
         flags: options,
         ignoreDefaults: env,
         parse: (type: ITypeInfo) => this.parseType(type),
         option: (option: IOption) => {
-          if (!actionOption && option.action) {
-            actionOption = option as ActionOption;
+          if (!action && option.action) {
+            action = option as ActionOption;
           }
         },
       });
+
+      // Merge context.
       return {
-        options: result.flags,
-        args: result.unknown,
-        literal: result.literal,
-        action: actionOption,
+        args: parseResult.unknown,
+        options: { ...ctx.options, ...parseResult.flags },
+        env: { ...ctx.env, ...env },
+        action: ctx.action ?? action,
+        literal: parseResult.literal,
       };
     } catch (error) {
       if (error instanceof FlagsValidationError) {
         throw new ValidationError(error.message);
       }
+
       throw error;
     }
   }
@@ -1543,9 +1546,12 @@ export class Command<
   /**
    * Parse command-line arguments.
    * @param args  Raw command line arguments.
-   * @param flags Parsed command line options.
+   * @param options Parsed command line options.
    */
-  protected parseArguments(args: string[], flags: Record<string, unknown>): CA {
+  protected parseArguments(
+    args: string[],
+    options: Record<string, unknown>,
+  ): CA {
     const params: Array<unknown> = [];
 
     // remove array reference
@@ -1566,8 +1572,8 @@ export class Command<
           .map((expectedArg) => expectedArg.name);
 
         if (required.length) {
-          const flagNames: string[] = Object.keys(flags);
-          const hasStandaloneOption = !!flagNames.find((name) =>
+          const optionNames: string[] = Object.keys(options);
+          const hasStandaloneOption = !!optionNames.find((name) =>
             this.getOption(name, true)?.standalone
           );
 
@@ -1629,12 +1635,14 @@ export class Command<
    * will be called.
    * @param error Error to handle.
    */
-  protected error(error: Error): Error {
+  protected throw(error: Error): never {
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
-      return error;
+      throw error;
     }
     this.showHelp();
+
     console.error(red(`  ${bold("error")}: ${error.message}\n`));
+
     Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
@@ -1788,21 +1796,20 @@ export class Command<
   public async checkVersion(): Promise<void> {
     const mainCommand = this.getMainCommand();
     const upgradeCommand = mainCommand.getCommand("upgrade");
-    if (isUpgradeCommand(upgradeCommand)) {
-      const latestVersion = await upgradeCommand.getLatestVersion();
-      const currentVersion = mainCommand.getVersion();
-      if (currentVersion !== latestVersion) {
-        mainCommand.version(
-          `${currentVersion}  ${
-            bold(
-              yellow(
-                `(New version available: ${latestVersion}. Run '${mainCommand.getName()} upgrade' to upgrade to the latest version!)`,
-              ),
-            )
-          }`,
-        );
-      }
+
+    if (!isUpgradeCommand(upgradeCommand)) {
+      return;
     }
+    const latestVersion = await upgradeCommand.getLatestVersion();
+    const currentVersion = mainCommand.getVersion();
+
+    if (currentVersion === latestVersion) {
+      return;
+    }
+    const versionHelpText =
+      `(New version available: ${latestVersion}. Run '${mainCommand.getName()} upgrade' to upgrade to the latest version!)`;
+
+    mainCommand.version(`${currentVersion}  ${bold(yellow(versionHelpText))}`);
   }
 
   /*****************************************************************************
@@ -2391,6 +2398,16 @@ interface IDefaultOption {
   opts?: ICommandOption;
 }
 
+type ActionOption = IOption & { action: IAction };
+
+interface ParseContext {
+  args: string[];
+  options?: Record<string, unknown>;
+  env?: Record<string, unknown>;
+  action?: ActionOption;
+  literal?: string[];
+}
+
 type TrimLeft<T extends string, V extends string | undefined> = T extends
   `${V}${infer U}` ? U
   : T;
@@ -2780,20 +2797,3 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
 >;
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
-
-type ActionOption = IOption & { action: IAction };
-
-type ParseOptionsResult = {
-  options: Record<string, unknown>;
-  args: Array<string>;
-  literal: Array<string>;
-  action?: ActionOption;
-};
-
-interface ParseCommandContext {
-  args: string[];
-  options?: Record<string, unknown>;
-  env?: Record<string, unknown>;
-  action?: ActionOption;
-  literal?: string[];
-}

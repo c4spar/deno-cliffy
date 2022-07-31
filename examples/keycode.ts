@@ -1,9 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import {
-  KeyCode,
-  parse,
-} from "https://deno.land/x/cliffy@v0.20.1/keycode/mod.ts";
+import { KeyCode, parse } from "../keycode/mod.ts";
 
 while (true) {
   const data = new Uint8Array(8);
