@@ -1476,8 +1476,8 @@ export class Command<
     }
   }
 
-  /** 
-   * Read and validate environment variables. 
+  /**
+   * Read and validate environment variables.
    * @param envVars env vars defined by the command
    * @param validate when true, throws an error if a required env var is missing
    */
