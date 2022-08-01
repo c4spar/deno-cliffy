@@ -1242,7 +1242,8 @@ export class Command<
       ...this.getGlobalEnvVars(true),
     ];
 
-    const env = await this.parseEnvVars(envVars);
+    const isHelpOption = ctx.options?.help === true;
+    const env = await this.parseEnvVars(envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1262,7 +1263,11 @@ export class Command<
       ? this.envVars.filter((envVar) => !envVar.global)
       : this.getEnvVars(true);
 
-    const env = { ...ctx.env, ...await this.parseEnvVars(envVars) };
+    const isHelpOption = ctx.options?.help === true;
+    const env = {
+      ...ctx.env,
+      ...await this.parseEnvVars(envVars, !isHelpOption),
+    };
 
     // Parse options.
     const options = preParseGlobals
@@ -1471,9 +1476,14 @@ export class Command<
     }
   }
 
-  /** Validate environment variables. */
+  /** 
+   * Read and validate environment variables. 
+   * @param envVars env vars defined by the command
+   * @param validate when true, throws an error if a required env var is missing
+   */
   protected async parseEnvVars(
     envVars: Array<IEnvVar>,
+    validate = true,
   ): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {};
 
@@ -1521,7 +1531,7 @@ export class Command<
         if (env.value && typeof result[propertyName] !== "undefined") {
           result[propertyName] = env.value(result[propertyName]);
         }
-      } else if (env.required) {
+      } else if (env.required && validate) {
         throw new MissingRequiredEnvVar(env);
       }
     }
