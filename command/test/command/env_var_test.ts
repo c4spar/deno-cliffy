@@ -106,10 +106,8 @@ Deno.test("[command] - env var - missing required env var", async () => {
 
 Deno.test("[command] - env var - ignores required env vars for help", async () => {
   await new Command()
-    .throwErrors()
+    .noExit()
     .env("foo", "...", { required: true })
-    // override default help action so Deno.exit() isn't called
-    .helpOption("", undefined, { action: () => {} })
     .parse(["--help"]);
 });
 

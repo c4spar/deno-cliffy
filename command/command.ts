@@ -115,8 +115,10 @@ export class Command<
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
-  private _versionOption?: IDefaultOption | false;
-  private _helpOption?: IDefaultOption | false;
+  private _versionOptions?: IDefaultOption | false;
+  private _helpOptions?: IDefaultOption | false;
+  private _versionOption?: IOption;
+  private _helpOption?: IOption;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
@@ -173,7 +175,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._versionOption = flags === false ? flags : {
+    this._versionOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -232,7 +234,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._helpOption = flags === false ? flags : {
+    this._helpOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -1236,14 +1238,18 @@ export class Command<
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
   ): Promise<ParseContext> {
-    // Parse global env vars.
-    const envVars = [
-      ...this.envVars.filter((envVar) => envVar.global),
-      ...this.getGlobalEnvVars(true),
-    ];
+    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
+    let env: Record<string, unknown> = {};
 
-    const isHelpOption = ctx.options?.help === true;
-    const env = await this.parseEnvVars(envVars, !isHelpOption);
+    // Parse global env vars.
+    if (!isHelpOption) {
+      const envVars = [
+        ...this.envVars.filter((envVar) => envVar.global),
+        ...this.getGlobalEnvVars(true),
+      ];
+
+      env = await this.parseEnvVars(envVars);
+    }
 
     // Parse global options.
     const options = [
@@ -1258,16 +1264,19 @@ export class Command<
     ctx: ParseContext,
     preParseGlobals: boolean,
   ): Promise<ParseContext> {
-    // Parse env vars.
-    const envVars = preParseGlobals
-      ? this.envVars.filter((envVar) => !envVar.global)
-      : this.getEnvVars(true);
+    const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
+    const isHelpOption = this._helpOption &&
+      ctx.options?.[this._helpOption?.name] === true;
+    let env: Record<string, unknown> = {};
 
-    const isHelpOption = ctx.options?.help === true;
-    const env = {
-      ...ctx.env,
-      ...await this.parseEnvVars(envVars, !isHelpOption),
-    };
+    // Parse env vars.
+    if (!isHelpOption && !isVersionOption) {
+      const envVars = preParseGlobals
+        ? this.envVars.filter((envVar) => !envVar.global)
+        : this.getEnvVars(true);
+
+      env = { ...ctx.env, ...await this.parseEnvVars(envVars) };
+    }
 
     // Parse options.
     const options = preParseGlobals
@@ -1304,16 +1313,18 @@ export class Command<
       });
     }
 
-    if (this._versionOption !== false && (this._versionOption || this.ver)) {
+    if (this._versionOptions !== false && (this._versionOptions || this.ver)) {
       this.option(
-        this._versionOption?.flags || "-V, --version",
-        this._versionOption?.desc ||
+        this._versionOptions?.flags || "-V, --version",
+        this._versionOptions?.desc ||
           "Show the version number for this program.",
         {
           standalone: true,
           prepend: true,
           action: async function () {
-            const long = this.getRawArgs().includes(`--${versionOption.name}`);
+            const long = this.getRawArgs().includes(
+              `--${this._versionOption?.name}`,
+            );
             if (long) {
               await this.checkVersion();
               this.showLongVersion();
@@ -1322,30 +1333,32 @@ export class Command<
             }
             this.exit();
           },
-          ...(this._versionOption?.opts ?? {}),
+          ...(this._versionOptions?.opts ?? {}),
         },
       );
-      const versionOption = this.options[0];
+      this._versionOption = this.options[0];
     }
 
-    if (this._helpOption !== false) {
+    if (this._helpOptions !== false) {
       this.option(
-        this._helpOption?.flags || "-h, --help",
-        this._helpOption?.desc || "Show this help.",
+        this._helpOptions?.flags || "-h, --help",
+        this._helpOptions?.desc || "Show this help.",
         {
           standalone: true,
           global: true,
           prepend: true,
           action: async function () {
-            const long = this.getRawArgs().includes(`--${helpOption.name}`);
+            const long = this.getRawArgs().includes(
+              `--${this._helpOption?.name}`,
+            );
             await this.checkVersion();
             this.showHelp({ long });
             this.exit();
           },
-          ...(this._helpOption?.opts ?? {}),
+          ...(this._helpOptions?.opts ?? {}),
         },
       );
-      const helpOption = this.options[0];
+      this._helpOption = this.options[0];
     }
 
     return this;
@@ -1476,14 +1489,9 @@ export class Command<
     }
   }
 
-  /**
-   * Read and validate environment variables.
-   * @param envVars env vars defined by the command
-   * @param validate when true, throws an error if a required env var is missing
-   */
+  /** Validate environment variables. */
   protected async parseEnvVars(
     envVars: Array<IEnvVar>,
-    validate = true,
   ): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {};
 
@@ -1531,7 +1539,7 @@ export class Command<
         if (env.value && typeof result[propertyName] !== "undefined") {
           result[propertyName] = env.value(result[propertyName]);
         }
-      } else if (env.required && validate) {
+      } else if (env.required) {
         throw new MissingRequiredEnvVar(env);
       }
     }
