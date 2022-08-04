@@ -1495,20 +1495,12 @@ export class Command<
   ): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {};
 
-    if (!envVars.length) {
-      return result;
-    }
-
-    const hasEnvPermissions = (await Deno.permissions.query({
-      name: "env",
-    })).state === "granted";
-
     for (const env of envVars) {
-      const name = hasEnvPermissions && env.names.find(
-        (name: string) => !!Deno.env.get(name),
-      );
+      const found = await this.findEnvVar(env.names);
 
-      if (name) {
+      if (found) {
+        const { name, value } = found;
+
         const propertyName = underscoreToCamelCase(
           env.prefix
             ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
@@ -1516,8 +1508,7 @@ export class Command<
         );
 
         if (env.details.list) {
-          const values = Deno.env.get(name)
-            ?.split(env.details.separator ?? ",") ?? [""];
+          const values = value.split(env.details.separator ?? ",");
 
           result[propertyName] = values.map((value) =>
             this.parseType({
@@ -1532,7 +1523,7 @@ export class Command<
             label: "Environment variable",
             type: env.type,
             name,
-            value: Deno.env.get(name) ?? "",
+            value,
           });
         }
 
@@ -1545,6 +1536,27 @@ export class Command<
     }
 
     return result;
+  }
+
+  protected async findEnvVar(
+    names: readonly string[],
+  ): Promise<{ name: string; value: string } | undefined> {
+    for (const name of names) {
+      const status = await Deno.permissions.query({
+        name: "env",
+        variable: name,
+      });
+
+      if (status.state === "granted") {
+        const value = Deno.env.get(name);
+
+        if (value) {
+          return { name, value };
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
