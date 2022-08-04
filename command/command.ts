@@ -1238,18 +1238,14 @@ export class Command<
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
   ): Promise<ParseContext> {
-    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
-    let env: Record<string, unknown> = {};
-
     // Parse global env vars.
-    if (!isHelpOption) {
-      const envVars = [
-        ...this.envVars.filter((envVar) => envVar.global),
-        ...this.getGlobalEnvVars(true),
-      ];
+    const envVars = [
+      ...this.envVars.filter((envVar) => envVar.global),
+      ...this.getGlobalEnvVars(true),
+    ];
 
-      env = await this.parseEnvVars(envVars);
-    }
+    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
+    const env = await this.parseEnvVars(envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1264,19 +1260,18 @@ export class Command<
     ctx: ParseContext,
     preParseGlobals: boolean,
   ): Promise<ParseContext> {
+    // Parse env vars.
+    const envVars = preParseGlobals
+      ? this.envVars.filter((envVar) => !envVar.global)
+      : this.getEnvVars(true);
+
     const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
     const isHelpOption = this._helpOption &&
       ctx.options?.[this._helpOption?.name] === true;
-    let env: Record<string, unknown> = {};
-
-    // Parse env vars.
-    if (!isHelpOption && !isVersionOption) {
-      const envVars = preParseGlobals
-        ? this.envVars.filter((envVar) => !envVar.global)
-        : this.getEnvVars(true);
-
-      env = { ...ctx.env, ...await this.parseEnvVars(envVars) };
-    }
+    const env = {
+      ...ctx.env,
+      ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
+    };
 
     // Parse options.
     const options = preParseGlobals
@@ -1489,9 +1484,14 @@ export class Command<
     }
   }
 
-  /** Validate environment variables. */
+  /**
+   * Read and validate environment variables.
+   * @param envVars env vars defined by the command
+   * @param validate when true, throws an error if a required env var is missing
+   */
   protected async parseEnvVars(
     envVars: Array<IEnvVar>,
+    validate = true,
   ): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {};
 
@@ -1539,7 +1539,7 @@ export class Command<
         if (env.value && typeof result[propertyName] !== "undefined") {
           result[propertyName] = env.value(result[propertyName]);
         }
-      } else if (env.required) {
+      } else if (env.required && validate) {
         throw new MissingRequiredEnvVar(env);
       }
     }
