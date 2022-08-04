@@ -111,6 +111,14 @@ Deno.test("[command] - env var - ignores required env vars for help", async () =
     .parse(["--help"]);
 });
 
+Deno.test("[command] - env var - ignores required env vars for version", async () => {
+  await new Command()
+    .noExit()
+    .version("1.0.0")
+    .env("foo", "...", { required: true })
+    .parse(["--version"]);
+});
+
 Deno.test("[command] - env var - should map the value", async () => {
   setupEnv();
   const { options } = await new Command()
