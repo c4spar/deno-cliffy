@@ -519,7 +519,7 @@ export class Command<
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
   public arguments<
-    A extends TypedArguments<N, Merge<CPT, Merge<CGT, CT>>>,
+    A extends TypedArgumentDefinition<N, Merge<CPT, Merge<CGT, CT>>>,
     N extends string = string,
   >(
     args: N,
@@ -1601,7 +1601,12 @@ export class Command<
             arg = parseArgValue(args.shift() as string);
           }
 
-          if (typeof arg !== "undefined") {
+          if (
+            expectedArg.variadic && this.getArguments().length === 1 &&
+            Array.isArray(arg)
+          ) {
+            params.push(...arg);
+          } else if (typeof arg !== "undefined") {
             params.push(arg);
           }
         }
@@ -2476,6 +2481,14 @@ type RestArgs = OptionalOrRequiredValue<
   `${RestValue}`
 >;
 
+/// Any kind of rest args.
+type JustRestArgs<T extends string> =
+  | RestArgs
+  | RestArgsType<T>
+  | RestArgsTypeCompletion<T>
+  | RestArgsListType<T>
+  | RestArgsListTypeCompletion<T>;
+
 /**
  * Single arg with list type and completions.
  *
@@ -2695,6 +2708,13 @@ type TypedOption<
   : F extends `-${infer Name}` ? BooleanOption<Name, CO, IsRequired<R, D>, D>
   : Record<string, unknown>;
 
+type TypedArgumentDefinition<
+  A extends string,
+  T extends Record<string, any> | void,
+> = A extends JustRestArgs<A> & `[${string}]` ? (ArgumentType<A, T> | undefined)
+  : A extends JustRestArgs<A> ? ArgumentType<A, T>
+  : TypedArguments<A, T>;
+
 type TypedArguments<A extends string, T extends Record<string, any> | void> =
   number extends T ? any
     : A extends `${infer Arg} ${infer Rest}`
@@ -2705,7 +2725,7 @@ type TypedArguments<A extends string, T extends Record<string, any> | void> =
     : [ArgumentType<A, T>];
 
 type TypedCommandArguments<N extends string, T> = number extends T ? any
-  : N extends `${string} ${infer Args}` ? TypedArguments<Args, T>
+  : N extends `${string} ${infer Args}` ? TypedArgumentDefinition<Args, T>
   : [];
 
 type TypedEnv<

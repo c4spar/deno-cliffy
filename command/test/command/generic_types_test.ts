@@ -506,6 +506,21 @@ import {
   });
 
   Deno.test({
+    name: "[command] - generic types - just a variadic arg",
+    fn() {
+      new Command()
+        .type("color", new EnumType(["red", "blue"]))
+        .arguments("<...args:number>")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, number[]>>(true);
+          assert<
+            IsExact<typeof options, void>
+          >(true);
+        });
+    },
+  });
+
+  Deno.test({
     name: "[command] - generic types - many arguments",
     fn() {
       enum Lang {
@@ -567,6 +582,19 @@ import {
         .command("foo <val:number>")
         .action((options, ...args) => {
           assert<IsExact<typeof args, [number]>>(true);
+          assert<IsExact<typeof options, void>>(true);
+        });
+    },
+  });
+
+  Deno.test({
+    name:
+      "[command] - generic types - command arguments with just a variadic argument",
+    fn() {
+      new Command()
+        .command("foo <...val>")
+        .action((options, ...args) => {
+          assert<IsExact<typeof args, string[]>>(true);
           assert<IsExact<typeof options, void>>(true);
         });
     },

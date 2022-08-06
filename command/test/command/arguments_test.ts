@@ -60,6 +60,15 @@ describe("command arguments", () => {
     assertEquals(args, ["abc", 123, true, "red", [1, 2, 3, 4]]);
   });
 
+  it("should parse correctly an isolated variadic argument", async () => {
+    const { args } = await new Command()
+      .throwErrors()
+      .arguments("<...foo:string>")
+      .parse(["foo", "bar", "baz"]);
+
+    assertEquals(args, ["foo", "bar", "baz"]);
+  });
+
   it("should parse correctly argument types with sub command arguments", async () => {
     const { args } = await cmd2().parse([
       "foo",
