@@ -2478,14 +2478,6 @@ type RestArgs = OptionalOrRequiredValue<
   `${RestValue}`
 >;
 
-/// Any kind of rest args.
-type JustRestArgs<T extends string> =
-  | RestArgs
-  | RestArgsType<T>
-  | RestArgsTypeCompletion<T>
-  | RestArgsListType<T>
-  | RestArgsListTypeCompletion<T>;
-
 /**
  * Single arg with list type and completions.
  *
