@@ -512,7 +512,7 @@ import {
         .type("color", new EnumType(["red", "blue"]))
         .arguments("<...args:number>")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, number[]>>(true);
+          assert<IsExact<typeof args, [number, ...Array<number>]>>(true);
           assert<
             IsExact<typeof options, void>
           >(true);
@@ -546,7 +546,7 @@ import {
               number?,
               boolean?,
               ("red" | "blue")?,
-              Array<Array<Lang>>?,
+              ...Array<Array<Lang>>,
             ]>
           >(true);
           assert<IsExact<typeof options, void>>(true);
@@ -566,7 +566,7 @@ import {
             IsExact<typeof args, [
               string,
               ("red" | "blue")?,
-              Array<Array<"js" | "rust">>?,
+              ...Array<Array<"js" | "rust">>,
             ]>
           >(true);
 
@@ -594,7 +594,7 @@ import {
       new Command()
         .command("foo <...val>")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, string[]>>(true);
+          assert<IsExact<typeof args, [string, ...Array<string>]>>(true);
           assert<IsExact<typeof options, void>>(true);
         });
     },
@@ -612,7 +612,7 @@ import {
             IsExact<typeof args, [
               string,
               ("red" | "blue")?,
-              Array<Array<"js" | "rust">>?,
+              ...Array<Array<"js" | "rust">>,
             ]>
           >(true);
 

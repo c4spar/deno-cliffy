@@ -7,7 +7,7 @@ export class CompleteCommand extends Command<
   void,
   void,
   void,
-  [action: string, commandNames?: Array<string>]
+  [action: string, ...commandNames: Array<string>]
 > {
   public constructor(cmd?: Command) {
     super();
@@ -16,7 +16,7 @@ export class CompleteCommand extends Command<
         "Get completions for given action from given command.",
       )
       .arguments("<action:string> [command...:string]")
-      .action(async (_, action: string, commandNames?: Array<string>) => {
+      .action(async (_, action: string, ...commandNames: Array<string>) => {
         let parent: Command | undefined;
         const completeCommand: Command = commandNames
           ?.reduce((cmd: Command, name: string): Command => {
