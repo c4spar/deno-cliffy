@@ -115,8 +115,10 @@ export class Command<
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
-  private _versionOption?: IDefaultOption | false;
-  private _helpOption?: IDefaultOption | false;
+  private _versionOptions?: IDefaultOption | false;
+  private _helpOptions?: IDefaultOption | false;
+  private _versionOption?: IOption;
+  private _helpOption?: IOption;
   private _help?: IHelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
@@ -173,7 +175,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._versionOption = flags === false ? flags : {
+    this._versionOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -232,7 +234,7 @@ export class Command<
         global: true;
       },
   ): this {
-    this._helpOption = flags === false ? flags : {
+    this._helpOptions = flags === false ? flags : {
       flags,
       desc,
       opts: typeof opts === "function" ? { action: opts } : opts,
@@ -1242,7 +1244,8 @@ export class Command<
       ...this.getGlobalEnvVars(true),
     ];
 
-    const env = await this.parseEnvVars(envVars);
+    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
+    const env = await this.parseEnvVars(envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1262,7 +1265,13 @@ export class Command<
       ? this.envVars.filter((envVar) => !envVar.global)
       : this.getEnvVars(true);
 
-    const env = { ...ctx.env, ...await this.parseEnvVars(envVars) };
+    const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
+    const isHelpOption = this._helpOption &&
+      ctx.options?.[this._helpOption?.name] === true;
+    const env = {
+      ...ctx.env,
+      ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
+    };
 
     // Parse options.
     const options = preParseGlobals
@@ -1299,16 +1308,18 @@ export class Command<
       });
     }
 
-    if (this._versionOption !== false && (this._versionOption || this.ver)) {
+    if (this._versionOptions !== false && (this._versionOptions || this.ver)) {
       this.option(
-        this._versionOption?.flags || "-V, --version",
-        this._versionOption?.desc ||
+        this._versionOptions?.flags || "-V, --version",
+        this._versionOptions?.desc ||
           "Show the version number for this program.",
         {
           standalone: true,
           prepend: true,
           action: async function () {
-            const long = this.getRawArgs().includes(`--${versionOption.name}`);
+            const long = this.getRawArgs().includes(
+              `--${this._versionOption?.name}`,
+            );
             if (long) {
               await this.checkVersion();
               this.showLongVersion();
@@ -1317,30 +1328,32 @@ export class Command<
             }
             this.exit();
           },
-          ...(this._versionOption?.opts ?? {}),
+          ...(this._versionOptions?.opts ?? {}),
         },
       );
-      const versionOption = this.options[0];
+      this._versionOption = this.options[0];
     }
 
-    if (this._helpOption !== false) {
+    if (this._helpOptions !== false) {
       this.option(
-        this._helpOption?.flags || "-h, --help",
-        this._helpOption?.desc || "Show this help.",
+        this._helpOptions?.flags || "-h, --help",
+        this._helpOptions?.desc || "Show this help.",
         {
           standalone: true,
           global: true,
           prepend: true,
           action: async function () {
-            const long = this.getRawArgs().includes(`--${helpOption.name}`);
+            const long = this.getRawArgs().includes(
+              `--${this._helpOption?.name}`,
+            );
             await this.checkVersion();
             this.showHelp({ long });
             this.exit();
           },
-          ...(this._helpOption?.opts ?? {}),
+          ...(this._helpOptions?.opts ?? {}),
         },
       );
-      const helpOption = this.options[0];
+      this._helpOption = this.options[0];
     }
 
     return this;
@@ -1471,26 +1484,23 @@ export class Command<
     }
   }
 
-  /** Validate environment variables. */
+  /**
+   * Read and validate environment variables.
+   * @param envVars env vars defined by the command
+   * @param validate when true, throws an error if a required env var is missing
+   */
   protected async parseEnvVars(
     envVars: Array<IEnvVar>,
+    validate = true,
   ): Promise<Record<string, unknown>> {
     const result: Record<string, unknown> = {};
 
-    if (!envVars.length) {
-      return result;
-    }
-
-    const hasEnvPermissions = (await Deno.permissions.query({
-      name: "env",
-    })).state === "granted";
-
     for (const env of envVars) {
-      const name = hasEnvPermissions && env.names.find(
-        (name: string) => !!Deno.env.get(name),
-      );
+      const found = await this.findEnvVar(env.names);
 
-      if (name) {
+      if (found) {
+        const { name, value } = found;
+
         const propertyName = underscoreToCamelCase(
           env.prefix
             ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
@@ -1498,8 +1508,7 @@ export class Command<
         );
 
         if (env.details.list) {
-          const values = Deno.env.get(name)
-            ?.split(env.details.separator ?? ",") ?? [""];
+          const values = value.split(env.details.separator ?? ",");
 
           result[propertyName] = values.map((value) =>
             this.parseType({
@@ -1514,19 +1523,40 @@ export class Command<
             label: "Environment variable",
             type: env.type,
             name,
-            value: Deno.env.get(name) ?? "",
+            value,
           });
         }
 
         if (env.value && typeof result[propertyName] !== "undefined") {
           result[propertyName] = env.value(result[propertyName]);
         }
-      } else if (env.required) {
+      } else if (env.required && validate) {
         throw new MissingRequiredEnvVar(env);
       }
     }
 
     return result;
+  }
+
+  protected async findEnvVar(
+    names: readonly string[],
+  ): Promise<{ name: string; value: string } | undefined> {
+    for (const name of names) {
+      const status = await Deno.permissions.query({
+        name: "env",
+        variable: name,
+      });
+
+      if (status.state === "granted") {
+        const value = Deno.env.get(name);
+
+        if (value) {
+          return { name, value };
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
