@@ -61,7 +61,7 @@ async function runPrompt(file: WalkEntry): Promise<string> {
   const flags = getCmdFlagsForFile(file);
   const process = Deno.run({
     stdin: "piped",
-    stdout: "piped",
+    stderr: "piped",
     cmd: [
       "deno",
       "run",
@@ -74,7 +74,7 @@ async function runPrompt(file: WalkEntry): Promise<string> {
   });
 
   const [output, bytesCopied] = await Promise.all([
-    process.output(),
+    process.stderrOutput(),
     copy(inputFile, process.stdin),
   ]);
   inputFile.close();
