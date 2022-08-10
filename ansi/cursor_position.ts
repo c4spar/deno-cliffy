@@ -23,7 +23,7 @@ export interface CursorPositionOptions {
 export function getCursorPosition(
   {
     stdin = Deno.stdin,
-    stdout = Deno.stdout,
+    stdout = Deno.stderr,
   }: CursorPositionOptions = {},
 ): Cursor {
   const data = new Uint8Array(8);

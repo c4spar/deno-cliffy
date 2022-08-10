@@ -1,7 +1,15 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run --unstable --allow-net
 
 import { Input } from "../../prompt/input.ts";
 
-const name: string = await Input.prompt("What's your github user name?");
+const username: string = await Input.prompt("What's your github user name?");
 
-console.log({ name });
+const response = await fetch(`https://api.github.com/users/${username}`, {
+  headers: {
+    "Accept": "application/vnd.github+json",
+  },
+});
+
+const body = await response.text();
+
+console.log(body);

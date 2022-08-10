@@ -123,7 +123,7 @@ export abstract class GenericPrompt<
       this.#value,
     );
     if (successMessage) {
-      console.log(successMessage);
+      console.error(successMessage);
     }
 
     GenericPrompt.injectedValue = undefined;
@@ -160,10 +160,10 @@ export abstract class GenericPrompt<
     this.#isFirstRun = false;
 
     if (Deno.build.os === "windows") {
-      console.log(content);
+      console.error(content);
       this.tty.cursorUp();
     } else {
-      Deno.stdout.writeSync(this.#encoder.encode(content));
+      Deno.stderr.writeSync(this.#encoder.encode(content));
     }
 
     if (y) {
@@ -388,7 +388,7 @@ type setRaw = (
 
 function getColumns(): number | null {
   try {
-    return Deno.consoleSize(Deno.stdout.rid).columns;
+    return Deno.consoleSize(Deno.stderr.rid).columns;
   } catch (_error) {
     return null;
   }

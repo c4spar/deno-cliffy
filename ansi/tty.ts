@@ -42,7 +42,7 @@ export const tty: Tty = factory();
 function factory(options?: TtyOptions): Tty {
   let result = "";
   let stack: Array<[Property, Args]> = [];
-  const stdout: Deno.WriterSync = options?.stdout ?? Deno.stdout;
+  const stdout: Deno.WriterSync = options?.stdout ?? Deno.stderr;
   const stdin: Deno.ReaderSync & { rid: number } = options?.stdin ?? Deno.stdin;
 
   const tty: Tty = function (
