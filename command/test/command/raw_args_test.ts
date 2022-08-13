@@ -22,7 +22,7 @@ Deno.test("command - raw args - command with useRawArgs disabled", async () => {
     ]);
 
   assertEquals(options, { flag: true, scriptArg1: true, scriptArg2: true });
-  assertEquals(args, ["run", ["script-name"]]);
+  assertEquals(args, ["run", "script-name"]);
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 

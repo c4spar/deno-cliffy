@@ -4,9 +4,9 @@ import { Command } from "../../command/command.ts";
 
 await new Command()
   .option("-d, --debug-level <level:string>", "Debug level.")
-  .arguments("[script] [args...]")
+  .arguments("[script] [...args]")
   .stopEarly() // <-- enable stop early
-  .action((options, script?: string, args?: Array<string>) => {
+  .action((options, script?: string, ...args: Array<string>) => {
     console.log("options:", options);
     console.log("script:", script);
     console.log("args:", args);

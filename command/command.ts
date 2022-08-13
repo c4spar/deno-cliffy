@@ -1631,7 +1631,9 @@ export class Command<
             arg = parseArgValue(args.shift() as string);
           }
 
-          if (typeof arg !== "undefined") {
+          if (expectedArg.variadic && Array.isArray(arg)) {
+            params.push(...arg);
+          } else if (typeof arg !== "undefined") {
             params.push(arg);
           }
         }
@@ -2731,6 +2733,11 @@ type TypedArguments<A extends string, T extends Record<string, any> | void> =
       ? Arg extends `[${string}]`
         ? [ArgumentType<Arg, T>?, ...TypedArguments<Rest, T>]
       : [ArgumentType<Arg, T>, ...TypedArguments<Rest, T>]
+    : A extends `${string}...${string}` ? [
+        ...ArgumentType<A, T> extends Array<infer U>
+          ? A extends `[${string}]` ? Array<U> : [U, ...Array<U>]
+          : never,
+      ]
     : A extends `[${string}]` ? [ArgumentType<A, T>?]
     : [ArgumentType<A, T>];
 
