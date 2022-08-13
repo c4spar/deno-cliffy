@@ -22,7 +22,7 @@ Deno.test("command stopEarly disable", async () => {
     ]);
 
   assertEquals(options, { flag: true, scriptArg1: true, scriptArg2: true });
-  assertEquals(args, ["run", ["script-name"]]);
+  assertEquals(args, ["run", "script-name"]);
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
@@ -51,7 +51,7 @@ Deno.test("command stopEarly enabled", async () => {
   assertEquals(options, { flag: true });
   assertEquals(
     args,
-    ["run", ["script-name", "--script-arg1", "--script-arg2", "--script-arg3"]],
+    ["run", "script-name", "--script-arg1", "--script-arg2", "--script-arg3"],
   );
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });

@@ -74,11 +74,7 @@ Deno.test("command optionVariadic numberInvalidValue", async () => {
 Deno.test("command optionVariadic exact", async () => {
   const { options, args } = await cmd.parse(["-v", "1", "abc", "1"]);
 
-  // @TODO: fix variadic types.
-  assertEquals(options, {
-    variadicOption: [1, "abc", true as unknown as Array<boolean>],
-  });
-  // assertEquals(options, { variadicOption: [1, "abc", [true]] });
+  assertEquals(options, { variadicOption: [1, "abc", true] });
   assertEquals(args, []);
 });
 
