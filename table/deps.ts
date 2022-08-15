@@ -1,1 +1,1 @@
-export { stripColor } from "https://deno.land/std@0.150.0/fmt/colors.ts";
+export { stripColor } from "https://deno.land/std@0.152.0/fmt/colors.ts";
