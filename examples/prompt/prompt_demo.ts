@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --unstable
 
-import { rgb24 } from "https://deno.land/std@0.150.0/fmt/colors.ts";
+import { rgb24 } from "https://deno.land/std@0.153.0/fmt/colors.ts";
 import { tty } from "../../ansi/tty.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Checkbox } from "../../prompt/checkbox.ts";
