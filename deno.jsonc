@@ -5,6 +5,8 @@
     "test": "deno test --allow-env --allow-read --allow-run --unstable --parallel",
     "check:examples": "deno check --unstable examples/*{.ts,/*.ts}",
     "coverage": "deno task test --coverage=./cov && deno coverage --unstable --lcov ./cov > cov.lcov",
-    "eggs": "deno run -A --unstable https://x.nest.land/eggs@0.3.10/eggs.ts"
+    "eggs": "deno run -A --unstable https://x.nest.land/eggs@0.3.10/eggs.ts",
+    "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.3/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md"
+    // "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.7.5/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
   }
 }
