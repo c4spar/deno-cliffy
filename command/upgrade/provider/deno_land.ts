@@ -6,8 +6,8 @@ export interface DenoLandProviderOptions {
 
 export class DenoLandProvider extends Provider {
   name = "deno.land";
-  private readonly repositoryUrl = "https://deno.land/x";
-  private readonly registryUrl = "https://deno.land/x";
+  private readonly repositoryUrl = "https://deno.land/x/";
+  private readonly registryUrl = "https://deno.land/x/";
   private readonly moduleName?: string;
 
   constructor({ name }: DenoLandProviderOptions = {}) {
