@@ -1881,6 +1881,9 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOptions(hidden?: boolean): IOption[] {
+    const areGlobalsDisabled = this.areGlobalsDisabled();
+    const helpOption = this.getHelpOption();
+
     const getOptions = (
       cmd: Command<any> | undefined,
       options: IOption[] = [],
@@ -1888,7 +1891,6 @@ export class Command<
     ): IOption[] => {
       if (cmd) {
         if (cmd.options.length) {
-          const areGlobalsDisabled = this.areGlobalsDisabled();
           for (const option of cmd.options) {
             if (
               option.global &&
@@ -1896,7 +1898,7 @@ export class Command<
               names.indexOf(option.name) === -1 &&
               (hidden || !option.hidden)
             ) {
-              if (areGlobalsDisabled && option !== cmd._helpOption) {
+              if (areGlobalsDisabled && option !== helpOption) {
                 continue;
               }
 
@@ -1953,20 +1955,22 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
-    if (!this._parent) {
-      return;
-    }
+    const getGlobalOption = (parent: Command): IOption | undefined => {
+      const option: IOption | undefined = parent.getBaseOption(
+        name,
+        hidden,
+      );
 
-    const option: IOption | undefined = this._parent.getBaseOption(
-      name,
-      hidden,
-    );
+      if (!option?.global) {
+        return parent._parent && getGlobalOption(parent._parent);
+      }
 
-    if (!option || !option.global) {
-      return this._parent.getGlobalOption(name, hidden);
-    }
+      return option;
+    };
 
-    if (this.areGlobalsDisabled() && option !== this._parent._helpOption) {
+    const option = this._parent && getGlobalOption(this._parent);
+
+    if (this.areGlobalsDisabled() && option !== this.getHelpOption()) {
       return;
     }
 
@@ -2017,14 +2021,17 @@ export class Command<
    * @param hidden Include hidden commands.
    */
   public getGlobalCommands(hidden?: boolean): Array<Command<any>> {
+    const areGlobalsDisabled = this.areGlobalsDisabled();
+    const helpCommand = this.getCommand("help");
+
     const getCommands = (
-      cmd: Command<any> | undefined,
+      command: Command<any> | undefined,
       commands: Array<Command<any>> = [],
       names: string[] = [],
     ): Array<Command<any>> => {
-      if (cmd) {
-        if (cmd.commands.size) {
-          cmd.commands.forEach((cmd: Command<any>) => {
+      if (command) {
+        if (command.commands.size) {
+          for (const [_, cmd] of command.commands) {
             if (
               cmd.isGlobal &&
               this !== cmd &&
@@ -2032,13 +2039,17 @@ export class Command<
               names.indexOf(cmd._name) === -1 &&
               (hidden || !cmd.isHidden)
             ) {
+              if (areGlobalsDisabled && cmd !== helpCommand) {
+                continue;
+              }
+
               names.push(cmd._name);
               commands.push(cmd);
             }
-          });
+          }
         }
 
-        return getCommands(cmd._parent, commands, names);
+        return getCommands(command._parent, commands, names);
       }
 
       return commands;
@@ -2096,14 +2107,20 @@ export class Command<
     name: string,
     hidden?: boolean,
   ): C | undefined {
-    if (!this._parent) {
+    const getGlobalCommand = (parent: Command): Command | undefined => {
+      const cmd: Command | undefined = parent.getBaseCommand(name, hidden);
+
+      if (!cmd?.isGlobal) {
+        return parent._parent && getGlobalCommand(parent._parent);
+      }
+
+      return cmd;
+    };
+
+    const cmd = this._parent && getGlobalCommand(this._parent);
+
+    if (this.areGlobalsDisabled() && cmd?.getName() !== "help") {
       return;
-    }
-
-    const cmd = this._parent.getBaseCommand(name, hidden);
-
-    if (!cmd?.isGlobal) {
-      return this._parent.getGlobalCommand(name, hidden);
     }
 
     return cmd as C;
