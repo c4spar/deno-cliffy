@@ -1244,7 +1244,7 @@ export class Command<
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.args[0]);
     const env = await this.parseEnvVars(envVars, !isHelpOption);
 
     // Parse global options.
@@ -1265,9 +1265,9 @@ export class Command<
       ? this.envVars.filter((envVar) => !envVar.global)
       : this.getEnvVars(true);
 
+    const helpOption = this.getHelpOption();
     const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = this._helpOption &&
-      ctx.options?.[this._helpOption?.name] === true;
+    const isHelpOption = helpOption && ctx.options?.[helpOption.name] === true;
     const env = {
       ...ctx.env,
       ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
@@ -1344,7 +1344,7 @@ export class Command<
           prepend: true,
           action: async function () {
             const long = this.getRawArgs().includes(
-              `--${this._helpOption?.name}`,
+              `--${this.getHelpOption()?.name}`,
             );
             await this.checkVersion();
             this.showHelp({ long });
@@ -2388,6 +2388,10 @@ export class Command<
   /** Get example with given name. */
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
+  }
+
+  private getHelpOption(): IOption | undefined {
+    return this._helpOption ?? this._parent?.getHelpOption();
   }
 }
 
