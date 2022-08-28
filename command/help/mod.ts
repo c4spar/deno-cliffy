@@ -11,6 +11,7 @@ export class HelpCommand
       .type("command", new CommandType())
       .arguments("[command:command]")
       .description("Show this help or the help of a sub-command.")
+      .noGlobals()
       .action(async (_, name?: string) => {
         if (!cmd) {
           cmd = name

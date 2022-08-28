@@ -15,6 +15,7 @@ export class CompleteCommand extends Command<
       .description(
         "Get completions for given action from given command.",
       )
+      .noGlobals()
       .arguments("<action:string> [command...:string]")
       .action(async (_, action: string, ...commandNames: Array<string>) => {
         let parent: Command | undefined;
