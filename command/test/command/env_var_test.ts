@@ -445,3 +445,25 @@ Deno.test({
     });
   }
 });
+
+Deno.test({
+  name: "[command] - env var - should disable global env vars with noGlobals",
+  async fn() {
+    Deno.env.set("FOO_BAR", "1,2,3");
+    Deno.env.set("FOO_BAR_BAZ", "1,2,3");
+
+    const { options } = await new Command()
+      .globalType("test", (type) => [type.value + "!"])
+      .globalEnv("FOO_BAR=<val:number[]>", "...")
+      .globalEnv("FOO_BAR_BAZ=<val2:test[]>", "...")
+      .command("biz")
+      .noGlobals()
+      .env("beep", "...")
+      .parse(["biz"]);
+
+    Deno.env.delete("FOO_BAR");
+    Deno.env.delete("FOO_BAR_BAZ");
+
+    assertEquals(options, {});
+  }
+});

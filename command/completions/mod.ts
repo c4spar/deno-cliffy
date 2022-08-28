@@ -28,6 +28,7 @@ To enable shell completions for this program add the following line to your ${
         }
 `;
       })
+      .noGlobals()
       .action(() => this.showHelp())
       .command("bash", new BashCompletionsCommand(this.#cmd))
       .command("fish", new FishCompletionsCommand(this.#cmd))

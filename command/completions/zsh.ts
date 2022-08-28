@@ -19,6 +19,7 @@ To enable zsh completions for this program add following line to your ${
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions zsh)`))}`;
       })
+      .noGlobals()
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
         console.log(ZshCompletionsGenerator.generate(baseCmd));

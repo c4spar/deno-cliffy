@@ -19,6 +19,7 @@ To enable bash completions for this program add following line to your ${
 
     ${dim(italic(`source <(${baseCmd.getPath()} completions bash)`))}`;
       })
+      .noGlobals()
       .action(() => {
         const baseCmd = this.#cmd || this.getMainCommand();
         console.log(BashCompletionsGenerator.generate(baseCmd));
