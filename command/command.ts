@@ -763,7 +763,10 @@ export class Command<
     return this;
   }
 
-  /** Disable global options and environment variables for this command. */
+  /**
+   * Disable inheriting global commands, options and environment variables from
+   * parent commands.
+   */
   public noGlobals(): this {
     this.cmd._noGlobals = true;
     return this;

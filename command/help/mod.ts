@@ -27,7 +27,9 @@ export class HelpCommand
         }
         await cmd.checkVersion();
         cmd.showHelp();
-        Deno.exit(0);
+        if (this.shouldExit()) {
+          Deno.exit(0);
+        }
       });
   }
 }
