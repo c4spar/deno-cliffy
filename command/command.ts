@@ -774,12 +774,12 @@ export class Command<
 
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
-    return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+    return this.throwOnError || !!this._parent?.shouldThrowErrors();
   }
 
   /** Check whether the command should exit after printing help or version. */
   protected shouldExit(): boolean {
-    return this.cmd._shouldExit ?? this.cmd._parent?.shouldExit() ?? true;
+    return this._shouldExit ?? this._parent?.shouldExit() ?? true;
   }
 
   public globalOption<
