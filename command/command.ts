@@ -85,7 +85,7 @@ export class Command<
   CGT extends Record<string, any> | void = CPG extends number ? any : void,
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
-  private types: Map<string, IType> = new Map();
+  private types: Record<string, IType> = {};
   private rawArgs: Array<string> = [];
   private literalArgs: Array<string> = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
@@ -636,11 +636,11 @@ export class Command<
     CGT,
     CP
   > {
-    if (this.cmd.types.get(name) && !options?.override) {
+    if (this.cmd.types[name] && !options?.override) {
       throw new DuplicateType(name);
     }
 
-    this.cmd.types.set(name, { ...options, name, handler });
+    this.cmd.types[name] = { ...options, name, handler };
 
     if (
       handler instanceof Type &&
@@ -764,12 +764,12 @@ export class Command<
 
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
-    return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+    return this.throwOnError || !!this._parent?.shouldThrowErrors();
   }
 
   /** Check whether the command should exit after printing help or version. */
   protected shouldExit(): boolean {
-    return this.cmd._shouldExit ?? this.cmd._parent?.shouldExit() ?? true;
+    return this._shouldExit ?? this._parent?.shouldExit() ?? true;
   }
 
   public globalOption<
@@ -1141,6 +1141,7 @@ export class Command<
       >
   > {
     try {
+      this.registerDefaults();
       return await this.parseCommand({ args }) as any;
     } catch (error: unknown) {
       this.throw(
@@ -1153,7 +1154,6 @@ export class Command<
 
   private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
     this.reset();
-    this.registerDefaults();
     this.rawArgs = ctx.args;
 
     if (this.isExecutable) {
@@ -1290,15 +1290,15 @@ export class Command<
 
     this.reset();
 
-    !this.types.has("string") &&
+    !this.types.string &&
       this.type("string", new StringType(), { global: true });
-    !this.types.has("number") &&
+    !this.types.number &&
       this.type("number", new NumberType(), { global: true });
-    !this.types.has("integer") &&
+    !this.types.integer &&
       this.type("integer", new IntegerType(), { global: true });
-    !this.types.has("boolean") &&
+    !this.types.boolean &&
       this.type("boolean", new BooleanType(), { global: true });
-    !this.types.has("file") &&
+    !this.types.file &&
       this.type("file", new FileType(), { global: true });
 
     if (!this._help) {
@@ -2109,7 +2109,7 @@ export class Command<
 
   /** Get base types. */
   public getBaseTypes(): IType[] {
-    return Array.from(this.types.values());
+    return Object.values(this.types);
   }
 
   /** Get global types. */
@@ -2120,17 +2120,15 @@ export class Command<
       names: string[] = [],
     ): IType[] => {
       if (cmd) {
-        if (cmd.types.size) {
-          cmd.types.forEach((type: IType) => {
-            if (
-              type.global &&
-              !this.types.has(type.name) &&
-              names.indexOf(type.name) === -1
-            ) {
-              names.push(type.name);
-              types.push(type);
-            }
-          });
+        for (const type of Object.values(cmd.types)) {
+          if (
+            type.global &&
+            !this.types[type.name] &&
+            names.indexOf(type.name) === -1
+          ) {
+            names.push(type.name);
+            types.push(type);
+          }
         }
 
         return getTypes(cmd._parent, types, names);
@@ -2155,7 +2153,7 @@ export class Command<
    * @param name Name of the type.
    */
   public getBaseType(name: string): IType | undefined {
-    return this.types.get(name);
+    return this.types[name];
   }
 
   /**
