@@ -770,11 +770,6 @@ export class Command<
   }
 
   /** Check whether the command should throw errors or exit. */
-  protected areGlobalsDisabled(): boolean {
-    return this._noGlobals || !!this._parent?.areGlobalsDisabled();
-  }
-
-  /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
     return this.throwOnError || !!this._parent?.shouldThrowErrors();
   }
@@ -1881,40 +1876,42 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOptions(hidden?: boolean): IOption[] {
-    const areGlobalsDisabled = this.areGlobalsDisabled();
     const helpOption = this.getHelpOption();
-
-    const getOptions = (
-      cmd: Command<any> | undefined,
+    const getGlobals = (
+      cmd: Command<any>,
+      noGlobals: boolean,
       options: IOption[] = [],
       names: string[] = [],
     ): IOption[] => {
-      if (cmd) {
-        if (cmd.options.length) {
-          for (const option of cmd.options) {
-            if (
-              option.global &&
-              !this.options.find((opt) => opt.name === option.name) &&
-              names.indexOf(option.name) === -1 &&
-              (hidden || !option.hidden)
-            ) {
-              if (areGlobalsDisabled && option !== helpOption) {
-                continue;
-              }
-
-              names.push(option.name);
-              options.push(option);
+      if (cmd.options.length) {
+        for (const option of cmd.options) {
+          if (
+            option.global &&
+            !this.options.find((opt) => opt.name === option.name) &&
+            names.indexOf(option.name) === -1 &&
+            (hidden || !option.hidden)
+          ) {
+            if (noGlobals && option !== helpOption) {
+              continue;
             }
+
+            names.push(option.name);
+            options.push(option);
           }
         }
-
-        return getOptions(cmd._parent, options, names);
       }
 
-      return options;
+      return cmd._parent
+        ? getGlobals(
+          cmd._parent,
+          noGlobals || cmd._noGlobals,
+          options,
+          names,
+        )
+        : options;
     };
 
-    return getOptions(this._parent);
+    return this._parent ? getGlobals(this._parent, this._noGlobals) : [];
   }
 
   /**
@@ -1955,26 +1952,33 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
-    const getGlobalOption = (parent: Command): IOption | undefined => {
+    const helpOption = this.getHelpOption();
+    const getGlobalOption = (
+      parent: Command,
+      noGlobals: boolean,
+    ): IOption | undefined => {
       const option: IOption | undefined = parent.getBaseOption(
         name,
         hidden,
       );
 
       if (!option?.global) {
-        return parent._parent && getGlobalOption(parent._parent);
+        return parent._parent && getGlobalOption(
+          parent._parent,
+          noGlobals || parent._noGlobals,
+        );
+      }
+      if (noGlobals && option !== helpOption) {
+        return;
       }
 
       return option;
     };
 
-    const option = this._parent && getGlobalOption(this._parent);
-
-    if (this.areGlobalsDisabled() && option !== this.getHelpOption()) {
-      return;
-    }
-
-    return option;
+    return this._parent && getGlobalOption(
+      this._parent,
+      this._noGlobals,
+    );
   }
 
   /**
@@ -2021,41 +2025,42 @@ export class Command<
    * @param hidden Include hidden commands.
    */
   public getGlobalCommands(hidden?: boolean): Array<Command<any>> {
-    const areGlobalsDisabled = this.areGlobalsDisabled();
-    const helpCommand = this.getCommand("help");
-
     const getCommands = (
-      command: Command<any> | undefined,
+      command: Command<any>,
+      noGlobals: boolean,
       commands: Array<Command<any>> = [],
       names: string[] = [],
     ): Array<Command<any>> => {
-      if (command) {
-        if (command.commands.size) {
-          for (const [_, cmd] of command.commands) {
-            if (
-              cmd.isGlobal &&
-              this !== cmd &&
-              !this.commands.has(cmd._name) &&
-              names.indexOf(cmd._name) === -1 &&
-              (hidden || !cmd.isHidden)
-            ) {
-              if (areGlobalsDisabled && cmd !== helpCommand) {
-                continue;
-              }
-
-              names.push(cmd._name);
-              commands.push(cmd);
+      if (command.commands.size) {
+        for (const [_, cmd] of command.commands) {
+          if (
+            cmd.isGlobal &&
+            this !== cmd &&
+            !this.commands.has(cmd._name) &&
+            names.indexOf(cmd._name) === -1 &&
+            (hidden || !cmd.isHidden)
+          ) {
+            if (noGlobals && cmd?.getName() !== "help") {
+              continue;
             }
+
+            names.push(cmd._name);
+            commands.push(cmd);
           }
         }
-
-        return getCommands(command._parent, commands, names);
       }
 
-      return commands;
+      return command._parent
+        ? getCommands(
+          command._parent,
+          noGlobals || command._noGlobals,
+          commands,
+          names,
+        )
+        : commands;
     };
 
-    return getCommands(this._parent);
+    return this._parent ? getCommands(this._parent, this._noGlobals) : [];
   }
 
   /**
@@ -2107,23 +2112,24 @@ export class Command<
     name: string,
     hidden?: boolean,
   ): C | undefined {
-    const getGlobalCommand = (parent: Command): Command | undefined => {
+    const getGlobalCommand = (
+      parent: Command,
+      noGlobals: boolean,
+    ): Command | undefined => {
       const cmd: Command | undefined = parent.getBaseCommand(name, hidden);
 
       if (!cmd?.isGlobal) {
-        return parent._parent && getGlobalCommand(parent._parent);
+        return parent._parent &&
+          getGlobalCommand(parent._parent, noGlobals || parent._noGlobals);
+      }
+      if (noGlobals && cmd.getName() !== "help") {
+        return;
       }
 
       return cmd;
     };
 
-    const cmd = this._parent && getGlobalCommand(this._parent);
-
-    if (this.areGlobalsDisabled() && cmd?.getName() !== "help") {
-      return;
-    }
-
-    return cmd as C;
+    return this._parent && getGlobalCommand(this._parent, this._noGlobals) as C;
   }
 
   /**
@@ -2323,7 +2329,7 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
-    if (this.areGlobalsDisabled()) {
+    if (this._noGlobals) {
       return [];
     }
 
@@ -2394,7 +2400,7 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
-    if (!this._parent || this.areGlobalsDisabled()) {
+    if (!this._parent || this._noGlobals) {
       return;
     }
 
