@@ -98,13 +98,13 @@ Deno.test("[command] should disable global options with noGlobals", async () => 
   );
 });
 
-Deno.test("[command] should not disable global help command with noGlobals", async () => {
+Deno.test("[command] should not disable global -h option with noGlobals", async () => {
   await cmd().parse(
     ["cmd1", "cmd3", "-h"],
   );
 });
 
-Deno.test("[command] should not disable global help command with noGlobals", async () => {
+Deno.test("[command] should not disable global --help option with noGlobals", async () => {
   await cmd().parse(
     ["cmd1", "cmd3", "--help"],
   );
