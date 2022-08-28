@@ -28,6 +28,7 @@ export class UpgradeCommand extends Command {
       .description(() =>
         `Upgrade ${this.getMainCommand().getName()} executable to latest or given version.`
       )
+      .noGlobals()
       .type("provider", new EnumType(this.getProviderNames()))
       .option(
         "-r, --registry <name:provider>",
