@@ -114,14 +114,13 @@ _completions_test() {
   }
 
   __completions_test_foo_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command foo help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean foo help ;;
     esac
   }
 
@@ -139,122 +138,112 @@ _completions_test() {
   }
 
   __completions_test_foo_bar_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command foo bar help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean foo bar help ;;
     esac
   }
 
   __completions_test_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean help ;;
     esac
   }
 
   __completions_test_completions() {
-    opts=(-h --help -g --global help bash fish zsh)
+    opts=(-h --help help bash fish zsh)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions ;;
     esac
   }
 
   __completions_test_completions_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command completions help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions help ;;
     esac
   }
 
   __completions_test_completions_bash() {
-    opts=(-h --help -g --global help)
+    opts=(-h --help help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions bash ;;
     esac
   }
 
   __completions_test_completions_bash_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command completions bash help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions bash help ;;
     esac
   }
 
   __completions_test_completions_fish() {
-    opts=(-h --help -g --global help)
+    opts=(-h --help help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions fish ;;
     esac
   }
 
   __completions_test_completions_fish_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command completions fish help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions fish help ;;
     esac
   }
 
   __completions_test_completions_zsh() {
-    opts=(-h --help -g --global help)
+    opts=(-h --help help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions zsh ;;
     esac
   }
 
   __completions_test_completions_zsh_help() {
-    opts=(-h --help -g --global)
+    opts=(-h --help)
     _completions_test_complete command completions zsh help
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
-      -g|--global) opts=(); _completions_test_complete boolean completions zsh help ;;
     esac
   }
 
@@ -344,7 +333,6 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo' -k -f -a bar -d 'Bar command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo_bar' -s h -l help -x -k -f -d 'Show this help.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo_bar' -s g -l global -k -f -r -a '(completions-test completions complete boolean foo bar)' -d 'Foo option.'
@@ -352,39 +340,29 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a completions -d 'Generate shell completions.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -s g -l global -k -f -r -a '(completions-test completions complete boolean completions)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a bash -d 'Generate shell completions for bash.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_bash' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_bash' -s g -l global -k -f -r -a '(completions-test completions complete boolean completions bash)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a fish -d 'Generate shell completions for fish.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_fish' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_fish' -s g -l global -k -f -r -a '(completions-test completions complete boolean completions fish)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a zsh -d 'Generate shell completions for zsh.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_zsh' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_zsh' -s g -l global -k -f -r -a '(completions-test completions complete boolean completions zsh)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s g -l global -k -f -r -a '(completions-test completions complete boolean help)' -d 'Foo option.'
 \`
 `;
 
@@ -509,12 +487,7 @@ function _completions_test_foo_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean foo help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -559,12 +532,7 @@ function _completions_test_foo_bar_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean foo bar help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -577,12 +545,7 @@ function _completions_test_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -612,13 +575,11 @@ function _completions_test_completions() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
-    val-boolean) __completions_test_complete val boolean completions ;;
   esac
 }
 
@@ -632,12 +593,7 @@ function _completions_test_completions_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean completions help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -661,13 +617,11 @@ function _completions_test_completions_bash() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
-    val-boolean) __completions_test_complete val boolean completions bash ;;
   esac
 }
 
@@ -681,12 +635,7 @@ function _completions_test_completions_bash_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean completions bash help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -710,13 +659,11 @@ function _completions_test_completions_fish() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
-    val-boolean) __completions_test_complete val boolean completions fish ;;
   esac
 }
 
@@ -730,12 +677,7 @@ function _completions_test_completions_fish_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean completions fish help ;;
-  esac
 }
 
 # shellcheck disable=SC2154
@@ -759,13 +701,11 @@ function _completions_test_completions_zsh() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
-    val-boolean) __completions_test_complete val boolean completions zsh ;;
   esac
 }
 
@@ -779,12 +719,7 @@ function _completions_test_completions_zsh_help() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '1:command:_commands'
-
-  case "\$state" in
-    val-boolean) __completions_test_complete val boolean completions zsh help ;;
-  esac
 }
 
 # _completions_test "\${@}"

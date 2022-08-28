@@ -123,6 +123,7 @@ export class Command<
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
   private _groupName?: string;
+  private _noGlobals = false;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -815,14 +816,23 @@ export class Command<
     return this;
   }
 
+  /**
+   * Disable inheriting global commands, options and environment variables from
+   * parent commands.
+   */
+  public noGlobals(): this {
+    this.cmd._noGlobals = true;
+    return this;
+  }
+
   /** Check whether the command should throw errors or exit. */
   protected shouldThrowErrors(): boolean {
-    return this.cmd.throwOnError || !!this.cmd._parent?.shouldThrowErrors();
+    return this.throwOnError || !!this._parent?.shouldThrowErrors();
   }
 
   /** Check whether the command should exit after printing help or version. */
   protected shouldExit(): boolean {
-    return this.cmd._shouldExit ?? this.cmd._parent?.shouldExit() ?? true;
+    return this._shouldExit ?? this._parent?.shouldExit() ?? true;
   }
 
   public globalOption<
@@ -1297,7 +1307,7 @@ export class Command<
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this._helpOption?.flags.includes(ctx.args[0]);
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.args[0]);
     const env = await this.parseEnvVars(envVars, !isHelpOption);
 
     // Parse global options.
@@ -1318,9 +1328,9 @@ export class Command<
       ? this.envVars.filter((envVar) => !envVar.global)
       : this.getEnvVars(true);
 
+    const helpOption = this.getHelpOption();
     const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = this._helpOption &&
-      ctx.options?.[this._helpOption?.name] === true;
+    const isHelpOption = helpOption && ctx.options?.[helpOption.name] === true;
     const env = {
       ...ctx.env,
       ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
@@ -1397,7 +1407,7 @@ export class Command<
           prepend: true,
           action: async function () {
             const long = this.getRawArgs().includes(
-              `--${this._helpOption?.name}`,
+              `--${this.getHelpOption()?.name}`,
             );
             await this.checkVersion();
             this.showHelp({ long });
@@ -1922,33 +1932,42 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOptions(hidden?: boolean): IOption[] {
-    const getOptions = (
-      cmd: Command<any> | undefined,
+    const helpOption = this.getHelpOption();
+    const getGlobals = (
+      cmd: Command<any>,
+      noGlobals: boolean,
       options: IOption[] = [],
       names: string[] = [],
     ): IOption[] => {
-      if (cmd) {
-        if (cmd.options.length) {
-          cmd.options.forEach((option: IOption) => {
-            if (
-              option.global &&
-              !this.options.find((opt) => opt.name === option.name) &&
-              names.indexOf(option.name) === -1 &&
-              (hidden || !option.hidden)
-            ) {
-              names.push(option.name);
-              options.push(option);
+      if (cmd.options.length) {
+        for (const option of cmd.options) {
+          if (
+            option.global &&
+            !this.options.find((opt) => opt.name === option.name) &&
+            names.indexOf(option.name) === -1 &&
+            (hidden || !option.hidden)
+          ) {
+            if (noGlobals && option !== helpOption) {
+              continue;
             }
-          });
-        }
 
-        return getOptions(cmd._parent, options, names);
+            names.push(option.name);
+            options.push(option);
+          }
+        }
       }
 
-      return options;
+      return cmd._parent
+        ? getGlobals(
+          cmd._parent,
+          noGlobals || cmd._noGlobals,
+          options,
+          names,
+        )
+        : options;
     };
 
-    return getOptions(this._parent);
+    return this._parent ? getGlobals(this._parent, this._noGlobals) : [];
   }
 
   /**
@@ -1989,20 +2008,33 @@ export class Command<
    * @param hidden Include hidden options.
    */
   public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
-    if (!this._parent) {
-      return;
-    }
+    const helpOption = this.getHelpOption();
+    const getGlobalOption = (
+      parent: Command,
+      noGlobals: boolean,
+    ): IOption | undefined => {
+      const option: IOption | undefined = parent.getBaseOption(
+        name,
+        hidden,
+      );
 
-    const option: IOption | undefined = this._parent.getBaseOption(
-      name,
-      hidden,
+      if (!option?.global) {
+        return parent._parent && getGlobalOption(
+          parent._parent,
+          noGlobals || parent._noGlobals,
+        );
+      }
+      if (noGlobals && option !== helpOption) {
+        return;
+      }
+
+      return option;
+    };
+
+    return this._parent && getGlobalOption(
+      this._parent,
+      this._noGlobals,
     );
-
-    if (!option || !option.global) {
-      return this._parent.getGlobalOption(name, hidden);
-    }
-
-    return option;
   }
 
   /**
@@ -2050,33 +2082,41 @@ export class Command<
    */
   public getGlobalCommands(hidden?: boolean): Array<Command<any>> {
     const getCommands = (
-      cmd: Command<any> | undefined,
+      command: Command<any>,
+      noGlobals: boolean,
       commands: Array<Command<any>> = [],
       names: string[] = [],
     ): Array<Command<any>> => {
-      if (cmd) {
-        if (cmd.commands.size) {
-          cmd.commands.forEach((cmd: Command<any>) => {
-            if (
-              cmd.isGlobal &&
-              this !== cmd &&
-              !this.commands.has(cmd._name) &&
-              names.indexOf(cmd._name) === -1 &&
-              (hidden || !cmd.isHidden)
-            ) {
-              names.push(cmd._name);
-              commands.push(cmd);
+      if (command.commands.size) {
+        for (const [_, cmd] of command.commands) {
+          if (
+            cmd.isGlobal &&
+            this !== cmd &&
+            !this.commands.has(cmd._name) &&
+            names.indexOf(cmd._name) === -1 &&
+            (hidden || !cmd.isHidden)
+          ) {
+            if (noGlobals && cmd?.getName() !== "help") {
+              continue;
             }
-          });
-        }
 
-        return getCommands(cmd._parent, commands, names);
+            names.push(cmd._name);
+            commands.push(cmd);
+          }
+        }
       }
 
-      return commands;
+      return command._parent
+        ? getCommands(
+          command._parent,
+          noGlobals || command._noGlobals,
+          commands,
+          names,
+        )
+        : commands;
     };
 
-    return getCommands(this._parent);
+    return this._parent ? getCommands(this._parent, this._noGlobals) : [];
   }
 
   /**
@@ -2128,17 +2168,24 @@ export class Command<
     name: string,
     hidden?: boolean,
   ): C | undefined {
-    if (!this._parent) {
-      return;
-    }
+    const getGlobalCommand = (
+      parent: Command,
+      noGlobals: boolean,
+    ): Command | undefined => {
+      const cmd: Command | undefined = parent.getBaseCommand(name, hidden);
 
-    const cmd = this._parent.getBaseCommand(name, hidden);
+      if (!cmd?.isGlobal) {
+        return parent._parent &&
+          getGlobalCommand(parent._parent, noGlobals || parent._noGlobals);
+      }
+      if (noGlobals && cmd.getName() !== "help") {
+        return;
+      }
 
-    if (!cmd?.isGlobal) {
-      return this._parent.getGlobalCommand(name, hidden);
-    }
+      return cmd;
+    };
 
-    return cmd as C;
+    return this._parent && getGlobalCommand(this._parent, this._noGlobals) as C;
   }
 
   /**
@@ -2340,6 +2387,10 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
+    if (this._noGlobals) {
+      return [];
+    }
+
     const getEnvVars = (
       cmd: Command<any> | undefined,
       envVars: IEnvVar[] = [],
@@ -2407,7 +2458,7 @@ export class Command<
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
-    if (!this._parent) {
+    if (!this._parent || this._noGlobals) {
       return;
     }
 
@@ -2441,6 +2492,10 @@ export class Command<
   /** Get example with given name. */
   public getExample(name: string): IExample | undefined {
     return this.examples.find((example) => example.name === name);
+  }
+
+  private getHelpOption(): IOption | undefined {
+    return this._helpOption ?? this._parent?.getHelpOption();
   }
 }
 
