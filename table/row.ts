@@ -1,7 +1,9 @@
 import { Cell, Direction, ICell } from "./cell.ts";
 
 /** Row type */
-export type IRow<T extends ICell = ICell> = T[] | Row<T>;
+export type IRow<T extends ICell | undefined = ICell | undefined> =
+  | T[]
+  | Row<T>;
 /** Json row. */
 export type IDataRow = Record<string, string | number>;
 
@@ -15,7 +17,8 @@ export interface IRowOptions {
 /**
  * Row representation.
  */
-export class Row<T extends ICell = ICell> extends Array<T> {
+export class Row<T extends ICell | undefined = ICell | undefined>
+  extends Array<T> {
   protected options: IRowOptions = {};
 
   /**
@@ -23,7 +26,9 @@ export class Row<T extends ICell = ICell> extends Array<T> {
    * be copied to the new row.
    * @param cells Cells or row.
    */
-  public static from<T extends ICell = ICell>(cells: IRow<T>): Row<T> {
+  public static from<T extends ICell | undefined>(
+    cells: IRow<T>,
+  ): Row<T> {
     const row = new this(...cells);
     if (cells instanceof Row) {
       row.options = { ...cells.options };
