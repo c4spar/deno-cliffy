@@ -250,8 +250,7 @@ import {
             }>
           >(true);
         })
-        .select("bar-bar")
-        .reset();
+        .select("bar-bar");
 
       const bar = new Command<{ debug?: true; logLevel?: true }>()
         .globalOption("--bar-global", "")
@@ -388,11 +387,50 @@ import {
   });
 
   Deno.test({
-    name: "[command] - generic types - unkown parent option",
+    name: "[command] - generic types - unkown parent option on empty command",
     fn() {
       new Command()
         // @ts-expect-error unknown global option main
         .command("foo", new Command<{ main?: true }>());
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - unkown parent option",
+    fn() {
+      new Command()
+        .globalOption("--foo", "")
+        // @ts-expect-error unknown global option main
+        .command("foo", new Command<{ main?: true }>());
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - unkown parent option with sub command",
+    fn() {
+      new Command()
+        .globalOption("--foo", "")
+        .command(
+          "foo",
+          // @ts-expect-error unknown global option main
+          new Command<{ main?: true }>()
+            .command("foo")
+            .option("--bar", ""),
+        );
+    },
+  });
+
+  Deno.test({
+    name: "[command] - generic types - global parent option with sub command",
+    fn() {
+      new Command()
+        .globalOption("--foo", "")
+        .command(
+          "foo",
+          new Command<{ foo?: true }>()
+            .command("foo")
+            .option("--bar", ""),
+        );
     },
   });
 

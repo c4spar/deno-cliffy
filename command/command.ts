@@ -70,19 +70,19 @@ import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
 
 export class Command<
-  CPG extends Record<string, any> | void = void,
-  CPT extends Record<string, any> | void = CPG extends number ? any : void,
-  CO extends Record<string, any> | void = CPG extends number ? any : void,
+  CPG extends Record<string, unknown> | void = void,
+  CPT extends Record<string, unknown> | void = CPG extends number ? any : void,
+  CO extends Record<string, unknown> | void = CPG extends number ? any : void,
   CA extends Array<unknown> = CPG extends number ? any : [],
-  CG extends Record<string, any> | void = CPG extends number ? any : void,
-  CT extends Record<string, any> | void = CPG extends number ? any : {
+  CG extends Record<string, unknown> | void = CPG extends number ? any : void,
+  CT extends Record<string, unknown> | void = CPG extends number ? any : {
     number: number;
     integer: number;
     string: string;
     boolean: boolean;
     file: string;
   },
-  CGT extends Record<string, any> | void = CPG extends number ? any : void,
+  CGT extends Record<string, unknown> | void = CPG extends number ? any : void,
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
   private types: Map<string, IType> = new Map();
@@ -251,13 +251,66 @@ export class Command<
    */
   public command<
     C extends Command<
+      (G & Record<string, unknown>) | void | undefined,
+      T | void | undefined,
+      Record<string, unknown> | void,
+      Array<unknown>,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
+      Command<
+        G | void | undefined,
+        T | void | undefined,
+        Record<string, unknown> | void,
+        Array<unknown>,
+        Record<string, unknown> | void,
+        Record<string, unknown> | void,
+        Record<string, unknown> | void,
+        undefined
+      >
+    >,
+    G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
+    T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
+  >(
+    name: string,
+    cmd: C,
+    override?: boolean,
+  ): ReturnType<C["reset"]> extends Command<
+    Record<string, unknown> | void,
+    Record<string, unknown> | void,
+    infer Options,
+    infer Arguments,
+    infer GlobalOptions,
+    infer Types,
+    infer GlobalTypes,
+    undefined
+  > ? Command<
+      G,
+      T,
+      Options,
+      Arguments,
+      GlobalOptions,
+      Types,
+      GlobalTypes,
+      OneOf<CP, this>
+    >
+    : never;
+
+  /**
+   * Add new sub-command.
+   * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
+   * @param cmd       The new child command to register.
+   * @param override  Override existing child command.
+   */
+  public command<
+    C extends Command<
       G | void | undefined,
       T | void | undefined,
-      Record<string, any> | void,
+      Record<string, unknown> | void,
       Array<unknown>,
-      Record<string, any> | void,
-      Record<string, any> | void,
-      Record<string, any> | void,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
+      Record<string, unknown> | void,
       OneOf<CP, this> | undefined
     >,
     G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
@@ -267,14 +320,14 @@ export class Command<
     cmd: C,
     override?: boolean,
   ): C extends Command<
-    any,
-    any,
+    Record<string, unknown> | void,
+    Record<string, unknown> | void,
     infer Options,
     infer Arguments,
     infer GlobalOptions,
     infer Types,
     infer GlobalTypes,
-    any
+    OneOf<CP, this> | undefined
   > ? Command<
       G,
       T,
