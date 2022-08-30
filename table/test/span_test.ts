@@ -2,6 +2,45 @@ import { Cell } from "../cell.ts";
 import { Table } from "../table.ts";
 import { assertEquals } from "../../dev_deps.ts";
 
+Deno.test("should allow undefined cell values", () => {
+  assertEquals(
+    Table.from([
+      ["foo", undefined, "bar"],
+      ["beep", undefined, "boop"],
+    ])
+      .border(true)
+      .toString(),
+    `
+┌──────┬──┬──────┐
+│ foo  │  │ bar  │
+├──────┼──┼──────┤
+│ beep │  │ boop │
+└──────┴──┴──────┘`
+      .slice(1),
+  );
+});
+
+Deno.test("should override undefined cell values with col & row span", () => {
+  assertEquals(
+    Table.from([
+      [new Cell("foo").colSpan(2), undefined, "bar"],
+      [undefined, new Cell("beep").rowSpan(2), "boop"],
+      ["biz", undefined, "baz"],
+    ])
+      .border(true)
+      .toString(),
+    `
+┌────────────┬──────┐
+│ foo        │ bar  │
+├─────┬──────┼──────┤
+│     │ beep │ boop │
+├─────┤      ├──────┤
+│ biz │      │ baz  │
+└─────┴──────┴──────┘`
+      .slice(1),
+  );
+});
+
 Deno.test("colspan + rowspan 1", () => {
   const expected = `
 ┌────────────────────┬────────────────┬────────────────┐

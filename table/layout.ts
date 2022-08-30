@@ -89,7 +89,7 @@ export class TableLayout {
     };
   }
 
-  #getRows() {
+  #getRows(): Array<Row<Cell>> {
     const header: Row | undefined = this.table.getHeader();
     const rows = header ? [header, ...this.table] : this.table.slice();
     const hasSpan = rows.some((row) =>
@@ -104,8 +104,11 @@ export class TableLayout {
 
     return rows.map((row) => {
       const newRow = this.createRow(row);
-      return newRow.map((cell) => this.createCell(cell, newRow));
-    }) as Array<Row<Cell>>;
+      for (let i = 0; i < row.length; i++) {
+        newRow[i] = this.createCell(row[i], newRow);
+      }
+      return newRow;
+    });
   }
 
   /**
@@ -139,7 +142,11 @@ export class TableLayout {
     if (colSpan > 1) {
       colSpan--;
       rowSpan[colIndex] = rowSpan[colIndex - 1];
-      rows[rowIndex].splice(colIndex - 1, 0, rows[rowIndex][colIndex - 1]);
+      rows[rowIndex].splice(
+        colIndex,
+        this.getDeleteCount(rows, rowIndex, colIndex),
+        rows[rowIndex][colIndex - 1],
+      );
       return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
     }
 
@@ -149,7 +156,11 @@ export class TableLayout {
 
     if (rowSpan[colIndex] > 1) {
       rowSpan[colIndex]--;
-      rows[rowIndex].splice(colIndex, 0, rows[rowIndex - 1][colIndex]);
+      rows[rowIndex].splice(
+        colIndex,
+        this.getDeleteCount(rows, rowIndex, colIndex),
+        rows[rowIndex - 1][colIndex],
+      );
       return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
     }
 
@@ -162,6 +173,17 @@ export class TableLayout {
     rowSpan[colIndex] = rows[rowIndex][colIndex].getRowSpan();
 
     return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
+  }
+
+  protected getDeleteCount(
+    rows: Array<Row<Cell>>,
+    rowIndex: number,
+    colIndex: number,
+  ) {
+    return colIndex <= rows[rowIndex].length - 1 &&
+        typeof rows[rowIndex][colIndex] === "undefined"
+      ? 1
+      : 0;
   }
 
   /**
@@ -179,7 +201,7 @@ export class TableLayout {
    * @param cell  Original cell.
    * @param row   Parent row.
    */
-  protected createCell(cell: ICell | null, row: Row): Cell {
+  protected createCell(cell: ICell | null | undefined, row: Row): Cell {
     return Cell.from(cell ?? "")
       .border(row.getBorder(), false)
       .align(row.getAlign(), false);
