@@ -89,7 +89,7 @@ export class TableLayout {
     };
   }
 
-  #getRows() {
+  #getRows(): Array<Row<Cell>> {
     const header: Row | undefined = this.table.getHeader();
     const rows = header ? [header, ...this.table] : this.table.slice();
     const hasSpan = rows.some((row) =>
@@ -104,8 +104,11 @@ export class TableLayout {
 
     return rows.map((row) => {
       const newRow = this.createRow(row);
-      return newRow.map((cell) => this.createCell(cell, newRow));
-    }) as Array<Row<Cell>>;
+      for (let i = 0; i < row.length; i++) {
+        newRow[i] = this.createCell(row[i], newRow);
+      }
+      return newRow;
+    });
   }
 
   /**
