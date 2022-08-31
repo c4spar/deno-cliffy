@@ -114,70 +114,67 @@ export class TableLayout {
   /**
    * Fills rows and cols by specified row/col span with a reference of the
    * original cell.
-   *
-   * @param _rows     All table rows.
-   * @param rowIndex  Current row index.
-   * @param colIndex  Current col index.
-   * @param rowSpan   Current row span.
-   * @param colSpan   Current col span.
    */
-  protected spanRows(
-    _rows: IRow[],
-    rowIndex = 0,
-    colIndex = 0,
-    rowSpan: number[] = [],
-    colSpan = 1,
-  ): Row<Cell>[] {
-    const rows: Row<Cell>[] = _rows as Row<Cell>[];
+  protected spanRows(rows: Array<IRow>) {
+    const rowSpan: Array<number> = [];
+    let colSpan = 1;
+    let rowIndex = -1;
 
-    if (rowIndex >= rows.length && rowSpan.every((span) => span === 1)) {
-      return rows;
-    } else if (
-      rows[rowIndex] && rows[rowIndex].length > 0 &&
-      colIndex >= rows[rowIndex].length &&
-      colIndex >= rowSpan.length && colSpan === 1
-    ) {
-      return this.spanRows(rows, ++rowIndex, 0, rowSpan, 1);
+    while (true) {
+      rowIndex++;
+      if (rowIndex === rows.length && rowSpan.every((span) => span === 1)) {
+        break;
+      }
+      const row = rows[rowIndex] = this.createRow(rows[rowIndex] || []);
+      let colIndex = -1;
+
+      while (true) {
+        colIndex++;
+        if (
+          colIndex === row.length &&
+          colIndex === rowSpan.length && colSpan === 1
+        ) {
+          break;
+        }
+
+        if (colSpan > 1) {
+          colSpan--;
+          rowSpan[colIndex] = rowSpan[colIndex - 1];
+          row.splice(
+            colIndex,
+            this.getDeleteCount(rows, rowIndex, colIndex),
+            row[colIndex - 1],
+          );
+
+          continue;
+        }
+
+        if (rowSpan[colIndex] > 1) {
+          rowSpan[colIndex]--;
+          rows[rowIndex].splice(
+            colIndex,
+            this.getDeleteCount(rows, rowIndex, colIndex),
+            rows[rowIndex - 1][colIndex],
+          );
+
+          continue;
+        }
+
+        const cell = row[colIndex] = this.createCell(
+          row[colIndex] || null,
+          row,
+        );
+
+        colSpan = cell.getColSpan();
+        rowSpan[colIndex] = cell.getRowSpan();
+      }
     }
 
-    if (colSpan > 1) {
-      colSpan--;
-      rowSpan[colIndex] = rowSpan[colIndex - 1];
-      rows[rowIndex].splice(
-        colIndex,
-        this.getDeleteCount(rows, rowIndex, colIndex),
-        rows[rowIndex][colIndex - 1],
-      );
-      return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
-    }
-
-    if (colIndex === 0) {
-      rows[rowIndex] = this.createRow(rows[rowIndex] || []);
-    }
-
-    if (rowSpan[colIndex] > 1) {
-      rowSpan[colIndex]--;
-      rows[rowIndex].splice(
-        colIndex,
-        this.getDeleteCount(rows, rowIndex, colIndex),
-        rows[rowIndex - 1][colIndex],
-      );
-      return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
-    }
-
-    rows[rowIndex][colIndex] = this.createCell(
-      rows[rowIndex][colIndex] || null,
-      rows[rowIndex],
-    );
-
-    colSpan = rows[rowIndex][colIndex].getColSpan();
-    rowSpan[colIndex] = rows[rowIndex][colIndex].getRowSpan();
-
-    return this.spanRows(rows, rowIndex, ++colIndex, rowSpan, colSpan);
+    return rows as Array<Row<Cell>>;
   }
 
   protected getDeleteCount(
-    rows: Array<Row<Cell>>,
+    rows: Array<Array<unknown>>,
     rowIndex: number,
     colIndex: number,
   ) {
