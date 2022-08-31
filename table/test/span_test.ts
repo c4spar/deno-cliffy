@@ -299,3 +299,20 @@ Deno.test("colspan + rowspan 8", () => {
       .toString(),
   );
 });
+
+Deno.test("should allow an empty array as first row", () => {
+  assertEquals(
+    Table.from([
+      [],
+      [new Cell("abc").colSpan(2)],
+    ])
+      .border(true)
+      .toString(),
+    `
+┌──┬──┐
+│  │  │
+├──┴──┤
+│ abc │
+└─────┘`.slice(1),
+  );
+});
