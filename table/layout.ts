@@ -133,7 +133,8 @@ export class TableLayout {
     if (rowIndex >= rows.length && rowSpan.every((span) => span === 1)) {
       return rows;
     } else if (
-      rows[rowIndex] && colIndex >= rows[rowIndex].length &&
+      rows[rowIndex] && rows[rowIndex].length > 0 &&
+      colIndex >= rows[rowIndex].length &&
       colIndex >= rowSpan.length && colSpan === 1
     ) {
       return this.spanRows(rows, ++rowIndex, 0, rowSpan, 1);
