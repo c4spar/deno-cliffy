@@ -1,3 +1,85 @@
+# [v0.25.0](https://github.com/c4spar/deno-cliffy/compare/v0.24.3...v0.25.0) (Sep 3, 2022)
+
+### Features
+
+- **command:** add `.noGlobals()` method (#403)
+  ([e37fb99](https://github.com/c4spar/deno-cliffy/commit/e37fb99))
+- **table:** allow undefined cell values and override them with row and col span
+  (#427) ([89fe0ca](https://github.com/c4spar/deno-cliffy/commit/89fe0ca))
+
+### Bug Fixes
+
+- **command:** required options with conflicting options should be optional
+  (#435) ([4c71af1](https://github.com/c4spar/deno-cliffy/commit/4c71af1))
+- **command:** type error when trying to add a command instance with child
+  commands (#386)
+  ([35fe1de](https://github.com/c4spar/deno-cliffy/commit/35fe1de))
+- **command:** use instance properties for shouldThrowErrors and shouldExit
+  check (#426) ([21d7558](https://github.com/c4spar/deno-cliffy/commit/21d7558))
+- **command:** don't call `Deno.exit()` in help command when `.noExit()` is
+  called (#424)
+  ([41769ec](https://github.com/c4spar/deno-cliffy/commit/41769ec))
+- **command:** ignore missing required env vars for global help option (#423)
+  ([0290828](https://github.com/c4spar/deno-cliffy/commit/0290828))
+- **command:** ignore missing required env vars for help and version option
+  (#415) ([275b337](https://github.com/c4spar/deno-cliffy/commit/275b337))
+- **command:** do not require full env permission (#416)
+  ([bc4c1bd](https://github.com/c4spar/deno-cliffy/commit/bc4c1bd))
+- **table:** max call stack error thrown for large tables (#433)
+  ([f699178](https://github.com/c4spar/deno-cliffy/commit/f699178))
+- **table:** error when first row is empty and colSpan is enabled (#432)
+  ([4d07eea](https://github.com/c4spar/deno-cliffy/commit/4d07eea))
+- **table:** row doesn't inherit the table settings correctly (#428)
+  ([60a781c](https://github.com/c4spar/deno-cliffy/commit/60a781c))
+
+### Code Refactoring
+
+- **command:** refactor `.parseOptions()` method (#409)
+  ([58df99d](https://github.com/c4spar/deno-cliffy/commit/58df99d))
+
+### Chore
+
+- **ci:** type-check and fix examples (#414)
+  ([63b6613](https://github.com/c4spar/deno-cliffy/commit/63b6613))
+- **ci:** run `deno test` with `--parallel` flag (#412)
+  ([1186435](https://github.com/c4spar/deno-cliffy/commit/1186435))
+- **deno:** add snapshot task (#429)
+  ([607182d](https://github.com/c4spar/deno-cliffy/commit/607182d))
+- **deno:** add `deno.jsonc` config and use `deno task` (#413)
+  ([5f28389](https://github.com/c4spar/deno-cliffy/commit/5f28389))
+- **upgrade:** std@0.154.0 and add update deps task (#420)
+  ([69e1ab5](https://github.com/c4spar/deno-cliffy/commit/69e1ab5),
+  [9af27da](https://github.com/c4spar/deno-cliffy/commit/9af27da))
+
+### Documentation Updates
+
+- **command:** update ansi example (#422)
+  ([cab4f51](https://github.com/c4spar/deno-cliffy/commit/cab4f51))
+- **command:** fix examples and use local file imports (#410)
+  ([4c62043](https://github.com/c4spar/deno-cliffy/commit/4c62043))
+
+### BREAKING CHANGES
+
+- **command:** flatten variadic arguments and fix types for variadic option
+  arguments (#418)
+  ([bf5f15a](https://github.com/c4spar/deno-cliffy/commit/bf5f15a))
+
+  **Before:**
+
+  ```ts
+  new Command()
+    .arguments("[arg1] [arg2] [...restArgs]")
+    .action((_, arg1, arg2, restArgs) => {});
+  ```
+
+  **After:**
+
+  ```ts
+  new Command()
+    .arguments("[arg1] [arg2] [...restArgs]")
+    .action((_, arg1, arg2, ...restArgs) => {});
+  ```
+
 # [v0.24.3](https://github.com/c4spar/deno-cliffy/compare/v0.24.2...v0.24.3) (Jul 29, 2022)
 
 ### Features
