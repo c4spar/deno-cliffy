@@ -837,10 +837,17 @@ export class Command<
 
   public globalOption<
     F extends string,
-    G extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    G extends TypedOption<
+      F,
+      CO,
+      Merge<CPT, Merge<CGT, CT>>,
+      undefined extends X ? R : false,
+      D
+    >,
     MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
+    X extends ICommandOption["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -912,10 +919,17 @@ export class Command<
    */
   public option<
     F extends string,
-    G extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    G extends TypedOption<
+      F,
+      CO,
+      Merge<CPT, Merge<CGT, CT>>,
+      undefined extends X ? R : false,
+      D
+    >,
     MG extends MapValue<G, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
+    X extends ICommandOption["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -956,10 +970,17 @@ export class Command<
 
   public option<
     F extends string,
-    O extends TypedOption<F, CO, Merge<CPT, Merge<CGT, CT>>, R, D>,
+    O extends TypedOption<
+      F,
+      CO,
+      Merge<CPT, Merge<CGT, CT>>,
+      undefined extends X ? R : false,
+      D
+    >,
     MO extends MapValue<O, V, C>,
     R extends ICommandOption["required"] = undefined,
     C extends ICommandOption["collect"] = undefined,
+    X extends ICommandOption["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -974,6 +995,7 @@ export class Command<
           default?: IDefaultValue<D>;
           required?: R;
           collect?: C;
+          conflicts?: X;
           value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,

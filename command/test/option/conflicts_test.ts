@@ -38,8 +38,7 @@ Deno.test("command optionConflicts noArguments", async () => {
 Deno.test("command optionConflicts type", async () => {
   const { options, args } = await cmd.parse(["-t", "value"]);
 
-  // @TODO: fix types for conflicting options. (make them optional)
-  assertEquals(options, { type: "value" } as unknown);
+  assertEquals(options, { type: "value" });
   assertEquals(args, []);
 });
 
@@ -50,8 +49,7 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
 
   assertEquals(
     options,
-    // @TODO: fix types for conflicting options. (make them optional)
-    { videoType: "value", audioType: "value", imageType: "value" } as unknown,
+    { videoType: "value", audioType: "value", imageType: "value" },
   );
   assertEquals(args, []);
 });
