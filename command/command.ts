@@ -2923,19 +2923,20 @@ type SpreadOptionalProperties<
 
 /** Merge types of two objects. */
 type Spread<L, R> = L extends void ? R : R extends void ? L
-: // Properties in L that don't exist in R.
-& Omit<L, keyof R>
-// Properties in R that don't exist in L.
-& Omit<R, keyof L>
-// Required properties in R that exist in L.
-& SpreadRequiredProperties<L, R, RequiredKeys<R> & keyof L>
-// Required properties in L that exist in R.
-& SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
-// Optional properties in L and R.
-& SpreadOptionalProperties<
-  L,
-  R,
-  OptionalKeys<L> & OptionalKeys<R>
->;
+  // Properties in L that don't exist in R.
+: 
+  & Omit<L, keyof R>
+  // Properties in R that don't exist in L.
+  & Omit<R, keyof L>
+  // Required properties in R that exist in L.
+  & SpreadRequiredProperties<L, R, RequiredKeys<R> & keyof L>
+  // Required properties in L that exist in R.
+  & SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
+  // Optional properties in L and R.
+  & SpreadOptionalProperties<
+    L,
+    R,
+    OptionalKeys<L> & OptionalKeys<R>
+  >;
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;

@@ -172,11 +172,11 @@ export const clearScreen = "\u001Bc";
  */
 export const clearTerminal = Deno.build.os === "windows"
   ? `${eraseScreen}${CSI}0f`
-  : // 1. Erases the screen (Only done in case `2` is not supported)
+  // 1. Erases the screen (Only done in case `2` is not supported)
   // 2. Erases the whole screen including scrollback buffer
   // 3. Moves cursor to the top-left position
   // More info: https://www.real-world-systems.com/docs/ANSIcode.html
-    `${eraseScreen}${CSI}3J${CSI}H`;
+  : `${eraseScreen}${CSI}3J${CSI}H`;
 
 /**
  * Create link.

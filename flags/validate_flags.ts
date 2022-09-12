@@ -104,6 +104,7 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 
     const hasDefaultValue: boolean = (!opts.ignoreDefaults ||
       typeof opts.ignoreDefaults[name] === "undefined") &&
+      (!opts.knownFlags || typeof opts.knownFlags[name] === "undefined") &&
       typeof values[name] === "undefined" && (
         typeof option.default !== "undefined" ||
         typeof defaultValue !== "undefined"
@@ -199,12 +200,15 @@ function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
   if (!opts.flags?.length) {
     return;
   }
+  const knownFlags = opts.knownFlags ?? {};
+
   for (const option of opts.flags) {
     if (option.required && !(paramCaseToCamelCase(option.name) in values)) {
+      const conflicts = option.conflicts ?? [];
       if (
-        (
-          !option.conflicts ||
-          !option.conflicts.find((flag: string) => !!values[flag])
+        typeof knownFlags[option.name] === "undefined" &&
+        !conflicts.find((flag: string) =>
+          typeof values[flag] !== "undefined"
         ) &&
         !options.find((opt) =>
           opt.option?.conflicts?.find((flag: string) => flag === option.name)
