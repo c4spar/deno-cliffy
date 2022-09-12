@@ -207,7 +207,9 @@ function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
       const conflicts = option.conflicts ?? [];
       if (
         typeof knownFlags[option.name] === "undefined" &&
-        !conflicts.find((flag: string) => typeof values[flag] !== "undefined") &&
+        !conflicts.find((flag: string) =>
+          typeof values[flag] !== "undefined"
+        ) &&
         !options.find((opt) =>
           opt.option?.conflicts?.find((flag: string) => flag === option.name)
         )
