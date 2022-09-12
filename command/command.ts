@@ -1520,7 +1520,7 @@ export class Command<
         stopEarly,
         allowEmpty: this._allowEmpty,
         flags: options,
-        ignoreDefaults: env,
+        knownFlags: { ...env, ...ctx.options },
         parse: (type: ITypeInfo) => this.parseType(type),
         option: (option: IOption) => {
           if (!action && option.action) {
