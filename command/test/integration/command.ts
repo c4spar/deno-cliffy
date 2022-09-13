@@ -40,6 +40,8 @@ const cmd = new Command()
       .option("-b, --bar", "Bar option.")
       .reset(),
   )
+  .command("bar")
+  .option("-f, --file <path>", "...", { required: true })
   .command("help", new HelpCommand().global())
   .command("completions", new CompletionsCommand());
 
