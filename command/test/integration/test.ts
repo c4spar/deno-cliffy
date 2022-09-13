@@ -81,6 +81,11 @@ describe({
       await assertSnapshot(t, output);
     });
 
+    it("should print the help of sub-command on validation error", async (t) => {
+      const output: string = await runCommand("bar", true);
+      await assertSnapshot(t, output);
+    });
+
     it("should print error message for unknown option with suggestion", async (t) => {
       const output: string = await runCommand("--colorr", true);
       await assertSnapshot(t, output);
