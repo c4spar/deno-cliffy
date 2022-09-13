@@ -1,3 +1,20 @@
+# [v0.25.1](https://github.com/c4spar/deno-cliffy/compare/v0.25.0...v0.25.1) (Sep 14, 2022)
+
+### Bug Fixes
+
+- **command:** help text of main command is always shown for validation errors
+  (#441) ([41b3547](https://github.com/c4spar/deno-cliffy/commit/41b3547))
+
+### Chore
+
+- **upgrade:** deno/std@0.155.0 (#442)
+  ([34f889d](https://github.com/c4spar/deno-cliffy/commit/34f889d))
+
+### Revert
+
+- feat(command): support passing global options before sub-command (#388) (#440)
+  ([85d3dac](https://github.com/c4spar/deno-cliffy/commit/85d3dac))
+
 # [v0.25.0](https://github.com/c4spar/deno-cliffy/compare/v0.24.3...v0.25.0) (Sep 3, 2022)
 
 ### Features
