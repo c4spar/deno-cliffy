@@ -1201,7 +1201,7 @@ export class Command<
    * Parse command line arguments and execute matched command.
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
    */
-  public async parse(
+  public parse(
     args: string[] = Deno.args,
   ): Promise<
     CP extends Command<any> ? IParseResult<
@@ -1225,7 +1225,7 @@ export class Command<
         CP
       >
   > {
-    return await this.parseCommand({ args }) as any;
+    return this.parseCommand({ args }) as any;
   }
 
   private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
