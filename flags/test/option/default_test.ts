@@ -45,7 +45,7 @@ const options = <IParseOptions> {
   }],
 };
 
-Deno.test("[flags] should set default args with empty arguments", () => {
+Deno.test("flags default option: no arguments", () => {
   const { flags, unknown, literal } = parseFlags([], options);
 
   assertEquals(flags, {
@@ -61,7 +61,7 @@ Deno.test("[flags] should set default args with empty arguments", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should override defaul values", () => {
+Deno.test("flags default option: override default values", () => {
   const { flags, unknown, literal } = parseFlags(
     [
       "-b",
@@ -95,7 +95,7 @@ Deno.test("[flags] should override defaul values", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should override default value with optional value", () => {
+Deno.test("flags optionDefault override default value with optional value", () => {
   const { flags, unknown, literal } = parseFlags(["-b"], options);
 
   assertEquals(flags, {
@@ -111,38 +111,10 @@ Deno.test("[flags] should override default value with optional value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should ignore defaults", () => {
+Deno.test("flags ignore defaults", () => {
   const { flags, unknown, literal } = parseFlags([], {
     ...options,
     ignoreDefaults: {
-      boolean: true,
-      number: 0,
-      string2: "foo",
-    },
-  });
-
-  assertEquals(flags, {
-    string: "0",
-    boolean2: true,
-    number2: 1,
-    method: 1,
-  });
-  assertEquals(unknown, []);
-  assertEquals(literal, []);
-});
-
-Deno.test("[flags] should ignore knownFlags", () => {
-  const { flags, unknown, literal } = parseFlags([], {
-    ...options,
-    flags: [
-      ...options?.flags ?? [],
-      {
-        name: "required",
-        required: true,
-      },
-    ],
-    knownFlags: {
-      required: true,
       boolean: true,
       number: 0,
       string2: "foo",
