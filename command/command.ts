@@ -1225,77 +1225,79 @@ export class Command<
         CP
       >
   > {
+    return await this.parseCommand({ args }) as any;
+  }
+
+  private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
     try {
-      return await this.parseCommand({ args }) as any;
+      this.reset();
+      this.registerDefaults();
+      this.rawArgs = ctx.args;
+
+      if (this.isExecutable) {
+        await this.executeExecutable(ctx.args);
+        return { options: {}, args: [], cmd: this, literal: [] } as any;
+      }
+
+      if (this._useRawArgs) {
+        const env = await this.parseEnvVars(this.envVars);
+        return this.execute(env, ...ctx.args) as any;
+      }
+
+      let subCommand: Command<any> | undefined;
+
+      // Parse sub command.
+      if (subCommand || ctx.args.length > 0) {
+        if (!subCommand) {
+          subCommand = this.getCommand(ctx.args[0], true);
+
+          if (subCommand) {
+            ctx.args = ctx.args.slice(1);
+          }
+        }
+
+        if (subCommand) {
+          subCommand._globalParent = this;
+
+          return subCommand.parseCommand(ctx);
+        }
+      }
+
+      // Parse rest options & env vars.
+      ctx = await this.parseOptionsAndEnvVars(ctx);
+
+      this.literalArgs = ctx.literal ?? [];
+
+      // Merge env and global options.
+      const options = { ...ctx.env, ...ctx.options };
+
+      // Parse arguments.
+      const params = this.parseArguments(ctx.args, options);
+
+      // Execute option action.
+      if (ctx.action) {
+        await ctx.action.action.call(this, options, ...params);
+
+        if (ctx.action.standalone) {
+          return {
+            options,
+            args: params,
+            cmd: this,
+            literal: this.literalArgs,
+          } as any;
+        }
+      }
+
+      return this.execute(options, ...params) as any;
     } catch (error: unknown) {
       this.throw(
-        error instanceof Error
+        error instanceof FlagsValidationError
+          ? new ValidationError(error.message)
+          : error instanceof Error
           ? error
           : new Error(`[non-error-thrown] ${error}`),
       );
     }
-  }
-
-  private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
-    this.reset();
-    this.registerDefaults();
-    this.rawArgs = ctx.args;
-
-    if (this.isExecutable) {
-      await this.executeExecutable(ctx.args);
-      return { options: {}, args: [], cmd: this, literal: [] } as any;
-    }
-
-    if (this._useRawArgs) {
-      const env = await this.parseEnvVars(this.envVars);
-      return this.execute(env, ...ctx.args) as any;
-    }
-
-    let subCommand: Command<any> | undefined;
-
-    // Parse sub command.
-    if (subCommand || ctx.args.length > 0) {
-      if (!subCommand) {
-        subCommand = this.getCommand(ctx.args[0], true);
-
-        if (subCommand) {
-          ctx.args = ctx.args.slice(1);
-        }
-      }
-
-      if (subCommand) {
-        subCommand._globalParent = this;
-
-        return subCommand.parseCommand(ctx);
-      }
-    }
-
-    // Parse rest options & env vars.
-    ctx = await this.parseOptionsAndEnvVars(ctx);
-
-    this.literalArgs = ctx.literal ?? [];
-
-    // Merge env and global options.
-    const options = { ...ctx.env, ...ctx.options };
-
-    // Parse arguments.
-    const params = this.parseArguments(ctx.args, options);
-
-    // Execute option action.
-    if (ctx.action) {
-      await ctx.action.action.call(this, options, ...params);
-
-      if (ctx.action.standalone) {
-        return {
-          options,
-          args: params,
-          cmd: this,
-          literal: this.literalArgs,
-        } as any;
-      }
-    }
-
-    return this.execute(options, ...params) as any;
   }
 
   private async parseGlobalOptionsAndEnvVars(
@@ -1487,37 +1489,29 @@ export class Command<
     env: Record<string, unknown>,
     stopEarly: boolean = this._stopEarly,
   ): ParseContext {
-    try {
-      let action: ActionOption | undefined;
+    let action: ActionOption | undefined;
 
-      const parseResult = parseFlags(ctx.args, {
-        stopEarly,
-        allowEmpty: this._allowEmpty,
-        flags: options,
-        ignoreDefaults: env,
-        parse: (type: ITypeInfo) => this.parseType(type),
-        option: (option: IOption) => {
-          if (!action && option.action) {
-            action = option as ActionOption;
-          }
-        },
-      });
+    const parseResult = parseFlags(ctx.args, {
+      stopEarly,
+      allowEmpty: this._allowEmpty,
+      flags: options,
+      ignoreDefaults: env,
+      parse: (type: ITypeInfo) => this.parseType(type),
+      option: (option: IOption) => {
+        if (!action && option.action) {
+          action = option as ActionOption;
+        }
+      },
+    });
 
-      // Merge context.
-      return {
-        args: parseResult.unknown,
-        options: { ...ctx.options, ...parseResult.flags },
-        env: { ...ctx.env, ...env },
-        action: ctx.action ?? action,
-        literal: parseResult.literal,
-      };
-    } catch (error) {
-      if (error instanceof FlagsValidationError) {
-        throw new ValidationError(error.message);
-      }
-
-      throw error;
-    }
+    // Merge context.
+    return {
+      args: parseResult.unknown,
+      options: { ...ctx.options, ...parseResult.flags },
+      env: { ...ctx.env, ...env },
+      action: ctx.action ?? action,
+      literal: parseResult.literal,
+    };
   }
 
   /** Parse argument type. */
@@ -1531,16 +1525,9 @@ export class Command<
       );
     }
 
-    try {
-      return typeSettings.handler instanceof Type
-        ? typeSettings.handler.parse(type)
-        : typeSettings.handler(type);
-    } catch (error) {
-      if (error instanceof FlagsValidationError) {
-        throw new ValidationError(error.message);
-      }
-      throw error;
-    }
+    return typeSettings.handler instanceof Type
+      ? typeSettings.handler.parse(type)
+      : typeSettings.handler(type);
   }
 
   /**
