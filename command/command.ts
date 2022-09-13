@@ -1251,29 +1251,7 @@ export class Command<
       return this.execute(env, ...ctx.args) as any;
     }
 
-    let preParseGlobals = false;
     let subCommand: Command<any> | undefined;
-
-    // Pre parse globals to support: cmd --global-option sub-command --option
-    if (ctx.args.length > 0) {
-      // Detect sub command.
-      subCommand = this.getCommand(ctx.args[0], true);
-
-      if (subCommand) {
-        ctx.args = ctx.args.slice(1);
-      } else {
-        // Only pre parse globals if first arg ist a global option.
-        const optionName = ctx.args[0].replace(/^-+/, "");
-        preParseGlobals = this.getOption(optionName, true)?.global === true;
-
-        // Parse global options & env vars.
-        if (preParseGlobals) {
-          ctx = await this.parseGlobalOptionsAndEnvVars(ctx);
-        }
-      }
-    } else {
-      preParseGlobals = false;
-    }
 
     // Parse sub command.
     if (subCommand || ctx.args.length > 0) {
@@ -1293,7 +1271,7 @@ export class Command<
     }
 
     // Parse rest options & env vars.
-    ctx = await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
+    ctx = await this.parseOptionsAndEnvVars(ctx);
 
     this.literalArgs = ctx.literal ?? [];
 
@@ -1343,25 +1321,21 @@ export class Command<
 
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
-    preParseGlobals: boolean,
   ): Promise<ParseContext> {
     // Parse env vars.
-    const envVars = preParseGlobals
-      ? this.envVars.filter((envVar) => !envVar.global)
-      : this.getEnvVars(true);
+    const envVars = this.getEnvVars(true);
 
     const helpOption = this.getHelpOption();
     const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = helpOption && ctx.options?.[helpOption.name] === true;
+    const isHelpOption = helpOption?.flags.includes(ctx.args[0]);
+
     const env = {
       ...ctx.env,
       ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
     };
 
     // Parse options.
-    const options = preParseGlobals
-      ? this.options.filter((option) => !option.global)
-      : this.getOptions(true);
+    const options = this.getOptions(true);
 
     return this.parseOptions(ctx, options, env);
   }
