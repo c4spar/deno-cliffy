@@ -5,7 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IDefaultValue } from "../flags/types.ts";
+import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -356,16 +356,17 @@ export class Command<
     name: N,
     desc?: string,
     override?: boolean,
-  ): CPG extends number ? Command<any> : Command<
-    CP extends Command<any> ? CPG : Merge<CPG, CG>,
-    CP extends Command<any> ? CPT : Merge<CPT, CGT>,
-    void,
-    A,
-    void,
-    void,
-    void,
-    OneOf<CP, this>
-  >;
+  ): CPG extends number ? Command<any>
+    : Command<
+      CP extends Command<any> ? CPG : Merge<CPG, CG>,
+      CP extends Command<any> ? CPT : Merge<CPT, CGT>,
+      void,
+      A,
+      void,
+      void,
+      void,
+      OneOf<CP, this>
+    >;
 
   /**
    * Add new sub-command.
@@ -654,16 +655,7 @@ export class Command<
     name: N,
     handler: H,
     options?: Omit<ITypeOptions, "global">,
-  ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    CG,
-    CT,
-    Merge<CGT, TypedType<N, H>>,
-    CP
-  > {
+  ): Command<CPG, CPT, CO, CA, CG, CT, Merge<CGT, TypedType<N, H>>, CP> {
     return this.type(name, handler, { ...options, global: true });
   }
 
@@ -673,23 +665,11 @@ export class Command<
    * @param handler The callback method to parse the type.
    * @param options Type options.
    */
-  public type<
-    H extends TypeOrTypeHandler<unknown>,
-    N extends string = string,
-  >(
+  public type<H extends TypeOrTypeHandler<unknown>, N extends string = string>(
     name: N,
     handler: H,
     options?: ITypeOptions,
-  ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    CG,
-    Merge<CT, TypedType<N, H>>,
-    CGT,
-    CP
-  > {
+  ): Command<CPG, CPT, CO, CA, CG, Merge<CT, TypedType<N, H>>, CGT, CP> {
     if (this.cmd.types.get(name) && !options?.override) {
       throw new DuplicateType(name);
     }
@@ -749,16 +729,7 @@ export class Command<
     name: string,
     complete:
       | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICompleteHandler<
-        Partial<CO>,
-        Partial<CA>,
-        CG,
-        CPG,
-        CT,
-        CGT,
-        CPT,
-        any
-      >,
+      | ICompleteHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, any>,
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
@@ -874,16 +845,7 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
-  ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    MergeOptions<F, CG, MG>,
-    CT,
-    CGT,
-    CP
-  > {
+  ): Command<CPG, CPT, CO, CA, MergeOptions<F, CG, MG>, CT, CGT, CP> {
     if (typeof opts === "function") {
       return this.option(
         flags,
@@ -957,16 +919,7 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
-  ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    MergeOptions<F, CG, MG>,
-    CT,
-    CGT,
-    CP
-  >;
+  ): Command<CPG, CPT, CO, CA, MergeOptions<F, CG, MG>, CT, CGT, CP>;
 
   public option<
     F extends string,
@@ -999,16 +952,7 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
-  ): Command<
-    CPG,
-    CPT,
-    MergeOptions<F, CO, MO>,
-    CA,
-    CG,
-    CT,
-    CGT,
-    CP
-  >;
+  ): Command<CPG, CPT, MergeOptions<F, CO, MO>, CA, CG, CT, CGT, CP>;
 
   public option(
     flags: string,
@@ -1225,34 +1169,65 @@ export class Command<
         CP
       >
   > {
-    return this.parseCommand({ args }) as any;
+    const ctx: ParseContext = {
+      unknown: args,
+      flags: {},
+      env: {},
+      literal: [],
+      standalone: false,
+      stopEarly: false,
+    };
+    return this.parseCommand(ctx) as any;
   }
 
   private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
     try {
       this.reset();
       this.registerDefaults();
-      this.rawArgs = ctx.args;
+      this.rawArgs = ctx.unknown.slice();
 
       if (this.isExecutable) {
-        await this.executeExecutable(ctx.args);
+        await this.executeExecutable(ctx.unknown);
         return { options: {}, args: [], cmd: this, literal: [] } as any;
       }
 
       if (this._useRawArgs) {
         const env = await this.parseEnvVars(this.envVars);
-        return this.execute(env, ...ctx.args) as any;
+        return this.execute(env ?? {}, ...ctx.unknown) as any;
       }
 
+      let preParseGlobals = false;
       let subCommand: Command<any> | undefined;
 
+      // Pre parse globals to support: cmd --global-option sub-command --option
+      if (ctx.unknown.length > 0) {
+        // Detect sub command.
+        subCommand = this.getCommand(ctx.unknown[0], true);
+
+        if (subCommand) {
+          ctx.unknown = ctx.unknown.slice(1);
+        } else {
+          // Only pre parse globals if first arg ist a global option.
+          const optionName = ctx.unknown[0].replace(/^-+/, "");
+          const option = this.getOption(optionName, true);
+          preParseGlobals = option?.global === true;
+
+          // Parse global options & env vars.
+          if (preParseGlobals) {
+            ctx = await this.parseGlobalOptionsAndEnvVars(ctx);
+          }
+        }
+      } else {
+        preParseGlobals = false;
+      }
+
       // Parse sub command.
-      if (subCommand || ctx.args.length > 0) {
+      if (subCommand || ctx.unknown.length > 0) {
         if (!subCommand) {
-          subCommand = this.getCommand(ctx.args[0], true);
+          subCommand = this.getCommand(ctx.unknown[0], true);
 
           if (subCommand) {
-            ctx.args = ctx.args.slice(1);
+            ctx.unknown = ctx.unknown.slice(1);
           }
         }
 
@@ -1264,31 +1239,31 @@ export class Command<
       }
 
       // Parse rest options & env vars.
-      ctx = await this.parseOptionsAndEnvVars(ctx);
+      ctx = await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
 
       this.literalArgs = ctx.literal ?? [];
 
       // Merge env and global options.
-      const options = { ...ctx.env, ...ctx.options };
+      const options = { ...ctx.env, ...ctx.flags };
 
       // Parse arguments.
-      const params = this.parseArguments(ctx.args, options);
+      const args = this.parseArguments(ctx.unknown, options);
 
       // Execute option action.
       if (ctx.action) {
-        await ctx.action.action.call(this, options, ...params);
+        await ctx.action.action.call(this, options, ...args);
 
         if (ctx.action.standalone) {
           return {
             options,
-            args: params,
+            args,
             cmd: this,
             literal: this.literalArgs,
           } as any;
         }
       }
 
-      return this.execute(options, ...params) as any;
+      return this.execute(options, ...args) as any;
     } catch (error: unknown) {
       this.throw(
         error instanceof FlagsValidationError
@@ -1309,37 +1284,44 @@ export class Command<
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.args[0]);
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
+
     const env = await this.parseEnvVars(envVars, !isHelpOption);
+    if (env) {
+      Object.assign(ctx.env, env);
+    }
 
     // Parse global options.
-    const options = [
-      ...this.options.filter((option) => option.global),
-      ...this.getGlobalOptions(true),
-    ];
+    const options = this.getOptions(true);
 
-    return this.parseOptions(ctx, options, env, true);
+    return this.parseOptions(ctx, options, true);
   }
 
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
+    preParseGlobals: boolean,
   ): Promise<ParseContext> {
     // Parse env vars.
-    const envVars = this.getEnvVars(true);
+    const envVars = preParseGlobals
+      ? this.envVars.filter((envVar) => !envVar.global)
+      : this.getEnvVars(true);
 
     const helpOption = this.getHelpOption();
-    const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = helpOption?.flags.includes(ctx.args[0]);
+    const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
+    const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
 
-    const env = {
-      ...ctx.env,
-      ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
-    };
+    const env = await this.parseEnvVars(
+      envVars,
+      !isHelpOption && !isVersionOption,
+    );
+    if (env) {
+      Object.assign(ctx.env, env);
+    }
 
     // Parse options.
     const options = this.getOptions(true);
 
-    return this.parseOptions(ctx, options, env);
+    return this.parseOptions(ctx, options);
   }
 
   /** Register default options like `--version` and `--help`. */
@@ -1479,39 +1461,25 @@ export class Command<
     }
   }
 
-  /**
-   * Parse raw command line arguments.
-   * @param args Raw command line arguments.
-   */
+  /** Parse raw command line arguments. */
   protected parseOptions(
     ctx: ParseContext,
     options: IOption[],
-    env: Record<string, unknown>,
     stopEarly: boolean = this._stopEarly,
   ): ParseContext {
-    let action: ActionOption | undefined;
-
-    const parseResult = parseFlags(ctx.args, {
+    return parseFlags(ctx, {
       stopEarly,
+      partial: true,
       allowEmpty: this._allowEmpty,
       flags: options,
-      ignoreDefaults: env,
+      ignoreDefaults: ctx.env,
       parse: (type: ITypeInfo) => this.parseType(type),
       option: (option: IOption) => {
-        if (!action && option.action) {
-          action = option as ActionOption;
+        if (!ctx.action && option.action) {
+          ctx.action = option as ActionOption;
         }
       },
     });
-
-    // Merge context.
-    return {
-      args: parseResult.unknown,
-      options: { ...ctx.options, ...parseResult.flags },
-      env: { ...ctx.env, ...env },
-      action: ctx.action ?? action,
-      literal: parseResult.literal,
-    };
   }
 
   /** Parse argument type. */
@@ -1538,13 +1506,15 @@ export class Command<
   protected async parseEnvVars(
     envVars: Array<IEnvVar>,
     validate = true,
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, unknown> | undefined> {
     const result: Record<string, unknown> = {};
+    let hasEnv = false;
 
     for (const env of envVars) {
       const found = await this.findEnvVar(env.names);
 
       if (found) {
+        hasEnv = true;
         const { name, value } = found;
 
         const propertyName = underscoreToCamelCase(
@@ -1581,7 +1551,7 @@ export class Command<
       }
     }
 
-    return result;
+    return hasEnv ? result : undefined;
   }
 
   protected async findEnvVar(
@@ -2498,12 +2468,9 @@ interface IDefaultOption {
 
 type ActionOption = IOption & { action: IAction };
 
-interface ParseContext {
-  args: string[];
-  options?: Record<string, unknown>;
-  env?: Record<string, unknown>;
+interface ParseContext extends IFlagsResult<Record<string, unknown>> {
   action?: ActionOption;
-  literal?: string[];
+  env: Record<string, unknown>;
 }
 
 type TrimLeft<T extends string, V extends string | undefined> = T extends
@@ -2595,9 +2562,7 @@ type RestArgsType<T extends string> = OptionalOrRequiredValue<
  * - `[name...]`
  * - `<name...>`
  */
-type RestArgs = OptionalOrRequiredValue<
-  `${RestValue}`
->;
+type RestArgs = OptionalOrRequiredValue<`${RestValue}`>;
 
 /**
  * Single arg with list type and completions.
@@ -2645,9 +2610,7 @@ type SingleArgType<T extends string> = OptionalOrRequiredValue<
  * - `[name]`
  * - `<name>`
  */
-type SingleArg = OptionalOrRequiredValue<
-  `${string}`
->;
+type SingleArg = OptionalOrRequiredValue<`${string}`>;
 
 type DefaultTypes = {
   number: NumberType;
@@ -2866,19 +2829,11 @@ type OptionalKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
 }[keyof T];
 
-type SpreadRequiredProperties<
-  L,
-  R,
-  K extends keyof L & keyof R,
-> = {
+type SpreadRequiredProperties<L, R, K extends keyof L & keyof R> = {
   [P in K]: Exclude<L[P], undefined> | Exclude<R[P], undefined>;
 };
 
-type SpreadOptionalProperties<
-  L,
-  R,
-  K extends keyof L & keyof R,
-> = {
+type SpreadOptionalProperties<L, R, K extends keyof L & keyof R> = {
   [P in K]?: L[P] | R[P];
 };
 
@@ -2894,10 +2849,6 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
   // Required properties in L that exist in R.
   & SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
   // Optional properties in L and R.
-  & SpreadOptionalProperties<
-    L,
-    R,
-    OptionalKeys<L> & OptionalKeys<R>
-  >;
+  & SpreadOptionalProperties<L, R, OptionalKeys<L> & OptionalKeys<R>>;
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
