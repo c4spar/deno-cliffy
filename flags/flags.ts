@@ -161,6 +161,13 @@ export function parseFlags<
           const name = current.replace(/^-+/g, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
+            if (opts.ignoreUnknown) {
+              ctx.unknown.push(current);
+              if (currentValue) {
+                ctx.unknown.push(currentValue);
+              }
+              continue;
+            }
             throw new UnknownOption(current, opts.flags);
           }
         }
