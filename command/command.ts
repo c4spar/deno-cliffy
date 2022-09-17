@@ -1292,7 +1292,10 @@ export class Command<
     }
 
     // Parse global options.
-    const options = this.getOptions(true);
+    const options = [
+      ...this.options.filter((option) => option.global),
+      ...this.getGlobalOptions(true),
+    ];
 
     return this.parseOptions(ctx, options, true);
   }
@@ -1469,6 +1472,7 @@ export class Command<
   ): ParseContext {
     return parseFlags(ctx, {
       stopEarly,
+      ignoreUnknown: stopEarly,
       partial: true,
       allowEmpty: this._allowEmpty,
       flags: options,
