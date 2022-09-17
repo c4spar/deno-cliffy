@@ -78,6 +78,15 @@ Deno.test("[command] should parse global options on nested sub command", async (
   assertEquals(args, []);
 });
 
+Deno.test("[command] should parse global options before sub commands", async () => {
+  const { options, args } = await cmd().parse(
+    ["-g", "foo", "cmd1", "-G", "bar", "cmd2", "-o", "baz"],
+  );
+
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
+  assertEquals(args, []);
+});
+
 Deno.test("[command] should disable global options with noGlobals", async () => {
   await assertRejects(
     () =>
