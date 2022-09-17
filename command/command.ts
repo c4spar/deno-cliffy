@@ -1202,11 +1202,9 @@ export class Command<
       // Pre parse globals to support: cmd --global-option sub-command --option
       if (ctx.unknown.length > 0) {
         // Detect sub command.
-        subCommand = this.getCommand(ctx.unknown[0], true);
+        subCommand = this.getSubCommand(ctx);
 
-        if (subCommand) {
-          ctx.unknown = ctx.unknown.slice(1);
-        } else {
+        if (!subCommand) {
           // Only pre parse globals if first arg ist a global option.
           const optionName = ctx.unknown[0].replace(/^-+/, "");
           const option = this.getOption(optionName, true);
@@ -1224,11 +1222,7 @@ export class Command<
       // Parse sub command.
       if (subCommand || ctx.unknown.length > 0) {
         if (!subCommand) {
-          subCommand = this.getCommand(ctx.unknown[0], true);
-
-          if (subCommand) {
-            ctx.unknown = ctx.unknown.slice(1);
-          }
+          subCommand = this.getSubCommand(ctx);
         }
 
         if (subCommand) {
@@ -1297,7 +1291,17 @@ export class Command<
       ...this.getGlobalOptions(true),
     ];
 
-    return this.parseOptions(ctx, options, true);
+    return this.parseOptions(ctx, options, true, true);
+  }
+
+  private getSubCommand(ctx: ParseContext) {
+    const subCommand = this.getCommand(ctx.unknown[0], true);
+
+    if (subCommand) {
+      ctx.unknown = ctx.unknown.slice(1);
+    }
+
+    return subCommand;
   }
 
   private async parseOptionsAndEnvVars(
@@ -1469,10 +1473,11 @@ export class Command<
     ctx: ParseContext,
     options: IOption[],
     stopEarly: boolean = this._stopEarly,
+    ignoreUnknown: boolean = false,
   ): ParseContext {
     return parseFlags(ctx, {
       stopEarly,
-      ignoreUnknown: stopEarly,
+      ignoreUnknown,
       partial: true,
       allowEmpty: this._allowEmpty,
       flags: options,
@@ -1596,7 +1601,11 @@ export class Command<
     if (!this.hasArguments()) {
       if (args.length) {
         if (this.hasCommands(true)) {
-          throw new UnknownCommand(args[0], this.getCommands());
+          if (this.hasCommand(args[0], true)) {
+            throw new TooManyArguments(args);
+          } else {
+            throw new UnknownCommand(args[0], this.getCommands());
+          }
         } else {
           throw new NoArgumentsAllowed(this.getPath());
         }
