@@ -1,4 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { parseFlags } from "../../flags.ts";
 import type { IParseOptions } from "../../types.ts";
 
@@ -39,4 +39,12 @@ Deno.test("flags - type - no value - long flag with argument", () => {
   assertEquals(flags, { flag: true });
   assertEquals(unknown, ["true"]);
   assertEquals(literal, []);
+});
+
+Deno.test("flags - type - no value - should throw if a no value flag has a value", () => {
+  assertThrows(
+    () => parseFlags(["-f=123"], options),
+    Error,
+    `Option "--flag" doesn't take a value, but got "123".`,
+  );
 });

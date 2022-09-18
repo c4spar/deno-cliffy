@@ -102,6 +102,15 @@ export class InvalidOptionValue extends ValidationError {
   }
 }
 
+export class UnexpectedOptionValue extends ValidationError {
+  constructor(option: string, value: string) {
+    super(
+      `Option "${getFlag(option)}" doesn't take a value, but got "${value}".`,
+    );
+    Object.setPrototypeOf(this, InvalidOptionValue.prototype);
+  }
+}
+
 export class OptionNotCombinable extends ValidationError {
   constructor(option: string) {
     super(`Option "${getFlag(option)}" cannot be combined with other options.`);
