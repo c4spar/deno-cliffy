@@ -32,32 +32,33 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
     return;
   }
 
-  for (const [name, option] of options) {
-    if (!getOption(opts.flags!, option.name)) {
-      throw new UnknownOption(name, opts.flags);
-    }
-
-    const isStandaloneOption = validateStandaloneOption(
-      option,
+  if (ctx.standalone) {
+    validateStandaloneOption(
+      ctx,
       options,
       optionNames,
       defaultValues,
     );
-    if (isStandaloneOption) {
-      ctx.standalone = true;
-      return;
-    }
+    return;
+  }
 
+  for (const [name, option] of options) {
+    validateUnknownOption(option, opts);
     validateConflictingOptions(ctx, option);
     validateDependingOptions(ctx, option, defaultValues);
     validateRequiredValues(ctx, option, name);
   }
 
-  if (ctx.standalone) {
-    return;
-  }
-
   validateRequiredOptions(ctx, options, opts);
+}
+
+function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
+  option: IFlagOptions,
+  opts: IParseOptions<T>,
+) {
+  if (!getOption(opts.flags ?? [], option.name)) {
+    throw new UnknownOption(option.name, opts.flags ?? []);
+  }
 }
 
 /**
@@ -82,7 +83,7 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
     // if --no-[flag] is present set --[flag] default value to true
     if (option.name.startsWith("no-")) {
       const propName = option.name.replace(/^no-/, "");
-      if (propName in ctx.flags) {
+      if (typeof ctx.flags[propName] !== "undefined") {
         continue;
       }
       const positiveOption = getOption(opts.flags, propName);
@@ -122,26 +123,21 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 }
 
 function validateStandaloneOption(
-  option: IFlagOptions,
+  ctx: IFlagsResult,
   options: Map<string, IFlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
-): boolean {
-  if (!option.standalone) {
-    return false;
-  }
-  if (optionNames.length === 1) {
-    return true;
+): void {
+  if (!ctx.standalone || optionNames.length === 1) {
+    return;
   }
 
   // don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
-    if (!defaultValues[opt.name] && opt !== option) {
-      throw new OptionNotCombinable(option.name);
+    if (!defaultValues[opt.name] && opt !== ctx.standalone) {
+      throw new OptionNotCombinable(ctx.standalone.name);
     }
   }
-
-  return true;
 }
 
 function validateConflictingOptions(

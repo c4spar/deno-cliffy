@@ -139,7 +139,6 @@ Deno.test("[flags] should ignore known flags", () => {
     },
     unknown: [],
     literal: [],
-    standalone: false,
     stopEarly: false,
     stopOnUnknown: false,
   }, {

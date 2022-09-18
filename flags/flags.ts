@@ -67,11 +67,11 @@ const Types: Record<string, ITypeHandler<unknown>> = {
 export function parseFlags<
   O extends Record<string, unknown>,
   T extends IFlagOptions,
-  R extends IFlagsResult<O>,
+  R extends IFlagsResult,
 >(
   argsOrCtx: string[] | R,
   opts: IParseOptions<T> = {},
-): R & IFlagsResult<O> {
+): R & IFlagsResult<O, T> {
   let args: Array<string>;
   let ctx: IFlagsResult<Record<string, unknown>>;
 
@@ -83,13 +83,13 @@ export function parseFlags<
     args = argsOrCtx.unknown;
     argsOrCtx.unknown = [];
   }
+  args = args.slice();
+
   ctx.flags ??= {};
   ctx.literal ??= [];
-  ctx.standalone ??= false;
   ctx.unknown ??= [];
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
-  args = args.slice();
 
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, IFlagOptions> = new Map();
@@ -179,6 +179,11 @@ export function parseFlags<
           };
         }
       }
+
+      if (option.standalone) {
+        ctx.standalone = option;
+      }
+
       if (!option.args?.length && typeof currentValue !== "undefined") {
         throw new UnexpectedOptionValue(option.name, currentValue);
       }
@@ -408,7 +413,7 @@ export function parseFlags<
     convertDottedOptions(ctx);
   }
 
-  return ctx as R & IFlagsResult<O>;
+  return ctx as R & IFlagsResult<O, T>;
 }
 
 function convertDottedOptions(ctx: IFlagsResult) {

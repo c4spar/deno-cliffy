@@ -1174,7 +1174,6 @@ export class Command<
       flags: {},
       env: {},
       literal: [],
-      standalone: false,
       stopEarly: false,
       stopOnUnknown: false,
     };
