@@ -93,8 +93,8 @@ Deno.test("[command] should parse global options before and after normal option"
     .command("foo")
     .option("--foo", "...", { collect: true })
     .parse(
-    ["foo", "--global", "--foo", "--global", "--foo"],
-  );
+      ["foo", "--global", "--foo", "--global", "--foo"],
+    );
 
   assertEquals(options, { global: [true, true], foo: [true, true] });
   assertEquals(args, []);

@@ -1299,7 +1299,10 @@ export class Command<
       ...this.getGlobalOptions(true),
     ];
 
-    return this.parseOptions(ctx, options, true, true);
+    return this.parseOptions(ctx, options, {
+      stopEarly: true,
+      stopOnUnknown: true,
+    });
   }
 
   private async parseOptionsAndEnvVars(
@@ -1468,8 +1471,10 @@ export class Command<
   protected parseOptions(
     ctx: ParseContext,
     options: IOption[],
-    stopEarly: boolean = this._stopEarly,
-    stopOnUnknown = false,
+    {
+      stopEarly = this._stopEarly,
+      stopOnUnknown = false,
+    }: ParseOptionsOptions = {},
   ): ParseContext {
     return parseFlags(ctx, {
       stopEarly,
@@ -2484,6 +2489,11 @@ type ActionOption = IOption & { action: IAction };
 interface ParseContext extends IFlagsResult<Record<string, unknown>> {
   action?: ActionOption;
   env: Record<string, unknown>;
+}
+
+interface ParseOptionsOptions {
+  stopEarly?: boolean;
+  stopOnUnknown?: boolean;
 }
 
 type TrimLeft<T extends string, V extends string | undefined> = T extends
