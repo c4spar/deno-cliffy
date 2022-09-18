@@ -1,4 +1,4 @@
-import { blue, underline, yellow } from "./deps.ts";
+import { blue, dim, italic, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -14,10 +14,15 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 export type SelectKeys = GenericListKeys;
 
 /** Select option options. */
-export type SelectOption = GenericListOption;
+export interface SelectOption extends GenericListOption {
+  options?: SelectValueOptions;
+}
 
 /** Select option settings. */
-export type SelectOptionSettings = GenericListOptionSettings;
+export interface SelectOptionSettings extends GenericListOptionSettings {
+  options: SelectValueSettings;
+  indentLevel: number;
+}
 
 /** Select options type. */
 export type SelectValueOptions = (string | SelectOption)[];
@@ -36,10 +41,24 @@ export interface SelectSettings extends GenericListSettings<string, string> {
   keys?: SelectKeys;
 }
 
+interface ParentCategoryInfo {
+  options: SelectValueSettings;
+  selectedCategoryIndex: number;
+}
+
+const backItem: SelectOptionSettings = {
+  name: "Back",
+  value: "back-1f8dec5d-a00c-4c9f-afb2-ca0c17f04a94",
+  options: [],
+  disabled: false,
+  indentLevel: 0,
+};
+
 /** Select prompt representation. */
 export class Select<S extends SelectSettings = SelectSettings>
   extends GenericList<string, string, S> {
   protected listIndex: number = this.getListIndex(this.settings.default);
+  #parentCategories: ParentCategoryInfo[] = [];
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -59,16 +78,25 @@ export class Select<S extends SelectSettings = SelectSettings>
       maxRows: 10,
       searchLabel: blue(Figures.SEARCH),
       ...options,
-      options: Select.mapOptions(options),
+      options: Select.mapOptions(options.options),
     }).prompt();
   }
 
-  protected static mapOptions(options: SelectOptions): SelectValueSettings {
-    return options.options
+  protected static mapOptions(
+    options: SelectValueOptions,
+  ): SelectValueSettings {
+    return options
       .map((item: string | SelectOption) =>
         typeof item === "string" ? { value: item } : item
       )
-      .map((item) => this.mapOption(item));
+      .map((item: SelectOption) => {
+        const settings = this.mapOption(item);
+        return {
+          options: Select.mapOptions(item.options ?? []),
+          indentLevel: 0,
+          ...settings,
+        };
+      });
   }
 
   protected input(): string {
@@ -85,18 +113,198 @@ export class Select<S extends SelectSettings = SelectSettings>
     isSelected?: boolean,
   ): string {
     let line = this.settings.indent;
-    line += isSelected ? `${this.settings.listPointer} ` : "  ";
+
+    if (this.isCurrentlySearching()) {
+      line += this.settings.indent.repeat(item.indentLevel);
+      line += isSelected ? `${this.settings.listPointer} ` : "  ";
+    } else {
+      let pointer = "";
+      if (Select.itemIsBackButton(item)) {
+        // TODO: Make configurable
+        pointer = blue(`⮠`);
+      } else if (Select.itemIsCategory(item)) {
+        // TODO: Make configurable
+        pointer = blue(`⮡`);
+      } else {
+        pointer = this.settings.listPointer;
+      }
+
+      line += isSelected ? `${pointer} ` : "  ";
+    }
+
     line += `${
       isSelected && !item.disabled
         ? this.highlight(item.name, (val) => val)
         : this.highlight(item.name)
     }`;
+
     return line;
   }
 
   /** Get value of selected option. */
   protected getValue(): string {
     return this.options[this.listIndex]?.value ?? this.settings.default;
+  }
+
+  protected async submit(): Promise<void> {
+    const itemToSubmit = this.options[this.listIndex];
+
+    if (Select.itemIsBackButton(itemToSubmit)) {
+      const previousLevel = this.#parentCategories.pop();
+      if (typeof previousLevel === "object") {
+        this.options = previousLevel.options;
+        if (this.isCurrentlyInsideCategory()) {
+          this.listIndex = 2;
+        } else {
+          this.listIndex = 0;
+        }
+      }
+    } else if (Select.itemIsCategory(itemToSubmit)) {
+      this.#parentCategories.push({
+        options: this.options,
+        selectedCategoryIndex: this.listIndex,
+      });
+      this.options = this.itemsInsideCategory(itemToSubmit);
+      this.listIndex = 2;
+    } else {
+      await super.submit();
+    }
+  }
+
+  private itemsInsideCategory(
+    option: SelectOptionSettings,
+  ): SelectValueSettings {
+    return [
+      backItem,
+      ...Select.mapOptions([Select.separator(), ...option.options]),
+    ];
+  }
+
+  protected body(): string | Promise<string> {
+    let categoryText = "";
+
+    switch (this.#parentCategories.length) {
+      case 0:
+        return super.body();
+      case 1:
+        categoryText = dim(italic(this.nameOfParentCategory(0)));
+        break;
+
+      case 2: 
+        categoryText = dim(
+          italic(
+            this.nameOfParentCategory(0) + "/" + this.nameOfParentCategory(1),
+          ),
+        );
+        break;
+      
+      default: 
+        categoryText = dim(
+          italic(
+            this.nameOfParentCategory(0) + "/../" +
+              this.nameOfParentCategory(this.#parentCategories.length - 1),
+          ),
+        );
+        break;
+      
+    }
+
+    return categoryText + "\n" + super.body();
+  }
+
+  private nameOfParentCategory(index: number): string {
+    const { options, selectedCategoryIndex } = this.#parentCategories[index];
+    return options[selectedCategoryIndex].name;
+  }
+
+  protected match(): void {
+    const input: string = this.getCurrentInputValue().toLowerCase();
+
+    if (input === "") {
+      if (this.isCurrentlyInsideCategory()) {
+        const nearestParentCategories =
+          this.#parentCategories[this.#parentCategories.length - 1];
+        const categoryToRevertTo =
+          nearestParentCategories.options[nearestParentCategories.selectedCategoryIndex];
+
+        this.options = this.itemsInsideCategory(categoryToRevertTo);
+        this.listIndex = 2;
+      } else {
+        this.options = this.settings.options.slice();
+        this.clampListIndex();
+      }
+    } else {
+      const newOptions = this.itemsToSearchIn()
+        .filter((option) => Select.matchesItemOrSubItems(input, option));
+
+      this.options = this.buildSearchResult(input, newOptions);
+      this.listIndex = this.options.findIndex((option) => !option.disabled);
+    }
+
+    this.clampListOffset();
+  }
+
+  private itemsToSearchIn(): SelectValueSettings {
+    return this.isCurrentlyInsideCategory()
+      ? this.#parentCategories[this.#parentCategories.length - 1]
+        .options[
+          this.#parentCategories[this.#parentCategories.length - 1]
+            .selectedCategoryIndex
+        ].options
+      : this.settings.options;
+  }
+
+  private buildSearchResult(
+    searchInput: string,
+    options: SelectValueSettings,
+  ): SelectValueSettings {
+    return options.map((option) =>
+      this.buildSearchResultHelper(0, searchInput, option)
+    ).flat();
+  }
+
+  private buildSearchResultHelper(
+    indentLevel: number,
+    searchInput: string,
+    item: SelectOptionSettings,
+  ): SelectValueSettings {
+    if (Select.itemIsCategory(item)) {
+      const items: SelectValueSettings = item.options.map((nextLevelOption) =>
+        this.buildSearchResultHelper(
+          indentLevel + 1,
+          searchInput,
+          nextLevelOption,
+        )
+      ).flat();
+
+      const itemForCategoryInSearchResult: SelectOptionSettings = {
+        name: item.name,
+        value: item.value,
+        disabled: true,
+        options: [],
+        indentLevel: indentLevel,
+      };
+
+      return [itemForCategoryInSearchResult, ...items];
+    } else if (GenericList.matchesItem(searchInput, item)) {
+      item.indentLevel = indentLevel;
+      return [item];
+    } else {
+      return [];
+    }
+  }
+
+  private static matchesItemOrSubItems(
+    inputString: string,
+    item: SelectOptionSettings,
+  ): boolean {
+    if (Select.itemIsCategory(item)) {
+      return item.options.some((subItem) =>
+        this.matchesItemOrSubItems(inputString, subItem)
+      );
+    } else {
+      return GenericList.matchesItem(inputString, item);
+    }
   }
 
   /**
@@ -127,5 +335,21 @@ export class Select<S extends SelectSettings = SelectSettings>
    */
   protected format(value: string): string {
     return this.getOptionByValue(value)?.name ?? value;
+  }
+
+  private static itemIsCategory(item: SelectOptionSettings): boolean {
+    return item.options.length > 0;
+  }
+
+  private static itemIsBackButton(item: SelectOptionSettings): boolean {
+    return item.value === backItem.value;
+  }
+
+  private isCurrentlyInsideCategory(): boolean {
+    return this.#parentCategories.length > 0;
+  }
+
+  private isCurrentlySearching(): boolean {
+    return this.getCurrentInputValue() !== "";
   }
 }

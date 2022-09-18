@@ -111,18 +111,45 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
       this.options = this.settings.options.slice();
     } else {
       this.options = this.settings.options
-        .filter((option: GenericListOptionSettings) =>
-          match(option.name) ||
-          (option.name !== option.value && match(option.value))
-        )
-        .sort((a: GenericListOptionSettings, b: GenericListOptionSettings) =>
-          distance(a.name, input) - distance(b.name, input)
-        );
+        .filter((option) => GenericList.matchesItem(input, option))
+        .sort((a, b) => GenericList.sortByDistanceToString(input, a, b));
     }
+    this.clampListIndex();
+    this.clampListOffset();
+  }
+
+  public static matchesItem(
+    inputString: string,
+    option: GenericListOptionSettings,
+  ): boolean {
+    return this.matchInput(inputString, option.name) ||
+      (option.name !== option.value &&
+        this.matchInput(inputString, option.value));
+  }
+
+  private static matchInput(inputString: string, value: string): boolean {
+    return stripColor(value)
+      .toLowerCase()
+      .includes(inputString);
+  }
+
+  public static sortByDistanceToString(
+    stringToDistanceFrom: string,
+    a: GenericListOptionSettings,
+    b: GenericListOptionSettings,
+  ): number {
+    return distance(a.name, stringToDistanceFrom) -
+      distance(b.name, stringToDistanceFrom);
+  }
+
+  protected clampListIndex(): void {
     this.listIndex = Math.max(
       0,
       Math.min(this.options.length - 1, this.listIndex),
     );
+  }
+
+  protected clampListOffset(): void {
     this.listOffset = Math.max(
       0,
       Math.min(
@@ -130,12 +157,6 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
         this.listOffset,
       ),
     );
-
-    function match(value: string): boolean {
-      return stripColor(value)
-        .toLowerCase()
-        .includes(input);
-    }
   }
 
   protected message(): string {
