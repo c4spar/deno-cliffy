@@ -131,6 +131,28 @@ Deno.test("[flags] should ignore defaults", () => {
   assertEquals(literal, []);
 });
 
+Deno.test("[flags] should parse from context", () => {
+  const { flags, unknown, literal } = parseFlags({
+    flags: { bar: true },
+    unknown: ["--foo"],
+    literal: [],
+    stopEarly: false,
+    stopOnUnknown: false,
+  }, {
+    ...options,
+    flags: [
+      { name: "foo" },
+    ],
+  });
+
+  assertEquals(flags, {
+    foo: true,
+    bar: true,
+  });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
+
 Deno.test("[flags] should ignore known flags", () => {
   const { flags, unknown, literal } = parseFlags({
     flags: {
