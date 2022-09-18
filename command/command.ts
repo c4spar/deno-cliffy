@@ -1268,7 +1268,7 @@ export class Command<
 
           // Parse global options & env vars.
           if (preParseGlobals) {
-            ctx = await this.parseGlobalOptionsAndEnvVars(ctx);
+            await this.parseGlobalOptionsAndEnvVars(ctx);
           }
         }
       } else {
@@ -1289,7 +1289,7 @@ export class Command<
       }
 
       // Parse rest options & env vars.
-      ctx = await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
+      await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
 
       this.literalArgs = ctx.literal ?? [];
 
@@ -1337,7 +1337,7 @@ export class Command<
 
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
-  ): Promise<ParseContext> {
+  ): Promise<void> {
     const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
 
     // Parse global env vars.
@@ -1354,7 +1354,7 @@ export class Command<
       ...this.getGlobalOptions(true),
     ];
 
-    return this.parseOptions(ctx, options, {
+    this.parseOptions(ctx, options, {
       stopEarly: true,
       stopOnUnknown: true,
     });
@@ -1363,7 +1363,7 @@ export class Command<
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
     preParseGlobals: boolean,
-  ): Promise<ParseContext> {
+  ): Promise<void> {
     const helpOption = this.getHelpOption();
     const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
     const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
@@ -1382,7 +1382,7 @@ export class Command<
     // Parse options.
     const options = this.getOptions(true);
 
-    return this.parseOptions(ctx, options);
+    this.parseOptions(ctx, options);
   }
 
   /** Register default options like `--version` and `--help`. */
@@ -1530,8 +1530,8 @@ export class Command<
       stopEarly = this._stopEarly,
       stopOnUnknown = false,
     }: ParseOptionsOptions = {},
-  ): ParseContext {
-    return parseFlags(ctx, {
+  ): void {
+    parseFlags(ctx, {
       stopEarly,
       stopOnUnknown,
       partial: true,

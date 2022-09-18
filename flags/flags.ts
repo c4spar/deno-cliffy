@@ -407,8 +407,7 @@ export function parseFlags<
     }
   }
 
-  // @TODO: test if partial option is required.
-  if (!opts.partial || !ctx.stopEarly) {
+  if (!opts.partial || (!ctx.stopEarly && !ctx.stopOnUnknown)) {
     validateFlags(ctx, opts, optionsMap);
     convertDottedOptions(ctx);
   }
