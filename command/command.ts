@@ -1176,6 +1176,7 @@ export class Command<
       literal: [],
       standalone: false,
       stopEarly: false,
+      stopOnUnknown: false,
     };
     return this.parseCommand(ctx) as any;
   }
@@ -1269,6 +1270,16 @@ export class Command<
     }
   }
 
+  private getSubCommand(ctx: ParseContext) {
+    const subCommand = this.getCommand(ctx.unknown[0], true);
+
+    if (subCommand) {
+      ctx.unknown = ctx.unknown.slice(1);
+    }
+
+    return subCommand;
+  }
+
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
   ): Promise<ParseContext> {
@@ -1291,16 +1302,6 @@ export class Command<
     return this.parseOptions(ctx, options, true, true);
   }
 
-  private getSubCommand(ctx: ParseContext) {
-    const subCommand = this.getCommand(ctx.unknown[0], true);
-
-    if (subCommand) {
-      ctx.unknown = ctx.unknown.slice(1);
-    }
-
-    return subCommand;
-  }
-
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
     preParseGlobals: boolean,
@@ -1321,9 +1322,7 @@ export class Command<
     );
 
     // Parse options.
-    const options = preParseGlobals
-      ? this.options.filter((option) => !option.global)
-      : this.getOptions(true);
+    const options = this.getOptions(true);
 
     return this.parseOptions(ctx, options);
   }
@@ -1470,11 +1469,11 @@ export class Command<
     ctx: ParseContext,
     options: IOption[],
     stopEarly: boolean = this._stopEarly,
-    ignoreUnknown = false,
+    stopOnUnknown = false,
   ): ParseContext {
     return parseFlags(ctx, {
       stopEarly,
-      ignoreUnknown,
+      stopOnUnknown,
       partial: true,
       allowEmpty: this._allowEmpty,
       flags: options,

@@ -87,6 +87,19 @@ Deno.test("[command] should parse global options before sub commands", async () 
   assertEquals(args, []);
 });
 
+Deno.test("[command] should parse global options before and after normal option", async () => {
+  const { options, args } = await new Command()
+    .globalOption("--global", "...", { collect: true })
+    .command("foo")
+    .option("--foo", "...", { collect: true })
+    .parse(
+    ["foo", "--global", "--foo", "--global", "--foo"],
+  );
+
+  assertEquals(options, { global: [true, true], foo: [true, true] });
+  assertEquals(args, []);
+});
+
 Deno.test("[command] should disable global options with noGlobals", async () => {
   await assertRejects(
     () =>

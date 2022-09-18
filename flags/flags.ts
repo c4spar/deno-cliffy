@@ -88,6 +88,7 @@ export function parseFlags<
   ctx.standalone ??= false;
   ctx.unknown ??= [];
   ctx.stopEarly = false;
+  ctx.stopOnUnknown = false;
   args = args.slice();
 
   /** Option name mapping: propertyName -> option.name */
@@ -122,10 +123,11 @@ export function parseFlags<
     if (inLiteral) {
       ctx.literal.push(current);
       continue;
-    }
-
-    if (current === "--") {
+    } else if (current === "--") {
       inLiteral = true;
+      continue;
+    } else if (ctx.stopEarly || ctx.stopOnUnknown) {
+      ctx.unknown.push(current);
       continue;
     }
 
@@ -161,11 +163,9 @@ export function parseFlags<
           const name = current.replace(/^-+/g, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
-            if (opts.ignoreUnknown) {
-              ctx.unknown.push(current);
-              if (currentValue) {
-                ctx.unknown.push(currentValue);
-              }
+            if (opts.stopOnUnknown) {
+              ctx.stopOnUnknown = true;
+              ctx.unknown.push(args[argsIndex]);
               continue;
             }
             throw new UnknownOption(current, opts.flags);
@@ -394,33 +394,19 @@ export function parseFlags<
           return result;
         }
       }
-    } else if (opts.stopEarly) {
-      ctx.stopEarly = true;
-      const stopEarlyArgIndex: number = args.indexOf(current);
-
-      if (stopEarlyArgIndex !== -1) {
-        const doubleDashIndex: number = args.indexOf("--");
-        ctx.unknown.push(
-          ...args.slice(
-            stopEarlyArgIndex,
-            doubleDashIndex === -1 ? undefined : doubleDashIndex,
-          ),
-        );
-        if (doubleDashIndex !== -1) {
-          ctx.literal.push(...args.slice(doubleDashIndex + 1));
-        }
-      }
-      break;
     } else {
+      if (opts.stopEarly) {
+        ctx.stopEarly = true;
+      }
       ctx.unknown.push(current);
     }
   }
 
   // @TODO: test if partial option is required.
-  // if (!opts.partial || !ctx.stopEarly) {
-  validateFlags(ctx, opts, optionsMap);
-  convertDottedOptions(ctx);
-  // }
+  if (!opts.partial || !ctx.stopEarly) {
+    validateFlags(ctx, opts, optionsMap);
+    convertDottedOptions(ctx);
+  }
 
   return ctx as R & IFlagsResult<O>;
 }

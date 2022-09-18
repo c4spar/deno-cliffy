@@ -8,7 +8,7 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   allowEmpty?: boolean;
   ignoreDefaults?: Record<string, unknown>;
   partial?: boolean;
-  ignoreUnknown?: boolean;
+  stopOnUnknown?: boolean;
 }
 
 /** Flag options. */
@@ -61,6 +61,7 @@ export interface IFlagsResult<
   literal: Array<string>;
   standalone: boolean;
   stopEarly: boolean;
+  stopOnUnknown: boolean;
 }
 
 /** Type details. */
