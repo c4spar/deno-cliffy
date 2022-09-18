@@ -356,17 +356,16 @@ export class Command<
     name: N,
     desc?: string,
     override?: boolean,
-  ): CPG extends number ? Command<any>
-    : Command<
-      CP extends Command<any> ? CPG : Merge<CPG, CG>,
-      CP extends Command<any> ? CPT : Merge<CPT, CGT>,
-      void,
-      A,
-      void,
-      void,
-      void,
-      OneOf<CP, this>
-    >;
+  ): CPG extends number ? Command<any> : Command<
+    CP extends Command<any> ? CPG : Merge<CPG, CG>,
+    CP extends Command<any> ? CPT : Merge<CPT, CGT>,
+    void,
+    A,
+    void,
+    void,
+    void,
+    OneOf<CP, this>
+  >;
 
   /**
    * Add new sub-command.
@@ -655,7 +654,16 @@ export class Command<
     name: N,
     handler: H,
     options?: Omit<ITypeOptions, "global">,
-  ): Command<CPG, CPT, CO, CA, CG, CT, Merge<CGT, TypedType<N, H>>, CP> {
+  ): Command<
+    CPG,
+    CPT,
+    CO,
+    CA,
+    CG,
+    CT,
+    Merge<CGT, TypedType<N, H>>,
+    CP
+  > {
     return this.type(name, handler, { ...options, global: true });
   }
 
@@ -665,11 +673,23 @@ export class Command<
    * @param handler The callback method to parse the type.
    * @param options Type options.
    */
-  public type<H extends TypeOrTypeHandler<unknown>, N extends string = string>(
+  public type<
+    H extends TypeOrTypeHandler<unknown>,
+    N extends string = string,
+  >(
     name: N,
     handler: H,
     options?: ITypeOptions,
-  ): Command<CPG, CPT, CO, CA, CG, Merge<CT, TypedType<N, H>>, CGT, CP> {
+  ): Command<
+    CPG,
+    CPT,
+    CO,
+    CA,
+    CG,
+    Merge<CT, TypedType<N, H>>,
+    CGT,
+    CP
+  > {
     if (this.cmd.types.get(name) && !options?.override) {
       throw new DuplicateType(name);
     }
@@ -729,7 +749,16 @@ export class Command<
     name: string,
     complete:
       | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICompleteHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, any>,
+      | ICompleteHandler<
+        Partial<CO>,
+        Partial<CA>,
+        CG,
+        CPG,
+        CT,
+        CGT,
+        CPT,
+        any
+      >,
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
@@ -845,7 +874,16 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
-  ): Command<CPG, CPT, CO, CA, MergeOptions<F, CG, MG>, CT, CGT, CP> {
+  ): Command<
+    CPG,
+    CPT,
+    CO,
+    CA,
+    MergeOptions<F, CG, MG>,
+    CT,
+    CGT,
+    CP
+  > {
     if (typeof opts === "function") {
       return this.option(
         flags,
@@ -919,7 +957,16 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
-  ): Command<CPG, CPT, CO, CA, MergeOptions<F, CG, MG>, CT, CGT, CP>;
+  ): Command<
+    CPG,
+    CPT,
+    CO,
+    CA,
+    MergeOptions<F, CG, MG>,
+    CT,
+    CGT,
+    CP
+  >;
 
   public option<
     F extends string,
@@ -952,7 +999,16 @@ export class Command<
           value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
       | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
-  ): Command<CPG, CPT, MergeOptions<F, CO, MO>, CA, CG, CT, CGT, CP>;
+  ): Command<
+    CPG,
+    CPT,
+    MergeOptions<F, CO, MO>,
+    CA,
+    CG,
+    CT,
+    CGT,
+    CP
+  >;
 
   public option(
     flags: string,
@@ -2584,7 +2640,9 @@ type RestArgsType<T extends string> = OptionalOrRequiredValue<
  * - `[name...]`
  * - `<name...>`
  */
-type RestArgs = OptionalOrRequiredValue<`${RestValue}`>;
+type RestArgs = OptionalOrRequiredValue<
+  `${RestValue}`
+>;
 
 /**
  * Single arg with list type and completions.
@@ -2632,7 +2690,9 @@ type SingleArgType<T extends string> = OptionalOrRequiredValue<
  * - `[name]`
  * - `<name>`
  */
-type SingleArg = OptionalOrRequiredValue<`${string}`>;
+type SingleArg = OptionalOrRequiredValue<
+  `${string}`
+>;
 
 type DefaultTypes = {
   number: NumberType;
@@ -2851,11 +2911,19 @@ type OptionalKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
 }[keyof T];
 
-type SpreadRequiredProperties<L, R, K extends keyof L & keyof R> = {
+type SpreadRequiredProperties<
+  L,
+  R,
+  K extends keyof L & keyof R,
+> = {
   [P in K]: Exclude<L[P], undefined> | Exclude<R[P], undefined>;
 };
 
-type SpreadOptionalProperties<L, R, K extends keyof L & keyof R> = {
+type SpreadOptionalProperties<
+  L,
+  R,
+  K extends keyof L & keyof R,
+> = {
   [P in K]?: L[P] | R[P];
 };
 
@@ -2871,6 +2939,10 @@ type Spread<L, R> = L extends void ? R : R extends void ? L
   // Required properties in L that exist in R.
   & SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
   // Optional properties in L and R.
-  & SpreadOptionalProperties<L, R, OptionalKeys<L> & OptionalKeys<R>>;
+  & SpreadOptionalProperties<
+    L,
+    R,
+    OptionalKeys<L> & OptionalKeys<R>
+  >;
 
 type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
