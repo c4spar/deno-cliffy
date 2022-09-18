@@ -1192,8 +1192,8 @@ export class Command<
       }
 
       if (this._useRawArgs) {
-        const env = await this.parseEnvVars(this.envVars);
-        return this.execute(env ?? {}, ...ctx.unknown) as any;
+        await this.parseEnvVars(ctx, this.envVars);
+        return this.execute(ctx.env, ...ctx.unknown) as any;
       }
 
       let preParseGlobals = false;
@@ -1272,18 +1272,15 @@ export class Command<
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
   ): Promise<ParseContext> {
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
+
     // Parse global env vars.
     const envVars = [
       ...this.envVars.filter((envVar) => envVar.global),
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
-
-    const env = await this.parseEnvVars(envVars, !isHelpOption);
-    if (env) {
-      Object.assign(ctx.env, env);
-    }
+    await this.parseEnvVars(ctx, envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1308,25 +1305,25 @@ export class Command<
     ctx: ParseContext,
     preParseGlobals: boolean,
   ): Promise<ParseContext> {
+    const helpOption = this.getHelpOption();
+    const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
+    const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
+
     // Parse env vars.
     const envVars = preParseGlobals
       ? this.envVars.filter((envVar) => !envVar.global)
       : this.getEnvVars(true);
 
-    const helpOption = this.getHelpOption();
-    const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
-    const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
-
-    const env = await this.parseEnvVars(
+    await this.parseEnvVars(
+      ctx,
       envVars,
       !isHelpOption && !isVersionOption,
     );
-    if (env) {
-      Object.assign(ctx.env, env);
-    }
 
     // Parse options.
-    const options = this.getOptions(true);
+    const options = preParseGlobals
+      ? this.options.filter((option) => !option.global)
+      : this.getOptions(true);
 
     return this.parseOptions(ctx, options);
   }
@@ -1473,7 +1470,7 @@ export class Command<
     ctx: ParseContext,
     options: IOption[],
     stopEarly: boolean = this._stopEarly,
-    ignoreUnknown: boolean = false,
+    ignoreUnknown = false,
   ): ParseContext {
     return parseFlags(ctx, {
       stopEarly,
@@ -1509,13 +1506,15 @@ export class Command<
 
   /**
    * Read and validate environment variables.
-   * @param envVars env vars defined by the command
-   * @param validate when true, throws an error if a required env var is missing
+   * @param ctx Parse context.
+   * @param envVars env vars defined by the command.
+   * @param validate when true, throws an error if a required env var is missing.
    */
   protected async parseEnvVars(
+    ctx: ParseContext,
     envVars: Array<IEnvVar>,
     validate = true,
-  ): Promise<Record<string, unknown> | undefined> {
+  ): Promise<void> {
     const result: Record<string, unknown> = {};
     let hasEnv = false;
 
@@ -1560,7 +1559,9 @@ export class Command<
       }
     }
 
-    return hasEnv ? result : undefined;
+    if (hasEnv) {
+      Object.assign(ctx.env, result);
+    }
   }
 
   protected async findEnvVar(
