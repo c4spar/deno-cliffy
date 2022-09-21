@@ -1226,7 +1226,7 @@ export class Command<
       >
   > {
     const ctx: ParseContext = {
-      unknown: args,
+      unknown: args.slice(),
       flags: {},
       env: {},
       literal: [],
@@ -1245,9 +1245,7 @@ export class Command<
       if (this.isExecutable) {
         await this.executeExecutable(ctx.unknown);
         return { options: {}, args: [], cmd: this, literal: [] } as any;
-      }
-
-      if (this._useRawArgs) {
+      } else if (this._useRawArgs) {
         await this.parseEnvVars(ctx, this.envVars);
         return this.execute(ctx.env, ...ctx.unknown) as any;
       }
@@ -1264,40 +1262,28 @@ export class Command<
           // Only pre parse globals if first arg ist a global option.
           const optionName = ctx.unknown[0].replace(/^-+/, "");
           const option = this.getOption(optionName, true);
-          preParseGlobals = option?.global === true;
 
-          // Parse global options & env vars.
-          if (preParseGlobals) {
+          if (option?.global) {
+            preParseGlobals = true;
             await this.parseGlobalOptionsAndEnvVars(ctx);
           }
         }
-      } else {
-        preParseGlobals = false;
       }
 
-      // Parse sub command.
       if (subCommand || ctx.unknown.length > 0) {
-        if (!subCommand) {
-          subCommand = this.getSubCommand(ctx);
-        }
+        subCommand ??= this.getSubCommand(ctx);
 
         if (subCommand) {
           subCommand._globalParent = this;
-
           return subCommand.parseCommand(ctx);
         }
       }
 
       // Parse rest options & env vars.
       await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
-
-      this.literalArgs = ctx.literal ?? [];
-
-      // Merge env and global options.
       const options = { ...ctx.env, ...ctx.flags };
-
-      // Parse arguments.
-      const args = this.parseArguments(ctx.unknown, options);
+      const args = this.parseArguments(ctx, options);
+      this.literalArgs = ctx.literal;
 
       // Execute option action.
       if (ctx.action) {
@@ -1329,7 +1315,7 @@ export class Command<
     const subCommand = this.getCommand(ctx.unknown[0], true);
 
     if (subCommand) {
-      ctx.unknown = ctx.unknown.slice(1);
+      ctx.unknown.shift()
     }
 
     return subCommand;
@@ -1646,17 +1632,15 @@ export class Command<
 
   /**
    * Parse command-line arguments.
-   * @param args  Raw command line arguments.
+   * @param ctx     Parse context.
    * @param options Parsed command line options.
    */
   protected parseArguments(
-    args: string[],
+    ctx: ParseContext,
     options: Record<string, unknown>,
   ): CA {
     const params: Array<unknown> = [];
-
-    // remove array reference
-    args = args.slice(0);
+    const args = ctx.unknown.slice();
 
     if (!this.hasArguments()) {
       if (args.length) {
