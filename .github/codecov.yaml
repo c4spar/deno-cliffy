@@ -7,7 +7,7 @@ flags:
   ansi:
     paths:
       - ansi/
-    carryforward: false
+    carryforward: true
   command:
     paths:
       - command/
