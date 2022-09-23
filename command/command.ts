@@ -1315,7 +1315,7 @@ export class Command<
     const subCommand = this.getCommand(ctx.unknown[0], true);
 
     if (subCommand) {
-      ctx.unknown.shift()
+      ctx.unknown.shift();
     }
 
     return subCommand;
@@ -1560,52 +1560,39 @@ export class Command<
     envVars: Array<IEnvVar>,
     validate = true,
   ): Promise<void> {
-    const result: Record<string, unknown> = {};
-    let hasEnv = false;
+    for (const envVar of envVars) {
+      const env = await this.findEnvVar(envVar.names);
 
-    for (const env of envVars) {
-      const found = await this.findEnvVar(env.names);
-
-      if (found) {
-        hasEnv = true;
-        const { name, value } = found;
-
-        const propertyName = underscoreToCamelCase(
-          env.prefix
-            ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
-            : env.names[0],
-        );
-
-        if (env.details.list) {
-          const values = value.split(env.details.separator ?? ",");
-
-          result[propertyName] = values.map((value) =>
-            this.parseType({
-              label: "Environment variable",
-              type: env.type,
-              name,
-              value,
-            })
-          );
-        } else {
-          result[propertyName] = this.parseType({
+      if (env) {
+        const parseType = (value: string) => {
+          return this.parseType({
             label: "Environment variable",
-            type: env.type,
-            name,
+            type: envVar.type,
+            name: env.name,
             value,
           });
+        };
+
+        const propertyName = underscoreToCamelCase(
+          envVar.prefix
+            ? envVar.names[0].replace(new RegExp(`^${envVar.prefix}`), "")
+            : envVar.names[0],
+        );
+
+        if (envVar.details.list) {
+          ctx.env[propertyName] = env.value
+            .split(envVar.details.separator ?? ",")
+            .map(parseType);
+        } else {
+          ctx.env[propertyName] = parseType(env.value);
         }
 
-        if (env.value && typeof result[propertyName] !== "undefined") {
-          result[propertyName] = env.value(result[propertyName]);
+        if (envVar.value && typeof ctx.env[propertyName] !== "undefined") {
+          ctx.env[propertyName] = envVar.value(ctx.env[propertyName]);
         }
-      } else if (env.required && validate) {
-        throw new MissingRequiredEnvVar(env);
+      } else if (envVar.required && validate) {
+        throw new MissingRequiredEnvVar(envVar);
       }
-    }
-
-    if (hasEnv) {
-      Object.assign(ctx.env, result);
     }
   }
 
