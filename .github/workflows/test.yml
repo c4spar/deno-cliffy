@@ -31,5 +31,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
-          files: cov.lcov
+          files: dist/coverage/${{ matrix.module }}/cov.lcov
           flags: ${{ matrix.module }}
