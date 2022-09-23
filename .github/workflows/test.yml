@@ -10,8 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, windows-latest, ubuntu-latest]
         module: [ansi, command, flags, keycode, keypress, prompt, table]
+        os: [macOS-latest, windows-latest, ubuntu-latest]
         deno: [v1.x]
     env:
       RUST_BACKTRACE: full
