@@ -10,7 +10,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        module: [ansi, command, flags, keycode, keypress, prompt, table]
         os: [macOS-latest, windows-latest, ubuntu-latest]
         deno: [v1.x]
     env:
@@ -25,11 +24,11 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run ${{ matrix.module }} tests
-        run: deno task coverage:${{ matrix.module }}
+        run: deno task coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/${{ matrix.module }}/cov.lcov
+          name: ${{ matrix.os }}-${{ matrix.deno }}
+          files: dist/coverage/all/cov.lcov
           flags: ${{ matrix.module }}
