@@ -1469,9 +1469,9 @@ export class Command<
           this.getCommands(),
         );
       }
-
       cmd._globalParent = this;
-      await cmd.execute(options, ...args);
+
+      return cmd.execute(options, ...args);
     }
 
     return {
