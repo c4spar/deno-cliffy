@@ -40,8 +40,9 @@ const Types: Record<string, ITypeHandler<unknown>> = {
 
 /**
  * Parse command line arguments.
- * @param args  Command line arguments e.g: `Deno.args`
- * @param opts  Parse options.
+ * @param argsOrCtx Command line arguments e.g: `Deno.args` or parse context.
+ * @param opts      Parse options.
+ *
  * ```
  * // example.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
  * parseFlags(Deno.args);
@@ -64,23 +65,34 @@ const Types: Record<string, ITypeHandler<unknown>> = {
  * ```
  */
 export function parseFlags<
-  // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = Record<string, any>,
-  T extends IFlagOptions = IFlagOptions,
+  TFlags extends Record<string, unknown>,
+  TFlagOptions extends IFlagOptions,
+  TFlagsResult extends IFlagsResult,
 >(
-  args: string[],
-  opts: IParseOptions<T> = {},
-): IFlagsResult<O> {
+  argsOrCtx: string[] | TFlagsResult,
+  opts: IParseOptions<TFlagOptions> = {},
+): TFlagsResult & IFlagsResult<TFlags, TFlagOptions> {
+  let args: Array<string>;
+  let ctx: IFlagsResult<Record<string, unknown>>;
+
+  if (Array.isArray(argsOrCtx)) {
+    ctx = {} as IFlagsResult<Record<string, unknown>>;
+    args = argsOrCtx;
+  } else {
+    ctx = argsOrCtx;
+    args = argsOrCtx.unknown;
+    argsOrCtx.unknown = [];
+  }
   args = args.slice();
 
-  let inLiteral = false;
+  ctx.flags ??= {};
+  ctx.literal ??= [];
+  ctx.unknown ??= [];
+  ctx.stopEarly = false;
 
-  const flags: Record<string, unknown> = {};
   /** Option name mapping: propertyName -> option.name */
-  const optionNameMap: Record<string, string> = {};
-  let literal: string[] = [];
-  let unknown: string[] = [];
-  let stopEarly: string | null = null;
+  const optionsMap: Map<string, IFlagOptions> = new Map();
+  let inLiteral = false;
 
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
@@ -108,12 +120,13 @@ export function parseFlags<
 
     // literal args after --
     if (inLiteral) {
-      literal.push(current);
+      ctx.literal.push(current);
       continue;
-    }
-
-    if (current === "--") {
+    } else if (current === "--") {
       inLiteral = true;
+      continue;
+    } else if (ctx.stopEarly) {
+      ctx.unknown.push(current);
       continue;
     }
 
@@ -160,6 +173,11 @@ export function parseFlags<
           };
         }
       }
+
+      if (option.standalone) {
+        ctx.standalone = option;
+      }
+
       if (!option.args?.length && typeof currentValue !== "undefined") {
         throw new UnexpectedOptionValue(option.name, currentValue);
       }
@@ -169,7 +187,7 @@ export function parseFlags<
         : option.name;
       const propName: string = paramCaseToCamelCase(positiveName);
 
-      if (typeof flags[propName] !== "undefined") {
+      if (typeof ctx.flags[propName] !== "undefined") {
         if (!opts.flags?.length) {
           option.collect = true;
         } else if (!option.collect) {
@@ -188,34 +206,34 @@ export function parseFlags<
 
       let optionArgsIndex = 0;
       let inOptionalArg = false;
-      const previous = flags[propName];
+      const previous = ctx.flags[propName];
 
       parseNext(option, optionArgs);
 
-      if (typeof flags[propName] === "undefined") {
+      if (typeof ctx.flags[propName] === "undefined") {
         if (optionArgs[optionArgsIndex].requiredValue) {
           throw new MissingOptionValue(option.name);
         } else if (typeof option.default !== "undefined") {
-          flags[propName] = getDefaultValue(option);
+          ctx.flags[propName] = getDefaultValue(option);
         } else {
-          flags[propName] = true;
+          ctx.flags[propName] = true;
         }
       }
 
       if (option.value) {
-        flags[propName] = option.value(flags[propName], previous);
+        ctx.flags[propName] = option.value(ctx.flags[propName], previous);
       } else if (option.collect) {
         const value: unknown[] = typeof previous !== "undefined"
           ? (Array.isArray(previous) ? previous : [previous])
           : [];
 
-        value.push(flags[propName]);
-        flags[propName] = value;
+        value.push(ctx.flags[propName]);
+        ctx.flags[propName] = value;
       }
 
-      optionNameMap[propName] = option.name;
+      optionsMap.set(propName, option);
 
-      opts.option?.(option as T, flags[propName]);
+      opts.option?.(option as TFlagOptions, ctx.flags[propName]);
 
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
@@ -264,7 +282,7 @@ export function parseFlags<
         }
 
         if (negate) {
-          flags[propName] = false;
+          ctx.flags[propName] = false;
           return;
         }
 
@@ -310,17 +328,17 @@ export function parseFlags<
           typeof result !== "undefined" &&
           (optionArgs.length > 1 || arg.variadic)
         ) {
-          if (!flags[propName]) {
-            flags[propName] = [];
+          if (!ctx.flags[propName]) {
+            ctx.flags[propName] = [];
           }
 
-          (flags[propName] as Array<unknown>).push(result);
+          (ctx.flags[propName] as Array<unknown>).push(result);
 
           if (hasNext(arg)) {
             parseNext(option, optionArgs);
           }
         } else {
-          flags[propName] = result;
+          ctx.flags[propName] = result;
         }
 
         /** Check if current option should have an argument. */
@@ -377,32 +395,22 @@ export function parseFlags<
       }
     } else {
       if (opts.stopEarly) {
-        stopEarly = current;
-        break;
+        ctx.stopEarly = true;
       }
-      unknown.push(current);
+      ctx.unknown.push(current);
     }
   }
 
-  if (stopEarly) {
-    const stopEarlyArgIndex: number = args.indexOf(stopEarly);
-    if (stopEarlyArgIndex !== -1) {
-      const doubleDashIndex: number = args.indexOf("--");
-      unknown = args.slice(
-        stopEarlyArgIndex,
-        doubleDashIndex === -1 ? undefined : doubleDashIndex,
-      );
-      if (doubleDashIndex !== -1) {
-        literal = args.slice(doubleDashIndex + 1);
-      }
-    }
-  }
+  validateFlags(ctx, opts, optionsMap);
+  convertDottedOptions(ctx);
 
-  validateFlags(opts, flags, optionNameMap);
+  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+}
 
+function convertDottedOptions(ctx: IFlagsResult) {
   // convert dotted option keys into nested objects
-  const result = Object.keys(flags)
-    .reduce((result: Record<string, unknown>, key: string) => {
+  ctx.flags = Object.keys(ctx.flags).reduce(
+    (result: Record<string, unknown>, key: string) => {
       if (~key.indexOf(".")) {
         key.split(".").reduce(
           (
@@ -413,7 +421,7 @@ export function parseFlags<
             parts: string[],
           ) => {
             if (index === parts.length - 1) {
-              result[subKey] = flags[key];
+              result[subKey] = ctx.flags[key];
             } else {
               result[subKey] = result[subKey] ?? {};
             }
@@ -422,12 +430,12 @@ export function parseFlags<
           result,
         );
       } else {
-        result[key] = flags[key];
+        result[key] = ctx.flags[key];
       }
       return result;
-    }, {});
-
-  return { flags: result as O, unknown, literal };
+    },
+    {},
+  );
 }
 
 function splitFlags(flag: string): Array<string> {
