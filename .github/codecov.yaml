@@ -1,9 +1,38 @@
 comment: false
 codecov:
   require_ci_to_pass: true
+ignore:
+  - examples
+flags:
+  ansi:
+    paths:
+      - ansi/
+    carryforward: true
+  command:
+    paths:
+      - command/
+    carryforward: true
+  flags:
+    paths:
+      - flags/
+    carryforward: true
+  keycode:
+    paths:
+      - keycode/
+    carryforward: true
+  keypress:
+    paths:
+      - keypress/
+    carryforward: true
+  prompt:
+    paths:
+      - prompt/
+    carryforward: true
+  table:
+    paths:
+      - table/
+    carryforward: true
 coverage:
   status:
     project: off
     patch: off
-ignore:
-  - examples
