@@ -184,7 +184,10 @@ export function parseFlags<
         ctx.standalone = option;
       }
 
-      if (!option.args?.length && typeof currentValue !== "undefined") {
+      if (
+        opts.flags?.length && !option.args?.length &&
+        typeof currentValue !== "undefined"
+      ) {
         throw new UnexpectedOptionValue(option.name, currentValue);
       }
 
