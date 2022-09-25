@@ -103,7 +103,9 @@ export function parseFlags<
   return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
 }
 
-function validateOptions<TFlagOptions extends IFlagOptions>(opts: IParseOptions<TFlagOptions>) {
+function validateOptions<TFlagOptions extends IFlagOptions>(
+  opts: IParseOptions<TFlagOptions>,
+) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
