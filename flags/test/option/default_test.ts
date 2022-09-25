@@ -153,7 +153,7 @@ Deno.test("[flags] should parse from context", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should ignore known flags", () => {
+Deno.test("[flags] should ignore missing required options which are already parsed", () => {
   const { flags, unknown, literal } = parseFlags({
     flags: {
       required: true,
