@@ -1,10 +1,20 @@
 {
+  "fmt": {
+    "files": {
+      "exclude": ["dist"]
+    }
+  },
+  "lint": {
+    "files": {
+      "exclude": ["dist"]
+    }
+  },
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
     "test": "deno test --allow-env --allow-read=./ --allow-run=deno --unstable --parallel",
     "snapshot": "deno task test --allow-write=./ -- --update",
-    "check:examples": "deno check --unstable examples/*{.ts,/*.ts}",
+    "check:examples": "deno run --allow-read=./ --allow-run=deno --unstable ./_scripts/check_examples.ts",
     "coverage": "deno task test --coverage=./dist/coverage/all/result && deno coverage --unstable --lcov ./dist/coverage/all/result > ./dist/coverage/all/cov.lcov",
     "coverage:ansi": "deno task test ansi --coverage=./dist/coverage/ansi/result && deno coverage --unstable --lcov ./dist/coverage/ansi/result > ./dist/coverage/ansi/cov.lcov",
     "coverage:command": "deno task test command --coverage=./dist/coverage/command/result && deno coverage --unstable --lcov ./dist/coverage/command/result > ./dist/coverage/command/cov.lcov",
