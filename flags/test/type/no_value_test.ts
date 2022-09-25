@@ -55,5 +55,7 @@ Deno.test("flags - type - no value - should not throw unexpected error value wit
     unknown: [],
     flags: { f: "123" },
     literal: [],
+    stopEarly: false,
+    stopOnUnknown: false,
   });
 });
