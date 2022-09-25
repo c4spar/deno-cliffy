@@ -89,6 +89,7 @@ export function parseFlags<
   ctx.literal ??= [];
   ctx.unknown ??= [];
   ctx.stopEarly = false;
+  ctx.stopOnUnknown = false;
 
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, IFlagOptions> = new Map();
@@ -125,7 +126,7 @@ export function parseFlags<
     } else if (current === "--") {
       inLiteral = true;
       continue;
-    } else if (ctx.stopEarly) {
+    } else if (ctx.stopEarly || ctx.stopOnUnknown) {
       ctx.unknown.push(current);
       continue;
     }
@@ -162,6 +163,11 @@ export function parseFlags<
           const name = current.replace(/^-+/, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
+            if (opts.stopOnUnknown) {
+              ctx.stopOnUnknown = true;
+              ctx.unknown.push(args[argsIndex]);
+              continue;
+            }
             throw new UnknownOption(current, opts.flags);
           }
         }
