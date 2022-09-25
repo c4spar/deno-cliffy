@@ -45,7 +45,7 @@ const options = <IParseOptions> {
   }],
 };
 
-Deno.test("flags default option: no arguments", () => {
+Deno.test("[flags] should set default args with empty arguments", () => {
   const { flags, unknown, literal } = parseFlags([], options);
 
   assertEquals(flags, {
@@ -61,7 +61,7 @@ Deno.test("flags default option: no arguments", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags default option: override default values", () => {
+Deno.test("[flags] should override default values", () => {
   const { flags, unknown, literal } = parseFlags(
     [
       "-b",
@@ -95,7 +95,7 @@ Deno.test("flags default option: override default values", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionDefault override default value with optional value", () => {
+Deno.test("[flags] should override default value with optional value", () => {
   const { flags, unknown, literal } = parseFlags(["-b"], options);
 
   assertEquals(flags, {
@@ -111,7 +111,7 @@ Deno.test("flags optionDefault override default value with optional value", () =
   assertEquals(literal, []);
 });
 
-Deno.test("flags ignore defaults", () => {
+Deno.test("[flags] should ignore defaults", () => {
   const { flags, unknown, literal } = parseFlags([], {
     ...options,
     ignoreDefaults: {
@@ -126,6 +126,54 @@ Deno.test("flags ignore defaults", () => {
     boolean2: true,
     number2: 1,
     method: 1,
+  });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
+
+Deno.test("[flags] should parse from context", () => {
+  const { flags, unknown, literal } = parseFlags({
+    flags: { bar: true },
+    unknown: ["--foo"],
+    literal: [],
+    stopEarly: false,
+  }, {
+    ...options,
+    flags: [
+      { name: "foo" },
+    ],
+  });
+
+  assertEquals(flags, {
+    foo: true,
+    bar: true,
+  });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
+
+Deno.test("[flags] should ignore missing required options which are already parsed", () => {
+  const { flags, unknown, literal } = parseFlags({
+    flags: {
+      required: true,
+      boolean: true,
+    },
+    unknown: [],
+    literal: [],
+    stopEarly: false,
+  }, {
+    ...options,
+    flags: [
+      {
+        name: "required",
+        required: true,
+      },
+    ],
+  });
+
+  assertEquals(flags, {
+    required: true,
+    boolean: true,
   });
   assertEquals(unknown, []);
   assertEquals(literal, []);
