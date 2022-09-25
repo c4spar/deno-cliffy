@@ -55,12 +55,12 @@ export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
 export interface IFlagsResult<
   // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
-  TStandalone extends IFlagOptions = IFlagOptions,
+  TStandaloneOption extends IFlagOptions = IFlagOptions,
 > {
   flags: TFlags;
   unknown: Array<string>;
   literal: Array<string>;
-  standalone?: TStandalone;
+  standalone?: TStandaloneOption;
   stopEarly: boolean;
   stopOnUnknown: boolean;
 }

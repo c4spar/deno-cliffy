@@ -25,7 +25,7 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
   if (!opts.flags) {
     return;
   }
-  const defaultValues = setDefaultValues(ctx, opts, options);
+  const defaultValues = setDefaultValues(ctx, opts);
 
   const optionNames = Object.keys(ctx.flags);
   if (!optionNames.length && opts.allowEmpty) {
@@ -62,13 +62,12 @@ function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
 }
 
 /**
- * Adds all default values on the values object and returns a new object with
- * only the default values.
+ * Adds all default values to ctx.flags and returns a boolean object map with
+ * only the default option names `{ [OptionName: string]: boolean }`.
  */
 function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
-  _options: Map<string, IFlagOptions> = new Map(),
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
@@ -97,11 +96,6 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
     if (!name) {
       name = paramCaseToCamelCase(option.name);
     }
-
-    // @TODO: check if this is still required.
-    // if (!options.has(name)) {
-    //   options.set(name, option);
-    // }
 
     const hasDefaultValue: boolean = (!opts.ignoreDefaults ||
       typeof opts.ignoreDefaults[name] === "undefined") &&

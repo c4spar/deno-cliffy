@@ -65,13 +65,13 @@ const Types: Record<string, ITypeHandler<unknown>> = {
  * ```
  */
 export function parseFlags<
-  O extends Record<string, unknown>,
-  T extends IFlagOptions,
-  R extends IFlagsResult,
+  TFlags extends Record<string, unknown>,
+  TFlagOptions extends IFlagOptions,
+  TFlagsResult extends IFlagsResult,
 >(
-  argsOrCtx: string[] | R,
-  opts: IParseOptions<T> = {},
-): R & IFlagsResult<O, T> {
+  argsOrCtx: string[] | TFlagsResult,
+  opts: IParseOptions<TFlagOptions> = {},
+): TFlagsResult & IFlagsResult<TFlags, TFlagOptions> {
   let args: Array<string>;
   let ctx: IFlagsResult<Record<string, unknown>>;
 
@@ -160,7 +160,7 @@ export function parseFlags<
 
       if (!option) {
         if (opts.flags?.length) {
-          const name = current.replace(/^-+/g, "");
+          const name = current.replace(/^-+/, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
             if (opts.stopOnUnknown) {
@@ -242,7 +242,7 @@ export function parseFlags<
 
       optionsMap.set(propName, option);
 
-      opts.option?.(option as T, ctx.flags[propName]);
+      opts.option?.(option as TFlagOptions, ctx.flags[propName]);
 
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
@@ -415,7 +415,7 @@ export function parseFlags<
     convertDottedOptions(ctx);
   }
 
-  return ctx as R & IFlagsResult<O, T>;
+  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
 }
 
 function convertDottedOptions(ctx: IFlagsResult) {
