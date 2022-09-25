@@ -41,7 +41,7 @@ const Types: Record<string, ITypeHandler<unknown>> = {
 /**
  * Parse command line arguments.
  * @param args  Command line arguments e.g: `Deno.args`
- * @param opts  Parse options.
+ * @param opts      Parse options.
  * ```
  * // example.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
  * parseFlags(Deno.args);
@@ -160,7 +160,10 @@ export function parseFlags<
           };
         }
       }
-      if (!option.args?.length && typeof currentValue !== "undefined") {
+      if (
+        opts.flags?.length && !option.args?.length &&
+        typeof currentValue !== "undefined"
+      ) {
         throw new UnexpectedOptionValue(option.name, currentValue);
       }
 
