@@ -37,6 +37,4 @@ jobs:
         run: ./shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions zsh)
 
       - name: Type-check examples
-        run: deno check --unstable examples/*{.ts,/*.ts}
-        # @TODO: Use deno task as soon as globs are supported.
-        # run: deno task check:examples
+        run: deno task check:examples
