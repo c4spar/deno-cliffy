@@ -5,6 +5,7 @@ import {
   MissingOptionValue,
   MissingRequiredOption,
   OptionNotCombinable,
+  UnknownOption,
 } from "./_errors.ts";
 import { IFlagsResult, IParseOptions } from "./types.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
@@ -31,23 +32,26 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
     return;
   }
 
-  if (ctx.standalone) {
-    validateStandaloneOption(
-      ctx,
-      options,
-      optionNames,
-      defaultValues,
-    );
-    return;
-  }
-
   for (const [name, option] of options) {
+    if (validateStandaloneOption(option, options, optionNames, defaultValues)) {
+      return;
+    }
+    validateUnknownOption(option, opts);
     validateConflictingOptions(ctx, option);
     validateDependingOptions(ctx, option, defaultValues);
     validateRequiredValues(ctx, option, name);
   }
 
   validateRequiredOptions(ctx, options, opts);
+}
+
+function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
+  option: IFlagOptions,
+  opts: IParseOptions<T>,
+) {
+  if (!getOption(opts.flags ?? [], option.name)) {
+    throw new UnknownOption(option.name, opts.flags ?? []);
+  }
 }
 
 /**
@@ -106,21 +110,23 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 }
 
 function validateStandaloneOption(
-  ctx: IFlagsResult,
+  option: IFlagOptions,
   options: Map<string, IFlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
-): void {
-  if (!ctx.standalone || optionNames.length === 1) {
-    return;
+): boolean {
+  if (!option.standalone || optionNames.length === 1) {
+    return false;
   }
 
   // don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
-    if (!defaultValues[opt.name] && opt !== ctx.standalone) {
-      throw new OptionNotCombinable(ctx.standalone.name);
+    if (!defaultValues[opt.name] && opt !== option) {
+      throw new OptionNotCombinable(option.name);
     }
   }
+
+  return true;
 }
 
 function validateConflictingOptions(

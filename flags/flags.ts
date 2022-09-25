@@ -174,10 +174,6 @@ export function parseFlags<
         }
       }
 
-      if (option.standalone) {
-        ctx.standalone = option;
-      }
-
       if (
         opts.flags?.length && !option.args?.length &&
         typeof currentValue !== "undefined"
