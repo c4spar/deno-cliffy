@@ -48,3 +48,12 @@ Deno.test("flags - type - no value - should throw if a no value flag has a value
     `Option "--flag" doesn't take a value, but got "123".`,
   );
 });
+
+Deno.test("flags - type - no value - should not throw unexpected error value with no options", () => {
+  const result = parseFlags(["-f=123"]);
+  assertEquals(result, {
+    unknown: [],
+    flags: { f: "123" },
+    literal: [],
+  });
+});
