@@ -159,7 +159,7 @@ export function parseFlags<
 
       if (!option) {
         if (opts.flags?.length) {
-          const name = current.replace(/^-+/g, "");
+          const name = current.replace(/^-+/, "");
           option = matchWildCardOptions(name, opts.flags);
           if (!option) {
             throw new UnknownOption(current, opts.flags);

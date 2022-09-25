@@ -24,7 +24,7 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
   if (!opts.flags) {
     return;
   }
-  const defaultValues = setDefaultValues(ctx, opts, options);
+  const defaultValues = setDefaultValues(ctx, opts);
 
   const optionNames = Object.keys(ctx.flags);
   if (!optionNames.length && opts.allowEmpty) {
@@ -57,7 +57,6 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
 function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
-  options: Map<string, IFlagOptions> = new Map(),
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
