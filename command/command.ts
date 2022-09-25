@@ -1343,6 +1343,7 @@ export class Command<
     this.parseOptions(ctx, options, {
       stopEarly: true,
       stopOnUnknown: true,
+      partial: true,
     });
   }
 
@@ -1515,12 +1516,13 @@ export class Command<
     {
       stopEarly = this._stopEarly,
       stopOnUnknown = false,
+      partial = false,
     }: ParseOptionsOptions = {},
   ): void {
     parseFlags(ctx, {
       stopEarly,
       stopOnUnknown,
-      partial: true,
+      partial,
       allowEmpty: this._allowEmpty,
       flags: options,
       ignoreDefaults: ctx.env,
@@ -2521,6 +2523,7 @@ interface ParseContext extends IFlagsResult<Record<string, unknown>> {
 interface ParseOptionsOptions {
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
+  partial?: boolean;
 }
 
 type TrimLeft<T extends string, V extends string | undefined> = T extends

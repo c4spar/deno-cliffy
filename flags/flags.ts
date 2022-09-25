@@ -91,10 +91,19 @@ export function parseFlags<
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
 
-  /** Option name mapping: propertyName -> option.name */
-  const optionsMap: Map<string, IFlagOptions> = new Map();
-  let inLiteral = false;
+  validateOptions(opts);
 
+  const options = parseArgs(ctx, args, opts);
+
+  if (!opts.partial) {
+    validateFlags(ctx, opts, options);
+    convertDottedOptions(ctx);
+  }
+
+  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+}
+
+function validateOptions<TFlagOptions extends IFlagOptions>(opts: IParseOptions<TFlagOptions>) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
@@ -107,6 +116,16 @@ export function parseFlags<
       }
     });
   });
+}
+
+function parseArgs<TFlagOptions extends IFlagOptions>(
+  ctx: IFlagsResult<Record<string, unknown>>,
+  args: Array<string>,
+  opts: IParseOptions<TFlagOptions>,
+) {
+  /** Option name mapping: propertyName -> option.name */
+  const optionsMap: Map<string, IFlagOptions> = new Map();
+  let inLiteral = false;
 
   for (
     let argsIndex = 0;
@@ -410,12 +429,7 @@ export function parseFlags<
     }
   }
 
-  if (!opts.partial || (!ctx.stopEarly && !ctx.stopOnUnknown)) {
-    validateFlags(ctx, opts, optionsMap);
-    convertDottedOptions(ctx);
-  }
-
-  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+  return optionsMap;
 }
 
 function convertDottedOptions(ctx: IFlagsResult) {
