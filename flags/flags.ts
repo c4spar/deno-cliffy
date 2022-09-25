@@ -78,9 +78,9 @@ export function parseFlags<
   const flags: Record<string, unknown> = {};
   /** Option name mapping: propertyName -> option.name */
   const optionNameMap: Record<string, string> = {};
-  let literal: string[] = [];
-  let unknown: string[] = [];
-  let stopEarly: string | null = null;
+  const literal: string[] = [];
+  const unknown: string[] = [];
+  let stopEarly = false;
 
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
@@ -110,10 +110,11 @@ export function parseFlags<
     if (inLiteral) {
       literal.push(current);
       continue;
-    }
-
-    if (current === "--") {
+    } else if (current === "--") {
       inLiteral = true;
+      continue;
+    } else if (stopEarly) {
+      unknown.push(current);
       continue;
     }
 
@@ -380,24 +381,9 @@ export function parseFlags<
       }
     } else {
       if (opts.stopEarly) {
-        stopEarly = current;
-        break;
+        stopEarly = true;
       }
       unknown.push(current);
-    }
-  }
-
-  if (stopEarly) {
-    const stopEarlyArgIndex: number = args.indexOf(stopEarly);
-    if (stopEarlyArgIndex !== -1) {
-      const doubleDashIndex: number = args.indexOf("--");
-      unknown = args.slice(
-        stopEarlyArgIndex,
-        doubleDashIndex === -1 ? undefined : doubleDashIndex,
-      );
-      if (doubleDashIndex !== -1) {
-        literal = args.slice(doubleDashIndex + 1);
-      }
     }
   }
 
