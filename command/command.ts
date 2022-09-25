@@ -1633,6 +1633,7 @@ export class Command<
       if (args.length) {
         if (this.hasCommands(true)) {
           if (this.hasCommand(args[0], true)) {
+            // e.g: command --global-foo --foo sub-command
             throw new TooManyArguments(args);
           } else {
             throw new UnknownCommand(args[0], this.getCommands());
