@@ -92,11 +92,10 @@ export function parseFlags<
   ctx.stopOnUnknown = false;
 
   validateOptions(opts);
-
   const options = parseArgs(ctx, args, opts);
+  validateFlags(ctx, opts, options);
 
   if (!opts.partial) {
-    validateFlags(ctx, opts, options);
     convertDottedOptions(ctx);
   }
 
