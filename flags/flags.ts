@@ -98,7 +98,7 @@ export function parseFlags<
   validateFlags(ctx, opts, options);
 
   if (opts.dotted) {
-    parseDottedOptions(ctx, options);
+    parseDottedOptions(ctx);
   }
 
   return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;

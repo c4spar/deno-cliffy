@@ -3,12 +3,10 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   flags?: Array<T>;
   parse?: ITypeHandler<unknown>;
   option?: (option: T, value?: unknown) => void;
-  knownFlaks?: Record<string, unknown>;
   stopEarly?: boolean;
+  stopOnUnknown?: boolean;
   allowEmpty?: boolean;
   ignoreDefaults?: Record<string, unknown>;
-  dotted?: boolean;
-  stopOnUnknown?: boolean;
   dotted?: boolean;
 }
 
