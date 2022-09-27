@@ -93,7 +93,16 @@ Deno.test("[command] should collect global options before sub commands", async (
     .globalOption("--collect <value>", "...", { collect: true })
     .command("cmd1", new Command().command("cmd2"))
     .parse(
-      ["--collect", "foo", "cmd1", "--collect", "bar", "cmd2", "--collect", "baz"],
+      [
+        "--collect",
+        "foo",
+        "cmd1",
+        "--collect",
+        "bar",
+        "cmd2",
+        "--collect",
+        "baz",
+      ],
     );
 
   assertEquals(options, { collect: ["foo", "bar", "baz"] });
