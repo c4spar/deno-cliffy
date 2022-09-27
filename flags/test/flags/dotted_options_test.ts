@@ -1,4 +1,5 @@
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { ValidationError } from "../../_errors.ts";
 import { parseFlags } from "../../flags.ts";
 import type { IParseOptions } from "../../types.ts";
 import { OptionType } from "../../types.ts";
@@ -64,7 +65,7 @@ Deno.test("[flags] should not parse dotted options with dotted options disabled"
 Deno.test("[flags] should throw error for missing depending options with dotted option", () => {
   assertThrows(
     () => parseFlags(["--bitrate.audio", "300"], options),
-    Error,
+    ValidationError,
     `Option "--bitrate.audio" depends on option "--bitrate.video".`,
   );
 });
@@ -72,7 +73,7 @@ Deno.test("[flags] should throw error for missing depending options with dotted 
 Deno.test("[flags] should throw error for missing depending options with dotted alias option", () => {
   assertThrows(
     () => parseFlags(["--audio-bitrate", "300"], options),
-    Error,
+    ValidationError,
     `Option "--bitrate.audio" depends on option "--bitrate.video".`,
   );
 });
@@ -84,7 +85,7 @@ Deno.test("[flags] should throw an error for dotted option with invalid value", 
         ["--bitrate.audio", "300", "--bitrate.video", "900k"],
         options,
       ),
-    Error,
+    ValidationError,
     `Option "--bitrate.video" must be of type "number", but got "900k".`,
   );
 });
