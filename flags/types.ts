@@ -7,7 +7,7 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   stopEarly?: boolean;
   allowEmpty?: boolean;
   ignoreDefaults?: Record<string, unknown>;
-  partial?: boolean;
+  dotted?: boolean;
   stopOnUnknown?: boolean;
 }
 

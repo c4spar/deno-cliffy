@@ -91,12 +91,14 @@ export function parseFlags<
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
 
+  opts.dotted ??= true;
+
   validateOptions(opts);
   const options = parseArgs(ctx, args, opts);
   validateFlags(ctx, opts, options);
 
-  if (!opts.partial) {
-    convertDottedOptions(ctx);
+  if (opts.dotted) {
+    parseDottedOptions(ctx, options);
   }
 
   return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
@@ -123,7 +125,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   args: Array<string>,
   opts: IParseOptions<TFlagOptions>,
-) {
+): Map<string, IFlagOptions> {
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, IFlagOptions> = new Map();
   let inLiteral = false;
@@ -433,7 +435,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
   return optionsMap;
 }
 
-function convertDottedOptions(ctx: IFlagsResult) {
+function parseDottedOptions(ctx: IFlagsResult): void {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {
