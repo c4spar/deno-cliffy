@@ -7,68 +7,67 @@ import {
   OptionNotCombinable,
   UnknownOption,
 } from "./_errors.ts";
-import { IParseOptions } from "./types.ts";
+import { IFlagsResult, IParseOptions } from "./types.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
-
-/** Flag option map. */
-interface IFlagOptionsMap {
-  name: string;
-  option?: IFlagOptions;
-}
 
 /**
  * Flags post validation. Validations that are not already done by the parser.
  *
- * @param opts            Parse options.
- * @param values          Flag values.
- * @param optionNameMap   Option name mappings: propertyName -> option.name
+ * @param ctx     Parse context.
+ * @param opts    Parse options.
+ * @param options Option name mappings: propertyName -> option
  */
 export function validateFlags<T extends IFlagOptions = IFlagOptions>(
+  ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
-  values: Record<string, unknown>,
-  optionNameMap: Record<string, string> = {},
+  options: Map<string, IFlagOptions> = new Map(),
 ): void {
   if (!opts.flags) {
     return;
   }
-  const defaultValues = setDefaultValues(opts, values, optionNameMap);
+  const defaultValues = setDefaultValues(ctx, opts);
 
-  const optionNames = Object.keys(values);
+  const optionNames = Object.keys(ctx.flags);
   if (!optionNames.length && opts.allowEmpty) {
     return;
   }
 
-  const options: Array<IFlagOptionsMap> = optionNames.map((name) => ({
-    name,
-    option: getOption(opts.flags!, optionNameMap[name]),
-  }));
-
-  for (const { name, option } of options) {
-    if (!option) {
-      throw new UnknownOption(name, opts.flags);
-    }
-    if (validateStandaloneOption(option, options, optionNames, defaultValues)) {
-      return;
-    }
-    validateConflictingOptions(option, values);
-    validateDependingOptions(option, values, defaultValues);
-    validateRequiredValues(option, values, name);
+  if (ctx.standalone) {
+    validateStandaloneOption(
+      ctx,
+      options,
+      optionNames,
+      defaultValues,
+    );
+    return;
   }
-  validateRequiredOptions(options, values, opts);
+
+  for (const [name, option] of options) {
+    validateUnknownOption(option, opts);
+    validateConflictingOptions(ctx, option);
+    validateDependingOptions(ctx, option, defaultValues);
+    validateRequiredValues(ctx, option, name);
+  }
+
+  validateRequiredOptions(ctx, options, opts);
+}
+
+function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
+  option: IFlagOptions,
+  opts: IParseOptions<T>,
+) {
+  if (!getOption(opts.flags ?? [], option.name)) {
+    throw new UnknownOption(option.name, opts.flags ?? []);
+  }
 }
 
 /**
- * Adds all default values on the values object and returns a new object with
- * only the default values.
- *
- * @param opts
- * @param values
- * @param optionNameMap
+ * Adds all default values to ctx.flags and returns a boolean object map with
+ * only the default option names `{ [OptionName: string]: boolean }`.
  */
 function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
+  ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
-  values: Record<string, unknown>,
-  optionNameMap: Record<string, string> = {},
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
@@ -83,7 +82,7 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
     // if --no-[flag] is present set --[flag] default value to true
     if (option.name.startsWith("no-")) {
       const propName = option.name.replace(/^no-/, "");
-      if (propName in values) {
+      if (typeof ctx.flags[propName] !== "undefined") {
         continue;
       }
       const positiveOption = getOption(opts.flags, propName);
@@ -98,22 +97,18 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
       name = paramCaseToCamelCase(option.name);
     }
 
-    if (!(name in optionNameMap)) {
-      optionNameMap[name] = option.name;
-    }
-
     const hasDefaultValue: boolean = (!opts.ignoreDefaults ||
       typeof opts.ignoreDefaults[name] === "undefined") &&
-      typeof values[name] === "undefined" && (
+      typeof ctx.flags[name] === "undefined" && (
         typeof option.default !== "undefined" ||
         typeof defaultValue !== "undefined"
       );
 
     if (hasDefaultValue) {
-      values[name] = getDefaultValue(option) ?? defaultValue;
+      ctx.flags[name] = getDefaultValue(option) ?? defaultValue;
       defaultValues[option.name] = true;
       if (typeof option.value === "function") {
-        values[name] = option.value(values[name]);
+        ctx.flags[name] = option.value(ctx.flags[name]);
       }
     }
   }
@@ -122,107 +117,113 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 }
 
 function validateStandaloneOption(
-  option: IFlagOptions,
-  options: Array<IFlagOptionsMap>,
+  ctx: IFlagsResult,
+  options: Map<string, IFlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
-): boolean {
-  if (!option.standalone) {
-    return false;
-  }
-  if (optionNames.length === 1) {
-    return true;
+): void {
+  if (!ctx.standalone || optionNames.length === 1) {
+    return;
   }
 
   // don't throw an error if all values are coming from the default option.
-  if (
-    options.every((opt) =>
-      opt.option &&
-      (option === opt.option || defaultValues[opt.option.name])
-    )
-  ) {
-    return true;
+  for (const [_, opt] of options) {
+    if (!defaultValues[opt.name] && opt !== ctx.standalone) {
+      throw new OptionNotCombinable(ctx.standalone.name);
+    }
   }
-
-  throw new OptionNotCombinable(option.name);
 }
 
 function validateConflictingOptions(
+  ctx: IFlagsResult<Record<string, unknown>>,
   option: IFlagOptions,
-  values: Record<string, unknown>,
 ): void {
-  option.conflicts?.forEach((flag: string) => {
-    if (isset(flag, values)) {
+  if (!option.conflicts?.length) {
+    return;
+  }
+  for (const flag of option.conflicts) {
+    if (isset(flag, ctx.flags)) {
       throw new ConflictingOption(option.name, flag);
     }
-  });
+  }
 }
 
 function validateDependingOptions(
+  ctx: IFlagsResult<Record<string, unknown>>,
   option: IFlagOptions,
-  values: Record<string, unknown>,
   defaultValues: Record<string, boolean>,
 ): void {
-  option.depends?.forEach((flag: string) => {
+  if (!option.depends) {
+    return;
+  }
+  for (const flag of option.depends) {
     // don't throw an error if the value is coming from the default option.
-    if (!isset(flag, values) && !defaultValues[option.name]) {
+    if (!isset(flag, ctx.flags) && !defaultValues[option.name]) {
       throw new DependingOption(option.name, flag);
     }
-  });
+  }
 }
 
 function validateRequiredValues(
+  ctx: IFlagsResult<Record<string, unknown>>,
   option: IFlagOptions,
-  values: Record<string, unknown>,
   name: string,
 ): void {
-  const isArray = (option.args?.length || 0) > 1;
-  option.args?.forEach((arg: IFlagArgument, i: number) => {
-    if (
-      arg.requiredValue &&
-      (
-        typeof values[name] === "undefined" ||
-        (isArray &&
-          typeof (values[name] as Array<unknown>)[i] === "undefined")
-      )
-    ) {
+  if (!option.args) {
+    return;
+  }
+  const isArray = option.args.length > 1;
+
+  for (let i = 0; i < option.args.length; i++) {
+    const arg: IFlagArgument = option.args[i];
+    if (!arg.requiredValue) {
+      continue;
+    }
+    const hasValue = isArray
+      ? typeof (ctx.flags[name] as Array<unknown>)[i] !== "undefined"
+      : typeof ctx.flags[name] !== "undefined";
+
+    if (!hasValue) {
       throw new MissingOptionValue(option.name);
     }
-  });
+  }
 }
 
 function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
-  options: Array<IFlagOptionsMap>,
-  values: Record<string, unknown>,
+  ctx: IFlagsResult<Record<string, unknown>>,
+  options: Map<string, IFlagOptions>,
   opts: IParseOptions<T>,
 ): void {
   if (!opts.flags?.length) {
     return;
   }
+  const optionsValues = [...options.values()];
+
   for (const option of opts.flags) {
-    if (option.required && !(paramCaseToCamelCase(option.name) in values)) {
-      if (
-        (
-          !option.conflicts ||
-          !option.conflicts.find((flag: string) => !!values[flag])
-        ) &&
-        !options.find((opt) =>
-          opt.option?.conflicts?.find((flag: string) => flag === option.name)
-        )
-      ) {
-        throw new MissingRequiredOption(option.name);
-      }
+    if (!option.required || paramCaseToCamelCase(option.name) in ctx.flags) {
+      continue;
     }
+    const conflicts = option.conflicts ?? [];
+    const hasConflict = conflicts.find((flag: string) => !!ctx.flags[flag]);
+    const hasConflicts = hasConflict ||
+      optionsValues.find((opt) =>
+        opt.conflicts?.find((flag: string) => flag === option.name)
+      );
+
+    if (hasConflicts) {
+      continue;
+    }
+    throw new MissingRequiredOption(option.name);
   }
 }
 
 /**
  * Check if value exists for flag.
- * @param flag    Flag name.
- * @param values  Parsed values.
+ * @param flagName  Flag name.
+ * @param flags     Parsed values.
  */
-function isset(flag: string, values: Record<string, unknown>): boolean {
-  const name = paramCaseToCamelCase(flag);
+function isset(flagName: string, flags: Record<string, unknown>): boolean {
+  const name = paramCaseToCamelCase(flagName);
   // return typeof values[ name ] !== 'undefined' && values[ name ] !== false;
-  return typeof values[name] !== "undefined";
+  return typeof flags[name] !== "undefined";
 }

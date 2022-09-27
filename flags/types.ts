@@ -7,6 +7,7 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   stopEarly?: boolean;
   allowEmpty?: boolean;
   ignoreDefaults?: Record<string, unknown>;
+  stopOnUnknown?: boolean;
 }
 
 /** Flag options. */
@@ -52,11 +53,15 @@ export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
 /** Result of the parseFlags method. */
 export interface IFlagsResult<
   // deno-lint-ignore no-explicit-any
-  O extends Record<string, any> = Record<string, any>,
+  TFlags extends Record<string, any> = Record<string, any>,
+  TStandaloneOption extends IFlagOptions = IFlagOptions,
 > {
-  flags: O;
-  unknown: string[];
-  literal: string[];
+  flags: TFlags;
+  unknown: Array<string>;
+  literal: Array<string>;
+  standalone?: TStandaloneOption;
+  stopEarly: boolean;
+  stopOnUnknown: boolean;
 }
 
 /** Type details. */

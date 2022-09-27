@@ -5,6 +5,7 @@ import {
   it,
 } from "../../../dev_deps.ts";
 import type { ITypeInfo } from "../../../flags/types.ts";
+import { ValidationError } from "../../_errors.ts";
 import { Command } from "../../command.ts";
 
 function cmd() {
@@ -12,7 +13,7 @@ function cmd() {
     .throwErrors()
     .type("color", ({ label, name, type, value }: ITypeInfo) => {
       if (!["red", "blue", "yellow"].includes(value)) {
-        throw new Error(
+        throw new ValidationError(
           `${label} "${name}" must be a valid "${type}", but got "${value}".`,
         );
       }
@@ -103,7 +104,7 @@ describe("command arguments", () => {
       async () => {
         await cmd().parse(["abc", "xyz", "true", "red"]);
       },
-      Error,
+      ValidationError,
       `Argument "bar" must be of type "number", but got "xyz".`,
     );
   });
@@ -113,7 +114,7 @@ describe("command arguments", () => {
       async () => {
         await cmd().parse(["abc", "123", "true", "red", "1,2,3,four"]);
       },
-      Error,
+      ValidationError,
       `Argument "list" must be of type "number", but got "four".`,
     );
   });
@@ -123,7 +124,7 @@ describe("command arguments", () => {
       async () => {
         await cmd2().parse(["foo", "abc", "123", "true", "red", "1,2,3,four"]);
       },
-      Error,
+      ValidationError,
       `Argument "list" must be of type "number", but got "four".`,
     );
   });
@@ -133,7 +134,7 @@ describe("command arguments", () => {
       async () => {
         await cmd().parse([]);
       },
-      Error,
+      ValidationError,
       "Missing argument(s): foo",
     );
   });
@@ -143,7 +144,7 @@ describe("command arguments", () => {
       async () => {
         await cmd().parse(["abc", "123", "xyz", "red"]);
       },
-      Error,
+      ValidationError,
       `Argument "baz" must be of type "boolean", but got "xyz".`,
     );
   });
@@ -153,8 +154,23 @@ describe("command arguments", () => {
       async () => {
         await cmd().parse(["abc", "123", "true", "xyz"]);
       },
-      Error,
+      ValidationError,
       `Argument "color" must be a valid "color", but got "xyz".`,
+    );
+  });
+
+  it("should throw to many arguments error for global & none global option before a sub-command", async () => {
+    await assertRejects(
+      async () => {
+        await new Command()
+          .noExit()
+          .globalOption("--foo", "foo...")
+          .option("--bar", "...")
+          .command("foo", "...")
+          .parse(["--foo", "--bar", "foo"]);
+      },
+      ValidationError,
+      `Too many arguments: foo`,
     );
   });
 });
