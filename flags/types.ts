@@ -9,6 +9,7 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   ignoreDefaults?: Record<string, unknown>;
   dotted?: boolean;
   stopOnUnknown?: boolean;
+  dotted?: boolean;
 }
 
 /** Flag options. */
