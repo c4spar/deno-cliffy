@@ -17,7 +17,7 @@ const options = <IParseOptions> {
   }],
 };
 
-Deno.test("flags: dotted short options", () => {
+Deno.test("[flags] should parse dotted short options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-b.a", "300", "-b.v", "900"],
     options,
@@ -28,7 +28,7 @@ Deno.test("flags: dotted short options", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags: dotted long options", () => {
+Deno.test("[flags] should parse dotted long options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--bitrate.audio", "300", "--bitrate.video", "900"],
     options,
@@ -39,7 +39,7 @@ Deno.test("flags: dotted long options", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags: dotted aliases", () => {
+Deno.test("[flags] should parse dotted alias options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--audio-bitrate", "300", "--video-bitrate", "900"],
     options,
@@ -50,7 +50,26 @@ Deno.test("flags: dotted aliases", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags: dotted aliases", () => {
+Deno.test("[flags] should not parse dotted options with dotted options disabled", () => {
+  const { flags, unknown, literal } = parseFlags(
+    ["-b.a", "300", "-b.v", "900"],
+    { ...options, dotted: false },
+  );
+
+  assertEquals(flags, { "bitrate.audio": 300, "bitrate.video": 900 });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
+
+Deno.test("[flags] should throw error for missing depending options with dotted option", () => {
+  assertThrows(
+    () => parseFlags(["--bitrate.audio", "300"], options),
+    Error,
+    `Option "--bitrate.audio" depends on option "--bitrate.video".`,
+  );
+});
+
+Deno.test("[flags] should throw error for missing depending options with dotted alias option", () => {
   assertThrows(
     () => parseFlags(["--audio-bitrate", "300"], options),
     Error,
@@ -58,7 +77,7 @@ Deno.test("flags: dotted aliases", () => {
   );
 });
 
-Deno.test("flags: dotted option with invalid value", () => {
+Deno.test("[flags] should throw an error for dotted option with invalid value", () => {
   assertThrows(
     () =>
       parseFlags(

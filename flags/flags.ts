@@ -91,6 +91,8 @@ export function parseFlags<
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
 
+  opts.dotted ??= true;
+
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, IFlagOptions> = new Map();
   let inLiteral = false;
@@ -411,12 +413,15 @@ export function parseFlags<
   }
 
   validateFlags(ctx, opts, optionsMap);
-  convertDottedOptions(ctx);
+
+  if (opts.dotted) {
+    parseDottedOptions(ctx);
+  }
 
   return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
 }
 
-function convertDottedOptions(ctx: IFlagsResult) {
+function parseDottedOptions(ctx: IFlagsResult) {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {
