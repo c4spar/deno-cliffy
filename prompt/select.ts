@@ -1,4 +1,4 @@
-import { blue, dim, italic, underline, yellow } from "./deps.ts";
+import { blue, bold, dim, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -32,16 +32,20 @@ export type SelectValueSettings = SelectOptionSettings[];
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {
   options: SelectValueOptions;
+  maxBreadcrumbItems?: number;
+  breadcrumbSeparator?: string;
   keys?: SelectKeys;
 }
 
 /** Select prompt settings. */
 export interface SelectSettings extends GenericListSettings<string, string> {
   options: SelectValueSettings;
+  maxBreadcrumbItems: number;
+  breadcrumbSeparator: string;
   keys?: SelectKeys;
 }
 
-interface ParentCategoryInfo {
+interface ParentOptions {
   options: SelectValueSettings;
   selectedCategoryIndex: number;
 }
@@ -58,7 +62,7 @@ const backItem: SelectOptionSettings = {
 export class Select<S extends SelectSettings = SelectSettings>
   extends GenericList<string, string, S> {
   protected listIndex: number = this.getListIndex(this.settings.default);
-  #parentCategories: ParentCategoryInfo[] = [];
+  #parentCategories: ParentOptions[] = [];
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -77,6 +81,8 @@ export class Select<S extends SelectSettings = SelectSettings>
       listPointer: blue(Figures.POINTER),
       maxRows: 10,
       searchLabel: blue(Figures.SEARCH),
+      maxBreadcrumbItems: 5,
+      breadcrumbSeparator: " › ",
       ...options,
       options: Select.mapOptions(options.options),
     }).prompt();
@@ -182,38 +188,34 @@ export class Select<S extends SelectSettings = SelectSettings>
 
   protected body(): string | Promise<string> {
     let categoryText = "";
+    const numberOfParents = this.#parentCategories.length;
+    const maxItems = this.settings.maxBreadcrumbItems;
 
-    switch (this.#parentCategories.length) {
-      case 0:
-        return super.body();
-      case 1:
-        categoryText = dim(italic(this.nameOfParentCategory(0)));
-        break;
-
-      case 2: 
-        categoryText = dim(
-          italic(
-            this.nameOfParentCategory(0) + "/" + this.nameOfParentCategory(1),
-          ),
-        );
-        break;
-      
-      default: 
-        categoryText = dim(
-          italic(
-            this.nameOfParentCategory(0) + "/../" +
-              this.nameOfParentCategory(this.#parentCategories.length - 1),
-          ),
-        );
-        break;
-      
+    if (numberOfParents === 0 || maxItems === 0) {
+      return super.body();
+    } else if (numberOfParents <= maxItems) {
+      categoryText = this.settings.breadcrumbSeparator +
+        this.#parentCategories.map((_category, index) =>
+          Select.nameOfParentCategoryForIndex(index, this.#parentCategories)
+        ).join(this.settings.breadcrumbSeparator);
+    } else {
+      const lastCategories = this.#parentCategories.slice(-maxItems,
+);
+      categoryText = this.settings.breadcrumbSeparator + ".." +
+        this.settings.breadcrumbSeparator +
+        lastCategories.map((_category, index) =>
+          Select.nameOfParentCategoryForIndex(index, lastCategories)
+        ).join(this.settings.breadcrumbSeparator);
     }
 
-    return categoryText + "\n" + super.body();
+    return dim(bold(categoryText)) + "\n" + super.body();
   }
 
-  private nameOfParentCategory(index: number): string {
-    const { options, selectedCategoryIndex } = this.#parentCategories[index];
+  private static nameOfParentCategoryForIndex(
+    index: number,
+    parentOptions: ParentOptions[],
+  ): string {
+    const { options, selectedCategoryIndex } = parentOptions[index];
     return options[selectedCategoryIndex].name;
   }
 
@@ -224,8 +226,8 @@ export class Select<S extends SelectSettings = SelectSettings>
       if (this.isCurrentlyInsideCategory()) {
         const nearestParentCategories =
           this.#parentCategories[this.#parentCategories.length - 1];
-        const categoryToRevertTo =
-          nearestParentCategories.options[nearestParentCategories.selectedCategoryIndex];
+        const categoryToRevertTo = nearestParentCategories
+          .options[nearestParentCategories.selectedCategoryIndex];
 
         this.options = this.itemsInsideCategory(categoryToRevertTo);
         this.listIndex = 2;

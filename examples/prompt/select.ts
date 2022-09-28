@@ -5,6 +5,7 @@ import { Select } from "../../prompt/select.ts";
 const color: string = await Select.prompt({
   message: "Pick a color",
   search: false,
+  maxBreadcrumbItems: 2,
   options: [
     { name: "Red", value: "#ff0000", options: ["hello", "test"] },
     { name: "Green", value: "#00ff00", disabled: true },
