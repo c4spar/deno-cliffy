@@ -296,7 +296,7 @@ export abstract class GenericPrompt<
 
     if (isTty) {
       // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
-      (Deno.setRaw as setRaw)(
+      (Deno.stdin.setRaw as setRaw)(
         Deno.stdin.rid,
         true,
         { cbreak: this.settings.cbreak === true },
@@ -305,7 +305,7 @@ export abstract class GenericPrompt<
     const nread: number | null = await Deno.stdin.read(buffer);
 
     if (isTty) {
-      Deno.setRaw(Deno.stdin.rid, false);
+      Deno.stdin.setRaw(Deno.stdin.rid, false);
     }
 
     if (nread === null) {

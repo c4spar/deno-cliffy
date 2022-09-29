@@ -28,10 +28,10 @@ export function getCursorPosition(
 ): Cursor {
   const data = new Uint8Array(8);
 
-  Deno.setRaw(stdin.rid, true);
+  Deno.stdin.setRaw(stdin.rid, true);
   stdout.writeSync(new TextEncoder().encode(cursorPosition));
   stdin.readSync(data);
-  Deno.setRaw(stdin.rid, false);
+  Deno.stdin.setRaw(stdin.rid, false);
 
   const [y, x] = new TextDecoder()
     .decode(data)
