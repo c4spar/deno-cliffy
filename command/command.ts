@@ -2823,19 +2823,18 @@ type TypedOption<
   : F extends `-${infer Name}` ? BooleanOption<Name, CO, IsRequired<R, D>, D>
   : Record<string, unknown>;
 
-type TypedArguments<A extends string, T extends Record<string, any> | void> =
-  number extends T ? any
-    : A extends `${infer Arg} ${infer Rest}`
-      ? Arg extends `[${string}]`
-        ? [ArgumentType<Arg, T>?, ...TypedArguments<Rest, T>]
-      : [ArgumentType<Arg, T>, ...TypedArguments<Rest, T>]
-    : A extends `${string}...${string}` ? [
-        ...ArgumentType<A, T> extends Array<infer U>
-          ? A extends `[${string}]` ? Array<U> : [U, ...Array<U>]
-          : never,
-      ]
-    : A extends `[${string}]` ? [ArgumentType<A, T>?]
-    : [ArgumentType<A, T>];
+type TypedArguments<A extends string, T> = number extends T ? any
+  : A extends `${infer Arg} ${infer Rest}`
+    ? Arg extends `[${string}]`
+      ? [ArgumentType<Arg, T>?, ...TypedArguments<Rest, T>]
+    : [ArgumentType<Arg, T>, ...TypedArguments<Rest, T>]
+  : A extends `${string}...${string}` ? [
+      ...ArgumentType<A, T> extends Array<infer U>
+        ? A extends `[${string}]` ? Array<U> : [U, ...Array<U>]
+        : never,
+    ]
+  : A extends `[${string}]` ? [ArgumentType<A, T>?]
+  : [ArgumentType<A, T>];
 
 type TypedCommandArguments<N extends string, T> = number extends T ? any
   : N extends `${string} ${infer Args}` ? TypedArguments<Args, T>
