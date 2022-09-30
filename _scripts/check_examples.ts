@@ -1,4 +1,4 @@
-import { expandGlobSync } from "https://deno.land/std@0.154.0/fs/expand_glob.ts";
+import { expandGlobSync } from "https://deno.land/std@0.158.0/fs/expand_glob.ts";
 
 const files = [...expandGlobSync("./examples/**/**.ts")];
 
