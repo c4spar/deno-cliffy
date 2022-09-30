@@ -164,8 +164,8 @@ export class Keypress extends EventTarget
 
   #read = async (): Promise<void> => {
     const buffer = new Uint8Array(8);
-    // Deno.setRaw(Deno.stdin.rid, true, { cbreak: true });
-    Deno.setRaw(Deno.stdin.rid, true);
+    // Deno.stdin.setRaw(true, { cbreak: true });
+    Deno.stdin.setRaw(true);
     const nread: number | null = await Deno.stdin.read(buffer).catch(
       (error) => {
         if (!this.#disposed) {
@@ -174,7 +174,7 @@ export class Keypress extends EventTarget
         return null;
       },
     );
-    Deno.setRaw(Deno.stdin.rid, false);
+    Deno.stdin.setRaw(false);
 
     if (this.#disposed) {
       return;

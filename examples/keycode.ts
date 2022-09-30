@@ -5,9 +5,9 @@ import { KeyCode, parse } from "../keycode/mod.ts";
 while (true) {
   const data = new Uint8Array(8);
 
-  Deno.setRaw(Deno.stdin.rid, true);
+  Deno.stdin.setRaw(true);
   const nread = await Deno.stdin.read(data);
-  Deno.setRaw(Deno.stdin.rid, false);
+  Deno.stdin.setRaw(false);
 
   if (nread === null) {
     break;
