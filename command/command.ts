@@ -5,7 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IDefaultValue } from "../flags/types.ts";
+import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -1225,70 +1225,81 @@ export class Command<
         CP
       >
   > {
-    return this.parseCommand({ args }) as any;
+    const ctx: ParseContext = {
+      unknown: args.slice(),
+      flags: {},
+      env: {},
+      literal: [],
+      stopEarly: false,
+      stopOnUnknown: false,
+    };
+    return this.parseCommand(ctx) as any;
   }
 
   private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
     try {
       this.reset();
       this.registerDefaults();
-      this.rawArgs = ctx.args;
+      this.rawArgs = ctx.unknown.slice();
 
       if (this.isExecutable) {
-        await this.executeExecutable(ctx.args);
+        await this.executeExecutable(ctx.unknown);
         return { options: {}, args: [], cmd: this, literal: [] } as any;
+      } else if (this._useRawArgs) {
+        await this.parseEnvVars(ctx, this.envVars);
+        return this.execute(ctx.env, ...ctx.unknown) as any;
       }
 
-      if (this._useRawArgs) {
-        const env = await this.parseEnvVars(this.envVars);
-        return this.execute(env, ...ctx.args) as any;
-      }
-
+      let preParseGlobals = false;
       let subCommand: Command<any> | undefined;
 
-      // Parse sub command.
-      if (subCommand || ctx.args.length > 0) {
-        if (!subCommand) {
-          subCommand = this.getCommand(ctx.args[0], true);
+      // Pre parse globals to support: cmd --global-option sub-command --option
+      if (ctx.unknown.length > 0) {
+        // Detect sub command.
+        subCommand = this.getSubCommand(ctx);
 
-          if (subCommand) {
-            ctx.args = ctx.args.slice(1);
+        if (!subCommand) {
+          // Only pre parse globals if first arg ist a global option.
+          const optionName = ctx.unknown[0].replace(/^-+/, "");
+          const option = this.getOption(optionName, true);
+
+          if (option?.global) {
+            preParseGlobals = true;
+            await this.parseGlobalOptionsAndEnvVars(ctx);
           }
         }
+      }
+
+      if (subCommand || ctx.unknown.length > 0) {
+        subCommand ??= this.getSubCommand(ctx);
 
         if (subCommand) {
           subCommand._globalParent = this;
-
           return subCommand.parseCommand(ctx);
         }
       }
 
       // Parse rest options & env vars.
-      ctx = await this.parseOptionsAndEnvVars(ctx);
-
-      this.literalArgs = ctx.literal ?? [];
-
-      // Merge env and global options.
-      const options = { ...ctx.env, ...ctx.options };
-
-      // Parse arguments.
-      const params = this.parseArguments(ctx.args, options);
+      await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
+      const options = { ...ctx.env, ...ctx.flags };
+      const args = this.parseArguments(ctx, options);
+      this.literalArgs = ctx.literal;
 
       // Execute option action.
       if (ctx.action) {
-        await ctx.action.action.call(this, options, ...params);
+        await ctx.action.action.call(this, options, ...args);
 
         if (ctx.action.standalone) {
           return {
             options,
-            args: params,
+            args,
             cmd: this,
             literal: this.literalArgs,
           } as any;
         }
       }
 
-      return this.execute(options, ...params) as any;
+      return this.execute(options, ...args) as any;
     } catch (error: unknown) {
       this.throw(
         error instanceof FlagsValidationError
@@ -1300,17 +1311,28 @@ export class Command<
     }
   }
 
+  private getSubCommand(ctx: ParseContext) {
+    const subCommand = this.getCommand(ctx.unknown[0], true);
+
+    if (subCommand) {
+      ctx.unknown.shift();
+    }
+
+    return subCommand;
+  }
+
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
-  ): Promise<ParseContext> {
+  ): Promise<void> {
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
+
     // Parse global env vars.
     const envVars = [
       ...this.envVars.filter((envVar) => envVar.global),
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.args[0]);
-    const env = await this.parseEnvVars(envVars, !isHelpOption);
+    await this.parseEnvVars(ctx, envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1318,28 +1340,36 @@ export class Command<
       ...this.getGlobalOptions(true),
     ];
 
-    return this.parseOptions(ctx, options, env, true);
+    this.parseOptions(ctx, options, {
+      stopEarly: true,
+      stopOnUnknown: true,
+      dotted: false,
+    });
   }
 
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
-  ): Promise<ParseContext> {
-    // Parse env vars.
-    const envVars = this.getEnvVars(true);
-
+    preParseGlobals: boolean,
+  ): Promise<void> {
     const helpOption = this.getHelpOption();
-    const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = helpOption?.flags.includes(ctx.args[0]);
+    const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
+    const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
 
-    const env = {
-      ...ctx.env,
-      ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
-    };
+    // Parse env vars.
+    const envVars = preParseGlobals
+      ? this.envVars.filter((envVar) => !envVar.global)
+      : this.getEnvVars(true);
+
+    await this.parseEnvVars(
+      ctx,
+      envVars,
+      !isHelpOption && !isVersionOption,
+    );
 
     // Parse options.
     const options = this.getOptions(true);
 
-    return this.parseOptions(ctx, options, env);
+    this.parseOptions(ctx, options);
   }
 
   /** Register default options like `--version` and `--help`. */
@@ -1440,9 +1470,9 @@ export class Command<
           this.getCommands(),
         );
       }
-
       cmd._globalParent = this;
-      await cmd.execute(options, ...args);
+
+      return cmd.execute(options, ...args);
     }
 
     return {
@@ -1479,39 +1509,30 @@ export class Command<
     }
   }
 
-  /**
-   * Parse raw command line arguments.
-   * @param args Raw command line arguments.
-   */
+  /** Parse raw command line arguments. */
   protected parseOptions(
     ctx: ParseContext,
     options: IOption[],
-    env: Record<string, unknown>,
-    stopEarly: boolean = this._stopEarly,
-  ): ParseContext {
-    let action: ActionOption | undefined;
-
-    const parseResult = parseFlags(ctx.args, {
+    {
+      stopEarly = this._stopEarly,
+      stopOnUnknown = false,
+      dotted = true,
+    }: ParseOptionsOptions = {},
+  ): void {
+    parseFlags(ctx, {
       stopEarly,
+      stopOnUnknown,
+      dotted,
       allowEmpty: this._allowEmpty,
       flags: options,
-      ignoreDefaults: env,
+      ignoreDefaults: ctx.env,
       parse: (type: ITypeInfo) => this.parseType(type),
       option: (option: IOption) => {
-        if (!action && option.action) {
-          action = option as ActionOption;
+        if (!ctx.action && option.action) {
+          ctx.action = option as ActionOption;
         }
       },
     });
-
-    // Merge context.
-    return {
-      args: parseResult.unknown,
-      options: { ...ctx.options, ...parseResult.flags },
-      env: { ...ctx.env, ...env },
-      action: ctx.action ?? action,
-      literal: parseResult.literal,
-    };
   }
 
   /** Parse argument type. */
@@ -1532,56 +1553,49 @@ export class Command<
 
   /**
    * Read and validate environment variables.
-   * @param envVars env vars defined by the command
-   * @param validate when true, throws an error if a required env var is missing
+   * @param ctx Parse context.
+   * @param envVars env vars defined by the command.
+   * @param validate when true, throws an error if a required env var is missing.
    */
   protected async parseEnvVars(
+    ctx: ParseContext,
     envVars: Array<IEnvVar>,
     validate = true,
-  ): Promise<Record<string, unknown>> {
-    const result: Record<string, unknown> = {};
+  ): Promise<void> {
+    for (const envVar of envVars) {
+      const env = await this.findEnvVar(envVar.names);
 
-    for (const env of envVars) {
-      const found = await this.findEnvVar(env.names);
-
-      if (found) {
-        const { name, value } = found;
-
-        const propertyName = underscoreToCamelCase(
-          env.prefix
-            ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
-            : env.names[0],
-        );
-
-        if (env.details.list) {
-          const values = value.split(env.details.separator ?? ",");
-
-          result[propertyName] = values.map((value) =>
-            this.parseType({
-              label: "Environment variable",
-              type: env.type,
-              name,
-              value,
-            })
-          );
-        } else {
-          result[propertyName] = this.parseType({
+      if (env) {
+        const parseType = (value: string) => {
+          return this.parseType({
             label: "Environment variable",
-            type: env.type,
-            name,
+            type: envVar.type,
+            name: env.name,
             value,
           });
+        };
+
+        const propertyName = underscoreToCamelCase(
+          envVar.prefix
+            ? envVar.names[0].replace(new RegExp(`^${envVar.prefix}`), "")
+            : envVar.names[0],
+        );
+
+        if (envVar.details.list) {
+          ctx.env[propertyName] = env.value
+            .split(envVar.details.separator ?? ",")
+            .map(parseType);
+        } else {
+          ctx.env[propertyName] = parseType(env.value);
         }
 
-        if (env.value && typeof result[propertyName] !== "undefined") {
-          result[propertyName] = env.value(result[propertyName]);
+        if (envVar.value && typeof ctx.env[propertyName] !== "undefined") {
+          ctx.env[propertyName] = envVar.value(ctx.env[propertyName]);
         }
-      } else if (env.required && validate) {
-        throw new MissingRequiredEnvVar(env);
+      } else if (envVar.required && validate) {
+        throw new MissingRequiredEnvVar(envVar);
       }
     }
-
-    return result;
   }
 
   protected async findEnvVar(
@@ -1607,17 +1621,15 @@ export class Command<
 
   /**
    * Parse command-line arguments.
-   * @param args  Raw command line arguments.
+   * @param ctx     Parse context.
    * @param options Parsed command line options.
    */
   protected parseArguments(
-    args: string[],
+    ctx: ParseContext,
     options: Record<string, unknown>,
   ): CA {
     const params: Array<unknown> = [];
-
-    // remove array reference
-    args = args.slice(0);
+    const args = ctx.unknown.slice();
 
     if (!this.hasArguments()) {
       if (args.length) {
@@ -2503,12 +2515,15 @@ interface IDefaultOption {
 
 type ActionOption = IOption & { action: IAction };
 
-interface ParseContext {
-  args: string[];
-  options?: Record<string, unknown>;
-  env?: Record<string, unknown>;
+interface ParseContext extends IFlagsResult<Record<string, unknown>> {
   action?: ActionOption;
-  literal?: string[];
+  env: Record<string, unknown>;
+}
+
+interface ParseOptionsOptions {
+  stopEarly?: boolean;
+  stopOnUnknown?: boolean;
+  dotted?: boolean;
 }
 
 type TrimLeft<T extends string, V extends string | undefined> = T extends

@@ -126,7 +126,7 @@ function validateStandaloneOption(
     return;
   }
 
-  // don't throw an error if all values are coming from the default option.
+  // Don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
     if (!defaultValues[opt.name] && opt !== ctx.standalone) {
       throw new OptionNotCombinable(ctx.standalone.name);
@@ -157,7 +157,7 @@ function validateDependingOptions(
     return;
   }
   for (const flag of option.depends) {
-    // don't throw an error if the value is coming from the default option.
+    // Don't throw an error if the value is coming from the default option.
     if (!isset(flag, ctx.flags) && !defaultValues[option.name]) {
       throw new DependingOption(option.name, flag);
     }

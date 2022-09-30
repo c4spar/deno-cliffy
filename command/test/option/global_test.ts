@@ -78,6 +78,51 @@ Deno.test("[command] should parse global options on nested sub command", async (
   assertEquals(args, []);
 });
 
+Deno.test("[command] should parse global options before sub commands", async () => {
+  const { options, args } = await cmd().parse(
+    ["-g", "foo", "cmd1", "-G", "bar", "cmd2", "-o", "baz"],
+  );
+
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
+  assertEquals(args, []);
+});
+
+Deno.test("[command] should collect global options before sub commands", async () => {
+  const { options, args } = await new Command()
+    .noExit()
+    .globalOption("--collect <value>", "...", { collect: true })
+    .command("cmd1", new Command().command("cmd2"))
+    .parse(
+      [
+        "--collect",
+        "foo",
+        "cmd1",
+        "--collect",
+        "bar",
+        "cmd2",
+        "--collect",
+        "baz",
+      ],
+    );
+
+  assertEquals(options, { collect: ["foo", "bar", "baz"] });
+  assertEquals(args, []);
+});
+
+Deno.test("[command] should parse global options before and after normal option", async () => {
+  const { options, args } = await new Command()
+    .noExit()
+    .globalOption("--global", "...", { collect: true })
+    .command("foo")
+    .option("--foo", "...", { collect: true })
+    .parse(
+      ["foo", "--global", "--foo", "--global", "--foo"],
+    );
+
+  assertEquals(options, { global: [true, true], foo: [true, true] });
+  assertEquals(args, []);
+});
+
 Deno.test("[command] should disable global options with noGlobals", async () => {
   await assertRejects(
     () =>

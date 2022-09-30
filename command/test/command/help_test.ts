@@ -146,3 +146,18 @@ Deno.test("[command] help - should group options", () => {
     cmd.getHelp(),
   );
 });
+
+Deno.test("[command] help - should ignore required options for help option", async () => {
+  const ctx = await new Command()
+    .noExit()
+    .name("bug-with-help-and-required-options")
+    .version("0.1.0")
+    .description("Help does not work if you have required option(s).")
+    .command("bar")
+    .description("Help doesn't work, because -f is required.")
+    .option("-f, --file <file:string>", "file path", { required: true })
+    .action((options) => console.log(options))
+    .parse(["bar", "--help"]);
+
+  assertEquals(ctx.options, { help: true });
+});

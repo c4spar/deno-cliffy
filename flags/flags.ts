@@ -93,10 +93,20 @@ export function parseFlags<
 
   opts.dotted ??= true;
 
-  /** Option name mapping: propertyName -> option.name */
-  const optionsMap: Map<string, IFlagOptions> = new Map();
-  let inLiteral = false;
+  validateOptions(opts);
+  const options = parseArgs(ctx, args, opts);
+  validateFlags(ctx, opts, options);
 
+  if (opts.dotted) {
+    parseDottedOptions(ctx);
+  }
+
+  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+}
+
+function validateOptions<TFlagOptions extends IFlagOptions>(
+  opts: IParseOptions<TFlagOptions>,
+) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
@@ -109,6 +119,16 @@ export function parseFlags<
       }
     });
   });
+}
+
+function parseArgs<TFlagOptions extends IFlagOptions>(
+  ctx: IFlagsResult<Record<string, unknown>>,
+  args: Array<string>,
+  opts: IParseOptions<TFlagOptions>,
+): Map<string, IFlagOptions> {
+  /** Option name mapping: propertyName -> option.name */
+  const optionsMap: Map<string, IFlagOptions> = new Map();
+  let inLiteral = false;
 
   for (
     let argsIndex = 0;
@@ -412,16 +432,10 @@ export function parseFlags<
     }
   }
 
-  validateFlags(ctx, opts, optionsMap);
-
-  if (opts.dotted) {
-    parseDottedOptions(ctx);
-  }
-
-  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+  return optionsMap;
 }
 
-function parseDottedOptions(ctx: IFlagsResult) {
+function parseDottedOptions(ctx: IFlagsResult): void {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {
