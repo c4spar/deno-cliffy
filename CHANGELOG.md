@@ -1,3 +1,48 @@
+# [v0.25.2](https://github.com/c4spar/deno-cliffy/compare/v0.25.1...v0.25.2) (Oct 1, 2022)
+
+### Features
+
+- **command:** re-implement support for passing global options before
+  sub-commands (#444)
+  ([5ff1575](https://github.com/c4spar/deno-cliffy/commit/5ff1575))
+- **flags:** add `dotted` option (#456)
+  ([cd8d73c](https://github.com/c4spar/deno-cliffy/commit/cd8d73c))
+- **flags:** add `stopOnUnknown` option (#453)
+  ([b2700e5](https://github.com/c4spar/deno-cliffy/commit/b2700e5))
+- **flags:** return matched standalone option (#451)
+  ([6c5e27c](https://github.com/c4spar/deno-cliffy/commit/6c5e27c))
+- **flags:** implement parse context (#448)
+  ([5890402](https://github.com/c4spar/deno-cliffy/commit/5890402))
+
+### Bug Fixes
+
+- **prompt,keycode,keypress**: switch from `Deno.setRaw` to new
+  `Deno.stdin.setRaw` (#459)
+  ([e5b9416](https://github.com/c4spar/deno-cliffy/commit/e5b9416))
+- **command:** fix type errors with typescript => 4.8 (#460)
+  ([9763bd4](https://github.com/c4spar/deno-cliffy/commit/9763bd4))
+- **command,flags:** throw an error if an option without a value has a value
+  (#443) ([166101f](https://github.com/c4spar/deno-cliffy/commit/166101f))
+- **flags:** don't throw `UnexpectedOptionValue` error if no flags are defined
+  (#450) ([ed50ca3](https://github.com/c4spar/deno-cliffy/commit/ed50ca3))
+
+### Code Refactoring
+
+- **command:** throw to many arguments error for global & none global option
+  before a sub-command (#454)
+  ([78eec2d](https://github.com/c4spar/deno-cliffy/commit/78eec2d))
+- **flags:** refactor stop early parsing (#449)
+  ([e48fc0f](https://github.com/c4spar/deno-cliffy/commit/e48fc0f))
+
+### Chore
+
+- **ci:** add codecov flags (#446)
+  ([9da9748](https://github.com/c4spar/deno-cliffy/commit/9da9748))
+- **task:** type check all examples parallel (#452)
+  ([8c1e884](https://github.com/c4spar/deno-cliffy/commit/8c1e884))
+- **upgrade:** deno/std@0.158.0 (#463)
+  ([8b8ba3b](https://github.com/c4spar/deno-cliffy/commit/8b8ba3b))
+
 # [v0.25.1](https://github.com/c4spar/deno-cliffy/compare/v0.25.0...v0.25.1) (Sep 14, 2022)
 
 ### Bug Fixes
