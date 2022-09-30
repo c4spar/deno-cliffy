@@ -97,7 +97,6 @@ Deno.test("command - type - custom - generic custom type", async () => {
       "...",
     )
     .action(({ format }) => {
-      // @ts-expect-error format cannot be xyz
       format === "xyz";
       format === "foo";
       format === "bar";
