@@ -31,7 +31,7 @@ export class Row<T extends ICell | undefined = ICell | undefined>
   ): Row<T> {
     const row = new this(...cells);
     if (cells instanceof Row) {
-      row.options = { ...cells.options };
+      row.options = { ...(cells as Row).options };
     }
     return row;
   }
