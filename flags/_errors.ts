@@ -1,5 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { IFlagOptions, ITypeInfo } from "./types.ts";
+import type { FlagOptions, ITypeInfo } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -9,7 +9,7 @@ export class FlagsError extends Error {
 }
 
 export class UnknownRequiredOption extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown required option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -20,7 +20,7 @@ export class UnknownRequiredOption extends FlagsError {
 }
 
 export class UnknownConflictingOption extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown conflicting option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -63,7 +63,7 @@ export class DuplicateOption extends ValidationError {
 }
 
 export class InvalidOption extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Invalid option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -74,7 +74,7 @@ export class InvalidOption extends ValidationError {
 }
 
 export class UnknownOption extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown option "${getFlag(option)}".${
         didYouMeanOption(option, options)

@@ -1,6 +1,7 @@
 import {
   getDefaultValue,
   getOption,
+  isValueFlag,
   matchWildCardOptions,
   paramCaseToCamelCase,
 } from "./_utils.ts";
@@ -18,13 +19,12 @@ import {
   UnknownType,
 } from "./_errors.ts";
 import type {
-  IFlagArgument,
-  IFlagOptions,
   IFlagsResult,
   IParseOptions,
   ITypeHandler,
+  ValueFlagOptions,
 } from "./types.ts";
-import { OptionType } from "./types.ts";
+import { FlagArgument, FlagOptions, OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
@@ -66,7 +66,7 @@ const Types: Record<string, ITypeHandler> = {
  */
 export function parseFlags<
   TFlags extends Record<string, unknown>,
-  TFlagOptions extends IFlagOptions,
+  TFlagOptions extends FlagOptions,
   TFlagsResult extends IFlagsResult,
 >(
   argsOrCtx: string[] | TFlagsResult,
@@ -104,7 +104,7 @@ export function parseFlags<
   return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
 }
 
-function validateOptions<TFlagOptions extends IFlagOptions>(
+function validateOptions<TFlagOptions extends FlagOptions>(
   opts: IParseOptions<TFlagOptions>,
 ) {
   opts.flags?.forEach((opt) => {
@@ -121,13 +121,13 @@ function validateOptions<TFlagOptions extends IFlagOptions>(
   });
 }
 
-function parseArgs<TFlagOptions extends IFlagOptions>(
+function parseArgs<TFlagOptions extends FlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   args: Array<string>,
   opts: IParseOptions<TFlagOptions>,
-): Map<string, IFlagOptions> {
+): Map<string, FlagOptions> {
   /** Option name mapping: propertyName -> option.name */
-  const optionsMap: Map<string, IFlagOptions> = new Map();
+  const optionsMap: Map<string, FlagOptions> = new Map();
   let inLiteral = false;
 
   for (
@@ -135,8 +135,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
     argsIndex < args.length;
     argsIndex++
   ) {
-    let option: IFlagOptions | undefined;
-    let optionArgs: IFlagArgument[] | undefined;
+    let option: FlagOptions | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
     let negate = false;
@@ -189,15 +188,15 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
       if (!option) {
         const name = current.replace(/^-+/, "");
         option = matchWildCardOptions(name, opts.flags);
-      }
 
-      if (!option) {
-        if (opts.stopOnUnknown) {
-          ctx.stopOnUnknown = true;
-          ctx.unknown.push(args[argsIndex]);
-          continue;
+        if (!option) {
+          if (opts.stopOnUnknown) {
+            ctx.stopOnUnknown = true;
+            ctx.unknown.push(args[argsIndex]);
+            continue;
+          }
+          throw new UnknownOption(current, opts.flags);
         }
-        throw new UnknownOption(current, opts.flags);
       }
     } else {
       option = {
@@ -224,18 +223,20 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
       }
     }
 
-    optionArgs = option.args?.length ? option.args : [{
-      type: option.type,
-      requiredValue: option.requiredValue,
-      optionalValue: option.optionalValue,
-      variadic: option.variadic,
-      list: option.list,
-      separator: option.separator,
-    }];
+    if ("type" in option && option.type && !isValueFlag(option)) {
+      (option as ValueFlagOptions).args = [{
+        type: option.type,
+        optional: option.optionalValue,
+        variadic: option.variadic,
+        list: option.list,
+        separator: option.separator,
+      }];
+    }
 
-    const hasArgs = opts.flags?.length && option.args?.length || !option.type;
-
-    if (hasArgs && typeof currentValue !== "undefined") {
+    if (
+      opts.flags?.length && !isValueFlag(option) &&
+      typeof currentValue !== "undefined"
+    ) {
       throw new UnexpectedOptionValue(option.name, currentValue);
     }
 
@@ -244,10 +245,10 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
     const next = () => currentValue ?? args[argsIndex + 1];
     const previous = ctx.flags[propName];
 
-    parseNext(option, optionArgs);
+    parseNext(option);
 
     if (typeof ctx.flags[propName] === "undefined") {
-      if (optionArgs[optionArgsIndex].requiredValue) {
+      if (isValueFlag(option) && !option.args[optionArgsIndex].optional) {
         throw new MissingOptionValue(option.name);
       } else if (typeof option.default !== "undefined") {
         ctx.flags[propName] = getDefaultValue(option);
@@ -274,47 +275,26 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
     /** Parse next argument for current option. */
     // deno-lint-ignore no-inner-declarations
     function parseNext(
-      option: IFlagOptions,
-      optionArgs: IFlagArgument[],
+      option: FlagOptions,
     ): void {
-      const arg: IFlagArgument | undefined = optionArgs[optionArgsIndex];
+      if (negate) {
+        ctx.flags[propName] = false;
+        return;
+      } else if (!isValueFlag(option)) {
+        ctx.flags[propName] = undefined;
+        return;
+      }
+      const arg: FlagArgument | undefined = option.args[optionArgsIndex];
 
       if (!arg) {
         const flag = next();
         throw new UnknownOption(flag, opts.flags ?? []);
       }
 
-      if (!arg.type) {
-        arg.type = OptionType.BOOLEAN;
-      }
-
-      if (option.args?.length) {
-        // make all values required by default
-        if (!arg.optionalValue && typeof arg.requiredValue === "undefined") {
-          arg.requiredValue = true;
-        }
-      } else {
-        // make non boolean value required by default
-        if (
-          arg.type !== OptionType.BOOLEAN &&
-          !arg.optionalValue &&
-          typeof arg.requiredValue === "undefined"
-        ) {
-          arg.requiredValue = true;
-        }
-      }
-
-      if (arg.requiredValue) {
-        if (inOptionalArg) {
-          throw new RequiredArgumentFollowsOptionalArgument(option.name);
-        }
-      } else {
+      if (arg.optional) {
         inOptionalArg = true;
-      }
-
-      if (negate) {
-        ctx.flags[propName] = false;
-        return;
+      } else if (inOptionalArg) {
+        throw new RequiredArgumentFollowsOptionalArgument(option.name);
       }
 
       let result: unknown;
@@ -341,7 +321,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
       } else {
         if (hasNext(arg)) {
           result = parseValue(option, arg, next());
-        } else if (arg.optionalValue && arg.type === OptionType.BOOLEAN) {
+        } else if (arg.optional && arg.type === OptionType.BOOLEAN) {
           result = true;
         }
       }
@@ -350,48 +330,47 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
         argsIndex++;
         if (!arg.variadic) {
           optionArgsIndex++;
-        } else if (optionArgs[optionArgsIndex + 1]) {
+        } else if (option.args[optionArgsIndex + 1]) {
           throw new ArgumentFollowsVariadicArgument(next());
         }
       }
 
       if (
         typeof result !== "undefined" &&
-        (optionArgs.length > 1 || arg.variadic)
+        (option.args.length > 1 || arg.variadic)
       ) {
         if (!ctx.flags[propName]) {
           ctx.flags[propName] = [];
         }
-
         (ctx.flags[propName] as Array<unknown>).push(result);
 
         if (hasNext(arg)) {
-          parseNext(option, optionArgs);
+          parseNext(option);
         }
       } else {
         ctx.flags[propName] = result;
       }
 
       /** Check if current option should have an argument. */
-      function hasNext(arg: IFlagArgument): boolean {
+      function hasNext(arg: FlagArgument): boolean {
         const nextValue = currentValue ?? args[argsIndex + 1];
-        if (!nextValue) {
+        if (!nextValue || !isValueFlag(option)) {
           return false;
         }
-        if (optionArgs.length > 1 && optionArgsIndex >= optionArgs.length) {
+        if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
           return false;
         }
-        if (arg.requiredValue) {
+        if (!arg.optional) {
           return true;
         }
         // require optional values to be called with an equal sign: foo=bar
         if (
-          option.equalsSign && arg.optionalValue && !arg.variadic &&
+          option.equalsSign && arg.optional && !arg.variadic &&
           typeof currentValue === "undefined"
         ) {
           return false;
         }
-        if (arg.optionalValue || arg.variadic) {
+        if (arg.optional || arg.variadic) {
           return nextValue[0] !== "-" ||
             (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
         }
@@ -401,8 +380,8 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
 
       /** Parse argument value.  */
       function parseValue(
-        option: IFlagOptions,
-        arg: IFlagArgument,
+        option: FlagOptions,
+        arg: FlagArgument,
         value: string,
       ): unknown {
         const type: string = arg.type || OptionType.STRING;
@@ -482,8 +461,8 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseFlagValue(
-  option: IFlagOptions,
-  arg: IFlagArgument,
+  option: FlagOptions,
+  arg: FlagArgument,
   value: string,
 ): unknown {
   const type: string = arg.type || OptionType.STRING;

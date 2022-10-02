@@ -8,14 +8,13 @@ const options = <IParseOptions> {
     name: "required",
     type: OptionType.STRING,
     required: true,
+    optionalValue: true,
   }, {
     name: "required-value",
     type: OptionType.STRING,
-    requiredValue: true,
   }, {
     name: "required-default",
     type: OptionType.STRING,
-    requiredValue: true,
     default: "default",
   }],
 };

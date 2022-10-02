@@ -4,17 +4,13 @@ import type { IParseOptions } from "../../types.ts";
 import { OptionType } from "../../types.ts";
 
 const options = <IParseOptions> {
-  stopEarly: false,
-  allowEmpty: false,
   flags: [{
     name: "flag",
     aliases: ["f"],
-    type: OptionType.BOOLEAN,
     standalone: true,
   }, {
     name: "all",
     aliases: ["a"],
-    type: OptionType.BOOLEAN,
   }, {
     name: "foo-bar",
     aliases: ["f"],

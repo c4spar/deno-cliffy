@@ -1,5 +1,5 @@
 /** Parser options. */
-export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
+export interface IParseOptions<T extends FlagOptions = FlagOptions> {
   flags?: Array<T>;
   parse?: ITypeHandler<unknown>;
   option?: (option: T, value?: unknown) => void;
@@ -10,10 +10,8 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
   dotted?: boolean;
 }
 
-/** Flag options. */
-export interface IFlagOptions extends IFlagArgument {
+export interface BaseFlagOptions {
   name: string;
-  args?: IFlagArgument[];
   aliases?: string[];
   standalone?: boolean;
   default?: IDefaultValue;
@@ -25,14 +23,25 @@ export interface IFlagOptions extends IFlagArgument {
   equalsSign?: boolean;
 }
 
-/** Flag argument definition. */
-export interface IFlagArgument {
-  type?: OptionType | string;
+export interface SingleFlagOptions extends BaseFlagOptions, BaseArgument {
   optionalValue?: boolean;
-  requiredValue?: boolean;
+}
+
+export interface ValueFlagOptions extends BaseFlagOptions {
+  args: Array<FlagArgument>;
+}
+
+export type FlagOptions = SingleFlagOptions | ValueFlagOptions;
+
+export interface BaseArgument {
+  type?: OptionType | string;
   variadic?: boolean;
   list?: boolean;
   separator?: string;
+}
+
+export interface FlagArgument extends BaseArgument {
+  optional?: boolean;
 }
 
 /** Available build-in argument types. */
@@ -54,7 +63,7 @@ export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
 export interface IFlagsResult<
   // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
-  TStandaloneOption extends IFlagOptions = IFlagOptions,
+  TStandaloneOption extends FlagOptions = FlagOptions,
 > {
   flags: TFlags;
   unknown: Array<string>;

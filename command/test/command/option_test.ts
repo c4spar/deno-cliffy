@@ -55,23 +55,19 @@ Deno.test("command - option - option properties", () => {
   assertEquals(option.standalone, true);
   assertEquals(option.collect, true);
   assertEquals(option.default, false);
-  // @TODO: remove optionalValue & requiredValue from options interface, they are always undefined.
-  assertEquals(option.optionalValue, undefined);
-  assertEquals(option.requiredValue, undefined);
+
   assertEquals(option.args, [{
     action: "boolean",
     list: false,
     name: "baz",
-    optionalValue: false,
-    requiredValue: true,
+    optional: false,
     type: "boolean",
     variadic: false,
   }, {
     action: "string",
     list: false,
     name: "baz",
-    optionalValue: true,
-    requiredValue: false,
+    optional: true,
     type: "string",
     variadic: false,
   }]);

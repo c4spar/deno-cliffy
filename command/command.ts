@@ -1175,7 +1175,7 @@ export class Command<
 
     if (details.length > 1) {
       throw new EnvironmentVariableSingleValue(name);
-    } else if (details.length && details[0].optionalValue) {
+    } else if (details.length && details[0].optional) {
       throw new EnvironmentVariableOptionalValue(name);
     } else if (details.length && details[0].variadic) {
       throw new EnvironmentVariableVariadicValue(name);
@@ -1647,7 +1647,7 @@ export class Command<
     } else {
       if (!args.length) {
         const required = this.getArguments()
-          .filter((expectedArg) => !expectedArg.optionalValue)
+          .filter((expectedArg) => !expectedArg.optional)
           .map((expectedArg) => expectedArg.name);
 
         if (required.length) {
@@ -1663,7 +1663,7 @@ export class Command<
       } else {
         for (const expectedArg of this.getArguments()) {
           if (!args.length) {
-            if (expectedArg.optionalValue) {
+            if (expectedArg.optional) {
               break;
             }
             throw new MissingArgument(`Missing argument: ${expectedArg.name}`);

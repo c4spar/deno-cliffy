@@ -33,13 +33,13 @@ const options = <IParseOptions> {
       type: OptionType.NUMBER,
     }, {
       type: OptionType.STRING,
-      optionalValue: false,
+      optional: false,
     }, {
       type: OptionType.STRING,
-      optionalValue: true,
+      optional: true,
     }, {
       type: OptionType.BOOLEAN,
-      optionalValue: true,
+      optional: true,
       variadic: true,
     }],
   }],

@@ -1,4 +1,4 @@
-import type { IFlagOptions } from "./types.ts";
+import type { FlagOptions, ValueFlagOptions } from "./types.ts";
 import { distance } from "../_utils/distance.ts";
 
 /** Convert param case string to camel case. */
@@ -26,7 +26,7 @@ export function underscoreToCamelCase(str: string): string {
  * @param flags Source options array.
  * @param name  Name of the option.
  */
-export function getOption<O extends IFlagOptions>(
+export function getOption<O extends FlagOptions>(
   flags: Array<O>,
   name: string,
 ): O | undefined {
@@ -45,7 +45,7 @@ export function getOption<O extends IFlagOptions>(
 
 export function didYouMeanOption(
   option: string,
-  options: Array<IFlagOptions>,
+  options: Array<FlagOptions>,
 ): string {
   const optionNames = options
     .map((option) => [option.name, ...(option.aliases ?? [])])
@@ -83,15 +83,15 @@ export function getFlag(name: string) {
  * @param option    The option to check.
  * @param name      The option name or alias.
  */
-function isOption(option: IFlagOptions, name: string) {
+function isOption(option: FlagOptions, name: string) {
   return option.name === name ||
     (option.aliases && option.aliases.indexOf(name) !== -1);
 }
 
 export function matchWildCardOptions(
   name: string,
-  flags: Array<IFlagOptions>,
-): IFlagOptions | undefined {
+  flags: Array<FlagOptions>,
+): FlagOptions | undefined {
   for (const option of flags) {
     if (option.name.indexOf("*") === -1) {
       continue;
@@ -107,8 +107,8 @@ export function matchWildCardOptions(
 
 function matchWildCardOption(
   name: string,
-  option: IFlagOptions,
-): IFlagOptions | false {
+  option: FlagOptions,
+): FlagOptions | false {
   const parts = option.name.split(".");
   const parts2 = name.split(".");
   if (parts.length !== parts2.length) {
@@ -136,8 +136,13 @@ function closest(str: string, arr: string[]): string | undefined {
   return arr[minIndex];
 }
 
-export function getDefaultValue(option: IFlagOptions): unknown {
+export function getDefaultValue(option: FlagOptions): unknown {
   return typeof option.default === "function"
     ? option.default()
     : option.default;
+}
+
+export function isValueFlag(option: FlagOptions): option is ValueFlagOptions {
+  return "args" in option && Array.isArray(option.args) &&
+    option.args.length > 0;
 }

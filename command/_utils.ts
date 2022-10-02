@@ -99,8 +99,7 @@ export function parseArgumentsDefinition<T extends boolean>(
     const type: string | undefined = parts[2] || OptionType.STRING;
 
     const details: IArgument = {
-      optionalValue: arg[0] === "[",
-      requiredValue: arg[0] === "<",
+      optional: arg[0] === "[",
       name: parts[1],
       action: parts[3] || type,
       variadic: false,
@@ -108,7 +107,7 @@ export function parseArgumentsDefinition<T extends boolean>(
       type,
     };
 
-    if (validate && !details.optionalValue && hasOptional) {
+    if (validate && !details.optional && hasOptional) {
       throw new RequiredArgumentFollowsOptionalArgument(details.name);
     }
 

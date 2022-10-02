@@ -1,9 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 
 import type {
+  BaseFlagOptions,
+  FlagArgument,
   IDefaultValue,
-  IFlagArgument,
-  IFlagOptions,
   IFlagValueHandler,
   ITypeHandler,
   ITypeInfo,
@@ -59,7 +59,7 @@ export type IAction<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface IArgument extends IFlagArgument {
+export interface IArgument extends FlagArgument {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
@@ -87,16 +87,6 @@ export interface IParseResult<
 
 /* OPTION TYPES */
 
-type ExcludedCommandOptions =
-  | "name"
-  | "args"
-  | "type"
-  | "optionalValue"
-  | "requiredValue"
-  | "aliases"
-  | "variadic"
-  | "list";
-
 /** Command option options. */
 export interface ICommandGlobalOption<
   O extends Record<string, any> | void = any,
@@ -107,11 +97,12 @@ export interface ICommandGlobalOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends Omit<IFlagOptions, ExcludedCommandOptions> {
+> extends Omit<BaseFlagOptions, "name" | "aliases"> {
   override?: boolean;
   hidden?: boolean;
   action?: IAction<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
+  separator?: string;
 }
 
 export interface ICommandOption<
@@ -137,12 +128,13 @@ export interface IOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, IFlagOptions {
+> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, BaseFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
   args: IArgument[];
   groupName?: string;
+  separator?: string;
 }
 
 /* ENV VARS TYPES */

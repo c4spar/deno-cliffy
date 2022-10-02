@@ -1,4 +1,9 @@
-import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
+import {
+  getDefaultValue,
+  getOption,
+  isValueFlag,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import {
   ConflictingOption,
   DependingOption,
@@ -7,8 +12,12 @@ import {
   OptionNotCombinable,
   UnknownOption,
 } from "./_errors.ts";
-import { IFlagsResult, IParseOptions } from "./types.ts";
-import type { IFlagArgument, IFlagOptions } from "./types.ts";
+import {
+  FlagArgument,
+  FlagOptions,
+  IFlagsResult,
+  IParseOptions,
+} from "./types.ts";
 
 /**
  * Flags post validation. Validations that are not already done by the parser.
@@ -17,10 +26,10 @@ import type { IFlagArgument, IFlagOptions } from "./types.ts";
  * @param opts    Parse options.
  * @param options Option name mappings: propertyName -> option
  */
-export function validateFlags<T extends IFlagOptions = IFlagOptions>(
+export function validateFlags<T extends FlagOptions = FlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
-  options: Map<string, IFlagOptions> = new Map(),
+  options: Map<string, FlagOptions> = new Map(),
 ): void {
   if (!opts.flags) {
     return;
@@ -52,8 +61,8 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
   validateRequiredOptions(ctx, options, opts);
 }
 
-function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
-  option: IFlagOptions,
+function validateUnknownOption<T extends FlagOptions = FlagOptions>(
+  option: FlagOptions,
   opts: IParseOptions<T>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
@@ -65,7 +74,7 @@ function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
  * Adds all default values to ctx.flags and returns a boolean object map with
  * only the default option names `{ [OptionName: string]: boolean }`.
  */
-function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
+function setDefaultValues<T extends FlagOptions = FlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
   opts: IParseOptions<T>,
 ) {
@@ -118,7 +127,7 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 
 function validateStandaloneOption(
   ctx: IFlagsResult,
-  options: Map<string, IFlagOptions>,
+  options: Map<string, FlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
 ): void {
@@ -136,7 +145,7 @@ function validateStandaloneOption(
 
 function validateConflictingOptions(
   ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  option: FlagOptions,
 ): void {
   if (!option.conflicts?.length) {
     return;
@@ -150,7 +159,7 @@ function validateConflictingOptions(
 
 function validateDependingOptions(
   ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  option: FlagOptions,
   defaultValues: Record<string, boolean>,
 ): void {
   if (!option.depends) {
@@ -166,17 +175,17 @@ function validateDependingOptions(
 
 function validateRequiredValues(
   ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  option: FlagOptions,
   name: string,
 ): void {
-  if (!option.args) {
+  if (!isValueFlag(option)) {
     return;
   }
   const isArray = option.args.length > 1;
 
   for (let i = 0; i < option.args.length; i++) {
-    const arg: IFlagArgument = option.args[i];
-    if (!arg.requiredValue) {
+    const arg: FlagArgument = option.args[i];
+    if (arg.optional) {
       continue;
     }
     const hasValue = isArray
@@ -189,9 +198,9 @@ function validateRequiredValues(
   }
 }
 
-function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
+function validateRequiredOptions<T extends FlagOptions = FlagOptions>(
   ctx: IFlagsResult<Record<string, unknown>>,
-  options: Map<string, IFlagOptions>,
+  options: Map<string, FlagOptions>,
   opts: IParseOptions<T>,
 ): void {
   if (!opts.flags?.length) {

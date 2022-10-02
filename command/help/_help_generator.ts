@@ -384,7 +384,7 @@ function highlightArgumentDetails(
 ): string {
   let str = "";
 
-  str += yellow(arg.optionalValue ? "[" : "<");
+  str += yellow(arg.optional ? "[" : "<");
 
   let name = "";
   name += arg.name;
@@ -403,7 +403,7 @@ function highlightArgumentDetails(
     }
   }
 
-  str += yellow(arg.optionalValue ? "]" : ">");
+  str += yellow(arg.optional ? "]" : ">");
 
   return str;
 }
