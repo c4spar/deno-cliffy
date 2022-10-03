@@ -380,7 +380,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Parse argument value.  */
       function parseValue(
-        option: FlagOptions,
+        option: ValueFlagOptions,
         arg: FlagArgument,
         value: string,
       ): unknown {
@@ -462,7 +462,7 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseFlagValue(
-  option: FlagOptions,
+  option: ValueFlagOptions,
   arg: FlagArgument,
   value: string,
 ): unknown {
