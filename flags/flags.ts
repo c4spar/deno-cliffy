@@ -353,8 +353,11 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Check if current option should have an argument. */
       function hasNext(arg: FlagArgument): boolean {
+        if (!isValueFlag(option)) {
+          return false;
+        }
         const nextValue = currentValue ?? args[argsIndex + 1];
-        if (!nextValue || !isValueFlag(option)) {
+        if (!nextValue) {
           return false;
         }
         if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
