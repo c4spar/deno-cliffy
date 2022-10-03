@@ -177,7 +177,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
     // split value: --foo="bar=baz" => --foo bar=baz
     const equalSignIndex = current.indexOf("=");
-    if (equalSignIndex > -1) {
+    if (equalSignIndex !== -1) {
       currentValue = current.slice(equalSignIndex + 1) || undefined;
       current = current.slice(0, equalSignIndex);
     }
@@ -440,9 +440,10 @@ function parseDottedOptions(ctx: IFlagsResult): void {
 }
 
 function splitFlags(flag: string): Array<string> {
+  flag = flag.slice(1);
   const normalized: Array<string> = [];
-  const parts = flag.slice(1).split("=");
-  const flags = parts[0].split("");
+  const index = flag.indexOf("=");
+  const flags = (index !== -1 ? flag.slice(0, index) : flag).split("");
 
   if (isNaN(Number(flag[flag.length - 1]))) {
     flags.forEach((val) => normalized.push(`-${val}`));
@@ -453,8 +454,8 @@ function splitFlags(flag: string): Array<string> {
     }
   }
 
-  if (parts[1]) {
-    normalized[normalized.length - 1] += `=${parts[1]}`;
+  if (index !== -1) {
+    normalized[normalized.length - 1] += flag.slice(index);
   }
 
   return normalized;
