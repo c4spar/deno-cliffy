@@ -97,7 +97,7 @@ export interface ICommandGlobalOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends Omit<BaseFlagOptions, "name" | "aliases"> {
+> extends Omit<BaseFlagOptions, "name" | "aliases" | "equalsSign"> {
   override?: boolean;
   hidden?: boolean;
   action?: IAction<O, A, G, PG, CT, GT, PT, P>;
