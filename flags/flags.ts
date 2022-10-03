@@ -357,10 +357,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
           return false;
         }
         const nextValue = currentValue ?? args[argsIndex + 1];
-        if (!nextValue) {
-          return false;
-        }
-        if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
+        if (
+          !nextValue ||
+          option.args.length > 1 && optionArgsIndex >= option.args.length
+        ) {
           return false;
         }
         if (!arg.optional) {
