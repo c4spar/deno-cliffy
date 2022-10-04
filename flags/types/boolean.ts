@@ -1,10 +1,10 @@
-import type { ITypeHandler, ITypeInfo } from "../types.ts";
+import type { FlagArgumentTypeInfo } from "../types.ts";
 import { InvalidTypeError } from "../_errors.ts";
 
 /** Boolean type handler. Excepts `true`, `false`, `1`, `0` */
-export const boolean: ITypeHandler<boolean> = (
-  type: ITypeInfo,
-): boolean => {
+export function boolean<TType extends string>(
+  type: FlagArgumentTypeInfo<TType>,
+): boolean {
   if (~["1", "true"].indexOf(type.value)) {
     return true;
   }
@@ -14,4 +14,4 @@ export const boolean: ITypeHandler<boolean> = (
   }
 
   throw new InvalidTypeError(type);
-};
+}

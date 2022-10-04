@@ -1,4 +1,4 @@
-import type { FlagOptions, ValueFlagOptions } from "./types.ts";
+import type { FlagOptions, MultiValueFlagOptions } from "./types.ts";
 import { distance } from "../_utils/distance.ts";
 
 /** Convert param case string to camel case. */
@@ -26,10 +26,10 @@ export function underscoreToCamelCase(str: string): string {
  * @param flags Source options array.
  * @param name  Name of the option.
  */
-export function getOption<O extends FlagOptions>(
-  flags: Array<O>,
+export function getOption<TType extends string>(
+  flags: Array<FlagOptions<TType>>,
   name: string,
-): O | undefined {
+): FlagOptions<TType> | undefined {
   while (name[0] === "-") {
     name = name.slice(1);
   }
@@ -45,7 +45,7 @@ export function getOption<O extends FlagOptions>(
 
 export function didYouMeanOption(
   option: string,
-  options: Array<FlagOptions>,
+  options: Array<FlagOptions<string>>,
 ): string {
   const optionNames = options
     .map((option) => [option.name, ...(option.aliases ?? [])])
@@ -83,15 +83,15 @@ export function getFlag(name: string) {
  * @param option    The option to check.
  * @param name      The option name or alias.
  */
-function isOption(option: FlagOptions, name: string) {
+function isOption(option: FlagOptions<string>, name: string) {
   return option.name === name ||
     (option.aliases && option.aliases.indexOf(name) !== -1);
 }
 
-export function matchWildCardOptions(
+export function matchWildCardOptions<TType extends string>(
   name: string,
-  flags: Array<FlagOptions>,
-): FlagOptions | undefined {
+  flags: Array<FlagOptions<TType>>,
+): FlagOptions<TType> | undefined {
   for (const option of flags) {
     if (option.name.indexOf("*") === -1) {
       continue;
@@ -105,10 +105,10 @@ export function matchWildCardOptions(
   }
 }
 
-function matchWildCardOption(
+function matchWildCardOption<TType extends string>(
   name: string,
-  option: FlagOptions,
-): FlagOptions | false {
+  option: FlagOptions<TType>,
+): FlagOptions<TType> | false {
   const parts = option.name.split(".");
   const parts2 = name.split(".");
   if (parts.length !== parts2.length) {
@@ -136,13 +136,17 @@ function closest(str: string, arr: string[]): string | undefined {
   return arr[minIndex];
 }
 
-export function getDefaultValue(option: FlagOptions): unknown {
+export function getDefaultValue<TType extends string>(
+  option: FlagOptions<TType>,
+): unknown {
   return typeof option.default === "function"
     ? option.default()
     : option.default;
 }
 
-export function isValueFlag(option: FlagOptions): option is ValueFlagOptions {
+export function isValueFlag<TType extends string>(
+  option: FlagOptions<TType>,
+): option is MultiValueFlagOptions<TType> {
   return "args" in option && Array.isArray(option.args) &&
     option.args.length > 0;
 }

@@ -1,11 +1,4 @@
 import {
-  getDefaultValue,
-  getOption,
-  isValueFlag,
-  matchWildCardOptions,
-  paramCaseToCamelCase,
-} from "./_utils.ts";
-import {
   ArgumentFollowsVariadicArgument,
   DuplicateOption,
   InvalidOption,
@@ -18,25 +11,36 @@ import {
   UnknownRequiredOption,
   UnknownType,
 } from "./_errors.ts";
+import {
+  getDefaultValue,
+  getOption,
+  isValueFlag,
+  matchWildCardOptions,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import type {
-  IFlagsResult,
-  IParseOptions,
-  ITypeHandler,
-  ValueFlagOptions,
+  FlagArgumentType,
+  FlagArgumentTypeHandler,
+  MultiValueFlagOptions,
+  ParseFlagsContext,
+  ParseFlagsOptions,
 } from "./types.ts";
 import { FlagArgument, FlagOptions, OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
+import { integer } from "./types/integer.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
 import { validateFlags } from "./validate_flags.ts";
-import { integer } from "./types/integer.ts";
 
-const Types: Record<string, ITypeHandler> = {
-  [OptionType.STRING]: string,
-  [OptionType.NUMBER]: number,
-  [OptionType.INTEGER]: integer,
-  [OptionType.BOOLEAN]: boolean,
+type Id<T> = T extends Record<string, unknown>
+  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
+  : T;
+
+export type DefaultTypes = {
+  [KType in FlagArgumentType]: FlagArgumentTypeHandler<KType, unknown>;
 };
+
+export const DefaultTypes = { string, number, integer, boolean };
 
 /**
  * Parse command line arguments.
@@ -44,9 +48,12 @@ const Types: Record<string, ITypeHandler> = {
  * @param opts      Parse options.
  *
  * ```
- * // example.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
+ * // examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land --deno.com -- --cliffy
  * parseFlags(Deno.args);
  * ```
+ *
+ * Output:
+ *
  * ```
  * {
  *   flags: {
@@ -57,26 +64,50 @@ const Types: Record<string, ITypeHandler> = {
  *     b: true,
  *     c: true,
  *     beep: "boop",
- *     deno: { land: true }
+ *     deno: { land: true, com: true }
  *   },
+ *   literal: [ "--cliffy" ],
  *   unknown: [ "foo", "bar", "baz" ],
- *   literal: [ "--cliffy" ]
+ *   stopEarly: false,
+ *   stopOnUnknown: false
  * }
  * ```
  */
 export function parseFlags<
   TFlags extends Record<string, unknown>,
-  TFlagOptions extends FlagOptions,
-  TFlagsResult extends IFlagsResult,
 >(
-  argsOrCtx: string[] | TFlagsResult,
-  opts: IParseOptions<TFlagOptions> = {},
-): TFlagsResult & IFlagsResult<TFlags, TFlagOptions> {
+  argsOrCtx:
+    | Array<string>
+    | ParseFlagsContext,
+  opts?: ParseFlagsOptions<FlagArgumentType>,
+): Id<ParseFlagsContext<TFlags>>;
+
+export function parseFlags<
+  TType extends string,
+  TFlagOptions extends FlagOptions<TType>,
+  TFlags extends Record<string, unknown>,
+>(
+  argsOrCtx:
+    | Array<string>
+    | ParseFlagsContext,
+  opts: ParseFlagsOptions<TType, TFlagOptions>,
+  parse: FlagArgumentTypeHandler<TType, unknown>,
+): Id<ParseFlagsContext<TFlags>>;
+
+export function parseFlags<
+  TType extends string,
+>(
+  argsOrCtx:
+    | Array<string>
+    | ParseFlagsContext,
+  opts: ParseFlagsOptions<TType> = {},
+  parse?: FlagArgumentTypeHandler<TType, unknown>,
+): Id<ParseFlagsContext> {
   let args: Array<string>;
-  let ctx: IFlagsResult<Record<string, unknown>>;
+  let ctx: ParseFlagsContext;
 
   if (Array.isArray(argsOrCtx)) {
-    ctx = {} as IFlagsResult<Record<string, unknown>>;
+    ctx = {} as ParseFlagsContext;
     args = argsOrCtx;
   } else {
     ctx = argsOrCtx;
@@ -94,19 +125,17 @@ export function parseFlags<
   opts.dotted ??= true;
 
   validateOptions(opts);
-  const options = parseArgs(ctx, args, opts);
+  const options = parseArgs(ctx, args, opts, parse);
   validateFlags(ctx, opts, options);
 
   if (opts.dotted) {
     parseDottedOptions(ctx);
   }
 
-  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+  return ctx;
 }
 
-function validateOptions<TFlagOptions extends FlagOptions>(
-  opts: IParseOptions<TFlagOptions>,
-) {
+function validateOptions<TType extends string>(opts: ParseFlagsOptions<TType>) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
@@ -121,13 +150,14 @@ function validateOptions<TFlagOptions extends FlagOptions>(
   });
 }
 
-function parseArgs<TFlagOptions extends FlagOptions>(
-  ctx: IFlagsResult<Record<string, unknown>>,
+function parseArgs<TType extends string>(
+  ctx: ParseFlagsContext,
   args: Array<string>,
-  opts: IParseOptions<TFlagOptions>,
-): Map<string, FlagOptions> {
+  opts: ParseFlagsOptions<TType>,
+  parseCustomType?: FlagArgumentTypeHandler<TType, unknown>,
+): Map<string, FlagOptions<TType>> {
   /** Option name mapping: propertyName -> option.name */
-  const optionsMap: Map<string, FlagOptions> = new Map();
+  const optionsMap: Map<string, FlagOptions<TType>> = new Map();
   let inLiteral = false;
 
   for (
@@ -135,7 +165,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     argsIndex < args.length;
     argsIndex++
   ) {
-    let option: FlagOptions | undefined;
+    let option: FlagOptions<TType> | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
     let negate = false;
@@ -202,7 +232,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       option = {
         name: current.replace(/^-+/, ""),
         optionalValue: true,
-        type: OptionType.STRING,
+        type: "string" as TType,
       };
     }
 
@@ -224,7 +254,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     }
 
     if ("type" in option && option.type && !isValueFlag(option)) {
-      (option as ValueFlagOptions).args = [{
+      (option as FlagOptions<TType>).args = [{
         type: option.type,
         optional: option.optionalValue,
         variadic: option.variadic,
@@ -270,12 +300,12 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
     optionsMap.set(propName, option);
 
-    opts.option?.(option as TFlagOptions, ctx.flags[propName]);
+    opts.option?.(option, ctx.flags[propName]);
 
     /** Parse next argument for current option. */
     // deno-lint-ignore no-inner-declarations
     function parseNext(
-      option: FlagOptions,
+      option: FlagOptions<TType>,
     ): void {
       if (negate) {
         ctx.flags[propName] = false;
@@ -284,7 +314,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         ctx.flags[propName] = undefined;
         return;
       }
-      const arg: FlagArgument | undefined = option.args[optionArgsIndex];
+      const arg: FlagArgument<TType> | undefined = option.args[optionArgsIndex];
 
       if (!arg) {
         const flag = next();
@@ -352,7 +382,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       }
 
       /** Check if current option should have an argument. */
-      function hasNext(arg: FlagArgument): boolean {
+      function hasNext(arg: FlagArgument<TType>): boolean {
         if (!isValueFlag(option)) {
           return false;
         }
@@ -383,23 +413,24 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Parse argument value.  */
       function parseValue(
-        option: ValueFlagOptions,
-        arg: FlagArgument,
+        option: MultiValueFlagOptions<TType>,
+        arg: FlagArgument<TType>,
         value: string,
       ): unknown {
-        const type: string = arg.type || OptionType.STRING;
-        const result: unknown = opts.parse
-          ? opts.parse({
+        const result: unknown = parseCustomType
+          ? parseCustomType({
             label: "Option",
-            type,
+            type: arg.type,
             name: `--${option.name}`,
             value,
           })
-          : parseFlagValue(option, arg, value);
+          : parseDefaultType(
+            option as MultiValueFlagOptions<FlagArgumentType>,
+            arg as FlagArgument<FlagArgumentType>,
+            value,
+          );
 
-        if (
-          typeof result !== "undefined"
-        ) {
+        if (typeof result !== "undefined") {
           increase = true;
         }
 
@@ -411,7 +442,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
   return optionsMap;
 }
 
-function parseDottedOptions(ctx: IFlagsResult): void {
+function parseDottedOptions(ctx: ParseFlagsContext): void {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {
@@ -464,16 +495,19 @@ function splitFlags(flag: string): Array<string> {
   return normalized;
 }
 
-function parseFlagValue(
-  option: ValueFlagOptions,
-  arg: FlagArgument,
+function parseDefaultType(
+  option: MultiValueFlagOptions<FlagArgumentType>,
+  arg: FlagArgument<FlagArgumentType>,
   value: string,
 ): unknown {
-  const type: string = arg.type || OptionType.STRING;
-  const parseType = Types[type];
+  const type: FlagArgumentType = arg.type || "string";
+  const parseType = DefaultTypes[type] as FlagArgumentTypeHandler<
+    FlagArgumentType,
+    unknown
+  >;
 
   if (!parseType) {
-    throw new UnknownType(type, Object.keys(Types));
+    throw new UnknownType(type, Object.keys(DefaultTypes));
   }
 
   return parseType({

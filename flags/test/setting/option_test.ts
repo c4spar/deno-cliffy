@@ -1,9 +1,11 @@
 import { assertEquals } from "../../../dev_deps.ts";
 import { parseFlags } from "../../flags.ts";
-import { FlagOptions, OptionType } from "../../types.ts";
+import { FlagArgumentType, FlagOptions, OptionType } from "../../types.ts";
 
 Deno.test("flags option callback", () => {
-  const options: Array<{ option: FlagOptions; value: unknown }> = [];
+  const options: Array<
+    { option: FlagOptions<FlagArgumentType>; value: unknown }
+  > = [];
   parseFlags([
     "--foo",
     "fooVal",

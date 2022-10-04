@@ -1,10 +1,10 @@
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { ValidationError } from "../../_errors.ts";
 import { parseFlags } from "../../flags.ts";
-import type { IParseOptions } from "../../types.ts";
+import type { ParseFlagsOptions } from "../../types.ts";
 import { OptionType } from "../../types.ts";
 
-const options = <IParseOptions> {
+const options: ParseFlagsOptions = {
   flags: [{
     name: "bitrate.audio",
     aliases: ["b.a", "audio-bitrate"],

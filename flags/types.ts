@@ -1,8 +1,24 @@
-/** Parser options. */
-export interface IParseOptions<T extends FlagOptions = FlagOptions> {
-  flags?: Array<T>;
-  parse?: ITypeHandler<unknown>;
-  option?: (option: T, value?: unknown) => void;
+/**
+ * Available build-in argument types.
+ * @deprecated Deprecated in favor of `FlagArgumentType`.
+ * @see FlagArgumentType
+ */
+export enum OptionType {
+  STRING = "string",
+  NUMBER = "number",
+  INTEGER = "integer",
+  BOOLEAN = "boolean",
+}
+
+export type FlagArgumentType = "string" | "boolean" | "number" | "integer";
+
+// /** Parser options. */
+export interface ParseFlagsOptions<
+  TType extends string = FlagArgumentType,
+  TFlagOptions extends FlagOptions<TType> = FlagOptions<TType>,
+> {
+  flags?: Array<TFlagOptions>;
+  option?: (option: TFlagOptions, value?: unknown) => void;
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
   allowEmpty?: boolean;
@@ -14,72 +30,79 @@ export interface BaseFlagOptions {
   name: string;
   aliases?: string[];
   standalone?: boolean;
-  default?: IDefaultValue;
+  default?: FlagDefaultValue;
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
-  value?: IFlagValueHandler;
+  value?: FlagValueHandler;
   collect?: boolean;
   equalsSign?: boolean;
 }
 
-export interface SingleFlagOptions extends BaseFlagOptions, BaseArgument {
+export interface SingleValueFlagOptions<TType extends string>
+  extends BaseFlagOptions, BaseFlagArgument<TType> {
   optionalValue?: boolean;
+  args?: never;
 }
 
-export interface ValueFlagOptions extends BaseFlagOptions {
-  args: Array<FlagArgument>;
+export interface MultiValueFlagOptions<TType extends string>
+  extends BaseFlagOptions {
+  type?: never;
+  args: Array<FlagArgument<TType>>;
 }
 
-export type FlagOptions = SingleFlagOptions | ValueFlagOptions;
-
-export interface BaseArgument {
-  type?: OptionType | string;
-  variadic?: boolean;
-  list?: boolean;
-  separator?: string;
-}
-
-export interface FlagArgument extends BaseArgument {
-  optional?: boolean;
-}
-
-/** Available build-in argument types. */
-export enum OptionType {
-  STRING = "string",
-  NUMBER = "number",
-  INTEGER = "integer",
-  BOOLEAN = "boolean",
-}
-
-/** Default flag value */
-export type IDefaultValue<T = unknown> = T | (() => T);
-
-/** Value handler for custom value processing. */
-// deno-lint-ignore no-explicit-any
-export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
+export type FlagOptions<TType extends string> =
+  | SingleValueFlagOptions<TType>
+  | MultiValueFlagOptions<TType>;
 
 /** Result of the parseFlags method. */
-export interface IFlagsResult<
-  // deno-lint-ignore no-explicit-any
-  TFlags extends Record<string, any> = Record<string, any>,
-  TStandaloneOption extends FlagOptions = FlagOptions,
-> {
+export type ParseFlagsContext<
+  TFlags extends Record<string, unknown> = Record<string, unknown>,
+  TStandaloneOption extends FlagOptions<string> = FlagOptions<string>,
+> = {
   flags: TFlags;
   unknown: Array<string>;
   literal: Array<string>;
   standalone?: TStandaloneOption;
   stopEarly: boolean;
   stopOnUnknown: boolean;
+};
+
+export interface BaseFlagArgument<TType extends string> {
+  type?: TType;
+  variadic?: boolean;
+  list?: boolean;
+  separator?: string;
 }
 
+export interface FlagArgument<TType extends string>
+  extends BaseFlagArgument<TType> {
+  type: TType;
+  optional?: boolean;
+}
+
+/** Default flag value */
+export type FlagDefaultValue<TValue = unknown> = TValue | (() => TValue);
+
+/** Value handler for custom value processing. */
+// deno-lint-ignore no-explicit-any
+export type FlagValueHandler<TValue = any, TPrevious = TValue> = (
+  val: TValue,
+  previous?: TPrevious,
+) => TPrevious;
+
 /** Type details. */
-export interface ITypeInfo {
+export interface FlagArgumentTypeInfo<TType extends string = FlagArgumentType> {
   label: string;
-  type: string;
+  type: TType;
   name: string;
   value: string;
 }
 
 /** Custom type handler/parser. */
-export type ITypeHandler<T = unknown> = (type: ITypeInfo) => T;
+export type FlagArgumentTypeHandler<
+  TType extends string,
+  TReturn,
+> = (
+  type: FlagArgumentTypeInfo<TType>,
+) => TReturn;

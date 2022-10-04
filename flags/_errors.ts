@@ -1,5 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { FlagOptions, ITypeInfo } from "./types.ts";
+import type { FlagArgumentTypeInfo, FlagOptions } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -9,7 +9,7 @@ export class FlagsError extends Error {
 }
 
 export class UnknownRequiredOption extends FlagsError {
-  constructor(option: string, options: Array<FlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions<string>>) {
     super(
       `Unknown required option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -20,7 +20,7 @@ export class UnknownRequiredOption extends FlagsError {
 }
 
 export class UnknownConflictingOption extends FlagsError {
-  constructor(option: string, options: Array<FlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions<string>>) {
     super(
       `Unknown conflicting option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -63,7 +63,7 @@ export class DuplicateOption extends ValidationError {
 }
 
 export class InvalidOption extends ValidationError {
-  constructor(option: string, options: Array<FlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions<string>>) {
     super(
       `Invalid option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -74,7 +74,7 @@ export class InvalidOption extends ValidationError {
 }
 
 export class UnknownOption extends ValidationError {
-  constructor(option: string, options: Array<FlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions<string>>) {
     super(
       `Unknown option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -175,7 +175,7 @@ export class NoArguments extends ValidationError {
 
 export class InvalidTypeError extends ValidationError {
   constructor(
-    { label, name, value, type }: ITypeInfo,
+    { label, name, value, type }: FlagArgumentTypeInfo<string>,
     expected?: Array<string | number | boolean>,
   ) {
     super(

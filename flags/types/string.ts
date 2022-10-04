@@ -1,6 +1,8 @@
-import type { ITypeHandler, ITypeInfo } from "../types.ts";
+import type { FlagArgumentTypeInfo } from "../types.ts";
 
 /** String type handler. Excepts any value. */
-export const string: ITypeHandler<string> = ({ value }: ITypeInfo): string => {
+export function string<TType extends string>(
+  { value }: FlagArgumentTypeInfo<TType>,
+): string {
   return value;
-};
+}
