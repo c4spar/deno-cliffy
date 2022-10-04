@@ -2,15 +2,15 @@
 
 import {
   Command,
-  ITypeInfo,
+  FlagArgumentTypeInfo,
   Type,
   ValidationError,
 } from "../../command/mod.ts";
 
-class ColorType extends Type<string> {
+class ColorType<TType extends string> extends Type<TType, string> {
   private readonly colors = ["red", "blue", "yellow"];
 
-  public parse({ label, name, value }: ITypeInfo): string {
+  public parse({ label, name, value }: FlagArgumentTypeInfo<TType>): string {
     if (!this.colors.includes(value)) {
       throw new ValidationError(
         `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${

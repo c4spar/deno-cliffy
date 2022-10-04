@@ -1,10 +1,12 @@
 #!/usr/bin/env -S deno run
 
-import { Command, ITypeInfo } from "../../command/mod.ts";
+import { Command, FlagArgumentTypeInfo } from "../../command/mod.ts";
 
 const colors = ["red", "blue", "yellow"];
 
-function colorType({ label, name, value }: ITypeInfo): string {
+function colorType<TType extends string>(
+  { label, name, value }: FlagArgumentTypeInfo<TType>,
+): string {
   if (!colors.includes(value.toLowerCase())) {
     throw new Error(
       `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${
