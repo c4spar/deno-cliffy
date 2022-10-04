@@ -1,13 +1,16 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { ITypeHandler, ITypeInfo } from "../../types.ts";
+import type {
+  FlagArgumentTypeHandler,
+  FlagArgumentTypeInfo,
+} from "../../types.ts";
 import { Type } from "../../type.ts";
 
-const email = (): ITypeHandler<string> => {
+function email<TType extends string>(): FlagArgumentTypeHandler<TType, string> {
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  return ({ label, value, name }: ITypeInfo): string => {
+  return ({ label, value, name }: FlagArgumentTypeInfo<string>): string => {
     if (!emailRegex.test(value.toLowerCase())) {
       throw new Error(
         `${label} "${name}" must be a valid "email", but got "${value}".`,
@@ -16,7 +19,7 @@ const email = (): ITypeHandler<string> => {
 
     return value;
   };
-};
+}
 
 const cmd = new Command()
   .throwErrors()
@@ -75,16 +78,17 @@ Deno.test("command - type - custom - with invalid value on child command", async
   );
 });
 
-class CustomType<T extends string> extends Type<T> {
-  constructor(private formats: ReadonlyArray<T>) {
+class CustomType<TType extends string, TReturn extends string>
+  extends Type<TType, TReturn> {
+  constructor(private formats: ReadonlyArray<TReturn>) {
     super();
   }
 
-  parse(type: ITypeInfo): T {
-    if (!this.formats.includes(type.value as T)) {
+  parse(type: FlagArgumentTypeInfo<TType>): TReturn {
+    if (!this.formats.includes(type.value as TReturn)) {
       throw new Error(`invalid type: ${type.value}`);
     }
-    return type.value as T;
+    return type.value as TReturn;
   }
 }
 

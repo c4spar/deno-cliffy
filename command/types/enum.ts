@@ -1,17 +1,20 @@
 import { Type } from "../type.ts";
-import type { ITypeInfo } from "../types.ts";
+import type { FlagArgumentTypeInfo } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
-export class EnumType<T extends string | number | boolean> extends Type<T> {
-  private readonly allowedValues: ReadonlyArray<T>;
+export class EnumType<
+  TType extends string,
+  TReturn extends string | number | boolean,
+> extends Type<TType, TReturn> {
+  private readonly allowedValues: ReadonlyArray<TReturn>;
 
-  constructor(values: ReadonlyArray<T> | Record<string, T>) {
+  constructor(values: ReadonlyArray<TReturn> | Record<string, TReturn>) {
     super();
     this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
-  public parse(type: ITypeInfo): T {
+  public parse(type: FlagArgumentTypeInfo<TType>): TReturn {
     for (const value of this.allowedValues) {
       if (value.toString() === type.value) {
         return value;
@@ -21,11 +24,11 @@ export class EnumType<T extends string | number | boolean> extends Type<T> {
     throw new InvalidTypeError(type, this.allowedValues.slice());
   }
 
-  public override values(): Array<T> {
+  public override values(): Array<TReturn> {
     return this.allowedValues.slice();
   }
 
-  public override complete(): Array<T> {
+  public override complete(): Array<TReturn> {
     return this.values();
   }
 }

@@ -4,7 +4,7 @@ import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
 export class HelpCommand
-  extends Command<void, void, void, [commandName?: CommandType]> {
+  extends Command<void, void, void, [commandName?: CommandType<"command">]> {
   public constructor(cmd?: Command) {
     super();
     return this

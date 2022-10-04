@@ -2,7 +2,7 @@ import type { Command } from "../command.ts";
 import { StringType } from "./string.ts";
 
 /** String type with auto completion of child command names. */
-export class ChildCommandType extends StringType {
+export class ChildCommandType<TType extends string> extends StringType<TType> {
   #cmd?: Command;
 
   constructor(cmd?: Command) {

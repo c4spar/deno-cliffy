@@ -5,7 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVar } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
+import type { FlagDefaultValue, ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -42,6 +42,8 @@ import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
+  FlagArgumentTypeInfo,
+  FlagValueHandler,
   IAction,
   IArgument,
   ICommandGlobalOption,
@@ -54,13 +56,11 @@ import type {
   IEnvVarOptions,
   IEnvVarValueHandler,
   IExample,
-  IFlagValueHandler,
   IGlobalEnvVarOptions,
   IHelpHandler,
   IOption,
   IParseResult,
   IType,
-  ITypeInfo,
   ITypeOptions,
   IVersionHandler,
   MapTypes,
@@ -648,7 +648,7 @@ export class Command<
   }
 
   public globalType<
-    H extends TypeOrTypeHandler<unknown>,
+    H extends TypeOrTypeHandler<N, unknown>,
     N extends string = string,
   >(
     name: N,
@@ -674,7 +674,7 @@ export class Command<
    * @param options Type options.
    */
   public type<
-    H extends TypeOrTypeHandler<unknown>,
+    H extends TypeOrTypeHandler<N, unknown>,
     N extends string = string,
   >(
     name: N,
@@ -694,7 +694,11 @@ export class Command<
       throw new DuplicateType(name);
     }
 
-    this.cmd.types.set(name, { ...options, name, handler });
+    this.cmd.types.set(name, {
+      ...options,
+      name,
+      handler: handler as TypeOrTypeHandler<string, unknown>,
+    });
 
     if (
       handler instanceof Type &&
@@ -868,12 +872,12 @@ export class Command<
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
+          default?: FlagDefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: FlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | FlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -951,12 +955,12 @@ export class Command<
       >
         & {
           global: true;
-          default?: IDefaultValue<D>;
+          default?: FlagDefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: FlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | FlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -992,13 +996,13 @@ export class Command<
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
+          default?: FlagDefaultValue<D>;
           required?: R;
           collect?: C;
           conflicts?: X;
-          value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
+          value?: FlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
+      | FlagValueHandler<MapTypes<ValueOf<O>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -1013,7 +1017,7 @@ export class Command<
   public option(
     flags: string,
     desc: string,
-    opts?: ICommandOption | IFlagValueHandler,
+    opts?: ICommandOption | FlagValueHandler,
   ): Command<any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
@@ -1526,17 +1530,16 @@ export class Command<
       allowEmpty: this._allowEmpty,
       flags: options,
       ignoreDefaults: ctx.env,
-      parse: (type: ITypeInfo) => this.parseType(type),
-      option: (option: IOption) => {
+      option: (option) => {
         if (!ctx.action && option.action) {
           ctx.action = option as ActionOption;
         }
       },
-    });
+    }, (type: FlagArgumentTypeInfo<string>) => this.parseType(type));
   }
 
   /** Parse argument type. */
-  protected parseType(type: ITypeInfo): unknown {
+  protected parseType(type: FlagArgumentTypeInfo<string>): unknown {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
@@ -2203,22 +2206,22 @@ export class Command<
   }
 
   /** Get types. */
-  public getTypes(): IType[] {
+  public getTypes(): Array<IType> {
     return this.getGlobalTypes().concat(this.getBaseTypes());
   }
 
   /** Get base types. */
-  public getBaseTypes(): IType[] {
+  public getBaseTypes(): Array<IType> {
     return Array.from(this.types.values());
   }
 
   /** Get global types. */
-  public getGlobalTypes(): IType[] {
+  public getGlobalTypes(): Array<IType> {
     const getTypes = (
       cmd: Command<any> | undefined,
-      types: IType[] = [],
-      names: string[] = [],
-    ): IType[] => {
+      types: Array<IType> = [],
+      names: Array<string> = [],
+    ): Array<IType> => {
       if (cmd) {
         if (cmd.types.size) {
           cmd.types.forEach((type: IType) => {
@@ -2515,7 +2518,7 @@ interface IDefaultOption {
 
 type ActionOption = IOption & { action: IAction };
 
-interface ParseContext extends IFlagsResult<Record<string, unknown>> {
+interface ParseContext extends ParseFlagsContext {
   action?: ActionOption;
   env: Record<string, unknown>;
 }
@@ -2670,11 +2673,11 @@ type SingleArg = OptionalOrRequiredValue<
 >;
 
 type DefaultTypes = {
-  number: NumberType;
-  integer: IntegerType;
-  string: StringType;
-  boolean: BooleanType;
-  file: FileType;
+  number: NumberType<"number">;
+  integer: IntegerType<"integer">;
+  string: StringType<"string">;
+  boolean: BooleanType<"boolean">;
+  file: FileType<"file">;
 };
 
 type ArgumentType<A extends string, U, T = Merge<DefaultTypes, U>> = A extends
@@ -2871,9 +2874,9 @@ type TypedEnv<
   : Record<string, unknown>;
 
 type TypedType<
-  Name extends string,
-  Handler extends TypeOrTypeHandler<unknown>,
-> = { [N in Name]: Handler };
+  TName extends string,
+  THandler extends TypeOrTypeHandler<TName, unknown>,
+> = { [N in TName]: THandler };
 
 type RequiredKeys<T> = {
   // deno-lint-ignore ban-types

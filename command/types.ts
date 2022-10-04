@@ -3,22 +3,31 @@
 import type {
   BaseFlagOptions,
   FlagArgument,
-  IDefaultValue,
-  IFlagValueHandler,
-  ITypeHandler,
-  ITypeInfo,
+  FlagArgumentTypeHandler,
+  FlagArgumentTypeInfo,
+  FlagDefaultValue,
+  FlagValueHandler,
 } from "../flags/types.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 
-export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
+export type {
+  FlagArgumentTypeHandler,
+  FlagArgumentTypeInfo,
+  FlagDefaultValue,
+  FlagValueHandler,
+};
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
-export type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
+export type TypeOrTypeHandler<TType extends string, TReturn> =
+  | Type<TType, TReturn>
+  | FlagArgumentTypeHandler<TType, TReturn>;
 
-export type TypeValue<T, U = T> = T extends TypeOrTypeHandler<infer V> ? V : U;
+export type TypeValue<TTypeHandler, TDefaultValue = TTypeHandler> =
+  TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
+    : TDefaultValue;
 
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
@@ -59,13 +68,12 @@ export type IAction<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface IArgument extends FlagArgument {
+export interface IArgument<TType extends string = string>
+  extends FlagArgument<TType> {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
   action: string;
-  /** Arguments type. */
-  type: string;
 }
 
 /** Result of `cmd.parse()` method. */
@@ -172,9 +180,10 @@ export interface ITypeOptions {
 }
 
 /** Type settings. */
-export interface IType extends ITypeOptions {
+export interface IType<TType extends string = string, TReturn = unknown>
+  extends ITypeOptions {
   name: string;
-  handler: Type<unknown> | ITypeHandler<unknown>;
+  handler: TypeOrTypeHandler<TType, TReturn>;
 }
 
 /* EXAMPLE TYPES */

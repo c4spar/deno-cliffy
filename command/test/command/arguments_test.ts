@@ -4,21 +4,24 @@ import {
   describe,
   it,
 } from "../../../dev_deps.ts";
-import type { ITypeInfo } from "../../../flags/types.ts";
+import type { FlagArgumentTypeInfo } from "../../../flags/types.ts";
 import { ValidationError } from "../../_errors.ts";
 import { Command } from "../../command.ts";
 
 function cmd() {
   return new Command()
     .throwErrors()
-    .type("color", ({ label, name, type, value }: ITypeInfo) => {
-      if (!["red", "blue", "yellow"].includes(value)) {
-        throw new ValidationError(
-          `${label} "${name}" must be a valid "${type}", but got "${value}".`,
-        );
-      }
-      return value;
-    })
+    .type(
+      "color",
+      ({ label, name, type, value }: FlagArgumentTypeInfo<"color">) => {
+        if (!["red", "blue", "yellow"].includes(value)) {
+          throw new ValidationError(
+            `${label} "${name}" must be a valid "${type}", but got "${value}".`,
+          );
+        }
+        return value;
+      },
+    )
     .option("-f, --foo <foo> <bar> <baz>", "...")
     .arguments(
       "<foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]",
@@ -31,14 +34,17 @@ function cmd2() {
     .command(
       "foo <foo:string> [bar:number] [baz:boolean] [color:color] [list:number[]]",
     )
-    .type("color", ({ label, name, type, value }: ITypeInfo) => {
-      if (!["red", "blue", "yellow"].includes(value)) {
-        throw new Error(
-          `${label} "${name}" must be a valid "${type}", but got "${value}".`,
-        );
-      }
-      return value;
-    })
+    .type(
+      "color",
+      ({ label, name, type, value }: FlagArgumentTypeInfo<"color">) => {
+        if (!["red", "blue", "yellow"].includes(value)) {
+          throw new Error(
+            `${label} "${name}" must be a valid "${type}", but got "${value}".`,
+          );
+        }
+        return value;
+      },
+    )
     .option("-f, --foo <foo> <bar> <baz>", "...");
 }
 

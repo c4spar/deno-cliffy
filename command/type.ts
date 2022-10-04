@@ -1,7 +1,7 @@
 import type { Command } from "./command.ts";
 import type {
   CompleteHandlerResult,
-  ITypeInfo,
+  FlagArgumentTypeInfo,
   ValuesHandlerResult,
 } from "./types.ts";
 
@@ -27,8 +27,8 @@ import type {
  * }
  * ```
  */
-export abstract class Type<T> {
-  public abstract parse(type: ITypeInfo): T;
+export abstract class Type<TType extends string, TReturn> {
+  public abstract parse(type: FlagArgumentTypeInfo<TType>): TReturn;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,
