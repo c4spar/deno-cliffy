@@ -78,9 +78,19 @@ export function parseFlags<
 >(
   argsOrCtx:
     | Array<string>
-    | ParseFlagsContext,
+    | ParseFlagsContext<
+      FlagArgumentType,
+      TFlags,
+      FlagOptions<FlagArgumentType>
+    >,
   opts?: ParseFlagsOptions<FlagArgumentType>,
-): Id<ParseFlagsContext<TFlags>>;
+): Id<
+  ParseFlagsContext<
+    FlagArgumentType,
+    TFlags,
+    FlagOptions<FlagArgumentType>
+  >
+>;
 
 export function parseFlags<
   TType extends string,
@@ -89,25 +99,53 @@ export function parseFlags<
 >(
   argsOrCtx:
     | Array<string>
-    | ParseFlagsContext,
+    | ParseFlagsContext<
+      TType,
+      TFlags,
+      TFlagOptions
+    >,
   opts: ParseFlagsOptions<TType, TFlagOptions>,
   parse: FlagArgumentTypeHandler<TType, unknown>,
-): Id<ParseFlagsContext<TFlags>>;
+): Id<
+  ParseFlagsContext<
+    TType,
+    TFlags,
+    TFlagOptions
+  >
+>;
 
 export function parseFlags<
   TType extends string,
 >(
   argsOrCtx:
     | Array<string>
-    | ParseFlagsContext,
+    | ParseFlagsContext<
+      TType,
+      Record<string, unknown>,
+      FlagOptions<TType>
+    >,
   opts: ParseFlagsOptions<TType> = {},
   parse?: FlagArgumentTypeHandler<TType, unknown>,
-): Id<ParseFlagsContext> {
+): Id<
+  ParseFlagsContext<
+    TType,
+    Record<string, unknown>,
+    FlagOptions<TType>
+  >
+> {
   let args: Array<string>;
-  let ctx: ParseFlagsContext;
+  let ctx: ParseFlagsContext<
+    TType,
+    Record<string, unknown>,
+    FlagOptions<TType>
+  >;
 
   if (Array.isArray(argsOrCtx)) {
-    ctx = {} as ParseFlagsContext;
+    ctx = {} as ParseFlagsContext<
+      TType,
+      Record<string, unknown>,
+      FlagOptions<TType>
+    >;
     args = argsOrCtx;
   } else {
     ctx = argsOrCtx;
@@ -151,7 +189,11 @@ function validateOptions<TType extends string>(opts: ParseFlagsOptions<TType>) {
 }
 
 function parseArgs<TType extends string>(
-  ctx: ParseFlagsContext,
+  ctx: ParseFlagsContext<
+    TType,
+    Record<string, unknown>,
+    FlagOptions<TType>
+  >,
   args: Array<string>,
   opts: ParseFlagsOptions<TType>,
   parseCustomType?: FlagArgumentTypeHandler<TType, unknown>,
@@ -442,7 +484,13 @@ function parseArgs<TType extends string>(
   return optionsMap;
 }
 
-function parseDottedOptions(ctx: ParseFlagsContext): void {
+function parseDottedOptions<TType extends string>(
+  ctx: ParseFlagsContext<
+    TType,
+    Record<string, unknown>,
+    FlagOptions<TType>
+  >,
+): void {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {

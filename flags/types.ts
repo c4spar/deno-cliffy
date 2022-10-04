@@ -57,8 +57,9 @@ export type FlagOptions<TType extends string> =
 
 /** Result of the parseFlags method. */
 export type ParseFlagsContext<
-  TFlags extends Record<string, unknown> = Record<string, unknown>,
-  TStandaloneOption extends FlagOptions<string> = FlagOptions<string>,
+  TType extends string,
+  TFlags extends Record<string, unknown>,
+  TStandaloneOption extends FlagOptions<TType>,
 > = {
   flags: TFlags;
   unknown: Array<string>;
