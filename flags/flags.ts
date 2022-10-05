@@ -36,11 +36,10 @@ type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : T;
 
-type DefaultTypes = {
-  [KType in FlagArgumentType]: FlagArgumentTypeHandler<KType, unknown>;
-};
-
-const DefaultTypes = { string, number, integer, boolean };
+const DefaultTypes: Record<
+  FlagArgumentType,
+  FlagArgumentTypeHandler<FlagArgumentType, unknown>
+> = { string, number, integer, boolean };
 
 /**
  * Parse command line arguments.
@@ -549,10 +548,7 @@ function parseDefaultType(
   value: string,
 ): unknown {
   const type: FlagArgumentType = arg.type || "string";
-  const parseType = DefaultTypes[type] as FlagArgumentTypeHandler<
-    FlagArgumentType,
-    unknown
-  >;
+  const parseType = DefaultTypes[type];
 
   if (!parseType) {
     throw new UnknownType(type, Object.keys(DefaultTypes));
