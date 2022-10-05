@@ -10,7 +10,7 @@ export enum OptionType {
   BOOLEAN = "boolean",
 }
 
-/** Default argument types. */
+/** Available build-in argument types. */
 export type FlagArgumentType = "string" | "boolean" | "number" | "integer";
 
 /** Options for the `parseFlags` method. */
