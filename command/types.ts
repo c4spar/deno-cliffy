@@ -140,7 +140,7 @@ export interface IOption<
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
-  args: IArgument[];
+  args: Array<IArgument<Extract<keyof CT & keyof GT, string>>>;
   groupName?: string;
   separator?: string;
 }
@@ -163,12 +163,13 @@ export interface IEnvVarOptions extends IGlobalEnvVarOptions {
 }
 
 /** Environment variable settings. */
-export interface IEnvVar extends IEnvVarOptions {
+export interface IEnvVar<TType extends string = string> extends IEnvVarOptions {
   name: string;
   names: string[];
   description: string;
-  type: string;
-  details: IArgument;
+  // @TODO: extend IEnvVar from IArgument
+  type: TType;
+  details: IArgument<TType>;
 }
 
 /* TYPE TYPES */

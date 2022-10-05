@@ -1,4 +1,4 @@
-import type { FlagOptions, MultiValueFlagOptions } from "./types.ts";
+import type { FlagOptions, ValuesFlagOptions } from "./types.ts";
 import { distance } from "../_utils/distance.ts";
 
 /** Convert param case string to camel case. */
@@ -146,7 +146,7 @@ export function getDefaultValue<TType extends string>(
 
 export function isValueFlag<TType extends string>(
   option: FlagOptions<TType>,
-): option is MultiValueFlagOptions<TType> {
+): option is ValuesFlagOptions<TType> {
   return "args" in option && Array.isArray(option.args) &&
     option.args.length > 0;
 }

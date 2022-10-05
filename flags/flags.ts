@@ -21,9 +21,9 @@ import {
 import type {
   FlagArgumentType,
   FlagArgumentTypeHandler,
-  MultiValueFlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
+  ValuesFlagOptions,
 } from "./types.ts";
 import { FlagArgument, FlagOptions, OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
@@ -87,7 +87,7 @@ export function parseFlags<
 ): Id<
   ParseFlagsContext<
     FlagArgumentType,
-    TFlags,
+    TFlags & Record<string, unknown>,
     FlagOptions<FlagArgumentType>
   >
 >;
@@ -109,7 +109,7 @@ export function parseFlags<
 ): Id<
   ParseFlagsContext<
     TType,
-    TFlags,
+    TFlags & Record<string, unknown>,
     TFlagOptions
   >
 >;
@@ -296,7 +296,7 @@ function parseArgs<TType extends string>(
     }
 
     if ("type" in option && option.type && !isValueFlag(option)) {
-      (option as FlagOptions<TType>).args = [{
+      (option as unknown as ValuesFlagOptions<TType>).args = [{
         type: option.type,
         optional: option.optionalValue,
         variadic: option.variadic,
@@ -455,7 +455,7 @@ function parseArgs<TType extends string>(
 
       /** Parse argument value.  */
       function parseValue(
-        option: MultiValueFlagOptions<TType>,
+        option: ValuesFlagOptions<TType>,
         arg: FlagArgument<TType>,
         value: string,
       ): unknown {
@@ -467,7 +467,7 @@ function parseArgs<TType extends string>(
             value,
           })
           : parseDefaultType(
-            option as MultiValueFlagOptions<FlagArgumentType>,
+            option as ValuesFlagOptions<FlagArgumentType>,
             arg as FlagArgument<FlagArgumentType>,
             value,
           );
@@ -544,7 +544,7 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseDefaultType(
-  option: MultiValueFlagOptions<FlagArgumentType>,
+  option: ValuesFlagOptions<FlagArgumentType>,
   arg: FlagArgument<FlagArgumentType>,
   value: string,
 ): unknown {

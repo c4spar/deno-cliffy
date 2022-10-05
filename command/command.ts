@@ -2518,7 +2518,8 @@ interface IDefaultOption {
 
 type ActionOption = IOption & { action: IAction };
 
-interface ParseContext extends ParseFlagsContext {
+interface ParseContext
+  extends ParseFlagsContext<string, Record<string, unknown>, IOption> {
   action?: ActionOption;
   env: Record<string, unknown>;
 }
