@@ -25,7 +25,7 @@ export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
 /* COMMAND TYPES */
 
 /** Description handler. */
-export type CommandDescription<
+export type DescriptionHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,

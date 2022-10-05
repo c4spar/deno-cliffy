@@ -45,11 +45,11 @@ import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   ActionHandler,
   Argument,
-  CommandDescription,
   CommandResult,
   CompleteHandler,
   CompleteOptions,
   Completion,
+  DescriptionHandler,
   EnvVar,
   EnvVarOptions,
   EnvVarValueHandler,
@@ -93,7 +93,7 @@ export class Command<
   private _parent?: CP;
   private _globalParent?: Command<any>;
   private ver?: VersionHandler;
-  private desc: CommandDescription = "";
+  private desc: DescriptionHandler = "";
   private _usage?: string;
   private fn?: ActionHandler;
   private options: Array<Option> = [];
@@ -533,7 +533,7 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: CommandDescription<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    description: DescriptionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this {
     this.cmd.desc = description;
     return this;
