@@ -2,7 +2,7 @@
 
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { IOption } from "../../types.ts";
+import type { Option } from "../../types.ts";
 
 function command() {
   return new Command()
@@ -24,7 +24,7 @@ function command() {
 }
 
 Deno.test("command - option - option properties", () => {
-  const option: IOption = new Command()
+  const option: Option = new Command()
     .throwErrors()
     .option("-F, --foo-bar <baz:boolean> [baz:string]", "test ...", {
       required: true,
@@ -38,7 +38,7 @@ Deno.test("command - option - option properties", () => {
       collect: true,
       default: false,
     })
-    .getOption("foo-bar", true) as IOption;
+    .getOption("foo-bar", true) as Option;
 
   assertEquals(option.name, "foo-bar");
   assertEquals(option.description, "test ...");

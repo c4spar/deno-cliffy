@@ -15,7 +15,7 @@ import {
   yellow,
 } from "../deps.ts";
 import { Type } from "../type.ts";
-import type { IArgument, IEnvVar, IExample, IOption } from "../types.ts";
+import type { Argument, EnvVar, Example, Option } from "../types.ts";
 
 export interface HelpOptions {
   types?: boolean;
@@ -26,7 +26,7 @@ export interface HelpOptions {
 
 interface OptionGroup {
   name?: string;
-  options: Array<IOption>;
+  options: Array<Option>;
 }
 
 /** Help text generator. */
@@ -172,7 +172,7 @@ export class HelpGenerator {
     if (hasTypeDefinitions) {
       return this.label(group.name ?? "Options") +
         Table.from([
-          ...group.options.map((option: IOption) => [
+          ...group.options.map((option: Option) => [
             option.flags.map((flag) => blue(flag)).join(", "),
             highlightArguments(
               option.typeDefinition || "",
@@ -192,7 +192,7 @@ export class HelpGenerator {
 
     return this.label(group.name ?? "Options") +
       Table.from([
-        ...group.options.map((option: IOption) => [
+        ...group.options.map((option: Option) => [
           option.flags.map((flag) => blue(flag)).join(", "),
           red(bold("-")),
           getDescription(option.description, !this.options.long),
@@ -261,7 +261,7 @@ export class HelpGenerator {
     }
     return this.label("Environment variables") +
       Table.from([
-        ...envVars.map((envVar: IEnvVar) => [
+        ...envVars.map((envVar: EnvVar) => [
           envVar.names.map((name: string) => blue(name)).join(", "),
           highlightArgumentDetails(
             envVar.details,
@@ -287,7 +287,7 @@ export class HelpGenerator {
       return "";
     }
     return this.label("Examples") +
-      Table.from(examples.map((example: IExample) => [
+      Table.from(examples.map((example: Example) => [
         dim(bold(`${capitalize(example.name)}:`)),
         dedent(example.description),
       ]))
@@ -298,7 +298,7 @@ export class HelpGenerator {
       "\n";
   }
 
-  private generateHints(option: IOption): string {
+  private generateHints(option: Option): string {
     if (!this.options.hints) {
       return "";
     }
@@ -367,7 +367,7 @@ function highlightArguments(argsDefinition: string, types = true) {
   }
 
   return parseArgumentsDefinition(argsDefinition, false, true)
-    .map((arg: IArgument | string) =>
+    .map((arg: Argument | string) =>
       typeof arg === "string" ? arg : highlightArgumentDetails(arg, types)
     )
     .join(" ");
@@ -379,7 +379,7 @@ function highlightArguments(argsDefinition: string, types = true) {
  * @param types Show types.
  */
 function highlightArgumentDetails(
-  arg: IArgument,
+  arg: Argument,
   types = true,
 ): string {
   let str = "";

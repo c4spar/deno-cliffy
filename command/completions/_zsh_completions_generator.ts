@@ -1,10 +1,10 @@
 import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
-import type { IArgument, IOption, IType } from "../types.ts";
+import type { Argument, Option, TypeDef } from "../types.ts";
 import { FileType } from "../types/file.ts";
 
 interface ICompletionAction {
-  arg: IArgument;
+  arg: Argument;
   label: string;
   name: string;
   cmd: string;
@@ -117,7 +117,7 @@ function _${replaceSpecialChars(path)}() {` +
     // only complete first argument, rest arguments are completed with _arguments.
     if (command.hasArguments()) {
       const completionsPath: string = path.split(" ").slice(1).join(" ");
-      const arg: IArgument = command.getArguments()[0];
+      const arg: Argument = command.getArguments()[0];
       const action = this.addAction(arg, completionsPath);
       if (action && command.getCompletion(arg.action)) {
         completions += `\n    __${
@@ -247,7 +247,7 @@ function _${replaceSpecialChars(path)}() {` +
 
   private generateOption(
     command: Command,
-    option: IOption,
+    option: Option,
     completionsPath: string,
     excludedOptions: string[],
   ): string {
@@ -299,7 +299,7 @@ function _${replaceSpecialChars(path)}() {` +
     }
   }
 
-  private getFileCompletions(type: IType) {
+  private getFileCompletions(type: TypeDef) {
     if (!(type.handler instanceof FileType)) {
       return "";
     }
@@ -318,7 +318,7 @@ function _${replaceSpecialChars(path)}() {` +
     // return fileCompletions;
   }
 
-  private addAction(arg: IArgument, cmd: string): ICompletionAction {
+  private addAction(arg: Argument, cmd: string): ICompletionAction {
     const action = `${arg.name}-${arg.action}`;
 
     if (!this.actions.has(action)) {

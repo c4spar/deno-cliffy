@@ -1,11 +1,11 @@
 #!/usr/bin/env -S deno run
 
-import { Command, FlagArgumentTypeInfo } from "../../command/mod.ts";
+import { Command, TypeInfo } from "../../command/mod.ts";
 
 const colors = ["red", "blue", "yellow"];
 
 function colorType<TType extends string>(
-  { label, name, value }: FlagArgumentTypeInfo<TType>,
+  { label, name, value }: TypeInfo<TType>,
 ): string {
   if (!colors.includes(value.toLowerCase())) {
     throw new Error(

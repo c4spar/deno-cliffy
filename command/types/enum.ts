@@ -1,5 +1,5 @@
 import { Type } from "../type.ts";
-import type { FlagArgumentTypeInfo } from "../types.ts";
+import type { TypeInfo } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
@@ -14,7 +14,7 @@ export class EnumType<
     this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
-  public parse(type: FlagArgumentTypeInfo<TType>): TReturn {
+  public parse(type: TypeInfo<TType>): TReturn {
     for (const value of this.allowedValues) {
       if (value.toString() === type.value) {
         return value;

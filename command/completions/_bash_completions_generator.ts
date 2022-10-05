@@ -1,5 +1,5 @@
 import type { Command } from "../command.ts";
-import type { IArgument } from "../types.ts";
+import type { Argument } from "../types.ts";
 import { FileType } from "../types/file.ts";
 
 /** Generates bash completions script. */
@@ -210,7 +210,7 @@ ${childCommandCompletions}`;
     command: Command,
     path: string,
   ) {
-    const args: IArgument[] = command.getArguments();
+    const args: Argument[] = command.getArguments();
     if (args.length) {
       const type = command.getType(args[0].type);
       if (type && type.handler instanceof FileType) {
@@ -227,7 +227,7 @@ ${childCommandCompletions}`;
 
   private generateOptionCompletionsCommand(
     command: Command,
-    args: IArgument[],
+    args: Argument[],
     path: string,
     opts?: { standalone?: boolean },
   ) {

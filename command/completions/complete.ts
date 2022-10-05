@@ -1,6 +1,6 @@
 import { Command } from "../command.ts";
 import { UnknownCompletionCommand } from "../_errors.ts";
-import type { ICompletion } from "../types.ts";
+import type { Completion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
 export class CompleteCommand extends Command<
@@ -29,7 +29,7 @@ export class CompleteCommand extends Command<
             return childCmd;
           }, cmd || this.getMainCommand()) ?? (cmd || this.getMainCommand());
 
-        const completion: ICompletion | undefined = completeCommand
+        const completion: Completion | undefined = completeCommand
           .getCompletion(action);
         const result: Array<string | number | boolean> =
           await completion?.complete(completeCommand, parent) ?? [];

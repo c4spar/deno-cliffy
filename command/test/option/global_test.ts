@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { FlagArgumentTypeInfo } from "../../types.ts";
+import type { TypeInfo } from "../../types.ts";
 import { ValidationError } from "../../_errors.ts";
 
 const cmd = () =>
@@ -10,7 +10,7 @@ const cmd = () =>
     .option("-b, --base", "Only available on this command.")
     .type(
       "custom",
-      ({ value }: FlagArgumentTypeInfo<"custom">) => value.toUpperCase(),
+      ({ value }: TypeInfo<"custom">) => value.toUpperCase(),
       { global: true },
     )
     .option(

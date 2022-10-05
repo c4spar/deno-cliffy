@@ -1,6 +1,6 @@
 import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
-import type { IArgument, IOption } from "../types.ts";
+import type { Argument, Option } from "../types.ts";
 import { FileType } from "../types/file.ts";
 
 /** Generates fish completions script. */
@@ -91,7 +91,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
     return result;
   }
 
-  private completeOption(command: Command, option: IOption) {
+  private completeOption(command: Command, option: Option) {
     const shortOption: string | undefined = option.flags
       .find((flag) => flag.length === 2)
       ?.replace(/^(-)+/, "");
@@ -135,7 +135,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
     return cmd.join(" ");
   }
 
-  private getCompletionCommand(cmd: Command, arg: IArgument): string {
+  private getCompletionCommand(cmd: Command, arg: Argument): string {
     const type = cmd.getType(arg.type);
     if (type && type.handler instanceof FileType) {
       return `'(__fish_complete_path)'`;
