@@ -10,9 +10,10 @@ export enum OptionType {
   BOOLEAN = "boolean",
 }
 
+/** Default argument types. */
 export type FlagArgumentType = "string" | "boolean" | "number" | "integer";
 
-// /** Parser options. */
+/** Options for the `parseFlags` method. */
 export interface ParseFlagsOptions<
   TType extends string = FlagArgumentType,
   TFlagOptions extends FlagOptions<TType> = FlagOptions<TType>,

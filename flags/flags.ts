@@ -36,11 +36,11 @@ type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : T;
 
-export type DefaultTypes = {
+type DefaultTypes = {
   [KType in FlagArgumentType]: FlagArgumentTypeHandler<KType, unknown>;
 };
 
-export const DefaultTypes = { string, number, integer, boolean };
+const DefaultTypes = { string, number, integer, boolean };
 
 /**
  * Parse command line arguments.
