@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { UnknownCommand } from "../_errors.ts";
+import { UnknownCommandError } from "../_errors.ts";
 import { CommandType } from "../types/command.ts";
 
 /** Generates well formatted and colored help output for specified command. */
@@ -20,7 +20,7 @@ export class HelpCommand
         }
         if (!cmd) {
           const cmds = this.getGlobalParent()?.getCommands();
-          throw new UnknownCommand(name ?? "", cmds ?? [], [
+          throw new UnknownCommandError(name ?? "", cmds ?? [], [
             this.getName(),
             ...this.getAliases(),
           ]);

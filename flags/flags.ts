@@ -1,15 +1,15 @@
 import {
   ArgumentFollowsVariadicArgument,
-  DuplicateOption,
-  InvalidOption,
-  InvalidOptionValue,
-  MissingOptionValue,
-  RequiredArgumentFollowsOptionalArgument,
-  UnexpectedOptionValue,
-  UnknownConflictingOption,
-  UnknownOption,
-  UnknownRequiredOption,
-  UnknownType,
+  DuplicateOptionError,
+  InvalidOptionError,
+  InvalidOptionValueError,
+  MissingOptionValueError,
+  UnexpectedOptionValueError,
+  UnexpectedRequiredArgumentError,
+  UnknownConflictingOptionError,
+  UnknownOptionError,
+  UnknownRequiredOptionError,
+  UnknownTypeError,
 } from "./_errors.ts";
 import {
   getDefaultValue,
@@ -176,12 +176,12 @@ function validateOptions<TType extends string>(opts: ParseFlagsOptions<TType>) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new UnknownRequiredOption(flag, opts.flags ?? []);
+        throw new UnknownRequiredOptionError(flag, opts.flags ?? []);
       }
     });
     opt.conflicts?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new UnknownConflictingOption(flag, opts.flags ?? []);
+        throw new UnknownConflictingOptionError(flag, opts.flags ?? []);
       }
     });
   });
@@ -235,7 +235,7 @@ function parseArgs<TType extends string>(
     const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
 
     if (!isShort && !isLong) {
-      throw new InvalidOption(current, opts.flags ?? []);
+      throw new InvalidOptionError(current, opts.flags ?? []);
     }
 
     // normalize short flags: -abc => -a -b -c
@@ -266,7 +266,7 @@ function parseArgs<TType extends string>(
             ctx.unknown.push(args[argsIndex]);
             continue;
           }
-          throw new UnknownOption(current, opts.flags);
+          throw new UnknownOptionError(current, opts.flags);
         }
       }
     } else {
@@ -290,7 +290,7 @@ function parseArgs<TType extends string>(
       if (!opts.flags?.length) {
         option.collect = true;
       } else if (!option.collect) {
-        throw new DuplicateOption(current);
+        throw new DuplicateOptionError(current);
       }
     }
 
@@ -308,7 +308,7 @@ function parseArgs<TType extends string>(
       opts.flags?.length && !isValueFlag(option) &&
       typeof currentValue !== "undefined"
     ) {
-      throw new UnexpectedOptionValue(option.name, currentValue);
+      throw new UnexpectedOptionValueError(option.name, currentValue);
     }
 
     let optionArgsIndex = 0;
@@ -320,7 +320,7 @@ function parseArgs<TType extends string>(
 
     if (typeof ctx.flags[propName] === "undefined") {
       if (isValueFlag(option) && !option.args[optionArgsIndex].optional) {
-        throw new MissingOptionValue(option.name);
+        throw new MissingOptionValueError(option.name);
       } else if (typeof option.default !== "undefined") {
         ctx.flags[propName] = getDefaultValue(option);
       } else {
@@ -359,13 +359,13 @@ function parseArgs<TType extends string>(
 
       if (!arg) {
         const flag = next();
-        throw new UnknownOption(flag, opts.flags ?? []);
+        throw new UnknownOptionError(flag, opts.flags ?? []);
       }
 
       if (arg.optional) {
         inOptionalArg = true;
       } else if (inOptionalArg) {
-        throw new RequiredArgumentFollowsOptionalArgument(option.name);
+        throw new UnexpectedRequiredArgumentError(option.name);
       }
 
       let result: unknown;
@@ -377,7 +377,7 @@ function parseArgs<TType extends string>(
           .map((nextValue: string) => {
             const value = parseValue(option, arg, nextValue);
             if (typeof value === "undefined") {
-              throw new InvalidOptionValue(
+              throw new InvalidOptionValueError(
                 option.name,
                 arg.type ?? "?",
                 nextValue,
@@ -551,7 +551,7 @@ function parseDefaultType(
   const parseType = DefaultTypes[type];
 
   if (!parseType) {
-    throw new UnknownType(type, Object.keys(DefaultTypes));
+    throw new UnknownTypeError(type, Object.keys(DefaultTypes));
   }
 
   return parseType({

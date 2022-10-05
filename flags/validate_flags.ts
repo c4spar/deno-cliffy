@@ -5,12 +5,12 @@ import {
   paramCaseToCamelCase,
 } from "./_utils.ts";
 import {
-  ConflictingOption,
-  DependingOption,
-  MissingOptionValue,
-  MissingRequiredOption,
-  OptionNotCombinable,
-  UnknownOption,
+  ConflictingOptionError,
+  DependingOptionError,
+  MissingOptionValueError,
+  MissingRequiredOptionError,
+  OptionNotCombinableError,
+  UnknownOptionError,
 } from "./_errors.ts";
 import {
   FlagArgument,
@@ -66,7 +66,7 @@ function validateUnknownOption<TType extends string>(
   opts: ParseFlagsOptions<TType>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
-    throw new UnknownOption(option.name, opts.flags ?? []);
+    throw new UnknownOptionError(option.name, opts.flags ?? []);
   }
 }
 
@@ -138,7 +138,7 @@ function validateStandaloneOption<TType extends string>(
   // Don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
     if (!defaultValues[opt.name] && opt !== ctx.standalone) {
-      throw new OptionNotCombinable(ctx.standalone.name);
+      throw new OptionNotCombinableError(ctx.standalone.name);
     }
   }
 }
@@ -152,7 +152,7 @@ function validateConflictingOptions<TType extends string>(
   }
   for (const flag of option.conflicts) {
     if (isset(flag, ctx.flags)) {
-      throw new ConflictingOption(option.name, flag);
+      throw new ConflictingOptionError(option.name, flag);
     }
   }
 }
@@ -168,7 +168,7 @@ function validateDependingOptions<TType extends string>(
   for (const flag of option.depends) {
     // Don't throw an error if the value is coming from the default option.
     if (!isset(flag, ctx.flags) && !defaultValues[option.name]) {
-      throw new DependingOption(option.name, flag);
+      throw new DependingOptionError(option.name, flag);
     }
   }
 }
@@ -193,7 +193,7 @@ function validateRequiredValues<TType extends string>(
       : typeof ctx.flags[name] !== "undefined";
 
     if (!hasValue) {
-      throw new MissingOptionValue(option.name);
+      throw new MissingOptionValueError(option.name);
     }
   }
 }
@@ -222,7 +222,7 @@ function validateRequiredOptions<TType extends string>(
     if (hasConflicts) {
       continue;
     }
-    throw new MissingRequiredOption(option.name);
+    throw new MissingRequiredOptionError(option.name);
   }
 }
 
