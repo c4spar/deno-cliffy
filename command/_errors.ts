@@ -1,4 +1,3 @@
-import { UnknownRequiredOptionError } from "../flags/_errors.ts";
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 import { getFlag } from "../flags/_utils.ts";

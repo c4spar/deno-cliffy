@@ -44,11 +44,10 @@ export interface BaseFlagOptions {
 /** Options for a flag with no arguments. */
 export type BooleanFlagOptions = BaseFlagOptions;
 
-/** Options for a flag with a argument. */
+/** Options for a flag with an argument. */
 export interface ValueFlagOptions<TType extends string>
   extends BaseFlagOptions, FlagArgument<TType> {
   optionalValue?: boolean;
-  args?: never;
 }
 
 /**
@@ -58,8 +57,8 @@ export interface ValueFlagOptions<TType extends string>
  */
 export interface ValuesFlagOptions<TType extends string>
   extends BaseFlagOptions {
-  type?: never;
   args: Array<FlagArgument<TType>>;
+  type?: never;
 }
 
 /** Flag options. */
