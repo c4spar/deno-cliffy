@@ -13,7 +13,7 @@ import {
   UnknownOptionError,
 } from "./_errors.ts";
 import {
-  FlagArgument,
+  ArgumentOptions,
   FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
@@ -184,7 +184,7 @@ function validateRequiredValues<TType extends string>(
   const isArray = option.args.length > 1;
 
   for (let i = 0; i < option.args.length; i++) {
-    const arg: FlagArgument<TType> = option.args[i];
+    const arg: ArgumentOptions<TType> = option.args[i];
     if (arg.optional) {
       continue;
     }

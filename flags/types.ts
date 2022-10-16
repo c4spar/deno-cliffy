@@ -1,7 +1,7 @@
 /**
  * Available build-in argument types.
- * @deprecated Deprecated in favor of `FlagArgumentType`.
- * @see FlagArgumentType
+ * @deprecated Deprecated in favor of `ArgumentType`.
+ * @see ArgumentType
  */
 export enum OptionType {
   STRING = "string",
@@ -11,11 +11,11 @@ export enum OptionType {
 }
 
 /** Available build-in argument types. */
-export type FlagArgumentType = "string" | "boolean" | "number" | "integer";
+export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
 /** Options for the `parseFlags` method. */
 export interface ParseFlagsOptions<
-  TType extends string = FlagArgumentType,
+  TType extends string = ArgumentType,
   TFlagOptions extends FlagOptions<TType> = FlagOptions<TType>,
 > {
   flags?: Array<TFlagOptions>;
@@ -28,11 +28,11 @@ export interface ParseFlagsOptions<
 }
 
 /** Base flag options. */
-export interface BaseFlagOptions {
+export interface BaseFlagOptions<TDefault = unknown> {
   name: string;
   aliases?: string[];
   standalone?: boolean;
-  default?: FlagDefaultValue;
+  default?: DefaultValue<TDefault>;
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
@@ -46,7 +46,7 @@ export type BooleanFlagOptions = BaseFlagOptions;
 
 /** Options for a flag with an argument. */
 export interface ValueFlagOptions<TType extends string>
-  extends BaseFlagOptions, FlagArgument<TType> {
+  extends BaseFlagOptions, ArgumentOptions<TType> {
   optionalValue?: boolean;
 }
 
@@ -57,7 +57,7 @@ export interface ValueFlagOptions<TType extends string>
  */
 export interface ValuesFlagOptions<TType extends string>
   extends BaseFlagOptions {
-  args: Array<FlagArgument<TType>>;
+  args: Array<ArgumentOptions<TType>>;
   type?: never;
 }
 
@@ -85,7 +85,7 @@ export type ParseFlagsContext<
 };
 
 /** Options for a flag argument. */
-export interface FlagArgument<TType extends string> {
+export interface ArgumentOptions<TType extends string> {
   type: TType;
   optional?: boolean;
   variadic?: boolean;
@@ -94,7 +94,11 @@ export interface FlagArgument<TType extends string> {
 }
 
 /** Default flag value or a method that returns the default value. */
-export type FlagDefaultValue<TValue = unknown> = TValue | (() => TValue);
+export type DefaultValue<TValue = unknown> =
+  | TValue
+  | DefaultValueHandler<TValue>;
+
+export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
 /** A callback method for custom processing or mapping of flag values. */
 // deno-lint-ignore no-explicit-any
@@ -104,7 +108,7 @@ export type FlagValueHandler<TValue = any, TPrevious = TValue> = (
 ) => TPrevious;
 
 /** Argument parsing informations. */
-export interface FlagArgumentTypeInfo<TType extends string = FlagArgumentType> {
+export interface ArgumentValue<TType extends string = ArgumentType> {
   label: string;
   type: TType;
   name: string;
@@ -115,9 +119,9 @@ export interface FlagArgumentTypeInfo<TType extends string = FlagArgumentType> {
  * Parse method for custom types. Gets the raw user input passed as argument
  * and returns the parsed value.
  */
-export type FlagArgumentTypeHandler<
+export type TypeHandler<
   TType extends string,
   TReturn,
 > = (
-  type: FlagArgumentTypeInfo<TType>,
+  type: ArgumentValue<TType>,
 ) => TReturn;

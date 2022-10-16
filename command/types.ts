@@ -1,12 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
 
+import { FlagValueHandler } from "../flags/types.ts";
 import type {
+  ArgumentOptions,
+  ArgumentValue,
   BaseFlagOptions,
-  FlagArgument,
-  FlagArgumentTypeHandler,
-  FlagArgumentTypeInfo,
-  FlagDefaultValue,
-  FlagValueHandler,
+  DefaultValue,
+  TypeHandler as FlagTypeHandler,
 } from "../flags/types.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
@@ -54,7 +54,7 @@ export type ActionHandler<
 
 /** Argument details. */
 export interface Argument<TType extends string = string>
-  extends FlagArgument<TType> {
+  extends ArgumentOptions<TType> {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
@@ -130,10 +130,10 @@ export interface Option<
   separator?: string;
 }
 
-export type OptionDefaultValue<TValue = unknown> = FlagDefaultValue<TValue>;
+export type OptionDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
-export type OptionValueHandler<TValue = any, TPrevious = TValue> =
-  FlagValueHandler<TValue, TPrevious>;
+export type OptionValueHandler<TValue = any, TReturn = TValue> =
+  FlagValueHandler<TValue, TReturn>;
 
 /* ENV VARS TYPES */
 
@@ -177,8 +177,10 @@ export interface TypeDef<TType extends string = string, TReturn = unknown>
   handler: TypeOrTypeHandler<TType, TReturn>;
 }
 
-export type TypeHandler<TType extends string, TReturn> =
-  FlagArgumentTypeHandler<TType, TReturn>;
+export type TypeHandler<TType extends string, TReturn> = FlagTypeHandler<
+  TType,
+  TReturn
+>;
 
 export type TypeOrTypeHandler<TType extends string, TReturn> =
   | Type<TType, TReturn>
@@ -188,7 +190,7 @@ export type TypeValue<TTypeHandler, TDefaultValue = TTypeHandler> =
   TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
     : TDefaultValue;
 
-export type TypeInfo<TType extends string = string> = FlagArgumentTypeInfo<
+export type TypeInfo<TType extends string = string> = ArgumentValue<
   TType
 >;
 

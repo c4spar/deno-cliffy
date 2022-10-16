@@ -19,13 +19,13 @@ import {
   paramCaseToCamelCase,
 } from "./_utils.ts";
 import type {
-  FlagArgumentType,
-  FlagArgumentTypeHandler,
+  ArgumentType,
   ParseFlagsContext,
   ParseFlagsOptions,
+  TypeHandler,
   ValuesFlagOptions,
 } from "./types.ts";
-import { FlagArgument, FlagOptions, OptionType } from "./types.ts";
+import { ArgumentOptions, FlagOptions, OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { integer } from "./types/integer.ts";
 import { number } from "./types/number.ts";
@@ -37,8 +37,8 @@ type Id<T> = T extends Record<string, unknown>
   : T;
 
 const DefaultTypes: Record<
-  FlagArgumentType,
-  FlagArgumentTypeHandler<FlagArgumentType, unknown>
+  ArgumentType,
+  TypeHandler<ArgumentType, unknown>
 > = { string, number, integer, boolean };
 
 /**
@@ -78,16 +78,16 @@ export function parseFlags<
   argsOrCtx:
     | Array<string>
     | ParseFlagsContext<
-      FlagArgumentType,
+      ArgumentType,
       TFlags,
-      FlagOptions<FlagArgumentType>
+      FlagOptions<ArgumentType>
     >,
-  opts?: ParseFlagsOptions<FlagArgumentType>,
+  opts?: ParseFlagsOptions<ArgumentType>,
 ): Id<
   ParseFlagsContext<
-    FlagArgumentType,
+    ArgumentType,
     TFlags & Record<string, unknown>,
-    FlagOptions<FlagArgumentType>
+    FlagOptions<ArgumentType>
   >
 >;
 
@@ -104,7 +104,7 @@ export function parseFlags<
       TFlagOptions
     >,
   opts: ParseFlagsOptions<TType, TFlagOptions>,
-  parse: FlagArgumentTypeHandler<TType, unknown>,
+  parse: TypeHandler<TType, unknown>,
 ): Id<
   ParseFlagsContext<
     TType,
@@ -124,7 +124,7 @@ export function parseFlags<
       FlagOptions<TType>
     >,
   opts: ParseFlagsOptions<TType> = {},
-  parse?: FlagArgumentTypeHandler<TType, unknown>,
+  parse?: TypeHandler<TType, unknown>,
 ): Id<
   ParseFlagsContext<
     TType,
@@ -195,7 +195,7 @@ function parseArgs<TType extends string>(
   >,
   args: Array<string>,
   opts: ParseFlagsOptions<TType>,
-  parseCustomType?: FlagArgumentTypeHandler<TType, unknown>,
+  parseCustomType?: TypeHandler<TType, unknown>,
 ): Map<string, FlagOptions<TType>> {
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, FlagOptions<TType>> = new Map();
@@ -355,7 +355,8 @@ function parseArgs<TType extends string>(
         ctx.flags[propName] = undefined;
         return;
       }
-      const arg: FlagArgument<TType> | undefined = option.args[optionArgsIndex];
+      const arg: ArgumentOptions<TType> | undefined =
+        option.args[optionArgsIndex];
 
       if (!arg) {
         const flag = next();
@@ -423,7 +424,7 @@ function parseArgs<TType extends string>(
       }
 
       /** Check if current option should have an argument. */
-      function hasNext(arg: FlagArgument<TType>): boolean {
+      function hasNext(arg: ArgumentOptions<TType>): boolean {
         if (!isValueFlag(option)) {
           return false;
         }
@@ -455,7 +456,7 @@ function parseArgs<TType extends string>(
       /** Parse argument value.  */
       function parseValue(
         option: ValuesFlagOptions<TType>,
-        arg: FlagArgument<TType>,
+        arg: ArgumentOptions<TType>,
         value: string,
       ): unknown {
         const result: unknown = parseCustomType
@@ -466,8 +467,8 @@ function parseArgs<TType extends string>(
             value,
           })
           : parseDefaultType(
-            option as ValuesFlagOptions<FlagArgumentType>,
-            arg as FlagArgument<FlagArgumentType>,
+            option as ValuesFlagOptions<ArgumentType>,
+            arg as ArgumentOptions<ArgumentType>,
             value,
           );
 
@@ -543,11 +544,11 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseDefaultType(
-  option: ValuesFlagOptions<FlagArgumentType>,
-  arg: FlagArgument<FlagArgumentType>,
+  option: ValuesFlagOptions<ArgumentType>,
+  arg: ArgumentOptions<ArgumentType>,
   value: string,
 ): unknown {
-  const type: FlagArgumentType = arg.type || "string";
+  const type: ArgumentType = arg.type || "string";
   const parseType = DefaultTypes[type];
 
   if (!parseType) {

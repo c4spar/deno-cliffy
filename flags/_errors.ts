@@ -1,5 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { FlagArgumentTypeInfo, FlagOptions } from "./types.ts";
+import type { ArgumentValue, FlagOptions } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -175,7 +175,7 @@ export class NoArguments extends ValidationError {
 
 export class InvalidTypeError extends ValidationError {
   constructor(
-    { label, name, value, type }: FlagArgumentTypeInfo<string>,
+    { label, name, value, type }: ArgumentValue<string>,
     expected?: Array<string | number | boolean>,
   ) {
     super(
