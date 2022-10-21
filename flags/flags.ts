@@ -1,9 +1,16 @@
 import {
-  ArgumentFollowsVariadicArgument,
+  getDefaultValue,
+  getOption,
+  isValueFlag,
+  matchWildCardOptions,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
+import {
   DuplicateOptionError,
   InvalidOptionError,
   InvalidOptionValueError,
   MissingOptionValueError,
+  UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedOptionValueError,
   UnexpectedRequiredArgumentError,
   UnknownConflictingOptionError,
@@ -11,13 +18,6 @@ import {
   UnknownRequiredOptionError,
   UnknownTypeError,
 } from "./_errors.ts";
-import {
-  getDefaultValue,
-  getOption,
-  isValueFlag,
-  matchWildCardOptions,
-  paramCaseToCamelCase,
-} from "./_utils.ts";
 import type {
   ArgumentType,
   ParseFlagsContext,
@@ -403,7 +403,7 @@ function parseArgs<TType extends string>(
         if (!arg.variadic) {
           optionArgsIndex++;
         } else if (option.args[optionArgsIndex + 1]) {
-          throw new ArgumentFollowsVariadicArgument(next());
+          throw new UnexpectedArgumentAfterVariadicArgumentError(next());
         }
       }
 

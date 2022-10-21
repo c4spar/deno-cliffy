@@ -1,5 +1,5 @@
 import {
-  ArgumentFollowsVariadicArgument,
+  UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
 } from "../flags/_errors.ts";
 import { didYouMean } from "../flags/_utils.ts";
@@ -86,7 +86,7 @@ export function parseArgumentsDefinition<T extends boolean>(
 
   for (const arg of parts) {
     if (validate && hasVariadic) {
-      throw new ArgumentFollowsVariadicArgument(arg);
+      throw new UnexpectedArgumentAfterVariadicArgumentError(arg);
     }
     const parts: string[] = arg.split(ARGUMENT_DETAILS_REGEX);
 

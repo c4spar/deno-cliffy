@@ -3,7 +3,7 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { MissingRequiredEnvVar } from "./_errors.ts";
+import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { ParseFlagsContext } from "../flags/types.ts";
 import {
@@ -1891,7 +1891,7 @@ export class Command<
           ctx.env[propertyName] = envVar.value(ctx.env[propertyName]);
         }
       } else if (envVar.required && validate) {
-        throw new MissingRequiredEnvVar(envVar);
+        throw new MissingRequiredEnvVarError(envVar);
       }
     }
   }

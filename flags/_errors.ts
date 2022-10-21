@@ -159,17 +159,14 @@ export class UnexpectedRequiredArgumentError extends ValidationError {
   }
 }
 
-export class ArgumentFollowsVariadicArgument extends ValidationError {
+export class UnexpectedArgumentAfterVariadicArgumentError
+  extends ValidationError {
   constructor(arg: string) {
     super(`An argument cannot follow an variadic argument, but got "${arg}".`);
-    Object.setPrototypeOf(this, ArgumentFollowsVariadicArgument.prototype);
-  }
-}
-
-export class NoArguments extends ValidationError {
-  constructor() {
-    super(`No arguments.`);
-    Object.setPrototypeOf(this, NoArguments.prototype);
+    Object.setPrototypeOf(
+      this,
+      UnexpectedArgumentAfterVariadicArgumentError.prototype,
+    );
   }
 }
 

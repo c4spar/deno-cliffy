@@ -63,7 +63,7 @@ export class CommandNotFoundError extends CommandError {
         didYouMeanCommand(name, commands, excluded)
       }`,
     );
-    Object.setPrototypeOf(this, UnknownCommandError.prototype);
+    Object.setPrototypeOf(this, CommandNotFoundError.prototype);
   }
 }
 
@@ -95,10 +95,10 @@ export class DuplicateEnvVarError extends CommandError {
   }
 }
 
-export class MissingRequiredEnvVar extends ValidationError {
+export class MissingRequiredEnvVarError extends ValidationError {
   constructor(envVar: EnvVar) {
     super(`Missing required environment variable "${envVar.names[0]}".`);
-    Object.setPrototypeOf(this, MissingRequiredEnvVar.prototype);
+    Object.setPrototypeOf(this, MissingRequiredEnvVarError.prototype);
   }
 }
 

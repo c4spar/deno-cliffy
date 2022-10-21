@@ -100,7 +100,11 @@ function _${replaceSpecialChars(path)}() {` +
 
     let completions: string = commands
       .map((subCommand: Command) =>
-        `'${subCommand.getName()}:${subCommand.getShortDescription()}'`
+        `'${subCommand.getName()}:${
+          subCommand.getShortDescription()
+            // escape single quotes
+            .replace(/'/g, "'\"'\"'")
+        }'`
       )
       .join("\n      ");
 
