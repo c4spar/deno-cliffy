@@ -1,8 +1,10 @@
 /** Parser options. */
-export interface ParseFlagsOptions<T extends FlagOptions = FlagOptions> {
-  flags?: Array<T>;
+export interface ParseFlagsOptions<
+  TFlagOptions extends FlagOptions = FlagOptions,
+> {
+  flags?: Array<TFlagOptions>;
   parse?: TypeHandler<unknown>;
-  option?: (option: T, value?: unknown) => void;
+  option?: (option: TFlagOptions, value?: unknown) => void;
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
   allowEmpty?: boolean;
@@ -80,4 +82,4 @@ export interface ArgumentValue {
 }
 
 /** Custom type handler/parser. */
-export type TypeHandler<TReturn = unknown> = (type: ArgumentValue) => TReturn;
+export type TypeHandler<TReturn = unknown> = (arg: ArgumentValue) => TReturn;
