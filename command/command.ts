@@ -1,9 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 import {
-  UnknownType,
+  UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { MissingRequiredEnvVar } from "./_errors.ts";
+import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
 import {
@@ -13,25 +13,25 @@ import {
 } from "./_utils.ts";
 import { blue, bold, red, yellow } from "./deps.ts";
 import {
-  CommandExecutableNotFound,
-  CommandNotFound,
-  DefaultCommandNotFound,
-  DuplicateCommandAlias,
-  DuplicateCommandName,
-  DuplicateCompletion,
-  DuplicateEnvironmentVariable,
-  DuplicateExample,
-  DuplicateOptionName,
-  DuplicateType,
-  EnvironmentVariableOptionalValue,
-  EnvironmentVariableSingleValue,
-  EnvironmentVariableVariadicValue,
-  MissingArgument,
-  MissingArguments,
-  MissingCommandName,
-  NoArgumentsAllowed,
-  TooManyArguments,
-  UnknownCommand,
+  CommandExecutableNotFoundError,
+  CommandNotFoundError,
+  DefaultCommandNotFoundError,
+  DuplicateCommandAliasError,
+  DuplicateCommandNameError,
+  DuplicateCompletionError,
+  DuplicateEnvVarError,
+  DuplicateExampleError,
+  DuplicateOptionNameError,
+  DuplicateTypeError,
+  MissingArgumentError,
+  MissingArgumentsError,
+  MissingCommandNameError,
+  NoArgumentsAllowedError,
+  TooManyArgumentsError,
+  TooManyEnvVarValuesError,
+  UnexpectedOptionalEnvVarValueError,
+  UnexpectedVariadicEnvVarValueError,
+  UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
 import { BooleanType } from "./types/boolean.ts";
@@ -386,12 +386,12 @@ export class Command<
     const aliases: string[] = result.flags;
 
     if (!name) {
-      throw new MissingCommandName();
+      throw new MissingCommandNameError();
     }
 
     if (this.getBaseCommand(name, true)) {
       if (!override) {
-        throw new DuplicateCommandName(name);
+        throw new DuplicateCommandNameError(name);
       }
       this.removeCommand(name);
     }
@@ -435,7 +435,7 @@ export class Command<
    */
   public alias(alias: string): this {
     if (this.cmd._name === alias || this.cmd.aliases.includes(alias)) {
-      throw new DuplicateCommandAlias(alias);
+      throw new DuplicateCommandAliasError(alias);
     }
 
     this.cmd.aliases.push(alias);
@@ -462,7 +462,7 @@ export class Command<
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw new CommandNotFound(name, this.getBaseCommands(true));
+      throw new CommandNotFoundError(name, this.getBaseCommands(true));
     }
 
     this.cmd = cmd;
@@ -691,7 +691,7 @@ export class Command<
     CP
   > {
     if (this.cmd.types.get(name) && !options?.override) {
-      throw new DuplicateType(name);
+      throw new DuplicateTypeError(name);
     }
 
     this.cmd.types.set(name, { ...options, name, handler });
@@ -762,7 +762,7 @@ export class Command<
     options?: ICompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
-      throw new DuplicateCompletion(name);
+      throw new DuplicateCompletionError(name);
     }
 
     this.cmd.completions.set(name, {
@@ -1053,7 +1053,7 @@ export class Command<
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw new DuplicateOptionName(name);
+          throw new DuplicateOptionNameError(name);
         }
       }
 
@@ -1082,7 +1082,7 @@ export class Command<
    */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
-      throw new DuplicateExample(name);
+      throw new DuplicateExampleError(name);
     }
 
     this.cmd.examples.push({ name, description });
@@ -1166,7 +1166,7 @@ export class Command<
     }
 
     if (result.flags.some((envName) => this.cmd.getBaseEnvVar(envName, true))) {
-      throw new DuplicateEnvironmentVariable(name);
+      throw new DuplicateEnvVarError(name);
     }
 
     const details: IArgument[] = parseArgumentsDefinition(
@@ -1174,11 +1174,11 @@ export class Command<
     );
 
     if (details.length > 1) {
-      throw new EnvironmentVariableSingleValue(name);
+      throw new TooManyEnvVarValuesError(name);
     } else if (details.length && details[0].optionalValue) {
-      throw new EnvironmentVariableOptionalValue(name);
+      throw new UnexpectedOptionalEnvVarValueError(name);
     } else if (details.length && details[0].variadic) {
-      throw new EnvironmentVariableVariadicValue(name);
+      throw new UnexpectedVariadicEnvVarValueError(name);
     }
 
     this.cmd.envVars.push({
@@ -1465,7 +1465,7 @@ export class Command<
       const cmd = this.getCommand(this.defaultCommand, true);
 
       if (!cmd) {
-        throw new DefaultCommandNotFound(
+        throw new DefaultCommandNotFoundError(
           this.defaultCommand,
           this.getCommands(),
         );
@@ -1503,7 +1503,7 @@ export class Command<
       }
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
-        throw new CommandExecutableNotFound(command);
+        throw new CommandExecutableNotFoundError(command);
       }
       throw error;
     }
@@ -1540,7 +1540,7 @@ export class Command<
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
-      throw new UnknownType(
+      throw new UnknownTypeError(
         type.type,
         this.getTypes().map((type) => type.name),
       );
@@ -1593,7 +1593,7 @@ export class Command<
           ctx.env[propertyName] = envVar.value(ctx.env[propertyName]);
         }
       } else if (envVar.required && validate) {
-        throw new MissingRequiredEnvVar(envVar);
+        throw new MissingRequiredEnvVarError(envVar);
       }
     }
   }
@@ -1636,12 +1636,12 @@ export class Command<
         if (this.hasCommands(true)) {
           if (this.hasCommand(args[0], true)) {
             // e.g: command --global-foo --foo sub-command
-            throw new TooManyArguments(args);
+            throw new TooManyArgumentsError(args);
           } else {
-            throw new UnknownCommand(args[0], this.getCommands());
+            throw new UnknownCommandError(args[0], this.getCommands());
           }
         } else {
-          throw new NoArgumentsAllowed(this.getPath());
+          throw new NoArgumentsAllowedError(this.getPath());
         }
       }
     } else {
@@ -1657,7 +1657,7 @@ export class Command<
           );
 
           if (!hasStandaloneOption) {
-            throw new MissingArguments(required);
+            throw new MissingArgumentsError(required);
           }
         }
       } else {
@@ -1666,7 +1666,9 @@ export class Command<
             if (expectedArg.optionalValue) {
               break;
             }
-            throw new MissingArgument(`Missing argument: ${expectedArg.name}`);
+            throw new MissingArgumentError(
+              `Missing argument: ${expectedArg.name}`,
+            );
           }
 
           let arg: unknown;
@@ -1702,7 +1704,7 @@ export class Command<
         }
 
         if (args.length) {
-          throw new TooManyArguments(args);
+          throw new TooManyArgumentsError(args);
         }
       }
     }

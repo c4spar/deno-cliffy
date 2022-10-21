@@ -1,11 +1,11 @@
 import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
 import {
-  ConflictingOption,
-  DependingOption,
-  MissingOptionValue,
-  MissingRequiredOption,
-  OptionNotCombinable,
-  UnknownOption,
+  ConflictingOptionError,
+  DependingOptionError,
+  MissingOptionValueError,
+  MissingRequiredOptionError,
+  OptionNotCombinableError,
+  UnknownOptionError,
 } from "./_errors.ts";
 import { IFlagsResult, IParseOptions } from "./types.ts";
 import type { IFlagArgument, IFlagOptions } from "./types.ts";
@@ -57,7 +57,7 @@ function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
   opts: IParseOptions<T>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
-    throw new UnknownOption(option.name, opts.flags ?? []);
+    throw new UnknownOptionError(option.name, opts.flags ?? []);
   }
 }
 
@@ -129,7 +129,7 @@ function validateStandaloneOption(
   // Don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
     if (!defaultValues[opt.name] && opt !== ctx.standalone) {
-      throw new OptionNotCombinable(ctx.standalone.name);
+      throw new OptionNotCombinableError(ctx.standalone.name);
     }
   }
 }
@@ -143,7 +143,7 @@ function validateConflictingOptions(
   }
   for (const flag of option.conflicts) {
     if (isset(flag, ctx.flags)) {
-      throw new ConflictingOption(option.name, flag);
+      throw new ConflictingOptionError(option.name, flag);
     }
   }
 }
@@ -159,7 +159,7 @@ function validateDependingOptions(
   for (const flag of option.depends) {
     // Don't throw an error if the value is coming from the default option.
     if (!isset(flag, ctx.flags) && !defaultValues[option.name]) {
-      throw new DependingOption(option.name, flag);
+      throw new DependingOptionError(option.name, flag);
     }
   }
 }
@@ -184,7 +184,7 @@ function validateRequiredValues(
       : typeof ctx.flags[name] !== "undefined";
 
     if (!hasValue) {
-      throw new MissingOptionValue(option.name);
+      throw new MissingOptionValueError(option.name);
     }
   }
 }
@@ -213,7 +213,7 @@ function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
     if (hasConflicts) {
       continue;
     }
-    throw new MissingRequiredOption(option.name);
+    throw new MissingRequiredOptionError(option.name);
   }
 }
 
