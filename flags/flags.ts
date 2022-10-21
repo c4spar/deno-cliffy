@@ -5,17 +5,17 @@ import {
   paramCaseToCamelCase,
 } from "./_utils.ts";
 import {
-  ArgumentFollowsVariadicArgument,
-  DuplicateOption,
-  InvalidOption,
-  InvalidOptionValue,
-  MissingOptionValue,
-  RequiredArgumentFollowsOptionalArgument,
-  UnexpectedOptionValue,
-  UnknownConflictingOption,
-  UnknownOption,
-  UnknownRequiredOption,
-  UnknownType,
+  DuplicateOptionError,
+  InvalidOptionError,
+  InvalidOptionValueError,
+  MissingOptionValueError,
+  UnexpectedArgumentAfterVariadicArgumentError,
+  UnexpectedOptionValueError,
+  UnexpectedRequiredArgumentError,
+  UnknownConflictingOptionError,
+  UnknownOptionError,
+  UnknownRequiredOptionError,
+  UnknownTypeError,
 } from "./_errors.ts";
 import type {
   IFlagArgument,
@@ -110,12 +110,12 @@ function validateOptions<TFlagOptions extends IFlagOptions>(
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new UnknownRequiredOption(flag, opts.flags ?? []);
+        throw new UnknownRequiredOptionError(flag, opts.flags ?? []);
       }
     });
     opt.conflicts?.forEach((flag) => {
       if (!opts.flags || !getOption(opts.flags, flag)) {
-        throw new UnknownConflictingOption(flag, opts.flags ?? []);
+        throw new UnknownConflictingOptionError(flag, opts.flags ?? []);
       }
     });
   });
@@ -161,7 +161,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
       const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
 
       if (!isShort && !isLong) {
-        throw new InvalidOption(current, opts.flags ?? []);
+        throw new InvalidOptionError(current, opts.flags ?? []);
       }
 
       // split value: --foo="bar=baz" => --foo bar=baz
@@ -190,7 +190,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
               ctx.unknown.push(args[argsIndex]);
               continue;
             }
-            throw new UnknownOption(current, opts.flags);
+            throw new UnknownOptionError(current, opts.flags);
           }
         }
         if (!option) {
@@ -210,7 +210,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
         opts.flags?.length && !option.args?.length &&
         typeof currentValue !== "undefined"
       ) {
-        throw new UnexpectedOptionValue(option.name, currentValue);
+        throw new UnexpectedOptionValueError(option.name, currentValue);
       }
 
       const positiveName: string = negate
@@ -222,7 +222,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
         if (!opts.flags?.length) {
           option.collect = true;
         } else if (!option.collect) {
-          throw new DuplicateOption(current);
+          throw new DuplicateOptionError(current);
         }
       }
 
@@ -243,7 +243,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
 
       if (typeof ctx.flags[propName] === "undefined") {
         if (optionArgs[optionArgsIndex].requiredValue) {
-          throw new MissingOptionValue(option.name);
+          throw new MissingOptionValueError(option.name);
         } else if (typeof option.default !== "undefined") {
           ctx.flags[propName] = getDefaultValue(option);
         } else {
@@ -276,7 +276,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
 
         if (!arg) {
           const flag = next();
-          throw new UnknownOption(flag, opts.flags ?? []);
+          throw new UnknownOptionError(flag, opts.flags ?? []);
         }
 
         if (!arg.type) {
@@ -306,7 +306,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
 
         if (arg.requiredValue) {
           if (inOptionalArg) {
-            throw new RequiredArgumentFollowsOptionalArgument(option.name);
+            throw new UnexpectedRequiredArgumentError(option.name);
           }
         } else {
           inOptionalArg = true;
@@ -326,7 +326,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
             .map((nextValue: string) => {
               const value = parseValue(option, arg, nextValue);
               if (typeof value === "undefined") {
-                throw new InvalidOptionValue(
+                throw new InvalidOptionValueError(
                   option.name,
                   arg.type ?? "?",
                   nextValue,
@@ -351,7 +351,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
           if (!arg.variadic) {
             optionArgsIndex++;
           } else if (optionArgs[optionArgsIndex + 1]) {
-            throw new ArgumentFollowsVariadicArgument(next());
+            throw new UnexpectedArgumentAfterVariadicArgumentError(next());
           }
         }
 
@@ -491,7 +491,7 @@ function parseFlagValue(
   const parseType = Types[type];
 
   if (!parseType) {
-    throw new UnknownType(type, Object.keys(Types));
+    throw new UnknownTypeError(type, Object.keys(Types));
   }
 
   return parseType({

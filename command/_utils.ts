@@ -1,6 +1,6 @@
 import {
-  ArgumentFollowsVariadicArgument,
-  RequiredArgumentFollowsOptionalArgument,
+  UnexpectedArgumentAfterVariadicArgumentError,
+  UnexpectedRequiredArgumentError,
 } from "../flags/_errors.ts";
 import { didYouMean } from "../flags/_utils.ts";
 import { OptionType } from "../flags/types.ts";
@@ -86,7 +86,7 @@ export function parseArgumentsDefinition<T extends boolean>(
 
   for (const arg of parts) {
     if (validate && hasVariadic) {
-      throw new ArgumentFollowsVariadicArgument(arg);
+      throw new UnexpectedArgumentAfterVariadicArgumentError(arg);
     }
     const parts: string[] = arg.split(ARGUMENT_DETAILS_REGEX);
 
@@ -109,7 +109,7 @@ export function parseArgumentsDefinition<T extends boolean>(
     };
 
     if (validate && !details.optionalValue && hasOptional) {
-      throw new RequiredArgumentFollowsOptionalArgument(details.name);
+      throw new UnexpectedRequiredArgumentError(details.name);
     }
 
     if (arg[0] === "[") {
