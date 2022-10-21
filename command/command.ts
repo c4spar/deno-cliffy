@@ -1666,9 +1666,7 @@ export class Command<
             if (expectedArg.optionalValue) {
               break;
             }
-            throw new MissingArgumentError(
-              `Missing argument: ${expectedArg.name}`,
-            );
+            throw new MissingArgumentError(expectedArg.name);
           }
 
           let arg: unknown;
