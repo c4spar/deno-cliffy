@@ -1,9 +1,9 @@
-import type { ITypeHandler, ITypeInfo } from "../types.ts";
+import type { ArgumentValue, TypeHandler } from "../types.ts";
 import { InvalidTypeError } from "../_errors.ts";
 
 /** Boolean type handler. Excepts `true`, `false`, `1`, `0` */
-export const boolean: ITypeHandler<boolean> = (
-  type: ITypeInfo,
+export const boolean: TypeHandler<boolean> = (
+  type: ArgumentValue,
 ): boolean => {
   if (~["1", "true"].indexOf(type.value)) {
     return true;

@@ -7,8 +7,8 @@ import {
   OptionNotCombinableError,
   UnknownOptionError,
 } from "./_errors.ts";
-import { IFlagsResult, IParseOptions } from "./types.ts";
-import type { IFlagArgument, IFlagOptions } from "./types.ts";
+import { ParseFlagsContext, ParseFlagsOptions } from "./types.ts";
+import type { FlagArgument, FlagOptions } from "./types.ts";
 
 /**
  * Flags post validation. Validations that are not already done by the parser.
@@ -17,10 +17,10 @@ import type { IFlagArgument, IFlagOptions } from "./types.ts";
  * @param opts    Parse options.
  * @param options Option name mappings: propertyName -> option
  */
-export function validateFlags<T extends IFlagOptions = IFlagOptions>(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  opts: IParseOptions<T>,
-  options: Map<string, IFlagOptions> = new Map(),
+export function validateFlags<T extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  opts: ParseFlagsOptions<T>,
+  options: Map<string, FlagOptions> = new Map(),
 ): void {
   if (!opts.flags) {
     return;
@@ -52,9 +52,9 @@ export function validateFlags<T extends IFlagOptions = IFlagOptions>(
   validateRequiredOptions(ctx, options, opts);
 }
 
-function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
-  option: IFlagOptions,
-  opts: IParseOptions<T>,
+function validateUnknownOption<T extends FlagOptions = FlagOptions>(
+  option: FlagOptions,
+  opts: ParseFlagsOptions<T>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
     throw new UnknownOptionError(option.name, opts.flags ?? []);
@@ -65,9 +65,9 @@ function validateUnknownOption<T extends IFlagOptions = IFlagOptions>(
  * Adds all default values to ctx.flags and returns a boolean object map with
  * only the default option names `{ [OptionName: string]: boolean }`.
  */
-function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  opts: IParseOptions<T>,
+function setDefaultValues<T extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  opts: ParseFlagsOptions<T>,
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
@@ -117,8 +117,8 @@ function setDefaultValues<T extends IFlagOptions = IFlagOptions>(
 }
 
 function validateStandaloneOption(
-  ctx: IFlagsResult,
-  options: Map<string, IFlagOptions>,
+  ctx: ParseFlagsContext,
+  options: Map<string, FlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
 ): void {
@@ -135,8 +135,8 @@ function validateStandaloneOption(
 }
 
 function validateConflictingOptions(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
 ): void {
   if (!option.conflicts?.length) {
     return;
@@ -149,8 +149,8 @@ function validateConflictingOptions(
 }
 
 function validateDependingOptions(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
   defaultValues: Record<string, boolean>,
 ): void {
   if (!option.depends) {
@@ -165,8 +165,8 @@ function validateDependingOptions(
 }
 
 function validateRequiredValues(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  option: IFlagOptions,
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
   name: string,
 ): void {
   if (!option.args) {
@@ -175,7 +175,7 @@ function validateRequiredValues(
   const isArray = option.args.length > 1;
 
   for (let i = 0; i < option.args.length; i++) {
-    const arg: IFlagArgument = option.args[i];
+    const arg: FlagArgument = option.args[i];
     if (!arg.requiredValue) {
       continue;
     }
@@ -189,10 +189,10 @@ function validateRequiredValues(
   }
 }
 
-function validateRequiredOptions<T extends IFlagOptions = IFlagOptions>(
-  ctx: IFlagsResult<Record<string, unknown>>,
-  options: Map<string, IFlagOptions>,
-  opts: IParseOptions<T>,
+function validateRequiredOptions<T extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  options: Map<string, FlagOptions>,
+  opts: ParseFlagsOptions<T>,
 ): void {
   if (!opts.flags?.length) {
     return;

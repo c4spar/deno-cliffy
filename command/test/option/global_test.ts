@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { ITypeInfo } from "../../types.ts";
+import type { ArgumentValue } from "../../types.ts";
 import { ValidationError } from "../../_errors.ts";
 
 const cmd = () =>
@@ -10,7 +10,7 @@ const cmd = () =>
     .option("-b, --base", "Only available on this command.")
     .type(
       "custom",
-      ({ value }: ITypeInfo) => value.toUpperCase(),
+      ({ value }: ArgumentValue) => value.toUpperCase(),
       { global: true },
     )
     .option(

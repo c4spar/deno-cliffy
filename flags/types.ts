@@ -1,7 +1,7 @@
 /** Parser options. */
-export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
+export interface ParseFlagsOptions<T extends FlagOptions = FlagOptions> {
   flags?: Array<T>;
-  parse?: ITypeHandler<unknown>;
+  parse?: TypeHandler<unknown>;
   option?: (option: T, value?: unknown) => void;
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
@@ -11,22 +11,22 @@ export interface IParseOptions<T extends IFlagOptions = IFlagOptions> {
 }
 
 /** Flag options. */
-export interface IFlagOptions extends IFlagArgument {
+export interface FlagOptions extends FlagArgument {
   name: string;
-  args?: IFlagArgument[];
+  args?: FlagArgument[];
   aliases?: string[];
   standalone?: boolean;
-  default?: IDefaultValue;
+  default?: DefaultValue;
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
-  value?: IFlagValueHandler;
+  value?: FlagValueHandler;
   collect?: boolean;
   equalsSign?: boolean;
 }
 
 /** Flag argument definition. */
-export interface IFlagArgument {
+export interface FlagArgument {
   type?: OptionType | string;
   optionalValue?: boolean;
   requiredValue?: boolean;
@@ -44,17 +44,24 @@ export enum OptionType {
 }
 
 /** Default flag value */
-export type IDefaultValue<T = unknown> = T | (() => T);
+export type DefaultValue<TValue = unknown> =
+  | TValue
+  | DefaultValueHandler<TValue>;
+
+export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
 /** Value handler for custom value processing. */
 // deno-lint-ignore no-explicit-any
-export type IFlagValueHandler<T = any, U = T> = (val: T, previous?: U) => U;
+export type FlagValueHandler<TValue = any, TReturn = TValue> = (
+  val: TValue,
+  previous?: TReturn,
+) => TReturn;
 
 /** Result of the parseFlags method. */
-export interface IFlagsResult<
+export interface ParseFlagsContext<
   // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
-  TStandaloneOption extends IFlagOptions = IFlagOptions,
+  TStandaloneOption extends FlagOptions = FlagOptions,
 > {
   flags: TFlags;
   unknown: Array<string>;
@@ -65,7 +72,7 @@ export interface IFlagsResult<
 }
 
 /** Type details. */
-export interface ITypeInfo {
+export interface ArgumentValue {
   label: string;
   type: string;
   name: string;
@@ -73,4 +80,4 @@ export interface ITypeInfo {
 }
 
 /** Custom type handler/parser. */
-export type ITypeHandler<T = unknown> = (type: ITypeInfo) => T;
+export type TypeHandler<TReturn = unknown> = (type: ArgumentValue) => TReturn;

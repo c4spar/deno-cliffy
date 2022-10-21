@@ -1,13 +1,13 @@
 #!/usr/bin/env -S deno run
 
-import { ITypeInfo, parseFlags } from "../../flags/mod.ts";
+import { ArgumentValue, parseFlags } from "../../flags/mod.ts";
 
 const result = parseFlags(Deno.args, {
   flags: [{
     name: "foo",
     type: "float",
   }],
-  parse: ({ label, name, value, type }: ITypeInfo) => {
+  parse: ({ label, name, value, type }: ArgumentValue) => {
     switch (type) {
       case "float":
         if (isNaN(Number(value))) {

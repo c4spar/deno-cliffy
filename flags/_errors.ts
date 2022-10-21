@@ -1,5 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { IFlagOptions, ITypeInfo } from "./types.ts";
+import type { ArgumentValue, FlagOptions } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -9,7 +9,7 @@ export class FlagsError extends Error {
 }
 
 export class UnknownRequiredOptionError extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown required option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -20,7 +20,7 @@ export class UnknownRequiredOptionError extends FlagsError {
 }
 
 export class UnknownConflictingOptionError extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown conflicting option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -63,7 +63,7 @@ export class DuplicateOptionError extends ValidationError {
 }
 
 export class InvalidOptionError extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Invalid option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -74,7 +74,7 @@ export class InvalidOptionError extends ValidationError {
 }
 
 export class UnknownOptionError extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown option "${getFlag(option)}".${
         didYouMeanOption(option, options)
@@ -172,7 +172,7 @@ export class UnexpectedArgumentAfterVariadicArgumentError
 
 export class InvalidTypeError extends ValidationError {
   constructor(
-    { label, name, value, type }: ITypeInfo,
+    { label, name, value, type }: ArgumentValue,
     expected?: Array<string | number | boolean>,
   ) {
     super(

@@ -1,9 +1,9 @@
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
 import { parseFlags } from "../../flags.ts";
-import type { IParseOptions } from "../../types.ts";
+import type { ParseFlagsOptions } from "../../types.ts";
 import { OptionType } from "../../types.ts";
 
-const options = <IParseOptions> {
+const options = <ParseFlagsOptions> {
   allowEmpty: false,
   flags: [{
     name: "flag",
