@@ -38,7 +38,6 @@ export interface BaseFlagOptions<TDefault = unknown> {
   conflicts?: string[];
   value?: FlagValueHandler;
   collect?: boolean;
-  equalsSign?: boolean;
 }
 
 /** Options for a flag with no arguments. */
@@ -48,6 +47,7 @@ export type BooleanFlagOptions = BaseFlagOptions;
 export interface ValueFlagOptions<TType extends string>
   extends BaseFlagOptions, ArgumentOptions<TType> {
   optionalValue?: boolean;
+  equalsSign?: boolean;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface ValueFlagOptions<TType extends string>
 export interface ValuesFlagOptions<TType extends string>
   extends BaseFlagOptions {
   args: Array<ArgumentOptions<TType>>;
-  type?: never;
+  equalsSign?: boolean;
 }
 
 /** Flag options. */
