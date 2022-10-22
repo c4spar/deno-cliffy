@@ -3,7 +3,7 @@ import {
   UnexpectedRequiredArgumentError,
 } from "../flags/_errors.ts";
 import { didYouMean } from "../flags/_utils.ts";
-import { OptionType } from "../flags/types.ts";
+import { OptionType } from "../flags/deprecated.ts";
 import type { Command } from "./command.ts";
 import type { IArgument } from "./types.ts";
 

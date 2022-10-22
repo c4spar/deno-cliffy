@@ -3,9 +3,10 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
+import { IFlagValueHandler } from "../flags/deprecated.ts";
 import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IDefaultValue, IFlagsResult } from "../flags/types.ts";
+import type { DefaultValue, ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -42,6 +43,7 @@ import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
+  ArgumentValue,
   IAction,
   IArgument,
   ICommandGlobalOption,
@@ -54,13 +56,11 @@ import type {
   IEnvVarOptions,
   IEnvVarValueHandler,
   IExample,
-  IFlagValueHandler,
   IGlobalEnvVarOptions,
   IHelpHandler,
   IOption,
   IParseResult,
   IType,
-  ITypeInfo,
   ITypeOptions,
   IVersionHandler,
   MapTypes,
@@ -868,7 +868,7 @@ export class Command<
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -951,7 +951,7 @@ export class Command<
       >
         & {
           global: true;
-          default?: IDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -992,7 +992,7 @@ export class Command<
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           conflicts?: X;
@@ -1526,7 +1526,7 @@ export class Command<
       allowEmpty: this._allowEmpty,
       flags: options,
       ignoreDefaults: ctx.env,
-      parse: (type: ITypeInfo) => this.parseType(type),
+      parse: (type: ArgumentValue) => this.parseType(type),
       option: (option: IOption) => {
         if (!ctx.action && option.action) {
           ctx.action = option as ActionOption;
@@ -1536,7 +1536,7 @@ export class Command<
   }
 
   /** Parse argument type. */
-  protected parseType(type: ITypeInfo): unknown {
+  protected parseType(type: ArgumentValue): unknown {
     const typeSettings: IType | undefined = this.getType(type.type);
 
     if (!typeSettings) {
@@ -2515,7 +2515,7 @@ interface IDefaultOption {
 
 type ActionOption = IOption & { action: IAction };
 
-interface ParseContext extends IFlagsResult<Record<string, unknown>> {
+interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
   action?: ActionOption;
   env: Record<string, unknown>;
 }

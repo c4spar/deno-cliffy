@@ -11,14 +11,14 @@ export {
   validateFlags,
 } from "./flags/mod.ts";
 export type {
-  IDefaultValue,
-  IFlagArgument,
-  IFlagOptions,
-  IFlagsResult,
-  IFlagValueHandler,
-  IParseOptions,
-  ITypeHandler,
-  ITypeInfo,
+  ArgumentOptions,
+  ArgumentValue,
+  DefaultValue,
+  FlagOptions,
+  ParseFlagsContext,
+  ParseFlagsOptions,
+  TypeHandler,
+  ValueHandler,
 } from "./flags/mod.ts";
 export * from "./keycode/mod.ts";
 export * from "./prompt/mod.ts";

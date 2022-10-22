@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
 import {
+  ArgumentValue,
   Command,
-  ITypeInfo,
   Type,
   ValidationError,
 } from "../../command/mod.ts";
@@ -10,7 +10,7 @@ import {
 class ColorType extends Type<string> {
   private readonly colors = ["red", "blue", "yellow"];
 
-  public parse({ label, name, value }: ITypeInfo): string {
+  public parse({ label, name, value }: ArgumentValue): string {
     if (!this.colors.includes(value)) {
       throw new ValidationError(
         `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${

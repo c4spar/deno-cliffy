@@ -17,25 +17,26 @@ import {
   UnknownRequiredOptionError,
   UnknownTypeError,
 } from "./_errors.ts";
+import { OptionType } from "./deprecated.ts";
 import type {
-  IFlagArgument,
-  IFlagOptions,
-  IFlagsResult,
-  IParseOptions,
-  ITypeHandler,
+  ArgumentOptions,
+  ArgumentType,
+  FlagOptions,
+  ParseFlagsContext,
+  ParseFlagsOptions,
+  TypeHandler,
 } from "./types.ts";
-import { OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
-import { validateFlags } from "./validate_flags.ts";
+import { validateFlags } from "./_validate_flags.ts";
 import { integer } from "./types/integer.ts";
 
-const Types: Record<string, ITypeHandler> = {
-  [OptionType.STRING]: string,
-  [OptionType.NUMBER]: number,
-  [OptionType.INTEGER]: integer,
-  [OptionType.BOOLEAN]: boolean,
+const Types: Record<ArgumentType, TypeHandler> = {
+  string,
+  number,
+  integer,
+  boolean,
 };
 
 /**
@@ -66,17 +67,17 @@ const Types: Record<string, ITypeHandler> = {
  */
 export function parseFlags<
   TFlags extends Record<string, unknown>,
-  TFlagOptions extends IFlagOptions,
-  TFlagsResult extends IFlagsResult,
+  TFlagOptions extends FlagOptions,
+  TFlagsResult extends ParseFlagsContext,
 >(
   argsOrCtx: string[] | TFlagsResult,
-  opts: IParseOptions<TFlagOptions> = {},
-): TFlagsResult & IFlagsResult<TFlags, TFlagOptions> {
+  opts: ParseFlagsOptions<TFlagOptions> = {},
+): TFlagsResult & ParseFlagsContext<TFlags, TFlagOptions> {
   let args: Array<string>;
-  let ctx: IFlagsResult<Record<string, unknown>>;
+  let ctx: ParseFlagsContext<Record<string, unknown>>;
 
   if (Array.isArray(argsOrCtx)) {
-    ctx = {} as IFlagsResult<Record<string, unknown>>;
+    ctx = {} as ParseFlagsContext<Record<string, unknown>>;
     args = argsOrCtx;
   } else {
     ctx = argsOrCtx;
@@ -101,11 +102,11 @@ export function parseFlags<
     parseDottedOptions(ctx);
   }
 
-  return ctx as TFlagsResult & IFlagsResult<TFlags, TFlagOptions>;
+  return ctx as TFlagsResult & ParseFlagsContext<TFlags, TFlagOptions>;
 }
 
-function validateOptions<TFlagOptions extends IFlagOptions>(
-  opts: IParseOptions<TFlagOptions>,
+function validateOptions<TFlagOptions extends FlagOptions>(
+  opts: ParseFlagsOptions<TFlagOptions>,
 ) {
   opts.flags?.forEach((opt) => {
     opt.depends?.forEach((flag) => {
@@ -121,13 +122,13 @@ function validateOptions<TFlagOptions extends IFlagOptions>(
   });
 }
 
-function parseArgs<TFlagOptions extends IFlagOptions>(
-  ctx: IFlagsResult<Record<string, unknown>>,
+function parseArgs<TFlagOptions extends FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
   args: Array<string>,
-  opts: IParseOptions<TFlagOptions>,
-): Map<string, IFlagOptions> {
+  opts: ParseFlagsOptions<TFlagOptions>,
+): Map<string, FlagOptions> {
   /** Option name mapping: propertyName -> option.name */
-  const optionsMap: Map<string, IFlagOptions> = new Map();
+  const optionsMap: Map<string, FlagOptions> = new Map();
   let inLiteral = false;
 
   for (
@@ -135,8 +136,8 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
     argsIndex < args.length;
     argsIndex++
   ) {
-    let option: IFlagOptions | undefined;
-    let optionArgs: IFlagArgument[] | undefined;
+    let option: FlagOptions | undefined;
+    let optionArgs: ArgumentOptions[] | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
     let negate = false;
@@ -269,10 +270,10 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
       /** Parse next argument for current option. */
       // deno-lint-ignore no-inner-declarations
       function parseNext(
-        option: IFlagOptions,
-        optionArgs: IFlagArgument[],
+        option: FlagOptions,
+        optionArgs: ArgumentOptions[],
       ): void {
-        const arg: IFlagArgument | undefined = optionArgs[optionArgsIndex];
+        const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
 
         if (!arg) {
           const flag = next();
@@ -373,7 +374,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
         }
 
         /** Check if current option should have an argument. */
-        function hasNext(arg: IFlagArgument): boolean {
+        function hasNext(arg: ArgumentOptions): boolean {
           const nextValue = currentValue ?? args[argsIndex + 1];
           if (!nextValue) {
             return false;
@@ -401,8 +402,8 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
 
         /** Parse argument value.  */
         function parseValue(
-          option: IFlagOptions,
-          arg: IFlagArgument,
+          option: FlagOptions,
+          arg: ArgumentOptions,
           value: string,
         ): unknown {
           const type: string = arg.type || OptionType.STRING;
@@ -435,7 +436,7 @@ function parseArgs<TFlagOptions extends IFlagOptions>(
   return optionsMap;
 }
 
-function parseDottedOptions(ctx: IFlagsResult): void {
+function parseDottedOptions(ctx: ParseFlagsContext): void {
   // convert dotted option keys into nested objects
   ctx.flags = Object.keys(ctx.flags).reduce(
     (result: Record<string, unknown>, key: string) => {
@@ -483,11 +484,11 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseFlagValue(
-  option: IFlagOptions,
-  arg: IFlagArgument,
+  option: FlagOptions,
+  arg: ArgumentOptions,
   value: string,
 ): unknown {
-  const type: string = arg.type || OptionType.STRING;
+  const type: ArgumentType = arg.type as ArgumentType || OptionType.STRING;
   const parseType = Types[type];
 
   if (!parseType) {

@@ -1,6 +1,8 @@
-import type { ITypeHandler, ITypeInfo } from "../types.ts";
+import type { ArgumentValue, TypeHandler } from "../types.ts";
 
 /** String type handler. Excepts any value. */
-export const string: ITypeHandler<string> = ({ value }: ITypeInfo): string => {
+export const string: TypeHandler<string> = (
+  { value }: ArgumentValue,
+): string => {
   return value;
 };

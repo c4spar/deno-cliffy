@@ -1,22 +1,22 @@
 // deno-lint-ignore-file no-explicit-any
 
 import type {
-  IDefaultValue,
-  IFlagArgument,
-  IFlagOptions,
-  IFlagValueHandler,
-  ITypeHandler,
-  ITypeInfo,
+  ArgumentOptions,
+  ArgumentValue,
+  DefaultValue,
+  FlagOptions,
+  TypeHandler,
 } from "../flags/types.ts";
+import type { IFlagValueHandler } from "../flags/deprecated.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 
-export type { IDefaultValue, IFlagValueHandler, ITypeHandler, ITypeInfo };
+export type { ArgumentValue, DefaultValue, IFlagValueHandler, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
-export type TypeOrTypeHandler<T> = Type<T> | ITypeHandler<T>;
+export type TypeOrTypeHandler<T> = Type<T> | TypeHandler<T>;
 
 export type TypeValue<T, U = T> = T extends TypeOrTypeHandler<infer V> ? V : U;
 
@@ -59,7 +59,7 @@ export type IAction<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface IArgument extends IFlagArgument {
+export interface IArgument extends ArgumentOptions {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
@@ -107,7 +107,7 @@ export interface ICommandGlobalOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends Omit<IFlagOptions, ExcludedCommandOptions> {
+> extends Omit<FlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
   action?: IAction<O, A, G, PG, CT, GT, PT, P>;
@@ -137,7 +137,7 @@ export interface IOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, IFlagOptions {
+> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, FlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
@@ -182,7 +182,7 @@ export interface ITypeOptions {
 /** Type settings. */
 export interface IType extends ITypeOptions {
   name: string;
-  handler: Type<unknown> | ITypeHandler<unknown>;
+  handler: Type<unknown> | TypeHandler<unknown>;
 }
 
 /* EXAMPLE TYPES */

@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
-import { OptionType } from "../../types.ts";
 
 Deno.test("flags stopEarly disable", () => {
   const { flags, unknown, literal } = parseFlags([

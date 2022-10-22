@@ -1,5 +1,5 @@
 import { Type } from "../type.ts";
-import type { ITypeInfo } from "../types.ts";
+import type { ArgumentValue } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
@@ -11,7 +11,7 @@ export class EnumType<T extends string | number | boolean> extends Type<T> {
     this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
-  public parse(type: ITypeInfo): T {
+  public parse(type: ArgumentValue): T {
     for (const value of this.allowedValues) {
       if (value.toString() === type.value) {
         return value;
