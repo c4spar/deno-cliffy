@@ -3,6 +3,7 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
+import { IFlagValueHandler } from "../flags/deprecated.ts";
 import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { DefaultValue, ParseFlagsContext } from "../flags/types.ts";
@@ -43,7 +44,6 @@ import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   ArgumentValue,
-  FlagValueHandler,
   IAction,
   IArgument,
   ICommandGlobalOption,
@@ -871,9 +871,9 @@ export class Command<
           default?: DefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: FlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | FlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -954,9 +954,9 @@ export class Command<
           default?: DefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: FlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | FlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -996,9 +996,9 @@ export class Command<
           required?: R;
           collect?: C;
           conflicts?: X;
-          value?: FlagValueHandler<MapTypes<ValueOf<O>>, V>;
+          value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
         }
-      | FlagValueHandler<MapTypes<ValueOf<O>>, V>,
+      | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -1013,7 +1013,7 @@ export class Command<
   public option(
     flags: string,
     desc: string,
-    opts?: ICommandOption | FlagValueHandler,
+    opts?: ICommandOption | IFlagValueHandler,
   ): Command<any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });

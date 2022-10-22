@@ -3,10 +3,10 @@ import {
   DefaultValue,
   FlagArgument,
   FlagOptions,
-  FlagValueHandler,
   ParseFlagsContext,
   ParseFlagsOptions,
   TypeHandler,
+  ValueHandler,
 } from "./types.ts";
 
 /** @deprecated Use ParseFlagsOptions instead. */
@@ -22,10 +22,12 @@ export type IFlagArgument = FlagArgument;
 /** @deprecated Use DefaultValue instead. */
 export type IDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
-/** @deprecated Use FlagValueHandler instead. */
+/** @deprecated Use ValueHandler instead. */
 // deno-lint-ignore no-explicit-any
-export type IFlagValueHandler<TValue = any, TReturn = TValue> =
-  FlagValueHandler<TValue, TReturn>;
+export type IFlagValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
+  TValue,
+  TReturn
+>;
 
 /** @deprecated Use ParseFlagsContext instead. */
 export type IFlagsResult<

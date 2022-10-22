@@ -5,14 +5,14 @@ import type {
   DefaultValue,
   FlagArgument,
   FlagOptions,
-  FlagValueHandler,
   TypeHandler,
 } from "../flags/types.ts";
+import type { IFlagValueHandler } from "../flags/deprecated.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 
-export type { ArgumentValue, DefaultValue, FlagValueHandler, TypeHandler };
+export type { ArgumentValue, DefaultValue, IFlagValueHandler, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 

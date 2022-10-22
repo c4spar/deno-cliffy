@@ -15,10 +15,10 @@ export type {
   DefaultValue,
   FlagArgument,
   FlagOptions,
-  FlagValueHandler,
   ParseFlagsContext,
   ParseFlagsOptions,
   TypeHandler,
+  ValueHandler,
 } from "./flags/mod.ts";
 export * from "./keycode/mod.ts";
 export * from "./prompt/mod.ts";

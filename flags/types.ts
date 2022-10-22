@@ -22,7 +22,7 @@ export interface FlagOptions extends FlagArgument {
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
-  value?: FlagValueHandler;
+  value?: ValueHandler;
   collect?: boolean;
   equalsSign?: boolean;
 }
@@ -54,7 +54,7 @@ export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
 /** Value handler for custom value processing. */
 // deno-lint-ignore no-explicit-any
-export type FlagValueHandler<TValue = any, TReturn = TValue> = (
+export type ValueHandler<TValue = any, TReturn = TValue> = (
   val: TValue,
   previous?: TReturn,
 ) => TReturn;
