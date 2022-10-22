@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
+import type { IFlagValueHandler } from "../flags/deprecated.ts";
 import type {
   ArgumentOptions,
   ArgumentValue,
@@ -8,10 +9,9 @@ import type {
   TypeHandler,
   ValueHandler,
 } from "../flags/types.ts";
-import type { IFlagValueHandler } from "../flags/deprecated.ts";
-import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
+import type { Type } from "./type.ts";
 
 export type { ArgumentValue, DefaultValue, IFlagValueHandler, TypeHandler };
 
@@ -19,15 +19,13 @@ type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
 export type TypeOrTypeHandler<T> = Type<T> | TypeHandler<T>;
 
-export type TypeValue<T, U = T> = T extends TypeOrTypeHandler<infer V> ? V : U;
-
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : T;
 
 export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
-  : TypeValue<T>;
+  : Type.infer<T>;
 
 /* COMMAND TYPES */
 
@@ -105,6 +103,13 @@ export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TReturn
 >;
 
+/** Default option value */
+export type OptionDefaultValue<TValue = unknown> =
+  | TValue
+  | OptionDefaultValueHandler<TValue>;
+
+export type OptionDefaultValueHandler<TValue = unknown> = () => TValue;
+
 type ExcludedCommandOptions =
   | "name"
   | "args"
@@ -114,7 +119,8 @@ type ExcludedCommandOptions =
   | "aliases"
   | "variadic"
   | "list"
-  | "value";
+  | "value"
+  | "default";
 
 /** Command option options. */
 export interface GlobalOptionOptions<
@@ -132,6 +138,7 @@ export interface GlobalOptionOptions<
   action?: ActionHandler<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
   value?: OptionValueHandler;
+  default?: OptionDefaultValue;
 }
 
 export interface OptionOptions<

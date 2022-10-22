@@ -5,7 +5,7 @@ import {
 } from "../flags/_errors.ts";
 import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { DefaultValue, ParseFlagsContext } from "../flags/types.ts";
+import type { ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -34,7 +34,7 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { OptionValueHandler } from "./types.ts";
+import { OptionDefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -868,7 +868,7 @@ export class Command<
         "value"
       >
         & {
-          default?: DefaultValue<D>;
+          default?: OptionDefaultValue<D>;
           required?: R;
           collect?: C;
           value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -951,7 +951,7 @@ export class Command<
       >
         & {
           global: true;
-          default?: DefaultValue<D>;
+          default?: OptionDefaultValue<D>;
           required?: R;
           collect?: C;
           value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -992,7 +992,7 @@ export class Command<
         "value"
       >
         & {
-          default?: DefaultValue<D>;
+          default?: OptionDefaultValue<D>;
           required?: R;
           collect?: C;
           conflicts?: X;

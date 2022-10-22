@@ -1,4 +1,5 @@
 import type { Command } from "./command.ts";
+import { TypeOrTypeHandler } from "./types.ts";
 import type {
   ArgumentValue,
   CompleteHandlerResult,
@@ -47,4 +48,9 @@ export abstract class Type<T> {
     cmd: Command,
     parent?: Command,
   ): CompleteHandlerResult;
+}
+
+export namespace Type {
+  export type infer<TType, TDefault = TType> = TType extends
+    TypeOrTypeHandler<infer Value> ? Value : TDefault;
 }
