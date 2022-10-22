@@ -28,7 +28,7 @@ import { OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
-import { validateFlags } from "./validate_flags.ts";
+import { validateFlags } from "./_validate_flags.ts";
 import { integer } from "./types/integer.ts";
 
 const Types: Record<string, TypeHandler> = {
