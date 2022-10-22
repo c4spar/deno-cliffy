@@ -11,9 +11,9 @@ export {
   validateFlags,
 } from "./flags/mod.ts";
 export type {
+  ArgumentOptions,
   ArgumentValue,
   DefaultValue,
-  FlagArgument,
   FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,

@@ -1,9 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
 
 import type {
+  ArgumentOptions,
   ArgumentValue,
   DefaultValue,
-  FlagArgument,
   FlagOptions,
   TypeHandler,
 } from "../flags/types.ts";
@@ -59,7 +59,7 @@ export type IAction<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface IArgument extends FlagArgument {
+export interface IArgument extends ArgumentOptions {
   /** Argument name. */
   name: string;
   /** Shell completion action. */

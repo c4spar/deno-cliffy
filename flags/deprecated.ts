@@ -1,7 +1,7 @@
 import {
+  ArgumentOptions,
   ArgumentValue,
   DefaultValue,
-  FlagArgument,
   FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
@@ -16,8 +16,8 @@ export type IParseOptions<TFlagOptions extends FlagOptions = FlagOptions> =
 /** @deprecated Use FlagOptions instead. */
 export type IFlagOptions = FlagOptions;
 
-/** @deprecated Use FlagArgument instead. */
-export type IFlagArgument = FlagArgument;
+/** @deprecated Use ArgumentOptions instead. */
+export type IFlagArgument = ArgumentOptions;
 
 /** @deprecated Use DefaultValue instead. */
 export type IDefaultValue<TValue = unknown> = DefaultValue<TValue>;

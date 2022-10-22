@@ -18,7 +18,7 @@ import {
   UnknownTypeError,
 } from "./_errors.ts";
 import type {
-  FlagArgument,
+  ArgumentOptions,
   FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
@@ -136,7 +136,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     argsIndex++
   ) {
     let option: FlagOptions | undefined;
-    let optionArgs: FlagArgument[] | undefined;
+    let optionArgs: ArgumentOptions[] | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
     let negate = false;
@@ -270,9 +270,9 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       // deno-lint-ignore no-inner-declarations
       function parseNext(
         option: FlagOptions,
-        optionArgs: FlagArgument[],
+        optionArgs: ArgumentOptions[],
       ): void {
-        const arg: FlagArgument | undefined = optionArgs[optionArgsIndex];
+        const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
 
         if (!arg) {
           const flag = next();
@@ -373,7 +373,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
 
         /** Check if current option should have an argument. */
-        function hasNext(arg: FlagArgument): boolean {
+        function hasNext(arg: ArgumentOptions): boolean {
           const nextValue = currentValue ?? args[argsIndex + 1];
           if (!nextValue) {
             return false;
@@ -402,7 +402,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         /** Parse argument value.  */
         function parseValue(
           option: FlagOptions,
-          arg: FlagArgument,
+          arg: ArgumentOptions,
           value: string,
         ): unknown {
           const type: string = arg.type || OptionType.STRING;
@@ -484,7 +484,7 @@ function splitFlags(flag: string): Array<string> {
 
 function parseFlagValue(
   option: FlagOptions,
-  arg: FlagArgument,
+  arg: ArgumentOptions,
   value: string,
 ): unknown {
   const type: string = arg.type || OptionType.STRING;

@@ -8,7 +8,7 @@ import {
   UnknownOptionError,
 } from "./_errors.ts";
 import { ParseFlagsContext, ParseFlagsOptions } from "./types.ts";
-import type { FlagArgument, FlagOptions } from "./types.ts";
+import type { ArgumentOptions, FlagOptions } from "./types.ts";
 
 /**
  * Flags post validation. Validations that are not already done by the parser.
@@ -175,7 +175,7 @@ function validateRequiredValues(
   const isArray = option.args.length > 1;
 
   for (let i = 0; i < option.args.length; i++) {
-    const arg: FlagArgument = option.args[i];
+    const arg: ArgumentOptions = option.args[i];
     if (!arg.requiredValue) {
       continue;
     }

@@ -13,9 +13,9 @@ export interface ParseFlagsOptions<
 }
 
 /** Flag options. */
-export interface FlagOptions extends FlagArgument {
+export interface FlagOptions extends ArgumentOptions {
   name: string;
-  args?: FlagArgument[];
+  args?: ArgumentOptions[];
   aliases?: string[];
   standalone?: boolean;
   default?: DefaultValue;
@@ -28,7 +28,7 @@ export interface FlagOptions extends FlagArgument {
 }
 
 /** Flag argument definition. */
-export interface FlagArgument {
+export interface ArgumentOptions {
   type?: OptionType | string;
   optionalValue?: boolean;
   requiredValue?: boolean;
