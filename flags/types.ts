@@ -1,15 +1,3 @@
-/**
- * Available build-in argument types.
- * @deprecated Deprecated in favor of `ArgumentType`.
- * @see ArgumentType
- */
-export enum OptionType {
-  STRING = "string",
-  NUMBER = "number",
-  INTEGER = "integer",
-  BOOLEAN = "boolean",
-}
-
 /** Available build-in argument types. */
 export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
@@ -36,8 +24,9 @@ export interface BaseFlagOptions<TDefault = unknown> {
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
-  value?: FlagValueHandler;
+  value?: ValueHandler;
   collect?: boolean;
+  equalsSign?: boolean;
 }
 
 /** Options for a flag with no arguments. */
@@ -47,7 +36,6 @@ export type BooleanFlagOptions = BaseFlagOptions;
 export interface ValueFlagOptions<TType extends string>
   extends BaseFlagOptions, ArgumentOptions<TType> {
   optionalValue?: boolean;
-  equalsSign?: boolean;
 }
 
 /**
@@ -58,7 +46,6 @@ export interface ValueFlagOptions<TType extends string>
 export interface ValuesFlagOptions<TType extends string>
   extends BaseFlagOptions {
   args: Array<ArgumentOptions<TType>>;
-  equalsSign?: boolean;
 }
 
 /** Flag options. */
@@ -102,7 +89,7 @@ export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
 /** A callback method for custom processing or mapping of flag values. */
 // deno-lint-ignore no-explicit-any
-export type FlagValueHandler<TValue = any, TPrevious = TValue> = (
+export type ValueHandler<TValue = any, TPrevious = TValue> = (
   val: TValue,
   previous?: TPrevious,
 ) => TPrevious;
@@ -123,5 +110,5 @@ export type TypeHandler<
   TType extends string,
   TReturn,
 > = (
-  type: ArgumentValue<TType>,
+  arg: ArgumentValue<TType>,
 ) => TReturn;

@@ -18,19 +18,21 @@ import {
   UnknownRequiredOptionError,
   UnknownTypeError,
 } from "./_errors.ts";
+import { OptionType } from "./deprecated.ts";
 import type {
+  ArgumentOptions,
   ArgumentType,
+  FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
   TypeHandler,
   ValuesFlagOptions,
 } from "./types.ts";
-import { ArgumentOptions, FlagOptions, OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { integer } from "./types/integer.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
-import { validateFlags } from "./validate_flags.ts";
+import { validateFlags } from "./_validate_flags.ts";
 
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never

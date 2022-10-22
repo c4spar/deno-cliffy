@@ -1,12 +1,12 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { FlagValueHandler } from "../flags/types.ts";
 import type {
   ArgumentOptions,
   ArgumentValue,
   BaseFlagOptions,
   DefaultValue,
   TypeHandler as FlagTypeHandler,
+  ValueHandler,
 } from "../flags/types.ts";
 import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
@@ -132,8 +132,10 @@ export interface Option<
 
 export type OptionDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
-export type OptionValueHandler<TValue = any, TReturn = TValue> =
-  FlagValueHandler<TValue, TReturn>;
+export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
+  TValue,
+  TReturn
+>;
 
 /* ENV VARS TYPES */
 
