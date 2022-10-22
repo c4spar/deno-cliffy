@@ -2,7 +2,7 @@
 
 import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { IExample } from "../../types.ts";
+import type { Example } from "../../types.ts";
 
 function command() {
   return new Command()
@@ -15,7 +15,7 @@ Deno.test("command - example - example properties", () => {
   const cmd = new Command()
     .throwErrors()
     .example("foo", "foo ...");
-  const example: IExample = cmd.getExample("foo") as IExample;
+  const example: Example = cmd.getExample("foo") as Example;
   assertEquals(example.name, "foo");
   assertEquals(example.description, "foo ...");
 });

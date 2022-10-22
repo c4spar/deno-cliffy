@@ -6,6 +6,7 @@ import type {
   DefaultValue,
   FlagOptions,
   TypeHandler,
+  ValueHandler,
 } from "../flags/types.ts";
 import type { IFlagValueHandler } from "../flags/deprecated.ts";
 import type { Type } from "./type.ts";
@@ -31,7 +32,7 @@ export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
 /* COMMAND TYPES */
 
 /** Description handler. */
-export type IDescription<
+export type Description<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -40,10 +41,22 @@ export type IDescription<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> = string | ((this: Command<PG, PT, O, A, G, CT, GT, P>) => string);
+> = string | DescriptionHandler<O, A, G, PG, CT, GT, PT, P>;
+
+/** Description handler. */
+export type DescriptionHandler<
+  O extends Record<string, any> | void = any,
+  A extends Array<unknown> = O extends number ? any : [],
+  G extends Record<string, any> | void = O extends number ? any : void,
+  PG extends Record<string, any> | void = O extends number ? any : void,
+  CT extends Record<string, any> | void = O extends number ? any : void,
+  GT extends Record<string, any> | void = O extends number ? any : void,
+  PT extends Record<string, any> | void = O extends number ? any : void,
+  P extends Command<any> | undefined = O extends number ? any : undefined,
+> = (this: Command<PG, PT, O, A, G, CT, GT, P>) => string;
 
 /** Action handler for commands and options. */
-export type IAction<
+export type ActionHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -59,7 +72,7 @@ export type IAction<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface IArgument extends ArgumentOptions {
+export interface Argument extends ArgumentOptions {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
@@ -69,7 +82,7 @@ export interface IArgument extends ArgumentOptions {
 }
 
 /** Result of `cmd.parse()` method. */
-export interface IParseResult<
+export interface CommandResult<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -87,6 +100,11 @@ export interface IParseResult<
 
 /* OPTION TYPES */
 
+export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
+  TValue,
+  TReturn
+>;
+
 type ExcludedCommandOptions =
   | "name"
   | "args"
@@ -95,10 +113,11 @@ type ExcludedCommandOptions =
   | "requiredValue"
   | "aliases"
   | "variadic"
-  | "list";
+  | "list"
+  | "value";
 
 /** Command option options. */
-export interface ICommandGlobalOption<
+export interface GlobalOptionOptions<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -110,11 +129,12 @@ export interface ICommandGlobalOption<
 > extends Omit<FlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
-  action?: IAction<O, A, G, PG, CT, GT, PT, P>;
+  action?: ActionHandler<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
+  value?: OptionValueHandler;
 }
 
-export interface ICommandOption<
+export interface OptionOptions<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -123,12 +143,12 @@ export interface ICommandOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends ICommandGlobalOption<O, A, G, PG, CT, GT, PT, P> {
+> extends GlobalOptionOptions<O, A, G, PG, CT, GT, PT, P> {
   global?: boolean;
 }
 
 /** Command option settings. */
-export interface IOption<
+export interface Option<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -137,50 +157,53 @@ export interface IOption<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends ICommandOption<O, A, G, PG, CT, GT, PT, P>, FlagOptions {
+> extends
+  OptionOptions<O, A, G, PG, CT, GT, PT, P>,
+  Omit<FlagOptions, "value"> {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
-  args: IArgument[];
+  args: Argument[];
   groupName?: string;
 }
 
 /* ENV VARS TYPES */
 
-export type IEnvVarValueHandler<T = any, V = unknown> = (val: T) => V;
+export type EnvVarValueHandler<T = any, V = unknown> = (val: T) => V;
 
 /** Environment variable options */
-export interface IGlobalEnvVarOptions {
+export interface GlobalEnvVarOptions {
   hidden?: boolean;
   required?: boolean;
   prefix?: string | undefined;
-  value?: IEnvVarValueHandler;
+  value?: EnvVarValueHandler;
 }
 
 /** Environment variable options */
-export interface IEnvVarOptions extends IGlobalEnvVarOptions {
+export interface EnvVarOptions extends GlobalEnvVarOptions {
   global?: boolean;
 }
 
 /** Environment variable settings. */
-export interface IEnvVar extends IEnvVarOptions {
+export interface EnvVar extends EnvVarOptions {
   name: string;
   names: string[];
   description: string;
   type: string;
-  details: IArgument;
+  details: Argument;
 }
 
 /* TYPE TYPES */
 
 /** Type options. */
-export interface ITypeOptions {
+export interface TypeOptions {
   override?: boolean;
   global?: boolean;
 }
 
+// @TODO: use Type class instead of TypeDef interface.
 /** Type settings. */
-export interface IType extends ITypeOptions {
+export interface TypeDef extends TypeOptions {
   name: string;
   handler: Type<unknown> | TypeHandler<unknown>;
 }
@@ -188,7 +211,7 @@ export interface IType extends ITypeOptions {
 /* EXAMPLE TYPES */
 
 /** Example settings. */
-export interface IExample {
+export interface Example {
   name: string;
   description: string;
 }
@@ -196,13 +219,13 @@ export interface IExample {
 /* COMPLETION TYPES */
 
 /** Completion options. */
-export interface ICompleteOptions {
+export interface CompleteOptions {
   override?: boolean;
   global?: boolean;
 }
 
 /** Completion settings. */
-export interface ICompletion<
+export interface Completion<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -211,9 +234,9 @@ export interface ICompletion<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends ICompleteOptions {
+> extends CompleteOptions {
   name: string;
-  complete: ICompleteHandler<O, A, G, PG, CT, GT, PT, P>;
+  complete: CompleteHandler<O, A, G, PG, CT, GT, PT, P>;
 }
 
 export type CompleteHandlerResult =
@@ -223,7 +246,7 @@ export type CompleteHandlerResult =
 export type ValuesHandlerResult = Array<string | number | boolean>;
 
 /** Type parser method. */
-export type ICompleteHandler<
+export type CompleteHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -241,7 +264,7 @@ export type ICompleteHandler<
  * Help callback method to print the help.
  * Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` methods.
  */
-export type IHelpHandler<
+export type HelpHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -266,7 +289,7 @@ export type IHelpHandler<
  * Version callback method to print the version.
  * Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` methods.
  */
-export type IVersionHandler<
+export type VersionHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
