@@ -1,6 +1,7 @@
 import { assertEquals } from "../../../dev_deps.ts";
+import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
-import { FlagOptions, OptionType } from "../../types.ts";
+import { FlagOptions } from "../../types.ts";
 
 Deno.test("flags option callback", () => {
   const options: Array<{ option: FlagOptions; value: unknown }> = [];

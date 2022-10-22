@@ -29,7 +29,7 @@ export interface FlagOptions extends ArgumentOptions {
 
 /** Flag argument definition. */
 export interface ArgumentOptions {
-  type?: OptionType | string;
+  type?: ArgumentType | string;
   optionalValue?: boolean;
   requiredValue?: boolean;
   variadic?: boolean;
@@ -38,12 +38,7 @@ export interface ArgumentOptions {
 }
 
 /** Available build-in argument types. */
-export enum OptionType {
-  STRING = "string",
-  NUMBER = "number",
-  INTEGER = "integer",
-  BOOLEAN = "boolean",
-}
+export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
 /** Default flag value */
 export type DefaultValue<TValue = unknown> =

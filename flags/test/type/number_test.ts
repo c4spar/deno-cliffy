@@ -1,7 +1,7 @@
 import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
-import { OptionType } from "../../types.ts";
 
 const optionalValueOptions = <ParseFlagsOptions> {
   stopEarly: false,

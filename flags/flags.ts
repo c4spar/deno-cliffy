@@ -17,25 +17,26 @@ import {
   UnknownRequiredOptionError,
   UnknownTypeError,
 } from "./_errors.ts";
+import { OptionType } from "./deprecated.ts";
 import type {
   ArgumentOptions,
+  ArgumentType,
   FlagOptions,
   ParseFlagsContext,
   ParseFlagsOptions,
   TypeHandler,
 } from "./types.ts";
-import { OptionType } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
 import { validateFlags } from "./_validate_flags.ts";
 import { integer } from "./types/integer.ts";
 
-const Types: Record<string, TypeHandler> = {
-  [OptionType.STRING]: string,
-  [OptionType.NUMBER]: number,
-  [OptionType.INTEGER]: integer,
-  [OptionType.BOOLEAN]: boolean,
+const Types: Record<ArgumentType, TypeHandler> = {
+  string,
+  number,
+  integer,
+  boolean,
 };
 
 /**
@@ -487,7 +488,7 @@ function parseFlagValue(
   arg: ArgumentOptions,
   value: string,
 ): unknown {
-  const type: string = arg.type || OptionType.STRING;
+  const type: ArgumentType = arg.type as ArgumentType || OptionType.STRING;
   const parseType = Types[type];
 
   if (!parseType) {
