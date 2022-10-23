@@ -3,6 +3,7 @@
 import type {
   ArgumentOptions,
   ArgumentValue,
+  DefaultValue,
   FlagOptions,
   TypeHandler,
   ValueHandler,
@@ -11,7 +12,7 @@ import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type { Type } from "./type.ts";
 
-export type { ArgumentValue, TypeHandler };
+export type { ArgumentValue, DefaultValue, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
@@ -101,13 +102,6 @@ export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TReturn
 >;
 
-/** Default option value */
-export type OptionDefaultValue<TValue = unknown> =
-  | TValue
-  | OptionDefaultValueHandler<TValue>;
-
-export type OptionDefaultValueHandler<TValue = unknown> = () => TValue;
-
 type ExcludedCommandOptions =
   | "name"
   | "args"
@@ -136,7 +130,7 @@ export interface GlobalOptionOptions<
   action?: ActionHandler<O, A, G, PG, CT, GT, PT, P>;
   prepend?: boolean;
   value?: OptionValueHandler;
-  default?: OptionDefaultValue;
+  default?: DefaultValue;
 }
 
 export interface OptionOptions<

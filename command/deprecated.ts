@@ -18,7 +18,6 @@ import type {
   GlobalOptionOptions,
   HelpHandler,
   Option,
-  OptionDefaultValue,
   OptionOptions,
   OptionValueHandler,
   TypeDef,
@@ -109,9 +108,6 @@ export type IType<TValue = unknown> = TypeDef;
 
 /** @deprecated Use `TypeOptions` instead. */
 export type ITypeOptions = TypeOptions;
-
-/** @deprecated Use `OptionDefaultValue` instead. */
-export type DefaultValue<TValue = unknown> = OptionDefaultValue<TValue>;
 
 /** @deprecated Use `ActionHandler` instead. */
 export type IAction<

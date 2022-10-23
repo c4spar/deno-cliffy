@@ -34,7 +34,7 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { OptionDefaultValue, OptionValueHandler } from "./types.ts";
+import { DefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -868,7 +868,7 @@ export class Command<
         "value"
       >
         & {
-          default?: OptionDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -951,7 +951,7 @@ export class Command<
       >
         & {
           global: true;
-          default?: OptionDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
@@ -992,7 +992,7 @@ export class Command<
         "value"
       >
         & {
-          default?: OptionDefaultValue<D>;
+          default?: DefaultValue<D>;
           required?: R;
           collect?: C;
           conflicts?: X;
