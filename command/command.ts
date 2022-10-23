@@ -45,11 +45,12 @@ import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
   ActionHandler,
   Argument,
+  ArgumentValue,
   CommandResult,
   CompleteHandler,
   CompleteOptions,
   Completion,
-  DescriptionHandler,
+  Description,
   EnvVar,
   EnvVarOptions,
   EnvVarValueHandler,
@@ -100,7 +101,7 @@ export class Command<
   private _parent?: TParentCommand;
   private _globalParent?: Command<any>;
   private ver?: VersionHandler;
-  private desc: DescriptionHandler = "";
+  private desc: Description = "";
   private _usage?: string;
   private fn?: ActionHandler;
   private options: Array<Option> = [];
@@ -690,7 +691,7 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: DescriptionHandler<
+    description: Description<
       TCommandOptions,
       TCommandArguments,
       TCommandGlobals,

@@ -12,7 +12,7 @@ import type {
  * **Custom type example:**
  * ```
  * export class ColorType extends Type<string> {
- *   public parse({ label, name, value, type }: ITypeInfo): string {
+ *   public parse({ label, name, value, type }: ArgumentValue): string {
  *     if (["red", "blue"].includes(value)) {
  *       trow new Error(
  *         `${label} "${name}" must be of type "${type}", but got "${value}".` +

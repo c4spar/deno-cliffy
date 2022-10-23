@@ -1,4 +1,6 @@
-import {
+// deno-lint-ignore-file no-explicit-any
+
+import type {
   ArgumentOptions,
   ArgumentType,
   ArgumentValue,
@@ -26,7 +28,6 @@ export type IFlagArgument<TType extends string> = ArgumentOptions<TType>;
 export type IDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
 /** @deprecated Use `ValueHandler` instead. */
-// deno-lint-ignore no-explicit-any
 export type IFlagValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TValue,
   TReturn
