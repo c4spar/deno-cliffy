@@ -28,8 +28,8 @@ import type {
  * }
  * ```
  */
-export abstract class Type<T> {
-  public abstract parse(type: ArgumentValue): T;
+export abstract class Type<TValue> {
+  public abstract parse(type: ArgumentValue): TValue;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,
