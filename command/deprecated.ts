@@ -68,13 +68,13 @@ export type ICompletion<
 > = Completion<O, A, G, PG, CT, GT, PT, P>;
 
 /** @deprecated Use `EnvVar` instead. */
-export type IEnvVar<TValue = unknown> = EnvVar;
+export type IEnvVar = EnvVar;
 
 /** @deprecated Use `EnvVarOptions` instead. */
 export type IEnvVarOptions = EnvVarOptions;
 
 /** @deprecated Use `Example` instead. */
-export type IExample<TValue = unknown> = Example;
+export type IExample = Example;
 
 /** @deprecated Use `GlobalEnvVarOptions` instead. */
 export type IGlobalEnvVarOptions = GlobalEnvVarOptions;
@@ -91,7 +91,7 @@ export type IOption<
   P extends Command<any> | undefined = O extends number ? any : undefined,
 > = Option<O, A, G, PG, CT, GT, PT, P>;
 
-/** @deprecated Use `OptionValueHandler` instead. */
+/** @deprecated Use `CommandResult` instead. */
 export type IParseResult<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
@@ -104,7 +104,7 @@ export type IParseResult<
 > = CommandResult<O, A, G, PG, CT, GT, PT, P>;
 
 /** @deprecated Use `TypeDef` instead. */
-export type IType<TValue = unknown> = TypeDef;
+export type IType = TypeDef;
 
 /** @deprecated Use `TypeOptions` instead. */
 export type ITypeOptions = TypeOptions;
