@@ -208,7 +208,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       }
 
       if (
-        opts.flags?.length && !option.args?.length &&
+        opts.flags?.length && !option.args?.length && !option.type &&
         typeof currentValue !== "undefined"
       ) {
         throw new UnexpectedOptionValueError(option.name, currentValue);
