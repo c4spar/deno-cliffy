@@ -2,7 +2,7 @@
 
 import { assertEquals } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { ICompletion } from "../../types.ts";
+import type { Completion } from "../../types.ts";
 
 function command() {
   return new Command()
@@ -26,8 +26,8 @@ Deno.test("command - completion - completion properties", () => {
       global: true,
       override: true,
     });
-  const fooCompletion: ICompletion = cmd.getCompletion("foo") as ICompletion;
-  const barCompletion: ICompletion = cmd.getCompletion("bar") as ICompletion;
+  const fooCompletion: Completion = cmd.getCompletion("foo") as Completion;
+  const barCompletion: Completion = cmd.getCompletion("bar") as Completion;
   assertEquals(fooCompletion.name, "foo");
   assertEquals(fooCompletion.global, undefined);
   assertEquals(barCompletion.name, "bar");

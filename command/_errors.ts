@@ -1,7 +1,7 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 import { getFlag } from "../flags/_utils.ts";
-import { IEnvVar } from "./types.ts";
+import { EnvVar } from "./types.ts";
 
 export class CommandError extends Error {
   constructor(message: string) {
@@ -96,7 +96,7 @@ export class DuplicateEnvVarError extends CommandError {
 }
 
 export class MissingRequiredEnvVarError extends ValidationError {
-  constructor(envVar: IEnvVar) {
+  constructor(envVar: EnvVar) {
     super(`Missing required environment variable "${envVar.names[0]}".`);
     Object.setPrototypeOf(this, MissingRequiredEnvVarError.prototype);
   }

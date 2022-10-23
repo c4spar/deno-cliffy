@@ -2,7 +2,7 @@
 
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { IEnvVar } from "../../types.ts";
+import type { EnvVar } from "../../types.ts";
 
 function command() {
   return new Command()
@@ -229,8 +229,8 @@ Deno.test("[command] - env var - env var properties", () => {
       hidden: true,
     });
 
-  const globalEnvVar: IEnvVar = cmd.getEnvVar("global") as IEnvVar;
-  const fooEnvVar: IEnvVar = cmd.getEnvVar("foo", true) as IEnvVar;
+  const globalEnvVar: EnvVar = cmd.getEnvVar("global") as EnvVar;
+  const fooEnvVar: EnvVar = cmd.getEnvVar("foo", true) as EnvVar;
 
   assertEquals(globalEnvVar.name, "global");
   assertEquals(globalEnvVar.names, ["global", "global2"]);

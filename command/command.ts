@@ -3,10 +3,9 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { IFlagValueHandler } from "../flags/deprecated.ts";
 import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { DefaultValue, ParseFlagsContext } from "../flags/types.ts";
+import type { ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -35,6 +34,7 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
+import { DefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -43,28 +43,28 @@ import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
+  ActionHandler,
+  Argument,
   ArgumentValue,
-  IAction,
-  IArgument,
-  ICommandGlobalOption,
-  ICommandOption,
-  ICompleteHandler,
-  ICompleteOptions,
-  ICompletion,
-  IDescription,
-  IEnvVar,
-  IEnvVarOptions,
-  IEnvVarValueHandler,
-  IExample,
-  IGlobalEnvVarOptions,
-  IHelpHandler,
-  IOption,
-  IParseResult,
-  IType,
-  ITypeOptions,
-  IVersionHandler,
+  CommandResult,
+  CompleteHandler,
+  CompleteOptions,
+  Completion,
+  Description,
+  EnvVar,
+  EnvVarOptions,
+  EnvVarValueHandler,
+  Example,
+  GlobalEnvVarOptions,
+  GlobalOptionOptions,
+  HelpHandler,
   MapTypes,
+  Option,
+  OptionOptions,
+  TypeDef,
+  TypeOptions,
   TypeOrTypeHandler,
+  VersionHandler,
 } from "./types.ts";
 import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
@@ -85,7 +85,7 @@ export class Command<
   CGT extends Record<string, unknown> | void = CPG extends number ? any : void,
   CP extends Command<any> | undefined = CPG extends number ? any : undefined,
 > {
-  private types: Map<string, IType> = new Map();
+  private types: Map<string, TypeDef> = new Map();
   private rawArgs: Array<string> = [];
   private literalArgs: Array<string> = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
@@ -93,16 +93,16 @@ export class Command<
   private _name = "COMMAND";
   private _parent?: CP;
   private _globalParent?: Command<any>;
-  private ver?: IVersionHandler;
-  private desc: IDescription = "";
+  private ver?: VersionHandler;
+  private desc: Description = "";
   private _usage?: string;
-  private fn?: IAction;
-  private options: Array<IOption> = [];
+  private fn?: ActionHandler;
+  private options: Array<Option> = [];
   private commands: Map<string, Command<any>> = new Map();
-  private examples: Array<IExample> = [];
-  private envVars: Array<IEnvVar> = [];
+  private examples: Array<Example> = [];
+  private envVars: Array<EnvVar> = [];
   private aliases: Array<string> = [];
-  private completions: Map<string, ICompletion> = new Map();
+  private completions: Map<string, Completion> = new Map();
   private cmd: Command<any> = this;
   private argsDefinition?: string;
   private isExecutable = false;
@@ -111,15 +111,15 @@ export class Command<
   private _stopEarly = false;
   private defaultCommand?: string;
   private _useRawArgs = false;
-  private args: Array<IArgument> = [];
+  private args: Array<Argument> = [];
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
   private _versionOptions?: IDefaultOption | false;
   private _helpOptions?: IDefaultOption | false;
-  private _versionOption?: IOption;
-  private _helpOption?: IOption;
-  private _help?: IHelpHandler;
+  private _versionOption?: Option;
+  private _helpOption?: Option;
+  private _help?: HelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
   private _groupName?: string;
@@ -137,7 +137,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
+    opts?: OptionOptions<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
       global: true;
     },
   ): this;
@@ -151,7 +151,7 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: OptionOptions<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
 
   /**
@@ -163,16 +163,16 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: ActionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
 
   public versionOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
+      | ActionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | OptionOptions<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | OptionOptions<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
         global: true;
       },
   ): this {
@@ -196,7 +196,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
+    opts?: OptionOptions<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
       global: true;
     },
   ): this;
@@ -210,7 +210,7 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: OptionOptions<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
 
   /**
@@ -222,16 +222,16 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: ActionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this;
 
   public helpOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
+      | ActionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | OptionOptions<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | OptionOptions<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
         global: true;
       },
   ): this {
@@ -487,7 +487,7 @@ export class Command<
   public version(
     version:
       | string
-      | IVersionHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, CP>,
+      | VersionHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, CP>,
   ): this {
     if (typeof version === "string") {
       this.cmd.ver = () => version;
@@ -515,7 +515,7 @@ export class Command<
   public help(
     help:
       | string
-      | IHelpHandler<Partial<CO>, Partial<CA>, CG, CPG>
+      | HelpHandler<Partial<CO>, Partial<CA>, CG, CPG>
       | HelpOptions,
   ): this {
     if (typeof help === "string") {
@@ -534,7 +534,7 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: IDescription<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    description: Description<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
   ): this {
     this.cmd.desc = description;
     return this;
@@ -588,7 +588,7 @@ export class Command<
    * Set command callback method.
    * @param fn Command action handler.
    */
-  public action(fn: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>): this {
+  public action(fn: ActionHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>): this {
     this.cmd.fn = fn;
     return this;
   }
@@ -653,7 +653,7 @@ export class Command<
   >(
     name: N,
     handler: H,
-    options?: Omit<ITypeOptions, "global">,
+    options?: Omit<TypeOptions, "global">,
   ): Command<
     CPG,
     CPT,
@@ -679,7 +679,7 @@ export class Command<
   >(
     name: N,
     handler: H,
-    options?: ITypeOptions,
+    options?: TypeOptions,
   ): Command<
     CPG,
     CPT,
@@ -701,7 +701,7 @@ export class Command<
       (typeof handler.complete !== "undefined" ||
         typeof handler.values !== "undefined")
     ) {
-      const completeHandler: ICompleteHandler = (
+      const completeHandler: CompleteHandler = (
         cmd: Command,
         parent?: Command,
       ) => handler.complete?.(cmd, parent) || [];
@@ -713,8 +713,8 @@ export class Command<
 
   public globalComplete(
     name: string,
-    complete: ICompleteHandler,
-    options?: Omit<ICompleteOptions, "global">,
+    complete: CompleteHandler,
+    options?: Omit<CompleteOptions, "global">,
   ): this {
     return this.complete(name, complete, { ...options, global: true });
   }
@@ -727,7 +727,7 @@ export class Command<
    */
   public complete(
     name: string,
-    complete: ICompleteHandler<
+    complete: CompleteHandler<
       Partial<CO>,
       Partial<CA>,
       CG,
@@ -737,19 +737,19 @@ export class Command<
       CPT,
       any
     >,
-    options: ICompleteOptions & { global: boolean },
+    options: CompleteOptions & { global: boolean },
   ): this;
   public complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
-    options?: ICompleteOptions,
+    complete: CompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    options?: CompleteOptions,
   ): this;
 
   public complete(
     name: string,
     complete:
-      | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICompleteHandler<
+      | CompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
+      | CompleteHandler<
         Partial<CO>,
         Partial<CA>,
         CG,
@@ -759,7 +759,7 @@ export class Command<
         CPT,
         any
       >,
-    options?: ICompleteOptions,
+    options?: CompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
       throw new DuplicateCompletionError(name);
@@ -845,9 +845,9 @@ export class Command<
       D
     >,
     MG extends MapValue<G, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
+    R extends OptionOptions["required"] = undefined,
+    C extends OptionOptions["collect"] = undefined,
+    X extends OptionOptions["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -855,7 +855,7 @@ export class Command<
     desc: string,
     opts?:
       | Omit<
-        ICommandGlobalOption<
+        GlobalOptionOptions<
           Partial<CO>,
           CA,
           MergeOptions<F, CG, G>,
@@ -871,9 +871,9 @@ export class Command<
           default?: DefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -888,13 +888,13 @@ export class Command<
       return this.option(
         flags,
         desc,
-        { value: opts, global: true } as ICommandOption,
+        { value: opts, global: true } as OptionOptions,
       ) as Command<any>;
     }
     return this.option(
       flags,
       desc,
-      { ...opts, global: true } as ICommandOption,
+      { ...opts, global: true } as OptionOptions,
     ) as Command<any>;
   }
 
@@ -927,9 +927,9 @@ export class Command<
       D
     >,
     MG extends MapValue<G, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
+    R extends OptionOptions["required"] = undefined,
+    C extends OptionOptions["collect"] = undefined,
+    X extends OptionOptions["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -937,7 +937,7 @@ export class Command<
     desc: string,
     opts:
       | Omit<
-        ICommandOption<
+        OptionOptions<
           Partial<CO>,
           CA,
           MergeOptions<F, CG, G>,
@@ -954,9 +954,9 @@ export class Command<
           default?: DefaultValue<D>;
           required?: R;
           collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          value?: OptionValueHandler<MapTypes<ValueOf<G>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<G>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -978,9 +978,9 @@ export class Command<
       D
     >,
     MO extends MapValue<O, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
+    R extends OptionOptions["required"] = undefined,
+    C extends OptionOptions["collect"] = undefined,
+    X extends OptionOptions["conflicts"] = undefined,
     D = undefined,
     V = undefined,
   >(
@@ -988,7 +988,7 @@ export class Command<
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<MergeOptions<F, CO, MO>, CA, CG, CPG, CT, CGT, CPT, CP>,
+        OptionOptions<MergeOptions<F, CO, MO>, CA, CG, CPG, CT, CGT, CPT, CP>,
         "value"
       >
         & {
@@ -996,9 +996,9 @@ export class Command<
           required?: R;
           collect?: C;
           conflicts?: X;
-          value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
+          value?: OptionValueHandler<MapTypes<ValueOf<O>>, V>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<O>>, V>,
   ): Command<
     CPG,
     CPT,
@@ -1013,7 +1013,7 @@ export class Command<
   public option(
     flags: string,
     desc: string,
-    opts?: ICommandOption | IFlagValueHandler,
+    opts?: OptionOptions | OptionValueHandler,
   ): Command<any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
@@ -1021,11 +1021,11 @@ export class Command<
 
     const result = splitArguments(flags);
 
-    const args: IArgument[] = result.typeDefinition
+    const args: Argument[] = result.typeDefinition
       ? parseArgumentsDefinition(result.typeDefinition)
       : [];
 
-    const option: IOption = {
+    const option: Option = {
       ...opts,
       name: "",
       description: desc,
@@ -1094,22 +1094,22 @@ export class Command<
     N extends string,
     G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
+    R extends EnvVarOptions["required"] = undefined,
+    P extends EnvVarOptions["prefix"] = undefined,
     V = undefined,
   >(
     name: N,
     description: string,
-    options?: Omit<IGlobalEnvVarOptions, "value"> & {
+    options?: Omit<GlobalEnvVarOptions, "value"> & {
       required?: R;
       prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
+      value?: EnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
     },
   ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP> {
     return this.env(
       name,
       description,
-      { ...options, global: true } as IEnvVarOptions,
+      { ...options, global: true } as EnvVarOptions,
     ) as Command<any>;
   }
 
@@ -1123,17 +1123,17 @@ export class Command<
     N extends string,
     G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MG extends MapValue<G, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
+    R extends EnvVarOptions["required"] = undefined,
+    P extends EnvVarOptions["prefix"] = undefined,
     V = undefined,
   >(
     name: N,
     description: string,
-    options: Omit<IEnvVarOptions, "value"> & {
+    options: Omit<EnvVarOptions, "value"> & {
       global: true;
       required?: R;
       prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
+      value?: EnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
     },
   ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP>;
 
@@ -1141,23 +1141,23 @@ export class Command<
     N extends string,
     O extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
     MO extends MapValue<O, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
+    R extends EnvVarOptions["required"] = undefined,
+    P extends EnvVarOptions["prefix"] = undefined,
     V = undefined,
   >(
     name: N,
     description: string,
-    options?: Omit<IEnvVarOptions, "value"> & {
+    options?: Omit<EnvVarOptions, "value"> & {
       required?: R;
       prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<O>>, V>;
+      value?: EnvVarValueHandler<MapTypes<ValueOf<O>>, V>;
     },
   ): Command<CPG, CPT, Merge<CO, MO>, CA, CG, CT, CGT, CP>;
 
   public env(
     name: string,
     description: string,
-    options?: IEnvVarOptions,
+    options?: EnvVarOptions,
   ): Command<any> {
     const result = splitArguments(name);
 
@@ -1169,7 +1169,7 @@ export class Command<
       throw new DuplicateEnvVarError(name);
     }
 
-    const details: IArgument[] = parseArgumentsDefinition(
+    const details: Argument[] = parseArgumentsDefinition(
       result.typeDefinition,
     );
 
@@ -1186,7 +1186,7 @@ export class Command<
       names: result.flags,
       description,
       type: details[0].type,
-      details: details.shift() as IArgument,
+      details: details.shift() as Argument,
       ...options,
     });
 
@@ -1204,7 +1204,7 @@ export class Command<
   public parse(
     args: string[] = Deno.args,
   ): Promise<
-    CP extends Command<any> ? IParseResult<
+    CP extends Command<any> ? CommandResult<
         Record<string, unknown>,
         Array<unknown>,
         Record<string, unknown>,
@@ -1214,7 +1214,7 @@ export class Command<
         Record<string, unknown>,
         undefined
       >
-      : IParseResult<
+      : CommandResult<
         MapTypes<CO>,
         MapTypes<CA>,
         MapTypes<CG>,
@@ -1236,7 +1236,7 @@ export class Command<
     return this.parseCommand(ctx) as any;
   }
 
-  private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
+  private async parseCommand(ctx: ParseContext): Promise<CommandResult> {
     try {
       this.reset();
       this.registerDefaults();
@@ -1458,7 +1458,7 @@ export class Command<
   protected async execute(
     options: Record<string, unknown>,
     ...args: Array<unknown>
-  ): Promise<IParseResult> {
+  ): Promise<CommandResult> {
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
@@ -1512,7 +1512,7 @@ export class Command<
   /** Parse raw command line arguments. */
   protected parseOptions(
     ctx: ParseContext,
-    options: IOption[],
+    options: Option[],
     {
       stopEarly = this._stopEarly,
       stopOnUnknown = false,
@@ -1527,7 +1527,7 @@ export class Command<
       flags: options,
       ignoreDefaults: ctx.env,
       parse: (type: ArgumentValue) => this.parseType(type),
-      option: (option: IOption) => {
+      option: (option: Option) => {
         if (!ctx.action && option.action) {
           ctx.action = option as ActionOption;
         }
@@ -1537,7 +1537,7 @@ export class Command<
 
   /** Parse argument type. */
   protected parseType(type: ArgumentValue): unknown {
-    const typeSettings: IType | undefined = this.getType(type.type);
+    const typeSettings: TypeDef | undefined = this.getType(type.type);
 
     if (!typeSettings) {
       throw new UnknownTypeError(
@@ -1559,7 +1559,7 @@ export class Command<
    */
   protected async parseEnvVars(
     ctx: ParseContext,
-    envVars: Array<IEnvVar>,
+    envVars: Array<EnvVar>,
     validate = true,
   ): Promise<void> {
     for (const envVar of envVars) {
@@ -1776,12 +1776,12 @@ export class Command<
    * Get argument by name.
    * @param name Name of the argument.
    */
-  public getArgument(name: string): IArgument | undefined {
+  public getArgument(name: string): Argument | undefined {
     return this.getArguments().find((arg) => arg.name === name);
   }
 
   /** Get arguments. */
-  public getArguments(): IArgument[] {
+  public getArguments(): Argument[] {
     if (!this.args.length && this.argsDefinition) {
       this.args = parseArgumentsDefinition(this.argsDefinition);
     }
@@ -1800,7 +1800,7 @@ export class Command<
   }
 
   /** Get help handler method. */
-  private getVersionHandler(): IVersionHandler | undefined {
+  private getVersionHandler(): VersionHandler | undefined {
     return this.ver ?? this._parent?.getVersionHandler();
   }
 
@@ -1863,8 +1863,8 @@ export class Command<
   }
 
   /** Get help handler method. */
-  private getHelpHandler(): IHelpHandler {
-    return this._help ?? this._parent?.getHelpHandler() as IHelpHandler;
+  private getHelpHandler(): HelpHandler {
+    return this._help ?? this._parent?.getHelpHandler() as HelpHandler;
   }
 
   private exit(code = 0) {
@@ -1909,7 +1909,7 @@ export class Command<
    * Get options.
    * @param hidden Include hidden options.
    */
-  public getOptions(hidden?: boolean): IOption[] {
+  public getOptions(hidden?: boolean): Option[] {
     return this.getGlobalOptions(hidden).concat(this.getBaseOptions(hidden));
   }
 
@@ -1917,7 +1917,7 @@ export class Command<
    * Get base options.
    * @param hidden Include hidden options.
    */
-  public getBaseOptions(hidden?: boolean): IOption[] {
+  public getBaseOptions(hidden?: boolean): Option[] {
     if (!this.options.length) {
       return [];
     }
@@ -1931,14 +1931,14 @@ export class Command<
    * Get global options.
    * @param hidden Include hidden options.
    */
-  public getGlobalOptions(hidden?: boolean): IOption[] {
+  public getGlobalOptions(hidden?: boolean): Option[] {
     const helpOption = this.getHelpOption();
     const getGlobals = (
       cmd: Command<any>,
       noGlobals: boolean,
-      options: IOption[] = [],
+      options: Option[] = [],
       names: string[] = [],
-    ): IOption[] => {
+    ): Option[] => {
       if (cmd.options.length) {
         for (const option of cmd.options) {
           if (
@@ -1984,7 +1984,7 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getOption(name: string, hidden?: boolean): IOption | undefined {
+  public getOption(name: string, hidden?: boolean): Option | undefined {
     return this.getBaseOption(name, hidden) ??
       this.getGlobalOption(name, hidden);
   }
@@ -1994,7 +1994,7 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getBaseOption(name: string, hidden?: boolean): IOption | undefined {
+  public getBaseOption(name: string, hidden?: boolean): Option | undefined {
     const option = this.options.find((option) =>
       option.name === name || option.aliases?.includes(name)
     );
@@ -2007,13 +2007,13 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
+  public getGlobalOption(name: string, hidden?: boolean): Option | undefined {
     const helpOption = this.getHelpOption();
     const getGlobalOption = (
       parent: Command,
       noGlobals: boolean,
-    ): IOption | undefined => {
-      const option: IOption | undefined = parent.getBaseOption(
+    ): Option | undefined => {
+      const option: Option | undefined = parent.getBaseOption(
         name,
         hidden,
       );
@@ -2041,7 +2041,7 @@ export class Command<
    * Remove option by name.
    * @param name Name of the option. Must be in param-case.
    */
-  public removeOption(name: string): IOption | undefined {
+  public removeOption(name: string): Option | undefined {
     const index = this.options.findIndex((option) => option.name === name);
 
     if (index === -1) {
@@ -2203,25 +2203,25 @@ export class Command<
   }
 
   /** Get types. */
-  public getTypes(): IType[] {
+  public getTypes(): TypeDef[] {
     return this.getGlobalTypes().concat(this.getBaseTypes());
   }
 
   /** Get base types. */
-  public getBaseTypes(): IType[] {
+  public getBaseTypes(): TypeDef[] {
     return Array.from(this.types.values());
   }
 
   /** Get global types. */
-  public getGlobalTypes(): IType[] {
+  public getGlobalTypes(): TypeDef[] {
     const getTypes = (
       cmd: Command<any> | undefined,
-      types: IType[] = [],
+      types: TypeDef[] = [],
       names: string[] = [],
-    ): IType[] => {
+    ): TypeDef[] => {
       if (cmd) {
         if (cmd.types.size) {
-          cmd.types.forEach((type: IType) => {
+          cmd.types.forEach((type: TypeDef) => {
             if (
               type.global &&
               !this.types.has(type.name) &&
@@ -2246,7 +2246,7 @@ export class Command<
    * Get type by name.
    * @param name Name of the type.
    */
-  public getType(name: string): IType | undefined {
+  public getType(name: string): TypeDef | undefined {
     return this.getBaseType(name) ?? this.getGlobalType(name);
   }
 
@@ -2254,7 +2254,7 @@ export class Command<
    * Get base type by name.
    * @param name Name of the type.
    */
-  public getBaseType(name: string): IType | undefined {
+  public getBaseType(name: string): TypeDef | undefined {
     return this.types.get(name);
   }
 
@@ -2262,12 +2262,12 @@ export class Command<
    * Get global type by name.
    * @param name Name of the type.
    */
-  public getGlobalType(name: string): IType | undefined {
+  public getGlobalType(name: string): TypeDef | undefined {
     if (!this._parent) {
       return;
     }
 
-    const cmd: IType | undefined = this._parent.getBaseType(name);
+    const cmd: TypeDef | undefined = this._parent.getBaseType(name);
 
     if (!cmd?.global) {
       return this._parent.getGlobalType(name);
@@ -2282,20 +2282,20 @@ export class Command<
   }
 
   /** Get base completions. */
-  public getBaseCompletions(): ICompletion[] {
+  public getBaseCompletions(): Completion[] {
     return Array.from(this.completions.values());
   }
 
   /** Get global completions. */
-  public getGlobalCompletions(): ICompletion[] {
+  public getGlobalCompletions(): Completion[] {
     const getCompletions = (
       cmd: Command<any> | undefined,
-      completions: ICompletion[] = [],
+      completions: Completion[] = [],
       names: string[] = [],
-    ): ICompletion[] => {
+    ): Completion[] => {
       if (cmd) {
         if (cmd.completions.size) {
-          cmd.completions.forEach((completion: ICompletion) => {
+          cmd.completions.forEach((completion: Completion) => {
             if (
               completion.global &&
               !this.completions.has(completion.name) &&
@@ -2320,7 +2320,7 @@ export class Command<
    * Get completion by name.
    * @param name Name of the completion.
    */
-  public getCompletion(name: string): ICompletion | undefined {
+  public getCompletion(name: string): Completion | undefined {
     return this.getBaseCompletion(name) ?? this.getGlobalCompletion(name);
   }
 
@@ -2328,7 +2328,7 @@ export class Command<
    * Get base completion by name.
    * @param name Name of the completion.
    */
-  public getBaseCompletion(name: string): ICompletion | undefined {
+  public getBaseCompletion(name: string): Completion | undefined {
     return this.completions.get(name);
   }
 
@@ -2336,12 +2336,12 @@ export class Command<
    * Get global completions by name.
    * @param name Name of the completion.
    */
-  public getGlobalCompletion(name: string): ICompletion | undefined {
+  public getGlobalCompletion(name: string): Completion | undefined {
     if (!this._parent) {
       return;
     }
 
-    const completion: ICompletion | undefined = this._parent.getBaseCompletion(
+    const completion: Completion | undefined = this._parent.getBaseCompletion(
       name,
     );
 
@@ -2364,7 +2364,7 @@ export class Command<
    * Get environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getEnvVars(hidden?: boolean): IEnvVar[] {
+  public getEnvVars(hidden?: boolean): EnvVar[] {
     return this.getGlobalEnvVars(hidden).concat(this.getBaseEnvVars(hidden));
   }
 
@@ -2372,7 +2372,7 @@ export class Command<
    * Get base environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getBaseEnvVars(hidden?: boolean): IEnvVar[] {
+  public getBaseEnvVars(hidden?: boolean): EnvVar[] {
     if (!this.envVars.length) {
       return [];
     }
@@ -2386,19 +2386,19 @@ export class Command<
    * Get global environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
+  public getGlobalEnvVars(hidden?: boolean): EnvVar[] {
     if (this._noGlobals) {
       return [];
     }
 
     const getEnvVars = (
       cmd: Command<any> | undefined,
-      envVars: IEnvVar[] = [],
+      envVars: EnvVar[] = [],
       names: string[] = [],
-    ): IEnvVar[] => {
+    ): EnvVar[] => {
       if (cmd) {
         if (cmd.envVars.length) {
-          cmd.envVars.forEach((envVar: IEnvVar) => {
+          cmd.envVars.forEach((envVar: EnvVar) => {
             if (
               envVar.global &&
               !this.envVars.find((env) => env.names[0] === envVar.names[0]) &&
@@ -2434,7 +2434,7 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
+  public getEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
     return this.getBaseEnvVar(name, hidden) ??
       this.getGlobalEnvVar(name, hidden);
   }
@@ -2444,8 +2444,8 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getBaseEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
-    const envVar: IEnvVar | undefined = this.envVars.find((env) =>
+  public getBaseEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
+    const envVar: EnvVar | undefined = this.envVars.find((env) =>
       env.names.indexOf(name) !== -1
     );
 
@@ -2457,12 +2457,12 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getGlobalEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
+  public getGlobalEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
     if (!this._parent || this._noGlobals) {
       return;
     }
 
-    const envVar: IEnvVar | undefined = this._parent.getBaseEnvVar(
+    const envVar: EnvVar | undefined = this._parent.getBaseEnvVar(
       name,
       hidden,
     );
@@ -2480,7 +2480,7 @@ export class Command<
   }
 
   /** Get all examples. */
-  public getExamples(): IExample[] {
+  public getExamples(): Example[] {
     return this.examples;
   }
 
@@ -2490,11 +2490,11 @@ export class Command<
   }
 
   /** Get example with given name. */
-  public getExample(name: string): IExample | undefined {
+  public getExample(name: string): Example | undefined {
     return this.examples.find((example) => example.name === name);
   }
 
-  private getHelpOption(): IOption | undefined {
+  private getHelpOption(): Option | undefined {
     return this._helpOption ?? this._parent?.getHelpOption();
   }
 }
@@ -2510,10 +2510,10 @@ interface UpgradeCommandImpl {
 interface IDefaultOption {
   flags: string;
   desc?: string;
-  opts?: ICommandOption;
+  opts?: OptionOptions;
 }
 
-type ActionOption = IOption & { action: IAction };
+type ActionOption = Option & { action: ActionHandler };
 
 interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
   action?: ActionOption;

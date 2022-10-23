@@ -1,35 +1,35 @@
 // deno-lint-ignore-file no-explicit-any
 
-import type {
-  ArgumentOptions,
-  ArgumentValue,
-  DefaultValue,
-  FlagOptions,
-  TypeHandler,
-  ValueHandler,
-} from "../flags/types.ts";
 import type { Command } from "./command.ts";
-import type { HelpOptions } from "./help/_help_generator.ts";
 import type { Type } from "./type.ts";
+import type {
+  ActionHandler,
+  Argument,
+  CommandResult,
+  CompleteHandler,
+  CompleteOptions,
+  Completion,
+  Description,
+  EnvVar,
+  EnvVarOptions,
+  EnvVarValueHandler,
+  Example,
+  GlobalEnvVarOptions,
+  GlobalOptionOptions,
+  HelpHandler,
+  Option,
+  OptionOptions,
+  OptionValueHandler,
+  TypeDef,
+  TypeOptions,
+  VersionHandler,
+} from "./types.ts";
 
-export type { ArgumentValue, DefaultValue, TypeHandler };
+/** @deprecated Use `Argument` instead. */
+export type IArgument = Argument;
 
-type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
-
-export type TypeOrTypeHandler<T> = Type<T> | TypeHandler<T>;
-
-type Id<T> = T extends Record<string, unknown>
-  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
-  : T;
-
-export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
-  ? { [K in keyof T]: MapTypes<T[K]> }
-  : Type.infer<T>;
-
-/* COMMAND TYPES */
-
-/** Description handler. */
-export type Description<
+/** @deprecated Use `GlobalOptionOptions` instead. */
+export type ICommandGlobalOption<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -38,10 +38,10 @@ export type Description<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> = string | DescriptionHandler<O, A, G, PG, CT, GT, PT, P>;
+> = GlobalOptionOptions<O, A, G, PG, CT, GT, PT, P>;
 
-/** Description handler. */
-export type DescriptionHandler<
+/** @deprecated Use `OptionOptions` instead. */
+export type ICommandOption<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -50,10 +50,13 @@ export type DescriptionHandler<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> = (this: Command<PG, PT, O, A, G, CT, GT, P>) => string;
+> = OptionOptions<O, A, G, PG, CT, GT, PT, P>;
 
-/** Action handler for commands and options. */
-export type ActionHandler<
+/** @deprecated Use `CompleteOptions` instead. */
+export type ICompleteOptions = CompleteOptions;
+
+/** @deprecated Use `Completion` instead. */
+export type ICompletion<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -62,24 +65,22 @@ export type ActionHandler<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> = (
-  this: Command<PG, PT, O, A, G, CT, GT, P>,
-  options: MapTypes<Merge<PG, Merge<G, O>>>,
-  ...args: MapTypes<A>
-) => unknown | Promise<unknown>;
+> = Completion<O, A, G, PG, CT, GT, PT, P>;
 
-/** Argument details. */
-export interface Argument extends ArgumentOptions {
-  /** Argument name. */
-  name: string;
-  /** Shell completion action. */
-  action: string;
-  /** Arguments type. */
-  type: string;
-}
+/** @deprecated Use `EnvVar` instead. */
+export type IEnvVar = EnvVar;
 
-/** Result of `cmd.parse()` method. */
-export interface CommandResult<
+/** @deprecated Use `EnvVarOptions` instead. */
+export type IEnvVarOptions = EnvVarOptions;
+
+/** @deprecated Use `Example` instead. */
+export type IExample = Example;
+
+/** @deprecated Use `GlobalEnvVarOptions` instead. */
+export type IGlobalEnvVarOptions = GlobalEnvVarOptions;
+
+/** @deprecated Use `Option` instead. */
+export type IOption<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -88,34 +89,10 @@ export interface CommandResult<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> {
-  options: Id<Merge<Merge<PG, G>, O>>;
-  args: A;
-  literal: string[];
-  cmd: Command<PG, PT, O, A, G, CT, GT, P>;
-}
+> = Option<O, A, G, PG, CT, GT, PT, P>;
 
-/* OPTION TYPES */
-
-export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
-  TValue,
-  TReturn
->;
-
-type ExcludedCommandOptions =
-  | "name"
-  | "args"
-  | "type"
-  | "optionalValue"
-  | "requiredValue"
-  | "aliases"
-  | "variadic"
-  | "list"
-  | "value"
-  | "default";
-
-/** Command option options. */
-export interface GlobalOptionOptions<
+/** @deprecated Use `CommandResult` instead. */
+export type IParseResult<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -124,16 +101,16 @@ export interface GlobalOptionOptions<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends Omit<FlagOptions, ExcludedCommandOptions> {
-  override?: boolean;
-  hidden?: boolean;
-  action?: ActionHandler<O, A, G, PG, CT, GT, PT, P>;
-  prepend?: boolean;
-  value?: OptionValueHandler;
-  default?: DefaultValue;
-}
+> = CommandResult<O, A, G, PG, CT, GT, PT, P>;
 
-export interface OptionOptions<
+/** @deprecated Use `TypeDef` instead. */
+export type IType = TypeDef;
+
+/** @deprecated Use `TypeOptions` instead. */
+export type ITypeOptions = TypeOptions;
+
+/** @deprecated Use `ActionHandler` instead. */
+export type IAction<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -142,12 +119,10 @@ export interface OptionOptions<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends GlobalOptionOptions<O, A, G, PG, CT, GT, PT, P> {
-  global?: boolean;
-}
+> = ActionHandler<O, A, G, PG, CT, GT, PT, P>;
 
-/** Command option settings. */
-export interface Option<
+/** @deprecated Use `CompleteHandler` instead. */
+export type ICompleteHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -156,76 +131,10 @@ export interface Option<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends
-  OptionOptions<O, A, G, PG, CT, GT, PT, P>,
-  Omit<FlagOptions, "value"> {
-  description: string;
-  flags: Array<string>;
-  typeDefinition?: string;
-  args: Argument[];
-  groupName?: string;
-}
+> = CompleteHandler<O, A, G, PG, CT, GT, PT, P>;
 
-/* ENV VARS TYPES */
-
-export type EnvVarValueHandler<TValue = any, TReturn = TValue> = (
-  val: TValue,
-) => TReturn;
-
-/** Environment variable options */
-export interface GlobalEnvVarOptions {
-  hidden?: boolean;
-  required?: boolean;
-  prefix?: string | undefined;
-  value?: EnvVarValueHandler;
-}
-
-/** Environment variable options */
-export interface EnvVarOptions extends GlobalEnvVarOptions {
-  global?: boolean;
-}
-
-/** Environment variable settings. */
-export interface EnvVar extends EnvVarOptions {
-  name: string;
-  names: string[];
-  description: string;
-  type: string;
-  details: Argument;
-}
-
-/* TYPE TYPES */
-
-/** Type options. */
-export interface TypeOptions {
-  override?: boolean;
-  global?: boolean;
-}
-
-/** Type settings. */
-export interface TypeDef extends TypeOptions {
-  name: string;
-  handler: Type<unknown> | TypeHandler<unknown>;
-}
-
-/* EXAMPLE TYPES */
-
-/** Example settings. */
-export interface Example {
-  name: string;
-  description: string;
-}
-
-/* COMPLETION TYPES */
-
-/** Completion options. */
-export interface CompleteOptions {
-  override?: boolean;
-  global?: boolean;
-}
-
-/** Completion settings. */
-export interface Completion<
+/** @deprecated Use `Description` instead. */
+export type IDescription<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -234,37 +143,18 @@ export interface Completion<
   GT extends Record<string, any> | void = O extends number ? any : void,
   PT extends Record<string, any> | void = O extends number ? any : void,
   P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends CompleteOptions {
-  name: string;
-  complete: CompleteHandler<O, A, G, PG, CT, GT, PT, P>;
-}
+> = Description<O, A, G, PG, CT, GT, PT, P>;
 
-export type CompleteHandlerResult =
-  | Array<string | number | boolean>
-  | Promise<Array<string | number | boolean>>;
+/** @deprecated Use `EnvVarValueHandler` instead. */
+export type IEnvVarValueHandler<TValue = any, TReturn = TValue> =
+  EnvVarValueHandler<TValue, TReturn>;
 
-export type ValuesHandlerResult = Array<string | number | boolean>;
+/** @deprecated Use `OptionValueHandler` instead. */
+export type IFlagValueHandler<TValue = any, TReturn = TValue> =
+  OptionValueHandler<TValue, TReturn>;
 
-/** Type parser method. */
-export type CompleteHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-> = (
-  cmd: Command<PG, PT, O, A, G, CT, GT, P>,
-  parent?: Command<any>,
-) => CompleteHandlerResult;
-
-/**
- * Help callback method to print the help.
- * Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` methods.
- */
-export type HelpHandler<
+/** @deprecated Use `HelpHandler` instead. */
+export type IHelpHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -283,13 +173,10 @@ export type HelpHandler<
     GT,
     P
   >,
-> = (this: C, cmd: C, options: HelpOptions) => string;
+> = HelpHandler<O, A, G, PG, CT, GT, PT, P>;
 
-/**
- * Version callback method to print the version.
- * Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` methods.
- */
-export type VersionHandler<
+/** @deprecated Use `VersionHandler` instead. */
+export type IVersionHandler<
   O extends Record<string, any> | void = any,
   A extends Array<unknown> = O extends number ? any : [],
   G extends Record<string, any> | void = O extends number ? any : void,
@@ -308,4 +195,7 @@ export type VersionHandler<
     GT,
     P
   >,
-> = (this: C, cmd: C) => string;
+> = VersionHandler<O, A, G, PG, CT, GT, PT, P>;
+
+/** @deprecated Use `Type.infer` instead. */
+export type TypeValue<TType, TDefault = TType> = Type.infer<TType, TDefault>;

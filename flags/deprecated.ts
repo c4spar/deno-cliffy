@@ -1,4 +1,6 @@
-import {
+// deno-lint-ignore-file no-explicit-any
+
+import type {
   ArgumentOptions,
   ArgumentValue,
   DefaultValue,
@@ -23,7 +25,6 @@ export type IFlagArgument = ArgumentOptions;
 export type IDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
 /** @deprecated Use `ValueHandler` instead. */
-// deno-lint-ignore no-explicit-any
 export type IFlagValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TValue,
   TReturn
@@ -31,7 +32,6 @@ export type IFlagValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
 
 /** @deprecated Use `ParseFlagsContext` instead. */
 export type IFlagsResult<
-  // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
   TStandaloneOption extends FlagOptions = FlagOptions,
 > = ParseFlagsContext<TFlags, TStandaloneOption>;
