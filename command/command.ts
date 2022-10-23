@@ -34,7 +34,6 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { ArgumentValue, DefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -50,6 +49,7 @@ import type {
   CompleteHandler,
   CompleteOptions,
   Completion,
+  DefaultValue,
   Description,
   EnvVar,
   EnvVarOptions,
@@ -61,6 +61,7 @@ import type {
   MapTypes,
   Option,
   OptionOptions,
+  OptionValueHandler,
   TypeDef,
   TypeOptions,
   TypeOrTypeHandler,
