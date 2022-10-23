@@ -5,16 +5,16 @@ import { InvalidTypeError } from "../../flags/_errors.ts";
 /** Enum type. Allows only provided values. */
 export class EnumType<
   TType extends string,
-  TReturn extends string | number | boolean,
-> extends Type<TType, TReturn> {
-  private readonly allowedValues: ReadonlyArray<TReturn>;
+  TValue extends string | number | boolean,
+> extends Type<TType, TValue> {
+  private readonly allowedValues: ReadonlyArray<TValue>;
 
-  constructor(values: ReadonlyArray<TReturn> | Record<string, TReturn>) {
+  constructor(values: ReadonlyArray<TValue> | Record<string, TValue>) {
     super();
     this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
-  public parse(type: ArgumentValue<TType>): TReturn {
+  public parse(type: ArgumentValue<TType>): TValue {
     for (const value of this.allowedValues) {
       if (value.toString() === type.value) {
         return value;
@@ -24,11 +24,11 @@ export class EnumType<
     throw new InvalidTypeError(type, this.allowedValues.slice());
   }
 
-  public override values(): Array<TReturn> {
+  public override values(): Array<TValue> {
     return this.allowedValues.slice();
   }
 
-  public override complete(): Array<TReturn> {
+  public override complete(): Array<TValue> {
     return this.values();
   }
 }

@@ -28,8 +28,8 @@ import type {
  * }
  * ```
  */
-export abstract class Type<TType extends string, TReturn> {
-  public abstract parse(type: ArgumentValue<TType>): TReturn;
+export abstract class Type<TType extends string, TValue> {
+  public abstract parse(type: ArgumentValue<TType>): TValue;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,
