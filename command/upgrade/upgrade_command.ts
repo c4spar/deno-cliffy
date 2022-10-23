@@ -4,10 +4,12 @@ import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
 
 export interface UpgradeCommandOptions<
-  P extends Provider = Provider,
-  V extends P | Array<P> = P | Array<P>,
+  TProvider extends Provider = Provider,
+  TProviders extends TProvider | Array<TProvider> =
+    | TProvider
+    | Array<TProvider>,
 > {
-  provider: V;
+  provider: TProviders;
   main?: string;
   importMap?: string;
   args?: Array<string>;

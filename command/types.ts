@@ -16,11 +16,11 @@ export type { ArgumentValue, DefaultValue, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
-export type TypeOrTypeHandler<T> = Type<T> | TypeHandler<T>;
+export type TypeOrTypeHandler<TValue> = Type<TValue> | TypeHandler<TValue>;
 
-type Id<T> = T extends Record<string, unknown>
-  ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
-  : T;
+type Id<TValue> = TValue extends Record<string, unknown>
+  ? TValue extends infer U ? { [K in keyof U]: Id<U[K]> } : never
+  : TValue;
 
 export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
@@ -30,42 +30,103 @@ export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
 
 /** Description handler. */
 export type Description<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-> = string | DescriptionHandler<O, A, G, PG, CT, GT, PT, P>;
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
+> =
+  | string
+  | DescriptionHandler<
+    TOptions,
+    TArguments,
+    TGlobals,
+    TParentGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentTypes,
+    TParentCommand
+  >;
 
 /** Description handler. */
 export type DescriptionHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-> = (this: Command<PG, PT, O, A, G, CT, GT, P>) => string;
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
+> = (
+  this: Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  >,
+) => string;
 
 /** Action handler for commands and options. */
 export type ActionHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > = (
-  this: Command<PG, PT, O, A, G, CT, GT, P>,
-  options: MapTypes<Merge<PG, Merge<G, O>>>,
-  ...args: MapTypes<A>
+  this: Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  >,
+  options: MapTypes<Merge<TParentGlobals, Merge<TGlobals, TOptions>>>,
+  ...args: MapTypes<TArguments>
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
@@ -80,19 +141,38 @@ export interface Argument extends ArgumentOptions {
 
 /** Result of `cmd.parse()` method. */
 export interface CommandResult<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > {
-  options: Id<Merge<Merge<PG, G>, O>>;
-  args: A;
+  options: Id<Merge<Merge<TParentGlobals, TGlobals>, TOptions>>;
+  args: TArguments;
   literal: string[];
-  cmd: Command<PG, PT, O, A, G, CT, GT, P>;
+  cmd: Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  >;
 }
 
 /* OPTION TYPES */
@@ -116,48 +196,106 @@ type ExcludedCommandOptions =
 
 /** Command option options. */
 export interface GlobalOptionOptions<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > extends Omit<FlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
-  action?: ActionHandler<O, A, G, PG, CT, GT, PT, P>;
+  action?: ActionHandler<
+    TOptions,
+    TArguments,
+    TGlobals,
+    TParentGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentTypes,
+    TParentCommand
+  >;
   prepend?: boolean;
   value?: OptionValueHandler;
   default?: DefaultValue;
 }
 
 export interface OptionOptions<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-> extends GlobalOptionOptions<O, A, G, PG, CT, GT, PT, P> {
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
+> extends
+  GlobalOptionOptions<
+    TOptions,
+    TArguments,
+    TGlobals,
+    TParentGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentTypes,
+    TParentCommand
+  > {
   global?: boolean;
 }
 
 /** Command option settings. */
 export interface Option<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > extends
-  OptionOptions<O, A, G, PG, CT, GT, PT, P>,
+  OptionOptions<
+    TOptions,
+    TArguments,
+    TGlobals,
+    TParentGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentTypes,
+    TParentCommand
+  >,
   Omit<FlagOptions, "value"> {
   description: string;
   flags: Array<string>;
@@ -226,17 +364,36 @@ export interface CompleteOptions {
 
 /** Completion settings. */
 export interface Completion<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > extends CompleteOptions {
   name: string;
-  complete: CompleteHandler<O, A, G, PG, CT, GT, PT, P>;
+  complete: CompleteHandler<
+    TOptions,
+    TArguments,
+    TGlobals,
+    TParentGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentTypes,
+    TParentCommand
+  >;
 }
 
 export type CompleteHandlerResult =
@@ -247,16 +404,35 @@ export type ValuesHandlerResult = Array<string | number | boolean>;
 
 /** Type parser method. */
 export type CompleteHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
 > = (
-  cmd: Command<PG, PT, O, A, G, CT, GT, P>,
+  cmd: Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  >,
   parent?: Command<any>,
 ) => CompleteHandlerResult;
 
@@ -265,47 +441,85 @@ export type CompleteHandler<
  * Invoked by the `--help` option and `help` command and the `.getHelp()` and `.showHelp()` methods.
  */
 export type HelpHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-  C extends Command<PG, PT, O, A, G, CT, GT, P> = Command<
-    PG,
-    PT,
-    O,
-    A,
-    G,
-    CT,
-    GT,
-    P
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
+  TCommand extends Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  > = Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
   >,
-> = (this: C, cmd: C, options: HelpOptions) => string;
+> = (this: TCommand, cmd: TCommand, options: HelpOptions) => string;
 
 /**
  * Version callback method to print the version.
  * Invoked by the `--help` option command and the `.getVersion()` and `.showHelp()` methods.
  */
 export type VersionHandler<
-  O extends Record<string, any> | void = any,
-  A extends Array<unknown> = O extends number ? any : [],
-  G extends Record<string, any> | void = O extends number ? any : void,
-  PG extends Record<string, any> | void = O extends number ? any : void,
-  CT extends Record<string, any> | void = O extends number ? any : void,
-  GT extends Record<string, any> | void = O extends number ? any : void,
-  PT extends Record<string, any> | void = O extends number ? any : void,
-  P extends Command<any> | undefined = O extends number ? any : undefined,
-  C extends Command<PG, PT, O, A, G, CT, GT, P> = Command<
-    PG,
-    PT,
-    O,
-    A,
-    G,
-    CT,
-    GT,
-    P
+  TOptions extends Record<string, any> | void = any,
+  TArguments extends Array<unknown> = TOptions extends number ? any : [],
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TTypes extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TGlobalTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentTypes extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+  TParentCommand extends Command<any> | undefined = TOptions extends number
+    ? any
+    : undefined,
+  TCommand extends Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
+  > = Command<
+    TParentGlobals,
+    TParentTypes,
+    TOptions,
+    TArguments,
+    TGlobals,
+    TTypes,
+    TGlobalTypes,
+    TParentCommand
   >,
-> = (this: C, cmd: C) => string;
+> = (this: TCommand, cmd: TCommand) => string;
