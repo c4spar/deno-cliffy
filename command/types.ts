@@ -289,7 +289,7 @@ export interface Option<
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
-  args: Array<Argument<Extract<keyof CT & keyof GT, string>>>;
+  args: Array<Argument<Extract<keyof TTypes & keyof TGlobalTypes, string>>>;
   groupName?: string;
   separator?: string;
 }

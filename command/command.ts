@@ -472,7 +472,7 @@ export class Command<
 
   /**
    * Add new sub-command.
-   * @param nameAndArguments      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
+   * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param desc              The description of the new child command.
    * @param override          Override existing child command.
    */
@@ -3097,21 +3097,21 @@ type ValueOption<
     })
   : (TRequired extends true ? {
       [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
-        ?
+        ? 
           | NonNullable<TDefault>
           | true
           | ArgumentType<GetArguments<TRestFlags>, TTypes>
-        :
+        : 
           | NonNullable<TDefault>
           | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     }
     : {
       [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
-        `[${string}]` ?
+        `[${string}]` ? 
           | NonNullable<TDefault>
           | true
           | ArgumentType<GetArguments<TRestFlags>, TTypes>
-        :
+        : 
           | NonNullable<TDefault>
           | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     });
@@ -3143,21 +3143,21 @@ type ValuesOption<
     })
   : (TRequired extends true ? {
       [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
-        ?
+        ? 
           | NonNullable<TDefault>
           | true
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
-        :
+        : 
           | NonNullable<TDefault>
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     }
     : {
       [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
-        `[${string}]` ?
+        `[${string}]` ? 
           | NonNullable<TDefault>
           | true
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
-        :
+        : 
           | NonNullable<TDefault>
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     });
@@ -3322,7 +3322,7 @@ type SpreadOptionalProperties<
 type Spread<TTarget, TSource> = TTarget extends void ? TSource
   : TSource extends void ? TTarget
   // Properties in L that don't exist in R.
-  :
+  : 
     & Omit<TTarget, keyof TSource>
     // Properties in R that don't exist in L.
     & Omit<TSource, keyof TTarget>
