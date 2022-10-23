@@ -50,6 +50,7 @@ export abstract class Type<T> {
   ): CompleteHandlerResult;
 }
 
+// deno-lint-ignore no-namespace
 export namespace Type {
   export type infer<TType, TDefault = TType> = TType extends
     TypeOrTypeHandler<infer Value> ? Value : TDefault;
