@@ -1,4 +1,5 @@
 import type { Command } from "./command.ts";
+import { TypeOrTypeHandler } from "./types.ts";
 import type {
   ArgumentValue,
   CompleteHandlerResult,
@@ -47,4 +48,12 @@ export abstract class Type<TType extends string, TReturn> {
     cmd: Command,
     parent?: Command,
   ): CompleteHandlerResult;
+}
+
+// deno-lint-ignore no-namespace
+export namespace Type {
+  export type infer<TTypeHandler, TDefaultValue = TTypeHandler> =
+    // deno-lint-ignore no-explicit-any
+    TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
+      : TDefaultValue;
 }

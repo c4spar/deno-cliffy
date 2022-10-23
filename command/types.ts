@@ -22,7 +22,7 @@ type Id<T> = T extends Record<string, unknown>
 
 export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
-  : TypeValue<T>;
+  : Type.infer<T>;
 
 /* COMMAND TYPES */
 
@@ -159,7 +159,7 @@ export interface EnvVar<TType extends string = string> extends EnvVarOptions {
   name: string;
   names: string[];
   description: string;
-  // @TODO: extend IEnvVar from IArgument
+  // @TODO: extend EnvVar from Argument
   type: TType;
   details: Argument<TType>;
 }
@@ -187,10 +187,6 @@ export type TypeHandler<TType extends string, TReturn> = FlagTypeHandler<
 export type TypeOrTypeHandler<TType extends string, TReturn> =
   | Type<TType, TReturn>
   | TypeHandler<TType, TReturn>;
-
-export type TypeValue<TTypeHandler, TDefaultValue = TTypeHandler> =
-  TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
-    : TDefaultValue;
 
 /* EXAMPLE TYPES */
 
