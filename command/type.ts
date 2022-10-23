@@ -3,7 +3,7 @@ import { TypeOrTypeHandler } from "./types.ts";
 import type {
   ArgumentValue,
   CompleteHandlerResult,
-  TypeValues,
+  ValuesHandlerResult,
 } from "./types.ts";
 
 /**
@@ -38,7 +38,7 @@ export abstract class Type<TType extends string, TReturn> {
   public values?(
     cmd: Command,
     parent?: Command,
-  ): TypeValues;
+  ): ValuesHandlerResult;
 
   /**
    * Returns shell completion values. If no complete method is provided,

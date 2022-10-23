@@ -16,6 +16,10 @@ export type { ArgumentValue, DefaultValue, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
+export type TypeOrTypeHandler<TType extends string, TReturn> =
+  | Type<TType, TReturn>
+  | TypeHandler<TType, TReturn>;
+
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : T;
@@ -94,6 +98,11 @@ export interface CommandResult<
 
 /* OPTION TYPES */
 
+export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
+  TValue,
+  TReturn
+>;
+
 /** Command option options. */
 export interface GlobalOptionOptions<
   O extends Record<string, any> | void = any,
@@ -145,11 +154,6 @@ export interface Option<
   separator?: string;
 }
 
-export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
-  TValue,
-  TReturn
->;
-
 /* ENV VARS TYPES */
 
 export type EnvVarValueHandler<TValue = any, TReturn = TValue> = (
@@ -194,10 +198,6 @@ export interface TypeDef<TType extends string = string, TReturn = unknown>
   handler: TypeOrTypeHandler<TType, TReturn>;
 }
 
-export type TypeOrTypeHandler<TType extends string, TReturn> =
-  | Type<TType, TReturn>
-  | TypeHandler<TType, TReturn>;
-
 /* EXAMPLE TYPES */
 
 /** Example settings. */
@@ -233,7 +233,7 @@ export type CompleteHandlerResult =
   | Array<string | number | boolean>
   | Promise<Array<string | number | boolean>>;
 
-export type TypeValues = Array<string | number | boolean>;
+export type ValuesHandlerResult = Array<string | number | boolean>;
 
 /** Type parser method. */
 export type CompleteHandler<

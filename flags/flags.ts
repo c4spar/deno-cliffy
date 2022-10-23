@@ -29,10 +29,10 @@ import type {
   ValuesFlagOptions,
 } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
-import { integer } from "./types/integer.ts";
 import { number } from "./types/number.ts";
 import { string } from "./types/string.ts";
 import { validateFlags } from "./_validate_flags.ts";
+import { integer } from "./types/integer.ts";
 
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never

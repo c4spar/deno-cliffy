@@ -1,6 +1,3 @@
-/** Available build-in argument types. */
-export type ArgumentType = "string" | "boolean" | "number" | "integer";
-
 /** Options for the `parseFlags` method. */
 export interface ParseFlagsOptions<
   TType extends string = ArgumentType,
@@ -54,23 +51,6 @@ export type FlagOptions<TType extends string> =
   | ValueFlagOptions<TType>
   | ValuesFlagOptions<TType>;
 
-/**
- * Parse result. The parse context will be returned by the `parseFlags` method
- * and can be also passed as first argument to the `parseFlags` method.
- */
-export type ParseFlagsContext<
-  TType extends string = string,
-  TFlags extends Record<string, unknown> = Record<string, unknown>,
-  TStandaloneOption extends FlagOptions<TType> = FlagOptions<TType>,
-> = {
-  flags: TFlags;
-  unknown: Array<string>;
-  literal: Array<string>;
-  standalone?: TStandaloneOption;
-  stopEarly: boolean;
-  stopOnUnknown: boolean;
-};
-
 /** Options for a flag argument. */
 export interface ArgumentOptions<TType extends string> {
   type: TType;
@@ -79,6 +59,8 @@ export interface ArgumentOptions<TType extends string> {
   list?: boolean;
   separator?: string;
 }
+/** Available build-in argument types. */
+export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
 /** Default flag value or a method that returns the default value. */
 export type DefaultValue<TValue = unknown> =
@@ -89,10 +71,28 @@ export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
 /** A callback method for custom processing or mapping of flag values. */
 // deno-lint-ignore no-explicit-any
-export type ValueHandler<TValue = any, TPrevious = TValue> = (
+export type ValueHandler<TValue = any, TReturn = TValue> = (
   val: TValue,
-  previous?: TPrevious,
-) => TPrevious;
+  previous?: TReturn,
+) => TReturn;
+
+/**
+ * Parse result. The parse context will be returned by the `parseFlags` method
+ * and can be also passed as first argument to the `parseFlags` method.
+ */
+export type ParseFlagsContext<
+  TType extends string = string,
+  // deno-lint-ignore no-explicit-any
+  TFlags extends Record<string, any> = Record<string, any>,
+  TStandaloneOption extends FlagOptions<TType> = FlagOptions<TType>,
+> = {
+  flags: TFlags;
+  unknown: Array<string>;
+  literal: Array<string>;
+  standalone?: TStandaloneOption;
+  stopEarly: boolean;
+  stopOnUnknown: boolean;
+};
 
 /** Argument parsing informations. */
 export interface ArgumentValue<TType extends string = ArgumentType> {
@@ -108,7 +108,7 @@ export interface ArgumentValue<TType extends string = ArgumentType> {
  */
 export type TypeHandler<
   TType extends string,
-  TReturn,
+  TReturn = unknown,
 > = (
   arg: ArgumentValue<TType>,
 ) => TReturn;
