@@ -12,6 +12,8 @@ import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 
+export type { DefaultValue };
+
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
 type Id<T> = T extends Record<string, unknown>
@@ -129,8 +131,6 @@ export interface Option<
   groupName?: string;
   separator?: string;
 }
-
-export type OptionDefaultValue<TValue = unknown> = DefaultValue<TValue>;
 
 export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TValue,
