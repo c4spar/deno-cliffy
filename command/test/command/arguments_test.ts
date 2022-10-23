@@ -4,7 +4,7 @@ import {
   describe,
   it,
 } from "../../../dev_deps.ts";
-import type { TypeInfo } from "../../types.ts";
+import type { ArgumentValue } from "../../types.ts";
 import { ValidationError } from "../../_errors.ts";
 import { Command } from "../../command.ts";
 
@@ -13,7 +13,7 @@ function cmd() {
     .throwErrors()
     .type(
       "color",
-      ({ label, name, type, value }: TypeInfo<"color">) => {
+      ({ label, name, type, value }: ArgumentValue<"color">) => {
         if (!["red", "blue", "yellow"].includes(value)) {
           throw new ValidationError(
             `${label} "${name}" must be a valid "${type}", but got "${value}".`,
@@ -36,7 +36,7 @@ function cmd2() {
     )
     .type(
       "color",
-      ({ label, name, type, value }: TypeInfo<"color">) => {
+      ({ label, name, type, value }: ArgumentValue<"color">) => {
         if (!["red", "blue", "yellow"].includes(value)) {
           throw new Error(
             `${label} "${name}" must be a valid "${type}", but got "${value}".`,

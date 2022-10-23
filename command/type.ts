@@ -1,5 +1,9 @@
 import type { Command } from "./command.ts";
-import type { CompleteHandlerResult, TypeInfo, TypeValues } from "./types.ts";
+import type {
+  ArgumentValue,
+  CompleteHandlerResult,
+  TypeValues,
+} from "./types.ts";
 
 /**
  * Base class for custom types.
@@ -24,7 +28,7 @@ import type { CompleteHandlerResult, TypeInfo, TypeValues } from "./types.ts";
  * ```
  */
 export abstract class Type<TType extends string, TReturn> {
-  public abstract parse(type: TypeInfo<TType>): TReturn;
+  public abstract parse(type: ArgumentValue<TType>): TReturn;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,

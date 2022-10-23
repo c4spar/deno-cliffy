@@ -1,13 +1,13 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { TypeHandler, TypeInfo } from "../../types.ts";
+import type { ArgumentValue, TypeHandler } from "../../types.ts";
 import { Type } from "../../type.ts";
 
 function email<TType extends string>(): TypeHandler<TType, string> {
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  return ({ label, value, name }: TypeInfo<string>): string => {
+  return ({ label, value, name }: ArgumentValue<string>): string => {
     if (!emailRegex.test(value.toLowerCase())) {
       throw new Error(
         `${label} "${name}" must be a valid "email", but got "${value}".`,
@@ -81,7 +81,7 @@ class CustomType<TType extends string, TReturn extends string>
     super();
   }
 
-  parse(type: TypeInfo<TType>): TReturn {
+  parse(type: ArgumentValue<TType>): TReturn {
     if (!this.formats.includes(type.value as TReturn)) {
       throw new Error(`invalid type: ${type.value}`);
     }

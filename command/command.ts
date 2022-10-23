@@ -34,7 +34,7 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { DefaultValue, OptionValueHandler, TypeInfo } from "./types.ts";
+import { ArgumentValue, DefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -1830,11 +1830,11 @@ export class Command<
           ctx.action = option as ActionOption;
         }
       },
-    }, (type: TypeInfo<string>) => this.parseType(type));
+    }, (type: ArgumentValue<string>) => this.parseType(type));
   }
 
   /** Parse argument type. */
-  protected parseType(type: TypeInfo<string>): unknown {
+  protected parseType(type: ArgumentValue<string>): unknown {
     const typeSettings: TypeDef | undefined = this.getType(type.type);
 
     if (!typeSettings) {

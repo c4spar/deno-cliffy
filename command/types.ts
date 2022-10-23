@@ -12,7 +12,7 @@ import type { Type } from "./type.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 
-export type { DefaultValue };
+export type { ArgumentValue, DefaultValue };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
@@ -191,10 +191,6 @@ export type TypeOrTypeHandler<TType extends string, TReturn> =
 export type TypeValue<TTypeHandler, TDefaultValue = TTypeHandler> =
   TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
     : TDefaultValue;
-
-export type TypeInfo<TType extends string = string> = ArgumentValue<
-  TType
->;
 
 /* EXAMPLE TYPES */
 
