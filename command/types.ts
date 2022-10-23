@@ -1,10 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
-import type { IFlagValueHandler } from "../flags/deprecated.ts";
 import type {
   ArgumentOptions,
   ArgumentValue,
-  DefaultValue,
   FlagOptions,
   TypeHandler,
   ValueHandler,
@@ -13,7 +11,7 @@ import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type { Type } from "./type.ts";
 
-export type { ArgumentValue, DefaultValue, IFlagValueHandler, TypeHandler };
+export type { ArgumentValue, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
@@ -176,7 +174,9 @@ export interface Option<
 
 /* ENV VARS TYPES */
 
-export type EnvVarValueHandler<T = any, V = unknown> = (val: T) => V;
+export type EnvVarValueHandler<TValue = any, TReturn = TValue> = (
+  val: TValue,
+) => TReturn;
 
 /** Environment variable options */
 export interface GlobalEnvVarOptions {
@@ -208,7 +208,6 @@ export interface TypeOptions {
   global?: boolean;
 }
 
-// @TODO: use Type class instead of TypeDef interface.
 /** Type settings. */
 export interface TypeDef extends TypeOptions {
   name: string;

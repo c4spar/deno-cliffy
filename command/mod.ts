@@ -12,4 +12,4 @@ export * from "./types/string.ts";
 export * from "./type.ts";
 export { ValidationError } from "./_errors.ts";
 export { type ValidationErrorOptions } from "./_errors.ts";
-export { type TypeValue } from "./deprecated.ts";
+export * from "./deprecated.ts";
