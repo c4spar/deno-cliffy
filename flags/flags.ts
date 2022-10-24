@@ -142,7 +142,6 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     argsIndex++
   ) {
     let option: FlagOptions | undefined;
-    let optionArgs: ArgumentOptions[] | undefined;
     let current: string = args[argsIndex];
     let currentValue: string | undefined;
     let negate = false;
@@ -230,17 +229,19 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       }
     }
 
-    optionArgs = option.args?.length ? option.args : [{
-      type: option.type,
-      requiredValue: option.requiredValue,
-      optionalValue: option.optionalValue,
-      variadic: option.variadic,
-      list: option.list,
-      separator: option.separator,
-    }];
+    if (option.type && !option.args?.length) {
+      option.args = [{
+        type: option.type,
+        requiredValue: option.requiredValue,
+        optionalValue: option.optionalValue,
+        variadic: option.variadic,
+        list: option.list,
+        separator: option.separator,
+      }];
+    }
 
     if (
-      opts.flags?.length && !option.args?.length && !option.type &&
+      opts.flags?.length && !option.args?.length &&
       typeof currentValue !== "undefined"
     ) {
       throw new UnexpectedOptionValueError(option.name, currentValue);
@@ -251,10 +252,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     const next = () => currentValue ?? args[argsIndex + 1];
     const previous = ctx.flags[propName];
 
-    parseNext(option, optionArgs);
+    parseNext(option);
 
     if (typeof ctx.flags[propName] === "undefined") {
-      if (optionArgs[optionArgsIndex].requiredValue) {
+      if (option.args?.[optionArgsIndex]?.requiredValue) {
         throw new MissingOptionValueError(option.name);
       } else if (typeof option.default !== "undefined") {
         ctx.flags[propName] = getDefaultValue(option);
@@ -280,15 +281,15 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
     /** Parse next argument for current option. */
     // deno-lint-ignore no-inner-declarations
-    function parseNext(
-      option: FlagOptions,
-      optionArgs: ArgumentOptions[],
-    ): void {
+    function parseNext(option: FlagOptions): void {
       if (negate) {
         ctx.flags[propName] = false;
         return;
+      } else if (!option.args?.length) {
+        ctx.flags[propName] = undefined;
+        return;
       }
-      const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
+      const arg: ArgumentOptions | undefined = option.args[optionArgsIndex];
 
       if (!arg) {
         const flag = next();
@@ -299,7 +300,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         arg.type = OptionType.BOOLEAN;
       }
 
-      if (option.args?.length) {
+      if (option.args?.length && !option.type) {
         // make all values required by default
         if (
           (typeof arg.optionalValue === "undefined" ||
@@ -320,12 +321,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
       }
 
-      if (arg.requiredValue) {
-        if (inOptionalArg) {
-          throw new UnexpectedRequiredArgumentError(option.name);
-        }
-      } else {
+      if (!arg.requiredValue) {
         inOptionalArg = true;
+      } else if (inOptionalArg) {
+        throw new UnexpectedRequiredArgumentError(option.name);
       }
 
       let result: unknown;
@@ -361,14 +360,14 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         argsIndex++;
         if (!arg.variadic) {
           optionArgsIndex++;
-        } else if (optionArgs[optionArgsIndex + 1]) {
+        } else if (option.args[optionArgsIndex + 1]) {
           throw new UnexpectedArgumentAfterVariadicArgumentError(next());
         }
       }
 
       if (
         typeof result !== "undefined" &&
-        (optionArgs.length > 1 || arg.variadic)
+        (option.args.length > 1 || arg.variadic)
       ) {
         if (!ctx.flags[propName]) {
           ctx.flags[propName] = [];
@@ -377,7 +376,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         (ctx.flags[propName] as Array<unknown>).push(result);
 
         if (hasNext(arg)) {
-          parseNext(option, optionArgs);
+          parseNext(option);
         }
       } else {
         ctx.flags[propName] = result;
@@ -385,11 +384,14 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Check if current option should have an argument. */
       function hasNext(arg: ArgumentOptions): boolean {
+        if (!option.args?.length) {
+          return false;
+        }
         const nextValue = currentValue ?? args[argsIndex + 1];
         if (!nextValue) {
           return false;
         }
-        if (optionArgs.length > 1 && optionArgsIndex >= optionArgs.length) {
+        if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
           return false;
         }
         if (arg.requiredValue) {
