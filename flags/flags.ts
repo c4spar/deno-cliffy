@@ -45,9 +45,12 @@ const DefaultTypes: Record<ArgumentType, TypeHandler> = {
  * @param opts      Parse options.
  *
  * ```
- * // example.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land -- --cliffy
+ * // examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land --deno.com -- --cliffy
  * parseFlags(Deno.args);
  * ```
+ *
+ * Output:
+ *
  * ```
  * {
  *   flags: {
@@ -58,10 +61,12 @@ const DefaultTypes: Record<ArgumentType, TypeHandler> = {
  *     b: true,
  *     c: true,
  *     beep: "boop",
- *     deno: { land: true }
+ *     deno: { land: true, com: true }
  *   },
+ *   literal: [ "--cliffy" ],
  *   unknown: [ "foo", "bar", "baz" ],
- *   literal: [ "--cliffy" ]
+ *   stopEarly: false,
+ *   stopOnUnknown: false
  * }
  * ```
  */
@@ -184,10 +189,11 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       currentValue = current.slice(equalSignIndex + 1) || undefined;
       current = current.slice(0, equalSignIndex);
     }
-    option = opts.flags && getOption(opts.flags, current);
 
-    if (!option) {
-      if (opts.flags?.length) {
+    if (opts.flags) {
+      option = getOption(opts.flags, current);
+
+      if (!option) {
         const name = current.replace(/^-+/, "");
         option = matchWildCardOptions(name, opts.flags);
         if (!option) {
@@ -199,13 +205,12 @@ function parseArgs<TFlagOptions extends FlagOptions>(
           throw new UnknownOptionError(current, opts.flags);
         }
       }
-      if (!option) {
-        option = {
-          name: current.replace(/^-+/, ""),
-          optionalValue: true,
-          type: OptionType.STRING,
-        };
-      }
+    } else {
+      option = {
+        name: current.replace(/^-+/, ""),
+        optionalValue: true,
+        type: OptionType.STRING,
+      };
     }
 
     if (option.standalone) {
@@ -279,6 +284,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       option: FlagOptions,
       optionArgs: ArgumentOptions[],
     ): void {
+      if (negate) {
+        ctx.flags[propName] = false;
+        return;
+      }
       const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
 
       if (!arg) {
@@ -317,11 +326,6 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
       } else {
         inOptionalArg = true;
-      }
-
-      if (negate) {
-        ctx.flags[propName] = false;
-        return;
       }
 
       let result: unknown;
