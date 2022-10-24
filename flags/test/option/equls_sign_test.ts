@@ -73,3 +73,29 @@ Deno.test("[flags] should parse optional value with leading dash with equals sig
   assertEquals(unknown, []);
   assertEquals(literal, []);
 });
+
+Deno.test("[flags] should parse multi short flag with equals sign", () => {
+  const { flags, unknown, literal } = parseFlags(["-abc=foo"]);
+
+  assertEquals(flags, { a: true, b: true, c: "foo" });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
+
+Deno.test("[flags] should parse multi short flag with required equals sign", () => {
+  const { flags, unknown, literal } = parseFlags(["-abc=foo"], {
+    flags: [{
+      name: "a",
+    }, {
+      name: "b",
+    }, {
+      name: "c",
+      type: "string",
+      equalsSign: true,
+    }],
+  });
+
+  assertEquals(flags, { a: true, b: true, c: "foo" });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});

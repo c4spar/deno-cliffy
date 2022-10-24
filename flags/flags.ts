@@ -165,19 +165,19 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         throw new InvalidOptionError(current, opts.flags ?? []);
       }
 
-      // split value: --foo="bar=baz" => --foo bar=baz
-      const equalSignIndex = current.indexOf("=");
-      if (equalSignIndex > -1) {
-        currentValue = current.slice(equalSignIndex + 1) || undefined;
-        current = current.slice(0, equalSignIndex);
-      }
-
       // normalize short flags: -abc => -a -b -c
       if (isShort && current.length > 2 && current[2] !== ".") {
         args.splice(argsIndex, 1, ...splitFlags(current));
         current = args[argsIndex];
       } else if (isLong && current.startsWith("--no-")) {
         negate = true;
+      }
+
+      // split value: --foo="bar=baz" => --foo bar=baz
+      const equalSignIndex = current.indexOf("=");
+      if (equalSignIndex !== -1) {
+        currentValue = current.slice(equalSignIndex + 1) || undefined;
+        current = current.slice(0, equalSignIndex);
       }
       option = opts.flags && getOption(opts.flags, current);
 
@@ -469,8 +469,10 @@ function parseDottedOptions(ctx: ParseFlagsContext): void {
 }
 
 function splitFlags(flag: string): Array<string> {
+  flag = flag.slice(1);
   const normalized: Array<string> = [];
-  const flags = flag.slice(1).split("");
+  const index = flag.indexOf("=");
+  const flags = (index !== -1 ? flag.slice(0, index) : flag).split("");
 
   if (isNaN(Number(flag[flag.length - 1]))) {
     flags.forEach((val) => normalized.push(`-${val}`));
@@ -479,6 +481,10 @@ function splitFlags(flag: string): Array<string> {
     if (flags.length) {
       normalized.push(flags.join(""));
     }
+  }
+
+  if (index !== -1) {
+    normalized[normalized.length - 1] += flag.slice(index);
   }
 
   return normalized;
