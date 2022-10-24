@@ -449,6 +449,7 @@ function parseArgs<TType extends string>(
         }
         if (arg.optional || arg.variadic) {
           return nextValue[0] !== "-" ||
+            typeof currentValue !== "undefined" ||
             (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
         }
 
