@@ -393,7 +393,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
             return false;
           }
           if (arg.optionalValue || arg.variadic) {
-            return nextValue[0] !== "-" ||
+            return nextValue[0] !== "-" || typeof currentValue !== "undefined" ||
               (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
           }
 
