@@ -58,3 +58,18 @@ Deno.test("[flags] should parse optional value without equals sign as argument",
   assertEquals(unknown, ["bar"]);
   assertEquals(literal, []);
 });
+
+Deno.test("[flags] should parse optional value with leading dash with equals sign", () => {
+  const { flags, unknown, literal } = parseFlags(["--foo=-bar"], {
+    flags: [{
+      name: "foo",
+      type: "string",
+      equalsSign: true,
+      optionalValue: true,
+    }],
+  });
+
+  assertEquals(flags, { foo: "-bar" });
+  assertEquals(unknown, []);
+  assertEquals(literal, []);
+});
