@@ -32,7 +32,7 @@ import { string } from "./types/string.ts";
 import { validateFlags } from "./_validate_flags.ts";
 import { integer } from "./types/integer.ts";
 
-const Types: Record<ArgumentType, TypeHandler> = {
+const DefaultTypes: Record<ArgumentType, TypeHandler> = {
   string,
   number,
   integer,
@@ -155,282 +155,281 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     }
 
     const isFlag = current.length > 1 && current[0] === "-";
-    const next = () => currentValue ?? args[argsIndex + 1];
 
-    if (isFlag) {
-      const isShort = current[1] !== "-";
-      const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
-
-      if (!isShort && !isLong) {
-        throw new InvalidOptionError(current, opts.flags ?? []);
-      }
-
-      // normalize short flags: -abc => -a -b -c
-      if (isShort && current.length > 2 && current[2] !== ".") {
-        args.splice(argsIndex, 1, ...splitFlags(current));
-        current = args[argsIndex];
-      } else if (isLong && current.startsWith("--no-")) {
-        negate = true;
-      }
-
-      // split value: --foo="bar=baz" => --foo bar=baz
-      const equalSignIndex = current.indexOf("=");
-      if (equalSignIndex !== -1) {
-        currentValue = current.slice(equalSignIndex + 1) || undefined;
-        current = current.slice(0, equalSignIndex);
-      }
-      option = opts.flags && getOption(opts.flags, current);
-
-      if (!option) {
-        if (opts.flags?.length) {
-          const name = current.replace(/^-+/, "");
-          option = matchWildCardOptions(name, opts.flags);
-          if (!option) {
-            if (opts.stopOnUnknown) {
-              ctx.stopOnUnknown = true;
-              ctx.unknown.push(args[argsIndex]);
-              continue;
-            }
-            throw new UnknownOptionError(current, opts.flags);
-          }
-        }
-        if (!option) {
-          option = {
-            name: current.replace(/^-+/, ""),
-            optionalValue: true,
-            type: OptionType.STRING,
-          };
-        }
-      }
-
-      if (option.standalone) {
-        ctx.standalone = option;
-      }
-
-      if (
-        opts.flags?.length && !option.args?.length && !option.type &&
-        typeof currentValue !== "undefined"
-      ) {
-        throw new UnexpectedOptionValueError(option.name, currentValue);
-      }
-
-      const positiveName: string = negate
-        ? option.name.replace(/^no-?/, "")
-        : option.name;
-      const propName: string = paramCaseToCamelCase(positiveName);
-
-      if (typeof ctx.flags[propName] !== "undefined") {
-        if (!opts.flags?.length) {
-          option.collect = true;
-        } else if (!option.collect) {
-          throw new DuplicateOptionError(current);
-        }
-      }
-
-      optionArgs = option.args?.length ? option.args : [{
-        type: option.type,
-        requiredValue: option.requiredValue,
-        optionalValue: option.optionalValue,
-        variadic: option.variadic,
-        list: option.list,
-        separator: option.separator,
-      }];
-
-      let optionArgsIndex = 0;
-      let inOptionalArg = false;
-      const previous = ctx.flags[propName];
-
-      parseNext(option, optionArgs);
-
-      if (typeof ctx.flags[propName] === "undefined") {
-        if (optionArgs[optionArgsIndex].requiredValue) {
-          throw new MissingOptionValueError(option.name);
-        } else if (typeof option.default !== "undefined") {
-          ctx.flags[propName] = getDefaultValue(option);
-        } else {
-          ctx.flags[propName] = true;
-        }
-      }
-
-      if (option.value) {
-        ctx.flags[propName] = option.value(ctx.flags[propName], previous);
-      } else if (option.collect) {
-        const value: unknown[] = typeof previous !== "undefined"
-          ? (Array.isArray(previous) ? previous : [previous])
-          : [];
-
-        value.push(ctx.flags[propName]);
-        ctx.flags[propName] = value;
-      }
-
-      optionsMap.set(propName, option);
-
-      opts.option?.(option as TFlagOptions, ctx.flags[propName]);
-
-      /** Parse next argument for current option. */
-      // deno-lint-ignore no-inner-declarations
-      function parseNext(
-        option: FlagOptions,
-        optionArgs: ArgumentOptions[],
-      ): void {
-        const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
-
-        if (!arg) {
-          const flag = next();
-          throw new UnknownOptionError(flag, opts.flags ?? []);
-        }
-
-        if (!arg.type) {
-          arg.type = OptionType.BOOLEAN;
-        }
-
-        if (option.args?.length) {
-          // make all values required by default
-          if (
-            (typeof arg.optionalValue === "undefined" ||
-              arg.optionalValue === false) &&
-            typeof arg.requiredValue === "undefined"
-          ) {
-            arg.requiredValue = true;
-          }
-        } else {
-          // make non boolean value required by default
-          if (
-            arg.type !== OptionType.BOOLEAN &&
-            (typeof arg.optionalValue === "undefined" ||
-              arg.optionalValue === false) &&
-            typeof arg.requiredValue === "undefined"
-          ) {
-            arg.requiredValue = true;
-          }
-        }
-
-        if (arg.requiredValue) {
-          if (inOptionalArg) {
-            throw new UnexpectedRequiredArgumentError(option.name);
-          }
-        } else {
-          inOptionalArg = true;
-        }
-
-        if (negate) {
-          ctx.flags[propName] = false;
-          return;
-        }
-
-        let result: unknown;
-        let increase = false;
-
-        if (arg.list && hasNext(arg)) {
-          const parsed: unknown[] = next()
-            .split(arg.separator || ",")
-            .map((nextValue: string) => {
-              const value = parseValue(option, arg, nextValue);
-              if (typeof value === "undefined") {
-                throw new InvalidOptionValueError(
-                  option.name,
-                  arg.type ?? "?",
-                  nextValue,
-                );
-              }
-              return value;
-            });
-
-          if (parsed?.length) {
-            result = parsed;
-          }
-        } else {
-          if (hasNext(arg)) {
-            result = parseValue(option, arg, next());
-          } else if (arg.optionalValue && arg.type === OptionType.BOOLEAN) {
-            result = true;
-          }
-        }
-
-        if (increase && typeof currentValue === "undefined") {
-          argsIndex++;
-          if (!arg.variadic) {
-            optionArgsIndex++;
-          } else if (optionArgs[optionArgsIndex + 1]) {
-            throw new UnexpectedArgumentAfterVariadicArgumentError(next());
-          }
-        }
-
-        if (
-          typeof result !== "undefined" &&
-          (optionArgs.length > 1 || arg.variadic)
-        ) {
-          if (!ctx.flags[propName]) {
-            ctx.flags[propName] = [];
-          }
-
-          (ctx.flags[propName] as Array<unknown>).push(result);
-
-          if (hasNext(arg)) {
-            parseNext(option, optionArgs);
-          }
-        } else {
-          ctx.flags[propName] = result;
-        }
-
-        /** Check if current option should have an argument. */
-        function hasNext(arg: ArgumentOptions): boolean {
-          const nextValue = currentValue ?? args[argsIndex + 1];
-          if (!nextValue) {
-            return false;
-          }
-          if (optionArgs.length > 1 && optionArgsIndex >= optionArgs.length) {
-            return false;
-          }
-          if (arg.requiredValue) {
-            return true;
-          }
-          // require optional values to be called with an equal sign: foo=bar
-          if (
-            option.equalsSign && arg.optionalValue && !arg.variadic &&
-            typeof currentValue === "undefined"
-          ) {
-            return false;
-          }
-          if (arg.optionalValue || arg.variadic) {
-            return nextValue[0] !== "-" ||
-              typeof currentValue !== "undefined" ||
-              (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
-          }
-
-          return false;
-        }
-
-        /** Parse argument value.  */
-        function parseValue(
-          option: FlagOptions,
-          arg: ArgumentOptions,
-          value: string,
-        ): unknown {
-          const type: string = arg.type || OptionType.STRING;
-          const result: unknown = opts.parse
-            ? opts.parse({
-              label: "Option",
-              type,
-              name: `--${option.name}`,
-              value,
-            })
-            : parseFlagValue(option, arg, value);
-
-          if (
-            typeof result !== "undefined"
-          ) {
-            increase = true;
-          }
-
-          return result;
-        }
-      }
-    } else {
+    if (!isFlag) {
       if (opts.stopEarly) {
         ctx.stopEarly = true;
       }
       ctx.unknown.push(current);
+      continue;
+    }
+    const isShort = current[1] !== "-";
+    const isLong = isShort ? false : current.length > 3 && current[2] !== "-";
+
+    if (!isShort && !isLong) {
+      throw new InvalidOptionError(current, opts.flags ?? []);
+    }
+
+    // normalize short flags: -abc => -a -b -c
+    if (isShort && current.length > 2 && current[2] !== ".") {
+      args.splice(argsIndex, 1, ...splitFlags(current));
+      current = args[argsIndex];
+    } else if (isLong && current.startsWith("--no-")) {
+      negate = true;
+    }
+
+    // split value: --foo="bar=baz" => --foo bar=baz
+    const equalSignIndex = current.indexOf("=");
+    if (equalSignIndex !== -1) {
+      currentValue = current.slice(equalSignIndex + 1) || undefined;
+      current = current.slice(0, equalSignIndex);
+    }
+    option = opts.flags && getOption(opts.flags, current);
+
+    if (!option) {
+      if (opts.flags?.length) {
+        const name = current.replace(/^-+/, "");
+        option = matchWildCardOptions(name, opts.flags);
+        if (!option) {
+          if (opts.stopOnUnknown) {
+            ctx.stopOnUnknown = true;
+            ctx.unknown.push(args[argsIndex]);
+            continue;
+          }
+          throw new UnknownOptionError(current, opts.flags);
+        }
+      }
+      if (!option) {
+        option = {
+          name: current.replace(/^-+/, ""),
+          optionalValue: true,
+          type: OptionType.STRING,
+        };
+      }
+    }
+
+    if (option.standalone) {
+      ctx.standalone = option;
+    }
+
+    const positiveName: string = negate
+      ? option.name.replace(/^no-?/, "")
+      : option.name;
+    const propName: string = paramCaseToCamelCase(positiveName);
+
+    if (typeof ctx.flags[propName] !== "undefined") {
+      if (!opts.flags?.length) {
+        option.collect = true;
+      } else if (!option.collect) {
+        throw new DuplicateOptionError(current);
+      }
+    }
+
+    optionArgs = option.args?.length ? option.args : [{
+      type: option.type,
+      requiredValue: option.requiredValue,
+      optionalValue: option.optionalValue,
+      variadic: option.variadic,
+      list: option.list,
+      separator: option.separator,
+    }];
+
+    if (
+      opts.flags?.length && !option.args?.length && !option.type &&
+      typeof currentValue !== "undefined"
+    ) {
+      throw new UnexpectedOptionValueError(option.name, currentValue);
+    }
+
+    let optionArgsIndex = 0;
+    let inOptionalArg = false;
+    const next = () => currentValue ?? args[argsIndex + 1];
+    const previous = ctx.flags[propName];
+
+    parseNext(option, optionArgs);
+
+    if (typeof ctx.flags[propName] === "undefined") {
+      if (optionArgs[optionArgsIndex].requiredValue) {
+        throw new MissingOptionValueError(option.name);
+      } else if (typeof option.default !== "undefined") {
+        ctx.flags[propName] = getDefaultValue(option);
+      } else {
+        ctx.flags[propName] = true;
+      }
+    }
+
+    if (option.value) {
+      ctx.flags[propName] = option.value(ctx.flags[propName], previous);
+    } else if (option.collect) {
+      const value: unknown[] = typeof previous !== "undefined"
+        ? (Array.isArray(previous) ? previous : [previous])
+        : [];
+
+      value.push(ctx.flags[propName]);
+      ctx.flags[propName] = value;
+    }
+
+    optionsMap.set(propName, option);
+
+    opts.option?.(option as TFlagOptions, ctx.flags[propName]);
+
+    /** Parse next argument for current option. */
+    // deno-lint-ignore no-inner-declarations
+    function parseNext(
+      option: FlagOptions,
+      optionArgs: ArgumentOptions[],
+    ): void {
+      const arg: ArgumentOptions | undefined = optionArgs[optionArgsIndex];
+
+      if (!arg) {
+        const flag = next();
+        throw new UnknownOptionError(flag, opts.flags ?? []);
+      }
+
+      if (!arg.type) {
+        arg.type = OptionType.BOOLEAN;
+      }
+
+      if (option.args?.length) {
+        // make all values required by default
+        if (
+          (typeof arg.optionalValue === "undefined" ||
+            arg.optionalValue === false) &&
+          typeof arg.requiredValue === "undefined"
+        ) {
+          arg.requiredValue = true;
+        }
+      } else {
+        // make non boolean value required by default
+        if (
+          arg.type !== OptionType.BOOLEAN &&
+          (typeof arg.optionalValue === "undefined" ||
+            arg.optionalValue === false) &&
+          typeof arg.requiredValue === "undefined"
+        ) {
+          arg.requiredValue = true;
+        }
+      }
+
+      if (arg.requiredValue) {
+        if (inOptionalArg) {
+          throw new UnexpectedRequiredArgumentError(option.name);
+        }
+      } else {
+        inOptionalArg = true;
+      }
+
+      if (negate) {
+        ctx.flags[propName] = false;
+        return;
+      }
+
+      let result: unknown;
+      let increase = false;
+
+      if (arg.list && hasNext(arg)) {
+        const parsed: unknown[] = next()
+          .split(arg.separator || ",")
+          .map((nextValue: string) => {
+            const value = parseValue(option, arg, nextValue);
+            if (typeof value === "undefined") {
+              throw new InvalidOptionValueError(
+                option.name,
+                arg.type ?? "?",
+                nextValue,
+              );
+            }
+            return value;
+          });
+
+        if (parsed?.length) {
+          result = parsed;
+        }
+      } else {
+        if (hasNext(arg)) {
+          result = parseValue(option, arg, next());
+        } else if (arg.optionalValue && arg.type === OptionType.BOOLEAN) {
+          result = true;
+        }
+      }
+
+      if (increase && typeof currentValue === "undefined") {
+        argsIndex++;
+        if (!arg.variadic) {
+          optionArgsIndex++;
+        } else if (optionArgs[optionArgsIndex + 1]) {
+          throw new UnexpectedArgumentAfterVariadicArgumentError(next());
+        }
+      }
+
+      if (
+        typeof result !== "undefined" &&
+        (optionArgs.length > 1 || arg.variadic)
+      ) {
+        if (!ctx.flags[propName]) {
+          ctx.flags[propName] = [];
+        }
+
+        (ctx.flags[propName] as Array<unknown>).push(result);
+
+        if (hasNext(arg)) {
+          parseNext(option, optionArgs);
+        }
+      } else {
+        ctx.flags[propName] = result;
+      }
+
+      /** Check if current option should have an argument. */
+      function hasNext(arg: ArgumentOptions): boolean {
+        const nextValue = currentValue ?? args[argsIndex + 1];
+        if (!nextValue) {
+          return false;
+        }
+        if (optionArgs.length > 1 && optionArgsIndex >= optionArgs.length) {
+          return false;
+        }
+        if (arg.requiredValue) {
+          return true;
+        }
+        // require optional values to be called with an equal sign: foo=bar
+        if (
+          option.equalsSign && arg.optionalValue && !arg.variadic &&
+          typeof currentValue === "undefined"
+        ) {
+          return false;
+        }
+        if (arg.optionalValue || arg.variadic) {
+          return nextValue[0] !== "-" ||
+            typeof currentValue !== "undefined" ||
+            (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
+        }
+
+        return false;
+      }
+
+      /** Parse argument value.  */
+      function parseValue(
+        option: FlagOptions,
+        arg: ArgumentOptions,
+        value: string,
+      ): unknown {
+        const result: unknown = opts.parse
+          ? opts.parse({
+            label: "Option",
+            type: arg.type || OptionType.STRING,
+            name: `--${option.name}`,
+            value,
+          })
+          : parseDefaultType(option, arg, value);
+
+        if (
+          typeof result !== "undefined"
+        ) {
+          increase = true;
+        }
+
+        return result;
+      }
     }
   }
 
@@ -490,16 +489,16 @@ function splitFlags(flag: string): Array<string> {
   return normalized;
 }
 
-function parseFlagValue(
+function parseDefaultType(
   option: FlagOptions,
   arg: ArgumentOptions,
   value: string,
 ): unknown {
   const type: ArgumentType = arg.type as ArgumentType || OptionType.STRING;
-  const parseType = Types[type];
+  const parseType = DefaultTypes[type];
 
   if (!parseType) {
-    throw new UnknownTypeError(type, Object.keys(Types));
+    throw new UnknownTypeError(type, Object.keys(DefaultTypes));
   }
 
   return parseType({
