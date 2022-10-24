@@ -347,9 +347,7 @@ function parseArgs<TType extends string>(
 
     /** Parse next argument for current option. */
     // deno-lint-ignore no-inner-declarations
-    function parseNext(
-      option: FlagOptions<TType>,
-    ): void {
+    function parseNext(option: FlagOptions<TType>): void {
       if (negate) {
         ctx.flags[propName] = false;
         return;
@@ -431,10 +429,10 @@ function parseArgs<TType extends string>(
           return false;
         }
         const nextValue = currentValue ?? args[argsIndex + 1];
-        if (
-          !nextValue ||
-          option.args.length > 1 && optionArgsIndex >= option.args.length
-        ) {
+        if (!nextValue) {
+          return false;
+        }
+        if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
           return false;
         }
         if (!arg.optional) {
