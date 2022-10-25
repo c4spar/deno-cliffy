@@ -1,4 +1,4 @@
-import { expandGlobSync } from "https://deno.land/std@0.158.0/fs/expand_glob.ts";
+import { expandGlobSync } from "https://deno.land/std@0.160.0/fs/expand_glob.ts";
 
 const MAX_PARALLEL = Number(Deno.env.get("MAX_PARALLEL")) || 8;
 const files = [...expandGlobSync("./examples/**/**.ts")];
