@@ -389,7 +389,7 @@ type setRaw = (
 function getColumns(): number | null {
   try {
     // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
-    // And keep backwards compatibility for deno < 1.25.3.
+    // And keep backwards compatibility for deno < 1.27.0.
     // deno-lint-ignore no-explicit-any
     return (Deno as any).consoleSize(Deno.stdout.rid).columns;
   } catch (_error) {
