@@ -144,7 +144,7 @@ export abstract class GenericPrompt<
     const content: string = result.filter(Boolean).join("\n");
     const lines = content.split("\n");
 
-    const columns = Deno.consoleSize().columns;
+    const columns = getColumns();
     const linesCount: number = columns
       ? lines.reduce((prev, next) => {
         const length = stripColor(next).length;
@@ -385,3 +385,14 @@ type setRaw = (
   mode: boolean,
   options?: { cbreak?: boolean },
 ) => void;
+
+function getColumns(): number | null {
+  try {
+    // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
+    // And keep backwards compatibility for deno < 1.25.3.
+    // deno-lint-ignore no-explicit-any
+    return (Deno as any).consoleSize(Deno.stdout.rid).columns;
+  } catch (_error) {
+    return null;
+  }
+}
