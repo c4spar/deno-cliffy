@@ -8,7 +8,6 @@ export {
   OptionType,
   parseFlags,
   string,
-  validateFlags,
 } from "./flags/mod.ts";
 export type {
   ArgumentOptions,
