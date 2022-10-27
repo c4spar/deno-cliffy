@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-net=localhost:8080,deno.land
 
 import { Command } from "../command/mod.ts";
-import { serve } from "https://deno.land/std@0.160.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.161.0/http/server.ts";
 
 await new Command()
   .name("reverse-proxy")
