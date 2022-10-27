@@ -144,7 +144,7 @@ export abstract class GenericPrompt<
     const content: string = result.filter(Boolean).join("\n");
     const lines = content.split("\n");
 
-    const columns = getColumns();
+    const columns = Deno.consoleSize().columns;
     const linesCount: number = columns
       ? lines.reduce((prev, next) => {
         const length = stripColor(next).length;
@@ -385,11 +385,3 @@ type setRaw = (
   mode: boolean,
   options?: { cbreak?: boolean },
 ) => void;
-
-function getColumns(): number | null {
-  try {
-    return Deno.consoleSize(Deno.stdout.rid).columns;
-  } catch (_error) {
-    return null;
-  }
-}
