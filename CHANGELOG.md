@@ -1,3 +1,17 @@
+# [v0.25.4](https://github.com/c4spar/deno-cliffy/compare/v0.25.3...v0.25.4) (Oct 27, 2022)
+
+### Bug Fixes
+
+- remove no longer existing `validateFlags` export from `cliffy/mod.ts` (#485)
+  ([22938a8](https://github.com/c4spar/deno-cliffy/commit/22938a8))
+- **prompt:** add support for stabilized `Deno.consoleSize()` (#484)
+  ([096bb00](https://github.com/c4spar/deno-cliffy/commit/096bb00))
+
+### Chore
+
+- **upgrade:** deno/std@0.161.0 (#486)
+  ([cf15791](https://github.com/c4spar/deno-cliffy/commit/cf15791))
+
 # [v0.25.3](https://github.com/c4spar/deno-cliffy/compare/v0.25.2...v0.25.3) (Oct 26, 2022)
 
 ### DEPRECATIONS
