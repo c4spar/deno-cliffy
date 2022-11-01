@@ -296,8 +296,7 @@ export abstract class GenericPrompt<
 
     if (isTty) {
       // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
-      (Deno.setRaw as setRaw)(
-        Deno.stdin.rid,
+      (Deno.stdin.setRaw as setRaw)(
         true,
         { cbreak: this.settings.cbreak === true },
       );
@@ -305,7 +304,7 @@ export abstract class GenericPrompt<
     const nread: number | null = await Deno.stdin.read(buffer);
 
     if (isTty) {
-      Deno.setRaw(Deno.stdin.rid, false);
+      Deno.stdin.setRaw(false);
     }
 
     if (nread === null) {
@@ -383,14 +382,16 @@ export abstract class GenericPrompt<
 }
 
 type setRaw = (
-  rid: number,
   mode: boolean,
   options?: { cbreak?: boolean },
 ) => void;
 
 function getColumns(): number | null {
   try {
-    return Deno.consoleSize(Deno.stdout.rid).columns;
+    // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
+    // And keep backwards compatibility for deno < 1.27.0.
+    // deno-lint-ignore no-explicit-any
+    return (Deno as any).consoleSize(Deno.stdout.rid).columns;
   } catch (_error) {
     return null;
   }

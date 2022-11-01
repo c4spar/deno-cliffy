@@ -1,17 +1,14 @@
 <img src="logo.png" style="width: 100%" />
 
-**Cliffy** is a _simple_ and _type-safe_ commandline framework for building
-complex commandline tools with [deno](https://deno.land).
-
-[![Latest version](https://img.shields.io/github/v/release/c4spar/deno-cliffy?logo=github&color=blue&label=Latest)](https://github.com/c4spar/deno-cliffy/releases)
+[![Latest version](https://deno.land/badge/cliffy/version)](https://deno.land/x/cliffy)
+[![popularity](https://deno.land/badge/cliffy/popularity)](https://deno.land/x/cliffy)
 [![Build status](https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main)](https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml)
 [![Code coverage](https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg)](https://codecov.io/gh/c4spar/deno-cliffy)
-[![Issues](https://img.shields.io/github/issues/c4spar/deno-cliffy?label=issues&logo=github)](https://github.com/c4spar/deno-cliffy/issues)
-[![License](https://img.shields.io/github/license/c4spar/deno-cliffy?logo=github)](./LICENSE)
-
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
-[![deno.land](https://img.shields.io/badge/Published%20on%20deno.land-blue?logo=deno&logoColor=959DA6&color=272727)](https://deno.land/x/cliffy)
 [![nest.land](https://nest.land/badge.svg)](https://nest.land/package/cliffy)
+
+**Cliffy** is a _simple_ and _type-safe_ commandline framework for building
+complex commandline tools with [deno](https://deno.land).
 
 > ⚠️ This project is still under development. Expect breaking changes.
 
@@ -21,8 +18,6 @@ The [documentation](https://cliffy.io/docs) is available on
 [cliffy.io](https://cliffy.io).
 
 ## Modules
-
-Following modules are included in cliffy:
 
 - **[ansi](https://cliffy.io/docs/ansi/):** Chainable ansi _escape sequences_.
 

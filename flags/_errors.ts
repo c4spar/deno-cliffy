@@ -1,5 +1,5 @@
 import { didYouMeanOption, didYouMeanType, getFlag } from "./_utils.ts";
-import type { IFlagOptions, ITypeInfo } from "./types.ts";
+import type { ArgumentValue, FlagOptions } from "./types.ts";
 
 export class FlagsError extends Error {
   constructor(message: string) {
@@ -8,32 +8,32 @@ export class FlagsError extends Error {
   }
 }
 
-export class UnknownRequiredOption extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+export class UnknownRequiredOptionError extends FlagsError {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown required option "${getFlag(option)}".${
         didYouMeanOption(option, options)
       }`,
     );
-    Object.setPrototypeOf(this, UnknownRequiredOption.prototype);
+    Object.setPrototypeOf(this, UnknownRequiredOptionError.prototype);
   }
 }
 
-export class UnknownConflictingOption extends FlagsError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+export class UnknownConflictingOptionError extends FlagsError {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown conflicting option "${getFlag(option)}".${
         didYouMeanOption(option, options)
       }`,
     );
-    Object.setPrototypeOf(this, UnknownConflictingOption.prototype);
+    Object.setPrototypeOf(this, UnknownConflictingOptionError.prototype);
   }
 }
 
-export class UnknownType extends FlagsError {
+export class UnknownTypeError extends FlagsError {
   constructor(type: string, types: Array<string>) {
     super(`Unknown type "${type}".${didYouMeanType(type, types)}`);
-    Object.setPrototypeOf(this, UnknownType.prototype);
+    Object.setPrototypeOf(this, UnknownTypeError.prototype);
   }
 }
 
@@ -51,131 +51,128 @@ export class ValidationError extends FlagsError {
   }
 }
 
-export class DuplicateOption extends ValidationError {
+export class DuplicateOptionError extends ValidationError {
   constructor(name: string) {
     super(
       `Option "${
         getFlag(name).replace(/^--no-/, "--")
       }" can only occur once, but was found several times.`,
     );
-    Object.setPrototypeOf(this, DuplicateOption.prototype);
+    Object.setPrototypeOf(this, DuplicateOptionError.prototype);
   }
 }
 
-export class InvalidOption extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+export class InvalidOptionError extends ValidationError {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Invalid option "${getFlag(option)}".${
         didYouMeanOption(option, options)
       }`,
     );
-    Object.setPrototypeOf(this, InvalidOption.prototype);
+    Object.setPrototypeOf(this, InvalidOptionError.prototype);
   }
 }
 
-export class UnknownOption extends ValidationError {
-  constructor(option: string, options: Array<IFlagOptions>) {
+export class UnknownOptionError extends ValidationError {
+  constructor(option: string, options: Array<FlagOptions>) {
     super(
       `Unknown option "${getFlag(option)}".${
         didYouMeanOption(option, options)
       }`,
     );
-    Object.setPrototypeOf(this, UnknownOption.prototype);
+    Object.setPrototypeOf(this, UnknownOptionError.prototype);
   }
 }
 
-export class MissingOptionValue extends ValidationError {
+export class MissingOptionValueError extends ValidationError {
   constructor(option: string) {
     super(`Missing value for option "${getFlag(option)}".`);
-    Object.setPrototypeOf(this, MissingOptionValue.prototype);
+    Object.setPrototypeOf(this, MissingOptionValueError.prototype);
   }
 }
 
-export class InvalidOptionValue extends ValidationError {
+export class InvalidOptionValueError extends ValidationError {
   constructor(option: string, expected: string, value: string) {
     super(
       `Option "${
         getFlag(option)
       }" must be of type "${expected}", but got "${value}".`,
     );
-    Object.setPrototypeOf(this, InvalidOptionValue.prototype);
+    Object.setPrototypeOf(this, InvalidOptionValueError.prototype);
   }
 }
 
-export class UnexpectedOptionValue extends ValidationError {
+export class UnexpectedOptionValueError extends ValidationError {
   constructor(option: string, value: string) {
     super(
       `Option "${getFlag(option)}" doesn't take a value, but got "${value}".`,
     );
-    Object.setPrototypeOf(this, InvalidOptionValue.prototype);
+    Object.setPrototypeOf(this, InvalidOptionValueError.prototype);
   }
 }
 
-export class OptionNotCombinable extends ValidationError {
+export class OptionNotCombinableError extends ValidationError {
   constructor(option: string) {
     super(`Option "${getFlag(option)}" cannot be combined with other options.`);
-    Object.setPrototypeOf(this, OptionNotCombinable.prototype);
+    Object.setPrototypeOf(this, OptionNotCombinableError.prototype);
   }
 }
 
-export class ConflictingOption extends ValidationError {
+export class ConflictingOptionError extends ValidationError {
   constructor(option: string, conflictingOption: string) {
     super(
       `Option "${getFlag(option)}" conflicts with option "${
         getFlag(conflictingOption)
       }".`,
     );
-    Object.setPrototypeOf(this, ConflictingOption.prototype);
+    Object.setPrototypeOf(this, ConflictingOptionError.prototype);
   }
 }
 
-export class DependingOption extends ValidationError {
+export class DependingOptionError extends ValidationError {
   constructor(option: string, dependingOption: string) {
     super(
       `Option "${getFlag(option)}" depends on option "${
         getFlag(dependingOption)
       }".`,
     );
-    Object.setPrototypeOf(this, DependingOption.prototype);
+    Object.setPrototypeOf(this, DependingOptionError.prototype);
   }
 }
 
-export class MissingRequiredOption extends ValidationError {
+export class MissingRequiredOptionError extends ValidationError {
   constructor(option: string) {
     super(`Missing required option "${getFlag(option)}".`);
-    Object.setPrototypeOf(this, MissingRequiredOption.prototype);
+    Object.setPrototypeOf(this, MissingRequiredOptionError.prototype);
   }
 }
 
-export class RequiredArgumentFollowsOptionalArgument extends ValidationError {
+export class UnexpectedRequiredArgumentError extends ValidationError {
   constructor(arg: string) {
     super(
       `An required argument cannot follow an optional argument, but "${arg}"  is defined as required.`,
     );
     Object.setPrototypeOf(
       this,
-      RequiredArgumentFollowsOptionalArgument.prototype,
+      UnexpectedRequiredArgumentError.prototype,
     );
   }
 }
 
-export class ArgumentFollowsVariadicArgument extends ValidationError {
+export class UnexpectedArgumentAfterVariadicArgumentError
+  extends ValidationError {
   constructor(arg: string) {
     super(`An argument cannot follow an variadic argument, but got "${arg}".`);
-    Object.setPrototypeOf(this, ArgumentFollowsVariadicArgument.prototype);
-  }
-}
-
-export class NoArguments extends ValidationError {
-  constructor() {
-    super(`No arguments.`);
-    Object.setPrototypeOf(this, NoArguments.prototype);
+    Object.setPrototypeOf(
+      this,
+      UnexpectedArgumentAfterVariadicArgumentError.prototype,
+    );
   }
 }
 
 export class InvalidTypeError extends ValidationError {
   constructor(
-    { label, name, value, type }: ITypeInfo,
+    { label, name, value, type }: ArgumentValue,
     expected?: Array<string | number | boolean>,
   ) {
     super(
@@ -187,6 +184,6 @@ export class InvalidTypeError extends ValidationError {
           : ""
       ),
     );
-    Object.setPrototypeOf(this, MissingOptionValue.prototype);
+    Object.setPrototypeOf(this, MissingOptionValueError.prototype);
   }
 }

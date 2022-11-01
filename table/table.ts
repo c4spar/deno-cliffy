@@ -47,7 +47,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   public static from<T extends IRow>(rows: ITable<T>): Table<T> {
     const table = new this(...rows);
     if (rows instanceof Table) {
-      table.options = { ...rows.options };
+      table.options = { ...(rows as Table).options };
       table.headerRow = rows.headerRow ? Row.from(rows.headerRow) : undefined;
     }
     return table;

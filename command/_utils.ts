@@ -1,11 +1,11 @@
 import {
-  ArgumentFollowsVariadicArgument,
-  RequiredArgumentFollowsOptionalArgument,
+  UnexpectedArgumentAfterVariadicArgumentError,
+  UnexpectedRequiredArgumentError,
 } from "../flags/_errors.ts";
 import { didYouMean } from "../flags/_utils.ts";
-import { OptionType } from "../flags/types.ts";
+import { OptionType } from "../flags/deprecated.ts";
 import type { Command } from "./command.ts";
-import type { IArgument } from "./types.ts";
+import type { Argument } from "./types.ts";
 
 export function didYouMeanCommand(
   command: string,
@@ -67,18 +67,18 @@ export function parseArgumentsDefinition<T extends boolean>(
   argsDefinition: string,
   validate: boolean,
   all: true,
-): Array<IArgument | string>;
+): Array<Argument | string>;
 export function parseArgumentsDefinition<T extends boolean>(
   argsDefinition: string,
   validate?: boolean,
   all?: false,
-): Array<IArgument>;
+): Array<Argument>;
 export function parseArgumentsDefinition<T extends boolean>(
   argsDefinition: string,
   validate = true,
   all?: T,
-): T extends true ? Array<IArgument | string> : Array<IArgument> {
-  const argumentDetails: Array<IArgument | string> = [];
+): T extends true ? Array<Argument | string> : Array<Argument> {
+  const argumentDetails: Array<Argument | string> = [];
 
   let hasOptional = false;
   let hasVariadic = false;
@@ -86,7 +86,7 @@ export function parseArgumentsDefinition<T extends boolean>(
 
   for (const arg of parts) {
     if (validate && hasVariadic) {
-      throw new ArgumentFollowsVariadicArgument(arg);
+      throw new UnexpectedArgumentAfterVariadicArgumentError(arg);
     }
     const parts: string[] = arg.split(ARGUMENT_DETAILS_REGEX);
 
@@ -98,7 +98,7 @@ export function parseArgumentsDefinition<T extends boolean>(
     }
     const type: string | undefined = parts[2] || OptionType.STRING;
 
-    const details: IArgument = {
+    const details: Argument = {
       optionalValue: arg[0] === "[",
       requiredValue: arg[0] === "<",
       name: parts[1],
@@ -109,7 +109,7 @@ export function parseArgumentsDefinition<T extends boolean>(
     };
 
     if (validate && !details.optionalValue && hasOptional) {
-      throw new RequiredArgumentFollowsOptionalArgument(details.name);
+      throw new UnexpectedRequiredArgumentError(details.name);
     }
 
     if (arg[0] === "[") {
@@ -133,7 +133,7 @@ export function parseArgumentsDefinition<T extends boolean>(
   }
 
   return argumentDetails as (
-    T extends true ? Array<IArgument | string> : Array<IArgument>
+    T extends true ? Array<Argument | string> : Array<Argument>
   );
 }
 

@@ -1,7 +1,8 @@
 import type { Command } from "./command.ts";
+import { TypeOrTypeHandler } from "./types.ts";
 import type {
+  ArgumentValue,
   CompleteHandlerResult,
-  ITypeInfo,
   ValuesHandlerResult,
 } from "./types.ts";
 
@@ -11,7 +12,7 @@ import type {
  * **Custom type example:**
  * ```
  * export class ColorType extends Type<string> {
- *   public parse({ label, name, value, type }: ITypeInfo): string {
+ *   public parse({ label, name, value, type }: ArgumentValue): string {
  *     if (["red", "blue"].includes(value)) {
  *       trow new Error(
  *         `${label} "${name}" must be of type "${type}", but got "${value}".` +
@@ -27,8 +28,8 @@ import type {
  * }
  * ```
  */
-export abstract class Type<T> {
-  public abstract parse(type: ITypeInfo): T;
+export abstract class Type<TValue> {
+  public abstract parse(type: ArgumentValue): TValue;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,
@@ -47,4 +48,10 @@ export abstract class Type<T> {
     cmd: Command,
     parent?: Command,
   ): CompleteHandlerResult;
+}
+
+// deno-lint-ignore no-namespace
+export namespace Type {
+  export type infer<TType, TDefault = TType> = TType extends
+    TypeOrTypeHandler<infer Value> ? Value : TDefault;
 }

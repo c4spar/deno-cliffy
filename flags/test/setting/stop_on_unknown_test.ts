@@ -1,6 +1,6 @@
 import { assertEquals } from "../../../dev_deps.ts";
+import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
-import { OptionType } from "../../types.ts";
 
 Deno.test("[flags] should stop on unknown option with stopOnUnknown enabled", () => {
   const { flags, unknown, literal } = parseFlags([

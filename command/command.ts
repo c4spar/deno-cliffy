@@ -1,11 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
 import {
-  UnknownType,
+  UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { MissingRequiredEnvVar } from "./_errors.ts";
+import { MissingRequiredEnvVarError } from "./_errors.ts";
 import { parseFlags } from "../flags/flags.ts";
-import type { IDefaultValue } from "../flags/types.ts";
+import type { ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -13,27 +13,28 @@ import {
 } from "./_utils.ts";
 import { blue, bold, red, yellow } from "./deps.ts";
 import {
-  CommandExecutableNotFound,
-  CommandNotFound,
-  DefaultCommandNotFound,
-  DuplicateCommandAlias,
-  DuplicateCommandName,
-  DuplicateCompletion,
-  DuplicateEnvironmentVariable,
-  DuplicateExample,
-  DuplicateOptionName,
-  DuplicateType,
-  EnvironmentVariableOptionalValue,
-  EnvironmentVariableSingleValue,
-  EnvironmentVariableVariadicValue,
-  MissingArgument,
-  MissingArguments,
-  MissingCommandName,
-  NoArgumentsAllowed,
-  TooManyArguments,
-  UnknownCommand,
+  CommandExecutableNotFoundError,
+  CommandNotFoundError,
+  DefaultCommandNotFoundError,
+  DuplicateCommandAliasError,
+  DuplicateCommandNameError,
+  DuplicateCompletionError,
+  DuplicateEnvVarError,
+  DuplicateExampleError,
+  DuplicateOptionNameError,
+  DuplicateTypeError,
+  MissingArgumentError,
+  MissingArgumentsError,
+  MissingCommandNameError,
+  NoArgumentsAllowedError,
+  TooManyArgumentsError,
+  TooManyEnvVarValuesError,
+  UnexpectedOptionalEnvVarValueError,
+  UnexpectedVariadicEnvVarValueError,
+  UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
+import { DefaultValue, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -42,67 +43,73 @@ import { Type } from "./type.ts";
 import { HelpGenerator } from "./help/_help_generator.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type {
-  IAction,
-  IArgument,
-  ICommandGlobalOption,
-  ICommandOption,
-  ICompleteHandler,
-  ICompleteOptions,
-  ICompletion,
-  IDescription,
-  IEnvVar,
-  IEnvVarOptions,
-  IEnvVarValueHandler,
-  IExample,
-  IFlagValueHandler,
-  IGlobalEnvVarOptions,
-  IHelpHandler,
-  IOption,
-  IParseResult,
-  IType,
-  ITypeInfo,
-  ITypeOptions,
-  IVersionHandler,
+  ActionHandler,
+  Argument,
+  ArgumentValue,
+  CommandResult,
+  CompleteHandler,
+  CompleteOptions,
+  Completion,
+  Description,
+  EnvVar,
+  EnvVarOptions,
+  EnvVarValueHandler,
+  Example,
+  GlobalEnvVarOptions,
+  GlobalOptionOptions,
+  HelpHandler,
   MapTypes,
+  Option,
+  OptionOptions,
+  TypeDef,
+  TypeOptions,
   TypeOrTypeHandler,
+  VersionHandler,
 } from "./types.ts";
 import { IntegerType } from "./types/integer.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
 
 export class Command<
-  CPG extends Record<string, unknown> | void = void,
-  CPT extends Record<string, unknown> | void = CPG extends number ? any : void,
-  CO extends Record<string, unknown> | void = CPG extends number ? any : void,
-  CA extends Array<unknown> = CPG extends number ? any : [],
-  CG extends Record<string, unknown> | void = CPG extends number ? any : void,
-  CT extends Record<string, unknown> | void = CPG extends number ? any : {
-    number: number;
-    integer: number;
-    string: string;
-    boolean: boolean;
-    file: string;
-  },
-  CGT extends Record<string, unknown> | void = CPG extends number ? any : void,
-  CP extends Command<any> | undefined = CPG extends number ? any : undefined,
+  TParentCommandGlobals extends Record<string, unknown> | void = void,
+  TParentCommandTypes extends Record<string, unknown> | void =
+    TParentCommandGlobals extends number ? any : void,
+  TCommandOptions extends Record<string, unknown> | void =
+    TParentCommandGlobals extends number ? any : void,
+  TCommandArguments extends Array<unknown> = TParentCommandGlobals extends
+    number ? any : [],
+  TCommandGlobals extends Record<string, unknown> | void =
+    TParentCommandGlobals extends number ? any : void,
+  TCommandTypes extends Record<string, unknown> | void =
+    TParentCommandGlobals extends number ? any : {
+      number: number;
+      integer: number;
+      string: string;
+      boolean: boolean;
+      file: string;
+    },
+  TCommandGlobalTypes extends Record<string, unknown> | void =
+    TParentCommandGlobals extends number ? any : void,
+  TParentCommand extends Command<any> | undefined =
+    TParentCommandGlobals extends number ? any : undefined,
 > {
-  private types: Map<string, IType> = new Map();
+  private types: Map<string, TypeDef> = new Map();
   private rawArgs: Array<string> = [];
   private literalArgs: Array<string> = [];
   // @TODO: get script name: https://github.com/denoland/deno/pull/5034
   // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
-  private _parent?: CP;
+  private _parent?: TParentCommand;
   private _globalParent?: Command<any>;
-  private ver?: IVersionHandler;
-  private desc: IDescription = "";
+  private ver?: VersionHandler;
+  private desc: Description = "";
   private _usage?: string;
-  private fn?: IAction;
-  private options: Array<IOption> = [];
+  private fn?: ActionHandler;
+  private options: Array<Option> = [];
   private commands: Map<string, Command<any>> = new Map();
-  private examples: Array<IExample> = [];
-  private envVars: Array<IEnvVar> = [];
+  private examples: Array<Example> = [];
+  private envVars: Array<EnvVar> = [];
   private aliases: Array<string> = [];
-  private completions: Map<string, ICompletion> = new Map();
+  private completions: Map<string, Completion> = new Map();
   private cmd: Command<any> = this;
   private argsDefinition?: string;
   private isExecutable = false;
@@ -111,15 +118,15 @@ export class Command<
   private _stopEarly = false;
   private defaultCommand?: string;
   private _useRawArgs = false;
-  private args: Array<IArgument> = [];
+  private args: Array<Argument> = [];
   private isHidden = false;
   private isGlobal = false;
   private hasDefaults = false;
-  private _versionOptions?: IDefaultOption | false;
-  private _helpOptions?: IDefaultOption | false;
-  private _versionOption?: IOption;
-  private _helpOption?: IOption;
-  private _help?: IHelpHandler;
+  private _versionOptions?: DefaultOption | false;
+  private _helpOptions?: DefaultOption | false;
+  private _versionOption?: Option;
+  private _helpOption?: Option;
+  private _help?: HelpHandler;
   private _shouldExit?: boolean;
   private _meta: Record<string, string> = {};
   private _groupName?: string;
@@ -137,9 +144,20 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
-      global: true;
-    },
+    opts?:
+      & OptionOptions<
+        Partial<TCommandOptions>,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      & {
+        global: true;
+      },
   ): this;
 
   /**
@@ -151,7 +169,16 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: OptionOptions<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
   ): this;
 
   /**
@@ -163,18 +190,55 @@ export class Command<
   public versionOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: ActionHandler<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
   ): this;
 
   public versionOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
-        global: true;
-      },
+      | ActionHandler<
+        TCommandOptions,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      | OptionOptions<
+        TCommandOptions,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      | OptionOptions<
+        Partial<TCommandOptions>,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+        & {
+          global: true;
+        },
   ): this {
     this._versionOptions = flags === false ? flags : {
       flags,
@@ -196,9 +260,20 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
-      global: true;
-    },
+    opts?:
+      & OptionOptions<
+        Partial<TCommandOptions>,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      & {
+        global: true;
+      },
   ): this;
 
   /**
@@ -210,7 +285,16 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: OptionOptions<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
   ): this;
 
   /**
@@ -222,18 +306,55 @@ export class Command<
   public helpOption(
     flags: string,
     desc?: string,
-    opts?: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    opts?: ActionHandler<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
   ): this;
 
   public helpOption(
     flags: string | false,
     desc?: string,
     opts?:
-      | IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICommandOption<Partial<CO>, CA, CG, CPG, CT, CGT, CPT, CP> & {
-        global: true;
-      },
+      | ActionHandler<
+        TCommandOptions,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      | OptionOptions<
+        TCommandOptions,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      | OptionOptions<
+        Partial<TCommandOptions>,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+        & {
+          global: true;
+        },
   ): this {
     this._helpOptions = flags === false ? flags : {
       flags,
@@ -250,17 +371,17 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    C extends Command<
-      (G & Record<string, unknown>) | void | undefined,
-      T | void | undefined,
+    TCommand extends Command<
+      (TGlobalOptions & Record<string, unknown>) | void | undefined,
+      TGlobalTypes | void | undefined,
       Record<string, unknown> | void,
       Array<unknown>,
       Record<string, unknown> | void,
       Record<string, unknown> | void,
       Record<string, unknown> | void,
       Command<
-        G | void | undefined,
-        T | void | undefined,
+        TGlobalOptions | void | undefined,
+        TGlobalTypes | void | undefined,
         Record<string, unknown> | void,
         Array<unknown>,
         Record<string, unknown> | void,
@@ -269,13 +390,17 @@ export class Command<
         undefined
       >
     >,
-    G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
-    T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
+    TGlobalOptions
+      extends (TParentCommand extends Command<any> ? TParentCommandGlobals
+        : Merge<TParentCommandGlobals, TCommandGlobals>),
+    TGlobalTypes
+      extends (TParentCommand extends Command<any> ? TParentCommandTypes
+        : Merge<TParentCommandTypes, TCommandTypes>),
   >(
     name: string,
-    cmd: C,
+    cmd: TCommand,
     override?: boolean,
-  ): ReturnType<C["reset"]> extends Command<
+  ): ReturnType<TCommand["reset"]> extends Command<
     Record<string, unknown> | void,
     Record<string, unknown> | void,
     infer Options,
@@ -285,14 +410,14 @@ export class Command<
     infer GlobalTypes,
     undefined
   > ? Command<
-      G,
-      T,
+      TGlobalOptions,
+      TGlobalTypes,
       Options,
       Arguments,
       GlobalOptions,
       Types,
       GlobalTypes,
-      OneOf<CP, this>
+      OneOf<TParentCommand, this>
     >
     : never;
 
@@ -303,23 +428,27 @@ export class Command<
    * @param override  Override existing child command.
    */
   public command<
-    C extends Command<
-      G | void | undefined,
-      T | void | undefined,
+    TCommand extends Command<
+      TGlobalOptions | void | undefined,
+      TGlobalTypes | void | undefined,
       Record<string, unknown> | void,
       Array<unknown>,
       Record<string, unknown> | void,
       Record<string, unknown> | void,
       Record<string, unknown> | void,
-      OneOf<CP, this> | undefined
+      OneOf<TParentCommand, this> | undefined
     >,
-    G extends (CP extends Command<any> ? CPG : Merge<CPG, CG>),
-    T extends (CP extends Command<any> ? CPT : Merge<CPT, CT>),
+    TGlobalOptions
+      extends (TParentCommand extends Command<any> ? TParentCommandGlobals
+        : Merge<TParentCommandGlobals, TCommandGlobals>),
+    TGlobalTypes
+      extends (TParentCommand extends Command<any> ? TParentCommandTypes
+        : Merge<TParentCommandTypes, TCommandTypes>),
   >(
     name: string,
-    cmd: C,
+    cmd: TCommand,
     override?: boolean,
-  ): C extends Command<
+  ): TCommand extends Command<
     Record<string, unknown> | void,
     Record<string, unknown> | void,
     infer Options,
@@ -327,44 +456,47 @@ export class Command<
     infer GlobalOptions,
     infer Types,
     infer GlobalTypes,
-    OneOf<CP, this> | undefined
+    OneOf<TParentCommand, this> | undefined
   > ? Command<
-      G,
-      T,
+      TGlobalOptions,
+      TGlobalTypes,
       Options,
       Arguments,
       GlobalOptions,
       Types,
       GlobalTypes,
-      OneOf<CP, this>
+      OneOf<TParentCommand, this>
     >
     : never;
 
   /**
    * Add new sub-command.
-   * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
-   * @param desc      The description of the new child command.
-   * @param override  Override existing child command.
+   * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
+   * @param desc              The description of the new child command.
+   * @param override          Override existing child command.
    */
   public command<
-    N extends string,
-    A extends TypedCommandArguments<
-      N,
-      CP extends Command<any> ? CPT : Merge<CPT, CGT>
+    TNameAndArguments extends string,
+    TArguments extends TypedCommandArguments<
+      TNameAndArguments,
+      TParentCommand extends Command<any> ? TParentCommandTypes
+        : Merge<TParentCommandTypes, TCommandGlobalTypes>
     >,
   >(
-    name: N,
+    nameAndArguments: TNameAndArguments,
     desc?: string,
     override?: boolean,
-  ): CPG extends number ? Command<any> : Command<
-    CP extends Command<any> ? CPG : Merge<CPG, CG>,
-    CP extends Command<any> ? CPT : Merge<CPT, CGT>,
+  ): TParentCommandGlobals extends number ? Command<any> : Command<
+    TParentCommand extends Command<any> ? TParentCommandGlobals
+      : Merge<TParentCommandGlobals, TCommandGlobals>,
+    TParentCommand extends Command<any> ? TParentCommandTypes
+      : Merge<TParentCommandTypes, TCommandGlobalTypes>,
     void,
-    A,
+    TArguments,
     void,
     void,
     void,
-    OneOf<CP, this>
+    OneOf<TParentCommand, this>
   >;
 
   /**
@@ -386,12 +518,12 @@ export class Command<
     const aliases: string[] = result.flags;
 
     if (!name) {
-      throw new MissingCommandName();
+      throw new MissingCommandNameError();
     }
 
     if (this.getBaseCommand(name, true)) {
       if (!override) {
-        throw new DuplicateCommandName(name);
+        throw new DuplicateCommandNameError(name);
       }
       this.removeCommand(name);
     }
@@ -435,7 +567,7 @@ export class Command<
    */
   public alias(alias: string): this {
     if (this.cmd._name === alias || this.cmd.aliases.includes(alias)) {
-      throw new DuplicateCommandAlias(alias);
+      throw new DuplicateCommandAliasError(alias);
     }
 
     this.cmd.aliases.push(alias);
@@ -444,10 +576,10 @@ export class Command<
   }
 
   /** Reset internal command reference to main command. */
-  public reset(): OneOf<CP, this> {
+  public reset(): OneOf<TParentCommand, this> {
     this._groupName = undefined;
     this.cmd = this;
-    return this as OneOf<CP, this>;
+    return this as OneOf<TParentCommand, this>;
   }
 
   /**
@@ -455,14 +587,25 @@ export class Command<
    * @param name The name of the command to select.
    */
   public select<
-    O extends Record<string, unknown> | void = any,
-    A extends Array<unknown> = any,
-    G extends Record<string, unknown> | void = any,
-  >(name: string): Command<CPG, CPT, O, A, G, CT, CGT, CP> {
+    TOptions extends Record<string, unknown> | void = any,
+    TArguments extends Array<unknown> = any,
+    TGlobalOptions extends Record<string, unknown> | void = any,
+  >(
+    name: string,
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TOptions,
+    TArguments,
+    TGlobalOptions,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  > {
     const cmd = this.getBaseCommand(name, true);
 
     if (!cmd) {
-      throw new CommandNotFound(name, this.getBaseCommands(true));
+      throw new CommandNotFoundError(name, this.getBaseCommands(true));
     }
 
     this.cmd = cmd;
@@ -487,7 +630,16 @@ export class Command<
   public version(
     version:
       | string
-      | IVersionHandler<Partial<CO>, Partial<CA>, CG, CPG, CT, CGT, CPT, CP>,
+      | VersionHandler<
+        Partial<TCommandOptions>,
+        Partial<TCommandArguments>,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >,
   ): this {
     if (typeof version === "string") {
       this.cmd.ver = () => version;
@@ -515,7 +667,12 @@ export class Command<
   public help(
     help:
       | string
-      | IHelpHandler<Partial<CO>, Partial<CA>, CG, CPG>
+      | HelpHandler<
+        Partial<TCommandOptions>,
+        Partial<TCommandArguments>,
+        TCommandGlobals,
+        TParentCommandGlobals
+      >
       | HelpOptions,
   ): this {
     if (typeof help === "string") {
@@ -534,7 +691,16 @@ export class Command<
    * @param description The command description.
    */
   public description(
-    description: IDescription<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
+    description: Description<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
   ): this {
     this.cmd.desc = description;
     return this;
@@ -575,11 +741,23 @@ export class Command<
    *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
    */
   public arguments<
-    A extends TypedArguments<N, Merge<CPT, Merge<CGT, CT>>>,
-    N extends string = string,
+    TArguments extends TypedArguments<
+      TArgs,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>
+    >,
+    TArgs extends string = string,
   >(
-    args: N,
-  ): Command<CPG, CPT, CO, A, CG, CT, CGT, CP> {
+    args: TArgs,
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TArguments,
+    TCommandGlobals,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  > {
     this.cmd.argsDefinition = args;
     return this as Command<any>;
   }
@@ -588,7 +766,18 @@ export class Command<
    * Set command callback method.
    * @param fn Command action handler.
    */
-  public action(fn: IAction<CO, CA, CG, CPG, CT, CGT, CPT, CP>): this {
+  public action(
+    fn: ActionHandler<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
+  ): this {
     this.cmd.fn = fn;
     return this;
   }
@@ -597,12 +786,48 @@ export class Command<
    * Don't throw an error if the command was called without arguments.
    * @param allowEmpty Enable/disable allow empty.
    */
-  public allowEmpty<T extends boolean | undefined = undefined>(
-    allowEmpty?: T,
-  ): false extends T ? this
-    : Command<Partial<CPG>, CPT, Partial<CO>, CA, CG, CT, CGT, CP> {
+  // public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
+  //   allowEmpty?: TAllowEmpty,
+  // ): false extends TAllowEmpty ? this
+  //   : Command<
+  //     Partial<TParentCommandGlobals>,
+  //     TParentCommandTypes,
+  //     Partial<TCommandOptions>,
+  //     TCommandArguments,
+  //     TCommandGlobals,
+  //     TCommandTypes,
+  //     TCommandGlobalTypes,
+  //     TParentCommand
+  //   > {
+  //   this.cmd._allowEmpty = allowEmpty !== false;
+  //   return this;
+  // }
+
+  public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
+    allowEmpty?: TAllowEmpty,
+  ): false extends TAllowEmpty ? this
+    : Command<
+      Partial<TParentCommandGlobals>,
+      TParentCommandTypes,
+      Partial<TCommandOptions>,
+      TCommandArguments,
+      TCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommand
+    > {
     this.cmd._allowEmpty = allowEmpty !== false;
-    return this;
+    return this as false extends TAllowEmpty ? this
+      : Command<
+        Partial<TParentCommandGlobals>,
+        TParentCommandTypes,
+        Partial<TCommandOptions>,
+        TCommandArguments,
+        TCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommand
+      >;
   }
 
   /**
@@ -632,7 +857,16 @@ export class Command<
    */
   public useRawArgs(
     useRawArgs = true,
-  ): Command<void, void, void, Array<string>, void, void, void, CP> {
+  ): Command<
+    void,
+    void,
+    void,
+    Array<string>,
+    void,
+    void,
+    void,
+    TParentCommand
+  > {
     this.cmd._useRawArgs = useRawArgs;
     return this as Command<any>;
   }
@@ -648,21 +882,21 @@ export class Command<
   }
 
   public globalType<
-    H extends TypeOrTypeHandler<unknown>,
-    N extends string = string,
+    THandler extends TypeOrTypeHandler<unknown>,
+    TName extends string = string,
   >(
-    name: N,
-    handler: H,
-    options?: Omit<ITypeOptions, "global">,
+    name: TName,
+    handler: THandler,
+    options?: Omit<TypeOptions, "global">,
   ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    CG,
-    CT,
-    Merge<CGT, TypedType<N, H>>,
-    CP
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    TCommandGlobals,
+    TCommandTypes,
+    Merge<TCommandGlobalTypes, TypedType<TName, THandler>>,
+    TParentCommand
   > {
     return this.type(name, handler, { ...options, global: true });
   }
@@ -674,34 +908,38 @@ export class Command<
    * @param options Type options.
    */
   public type<
-    H extends TypeOrTypeHandler<unknown>,
-    N extends string = string,
+    THandler extends TypeOrTypeHandler<unknown>,
+    TName extends string = string,
   >(
-    name: N,
-    handler: H,
-    options?: ITypeOptions,
+    name: TName,
+    handler: THandler,
+    options?: TypeOptions,
   ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    CG,
-    Merge<CT, TypedType<N, H>>,
-    CGT,
-    CP
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    TCommandGlobals,
+    Merge<TCommandTypes, TypedType<TName, THandler>>,
+    TCommandGlobalTypes,
+    TParentCommand
   > {
     if (this.cmd.types.get(name) && !options?.override) {
-      throw new DuplicateType(name);
+      throw new DuplicateTypeError(name);
     }
 
-    this.cmd.types.set(name, { ...options, name, handler });
+    this.cmd.types.set(name, {
+      ...options,
+      name,
+      handler: handler as TypeOrTypeHandler<unknown>,
+    });
 
     if (
       handler instanceof Type &&
       (typeof handler.complete !== "undefined" ||
         typeof handler.values !== "undefined")
     ) {
-      const completeHandler: ICompleteHandler = (
+      const completeHandler: CompleteHandler = (
         cmd: Command,
         parent?: Command,
       ) => handler.complete?.(cmd, parent) || [];
@@ -713,8 +951,8 @@ export class Command<
 
   public globalComplete(
     name: string,
-    complete: ICompleteHandler,
-    options?: Omit<ICompleteOptions, "global">,
+    complete: CompleteHandler,
+    options?: Omit<CompleteOptions, "global">,
   ): this {
     return this.complete(name, complete, { ...options, global: true });
   }
@@ -727,42 +965,60 @@ export class Command<
    */
   public complete(
     name: string,
-    complete: ICompleteHandler<
-      Partial<CO>,
-      Partial<CA>,
-      CG,
-      CPG,
-      CT,
-      CGT,
-      CPT,
+    complete: CompleteHandler<
+      Partial<TCommandOptions>,
+      Partial<TCommandArguments>,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
       any
     >,
-    options: ICompleteOptions & { global: boolean },
+    options: CompleteOptions & { global: boolean },
   ): this;
   public complete(
     name: string,
-    complete: ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>,
-    options?: ICompleteOptions,
+    complete: CompleteHandler<
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
+    options?: CompleteOptions,
   ): this;
 
   public complete(
     name: string,
     complete:
-      | ICompleteHandler<CO, CA, CG, CPG, CT, CGT, CPT, CP>
-      | ICompleteHandler<
-        Partial<CO>,
-        Partial<CA>,
-        CG,
-        CPG,
-        CT,
-        CGT,
-        CPT,
+      | CompleteHandler<
+        TCommandOptions,
+        TCommandArguments,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
+      >
+      | CompleteHandler<
+        Partial<TCommandOptions>,
+        Partial<TCommandArguments>,
+        TCommandGlobals,
+        TParentCommandGlobals,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
         any
       >,
-    options?: ICompleteOptions,
+    options?: CompleteOptions,
   ): this {
     if (this.cmd.completions.has(name) && !options?.override) {
-      throw new DuplicateCompletion(name);
+      throw new DuplicateCompletionError(name);
     }
 
     this.cmd.completions.set(name, {
@@ -836,65 +1092,72 @@ export class Command<
   }
 
   public globalOption<
-    F extends string,
-    G extends TypedOption<
-      F,
-      CO,
-      Merge<CPT, Merge<CGT, CT>>,
-      undefined extends X ? R : false,
-      D
+    TFlags extends string,
+    TGlobalOptions extends TypedOption<
+      TFlags,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      undefined extends TConflicts ? TRequired : false,
+      TDefaultValue
     >,
-    MG extends MapValue<G, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
-    D = undefined,
-    V = undefined,
+    TMappedGlobalOptions extends MapValue<
+      TGlobalOptions,
+      TMappedValue,
+      TCollect
+    >,
+    TRequired extends OptionOptions["required"] = undefined,
+    TCollect extends OptionOptions["collect"] = undefined,
+    TConflicts extends OptionOptions["conflicts"] = undefined,
+    TDefaultValue = undefined,
+    TMappedValue = undefined,
   >(
-    flags: F,
+    flags: TFlags,
     desc: string,
     opts?:
       | Omit<
-        ICommandGlobalOption<
-          Partial<CO>,
-          CA,
-          MergeOptions<F, CG, G>,
-          CPG,
-          CT,
-          CGT,
-          CPT,
-          CP
+        GlobalOptionOptions<
+          Partial<TCommandOptions>,
+          TCommandArguments,
+          MergeOptions<TFlags, TCommandGlobals, TGlobalOptions>,
+          TParentCommandGlobals,
+          TCommandTypes,
+          TCommandGlobalTypes,
+          TParentCommandTypes,
+          TParentCommand
         >,
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
-          required?: R;
-          collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          default?: DefaultValue<TDefaultValue>;
+          required?: TRequired;
+          collect?: TCollect;
+          value?: OptionValueHandler<
+            MapTypes<ValueOf<TGlobalOptions>>,
+            TMappedValue
+          >;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<TGlobalOptions>>, TMappedValue>,
   ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    MergeOptions<F, CG, MG>,
-    CT,
-    CGT,
-    CP
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    MergeOptions<TFlags, TCommandGlobals, TMappedGlobalOptions>,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
   > {
     if (typeof opts === "function") {
       return this.option(
         flags,
         desc,
-        { value: opts, global: true } as ICommandOption,
+        { value: opts, global: true } as OptionOptions,
       ) as Command<any>;
     }
     return this.option(
       flags,
       desc,
-      { ...opts, global: true } as ICommandOption,
+      { ...opts, global: true } as OptionOptions,
     ) as Command<any>;
   }
 
@@ -918,102 +1181,118 @@ export class Command<
    * @param opts Flag options or custom handler for processing flag value.
    */
   public option<
-    F extends string,
-    G extends TypedOption<
-      F,
-      CO,
-      Merge<CPT, Merge<CGT, CT>>,
-      undefined extends X ? R : false,
-      D
+    TFlags extends string,
+    TGlobalOptions extends TypedOption<
+      TFlags,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      undefined extends TConflicts ? TRequired : false,
+      TDefault
     >,
-    MG extends MapValue<G, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
-    D = undefined,
-    V = undefined,
+    TMappedGlobalOptions extends MapValue<
+      TGlobalOptions,
+      TMappedValue,
+      TCollect
+    >,
+    TRequired extends OptionOptions["required"] = undefined,
+    TCollect extends OptionOptions["collect"] = undefined,
+    TConflicts extends OptionOptions["conflicts"] = undefined,
+    TDefault = undefined,
+    TMappedValue = undefined,
   >(
-    flags: F,
+    flags: TFlags,
     desc: string,
     opts:
       | Omit<
-        ICommandOption<
-          Partial<CO>,
-          CA,
-          MergeOptions<F, CG, G>,
-          CPG,
-          CT,
-          CGT,
-          CPT,
-          CP
+        OptionOptions<
+          Partial<TCommandOptions>,
+          TCommandArguments,
+          MergeOptions<TFlags, TCommandGlobals, TGlobalOptions>,
+          TParentCommandGlobals,
+          TCommandTypes,
+          TCommandGlobalTypes,
+          TParentCommandTypes,
+          TParentCommand
         >,
         "value"
       >
         & {
           global: true;
-          default?: IDefaultValue<D>;
-          required?: R;
-          collect?: C;
-          value?: IFlagValueHandler<MapTypes<ValueOf<G>>, V>;
+          default?: DefaultValue<TDefault>;
+          required?: TRequired;
+          collect?: TCollect;
+          value?: OptionValueHandler<
+            MapTypes<ValueOf<TGlobalOptions>>,
+            TMappedValue
+          >;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<G>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<TGlobalOptions>>, TMappedValue>,
   ): Command<
-    CPG,
-    CPT,
-    CO,
-    CA,
-    MergeOptions<F, CG, MG>,
-    CT,
-    CGT,
-    CP
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    MergeOptions<TFlags, TCommandGlobals, TMappedGlobalOptions>,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
   >;
 
   public option<
-    F extends string,
-    O extends TypedOption<
-      F,
-      CO,
-      Merge<CPT, Merge<CGT, CT>>,
-      undefined extends X ? R : false,
-      D
+    TFlags extends string,
+    TOptions extends TypedOption<
+      TFlags,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      undefined extends TConflicts ? TRequired : false,
+      TDefaultValue
     >,
-    MO extends MapValue<O, V, C>,
-    R extends ICommandOption["required"] = undefined,
-    C extends ICommandOption["collect"] = undefined,
-    X extends ICommandOption["conflicts"] = undefined,
-    D = undefined,
-    V = undefined,
+    TMappedOptions extends MapValue<TOptions, TMappedValue, TCollect>,
+    TRequired extends OptionOptions["required"] = undefined,
+    TCollect extends OptionOptions["collect"] = undefined,
+    TConflicts extends OptionOptions["conflicts"] = undefined,
+    TDefaultValue = undefined,
+    TMappedValue = undefined,
   >(
-    flags: F,
+    flags: TFlags,
     desc: string,
     opts?:
       | Omit<
-        ICommandOption<MergeOptions<F, CO, MO>, CA, CG, CPG, CT, CGT, CPT, CP>,
+        OptionOptions<
+          MergeOptions<TFlags, TCommandOptions, TMappedOptions>,
+          TCommandArguments,
+          TCommandGlobals,
+          TParentCommandGlobals,
+          TCommandTypes,
+          TCommandGlobalTypes,
+          TParentCommandTypes,
+          TParentCommand
+        >,
         "value"
       >
         & {
-          default?: IDefaultValue<D>;
-          required?: R;
-          collect?: C;
-          conflicts?: X;
-          value?: IFlagValueHandler<MapTypes<ValueOf<O>>, V>;
+          default?: DefaultValue<TDefaultValue>;
+          required?: TRequired;
+          collect?: TCollect;
+          conflicts?: TConflicts;
+          value?: OptionValueHandler<MapTypes<ValueOf<TOptions>>, TMappedValue>;
         }
-      | IFlagValueHandler<MapTypes<ValueOf<O>>, V>,
+      | OptionValueHandler<MapTypes<ValueOf<TOptions>>, TMappedValue>,
   ): Command<
-    CPG,
-    CPT,
-    MergeOptions<F, CO, MO>,
-    CA,
-    CG,
-    CT,
-    CGT,
-    CP
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    MergeOptions<TFlags, TCommandOptions, TMappedOptions>,
+    TCommandArguments,
+    TCommandGlobals,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
   >;
 
   public option(
     flags: string,
     desc: string,
-    opts?: ICommandOption | IFlagValueHandler,
+    opts?: OptionOptions | OptionValueHandler,
   ): Command<any> {
     if (typeof opts === "function") {
       return this.option(flags, desc, { value: opts });
@@ -1021,11 +1300,11 @@ export class Command<
 
     const result = splitArguments(flags);
 
-    const args: IArgument[] = result.typeDefinition
+    const args: Argument[] = result.typeDefinition
       ? parseArgumentsDefinition(result.typeDefinition)
       : [];
 
-    const option: IOption = {
+    const option: Option = {
       ...opts,
       name: "",
       description: desc,
@@ -1053,7 +1332,7 @@ export class Command<
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw new DuplicateOptionName(name);
+          throw new DuplicateOptionNameError(name);
         }
       }
 
@@ -1082,7 +1361,7 @@ export class Command<
    */
   public example(name: string, description: string): this {
     if (this.cmd.hasExample(name)) {
-      throw new DuplicateExample(name);
+      throw new DuplicateExampleError(name);
     }
 
     this.cmd.examples.push({ name, description });
@@ -1091,25 +1370,43 @@ export class Command<
   }
 
   public globalEnv<
-    N extends string,
-    G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
-    MG extends MapValue<G, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
-    V = undefined,
+    TNameAndValue extends string,
+    TGlobalEnvVars extends TypedEnv<
+      TNameAndValue,
+      TPrefix,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      TRequired
+    >,
+    TMappedGlobalEnvVars extends MapValue<TGlobalEnvVars, TMappedValue>,
+    TRequired extends EnvVarOptions["required"] = undefined,
+    TPrefix extends EnvVarOptions["prefix"] = undefined,
+    TMappedValue = undefined,
   >(
-    name: N,
+    name: TNameAndValue,
     description: string,
-    options?: Omit<IGlobalEnvVarOptions, "value"> & {
-      required?: R;
-      prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
+    options?: Omit<GlobalEnvVarOptions, "value"> & {
+      required?: TRequired;
+      prefix?: TPrefix;
+      value?: EnvVarValueHandler<
+        MapTypes<ValueOf<TGlobalEnvVars>>,
+        TMappedValue
+      >;
     },
-  ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP> {
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    Merge<TCommandGlobals, TMappedGlobalEnvVars>,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  > {
     return this.env(
       name,
       description,
-      { ...options, global: true } as IEnvVarOptions,
+      { ...options, global: true } as EnvVarOptions,
     ) as Command<any>;
   }
 
@@ -1121,43 +1418,73 @@ export class Command<
    */
   public env<
     N extends string,
-    G extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
+    G extends TypedEnv<
+      N,
+      P,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      R
+    >,
     MG extends MapValue<G, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
+    R extends EnvVarOptions["required"] = undefined,
+    P extends EnvVarOptions["prefix"] = undefined,
     V = undefined,
   >(
     name: N,
     description: string,
-    options: Omit<IEnvVarOptions, "value"> & {
+    options: Omit<EnvVarOptions, "value"> & {
       global: true;
       required?: R;
       prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
+      value?: EnvVarValueHandler<MapTypes<ValueOf<G>>, V>;
     },
-  ): Command<CPG, CPT, CO, CA, Merge<CG, MG>, CT, CGT, CP>;
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    TCommandArguments,
+    Merge<TCommandGlobals, MG>,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  >;
 
   public env<
-    N extends string,
-    O extends TypedEnv<N, P, CO, Merge<CPT, Merge<CGT, CT>>, R>,
-    MO extends MapValue<O, V>,
-    R extends IEnvVarOptions["required"] = undefined,
-    P extends IEnvVarOptions["prefix"] = undefined,
-    V = undefined,
+    TNameAndValue extends string,
+    TEnvVar extends TypedEnv<
+      TNameAndValue,
+      TPrefix,
+      TCommandOptions,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      TRequired
+    >,
+    TMappedEnvVar extends MapValue<TEnvVar, TMappedValue>,
+    TRequired extends EnvVarOptions["required"] = undefined,
+    TPrefix extends EnvVarOptions["prefix"] = undefined,
+    TMappedValue = undefined,
   >(
-    name: N,
+    name: TNameAndValue,
     description: string,
-    options?: Omit<IEnvVarOptions, "value"> & {
-      required?: R;
-      prefix?: P;
-      value?: IEnvVarValueHandler<MapTypes<ValueOf<O>>, V>;
+    options?: Omit<EnvVarOptions, "value"> & {
+      required?: TRequired;
+      prefix?: TPrefix;
+      value?: EnvVarValueHandler<MapTypes<ValueOf<TEnvVar>>, TMappedValue>;
     },
-  ): Command<CPG, CPT, Merge<CO, MO>, CA, CG, CT, CGT, CP>;
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    Merge<TCommandOptions, TMappedEnvVar>,
+    TCommandArguments,
+    TCommandGlobals,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  >;
 
   public env(
     name: string,
     description: string,
-    options?: IEnvVarOptions,
+    options?: EnvVarOptions,
   ): Command<any> {
     const result = splitArguments(name);
 
@@ -1166,19 +1493,19 @@ export class Command<
     }
 
     if (result.flags.some((envName) => this.cmd.getBaseEnvVar(envName, true))) {
-      throw new DuplicateEnvironmentVariable(name);
+      throw new DuplicateEnvVarError(name);
     }
 
-    const details: IArgument[] = parseArgumentsDefinition(
+    const details: Argument[] = parseArgumentsDefinition(
       result.typeDefinition,
     );
 
     if (details.length > 1) {
-      throw new EnvironmentVariableSingleValue(name);
+      throw new TooManyEnvVarValuesError(name);
     } else if (details.length && details[0].optionalValue) {
-      throw new EnvironmentVariableOptionalValue(name);
+      throw new UnexpectedOptionalEnvVarValueError(name);
     } else if (details.length && details[0].variadic) {
-      throw new EnvironmentVariableVariadicValue(name);
+      throw new UnexpectedVariadicEnvVarValueError(name);
     }
 
     this.cmd.envVars.push({
@@ -1186,7 +1513,7 @@ export class Command<
       names: result.flags,
       description,
       type: details[0].type,
-      details: details.shift() as IArgument,
+      details: details.shift() as Argument,
       ...options,
     });
 
@@ -1204,7 +1531,7 @@ export class Command<
   public parse(
     args: string[] = Deno.args,
   ): Promise<
-    CP extends Command<any> ? IParseResult<
+    TParentCommand extends Command<any> ? CommandResult<
         Record<string, unknown>,
         Array<unknown>,
         Record<string, unknown>,
@@ -1214,81 +1541,92 @@ export class Command<
         Record<string, unknown>,
         undefined
       >
-      : IParseResult<
-        MapTypes<CO>,
-        MapTypes<CA>,
-        MapTypes<CG>,
-        MapTypes<CPG>,
-        CT,
-        CGT,
-        CPT,
-        CP
+      : CommandResult<
+        MapTypes<TCommandOptions>,
+        MapTypes<TCommandArguments>,
+        MapTypes<TCommandGlobals>,
+        MapTypes<TParentCommandGlobals>,
+        TCommandTypes,
+        TCommandGlobalTypes,
+        TParentCommandTypes,
+        TParentCommand
       >
   > {
-    return this.parseCommand({ args }) as any;
+    const ctx: ParseContext = {
+      unknown: args.slice(),
+      flags: {},
+      env: {},
+      literal: [],
+      stopEarly: false,
+      stopOnUnknown: false,
+    };
+    return this.parseCommand(ctx) as any;
   }
 
-  private async parseCommand(ctx: ParseContext): Promise<IParseResult> {
+  private async parseCommand(ctx: ParseContext): Promise<CommandResult> {
     try {
       this.reset();
       this.registerDefaults();
-      this.rawArgs = ctx.args;
+      this.rawArgs = ctx.unknown.slice();
 
       if (this.isExecutable) {
-        await this.executeExecutable(ctx.args);
+        await this.executeExecutable(ctx.unknown);
         return { options: {}, args: [], cmd: this, literal: [] } as any;
+      } else if (this._useRawArgs) {
+        await this.parseEnvVars(ctx, this.envVars);
+        return this.execute(ctx.env, ...ctx.unknown) as any;
       }
 
-      if (this._useRawArgs) {
-        const env = await this.parseEnvVars(this.envVars);
-        return this.execute(env, ...ctx.args) as any;
-      }
-
+      let preParseGlobals = false;
       let subCommand: Command<any> | undefined;
 
-      // Parse sub command.
-      if (subCommand || ctx.args.length > 0) {
-        if (!subCommand) {
-          subCommand = this.getCommand(ctx.args[0], true);
+      // Pre parse globals to support: cmd --global-option sub-command --option
+      if (ctx.unknown.length > 0) {
+        // Detect sub command.
+        subCommand = this.getSubCommand(ctx);
 
-          if (subCommand) {
-            ctx.args = ctx.args.slice(1);
+        if (!subCommand) {
+          // Only pre parse globals if first arg ist a global option.
+          const optionName = ctx.unknown[0].replace(/^-+/, "");
+          const option = this.getOption(optionName, true);
+
+          if (option?.global) {
+            preParseGlobals = true;
+            await this.parseGlobalOptionsAndEnvVars(ctx);
           }
         }
+      }
+
+      if (subCommand || ctx.unknown.length > 0) {
+        subCommand ??= this.getSubCommand(ctx);
 
         if (subCommand) {
           subCommand._globalParent = this;
-
           return subCommand.parseCommand(ctx);
         }
       }
 
       // Parse rest options & env vars.
-      ctx = await this.parseOptionsAndEnvVars(ctx);
-
-      this.literalArgs = ctx.literal ?? [];
-
-      // Merge env and global options.
-      const options = { ...ctx.env, ...ctx.options };
-
-      // Parse arguments.
-      const params = this.parseArguments(ctx.args, options);
+      await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
+      const options = { ...ctx.env, ...ctx.flags };
+      const args = this.parseArguments(ctx, options);
+      this.literalArgs = ctx.literal;
 
       // Execute option action.
       if (ctx.action) {
-        await ctx.action.action.call(this, options, ...params);
+        await ctx.action.action.call(this, options, ...args);
 
         if (ctx.action.standalone) {
           return {
             options,
-            args: params,
+            args,
             cmd: this,
             literal: this.literalArgs,
           } as any;
         }
       }
 
-      return this.execute(options, ...params) as any;
+      return this.execute(options, ...args) as any;
     } catch (error: unknown) {
       this.throw(
         error instanceof FlagsValidationError
@@ -1300,17 +1638,28 @@ export class Command<
     }
   }
 
+  private getSubCommand(ctx: ParseContext) {
+    const subCommand = this.getCommand(ctx.unknown[0], true);
+
+    if (subCommand) {
+      ctx.unknown.shift();
+    }
+
+    return subCommand;
+  }
+
   private async parseGlobalOptionsAndEnvVars(
     ctx: ParseContext,
-  ): Promise<ParseContext> {
+  ): Promise<void> {
+    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.unknown[0]);
+
     // Parse global env vars.
     const envVars = [
       ...this.envVars.filter((envVar) => envVar.global),
       ...this.getGlobalEnvVars(true),
     ];
 
-    const isHelpOption = this.getHelpOption()?.flags.includes(ctx.args[0]);
-    const env = await this.parseEnvVars(envVars, !isHelpOption);
+    await this.parseEnvVars(ctx, envVars, !isHelpOption);
 
     // Parse global options.
     const options = [
@@ -1318,28 +1667,36 @@ export class Command<
       ...this.getGlobalOptions(true),
     ];
 
-    return this.parseOptions(ctx, options, env, true);
+    this.parseOptions(ctx, options, {
+      stopEarly: true,
+      stopOnUnknown: true,
+      dotted: false,
+    });
   }
 
   private async parseOptionsAndEnvVars(
     ctx: ParseContext,
-  ): Promise<ParseContext> {
-    // Parse env vars.
-    const envVars = this.getEnvVars(true);
-
+    preParseGlobals: boolean,
+  ): Promise<void> {
     const helpOption = this.getHelpOption();
-    const isVersionOption = this._versionOption?.flags.includes(ctx.args[0]);
-    const isHelpOption = helpOption?.flags.includes(ctx.args[0]);
+    const isVersionOption = this._versionOption?.flags.includes(ctx.unknown[0]);
+    const isHelpOption = helpOption && ctx.flags?.[helpOption.name] === true;
 
-    const env = {
-      ...ctx.env,
-      ...await this.parseEnvVars(envVars, !isHelpOption && !isVersionOption),
-    };
+    // Parse env vars.
+    const envVars = preParseGlobals
+      ? this.envVars.filter((envVar) => !envVar.global)
+      : this.getEnvVars(true);
+
+    await this.parseEnvVars(
+      ctx,
+      envVars,
+      !isHelpOption && !isVersionOption,
+    );
 
     // Parse options.
     const options = this.getOptions(true);
 
-    return this.parseOptions(ctx, options, env);
+    this.parseOptions(ctx, options);
   }
 
   /** Register default options like `--version` and `--help`. */
@@ -1428,21 +1785,21 @@ export class Command<
   protected async execute(
     options: Record<string, unknown>,
     ...args: Array<unknown>
-  ): Promise<IParseResult> {
+  ): Promise<CommandResult> {
     if (this.fn) {
       await this.fn(options, ...args);
     } else if (this.defaultCommand) {
       const cmd = this.getCommand(this.defaultCommand, true);
 
       if (!cmd) {
-        throw new DefaultCommandNotFound(
+        throw new DefaultCommandNotFoundError(
           this.defaultCommand,
           this.getCommands(),
         );
       }
-
       cmd._globalParent = this;
-      await cmd.execute(options, ...args);
+
+      return cmd.execute(options, ...args);
     }
 
     return {
@@ -1473,53 +1830,44 @@ export class Command<
       }
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
-        throw new CommandExecutableNotFound(command);
+        throw new CommandExecutableNotFoundError(command);
       }
       throw error;
     }
   }
 
-  /**
-   * Parse raw command line arguments.
-   * @param args Raw command line arguments.
-   */
+  /** Parse raw command line arguments. */
   protected parseOptions(
     ctx: ParseContext,
-    options: IOption[],
-    env: Record<string, unknown>,
-    stopEarly: boolean = this._stopEarly,
-  ): ParseContext {
-    let action: ActionOption | undefined;
-
-    const parseResult = parseFlags(ctx.args, {
+    options: Option[],
+    {
+      stopEarly = this._stopEarly,
+      stopOnUnknown = false,
+      dotted = true,
+    }: ParseOptionsOptions = {},
+  ): void {
+    parseFlags(ctx, {
       stopEarly,
+      stopOnUnknown,
+      dotted,
       allowEmpty: this._allowEmpty,
       flags: options,
-      ignoreDefaults: env,
-      parse: (type: ITypeInfo) => this.parseType(type),
-      option: (option: IOption) => {
-        if (!action && option.action) {
-          action = option as ActionOption;
+      ignoreDefaults: ctx.env,
+      parse: (type: ArgumentValue) => this.parseType(type),
+      option: (option: Option) => {
+        if (!ctx.action && option.action) {
+          ctx.action = option as ActionOption;
         }
       },
     });
-
-    // Merge context.
-    return {
-      args: parseResult.unknown,
-      options: { ...ctx.options, ...parseResult.flags },
-      env: { ...ctx.env, ...env },
-      action: ctx.action ?? action,
-      literal: parseResult.literal,
-    };
   }
 
   /** Parse argument type. */
-  protected parseType(type: ITypeInfo): unknown {
-    const typeSettings: IType | undefined = this.getType(type.type);
+  protected parseType(type: ArgumentValue): unknown {
+    const typeSettings: TypeDef | undefined = this.getType(type.type);
 
     if (!typeSettings) {
-      throw new UnknownType(
+      throw new UnknownTypeError(
         type.type,
         this.getTypes().map((type) => type.name),
       );
@@ -1532,56 +1880,49 @@ export class Command<
 
   /**
    * Read and validate environment variables.
-   * @param envVars env vars defined by the command
-   * @param validate when true, throws an error if a required env var is missing
+   * @param ctx Parse context.
+   * @param envVars env vars defined by the command.
+   * @param validate when true, throws an error if a required env var is missing.
    */
   protected async parseEnvVars(
-    envVars: Array<IEnvVar>,
+    ctx: ParseContext,
+    envVars: Array<EnvVar>,
     validate = true,
-  ): Promise<Record<string, unknown>> {
-    const result: Record<string, unknown> = {};
+  ): Promise<void> {
+    for (const envVar of envVars) {
+      const env = await this.findEnvVar(envVar.names);
 
-    for (const env of envVars) {
-      const found = await this.findEnvVar(env.names);
-
-      if (found) {
-        const { name, value } = found;
-
-        const propertyName = underscoreToCamelCase(
-          env.prefix
-            ? env.names[0].replace(new RegExp(`^${env.prefix}`), "")
-            : env.names[0],
-        );
-
-        if (env.details.list) {
-          const values = value.split(env.details.separator ?? ",");
-
-          result[propertyName] = values.map((value) =>
-            this.parseType({
-              label: "Environment variable",
-              type: env.type,
-              name,
-              value,
-            })
-          );
-        } else {
-          result[propertyName] = this.parseType({
+      if (env) {
+        const parseType = (value: string) => {
+          return this.parseType({
             label: "Environment variable",
-            type: env.type,
-            name,
+            type: envVar.type,
+            name: env.name,
             value,
           });
+        };
+
+        const propertyName = underscoreToCamelCase(
+          envVar.prefix
+            ? envVar.names[0].replace(new RegExp(`^${envVar.prefix}`), "")
+            : envVar.names[0],
+        );
+
+        if (envVar.details.list) {
+          ctx.env[propertyName] = env.value
+            .split(envVar.details.separator ?? ",")
+            .map(parseType);
+        } else {
+          ctx.env[propertyName] = parseType(env.value);
         }
 
-        if (env.value && typeof result[propertyName] !== "undefined") {
-          result[propertyName] = env.value(result[propertyName]);
+        if (envVar.value && typeof ctx.env[propertyName] !== "undefined") {
+          ctx.env[propertyName] = envVar.value(ctx.env[propertyName]);
         }
-      } else if (env.required && validate) {
-        throw new MissingRequiredEnvVar(env);
+      } else if (envVar.required && validate) {
+        throw new MissingRequiredEnvVarError(envVar);
       }
     }
-
-    return result;
   }
 
   protected async findEnvVar(
@@ -1607,29 +1948,27 @@ export class Command<
 
   /**
    * Parse command-line arguments.
-   * @param args  Raw command line arguments.
+   * @param ctx     Parse context.
    * @param options Parsed command line options.
    */
   protected parseArguments(
-    args: string[],
+    ctx: ParseContext,
     options: Record<string, unknown>,
-  ): CA {
+  ): TCommandArguments {
     const params: Array<unknown> = [];
-
-    // remove array reference
-    args = args.slice(0);
+    const args = ctx.unknown.slice();
 
     if (!this.hasArguments()) {
       if (args.length) {
         if (this.hasCommands(true)) {
           if (this.hasCommand(args[0], true)) {
             // e.g: command --global-foo --foo sub-command
-            throw new TooManyArguments(args);
+            throw new TooManyArgumentsError(args);
           } else {
-            throw new UnknownCommand(args[0], this.getCommands());
+            throw new UnknownCommandError(args[0], this.getCommands());
           }
         } else {
-          throw new NoArgumentsAllowed(this.getPath());
+          throw new NoArgumentsAllowedError(this.getPath());
         }
       }
     } else {
@@ -1645,7 +1984,7 @@ export class Command<
           );
 
           if (!hasStandaloneOption) {
-            throw new MissingArguments(required);
+            throw new MissingArgumentsError(required);
           }
         }
       } else {
@@ -1654,7 +1993,7 @@ export class Command<
             if (expectedArg.optionalValue) {
               break;
             }
-            throw new MissingArgument(`Missing argument: ${expectedArg.name}`);
+            throw new MissingArgumentError(expectedArg.name);
           }
 
           let arg: unknown;
@@ -1690,12 +2029,12 @@ export class Command<
         }
 
         if (args.length) {
-          throw new TooManyArguments(args);
+          throw new TooManyArgumentsError(args);
         }
       }
     }
 
-    return params as CA;
+    return params as TCommandArguments;
   }
 
   /**
@@ -1725,8 +2064,8 @@ export class Command<
   }
 
   /** Get parent command. */
-  public getParent(): CP {
-    return this._parent as CP;
+  public getParent(): TParentCommand {
+    return this._parent as TParentCommand;
   }
 
   /**
@@ -1764,12 +2103,12 @@ export class Command<
    * Get argument by name.
    * @param name Name of the argument.
    */
-  public getArgument(name: string): IArgument | undefined {
+  public getArgument(name: string): Argument | undefined {
     return this.getArguments().find((arg) => arg.name === name);
   }
 
   /** Get arguments. */
-  public getArguments(): IArgument[] {
+  public getArguments(): Argument[] {
     if (!this.args.length && this.argsDefinition) {
       this.args = parseArgumentsDefinition(this.argsDefinition);
     }
@@ -1788,7 +2127,7 @@ export class Command<
   }
 
   /** Get help handler method. */
-  private getVersionHandler(): IVersionHandler | undefined {
+  private getVersionHandler(): VersionHandler | undefined {
     return this.ver ?? this._parent?.getVersionHandler();
   }
 
@@ -1851,8 +2190,8 @@ export class Command<
   }
 
   /** Get help handler method. */
-  private getHelpHandler(): IHelpHandler {
-    return this._help ?? this._parent?.getHelpHandler() as IHelpHandler;
+  private getHelpHandler(): HelpHandler {
+    return this._help ?? this._parent?.getHelpHandler() as HelpHandler;
   }
 
   private exit(code = 0) {
@@ -1897,7 +2236,7 @@ export class Command<
    * Get options.
    * @param hidden Include hidden options.
    */
-  public getOptions(hidden?: boolean): IOption[] {
+  public getOptions(hidden?: boolean): Option[] {
     return this.getGlobalOptions(hidden).concat(this.getBaseOptions(hidden));
   }
 
@@ -1905,7 +2244,7 @@ export class Command<
    * Get base options.
    * @param hidden Include hidden options.
    */
-  public getBaseOptions(hidden?: boolean): IOption[] {
+  public getBaseOptions(hidden?: boolean): Option[] {
     if (!this.options.length) {
       return [];
     }
@@ -1919,14 +2258,14 @@ export class Command<
    * Get global options.
    * @param hidden Include hidden options.
    */
-  public getGlobalOptions(hidden?: boolean): IOption[] {
+  public getGlobalOptions(hidden?: boolean): Option[] {
     const helpOption = this.getHelpOption();
     const getGlobals = (
       cmd: Command<any>,
       noGlobals: boolean,
-      options: IOption[] = [],
+      options: Option[] = [],
       names: string[] = [],
-    ): IOption[] => {
+    ): Option[] => {
       if (cmd.options.length) {
         for (const option of cmd.options) {
           if (
@@ -1972,7 +2311,7 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getOption(name: string, hidden?: boolean): IOption | undefined {
+  public getOption(name: string, hidden?: boolean): Option | undefined {
     return this.getBaseOption(name, hidden) ??
       this.getGlobalOption(name, hidden);
   }
@@ -1982,7 +2321,7 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getBaseOption(name: string, hidden?: boolean): IOption | undefined {
+  public getBaseOption(name: string, hidden?: boolean): Option | undefined {
     const option = this.options.find((option) =>
       option.name === name || option.aliases?.includes(name)
     );
@@ -1995,13 +2334,13 @@ export class Command<
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
-  public getGlobalOption(name: string, hidden?: boolean): IOption | undefined {
+  public getGlobalOption(name: string, hidden?: boolean): Option | undefined {
     const helpOption = this.getHelpOption();
     const getGlobalOption = (
       parent: Command,
       noGlobals: boolean,
-    ): IOption | undefined => {
-      const option: IOption | undefined = parent.getBaseOption(
+    ): Option | undefined => {
+      const option: Option | undefined = parent.getBaseOption(
         name,
         hidden,
       );
@@ -2029,7 +2368,7 @@ export class Command<
    * Remove option by name.
    * @param name Name of the option. Must be in param-case.
    */
-  public removeOption(name: string): IOption | undefined {
+  public removeOption(name: string): Option | undefined {
     const index = this.options.findIndex((option) => option.name === name);
 
     if (index === -1) {
@@ -2121,10 +2460,10 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getCommand<C extends Command<any>>(
+  public getCommand<TCommand extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): C | undefined {
+  ): TCommand | undefined {
     return this.getBaseCommand(name, hidden) ??
       this.getGlobalCommand(name, hidden);
   }
@@ -2134,14 +2473,14 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getBaseCommand<C extends Command<any>>(
+  public getBaseCommand<TCommand extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): C | undefined {
+  ): TCommand | undefined {
     for (const cmd of this.commands.values()) {
       if (cmd._name === name || cmd.aliases.includes(name)) {
         return (cmd && (hidden || !cmd.isHidden) ? cmd : undefined) as
-          | C
+          | TCommand
           | undefined;
       }
     }
@@ -2152,10 +2491,10 @@ export class Command<
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
-  public getGlobalCommand<C extends Command<any>>(
+  public getGlobalCommand<TCommand extends Command<any>>(
     name: string,
     hidden?: boolean,
-  ): C | undefined {
+  ): TCommand | undefined {
     const getGlobalCommand = (
       parent: Command,
       noGlobals: boolean,
@@ -2173,7 +2512,8 @@ export class Command<
       return cmd;
     };
 
-    return this._parent && getGlobalCommand(this._parent, this._noGlobals) as C;
+    return this._parent &&
+      getGlobalCommand(this._parent, this._noGlobals) as TCommand;
   }
 
   /**
@@ -2191,25 +2531,25 @@ export class Command<
   }
 
   /** Get types. */
-  public getTypes(): IType[] {
+  public getTypes(): Array<TypeDef> {
     return this.getGlobalTypes().concat(this.getBaseTypes());
   }
 
   /** Get base types. */
-  public getBaseTypes(): IType[] {
+  public getBaseTypes(): Array<TypeDef> {
     return Array.from(this.types.values());
   }
 
   /** Get global types. */
-  public getGlobalTypes(): IType[] {
+  public getGlobalTypes(): Array<TypeDef> {
     const getTypes = (
       cmd: Command<any> | undefined,
-      types: IType[] = [],
-      names: string[] = [],
-    ): IType[] => {
+      types: Array<TypeDef> = [],
+      names: Array<string> = [],
+    ): Array<TypeDef> => {
       if (cmd) {
         if (cmd.types.size) {
-          cmd.types.forEach((type: IType) => {
+          cmd.types.forEach((type: TypeDef) => {
             if (
               type.global &&
               !this.types.has(type.name) &&
@@ -2234,7 +2574,7 @@ export class Command<
    * Get type by name.
    * @param name Name of the type.
    */
-  public getType(name: string): IType | undefined {
+  public getType(name: string): TypeDef | undefined {
     return this.getBaseType(name) ?? this.getGlobalType(name);
   }
 
@@ -2242,7 +2582,7 @@ export class Command<
    * Get base type by name.
    * @param name Name of the type.
    */
-  public getBaseType(name: string): IType | undefined {
+  public getBaseType(name: string): TypeDef | undefined {
     return this.types.get(name);
   }
 
@@ -2250,12 +2590,12 @@ export class Command<
    * Get global type by name.
    * @param name Name of the type.
    */
-  public getGlobalType(name: string): IType | undefined {
+  public getGlobalType(name: string): TypeDef | undefined {
     if (!this._parent) {
       return;
     }
 
-    const cmd: IType | undefined = this._parent.getBaseType(name);
+    const cmd: TypeDef | undefined = this._parent.getBaseType(name);
 
     if (!cmd?.global) {
       return this._parent.getGlobalType(name);
@@ -2270,20 +2610,20 @@ export class Command<
   }
 
   /** Get base completions. */
-  public getBaseCompletions(): ICompletion[] {
+  public getBaseCompletions(): Completion[] {
     return Array.from(this.completions.values());
   }
 
   /** Get global completions. */
-  public getGlobalCompletions(): ICompletion[] {
+  public getGlobalCompletions(): Completion[] {
     const getCompletions = (
       cmd: Command<any> | undefined,
-      completions: ICompletion[] = [],
+      completions: Completion[] = [],
       names: string[] = [],
-    ): ICompletion[] => {
+    ): Completion[] => {
       if (cmd) {
         if (cmd.completions.size) {
-          cmd.completions.forEach((completion: ICompletion) => {
+          cmd.completions.forEach((completion: Completion) => {
             if (
               completion.global &&
               !this.completions.has(completion.name) &&
@@ -2308,7 +2648,7 @@ export class Command<
    * Get completion by name.
    * @param name Name of the completion.
    */
-  public getCompletion(name: string): ICompletion | undefined {
+  public getCompletion(name: string): Completion | undefined {
     return this.getBaseCompletion(name) ?? this.getGlobalCompletion(name);
   }
 
@@ -2316,7 +2656,7 @@ export class Command<
    * Get base completion by name.
    * @param name Name of the completion.
    */
-  public getBaseCompletion(name: string): ICompletion | undefined {
+  public getBaseCompletion(name: string): Completion | undefined {
     return this.completions.get(name);
   }
 
@@ -2324,12 +2664,12 @@ export class Command<
    * Get global completions by name.
    * @param name Name of the completion.
    */
-  public getGlobalCompletion(name: string): ICompletion | undefined {
+  public getGlobalCompletion(name: string): Completion | undefined {
     if (!this._parent) {
       return;
     }
 
-    const completion: ICompletion | undefined = this._parent.getBaseCompletion(
+    const completion: Completion | undefined = this._parent.getBaseCompletion(
       name,
     );
 
@@ -2352,7 +2692,7 @@ export class Command<
    * Get environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getEnvVars(hidden?: boolean): IEnvVar[] {
+  public getEnvVars(hidden?: boolean): EnvVar[] {
     return this.getGlobalEnvVars(hidden).concat(this.getBaseEnvVars(hidden));
   }
 
@@ -2360,7 +2700,7 @@ export class Command<
    * Get base environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getBaseEnvVars(hidden?: boolean): IEnvVar[] {
+  public getBaseEnvVars(hidden?: boolean): EnvVar[] {
     if (!this.envVars.length) {
       return [];
     }
@@ -2374,19 +2714,19 @@ export class Command<
    * Get global environment variables.
    * @param hidden Include hidden environment variable.
    */
-  public getGlobalEnvVars(hidden?: boolean): IEnvVar[] {
+  public getGlobalEnvVars(hidden?: boolean): EnvVar[] {
     if (this._noGlobals) {
       return [];
     }
 
     const getEnvVars = (
       cmd: Command<any> | undefined,
-      envVars: IEnvVar[] = [],
+      envVars: EnvVar[] = [],
       names: string[] = [],
-    ): IEnvVar[] => {
+    ): EnvVar[] => {
       if (cmd) {
         if (cmd.envVars.length) {
-          cmd.envVars.forEach((envVar: IEnvVar) => {
+          cmd.envVars.forEach((envVar: EnvVar) => {
             if (
               envVar.global &&
               !this.envVars.find((env) => env.names[0] === envVar.names[0]) &&
@@ -2422,7 +2762,7 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
+  public getEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
     return this.getBaseEnvVar(name, hidden) ??
       this.getGlobalEnvVar(name, hidden);
   }
@@ -2432,8 +2772,8 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getBaseEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
-    const envVar: IEnvVar | undefined = this.envVars.find((env) =>
+  public getBaseEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
+    const envVar: EnvVar | undefined = this.envVars.find((env) =>
       env.names.indexOf(name) !== -1
     );
 
@@ -2445,12 +2785,12 @@ export class Command<
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
-  public getGlobalEnvVar(name: string, hidden?: boolean): IEnvVar | undefined {
+  public getGlobalEnvVar(name: string, hidden?: boolean): EnvVar | undefined {
     if (!this._parent || this._noGlobals) {
       return;
     }
 
-    const envVar: IEnvVar | undefined = this._parent.getBaseEnvVar(
+    const envVar: EnvVar | undefined = this._parent.getBaseEnvVar(
       name,
       hidden,
     );
@@ -2468,7 +2808,7 @@ export class Command<
   }
 
   /** Get all examples. */
-  public getExamples(): IExample[] {
+  public getExamples(): Example[] {
     return this.examples;
   }
 
@@ -2478,11 +2818,11 @@ export class Command<
   }
 
   /** Get example with given name. */
-  public getExample(name: string): IExample | undefined {
+  public getExample(name: string): Example | undefined {
     return this.examples.find((example) => example.name === name);
   }
 
-  private getHelpOption(): IOption | undefined {
+  private getHelpOption(): Option | undefined {
     return this._helpOption ?? this._parent?.getHelpOption();
   }
 }
@@ -2495,54 +2835,61 @@ interface UpgradeCommandImpl {
   getLatestVersion(): Promise<string>;
 }
 
-interface IDefaultOption {
+interface DefaultOption {
   flags: string;
   desc?: string;
-  opts?: ICommandOption;
+  opts?: OptionOptions;
 }
 
-type ActionOption = IOption & { action: IAction };
+type ActionOption = Option & { action: ActionHandler };
 
-interface ParseContext {
-  args: string[];
-  options?: Record<string, unknown>;
-  env?: Record<string, unknown>;
+interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
   action?: ActionOption;
-  literal?: string[];
+  env: Record<string, unknown>;
 }
 
-type TrimLeft<T extends string, V extends string | undefined> = T extends
-  `${V}${infer U}` ? U
-  : T;
+interface ParseOptionsOptions {
+  stopEarly?: boolean;
+  stopOnUnknown?: boolean;
+  dotted?: boolean;
+}
 
-type TrimRight<T extends string, V extends string> = T extends `${infer U}${V}`
-  ? U
-  : T;
+type TrimLeft<TValue extends string, TTrimValue extends string | undefined> =
+  TValue extends `${TTrimValue}${infer TRest}` ? TRest
+    : TValue;
 
-type Lower<V extends string> = V extends Uppercase<V> ? Lowercase<V>
-  : Uncapitalize<V>;
+type TrimRight<TValue extends string, TTrimValue extends string> =
+  TValue extends `${infer TRest}${TTrimValue}` ? TRest
+    : TValue;
 
-type CamelCase<T extends string> = T extends `${infer V}_${infer Rest}`
-  ? `${Lower<V>}${Capitalize<CamelCase<Rest>>}`
-  : T extends `${infer V}-${infer Rest}`
-    ? `${Lower<V>}${Capitalize<CamelCase<Rest>>}`
-  : Lower<T>;
+type Lower<TValue extends string> = TValue extends Uppercase<TValue>
+  ? Lowercase<TValue>
+  : Uncapitalize<TValue>;
 
-type OneOf<T, V> = T extends void ? V : T;
+type CamelCase<TValue extends string> = TValue extends
+  `${infer TPart}_${infer TRest}`
+  ? `${Lower<TPart>}${Capitalize<CamelCase<TRest>>}`
+  : TValue extends `${infer TPart}-${infer TRest}`
+    ? `${Lower<TPart>}${Capitalize<CamelCase<TRest>>}`
+  : Lower<TValue>;
 
-type Merge<L, R> = L extends void ? R
-  : R extends void ? L
-  : L & R;
+type OneOf<TValue, TDefault> = TValue extends void ? TDefault : TValue;
+
+type Merge<TLeft, TRight> = TLeft extends void ? TRight
+  : TRight extends void ? TLeft
+  : TLeft & TRight;
 
 // type Merge<L, R> = L extends void ? R
 //   : R extends void ? L
 //   : Omit<L, keyof R> & R;
 
-type MergeRecursive<L, R> = L extends void ? R
-  : R extends void ? L
-  : L & R;
+type MergeRecursive<TLeft, TRight> = TLeft extends void ? TRight
+  : TRight extends void ? TLeft
+  : TLeft & TRight;
 
-type OptionalOrRequiredValue<T extends string> = `[${T}]` | `<${T}>`;
+type OptionalOrRequiredValue<TType extends string> =
+  | `[${TType}]`
+  | `<${TType}>`;
 type RestValue = `...${string}` | `${string}...`;
 
 /**
@@ -2553,8 +2900,8 @@ type RestValue = `...${string}` | `${string}...`;
  * - `[name...:type[]:completion]`
  * - `<name...:type[]:completion>`
  */
-type RestArgsListTypeCompletion<T extends string> = OptionalOrRequiredValue<
-  `${RestValue}:${T}[]:${string}`
+type RestArgsListTypeCompletion<TType extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${TType}[]:${string}`
 >;
 
 /**
@@ -2565,8 +2912,8 @@ type RestArgsListTypeCompletion<T extends string> = OptionalOrRequiredValue<
  * - `[name...:type[]]`
  * - `<name...:type[]>`
  */
-type RestArgsListType<T extends string> = OptionalOrRequiredValue<
-  `${RestValue}:${T}[]`
+type RestArgsListType<TType extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${TType}[]`
 >;
 
 /**
@@ -2577,8 +2924,8 @@ type RestArgsListType<T extends string> = OptionalOrRequiredValue<
  * - `[name...:type:completion]`
  * - `<name...:type:completion>`
  */
-type RestArgsTypeCompletion<T extends string> = OptionalOrRequiredValue<
-  `${RestValue}:${T}:${string}`
+type RestArgsTypeCompletion<TType extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${TType}:${string}`
 >;
 
 /**
@@ -2589,8 +2936,8 @@ type RestArgsTypeCompletion<T extends string> = OptionalOrRequiredValue<
  * - `[name...:type]`
  * - `<name...:type>`
  */
-type RestArgsType<T extends string> = OptionalOrRequiredValue<
-  `${RestValue}:${T}`
+type RestArgsType<TType extends string> = OptionalOrRequiredValue<
+  `${RestValue}:${TType}`
 >;
 
 /**
@@ -2610,9 +2957,10 @@ type RestArgs = OptionalOrRequiredValue<
  * - `[name:type[]:completion]`
  * - `<name:type[]:completion>`
  */
-type SingleArgListTypeCompletion<T extends string> = OptionalOrRequiredValue<
-  `${string}:${T}[]:${string}`
->;
+type SingleArgListTypeCompletion<TType extends string> =
+  OptionalOrRequiredValue<
+    `${string}:${TType}[]:${string}`
+  >;
 
 /**
  * Single arg with list type.
@@ -2620,8 +2968,8 @@ type SingleArgListTypeCompletion<T extends string> = OptionalOrRequiredValue<
  * - `[name:type[]]`
  * - `<name:type[]>`
  */
-type SingleArgListType<T extends string> = OptionalOrRequiredValue<
-  `${string}:${T}[]`
+type SingleArgListType<TType extends string> = OptionalOrRequiredValue<
+  `${string}:${TType}[]`
 >;
 
 /**
@@ -2630,8 +2978,8 @@ type SingleArgListType<T extends string> = OptionalOrRequiredValue<
  * - `[name:type:completion]`
  * - `<name:type:completion>`
  */
-type SingleArgTypeCompletion<T extends string> = OptionalOrRequiredValue<
-  `${string}:${T}:${string}`
+type SingleArgTypeCompletion<TType extends string> = OptionalOrRequiredValue<
+  `${string}:${TType}:${string}`
 >;
 
 /**
@@ -2640,8 +2988,8 @@ type SingleArgTypeCompletion<T extends string> = OptionalOrRequiredValue<
  * - `[name:type]`
  * - `<name:type>`
  */
-type SingleArgType<T extends string> = OptionalOrRequiredValue<
-  `${string}:${T}`
+type SingleArgType<TType extends string> = OptionalOrRequiredValue<
+  `${string}:${TType}`
 >;
 
 /**
@@ -2662,136 +3010,207 @@ type DefaultTypes = {
   file: FileType;
 };
 
-type ArgumentType<A extends string, U, T = Merge<DefaultTypes, U>> = A extends
-  RestArgsListTypeCompletion<infer Type>
-  ? T extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : A extends RestArgsListType<infer Type>
-    ? T extends Record<Type, infer R> ? Array<Array<R>> : unknown
-  : A extends RestArgsTypeCompletion<infer Type>
-    ? T extends Record<Type, infer R> ? Array<R> : unknown
-  : A extends RestArgsType<infer Type>
-    ? T extends Record<Type, infer R> ? Array<R> : unknown
-  : A extends RestArgs ? Array<string>
-  : A extends SingleArgListTypeCompletion<infer Type>
-    ? T extends Record<Type, infer R> ? Array<R> : unknown
-  : A extends SingleArgListType<infer Type>
-    ? T extends Record<Type, infer R> ? Array<R> : unknown
-  : A extends SingleArgTypeCompletion<infer Type>
-    ? T extends Record<Type, infer R> ? R : unknown
-  : A extends SingleArgType<infer Type>
-    ? T extends Record<Type, infer R> ? R : unknown
-  : A extends SingleArg ? string
+type ArgumentType<
+  TArg extends string,
+  TCustomTypes,
+  TTypes = Merge<DefaultTypes, TCustomTypes>,
+> = TArg extends RestArgsListTypeCompletion<infer Type>
+  ? TTypes extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : TArg extends RestArgsListType<infer Type>
+    ? TTypes extends Record<Type, infer R> ? Array<Array<R>> : unknown
+  : TArg extends RestArgsTypeCompletion<infer Type>
+    ? TTypes extends Record<Type, infer R> ? Array<R> : unknown
+  : TArg extends RestArgsType<infer Type>
+    ? TTypes extends Record<Type, infer R> ? Array<R> : unknown
+  : TArg extends RestArgs ? Array<string>
+  : TArg extends SingleArgListTypeCompletion<infer Type>
+    ? TTypes extends Record<Type, infer R> ? Array<R> : unknown
+  : TArg extends SingleArgListType<infer Type>
+    ? TTypes extends Record<Type, infer R> ? Array<R> : unknown
+  : TArg extends SingleArgTypeCompletion<infer Type>
+    ? TTypes extends Record<Type, infer R> ? R : unknown
+  : TArg extends SingleArgType<infer Type>
+    ? TTypes extends Record<Type, infer R> ? R : unknown
+  : TArg extends SingleArg ? string
   : unknown;
 
-type ArgumentTypes<A extends string, T> = A extends `${string} ${string}`
-  ? TypedArguments<A, T>
-  : ArgumentType<A, T>;
+type ArgumentTypes<TFlags extends string, T> = TFlags extends
+  `${string} ${string}` ? TypedArguments<TFlags, T>
+  : ArgumentType<TFlags, T>;
 
-type GetArguments<A extends string> = A extends `-${string}=${infer Rest}`
-  ? GetArguments<Rest>
-  : A extends `-${string} ${infer Rest}` ? GetArguments<Rest>
-  : A;
+type GetArguments<TFlags extends string> = TFlags extends
+  `-${string}=${infer RestFlags}` ? GetArguments<RestFlags>
+  : TFlags extends `-${string} ${infer RestFlags}` ? GetArguments<RestFlags>
+  : TFlags;
 
 type OptionName<Name extends string> = Name extends "*" ? string
   : CamelCase<TrimRight<Name, ",">>;
 
-type IsRequired<R extends boolean | undefined, D> = R extends true ? true
-  : D extends undefined ? false
-  : true;
+type IsRequired<TRequired extends boolean | undefined, TDefault> =
+  TRequired extends true ? true
+    : TDefault extends undefined ? false
+    : true;
 
 type NegatableOption<
-  F extends string,
-  CO,
-  D,
-  N extends string = OptionName<F>,
-> = D extends undefined
-  ? N extends keyof CO ? { [K in N]?: false } : { [K in N]: boolean }
-  : { [K in N]: NonNullable<D> | false };
+  TName extends string,
+  TOptions,
+  TDefault,
+> = TDefault extends undefined
+  ? OptionName<TName> extends keyof TOptions
+    ? { [Key in OptionName<TName>]?: false }
+  : { [Key in OptionName<TName>]: boolean }
+  : { [Key in OptionName<TName>]: NonNullable<TDefault> | false };
 
 type BooleanOption<
-  N extends string,
-  CO,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = N extends `no-${infer Name}` ? NegatableOption<Name, CO, D>
-  : N extends `${infer Name}.${infer Rest}`
-    ? (R extends true
-      ? { [K in OptionName<Name>]: BooleanOption<Rest, CO, R, D> }
-      : { [K in OptionName<Name>]?: BooleanOption<Rest, CO, R, D> })
-  : (R extends true ? { [K in OptionName<N>]: true | D }
-    : { [K in OptionName<N>]?: true | D });
+  TName extends string,
+  TOptions,
+  TRequired extends boolean | undefined = undefined,
+  TDefault = undefined,
+> = TName extends `no-${infer Name}` ? NegatableOption<Name, TOptions, TDefault>
+  : TName extends `${infer Name}.${infer Rest}` ? (TRequired extends true ? {
+        [Key in OptionName<Name>]: BooleanOption<
+          Rest,
+          TOptions,
+          TRequired,
+          TDefault
+        >;
+      }
+      : {
+        [Key in OptionName<Name>]?: BooleanOption<
+          Rest,
+          TOptions,
+          TRequired,
+          TDefault
+        >;
+      })
+  : (TRequired extends true ? { [Key in OptionName<TName>]: true | TDefault }
+    : { [Key in OptionName<TName>]?: true | TDefault });
 
 type ValueOption<
-  N extends string,
-  F extends string,
-  V,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = N extends `${infer Name}.${infer RestName}` ? (R extends true ? {
-      [K in OptionName<Name>]: ValueOption<RestName, F, V, R, D>;
+  TName extends string,
+  TRestFlags extends string,
+  TTypes,
+  TRequired extends boolean | undefined = undefined,
+  TDefault = undefined,
+> = TName extends `${infer Name}.${infer RestName}`
+  ? (TRequired extends true ? {
+      [Key in OptionName<Name>]: ValueOption<
+        RestName,
+        TRestFlags,
+        TTypes,
+        TRequired,
+        TDefault
+      >;
     }
     : {
-      [K in OptionName<Name>]?: ValueOption<RestName, F, V, R, D>;
+      [Key in OptionName<Name>]?: ValueOption<
+        RestName,
+        TRestFlags,
+        TTypes,
+        TRequired,
+        TDefault
+      >;
     })
-  : (R extends true ? {
-      [K in OptionName<N>]: GetArguments<F> extends `[${string}]`
-        ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
-        : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
+  : (TRequired extends true ? {
+      [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
+        ? 
+          | NonNullable<TDefault>
+          | true
+          | ArgumentType<GetArguments<TRestFlags>, TTypes>
+        : 
+          | NonNullable<TDefault>
+          | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     }
     : {
-      [K in OptionName<N>]?: GetArguments<F> extends `[${string}]`
-        ? NonNullable<D> | true | ArgumentType<GetArguments<F>, V>
-        : NonNullable<D> | ArgumentType<GetArguments<F>, V>;
+      [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
+        `[${string}]` ? 
+          | NonNullable<TDefault>
+          | true
+          | ArgumentType<GetArguments<TRestFlags>, TTypes>
+        : 
+          | NonNullable<TDefault>
+          | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     });
 
 type ValuesOption<
-  T extends string,
-  Rest extends string,
-  V,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = T extends `${infer Name}.${infer RestName}` ? (R extends true ? {
-      [N in OptionName<Name>]: ValuesOption<RestName, Rest, V, R, D>;
+  TName extends string,
+  TRestFlags extends string,
+  TTypes,
+  TRequired extends boolean | undefined = undefined,
+  TDefault = undefined,
+> = TName extends `${infer Name}.${infer RestName}`
+  ? (TRequired extends true ? {
+      [Key in OptionName<Name>]: ValuesOption<
+        RestName,
+        TRestFlags,
+        TTypes,
+        TRequired,
+        TDefault
+      >;
     }
     : {
-      [N in OptionName<Name>]?: ValuesOption<RestName, Rest, V, R, D>;
+      [Key in OptionName<Name>]?: ValuesOption<
+        RestName,
+        TRestFlags,
+        TTypes,
+        TRequired,
+        TDefault
+      >;
     })
-  : (R extends true ? {
-      [N in OptionName<T>]: GetArguments<Rest> extends `[${string}]`
-        ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
-        : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
+  : (TRequired extends true ? {
+      [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
+        ? 
+          | NonNullable<TDefault>
+          | true
+          | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
+        : 
+          | NonNullable<TDefault>
+          | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     }
     : {
-      [N in OptionName<T>]?: GetArguments<Rest> extends `[${string}]`
-        ? NonNullable<D> | true | ArgumentTypes<GetArguments<Rest>, V>
-        : NonNullable<D> | ArgumentTypes<GetArguments<Rest>, V>;
+      [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
+        `[${string}]` ? 
+          | NonNullable<TDefault>
+          | true
+          | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
+        : 
+          | NonNullable<TDefault>
+          | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     });
 
-type MapValue<O, V, C = undefined> = V extends undefined ? C extends true ? {
-      [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
-        ? MapValue<O[K], V>
-        : Array<NonNullable<O[K]>>;
-    }
-  : O
-  : {
-    [K in keyof O]: O[K] extends (Record<string, unknown> | undefined)
-      ? MapValue<O[K], V>
-      : V;
-  };
+type MapValue<TOptions, TMappedOptions, TCollect = undefined> =
+  TMappedOptions extends undefined ? TCollect extends true ? {
+        [Key in keyof TOptions]: TOptions[Key] extends
+          (Record<string, unknown> | undefined)
+          ? MapValue<TOptions[Key], TMappedOptions>
+          : Array<NonNullable<TOptions[Key]>>;
+      }
+    : TOptions
+    : {
+      [Key in keyof TOptions]: TOptions[Key] extends
+        (Record<string, unknown> | undefined)
+        ? MapValue<TOptions[Key], TMappedOptions>
+        : TMappedOptions;
+    };
 
-type GetOptionName<T> = T extends `${string}--${infer Name}=${string}`
+type GetOptionName<TFlags> = TFlags extends `${string}--${infer Name}=${string}`
   ? TrimRight<Name, ",">
-  : T extends `${string}--${infer Name} ${string}` ? TrimRight<Name, ",">
-  : T extends `${string}--${infer Name}` ? Name
-  : T extends `-${infer Name}=${string}` ? TrimRight<Name, ",">
-  : T extends `-${infer Name} ${string}` ? TrimRight<Name, ",">
-  : T extends `-${infer Name}` ? Name
+  : TFlags extends `${string}--${infer Name} ${string}` ? TrimRight<Name, ",">
+  : TFlags extends `${string}--${infer Name}` ? Name
+  : TFlags extends `-${infer Name}=${string}` ? TrimRight<Name, ",">
+  : TFlags extends `-${infer Name} ${string}` ? TrimRight<Name, ",">
+  : TFlags extends `-${infer Name}` ? Name
   : unknown;
 
-type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
-  ? Spread<CO, O>
-  : N extends `${string}.${string}` ? MergeRecursive<CO, O>
-  : Merge<CO, O>;
+type MergeOptions<
+  TFlags,
+  TOptions,
+  TMappedOptions,
+  TName = GetOptionName<TFlags>,
+> = TName extends `no-${string}` ? Spread<TOptions, TMappedOptions>
+  : TName extends `${string}.${string}`
+    ? MergeRecursive<TOptions, TMappedOptions>
+  : Merge<TOptions, TMappedOptions>;
 
 // type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //   ? Spread<CO, O>
@@ -2804,105 +3223,143 @@ type MergeOptions<T, CO, O, N = GetOptionName<T>> = N extends `no-${string}`
 //   : Merge<CO, O>;
 
 type TypedOption<
-  F extends string,
-  CO,
-  T,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = number extends T ? any
-  : F extends `${string}--${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
-  : F extends `${string}--${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
-  : F extends `${string}--${infer Name}`
-    ? BooleanOption<Name, CO, IsRequired<R, D>, D>
-  : F extends `-${infer Name}=${infer Rest}`
-    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
-  : F extends `-${infer Name} ${infer Rest}`
-    ? ValuesOption<Name, Rest, T, IsRequired<R, D>, D>
-  : F extends `-${infer Name}` ? BooleanOption<Name, CO, IsRequired<R, D>, D>
+  TFlags extends string,
+  TOptions,
+  TTypes,
+  TRequired extends boolean | undefined = undefined,
+  TDefault = undefined,
+> = number extends TTypes ? any
+  : TFlags extends `${string}--${infer Name}=${infer TRestFlags}`
+    ? ValuesOption<
+      Name,
+      TRestFlags,
+      TTypes,
+      IsRequired<TRequired, TDefault>,
+      TDefault
+    >
+  : TFlags extends `${string}--${infer Name} ${infer TRestFlags}`
+    ? ValuesOption<
+      Name,
+      TRestFlags,
+      TTypes,
+      IsRequired<TRequired, TDefault>,
+      TDefault
+    >
+  : TFlags extends `${string}--${infer Name}`
+    ? BooleanOption<Name, TOptions, IsRequired<TRequired, TDefault>, TDefault>
+  : TFlags extends `-${infer Name}=${infer TRestFlags}` ? ValuesOption<
+      Name,
+      TRestFlags,
+      TTypes,
+      IsRequired<TRequired, TDefault>,
+      TDefault
+    >
+  : TFlags extends `-${infer Name} ${infer TRestFlags}` ? ValuesOption<
+      Name,
+      TRestFlags,
+      TTypes,
+      IsRequired<TRequired, TDefault>,
+      TDefault
+    >
+  : TFlags extends `-${infer Name}`
+    ? BooleanOption<Name, TOptions, IsRequired<TRequired, TDefault>, TDefault>
   : Record<string, unknown>;
 
-type TypedArguments<A extends string, T extends Record<string, any> | void> =
-  number extends T ? any
-    : A extends `${infer Arg} ${infer Rest}`
-      ? Arg extends `[${string}]`
-        ? [ArgumentType<Arg, T>?, ...TypedArguments<Rest, T>]
-      : [ArgumentType<Arg, T>, ...TypedArguments<Rest, T>]
-    : A extends `${string}...${string}` ? [
-        ...ArgumentType<A, T> extends Array<infer U>
-          ? A extends `[${string}]` ? Array<U> : [U, ...Array<U>]
-          : never,
-      ]
-    : A extends `[${string}]` ? [ArgumentType<A, T>?]
-    : [ArgumentType<A, T>];
+type TypedArguments<TArgs extends string, TTypes> = number extends TTypes ? any
+  : TArgs extends `${infer TArg} ${infer TRestArgs}`
+    ? TArg extends `[${string}]`
+      ? [ArgumentType<TArg, TTypes>?, ...TypedArguments<TRestArgs, TTypes>]
+    : [ArgumentType<TArg, TTypes>, ...TypedArguments<TRestArgs, TTypes>]
+  : TArgs extends `${string}...${string}` ? [
+      ...ArgumentType<TArgs, TTypes> extends Array<infer TValue>
+        ? TArgs extends `[${string}]` ? Array<TValue>
+        : [TValue, ...Array<TValue>]
+        : never,
+    ]
+  : TArgs extends `[${string}]` ? [ArgumentType<TArgs, TTypes>?]
+  : [ArgumentType<TArgs, TTypes>];
 
-type TypedCommandArguments<N extends string, T> = number extends T ? any
-  : N extends `${string} ${infer Args}` ? TypedArguments<Args, T>
-  : [];
+type TypedCommandArguments<TNameAndArguments extends string, TTypes> =
+  number extends TTypes ? any
+    : TNameAndArguments extends `${string} ${infer TFlags}`
+      ? TypedArguments<TFlags, TTypes>
+    : [];
 
 type TypedEnv<
-  N extends string,
-  P extends string | undefined,
-  CO,
-  T,
-  R extends boolean | undefined = undefined,
-  D = undefined,
-> = number extends T ? any
-  : N extends `${infer Name}=${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, T, R, D>
-  : N extends `${infer Name} ${infer Rest}`
-    ? ValueOption<TrimLeft<Name, P>, Rest, T, R, D>
-  : N extends `${infer Name}` ? BooleanOption<TrimLeft<Name, P>, CO, R, D>
+  TNameAndValue extends string,
+  TPrefix extends string | undefined,
+  TOptions,
+  TTypes,
+  TRequired extends boolean | undefined = undefined,
+  TDefault = undefined,
+> = number extends TTypes ? any
+  : TNameAndValue extends `${infer Name}=${infer Rest}`
+    ? ValueOption<TrimLeft<Name, TPrefix>, Rest, TTypes, TRequired, TDefault>
+  : TNameAndValue extends `${infer Name} ${infer Rest}`
+    ? ValueOption<TrimLeft<Name, TPrefix>, Rest, TTypes, TRequired, TDefault>
+  : TNameAndValue extends `${infer Name}`
+    ? BooleanOption<TrimLeft<Name, TPrefix>, TOptions, TRequired, TDefault>
   : Record<string, unknown>;
 
 type TypedType<
-  Name extends string,
-  Handler extends TypeOrTypeHandler<unknown>,
-> = { [N in Name]: Handler };
+  TName extends string,
+  THandler extends TypeOrTypeHandler<unknown>,
+> = { [Name in TName]: THandler };
 
-type RequiredKeys<T> = {
+type RequiredKeys<TRecord> = {
   // deno-lint-ignore ban-types
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
-}[keyof T];
+  [Key in keyof TRecord]-?: {} extends Pick<TRecord, Key> ? never : Key;
+}[keyof TRecord];
 
-type OptionalKeys<T> = {
+type OptionalKeys<TRecord> = {
   // deno-lint-ignore ban-types
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
-}[keyof T];
+  [Key in keyof TRecord]-?: {} extends Pick<TRecord, Key> ? Key : never;
+}[keyof TRecord];
 
 type SpreadRequiredProperties<
-  L,
-  R,
-  K extends keyof L & keyof R,
+  TTarget,
+  TSource,
+  TKeys extends keyof TTarget & keyof TSource,
 > = {
-  [P in K]: Exclude<L[P], undefined> | Exclude<R[P], undefined>;
+  [Key in TKeys]:
+    | Exclude<TTarget[Key], undefined>
+    | Exclude<TSource[Key], undefined>;
 };
 
 type SpreadOptionalProperties<
-  L,
-  R,
-  K extends keyof L & keyof R,
+  TTarget,
+  TSource,
+  TKeys extends keyof TTarget & keyof TSource,
 > = {
-  [P in K]?: L[P] | R[P];
+  [Key in TKeys]?: TTarget[Key] | TSource[Key];
 };
 
 /** Merge types of two objects. */
-type Spread<L, R> = L extends void ? R : R extends void ? L
+type Spread<TTarget, TSource> = TTarget extends void ? TSource
+  : TSource extends void ? TTarget
   // Properties in L that don't exist in R.
-: 
-  & Omit<L, keyof R>
-  // Properties in R that don't exist in L.
-  & Omit<R, keyof L>
-  // Required properties in R that exist in L.
-  & SpreadRequiredProperties<L, R, RequiredKeys<R> & keyof L>
-  // Required properties in L that exist in R.
-  & SpreadRequiredProperties<L, R, RequiredKeys<L> & keyof R>
-  // Optional properties in L and R.
-  & SpreadOptionalProperties<
-    L,
-    R,
-    OptionalKeys<L> & OptionalKeys<R>
-  >;
+  : 
+    & Omit<TTarget, keyof TSource>
+    // Properties in R that don't exist in L.
+    & Omit<TSource, keyof TTarget>
+    // Required properties in R that exist in L.
+    & SpreadRequiredProperties<
+      TTarget,
+      TSource,
+      RequiredKeys<TSource> & keyof TTarget
+    >
+    // Required properties in L that exist in R.
+    & SpreadRequiredProperties<
+      TTarget,
+      TSource,
+      RequiredKeys<TTarget> & keyof TSource
+    >
+    // Optional properties in L and R.
+    & SpreadOptionalProperties<
+      TTarget,
+      TSource,
+      OptionalKeys<TTarget> & OptionalKeys<TSource>
+    >;
 
-type ValueOf<T> = T extends Record<string, infer V> ? ValueOf<V> : T;
+type ValueOf<TValue> = TValue extends Record<string, infer V> ? ValueOf<V>
+  : TValue;

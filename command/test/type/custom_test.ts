@@ -1,13 +1,13 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
-import type { ITypeHandler, ITypeInfo } from "../../types.ts";
+import type { ArgumentValue, TypeHandler } from "../../types.ts";
 import { Type } from "../../type.ts";
 
-const email = (): ITypeHandler<string> => {
+const email = (): TypeHandler<string> => {
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  return ({ label, value, name }: ITypeInfo): string => {
+  return ({ label, value, name }: ArgumentValue): string => {
     if (!emailRegex.test(value.toLowerCase())) {
       throw new Error(
         `${label} "${name}" must be a valid "email", but got "${value}".`,
@@ -80,7 +80,7 @@ class CustomType<T extends string> extends Type<T> {
     super();
   }
 
-  parse(type: ITypeInfo): T {
+  parse(type: ArgumentValue): T {
     if (!this.formats.includes(type.value as T)) {
       throw new Error(`invalid type: ${type.value}`);
     }
@@ -97,7 +97,6 @@ Deno.test("command - type - custom - generic custom type", async () => {
       "...",
     )
     .action(({ format }) => {
-      // @ts-expect-error format cannot be xyz
       format === "xyz";
       format === "foo";
       format === "bar";

@@ -518,8 +518,9 @@ import {
   Deno.test({
     name: "[command] - generic types - return types",
     fn() {
+      const colorType = new EnumType(["red", "blue"]);
       new Command()
-        .type("color", new EnumType(["red", "blue"]))
+        .type("color", colorType)
         .option("--num [val:number]", "")
         .option("--str [val:string]", "")
         .option("--bool [val:boolean]", "")
@@ -547,7 +548,6 @@ import {
     name: "[command] - generic types - just a variadic arg",
     fn() {
       new Command()
-        .type("color", new EnumType(["red", "blue"]))
         .arguments("<...args:number>")
         .action((options, ...args) => {
           assert<IsExact<typeof args, [number, ...Array<number>]>>(true);
@@ -565,9 +565,10 @@ import {
         JS = "js",
         Rust = "rust",
       }
+      const colorType = new EnumType(["red", "blue"]);
 
       new Command()
-        .type("color", new EnumType(["red", "blue"]))
+        .type("color", colorType)
         .type("lang", new EnumType(Lang))
         .arguments(
           "<arg1> <arg2:string> <arg3:number> <arg4:boolean> [arg5] [arg6:string] [arg7:number] [arg8:boolean] [arg9:color] [...rest:lang[]]",
@@ -595,9 +596,11 @@ import {
   Deno.test({
     name: "[command] - generic types - command arguments",
     fn() {
+      const colorType = new EnumType(["red", "blue"]);
+      const langType = new EnumType(["js", "rust"]);
       new Command()
-        .globalType("color", new EnumType(["red", "blue"]))
-        .globalType("lang", new EnumType(["js", "rust"]))
+        .globalType("color", colorType)
+        .globalType("lang", langType)
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
           assert<
@@ -641,9 +644,11 @@ import {
   Deno.test({
     name: "[command] - generic types - command arguments with custom types",
     fn() {
+      const colorType = new EnumType(["red", "blue"]);
+      const langType = new EnumType(["js", "rust"]);
       new Command()
-        .globalType("color", new EnumType(["red", "blue"]))
-        .globalType("lang", new EnumType(["js", "rust"]))
+        .globalType("color", colorType)
+        .globalType("lang", langType)
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
           assert<
@@ -662,9 +667,11 @@ import {
   Deno.test({
     name: "[command] - generic types - environment variables",
     fn() {
+      const colorType = new EnumType(["red", "blue"]);
+      const langType = new EnumType(["js", "rust"]);
       new Command()
-        .globalType("color", new EnumType(["red", "blue"]))
-        .globalType("lang", new EnumType(["js", "rust"]))
+        .globalType("color", colorType)
+        .globalType("lang", langType)
         .option("--foo-bar <val:color>", "")
         .env("FOO_BAR <val:color>", "")
         .env("FOO_BAR_BAZ=<val:number>", "", { required: true })
@@ -746,8 +753,9 @@ import {
   Deno.test({
     name: "[command] - generic types - default value",
     fn() {
+      const colorType = new EnumType(["red", "blue"]);
       new Command()
-        .type("color", new EnumType(["red", "blue"]))
+        .type("color", colorType)
         .option("--foo [val:string]", "...")
         .option("--bar [val:string]", "...", { default: 4 })
         .option("--baz <val:color>", "...", { default: "red" as const })
