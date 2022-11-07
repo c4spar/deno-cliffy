@@ -7,32 +7,32 @@ import {
   StaticGenericPrompt,
 } from "./_generic_prompt.ts";
 
-type Next<N extends keyof any> = (
-  next?: N | number | true | null,
+type Next<TName extends keyof any> = (
+  next?: TName | number | true | null,
 ) => Promise<void>;
 
 type PromptOptions<
-  N0 extends string,
-  G0 extends StaticGenericPrompt<any, any, any, any, any> | void,
-  R,
-  U = G0 extends StaticGenericPrompt<any, any, any, any, any>
-    ? Parameters<G0["prompt"]>[0]
+  TName extends string,
+  TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any> | void,
+  TResult,
+  TOptions = TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any>
+    ? Parameters<TStaticPrompt["prompt"]>[0]
     : never,
-> = G0 extends StaticGenericPrompt<any, any, any, any, any> ? 
+> = TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any> ? 
     & {
-      name: N0;
-      type: G0;
+      name: TName;
+      type: TStaticPrompt;
       before?: (
-        opts: R,
-        next: Next<Exclude<keyof R, symbol>>,
+        opts: TResult,
+        next: Next<Exclude<keyof TResult, symbol>>,
       ) => void | Promise<void>;
       after?: (
-        opts: R,
-        next: Next<Exclude<keyof R, symbol>>,
+        opts: TResult,
+        next: Next<Exclude<keyof TResult, symbol>>,
       ) => void | Promise<void>;
     }
     // exclude none options parameter
-    & (U extends GenericPromptOptions<any, any> ? U : {})
+    & (TOptions extends GenericPromptOptions<any, any> ? TOptions : {})
   : never;
 
 type PromptResult<
@@ -68,134 +68,180 @@ type Id<T> = T extends Record<string, unknown>
   : T;
 
 export function prompt<
-  N0 extends string,
-  N1 extends string,
-  N2 extends string,
-  N3 extends string,
-  N4 extends string,
-  N5 extends string,
-  N6 extends string,
-  N7 extends string,
-  N8 extends string,
-  N9 extends string,
-  N10 extends string,
-  N11 extends string,
-  N12 extends string,
-  N13 extends string,
-  N14 extends string,
-  N15 extends string,
-  N16 extends string,
-  N17 extends string,
-  N18 extends string,
-  N19 extends string,
-  N20 extends string,
-  N21 extends string,
-  N22 extends string,
-  N23 extends string,
-  O0 extends GenericPromptOptions<any, any>,
-  O1 extends GenericPromptOptions<any, any>,
-  O2 extends GenericPromptOptions<any, any>,
-  O3 extends GenericPromptOptions<any, any>,
-  O4 extends GenericPromptOptions<any, any>,
-  O5 extends GenericPromptOptions<any, any>,
-  O6 extends GenericPromptOptions<any, any>,
-  O7 extends GenericPromptOptions<any, any>,
-  O8 extends GenericPromptOptions<any, any>,
-  O9 extends GenericPromptOptions<any, any>,
-  O10 extends GenericPromptOptions<any, any>,
-  O11 extends GenericPromptOptions<any, any>,
-  O12 extends GenericPromptOptions<any, any>,
-  O13 extends GenericPromptOptions<any, any>,
-  O14 extends GenericPromptOptions<any, any>,
-  O15 extends GenericPromptOptions<any, any>,
-  O16 extends GenericPromptOptions<any, any>,
-  O17 extends GenericPromptOptions<any, any>,
-  O18 extends GenericPromptOptions<any, any>,
-  O19 extends GenericPromptOptions<any, any>,
-  O20 extends GenericPromptOptions<any, any>,
-  O21 extends GenericPromptOptions<any, any>,
-  O22 extends GenericPromptOptions<any, any>,
-  O23 extends GenericPromptOptions<any, any>,
-  G0 extends StaticGenericPrompt<any, any, O0, any, any>,
-  G1 extends StaticGenericPrompt<any, any, O1, any, any> | void = void,
-  G2 extends StaticGenericPrompt<any, any, O2, any, any> | void = void,
-  G3 extends StaticGenericPrompt<any, any, O3, any, any> | void = void,
-  G4 extends StaticGenericPrompt<any, any, O4, any, any> | void = void,
-  G5 extends StaticGenericPrompt<any, any, O5, any, any> | void = void,
-  G6 extends StaticGenericPrompt<any, any, O6, any, any> | void = void,
-  G7 extends StaticGenericPrompt<any, any, O7, any, any> | void = void,
-  G8 extends StaticGenericPrompt<any, any, O8, any, any> | void = void,
-  G9 extends StaticGenericPrompt<any, any, O9, any, any> | void = void,
-  G10 extends StaticGenericPrompt<any, any, O10, any, any> | void = void,
-  G11 extends StaticGenericPrompt<any, any, O11, any, any> | void = void,
-  G12 extends StaticGenericPrompt<any, any, O12, any, any> | void = void,
-  G13 extends StaticGenericPrompt<any, any, O13, any, any> | void = void,
-  G14 extends StaticGenericPrompt<any, any, O14, any, any> | void = void,
-  G15 extends StaticGenericPrompt<any, any, O15, any, any> | void = void,
-  G16 extends StaticGenericPrompt<any, any, O16, any, any> | void = void,
-  G17 extends StaticGenericPrompt<any, any, O17, any, any> | void = void,
-  G18 extends StaticGenericPrompt<any, any, O18, any, any> | void = void,
-  G19 extends StaticGenericPrompt<any, any, O19, any, any> | void = void,
-  G20 extends StaticGenericPrompt<any, any, O20, any, any> | void = void,
-  G21 extends StaticGenericPrompt<any, any, O21, any, any> | void = void,
-  G22 extends StaticGenericPrompt<any, any, O22, any, any> | void = void,
-  G23 extends StaticGenericPrompt<any, any, O23, any, any> | void = void,
-  R = Id<
-    & PromptResult<N0, G0>
-    & PromptResult<N1, G1>
-    & PromptResult<N2, G2>
-    & PromptResult<N3, G3>
-    & PromptResult<N4, G4>
-    & PromptResult<N5, G5>
-    & PromptResult<N6, G6>
-    & PromptResult<N7, G7>
-    & PromptResult<N8, G8>
-    & PromptResult<N9, G9>
-    & PromptResult<N10, G10>
-    & PromptResult<N11, G11>
-    & PromptResult<N12, G12>
-    & PromptResult<N13, G13>
-    & PromptResult<N14, G14>
-    & PromptResult<N15, G15>
-    & PromptResult<N16, G16>
-    & PromptResult<N17, G17>
-    & PromptResult<N18, G18>
-    & PromptResult<N19, G19>
-    & PromptResult<N20, G20>
-    & PromptResult<N21, G21>
-    & PromptResult<N22, G22>
-    & PromptResult<N23, G23>
+  TName0 extends string,
+  TName1 extends string,
+  TName2 extends string,
+  TName3 extends string,
+  TName4 extends string,
+  TName5 extends string,
+  TName6 extends string,
+  TName7 extends string,
+  TName8 extends string,
+  TName9 extends string,
+  TName10 extends string,
+  TName11 extends string,
+  TName12 extends string,
+  TName13 extends string,
+  TName14 extends string,
+  TName15 extends string,
+  TName16 extends string,
+  TName17 extends string,
+  TName18 extends string,
+  TName19 extends string,
+  TName20 extends string,
+  TName21 extends string,
+  TName22 extends string,
+  TName23 extends string,
+  TOptions0 extends GenericPromptOptions<any, any>,
+  TOptions1 extends GenericPromptOptions<any, any>,
+  TOptions2 extends GenericPromptOptions<any, any>,
+  TOptions3 extends GenericPromptOptions<any, any>,
+  TOptions4 extends GenericPromptOptions<any, any>,
+  TOptions5 extends GenericPromptOptions<any, any>,
+  TOptions6 extends GenericPromptOptions<any, any>,
+  TOptions7 extends GenericPromptOptions<any, any>,
+  TOptions8 extends GenericPromptOptions<any, any>,
+  TOptions9 extends GenericPromptOptions<any, any>,
+  TOptions10 extends GenericPromptOptions<any, any>,
+  TOptions11 extends GenericPromptOptions<any, any>,
+  TOptions12 extends GenericPromptOptions<any, any>,
+  TOptions13 extends GenericPromptOptions<any, any>,
+  TOptions14 extends GenericPromptOptions<any, any>,
+  TOptions15 extends GenericPromptOptions<any, any>,
+  TOptions16 extends GenericPromptOptions<any, any>,
+  TOptions17 extends GenericPromptOptions<any, any>,
+  TOptions18 extends GenericPromptOptions<any, any>,
+  TOptions19 extends GenericPromptOptions<any, any>,
+  TOptions20 extends GenericPromptOptions<any, any>,
+  TOptions21 extends GenericPromptOptions<any, any>,
+  TOptions22 extends GenericPromptOptions<any, any>,
+  TOptions23 extends GenericPromptOptions<any, any>,
+  TStaticPrompt0 extends StaticGenericPrompt<any, any, TOptions0, any, any>,
+  TStaticPrompt1 extends
+    | StaticGenericPrompt<any, any, TOptions1, any, any>
+    | void = void,
+  TStaticPrompt2 extends
+    | StaticGenericPrompt<any, any, TOptions2, any, any>
+    | void = void,
+  TStaticPrompt3 extends
+    | StaticGenericPrompt<any, any, TOptions3, any, any>
+    | void = void,
+  TStaticPrompt4 extends
+    | StaticGenericPrompt<any, any, TOptions4, any, any>
+    | void = void,
+  TStaticPrompt5 extends
+    | StaticGenericPrompt<any, any, TOptions5, any, any>
+    | void = void,
+  TStaticPrompt6 extends
+    | StaticGenericPrompt<any, any, TOptions6, any, any>
+    | void = void,
+  TStaticPrompt7 extends
+    | StaticGenericPrompt<any, any, TOptions7, any, any>
+    | void = void,
+  TStaticPrompt8 extends
+    | StaticGenericPrompt<any, any, TOptions8, any, any>
+    | void = void,
+  TStaticPrompt9 extends
+    | StaticGenericPrompt<any, any, TOptions9, any, any>
+    | void = void,
+  TStaticPrompt10 extends
+    | StaticGenericPrompt<any, any, TOptions10, any, any>
+    | void = void,
+  TStaticPrompt11 extends
+    | StaticGenericPrompt<any, any, TOptions11, any, any>
+    | void = void,
+  TStaticPrompt12 extends
+    | StaticGenericPrompt<any, any, TOptions12, any, any>
+    | void = void,
+  TStaticPrompt13 extends
+    | StaticGenericPrompt<any, any, TOptions13, any, any>
+    | void = void,
+  TStaticPrompt14 extends
+    | StaticGenericPrompt<any, any, TOptions14, any, any>
+    | void = void,
+  TStaticPrompt15 extends
+    | StaticGenericPrompt<any, any, TOptions15, any, any>
+    | void = void,
+  TStaticPrompt16 extends
+    | StaticGenericPrompt<any, any, TOptions16, any, any>
+    | void = void,
+  TStaticPrompt17 extends
+    | StaticGenericPrompt<any, any, TOptions17, any, any>
+    | void = void,
+  TStaticPrompt18 extends
+    | StaticGenericPrompt<any, any, TOptions18, any, any>
+    | void = void,
+  TStaticPrompt19 extends
+    | StaticGenericPrompt<any, any, TOptions19, any, any>
+    | void = void,
+  TStaticPrompt20 extends
+    | StaticGenericPrompt<any, any, TOptions20, any, any>
+    | void = void,
+  TStaticPrompt21 extends
+    | StaticGenericPrompt<any, any, TOptions21, any, any>
+    | void = void,
+  TStaticPrompt22 extends
+    | StaticGenericPrompt<any, any, TOptions22, any, any>
+    | void = void,
+  TStaticPrompt23 extends
+    | StaticGenericPrompt<any, any, TOptions23, any, any>
+    | void = void,
+  TResult = Id<
+    & PromptResult<TName0, TStaticPrompt0>
+    & PromptResult<TName1, TStaticPrompt1>
+    & PromptResult<TName2, TStaticPrompt2>
+    & PromptResult<TName3, TStaticPrompt3>
+    & PromptResult<TName4, TStaticPrompt4>
+    & PromptResult<TName5, TStaticPrompt5>
+    & PromptResult<TName6, TStaticPrompt6>
+    & PromptResult<TName7, TStaticPrompt7>
+    & PromptResult<TName8, TStaticPrompt8>
+    & PromptResult<TName9, TStaticPrompt9>
+    & PromptResult<TName10, TStaticPrompt10>
+    & PromptResult<TName11, TStaticPrompt11>
+    & PromptResult<TName12, TStaticPrompt12>
+    & PromptResult<TName13, TStaticPrompt13>
+    & PromptResult<TName14, TStaticPrompt14>
+    & PromptResult<TName15, TStaticPrompt15>
+    & PromptResult<TName16, TStaticPrompt16>
+    & PromptResult<TName17, TStaticPrompt17>
+    & PromptResult<TName18, TStaticPrompt18>
+    & PromptResult<TName19, TStaticPrompt19>
+    & PromptResult<TName20, TStaticPrompt20>
+    & PromptResult<TName21, TStaticPrompt21>
+    & PromptResult<TName22, TStaticPrompt22>
+    & PromptResult<TName23, TStaticPrompt23>
   >,
 >(prompts: [
-  PromptOptions<N0, G0, R>,
-  PromptOptions<N1, G1, R>?,
-  PromptOptions<N2, G2, R>?,
-  PromptOptions<N3, G3, R>?,
-  PromptOptions<N4, G4, R>?,
-  PromptOptions<N5, G5, R>?,
-  PromptOptions<N6, G6, R>?,
-  PromptOptions<N7, G7, R>?,
-  PromptOptions<N8, G8, R>?,
-  PromptOptions<N9, G9, R>?,
-  PromptOptions<N10, G10, R>?,
-  PromptOptions<N11, G11, R>?,
-  PromptOptions<N12, G12, R>?,
-  PromptOptions<N13, G13, R>?,
-  PromptOptions<N14, G14, R>?,
-  PromptOptions<N15, G15, R>?,
-  PromptOptions<N16, G16, R>?,
-  PromptOptions<N17, G17, R>?,
-  PromptOptions<N18, G18, R>?,
-  PromptOptions<N19, G19, R>?,
-  PromptOptions<N20, G20, R>?,
-  PromptOptions<N21, G21, R>?,
-  PromptOptions<N22, G22, R>?,
-  PromptOptions<N23, G23, R>?,
-], options?: GlobalPromptOptions<R>): Promise<R> {
+  PromptOptions<TName0, TStaticPrompt0, TResult>,
+  PromptOptions<TName1, TStaticPrompt1, TResult>?,
+  PromptOptions<TName2, TStaticPrompt2, TResult>?,
+  PromptOptions<TName3, TStaticPrompt3, TResult>?,
+  PromptOptions<TName4, TStaticPrompt4, TResult>?,
+  PromptOptions<TName5, TStaticPrompt5, TResult>?,
+  PromptOptions<TName6, TStaticPrompt6, TResult>?,
+  PromptOptions<TName7, TStaticPrompt7, TResult>?,
+  PromptOptions<TName8, TStaticPrompt8, TResult>?,
+  PromptOptions<TName9, TStaticPrompt9, TResult>?,
+  PromptOptions<TName10, TStaticPrompt10, TResult>?,
+  PromptOptions<TName11, TStaticPrompt11, TResult>?,
+  PromptOptions<TName12, TStaticPrompt12, TResult>?,
+  PromptOptions<TName13, TStaticPrompt13, TResult>?,
+  PromptOptions<TName14, TStaticPrompt14, TResult>?,
+  PromptOptions<TName15, TStaticPrompt15, TResult>?,
+  PromptOptions<TName16, TStaticPrompt16, TResult>?,
+  PromptOptions<TName17, TStaticPrompt17, TResult>?,
+  PromptOptions<TName18, TStaticPrompt18, TResult>?,
+  PromptOptions<TName19, TStaticPrompt19, TResult>?,
+  PromptOptions<TName20, TStaticPrompt20, TResult>?,
+  PromptOptions<TName21, TStaticPrompt21, TResult>?,
+  PromptOptions<TName22, TStaticPrompt22, TResult>?,
+  PromptOptions<TName23, TStaticPrompt23, TResult>?,
+], options?: GlobalPromptOptions<TResult>): Promise<TResult> {
   return new PromptList(
     prompts as PromptOptions<any, any, any, any>,
     options as PromptListOptions<any>,
-  ).run(options?.initial) as Promise<R>;
+  ).run(options?.initial) as Promise<TResult>;
 }
 
 let injected: Record<string, any> = {};
