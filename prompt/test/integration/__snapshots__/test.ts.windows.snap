@@ -18,38 +18,38 @@ snapshot[`prompt - integration - checkbox 1`] = `
 `;
 
 snapshot[`prompt - integration - confirm 1`] = `
-" ? Please confirm (y/N) »
+" ? Please confirm (y/N) » 
  ❯ some hint
 \\x1b[1A\\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J ? Please confirm (y/N) » Yes
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - input 1`] = `
-" ? Whats your name? (foo) »
+" ? Whats your name? (foo) » 
 \\x1b[1A\\x1b[29G\\x1b[G\\x1b[0J ? Whats your name? (foo) » bar
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - input no location flag 1`] = `
-" ? Works without --location? (hope so) »
+" ? Works without --location? (hope so) » 
 \\x1b[1A\\x1b[42G\\x1b[G\\x1b[0J ? Works without --location? (hope so) » yes
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - input no prefix 1`] = `
-" Whats your name? (foo) »
+" Whats your name? (foo) » 
 \\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J Whats your name? (foo) » bar
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - input prefix 1`] = `
-" PREFIX Whats your name? (foo) »
+" PREFIX Whats your name? (foo) » 
 \\x1b[1A\\x1b[34G\\x1b[G\\x1b[0J PREFIX Whats your name? (foo) » bar
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - input suggestions 1`] = `
-" ? Whats your name? (foo) »
+" ? Whats your name? (foo) » 
    foo
    bar
    baz
@@ -58,7 +58,7 @@ snapshot[`prompt - integration - input suggestions 1`] = `
 `;
 
 snapshot[`prompt - integration - list 1`] = `
-" ? Enter some keywords (foo, far) »
+" ? Enter some keywords (foo, far) » 
  ❯ some hint...
 \\x1b[1A\\x1b[1A\\x1b[37G\\x1b[G\\x1b[0J ? Enter some keywords (foo, far) » bar, foo
  ❯ some hint...
@@ -67,7 +67,7 @@ snapshot[`prompt - integration - list 1`] = `
 `;
 
 snapshot[`prompt - integration - number 1`] = `
-" ? How old are you? (7) »
+" ? How old are you? (7) » 
 \\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J ? How old are you? (7) » 19
  × Value must be lower or equal than 20
 \\x1b[1A\\x1b[1A\\x1b[28G\\x1b[G\\x1b[0J ? How old are you? (7) » 20
@@ -75,13 +75,13 @@ snapshot[`prompt - integration - number 1`] = `
 `;
 
 snapshot[`prompt - integration - number decimal 1`] = `
-" ? How old are you? (7) »
+" ? How old are you? (7) » 
 \\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J ? How old are you? (7) » 19.4
 \\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - secret 1`] = `
-" ? enter your secret »
+" ? enter your secret » 
 \\x1b[1A\\x1b[24G\\x1b[G\\x1b[0J ? enter your secret » ***
 \\x1b[?25h\\x1b[?25h"
 `;
