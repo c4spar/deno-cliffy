@@ -97,7 +97,7 @@ export class Checkbox extends GenericList<
 
   /**
    * Render checkbox option.
-   * @param option        Checkbox option settings.
+   * @param option      Checkbox option settings.
    * @param isSelected  Set to true if option is selected.
    */
   protected getListItem(

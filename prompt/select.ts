@@ -54,7 +54,7 @@ export class Select
 
   /**
    * Render select option.
-   * @param option        Select option settings.
+   * @param option      Select option settings.
    * @param isSelected  Set to true if option is selected.
    */
   protected getListItem(
