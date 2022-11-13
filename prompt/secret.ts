@@ -42,7 +42,7 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
       indent: " ",
-      label: "Password",
+      label: "Secret",
       hidden: false,
       minLength: 0,
       maxLength: Infinity,
