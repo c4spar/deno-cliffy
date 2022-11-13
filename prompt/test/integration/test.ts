@@ -1,6 +1,6 @@
 import {
   assert,
-  assertEquals,
+  assertSnapshot,
   copy,
   dirname,
   expandGlob,
@@ -16,27 +16,11 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
     Deno.test({
       name: `prompt - integration - ${name}`,
       ignore: lt(Deno.version.deno, "1.10.0"),
-      async fn() {
+      async fn(t) {
         const output: string = await runPrompt(file);
-        const expectedOutput: string = await getExpectedOutput(file.path);
-        assertEquals(
-          output,
-          expectedOutput
-            .replace(/\\x1b/g, "\x1b")
-            .replace(/\r\n/g, "\n"),
-        );
+        await assertSnapshot(t, output);
       },
     });
-  }
-}
-
-async function getExpectedOutput(path: string) {
-  const osOutputPath = path.replace(/\.ts$/, `.${Deno.build.os}.out`);
-  try {
-    return await Deno.readTextFile(osOutputPath);
-  } catch (_) {
-    const outputPath = path.replace(/\.ts$/, ".out");
-    return await Deno.readTextFile(outputPath);
   }
 }
 
