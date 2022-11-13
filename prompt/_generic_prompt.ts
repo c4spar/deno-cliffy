@@ -78,7 +78,7 @@ export abstract class GenericPrompt<
     this.settings = {
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
-      indent: " ",
+      indent: "",
       ...options,
       keys: {
         submit: ["enter", "return"],
