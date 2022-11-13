@@ -1,18 +1,10 @@
 import type { KeyCode } from "../keycode/key_code.ts";
-import { blue, dim, underline, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { dim, underline } from "./deps.ts";
 import {
   GenericPrompt,
   GenericPromptKeys,
   GenericPromptOptions,
-  GenericPromptSettings,
 } from "./_generic_prompt.ts";
-
-/** Toggle key options. */
-export interface ToggleKeys extends GenericPromptKeys {
-  active?: string[];
-  inactive?: string[];
-}
 
 /** Generic prompt options. */
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
@@ -21,18 +13,19 @@ export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
   keys?: ToggleKeys;
 }
 
-/** Toggle prompt settings. */
-interface ToggleSettings extends GenericPromptSettings<boolean, string> {
-  active: string;
-  inactive: string;
-  keys: ToggleKeys;
+/** Toggle key options. */
+export interface ToggleKeys extends GenericPromptKeys {
+  active?: string[];
+  inactive?: string[];
 }
 
 /** Toggle prompt representation. */
-export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
+export class Toggle extends GenericPrompt<boolean, string, ToggleOptions> {
   protected status: string = typeof this.settings.default !== "undefined"
     ? this.format(this.settings.default)
     : "";
+  private readonly active: string;
+  private readonly inactive: string;
 
   /** Execute the prompt and show cursor on end. */
   public static prompt(
@@ -42,32 +35,33 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
       options = { message: options };
     }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      active: "Yes",
-      inactive: "No",
+    return new this(options).prompt();
+  }
+
+  constructor(options: ToggleOptions) {
+    super({
       ...options,
       keys: {
         active: ["right", "y", "j", "s", "o"],
         inactive: ["left", "n"],
         ...(options.keys ?? {}),
       },
-    }).prompt();
+    });
+    this.active = this.settings.active || "Yes";
+    this.inactive = this.settings.inactive || "No";
   }
 
   protected message(): string {
-    let message = super.message() + " " + this.settings.pointer + " ";
+    let message = super.message() + this.pointer() + " ";
 
-    if (this.status === this.settings.active) {
-      message += dim(this.settings.inactive + " / ") +
-        underline(this.settings.active);
-    } else if (this.status === this.settings.inactive) {
-      message += underline(this.settings.inactive) +
-        dim(" / " + this.settings.active);
+    if (this.status === this.active) {
+      message += dim(this.inactive + " / ") +
+        underline(this.active);
+    } else if (this.status === this.inactive) {
+      message += underline(this.inactive) +
+        dim(" / " + this.active);
     } else {
-      message += dim(this.settings.inactive + " / " + this.settings.active);
+      message += dim(this.inactive + " / " + this.active);
     }
 
     return message;
@@ -85,11 +79,11 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
-      case event.sequence === this.settings.inactive[0].toLowerCase():
+      case event.sequence === this.inactive[0].toLowerCase():
       case this.isKey(this.settings.keys, "inactive", event):
         this.selectInactive();
         break;
-      case event.sequence === this.settings.active[0].toLowerCase():
+      case event.sequence === this.active[0].toLowerCase():
       case this.isKey(this.settings.keys, "active", event):
         this.selectActive();
         break;
@@ -100,12 +94,12 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
 
   /** Set active. */
   protected selectActive() {
-    this.status = this.settings.active;
+    this.status = this.active;
   }
 
   /** Set inactive. */
   protected selectInactive() {
-    this.status = this.settings.inactive;
+    this.status = this.inactive;
   }
 
   /**
@@ -114,7 +108,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * @return True on success, false or error message on error.
    */
   protected validate(value: string): boolean | string {
-    return [this.settings.active, this.settings.inactive].indexOf(value) !== -1;
+    return [this.active, this.inactive].indexOf(value) !== -1;
   }
 
   /**
@@ -124,9 +118,9 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    */
   protected transform(value: string): boolean | undefined {
     switch (value) {
-      case this.settings.active:
+      case this.active:
         return true;
-      case this.settings.inactive:
+      case this.inactive:
         return false;
     }
   }
@@ -136,7 +130,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
    * @param value Output value.
    */
   protected format(value: boolean): string {
-    return value ? this.settings.active : this.settings.inactive;
+    return value ? this.active : this.inactive;
   }
 
   /** Get input value. */

@@ -3,9 +3,14 @@ import {
   GenericPrompt,
   GenericPromptKeys,
   GenericPromptOptions,
-  GenericPromptSettings,
 } from "./_generic_prompt.ts";
 import { blue, dim, stripColor, underline } from "./deps.ts";
+
+/** Generic input prompt options. */
+export interface GenericInputPromptOptions<TValue, TRawValue>
+  extends GenericPromptOptions<TValue, TRawValue> {
+  keys?: GenericInputKeys;
+}
 
 /** Input keys options. */
 export interface GenericInputKeys extends GenericPromptKeys {
@@ -15,24 +20,12 @@ export interface GenericInputKeys extends GenericPromptKeys {
   deleteCharRight?: string[];
 }
 
-/** Generic input prompt options. */
-export interface GenericInputPromptOptions<TValue, TRawValue>
-  extends GenericPromptOptions<TValue, TRawValue> {
-  keys?: GenericInputKeys;
-}
-
-/** Generic input prompt settings. */
-export interface GenericInputPromptSettings<TValue, TRawValue>
-  extends GenericPromptSettings<TValue, TRawValue> {
-  keys?: GenericInputKeys;
-}
-
 /** Generic input prompt representation. */
 export abstract class GenericInput<
   TValue,
   TRawValue,
-  TSettings extends GenericInputPromptSettings<TValue, TRawValue>,
-> extends GenericPrompt<TValue, TRawValue, TSettings> {
+  TOptions extends GenericInputPromptOptions<TValue, TRawValue>,
+> extends GenericPrompt<TValue, TRawValue, TOptions> {
   protected inputValue = "";
   protected inputIndex = 0;
 
@@ -40,7 +33,7 @@ export abstract class GenericInput<
    * Prompt constructor.
    * @param settings Prompt settings.
    */
-  protected constructor(settings: TSettings) {
+  protected constructor(settings: TOptions) {
     super({
       ...settings,
       keys: {
@@ -58,7 +51,7 @@ export abstract class GenericInput<
   }
 
   protected message(): string {
-    const message: string = super.message() + " " + this.settings.pointer + " ";
+    const message: string = super.message() + this.pointer() + " ";
     this.cursor.x = stripColor(message).length + this.inputIndex + 1;
     return message + this.input();
   }

@@ -1,15 +1,10 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
-import { blue, underline, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { underline } from "./deps.ts";
 import {
   GenericInput,
   GenericInputKeys,
   GenericInputPromptOptions,
-  GenericInputPromptSettings,
 } from "./_generic_input.ts";
-
-/** Secret key options. */
-export type SecretKeys = GenericInputKeys;
 
 /** Secret prompt options. */
 export interface SecretOptions
@@ -21,33 +16,24 @@ export interface SecretOptions
   keys?: SecretKeys;
 }
 
-/** Secret prompt settings. */
-interface SecretSettings extends GenericInputPromptSettings<string, string> {
-  label: string;
-  hidden: boolean;
-  minLength: number;
-  maxLength: number;
-  keys?: SecretKeys;
-}
+/** Secret key options. */
+export type SecretKeys = GenericInputKeys;
 
 /** Secret prompt representation. */
-export class Secret extends GenericInput<string, string, SecretSettings> {
+export class Secret extends GenericInput<string, string, SecretOptions> {
+  readonly #label: string;
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
     }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      label: "Password",
-      hidden: false,
-      minLength: 0,
-      maxLength: Infinity,
-      ...options,
-    }).prompt();
+    return new this(options).prompt();
+  }
+
+  constructor(options: SecretOptions) {
+    super(options);
+    this.#label = this.settings.label || "Secret";
   }
 
   /**
@@ -81,11 +67,11 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
     if (typeof value !== "string") {
       return false;
     }
-    if (value.length < this.settings.minLength) {
-      return `${this.settings.label} must be longer then ${this.settings.minLength} but has a length of ${value.length}.`;
+    if (this.settings.minLength && value.length < this.settings.minLength) {
+      return `${this.#label} must be longer then ${this.settings.minLength} but has a length of ${value.length}.`;
     }
-    if (value.length > this.settings.maxLength) {
-      return `${this.settings.label} can't be longer then ${this.settings.maxLength} but has a length of ${value.length}.`;
+    if (this.settings.maxLength && value.length > this.settings.maxLength) {
+      return `${this.#label} can't be longer then ${this.settings.maxLength} but has a length of ${value.length}.`;
     }
     return true;
   }
@@ -107,7 +93,7 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
     return this.settings.hidden ? "*".repeat(8) : "*".repeat(value.length);
   }
 
-  /** Get input input. */
+  /** Get input value. */
   protected getValue(): string {
     return this.inputValue;
   }

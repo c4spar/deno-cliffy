@@ -3,7 +3,6 @@ import {
   GenericInput,
   GenericInputKeys,
   GenericInputPromptOptions,
-  GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import {
   blue,
@@ -18,10 +17,18 @@ import {
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
-interface LocalStorage {
-  getItem(key: string): string | null;
-  removeItem(key: string): void;
-  setItem(key: string, value: string): void;
+/** Generic input prompt options. */
+export interface GenericSuggestionsOptions<TValue, TRawValue>
+  extends GenericInputPromptOptions<TValue, TRawValue> {
+  keys?: GenericSuggestionsKeys;
+  id?: string;
+  suggestions?: Array<string | number> | SuggestionHandler;
+  complete?: CompleteHandler;
+  files?: boolean | RegExp;
+  list?: boolean;
+  info?: boolean;
+  listPointer?: string;
+  maxRows?: number;
 }
 
 /** Input keys options. */
@@ -42,32 +49,10 @@ export type CompleteHandler = (
   suggestion?: string,
 ) => Promise<string> | string;
 
-/** Generic input prompt options. */
-export interface GenericSuggestionsOptions<TValue, TRawValue>
-  extends GenericInputPromptOptions<TValue, TRawValue> {
-  keys?: GenericSuggestionsKeys;
-  id?: string;
-  suggestions?: Array<string | number> | SuggestionHandler;
-  complete?: CompleteHandler;
-  files?: boolean | RegExp;
-  list?: boolean;
-  info?: boolean;
-  listPointer?: string;
-  maxRows?: number;
-}
-
-/** Generic input prompt settings. */
-export interface GenericSuggestionsSettings<TValue, TRawValue>
-  extends GenericInputPromptSettings<TValue, TRawValue> {
-  keys?: GenericSuggestionsKeys;
-  id?: string;
-  suggestions?: Array<string | number> | SuggestionHandler;
-  complete?: CompleteHandler;
-  files?: boolean | RegExp;
-  list?: boolean;
-  info?: boolean;
-  listPointer: string;
-  maxRows: number;
+interface LocalStorage {
+  getItem(key: string): string | null;
+  removeItem(key: string): void;
+  setItem(key: string, value: string): void;
 }
 
 const sep = Deno.build.os === "windows" ? "\\" : "/";
@@ -76,8 +61,8 @@ const sep = Deno.build.os === "windows" ? "\\" : "/";
 export abstract class GenericSuggestions<
   TValue,
   TRawValue,
-  TSettings extends GenericSuggestionsSettings<TValue, TRawValue>,
-> extends GenericInput<TValue, TRawValue, TSettings> {
+  TOptions extends GenericSuggestionsOptions<TValue, TRawValue>,
+> extends GenericInput<TValue, TRawValue, TOptions> {
   protected suggestionsIndex = -1;
   protected suggestionsOffset = 0;
   protected suggestions: Array<string | number> = [];
@@ -85,18 +70,20 @@ export abstract class GenericSuggestions<
 
   /**
    * Prompt constructor.
-   * @param settings Prompt settings.
+   * @param options Prompt settings.
    */
-  protected constructor(settings: TSettings) {
+  protected constructor(options: TOptions) {
     super({
-      ...settings,
+      listPointer: blue(Figures.POINTER),
+      maxRows: 8,
+      ...options,
       keys: {
         complete: ["tab"],
         next: ["up"],
         previous: ["down"],
         nextPage: ["pageup"],
         previousPage: ["pagedown"],
-        ...(settings.keys ?? {}),
+        ...(options.keys ?? {}),
       },
     });
   }
@@ -261,7 +248,7 @@ export abstract class GenericSuggestions<
       ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
     );
 
-    let info = this.settings.indent;
+    let info = this.settings.indent ?? "";
     if (this.suggestions.length) {
       info += blue(Figures.INFO) + bold(` ${selected}/${matched} `);
     }
@@ -306,7 +293,9 @@ export abstract class GenericSuggestions<
     isSelected?: boolean,
   ): string {
     let line = this.settings.indent ?? "";
-    line += isSelected ? `${this.settings.listPointer} ` : "  ";
+    line += isSelected && this.settings.listPointer
+      ? `${this.settings.listPointer} `
+      : "  ";
     if (isSelected) {
       line += underline(this.highlight(value));
     } else {

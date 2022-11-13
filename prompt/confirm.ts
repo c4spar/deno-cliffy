@@ -3,12 +3,8 @@ import {
   GenericSuggestions,
   GenericSuggestionsKeys,
   GenericSuggestionsOptions,
-  GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-export type ConfirmKeys = GenericSuggestionsKeys;
+import { dim } from "./deps.ts";
 
 type UnsupportedOptions =
   | "files"
@@ -18,23 +14,24 @@ type UnsupportedOptions =
   | "info";
 
 /** Confirm prompt options. */
-export interface ConfirmOptions
-  extends Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedOptions> {
+export type ConfirmOptions = Omit<ConfirmBaseOptions, UnsupportedOptions>;
+
+/** Confirm prompt options. */
+export interface ConfirmBaseOptions
+  extends GenericSuggestionsOptions<boolean, string> {
   active?: string;
   inactive?: string;
   keys?: ConfirmKeys;
 }
 
-/** Confirm prompt settings. */
-interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
-  active: string;
-  inactive: string;
-  keys?: ConfirmKeys;
-}
+export type ConfirmKeys = GenericSuggestionsKeys;
 
 /** Confirm prompt representation. */
 export class Confirm
-  extends GenericSuggestions<boolean, string, ConfirmSettings> {
+  extends GenericSuggestions<boolean, string, ConfirmBaseOptions> {
+  private readonly active: string;
+  private readonly inactive: string;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(
     options: string | ConfirmOptions,
@@ -43,14 +40,11 @@ export class Confirm
       options = { message: options };
     }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      active: "Yes",
-      inactive: "No",
+    return new this(options).prompt();
+  }
+
+  constructor(options: ConfirmOptions) {
+    super({
       ...options,
       files: false,
       complete: undefined,
@@ -60,7 +54,9 @@ export class Confirm
       ],
       list: false,
       info: false,
-    }).prompt();
+    });
+    this.active = this.settings.active || "Yes";
+    this.inactive = this.settings.inactive || "No";
   }
 
   /**
@@ -75,14 +71,14 @@ export class Confirm
     let defaultMessage = "";
 
     if (this.settings.default === true) {
-      defaultMessage += this.settings.active[0].toUpperCase() + "/" +
-        this.settings.inactive[0].toLowerCase();
+      defaultMessage += this.active[0].toUpperCase() + "/" +
+        this.inactive[0].toLowerCase();
     } else if (this.settings.default === false) {
-      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
-        this.settings.inactive[0].toUpperCase();
+      defaultMessage += this.active[0].toLowerCase() + "/" +
+        this.inactive[0].toUpperCase();
     } else {
-      defaultMessage += this.settings.active[0].toLowerCase() + "/" +
-        this.settings.inactive[0].toLowerCase();
+      defaultMessage += this.active[0].toLowerCase() + "/" +
+        this.inactive[0].toLowerCase();
     }
 
     return defaultMessage ? dim(` (${defaultMessage})`) : "";
@@ -93,7 +89,7 @@ export class Confirm
     return super.success(value);
   }
 
-  /** Get input input. */
+  /** Get input value. */
   protected getValue(): string {
     return this.inputValue;
   }
@@ -106,10 +102,10 @@ export class Confirm
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       [
-          this.settings.active[0].toLowerCase(),
-          this.settings.active.toLowerCase(),
-          this.settings.inactive[0].toLowerCase(),
-          this.settings.inactive.toLowerCase(),
+          this.active[0].toLowerCase(),
+          this.active.toLowerCase(),
+          this.inactive[0].toLowerCase(),
+          this.inactive.toLowerCase(),
         ].indexOf(value.toLowerCase()) !== -1;
   }
 
@@ -120,11 +116,11 @@ export class Confirm
    */
   protected transform(value: string): boolean | undefined {
     switch (value.toLowerCase()) {
-      case this.settings.active[0].toLowerCase():
-      case this.settings.active.toLowerCase():
+      case this.active[0].toLowerCase():
+      case this.active.toLowerCase():
         return true;
-      case this.settings.inactive[0].toLowerCase():
-      case this.settings.inactive.toLowerCase():
+      case this.inactive[0].toLowerCase():
+      case this.inactive.toLowerCase():
         return false;
     }
     return;
@@ -135,6 +131,6 @@ export class Confirm
    * @param value Output value.
    */
   protected format(value: boolean): string {
-    return value ? this.settings.active : this.settings.inactive;
+    return value ? this.active : this.inactive;
   }
 }

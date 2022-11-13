@@ -1,15 +1,28 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
-import { blue, bold, dim, green, italic, red, stripColor } from "./deps.ts";
+import {
+  blue,
+  bold,
+  dim,
+  green,
+  italic,
+  red,
+  stripColor,
+  yellow,
+} from "./deps.ts";
 import { Figures } from "./figures.ts";
 
-/** Prompt validation return tape. */
-export type ValidateResult = string | boolean | Promise<string | boolean>;
+/** Static generic prompt interface. */
+export interface StaticGenericPrompt<
+  TValue,
+  TRawValue,
+  TOptions extends GenericPromptOptions<TValue, TRawValue>,
+  TPrompt extends GenericPrompt<TValue, TRawValue, TOptions>,
+> {
+  inject?(value: TValue): void;
 
-/** Input keys options. */
-export interface GenericPromptKeys {
-  submit?: Array<string>;
+  prompt(options: TOptions): Promise<TValue>;
 }
 
 /** Generic prompt options. */
@@ -27,37 +40,23 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   prefix?: string;
 }
 
-/** Generic prompt settings. */
-export interface GenericPromptSettings<TValue, TRawValue>
-  extends GenericPromptOptions<TValue, TRawValue> {
-  pointer: string;
-  indent: string;
-  prefix: string;
-}
+/** Prompt validation return tape. */
+export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-/** Static generic prompt interface. */
-export interface StaticGenericPrompt<
-  TValue,
-  TRawValue,
-  TOptions extends GenericPromptOptions<TValue, TRawValue>,
-  TSettings extends GenericPromptSettings<TValue, TRawValue>,
-  TPrompt extends GenericPrompt<TValue, TRawValue, TSettings>,
-> {
-  inject?(value: TValue): void;
-
-  prompt(options: TOptions): Promise<TValue>;
+/** Input keys options. */
+export interface GenericPromptKeys {
+  submit?: Array<string>;
 }
 
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   TValue,
   TRawValue,
-  TSettings extends GenericPromptSettings<TValue, TRawValue>,
+  TOptions extends GenericPromptOptions<TValue, TRawValue>,
 > {
   protected static injectedValue: unknown | undefined;
-  protected readonly settings: TSettings;
+  protected readonly settings: TOptions;
   protected readonly tty = tty;
-  protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
@@ -75,15 +74,17 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected constructor(settings: TSettings) {
+  protected constructor(options: TOptions) {
     this.settings = {
-      ...settings,
+      pointer: blue(Figures.POINTER_SMALL),
+      prefix: yellow("? "),
+      indent: " ",
+      ...options,
       keys: {
         submit: ["enter", "return"],
-        ...(settings.keys ?? {}),
+        ...(options.keys ?? {}),
       },
     };
-    this.indent = this.settings.indent ?? " ";
   }
 
   /** Execute the prompt and show cursor on end. */
@@ -104,7 +105,7 @@ export abstract class GenericPrompt<
   #execute = async (): Promise<TValue> => {
     // Throw errors on unit tests.
     if (typeof GenericPrompt.injectedValue !== "undefined" && this.#lastError) {
-      throw new Error(await this.error());
+      throw new Error(this.error());
     }
 
     await this.render();
@@ -197,7 +198,7 @@ export abstract class GenericPrompt<
   }
 
   protected message(): string {
-    return `${this.settings.indent}${this.settings.prefix}` +
+    return `${this.settings.indent ?? ""}${this.settings.prefix ?? ""}` +
       bold(this.settings.message) + this.defaults();
   }
 
@@ -211,11 +212,14 @@ export abstract class GenericPrompt<
     return defaultMessage;
   }
 
+  protected pointer(): string {
+    return this.settings.pointer ? ` ${this.settings.pointer}` : "";
+  }
+
   /** Get prompt success message. */
   protected success(value: TValue): string | undefined {
-    return `${this.settings.indent}${this.settings.prefix}` +
-      bold(this.settings.message) + this.defaults() +
-      " " + this.settings.pointer +
+    return `${this.settings.indent ?? ""}${this.settings.prefix ?? ""}` +
+      bold(this.settings.message) + this.defaults() + this.pointer() +
       " " + green(this.format(value));
   }
 
@@ -227,13 +231,14 @@ export abstract class GenericPrompt<
 
   protected error(): string | undefined {
     return this.#lastError
-      ? this.settings.indent + red(bold(`${Figures.CROSS} `) + this.#lastError)
+      ? (this.settings.indent ?? "") +
+        red(bold(`${Figures.CROSS} `) + this.#lastError)
       : undefined;
   }
 
   protected hint(): string | undefined {
     return this.settings.hint
-      ? this.settings.indent +
+      ? (this.settings.indent ?? "") +
         italic(blue(dim(`${Figures.POINTER} `) + this.settings.hint))
       : undefined;
   }

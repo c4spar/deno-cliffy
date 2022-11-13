@@ -4,23 +4,17 @@ import {
   GenericSuggestions,
   GenericSuggestionsKeys,
   GenericSuggestionsOptions,
-  GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
-import { blue, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-/** Number key options. */
-export interface NumberKeys extends GenericSuggestionsKeys {
-  increaseValue?: string[];
-  decreaseValue?: string[];
-}
 
 type UnsupportedOptions = "files";
 
 /** Number prompt options. */
-export interface NumberOptions
-  extends Omit<GenericSuggestionsOptions<number, string>, UnsupportedOptions> {
+export type NumberOptions = Omit<NumberBaseOptions, UnsupportedOptions>;
+
+/** Number prompt options. */
+export interface NumberBaseOptions
+  extends GenericSuggestionsOptions<number, string> {
   min?: number;
   max?: number;
   float?: boolean;
@@ -28,33 +22,28 @@ export interface NumberOptions
   keys?: NumberKeys;
 }
 
-/** Number prompt settings. */
-interface NumberSettings extends GenericSuggestionsSettings<number, string> {
-  min: number;
-  max: number;
-  float: boolean;
-  round: number;
-  keys?: NumberKeys;
+/** Number key options. */
+export interface NumberKeys extends GenericSuggestionsKeys {
+  increaseValue?: string[];
+  decreaseValue?: string[];
 }
 
 /** Number prompt representation. */
-export class Number extends GenericSuggestions<number, string, NumberSettings> {
+export class Number
+  extends GenericSuggestions<number, string, NumberBaseOptions> {
+  readonly #round: number;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | NumberOptions): Promise<number> {
     if (typeof options === "string") {
       options = { message: options };
     }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      min: -Infinity,
-      max: Infinity,
-      float: false,
-      round: 2,
+    return new this(options).prompt();
+  }
+
+  constructor(options: NumberOptions) {
+    super({
       ...options,
       files: false,
       keys: {
@@ -62,7 +51,8 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
         decreaseValue: ["down", "d", "-"],
         ...(options.keys ?? {}),
       },
-    }).prompt();
+    });
+    this.#round = this.settings.round ?? 2;
   }
 
   /**
@@ -202,11 +192,11 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
 
     const val: number = parseFloat(value);
 
-    if (val > this.settings.max) {
+    if (this.settings.max !== undefined && val > this.settings.max) {
       return `Value must be lower or equal than ${this.settings.max}`;
     }
 
-    if (val < this.settings.min) {
+    if (this.settings.min !== undefined && val < this.settings.min) {
       return `Value must be greater or equal than ${this.settings.min}`;
     }
 
@@ -222,7 +212,7 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
     const val: number = parseFloat(value);
 
     if (this.settings.float) {
-      return parseFloat(val.toFixed(this.settings.round));
+      return parseFloat(val.toFixed(this.#round));
     }
 
     return val;
@@ -236,7 +226,7 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
     return value.toString();
   }
 
-  /** Get input input. */
+  /** Get input value. */
   protected getValue(): string {
     return this.inputValue;
   }

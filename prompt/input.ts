@@ -3,12 +3,8 @@ import {
   GenericSuggestions,
   GenericSuggestionsKeys,
   GenericSuggestionsOptions,
-  GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, normalize, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-export type InputKeys = GenericSuggestionsKeys;
+import { normalize } from "./deps.ts";
 
 /** Input prompt options. */
 export interface InputOptions
@@ -18,31 +14,17 @@ export interface InputOptions
   keys?: InputKeys;
 }
 
-/** Input prompt settings. */
-interface InputSettings extends GenericSuggestionsSettings<string, string> {
-  minLength: number;
-  maxLength: number;
-  keys?: InputKeys;
-}
+export type InputKeys = GenericSuggestionsKeys;
 
 /** Input prompt representation. */
-export class Input extends GenericSuggestions<string, string, InputSettings> {
+export class Input extends GenericSuggestions<string, string, InputOptions> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | InputOptions): Promise<string> {
     if (typeof options === "string") {
       options = { message: options };
     }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      minLength: 0,
-      maxLength: Infinity,
-      ...options,
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -72,10 +54,10 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
     if (typeof value !== "string") {
       return false;
     }
-    if (value.length < this.settings.minLength) {
+    if (this.settings.minLength && value.length < this.settings.minLength) {
       return `Value must be longer then ${this.settings.minLength} but has a length of ${value.length}.`;
     }
-    if (value.length > this.settings.maxLength) {
+    if (this.settings.maxLength && value.length > this.settings.maxLength) {
       return `Value can't be longer then ${this.settings.maxLength} but has a length of ${value.length}.`;
     }
     return true;

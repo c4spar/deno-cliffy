@@ -1,19 +1,23 @@
 import type { KeyCode } from "../keycode/mod.ts";
-import { blue, dim, green, red, yellow } from "./deps.ts";
+import { dim, green, red } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
   GenericListKeys,
   GenericListOption,
   GenericListOptions,
-  GenericListOptionSettings,
-  GenericListSettings,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
-/** Checkbox key options. */
-export interface CheckboxKeys extends GenericListKeys {
-  check?: string[];
+/** Checkbox prompt options. */
+export interface CheckboxOptions
+  extends GenericListOptions<string[], string[], CheckboxOption> {
+  options: Array<string | CheckboxOption>;
+  check?: string;
+  uncheck?: string;
+  minOptions?: number;
+  maxOptions?: number;
+  keys?: CheckboxKeys;
 }
 
 /** Checkbox option options. */
@@ -22,69 +26,17 @@ export interface CheckboxOption extends GenericListOption {
   icon?: boolean;
 }
 
-/** Checkbox option settings. */
-export interface CheckboxOptionSettings extends GenericListOptionSettings {
-  checked: boolean;
-  icon: boolean;
-}
-
-/** Checkbox options type. */
-export type CheckboxValueOptions = (string | CheckboxOption)[];
-/** Checkbox option settings type. */
-export type CheckboxValueSettings = CheckboxOptionSettings[];
-
-/** Checkbox prompt options. */
-export interface CheckboxOptions
-  extends GenericListOptions<string[], string[]> {
-  options: CheckboxValueOptions;
-  check?: string;
-  uncheck?: string;
-  minOptions?: number;
-  maxOptions?: number;
-  keys?: CheckboxKeys;
-}
-
-/** Checkbox prompt settings. */
-interface CheckboxSettings extends GenericListSettings<string[], string[]> {
-  options: CheckboxValueSettings;
-  check: string;
-  uncheck: string;
-  minOptions: number;
-  maxOptions: number;
-  keys?: CheckboxKeys;
+/** Checkbox key options. */
+export interface CheckboxKeys extends GenericListKeys {
+  check?: string[];
 }
 
 /** Checkbox prompt representation. */
 export class Checkbox
-  extends GenericList<string[], string[], CheckboxSettings> {
-  /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Array of input values.
-   */
-  public static inject(value: string[]): void {
-    GenericPrompt.inject(value);
-  }
-
+  extends GenericList<string[], string[], CheckboxOptions, CheckboxOption> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: CheckboxOptions): Promise<string[]> {
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 10,
-      searchLabel: blue(Figures.SEARCH),
-      minOptions: 0,
-      maxOptions: Infinity,
-      check: green(Figures.TICK),
-      uncheck: red(Figures.CROSS),
-      ...options,
-      keys: {
-        check: ["space"],
-        ...(options.keys ?? {}),
-      },
-      options: Checkbox.mapOptions(options),
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -99,44 +51,70 @@ export class Checkbox
   }
 
   /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Array of input values.
+   */
+  public static inject(value: string[]): void {
+    GenericPrompt.inject(value);
+  }
+
+  constructor(options: CheckboxOptions) {
+    super({
+      check: green(Figures.TICK),
+      uncheck: red(Figures.CROSS),
+      ...options,
+      keys: {
+        check: ["space"],
+        ...(options.keys ?? {}),
+      },
+    });
+  }
+
+  /**
    * Map string option values to options and set option defaults.
    * @param options Checkbox options.
    */
-  protected static mapOptions(options: CheckboxOptions): CheckboxValueSettings {
+  protected mapOptions(
+    options: CheckboxOptions,
+  ): Array<CheckboxOption> {
     return options.options
-      .map((item: string | CheckboxOption) =>
-        typeof item === "string" ? { value: item } : item
+      .map((option: string | CheckboxOption) =>
+        typeof option === "string" ? { value: option } : option
       )
-      .map((item) => ({
-        ...this.mapOption(item),
-        checked: typeof item.checked === "undefined" && options.default &&
-            options.default.indexOf(item.value) !== -1
+      .map((option) => ({
+        ...option,
+        checked: typeof option.checked === "undefined" && options.default &&
+            options.default.indexOf(option.value) !== -1
           ? true
-          : !!item.checked,
-        icon: typeof item.icon === "undefined" ? true : item.icon,
+          : !!option.checked,
+        icon: typeof option.icon === "undefined" ? true : option.icon,
       }));
   }
 
   /**
    * Render checkbox option.
-   * @param item        Checkbox option settings.
+   * @param option        Checkbox option settings.
    * @param isSelected  Set to true if option is selected.
    */
   protected getListItem(
-    item: CheckboxOptionSettings,
+    option: CheckboxOption,
     isSelected?: boolean,
   ): string {
-    let line = this.settings.indent;
+    let line = this.settings.indent ?? "";
 
     // pointer
-    line += isSelected ? this.settings.listPointer + " " : "  ";
+    line += isSelected && this.settings.listPointer
+      ? this.settings.listPointer + " "
+      : "  ";
 
     // icon
-    if (item.icon) {
-      let check = item.checked
-        ? this.settings.check + " "
-        : this.settings.uncheck + " ";
-      if (item.disabled) {
+    if (option.icon) {
+      let check = option.checked
+        ? this.settings.check ? this.settings.check + " " : "  "
+        : this.settings.uncheck
+        ? this.settings.uncheck + " "
+        : "  ";
+      if (option.disabled) {
         check = dim(check);
       }
       line += check;
@@ -146,9 +124,9 @@ export class Checkbox
 
     // value
     line += `${
-      isSelected && !item.disabled
-        ? this.highlight(item.name, (val) => val)
-        : this.highlight(item.name)
+      isSelected && !option.disabled
+        ? this.highlight(option.name || option.value, (val) => val)
+        : this.highlight(option.name || option.value)
     }`;
 
     return line;
@@ -156,9 +134,9 @@ export class Checkbox
 
   /** Get value of checked options. */
   protected getValue(): string[] {
-    return this.settings.options
-      .filter((item) => item.checked)
-      .map((item) => item.value);
+    return this.originalOptions
+      .filter((option) => option.checked)
+      .map((option) => option.value);
   }
 
   /**
@@ -177,11 +155,11 @@ export class Checkbox
 
   /** Check selected option. */
   protected checkValue(): void {
-    const item = this.options[this.listIndex];
-    if (item.disabled) {
+    const option = this.options[this.listIndex];
+    if (option.disabled) {
       this.setErrorMessage("This option is disabled and cannot be changed.");
     } else {
-      item.checked = !item.checked;
+      option.checked = !option.checked;
     }
   }
 
@@ -195,7 +173,7 @@ export class Checkbox
       value.every((val) =>
         typeof val === "string" &&
         val.length > 0 &&
-        this.settings.options.findIndex((option: CheckboxOptionSettings) =>
+        this.originalOptions.findIndex((option: CheckboxOption) =>
             option.value === val
           ) !== -1
       );
@@ -204,10 +182,10 @@ export class Checkbox
       return false;
     }
 
-    if (value.length < this.settings.minOptions) {
+    if (this.settings.minOptions && value.length < this.settings.minOptions) {
       return `The minimum number of options is ${this.settings.minOptions} but got ${value.length}.`;
     }
-    if (value.length > this.settings.maxOptions) {
+    if (this.settings.maxOptions && value.length > this.settings.maxOptions) {
       return `The maximum number of options is ${this.settings.maxOptions} but got ${value.length}.`;
     }
 
@@ -232,3 +210,21 @@ export class Checkbox
       .join(", ");
   }
 }
+
+/**
+ * Checkbox options type.
+ * @deprecated Use `Array<string | CheckboxOption>` instead.
+ */
+export type CheckboxValueOptions = Array<string | CheckboxOption>;
+
+/**
+ * Checkbox option settings type.
+ * @deprecated Use `Array<CheckboxOption>` instead.
+ */
+export type CheckboxValueSettings = Array<CheckboxOption>;
+
+/**
+ * Select option settings.
+ * @deprecated Use `CheckboxOption` instead.
+ */
+export type CheckboxOptionSettings = CheckboxOption;
