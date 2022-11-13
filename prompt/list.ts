@@ -23,6 +23,7 @@ export type ListKeys = GenericSuggestionsKeys;
 /** List prompt representation. */
 export class List extends GenericSuggestions<string[], string, ListOptions> {
   readonly #separator: string;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
     if (typeof options === "string") {
@@ -32,17 +33,17 @@ export class List extends GenericSuggestions<string[], string, ListOptions> {
     return new this(options).prompt();
   }
 
-  constructor(options: ListOptions) {
-    super(options);
-    this.#separator = this.settings.separator ?? ",";
-  }
-
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
    * @param value Input value.
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: ListOptions) {
+    super(options);
+    this.#separator = this.settings.separator ?? ",";
   }
 
   protected input(): string {

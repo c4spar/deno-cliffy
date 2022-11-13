@@ -43,6 +43,14 @@ export class Confirm
     return new this(options).prompt();
   }
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
   constructor(options: ConfirmOptions) {
     super({
       ...options,
@@ -57,14 +65,6 @@ export class Confirm
     });
     this.active = this.settings.active || "Yes";
     this.inactive = this.settings.inactive || "No";
-  }
-
-  /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Input value.
-   */
-  public static inject(value: string): void {
-    GenericPrompt.inject(value);
   }
 
   protected defaults(): string {

@@ -32,8 +32,12 @@ export interface CheckboxKeys extends GenericListKeys {
 }
 
 /** Checkbox prompt representation. */
-export class Checkbox
-  extends GenericList<string[], string[], CheckboxOptions, CheckboxOption> {
+export class Checkbox extends GenericList<
+  string[],
+  string[],
+  CheckboxOptions,
+  CheckboxOption
+> {
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: CheckboxOptions): Promise<string[]> {
     return new this(options).prompt();
@@ -81,7 +85,7 @@ export class Checkbox
       .map((option: string | CheckboxOption) =>
         typeof option === "string" ? { value: option } : option
       )
-      .map((option) => ({
+      .map((option: CheckboxOption) => ({
         ...option,
         checked: typeof option.checked === "undefined" && options.default &&
             options.default.indexOf(option.value) !== -1

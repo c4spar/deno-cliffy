@@ -42,6 +42,14 @@ export class Number
     return new this(options).prompt();
   }
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: string): void {
+    GenericPrompt.inject(value);
+  }
+
   constructor(options: NumberOptions) {
     super({
       ...options,
@@ -53,14 +61,6 @@ export class Number
       },
     });
     this.#round = this.settings.round ?? 2;
-  }
-
-  /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Input value.
-   */
-  public static inject(value: string): void {
-    GenericPrompt.inject(value);
   }
 
   protected success(value: number): string | undefined {

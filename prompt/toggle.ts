@@ -38,6 +38,14 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleOptions> {
     return new this(options).prompt();
   }
 
+  /**
+   * Inject prompt value. Can be used for unit tests or pre selections.
+   * @param value Input value.
+   */
+  public static inject(value: boolean): void {
+    GenericPrompt.injectedValue = value;
+  }
+
   constructor(options: ToggleOptions) {
     super({
       ...options,

@@ -22,6 +22,7 @@ export type SecretKeys = GenericInputKeys;
 /** Secret prompt representation. */
 export class Secret extends GenericInput<string, string, SecretOptions> {
   readonly #label: string;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | SecretOptions): Promise<string> {
     if (typeof options === "string") {
@@ -31,17 +32,17 @@ export class Secret extends GenericInput<string, string, SecretOptions> {
     return new this(options).prompt();
   }
 
-  constructor(options: SecretOptions) {
-    super(options);
-    this.#label = this.settings.label || "Secret";
-  }
-
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
    * @param value Input value.
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: SecretOptions) {
+    super(options);
+    this.#label = this.settings.label || "Secret";
   }
 
   protected input(): string {
