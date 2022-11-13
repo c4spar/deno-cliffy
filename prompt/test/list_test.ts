@@ -52,7 +52,7 @@ Deno.test("prompt list: empty value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Invalid answer.`,
     ),
   );
@@ -71,7 +71,7 @@ Deno.test("prompt list: min length", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Value must be longer then 3 but has a length of 2.`,
     ),
   );
@@ -90,7 +90,7 @@ Deno.test("prompt list: max length", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Value can't be longer then 2 but has a length of 3.`,
     ),
   );
@@ -109,7 +109,7 @@ Deno.test("prompt list: min tags", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }The minimum number of tags is 3 but got 0.`,
     ),
   );
@@ -128,7 +128,7 @@ Deno.test("prompt list: max tags", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }The maximum number of tags is 2 but got 3.`,
     ),
   );
@@ -146,7 +146,7 @@ Deno.test("prompt list: null value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Invalid answer.`,
     ),
   );

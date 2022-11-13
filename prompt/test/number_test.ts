@@ -31,7 +31,7 @@ Deno.test("prompt number: empty value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Invalid answer.`,
     ),
   );
@@ -46,7 +46,7 @@ Deno.test("prompt number: invalid value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Invalid answer.`,
     ),
   );
@@ -62,7 +62,7 @@ Deno.test("prompt number: null value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }Invalid answer.`,
     ),
   );
