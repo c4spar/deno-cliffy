@@ -36,7 +36,7 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
-      indent: " ",
+      indent: "",
       listPointer: blue(Figures.POINTER),
       maxRows: 8,
       minLength: 0,

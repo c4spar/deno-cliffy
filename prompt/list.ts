@@ -43,7 +43,7 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
-      indent: " ",
+      indent: "",
       listPointer: blue(Figures.POINTER),
       maxRows: 8,
       separator: ",",

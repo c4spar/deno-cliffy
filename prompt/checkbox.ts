@@ -70,7 +70,7 @@ export class Checkbox
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
-      indent: " ",
+      indent: "",
       listPointer: blue(Figures.POINTER),
       maxRows: 10,
       searchLabel: blue(Figures.SEARCH),

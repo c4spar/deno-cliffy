@@ -41,7 +41,7 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
     return new this({
       pointer: blue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
-      indent: " ",
+      indent: "",
       label: "Password",
       hidden: false,
       minLength: 0,
