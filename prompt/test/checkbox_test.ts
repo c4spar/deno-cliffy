@@ -33,9 +33,7 @@ Deno.test("prompt checkbox: invalid value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -53,9 +51,7 @@ Deno.test("prompt checkbox: null value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

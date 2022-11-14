@@ -38,9 +38,7 @@ Deno.test("prompt confirm: empty value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -54,9 +52,7 @@ Deno.test("prompt confirm: invalid value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -71,9 +67,7 @@ Deno.test("prompt confirm: null value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
