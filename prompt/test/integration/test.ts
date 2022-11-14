@@ -16,9 +16,12 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
     Deno.test({
       name: `prompt - integration - ${name}`,
       ignore: lt(Deno.version.deno, "1.10.0"),
-      async fn(ctx) {
+      async fn(t) {
         const output: string = await runPrompt(file);
-        await assertSnapshot(ctx, output);
+        const os = Deno.build.os === "windows" ? ".windows" : "";
+        await assertSnapshot(t, output, {
+          path: `__snapshots__/test.ts${os}.snap`,
+        });
       },
     });
   }
