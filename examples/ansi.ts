@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --unstable
 
 import { colors, tty } from "../ansi/mod.ts";
-import { delay } from "https://deno.land/std@0.158.0/async/delay.ts";
+import { delay } from "https://deno.land/std@0.161.0/async/delay.ts";
 
 const error = colors.bold.red;
 const warn = colors.bold.yellow;

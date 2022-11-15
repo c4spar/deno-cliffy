@@ -43,8 +43,8 @@ export type CompleteHandler = (
 ) => Promise<string> | string;
 
 /** Generic input prompt options. */
-export interface GenericSuggestionsOptions<T, V>
-  extends GenericInputPromptOptions<T, V> {
+export interface GenericSuggestionsOptions<TValue, TRawValue>
+  extends GenericInputPromptOptions<TValue, TRawValue> {
   keys?: GenericSuggestionsKeys;
   id?: string;
   suggestions?: Array<string | number> | SuggestionHandler;
@@ -57,8 +57,8 @@ export interface GenericSuggestionsOptions<T, V>
 }
 
 /** Generic input prompt settings. */
-export interface GenericSuggestionsSettings<T, V>
-  extends GenericInputPromptSettings<T, V> {
+export interface GenericSuggestionsSettings<TValue, TRawValue>
+  extends GenericInputPromptSettings<TValue, TRawValue> {
   keys?: GenericSuggestionsKeys;
   id?: string;
   suggestions?: Array<string | number> | SuggestionHandler;
@@ -74,10 +74,10 @@ const sep = Deno.build.os === "windows" ? "\\" : "/";
 
 /** Generic input prompt representation. */
 export abstract class GenericSuggestions<
-  T,
-  V,
-  S extends GenericSuggestionsSettings<T, V>,
-> extends GenericInput<T, V, S> {
+  TValue,
+  TRawValue,
+  TSettings extends GenericSuggestionsSettings<TValue, TRawValue>,
+> extends GenericInput<TValue, TRawValue, TSettings> {
   protected suggestionsIndex = -1;
   protected suggestionsOffset = 0;
   protected suggestions: Array<string | number> = [];
@@ -87,7 +87,7 @@ export abstract class GenericSuggestions<
    * Prompt constructor.
    * @param settings Prompt settings.
    */
-  protected constructor(settings: S) {
+  protected constructor(settings: TSettings) {
     super({
       ...settings,
       keys: {

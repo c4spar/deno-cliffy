@@ -13,12 +13,12 @@ export interface GenericPromptKeys {
 }
 
 /** Generic prompt options. */
-export interface GenericPromptOptions<T, V> {
+export interface GenericPromptOptions<TValue, TRawValue> {
   message: string;
-  default?: T;
+  default?: TValue;
   hideDefault?: boolean;
-  validate?: (value: V) => ValidateResult;
-  transform?: (value: V) => T | undefined;
+  validate?: (value: TRawValue) => ValidateResult;
+  transform?: (value: TRawValue) => TValue | undefined;
   hint?: string;
   pointer?: string;
   indent?: string;
@@ -28,8 +28,8 @@ export interface GenericPromptOptions<T, V> {
 }
 
 /** Generic prompt settings. */
-export interface GenericPromptSettings<T, V>
-  extends GenericPromptOptions<T, V> {
+export interface GenericPromptSettings<TValue, TRawValue>
+  extends GenericPromptOptions<TValue, TRawValue> {
   pointer: string;
   indent: string;
   prefix: string;
@@ -37,32 +37,32 @@ export interface GenericPromptSettings<T, V>
 
 /** Static generic prompt interface. */
 export interface StaticGenericPrompt<
-  T,
-  V,
-  O extends GenericPromptOptions<T, V>,
-  S extends GenericPromptSettings<T, V>,
-  P extends GenericPrompt<T, V, S>,
+  TValue,
+  TRawValue,
+  TOptions extends GenericPromptOptions<TValue, TRawValue>,
+  TSettings extends GenericPromptSettings<TValue, TRawValue>,
+  TPrompt extends GenericPrompt<TValue, TRawValue, TSettings>,
 > {
-  inject?(value: T): void;
+  inject?(value: TValue): void;
 
-  prompt(options: O): Promise<T>;
+  prompt(options: TOptions): Promise<TValue>;
 }
 
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
-  T,
-  V,
-  S extends GenericPromptSettings<T, V>,
+  TValue,
+  TRawValue,
+  TSettings extends GenericPromptSettings<TValue, TRawValue>,
 > {
   protected static injectedValue: unknown | undefined;
-  protected readonly settings: S;
+  protected readonly settings: TSettings;
   protected readonly tty = tty;
   protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
   };
-  #value: T | undefined;
+  #value: TValue | undefined;
   #lastError: string | undefined;
   #isFirstRun = true;
   #encoder = new TextEncoder();
@@ -75,7 +75,7 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected constructor(settings: S) {
+  protected constructor(settings: TSettings) {
     this.settings = {
       ...settings,
       keys: {
@@ -87,7 +87,7 @@ export abstract class GenericPrompt<
   }
 
   /** Execute the prompt and show cursor on end. */
-  public async prompt(): Promise<T> {
+  public async prompt(): Promise<TValue> {
     try {
       return await this.#execute();
     } finally {
@@ -101,7 +101,7 @@ export abstract class GenericPrompt<
   }
 
   /** Execute the prompt. */
-  #execute = async (): Promise<T> => {
+  #execute = async (): Promise<TValue> => {
     // Throw errors on unit tests.
     if (typeof GenericPrompt.injectedValue !== "undefined" && this.#lastError) {
       throw new Error(await this.error());
@@ -175,7 +175,7 @@ export abstract class GenericPrompt<
   /** Read user input from stdin, handle events and validate user input. */
   protected async read(): Promise<boolean> {
     if (typeof GenericPrompt.injectedValue !== "undefined") {
-      const value: V = GenericPrompt.injectedValue as V;
+      const value: TRawValue = GenericPrompt.injectedValue as TRawValue;
       await this.#validateValue(value);
     } else {
       const events: Array<KeyCode> = await this.#readKey();
@@ -212,7 +212,7 @@ export abstract class GenericPrompt<
   }
 
   /** Get prompt success message. */
-  protected success(value: T): string | undefined {
+  protected success(value: TValue): string | undefined {
     return `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) + this.defaults() +
       " " + this.settings.pointer +
@@ -264,23 +264,23 @@ export abstract class GenericPrompt<
    * @param value Input value.
    * @return Output value.
    */
-  protected abstract transform(value: V): T | undefined;
+  protected abstract transform(value: TRawValue): TValue | undefined;
 
   /**
    * Validate input value.
    * @param value User input value.
    * @return True on success, false or error message on error.
    */
-  protected abstract validate(value: V): ValidateResult;
+  protected abstract validate(value: TRawValue): ValidateResult;
 
   /**
    * Format output value.
    * @param value Output value.
    */
-  protected abstract format(value: T): string;
+  protected abstract format(value: TValue): string;
 
   /** Get input value. */
-  protected abstract getValue(): V;
+  protected abstract getValue(): TRawValue;
 
   /** Read user input from stdin and pars ansi codes. */
   #readKey = async (): Promise<Array<KeyCode>> => {
@@ -320,7 +320,7 @@ export abstract class GenericPrompt<
    * from the prompt will be executed.
    * @param value The value to transform.
    */
-  #transformValue = (value: V): T | undefined => {
+  #transformValue = (value: TRawValue): TValue | undefined => {
     return this.settings.transform
       ? this.settings.transform(value)
       : this.transform(value);
@@ -336,7 +336,7 @@ export abstract class GenericPrompt<
    * executed.
    * @param value The value to validate.
    */
-  #validateValue = async (value: V): Promise<void> => {
+  #validateValue = async (value: TRawValue): Promise<void> => {
     if (!value && typeof this.settings.default !== "undefined") {
       this.#value = this.settings.default;
       return;
@@ -365,9 +365,9 @@ export abstract class GenericPrompt<
    * @param name  Key name.
    * @param event Key event.
    */
-  protected isKey<K extends unknown, N extends keyof K>(
-    keys: K | undefined,
-    name: N,
+  protected isKey<TKey extends unknown, TName extends keyof TKey>(
+    keys: TKey | undefined,
+    name: TName,
     event: KeyCode,
   ): boolean {
     // deno-lint-ignore no-explicit-any
@@ -388,7 +388,10 @@ type setRaw = (
 
 function getColumns(): number | null {
   try {
-    return Deno.consoleSize(Deno.stdout.rid).columns;
+    // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
+    // And keep backwards compatibility for deno < 1.27.0.
+    // deno-lint-ignore no-explicit-any
+    return (Deno as any).consoleSize(Deno.stdout.rid).columns;
   } catch (_error) {
     return null;
   }

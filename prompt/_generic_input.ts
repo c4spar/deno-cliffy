@@ -16,23 +16,23 @@ export interface GenericInputKeys extends GenericPromptKeys {
 }
 
 /** Generic input prompt options. */
-export interface GenericInputPromptOptions<T, V>
-  extends GenericPromptOptions<T, V> {
+export interface GenericInputPromptOptions<TValue, TRawValue>
+  extends GenericPromptOptions<TValue, TRawValue> {
   keys?: GenericInputKeys;
 }
 
 /** Generic input prompt settings. */
-export interface GenericInputPromptSettings<T, V>
-  extends GenericPromptSettings<T, V> {
+export interface GenericInputPromptSettings<TValue, TRawValue>
+  extends GenericPromptSettings<TValue, TRawValue> {
   keys?: GenericInputKeys;
 }
 
 /** Generic input prompt representation. */
 export abstract class GenericInput<
-  T,
-  V,
-  S extends GenericInputPromptSettings<T, V>,
-> extends GenericPrompt<T, V, S> {
+  TValue,
+  TRawValue,
+  TSettings extends GenericInputPromptSettings<TValue, TRawValue>,
+> extends GenericPrompt<TValue, TRawValue, TSettings> {
   protected inputValue = "";
   protected inputIndex = 0;
 
@@ -40,7 +40,7 @@ export abstract class GenericInput<
    * Prompt constructor.
    * @param settings Prompt settings.
    */
-  protected constructor(settings: S) {
+  protected constructor(settings: TSettings) {
     super({
       ...settings,
       keys: {

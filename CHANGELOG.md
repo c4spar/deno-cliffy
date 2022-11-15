@@ -1,3 +1,101 @@
+# [v0.25.4](https://github.com/c4spar/deno-cliffy/compare/v0.25.3...v0.25.4) (Oct 27, 2022)
+
+### Bug Fixes
+
+- remove no longer existing `validateFlags` export from `cliffy/mod.ts` (#485)
+  ([22938a8](https://github.com/c4spar/deno-cliffy/commit/22938a8))
+- **prompt:** add support for stabilized `Deno.consoleSize()` (#484)
+  ([096bb00](https://github.com/c4spar/deno-cliffy/commit/096bb00))
+
+### Chore
+
+- **upgrade:** deno/std@0.161.0 (#486)
+  ([cf15791](https://github.com/c4spar/deno-cliffy/commit/cf15791))
+
+# [v0.25.3](https://github.com/c4spar/deno-cliffy/compare/v0.25.2...v0.25.3) (Oct 26, 2022)
+
+### DEPRECATIONS
+
+- **command:** rename some types and deprecate old types (#474)
+  ([d56ad88](https://github.com/c4spar/deno-cliffy/commit/d56ad88))
+
+  The following types have been deprecated and renamed:
+
+  - `IArgument` -> `Argument`
+  - `ICommandGlobalOption` -> `GlobalOptionOptions`
+  - `ICommandOption` -> `OptionOptions`
+  - `ICompleteOptions` -> `CompleteOptions`
+  - `ICompletion` -> `Completion`
+  - `IEnvVar` -> `EnvVar`
+  - `IEnvVarOptions` -> `EnvVarOptions`
+  - `IExample` -> `Example`
+  - `IGlobalEnvVarOptions` -> `GlobalEnvVarOptions`
+  - `IOption` -> `Option`
+  - `IParseResult` -> `CommandResult`
+  - `IType` -> `TypeDef`
+  - `ITypeOptions` -> `TypeOptions`
+  - `IAction` -> `ActionHandler`
+  - `ICompleteHandler` -> `CompleteHandler`
+  - `IDescription` -> `Description`
+  - `IEnvVarValueHandler` -> `EnvVarValueHandler`
+  - `IFlagValueHandler` -> `OptionValueHandler`
+  - `IHelpHandler` -> `HelpHandler`
+  - `IVersionHandler` -> `VersionHandler`
+  - `TypeValue` -> `Type.infer`
+
+- **flags:** rename some types and deprecate old types (#473)
+  ([7615ed7](https://github.com/c4spar/deno-cliffy/commit/7615ed7))
+
+  The following types have been deprecated and renamed:
+
+  - `IParseOptions` -> `ParseFlagsOptions`
+  - `IFlagOptions` -> `FlagOptions`
+  - `IFlagArgument` -> `ArgumentOptions`
+  - `IDefaultValue` -> `DefaultValue`
+  - `IFlagValueHandler` -> `ValueHandler`
+  - `IFlagsResult` -> `ParseFlagsContext`
+  - `ITypeInfo` -> `ArgumentValue`
+  - `ITypeHandler` -> `TypeHandler`
+  - `OptionType` -> `ArgumentType`
+
+### Bug Fixes
+
+- **command:** remove duplicate "Missing argument" in error message (#471)
+  ([ee52235](https://github.com/c4spar/deno-cliffy/commit/ee52235))
+- **command:** escape single quotes in command description for zsh completions
+  (#467) ([0b82722](https://github.com/c4spar/deno-cliffy/commit/0b82722))
+- **command,flags:** value gets ignored if value of an option with an equals
+  sign starts with a dash (#477)
+  ([517795a](https://github.com/c4spar/deno-cliffy/commit/517795a))
+- **flags:** value of combined short flags with equals sign is assigned to wrong
+  option (#479)
+  ([dc29ab5](https://github.com/c4spar/deno-cliffy/commit/dc29ab5))
+- **flags:** `equalsSign` option not working with `type` option (#476)
+  ([08e7465](https://github.com/c4spar/deno-cliffy/commit/08e7465))
+
+### Code Refactoring
+
+- **command:** export `CommandType` and `IntegerType` (#478)
+  ([22b8999](https://github.com/c4spar/deno-cliffy/commit/22b8999))
+- **command:** use full names for generic parameters (#475)
+  ([d93d2e0](https://github.com/c4spar/deno-cliffy/commit/d93d2e0))
+- **command,flags:** rename errors (#470)
+  ([eb046b2](https://github.com/c4spar/deno-cliffy/commit/eb046b2))
+- **flags:** refactor arguments parsing (#480)
+  ([273dd41](https://github.com/c4spar/deno-cliffy/commit/273dd41))
+
+### Chore
+
+- **task:** add MAX_PARALLEL env var to check:examples task (#472)
+  ([fd74ce1](https://github.com/c4spar/deno-cliffy/commit/fd74ce1))
+- **upgrade:** deno/std@0.160.0 (#481)
+  ([1242ec9](https://github.com/c4spar/deno-cliffy/commit/1242ec9))
+
+### Documentation Updates
+
+- update readme
+  ([3e96df1](https://github.com/c4spar/deno-cliffy/commit/3e96df1))
+
 # [v0.25.2](https://github.com/c4spar/deno-cliffy/compare/v0.25.1...v0.25.2) (Oct 1, 2022)
 
 ### Features
