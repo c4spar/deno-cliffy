@@ -13,7 +13,7 @@ const { options } = await new Command()
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
   // Option with required number value.
   .option("-a, --amount <amount:integer>", "Pieces of pizza.")
-  // One required and one optional command arguemnt.
+  // One required and one optional command argument.
   .arguments("<input:string> [output:string]")
   .parse(Deno.args);
 

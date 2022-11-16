@@ -3,7 +3,7 @@ import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
-const options = <ParseFlagsOptions> {
+const options: ParseFlagsOptions = {
   allowEmpty: false,
   flags: [{
     name: "optional",
@@ -33,13 +33,13 @@ const options = <ParseFlagsOptions> {
       type: OptionType.NUMBER,
     }, {
       type: OptionType.STRING,
-      optionalValue: false,
+      optional: false,
     }, {
       type: OptionType.STRING,
-      optionalValue: true,
+      optional: true,
     }, {
       type: OptionType.BOOLEAN,
-      optionalValue: true,
+      optional: true,
       variadic: true,
     }],
   }],

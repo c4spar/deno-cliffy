@@ -197,14 +197,14 @@ function _${replaceSpecialChars(path)}() {` +
             for (let i = 0; i < 5; i++) {
               args.push(
                 `${argIndex + i}${
-                  arg.optionalValue ? "::" : ":"
+                  arg.optional ? "::" : ":"
                 }${arg.name}:${fileCompletions}`,
               );
             }
           } else {
             args.push(
               `${++argIndex}${
-                arg.optionalValue ? "::" : ":"
+                arg.optional ? "::" : ":"
               }${arg.name}:${fileCompletions}`,
             );
           }
@@ -213,7 +213,7 @@ function _${replaceSpecialChars(path)}() {` +
           const action = this.addAction(arg, completionsPath);
           args.push(
             `${++argIndex}${
-              arg.optionalValue ? "::" : ":"
+              arg.optional ? "::" : ":"
             }${arg.name}:->${action.name}`,
           );
         }
@@ -271,12 +271,10 @@ function _${replaceSpecialChars(path)}() {` +
       const type = command.getType(arg.type);
       if (type && type.handler instanceof FileType) {
         const fileCompletions = this.getFileCompletions(type);
-        args += `${
-          arg.optionalValue ? "::" : ":"
-        }${arg.name}:${fileCompletions}`;
+        args += `${arg.optional ? "::" : ":"}${arg.name}:${fileCompletions}`;
       } else {
         const action = this.addAction(arg, completionsPath);
-        args += `${arg.optionalValue ? "::" : ":"}${arg.name}:->${action.name}`;
+        args += `${arg.optional ? "::" : ":"}${arg.name}:->${action.name}`;
       }
     }
 

@@ -3,7 +3,7 @@ import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
-const options = <ParseFlagsOptions> {
+const options: ParseFlagsOptions = {
   allowEmpty: true,
   flags: [{
     name: "boolean",
@@ -132,6 +132,7 @@ Deno.test("[flags] should ignore defaults", () => {
 });
 
 Deno.test("[flags] should parse from context", () => {
+  console.log();
   const { flags, unknown, literal } = parseFlags({
     flags: { bar: true },
     unknown: ["--foo"],
