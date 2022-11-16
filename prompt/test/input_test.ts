@@ -43,7 +43,7 @@ Deno.test("prompt input: empty value", async () => {
     red(
       `${
         Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Value must be longer then 8 but has a length of 0.`,
+      }Value must be longer than 8 but has a length of 0.`,
     ),
   );
 });
