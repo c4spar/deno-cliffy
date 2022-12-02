@@ -2058,6 +2058,10 @@ export class Command<
    * @param error Error to handle.
    */
   protected throw(error: Error): never {
+    if (error instanceof ValidationError) {
+      error.cmd = this as unknown as Command;
+    }
+
     this.getErrorHandler()?.(error, this as unknown as Command);
 
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
