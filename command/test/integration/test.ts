@@ -91,7 +91,7 @@ describe({
       await assertSnapshot(t, output);
     });
 
-    it("should print error message for validation error", async (t) => {
+    it("should print help and error message when validation error is thrown", async (t) => {
       const output: string = await runCommand("validation-error", true);
       await assertSnapshot(t, output);
     });

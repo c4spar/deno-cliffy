@@ -1,4 +1,9 @@
-import { Command, CompletionsCommand, HelpCommand, ValidationError } from "../../mod.ts";
+import {
+  Command,
+  CompletionsCommand,
+  HelpCommand,
+  ValidationError,
+} from "../../mod.ts";
 import { EnumType } from "../../types/enum.ts";
 
 const cmd = new Command()
