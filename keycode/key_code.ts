@@ -13,6 +13,8 @@ export interface KeyCode {
   ctrl?: boolean;
   meta?: boolean;
   shift?: boolean;
+  specialKey?: boolean;
+  char?: string;
 }
 
 /**
@@ -76,6 +78,7 @@ export function parse(data: Uint8Array | string): KeyCode[] {
 
     const key: KeyCode = {
       name: undefined,
+      char: undefined,
       sequence: undefined,
       code: undefined,
       ctrl: false,
@@ -214,26 +217,29 @@ export function parse(data: Uint8Array | string): KeyCode[] {
         ch.charCodeAt(0) + "a".charCodeAt(0) - 1,
       );
       key.ctrl = true;
+
+      key.char = key.name;
     } else if (/^[0-9A-Za-z]$/.test(ch)) {
       // Letter, number, shift+letter
       key.name = ch.toLowerCase();
       key.shift = /^[A-Z]$/.test(ch);
       key.meta = escaped;
+      key.char = ch;
     } else if (escaped) {
       // Escape sequence timeout
       key.name = ch.length ? undefined : "escape";
       key.meta = true;
+    } else {
+      key.name = ch;
+      key.char = ch;
     }
 
     key.sequence = s;
 
-    if (s.length !== 0 && (key.name !== undefined || escaped)) {
-      /* Named character or sequence */
-      // key.sequence = escaped ? undefined : s;
-      keys.push(key);
-    } else if (charLengthAt(s, 0) === s.length) {
-      /* Single unnamed character, e.g. "." */
-      // key.sequence = s;
+    if (
+      (s.length !== 0 && (key.name !== undefined || escaped)) ||
+      charLengthAt(s, 0) === s.length
+    ) {
       keys.push(key);
     } else {
       throw new Error("Unrecognized or broken escape sequence");
