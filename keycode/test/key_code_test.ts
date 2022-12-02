@@ -9,8 +9,9 @@ import {
 
 const ESC = "\x1B";
 
-const defaults = <KeyCode> {
+const defaults: KeyCode = {
   name: undefined,
+  char: undefined,
   sequence: undefined,
   code: undefined,
   ctrl: false,
@@ -24,8 +25,9 @@ for (const char of "abcdefghijklmnopqrstuvwxyz123456789") {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
+        char,
         name: char.toLowerCase(),
         sequence: char,
       }],
@@ -39,8 +41,9 @@ for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
+        char,
         name: char.toLowerCase(),
         sequence: char,
         shift: true,
@@ -49,15 +52,16 @@ for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
   });
 }
 
-for (const char of '!"§$%&/()=?,;.:-_') {
+for (const char of '!"§$%&/()=?,;.:-_¬”#£ﬁ^^˜·¯˙»„‰') {
   Deno.test(`keycode - parse special key - ${char}`, function () {
     const keys: KeyCode[] = parse(char);
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
-        name: undefined,
+        char,
+        name: char,
         sequence: char,
       }],
     );
@@ -73,7 +77,7 @@ for (const code of Object.keys(SpecialKeyMap)) {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
         name,
         sequence: code,
@@ -90,7 +94,7 @@ for (const code of Object.keys(KeyMap)) {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -108,7 +112,7 @@ for (const code of Object.keys(KeyMapShift)) {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -127,7 +131,7 @@ for (const code of Object.keys(KeyMapCtrl)) {
 
     assertEquals(
       keys,
-      <KeyCode[]> [{
+      [{
         ...defaults,
         name,
         sequence: ESC + code,
@@ -143,17 +147,20 @@ Deno.test(`keycode - parse string - abc`, function () {
 
   assertEquals(
     keys,
-    <KeyCode[]> [{
+    [{
       ...defaults,
       name: "a",
+      char: "a",
       sequence: "a",
     }, {
       ...defaults,
       name: "b",
+      char: "b",
       sequence: "b",
     }, {
       ...defaults,
       name: "c",
+      char: "c",
       sequence: "c",
     }],
   );
@@ -166,6 +173,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
   assertEquals(keys, [
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[2P",
       code: "[P",
       shift: true,
@@ -174,6 +182,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[3P",
       code: "[P",
       shift: false,
@@ -182,6 +191,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[4P",
       code: "[P",
       shift: true,
@@ -190,6 +200,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[5P",
       code: "[P",
       shift: false,
@@ -198,6 +209,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[6P",
       code: "[P",
       shift: true,
@@ -206,6 +218,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[7P",
       code: "[P",
       shift: false,
@@ -214,6 +227,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f1",
+      char: undefined,
       sequence: "\x1b[8P",
       code: "[P",
       shift: true,
@@ -222,6 +236,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f2",
+      char: undefined,
       sequence: "\x1b[3Q",
       code: "[Q",
       shift: false,
@@ -230,6 +245,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f2",
+      char: undefined,
       sequence: "\x1b[8Q",
       code: "[Q",
       shift: true,
@@ -238,6 +254,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f3",
+      char: undefined,
       sequence: "\x1b[3R",
       code: "[R",
       shift: false,
@@ -246,6 +263,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f3",
+      char: undefined,
       sequence: "\x1b[8R",
       code: "[R",
       shift: true,
@@ -254,6 +272,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f4",
+      char: undefined,
       sequence: "\x1b[3S",
       code: "[S",
       shift: false,
@@ -262,6 +281,7 @@ Deno.test("keycode - xterm/gnome ESC [ letter (with modifiers)", function () {
     },
     {
       name: "f4",
+      char: undefined,
       sequence: "\x1b[8S",
       code: "[S",
       shift: true,
