@@ -2,10 +2,15 @@
 export {
   assert,
   assertEquals,
+  assertInstanceOf,
   assertRejects,
   assertStrictEquals,
   assertThrows,
 } from "https://deno.land/std@0.161.0/testing/asserts.ts";
+export {
+  assertSpyCalls,
+  spy,
+} from "https://deno.land/std@0.161.0/testing/mock.ts";
 export { assertSnapshot } from "https://deno.land/std@0.161.0/testing/snapshot.ts";
 export { describe, it } from "https://deno.land/std@0.161.0/testing/bdd.ts";
 export {
