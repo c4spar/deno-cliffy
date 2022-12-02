@@ -110,8 +110,8 @@ export abstract class GenericInput<
         await this.submit();
         break;
       default:
-        if (event.sequence && !event.meta && !event.ctrl) {
-          this.addChar(event.sequence);
+        if (event.char && !event.meta && !event.ctrl) {
+          this.addChar(event.char);
         }
     }
   }
