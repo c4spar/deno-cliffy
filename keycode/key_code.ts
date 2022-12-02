@@ -13,7 +13,6 @@ export interface KeyCode {
   ctrl?: boolean;
   meta?: boolean;
   shift?: boolean;
-  specialKey?: boolean;
   char?: string;
 }
 
