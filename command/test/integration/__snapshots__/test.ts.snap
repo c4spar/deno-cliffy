@@ -1153,7 +1153,7 @@ snapshot[`command integration > should print error message for unknown option wi
 '
 `;
 
-snapshot[`command integration > should print error message for validation error 1`] = `
+snapshot[`command integration > should print help and error message when validation error is thrown 1`] = `
 "
   \\x1b[1mUsage:\\x1b[22m   \\x1b[35mcompletions-test validation-error\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
