@@ -89,11 +89,6 @@ export abstract class GenericInput<
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
-      case event.name === "c" && event.ctrl:
-        this.clear();
-        this.tty.cursorShow();
-        Deno.exit(130);
-        return;
       case this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();
         break;
@@ -106,13 +101,11 @@ export abstract class GenericInput<
       case this.isKey(this.settings.keys, "deleteCharLeft", event):
         this.deleteChar();
         break;
-      case this.isKey(this.settings.keys, "submit", event):
-        await this.submit();
+      case event.char && !event.meta && !event.ctrl:
+        this.addChar(event.char!);
         break;
       default:
-        if (event.char && !event.meta && !event.ctrl) {
-          this.addChar(event.char);
-        }
+        await super.handleEvent(event);
     }
   }
 
