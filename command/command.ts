@@ -1626,7 +1626,7 @@ export class Command<
         }
       }
 
-      return this.execute(options, ...args) as any;
+      return await this.execute(options, ...args) as any;
     } catch (error: unknown) {
       this.throw(
         error instanceof FlagsValidationError

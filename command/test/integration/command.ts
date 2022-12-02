@@ -1,4 +1,4 @@
-import { Command, CompletionsCommand, HelpCommand } from "../../mod.ts";
+import { Command, CompletionsCommand, HelpCommand, ValidationError } from "../../mod.ts";
 import { EnumType } from "../../types/enum.ts";
 
 const cmd = new Command()
@@ -42,6 +42,10 @@ const cmd = new Command()
   )
   .command("bar")
   .option("-f, --file <path>", "...", { required: true })
+  .command("validation-error")
+  .action(() => {
+    throw new ValidationError("Validation error message.", { exitCode: 1 });
+  })
   .command("help", new HelpCommand().global())
   .command("completions", new CompletionsCommand());
 

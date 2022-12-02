@@ -90,5 +90,10 @@ describe({
       const output: string = await runCommand("--colorr", true);
       await assertSnapshot(t, output);
     });
+
+    it("should print error message for validation error", async (t) => {
+      const output: string = await runCommand("validation-error", true);
+      await assertSnapshot(t, output);
+    });
   },
 });
