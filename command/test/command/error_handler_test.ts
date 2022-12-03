@@ -12,6 +12,8 @@ Deno.test("[command] should call error handler on error", async () => {
     assertInstanceOf(error, ValidationError);
     assertInstanceOf(cmd, Command);
     assertEquals(cmd.getName(), "child");
+    assertInstanceOf(error.cmd, Command);
+    assertEquals(error.cmd.getName(), "child");
   };
   const errorHandlerSpy = spy(errorHandler());
   const child2ErrorHandlerSpy = spy(errorHandler());
@@ -38,6 +40,8 @@ Deno.test("[command] should call error handler on error", async () => {
   assertSpyCalls(errorHandlerSpy, 1);
   assertSpyCalls(child2ErrorHandlerSpy, 0);
   assertInstanceOf(error, ValidationError);
+  assertInstanceOf(error.cmd, Command);
+  assertEquals(error.cmd.getName(), "child");
 });
 
 Deno.test("[command] should call child error handler on child error", async () => {
@@ -46,6 +50,8 @@ Deno.test("[command] should call child error handler on child error", async () =
     assertInstanceOf(error, ValidationError);
     assertInstanceOf(cmd, Command);
     assertEquals(cmd.getName(), "child2");
+    assertInstanceOf(error.cmd, Command);
+    assertEquals(error.cmd.getName(), "child2");
   };
   const errorHandlerSpy = spy(errorHandler());
   const child2ErrorHandlerSpy = spy(errorHandler());
@@ -72,4 +78,6 @@ Deno.test("[command] should call child error handler on child error", async () =
   assertSpyCalls(errorHandlerSpy, 0);
   assertSpyCalls(child2ErrorHandlerSpy, 1);
   assertInstanceOf(error, ValidationError);
+  assertInstanceOf(error.cmd, Command);
+  assertEquals(error.cmd.getName(), "child2");
 });
