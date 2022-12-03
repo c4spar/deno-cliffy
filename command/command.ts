@@ -2052,16 +2052,16 @@ export class Command<
   }
 
   /**
-   * Handle error. If `throwErrors` is enabled the error will be returned,
+   * Handle error. If `throwErrors` is enabled the error will be thrown,
    * otherwise a formatted error message will be printed and `Deno.exit(1)`
-   * will be called.
-   * @param error Error to handle.
+   * will be called. This will also trigger registered error handlers.
+   *
+   * @param error The error to handle.
    */
-  protected throw(error: Error): never {
+  public throw(error: Error): never {
     if (error instanceof ValidationError) {
       error.cmd = this as unknown as Command;
     }
-
     this.getErrorHandler()?.(error, this as unknown as Command);
 
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
