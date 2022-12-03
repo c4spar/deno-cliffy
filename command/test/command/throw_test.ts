@@ -1,7 +1,7 @@
 import { assertThrows } from "../../../dev_deps.ts";
 import { Command, ValidationError } from "../../mod.ts";
 
-Deno.test("[command] should throw error", async () => {
+Deno.test("[command] should throw error", () => {
   assertThrows(
     () =>
       new Command()
@@ -12,7 +12,7 @@ Deno.test("[command] should throw error", async () => {
   );
 });
 
-Deno.test("[command] should throw validation error", async () => {
+Deno.test("[command] should throw validation error", () => {
   assertThrows(
     () =>
       new Command()
