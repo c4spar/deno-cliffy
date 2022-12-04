@@ -132,6 +132,7 @@ export class Command<
   private _meta: Record<string, string> = {};
   private _groupName?: string;
   private _noGlobals = false;
+  private errorHandler?: ErrorHandler;
 
   /** Disable version option. */
   public versionOption(enable: false): this;
@@ -1063,6 +1064,15 @@ export class Command<
     return this;
   }
 
+  public error(handler: ErrorHandler): this {
+    this.cmd.errorHandler = handler;
+    return this;
+  }
+
+  private getErrorHandler(): ErrorHandler | undefined {
+    return this.errorHandler ?? this._parent?.errorHandler;
+  }
+
   /**
    * Same as `.throwErrors()` but also prevents calling `Deno.exit` after
    * printing help or version with the --help and --version option.
@@ -1627,15 +1637,9 @@ export class Command<
         }
       }
 
-      return this.execute(options, ...args) as any;
+      return await this.execute(options, ...args) as any;
     } catch (error: unknown) {
-      this.throw(
-        error instanceof FlagsValidationError
-          ? new ValidationError(error.message)
-          : error instanceof Error
-          ? error
-          : new Error(`[non-error-thrown] ${error}`),
-      );
+      this.handleError(error);
     }
   }
 
@@ -2038,13 +2042,29 @@ export class Command<
     return params as TCommandArguments;
   }
 
+  private handleError(error: unknown): never {
+    this.throw(
+      error instanceof FlagsValidationError
+        ? new ValidationError(error.message)
+        : error instanceof Error
+        ? error
+        : new Error(`[non-error-thrown] ${error}`),
+    );
+  }
+
   /**
-   * Handle error. If `throwErrors` is enabled the error will be returned,
+   * Handle error. If `throwErrors` is enabled the error will be thrown,
    * otherwise a formatted error message will be printed and `Deno.exit(1)`
-   * will be called.
-   * @param error Error to handle.
+   * will be called. This will also trigger registered error handlers.
+   *
+   * @param error The error to handle.
    */
-  protected throw(error: Error): never {
+  public throw(error: Error): never {
+    if (error instanceof ValidationError) {
+      error.cmd = this as unknown as Command;
+    }
+    this.getErrorHandler()?.(error, this as unknown as Command);
+
     if (this.shouldThrowErrors() || !(error instanceof ValidationError)) {
       throw error;
     }
