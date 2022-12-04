@@ -4,7 +4,7 @@ import { Select } from "../../prompt/select.ts";
 
 const title: string = await Select.prompt({
   message: "Pick a book",
-  search: false,
+  search: true,
   maxBreadcrumbItems: 2,
   options: [
     {

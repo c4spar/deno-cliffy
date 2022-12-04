@@ -9,6 +9,7 @@ import {
   GenericListSettings,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
+import { distance } from "../_utils/distance.ts";
 
 /** Select key options. */
 export type SelectKeys = GenericListKeys;
@@ -51,6 +52,12 @@ export interface SelectSettings extends GenericListSettings<string, string> {
 interface ParentOptions {
   options: SelectValueSettings;
   selectedCategoryIndex: number;
+}
+
+interface SortedOption {
+  originalOption: SelectOptionSettings;
+  distance: number;
+  children: SortedOption[];
 }
 
 const backItem: SelectOptionSettings = {
@@ -213,8 +220,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
           Select.nameOfParentCategoryForIndex(index, this.#parentCategories)
         ).join(this.settings.breadcrumbSeparator);
     } else {
-      const lastCategories = this.#parentCategories.slice(-maxItems,
-);
+      const lastCategories = this.#parentCategories.slice(-maxItems);
       categoryText = this.settings.breadcrumbSeparator + ".." +
         this.settings.breadcrumbSeparator +
         lastCategories.map((_category, index) =>
@@ -250,14 +256,46 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
         this.clampListIndex();
       }
     } else {
-      const newOptions = this.itemsToSearchIn()
-        .filter((option) => Select.matchesItemOrSubItems(input, option));
-
-      this.options = this.buildSearchResult(input, newOptions);
+      const sortedHits = this.findSearchHits(input,this.itemsToSearchIn());
+      this.options = this.buildSearchResultsToDisplay(sortedHits);
       this.listIndex = this.options.findIndex((option) => !option.disabled);
     }
 
     this.clampListOffset();
+  }
+
+  private findSearchHits(
+    searchInput: string,
+    options: SelectValueSettings,
+  ): SortedOption[] {
+    return options.map((opt) => {
+      if (Select.itemIsCategory(opt)) {
+        const sortedChildHits = this.findSearchHits(searchInput,opt.options)
+          .sort(this.sortByDistance);
+
+        if (sortedChildHits.length === 0) {
+          return [];
+        } else {
+          return [{
+            originalOption: opt,
+            distance: Math.min(...sortedChildHits.map((item) => item.distance)),
+            children: sortedChildHits,
+          }];
+        }
+      } else if (GenericList.matchesItem(searchInput, opt)) {
+        return [{
+          originalOption: opt,
+          distance: distance(opt.name, searchInput),
+          children: [],
+        }];
+      } else {
+        return [];
+      }
+    }).flat().sort(this.sortByDistance);
+  }
+
+  private sortByDistance(a: SortedOption, b: SortedOption): number {
+    return a.distance - b.distance;
   }
 
   private itemsToSearchIn(): SelectValueSettings {
@@ -270,56 +308,37 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
       : this.settings.options;
   }
 
-  private buildSearchResult(
-    searchInput: string,
-    options: SelectValueSettings,
+  private buildSearchResultsToDisplay(
+    sortedOptions: SortedOption[],
   ): SelectValueSettings {
-    return options.map((option) =>
-      this.buildSearchResultHelper(0, searchInput, option)
-    ).flat();
+    return sortedOptions.map((option) =>
+      this.buildSearchResultHelper(0, option)
+    )
+      .flat();
   }
 
   private buildSearchResultHelper(
     indentLevel: number,
-    searchInput: string,
-    item: SelectOptionSettings,
+    sortedItem: SortedOption,
   ): SelectValueSettings {
-    if (Select.itemIsCategory(item)) {
-      const items: SelectValueSettings = item.options.map((nextLevelOption) =>
-        this.buildSearchResultHelper(
-          indentLevel + 1,
-          searchInput,
-          nextLevelOption,
-        )
-      ).flat();
+    if (sortedItem.children.length > 0) {
+      const sortedChildItems = sortedItem.children.map((nextLevelOption) =>
+        this.buildSearchResultHelper(indentLevel + 1, nextLevelOption)
+      )
+        .flat();
 
       const itemForCategoryInSearchResult: SelectOptionSettings = {
-        name: item.name,
-        value: item.value,
+        name: dim(sortedItem.originalOption.name),
+        value: sortedItem.originalOption.value,
         disabled: true,
         options: [],
         indentLevel: indentLevel,
       };
 
-      return [itemForCategoryInSearchResult, ...items];
-    } else if (GenericList.matchesItem(searchInput, item)) {
-      item.indentLevel = indentLevel;
-      return [item];
+      return [itemForCategoryInSearchResult, ...sortedChildItems];
     } else {
-      return [];
-    }
-  }
-
-  private static matchesItemOrSubItems(
-    inputString: string,
-    item: SelectOptionSettings,
-  ): boolean {
-    if (Select.itemIsCategory(item)) {
-      return item.options.some((subItem) =>
-        this.matchesItemOrSubItems(inputString, subItem)
-      );
-    } else {
-      return GenericList.matchesItem(inputString, item);
+      sortedItem.originalOption.indentLevel = indentLevel;
+      return [sortedItem.originalOption];
     }
   }
 
