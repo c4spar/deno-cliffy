@@ -25,6 +25,6 @@
     "coverage:table": "deno task test table --coverage=./dist/coverage/table/result && deno coverage --unstable --lcov ./dist/coverage/table/result > ./dist/coverage/table/cov.lcov",
     "eggs": "deno run -A --unstable https://x.nest.land/eggs@0.3.10/eggs.ts",
     "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.4/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md"
-    // "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.8.1/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
+    // "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.8.2/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
   }
 }

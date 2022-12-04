@@ -1,3 +1,57 @@
+# [v0.25.5](https://github.com/c4spar/deno-cliffy/compare/v0.25.4...v0.25.5) (Dec 3, 2022)
+
+### Features
+
+- **command:** expose `.throw()` method (#508)
+  ([f07d37a](https://github.com/c4spar/deno-cliffy/commit/f07d37a))
+- **command:** add `cmd` property to `ValidationError` (#506)
+  ([27ae6cd](https://github.com/c4spar/deno-cliffy/commit/27ae6cd))
+- **command:** add error handler (#505)
+  ([a9f55b2](https://github.com/c4spar/deno-cliffy/commit/a9f55b2))
+- **keypress:** add char property to KeyPressEvent (#504)
+  ([0b655c7](https://github.com/c4spar/deno-cliffy/commit/0b655c7))
+- **keycode:** add char property to KeyCode and support more special chars
+  (#501) ([b0db79e](https://github.com/c4spar/deno-cliffy/commit/b0db79e))
+
+### Bug Fixes
+
+- **command:** add missing await to catch validation error correctly (#500)
+  ([f33161a](https://github.com/c4spar/deno-cliffy/commit/f33161a))
+- **command:** export UpgradeCommand from command/mod.ts (#482)
+  ([fee48bf](https://github.com/c4spar/deno-cliffy/commit/fee48bf))
+- **prompt:** ignore special key like F1, escape, etc. in input prompts (#502)
+  ([1e444a7](https://github.com/c4spar/deno-cliffy/commit/1e444a7))
+- **prompt:** grammar longer then to longer than (#497)
+  ([1b6b563](https://github.com/c4spar/deno-cliffy/commit/1b6b563))
+
+### Code Refactoring
+
+- **prompt:** refactor handleEvent method in input prompt (#503)
+  ([94fa06b](https://github.com/c4spar/deno-cliffy/commit/94fa06b))
+- **prompt:** use long names for generic parameters (#491)
+  ([f2a0d2a](https://github.com/c4spar/deno-cliffy/commit/f2a0d2a))
+
+### Chore
+
+- **upgrade:** deno/std@0.167.0 (#510)
+  ([3c40677](https://github.com/c4spar/deno-cliffy/commit/3c40677))
+
+### Unit/Integration Tests
+
+- **prompt:** use assertSnapshot for snapshot tests (#493)
+  ([e3a2d65](https://github.com/c4spar/deno-cliffy/commit/e3a2d65))
+
+### Documentation Updates
+
+- **command:** update example
+  ([572c44f](https://github.com/c4spar/deno-cliffy/commit/572c44f))
+- **command:** add example for `.throw()` method (#509)
+  ([dd4d33d](https://github.com/c4spar/deno-cliffy/commit/dd4d33d))
+- **command:** add missing await in command examples (#507)
+  ([1443b38](https://github.com/c4spar/deno-cliffy/commit/1443b38))
+- **examples:** don't use deprecated `OptionType` (#487)
+  ([a9a0a98](https://github.com/c4spar/deno-cliffy/commit/a9a0a98))
+
 # [v0.25.4](https://github.com/c4spar/deno-cliffy/compare/v0.25.3...v0.25.4) (Oct 27, 2022)
 
 ### Bug Fixes

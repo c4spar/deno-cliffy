@@ -8,6 +8,7 @@ import type {
   TypeHandler,
   ValueHandler,
 } from "../flags/types.ts";
+import type { ValidationError } from "./_errors.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type { Type } from "./type.ts";
@@ -517,3 +518,8 @@ export type VersionHandler<
     TParentCommand
   >,
 > = (this: TCommand, cmd: TCommand) => string;
+
+export type ErrorHandler = (
+  error: Error | ValidationError,
+  cmd: Command,
+) => unknown;
