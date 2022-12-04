@@ -54,6 +54,7 @@ import type {
   EnvVar,
   EnvVarOptions,
   EnvVarValueHandler,
+  ErrorHandler,
   Example,
   GlobalEnvVarOptions,
   GlobalOptionOptions,
