@@ -42,6 +42,9 @@ export interface SelectSettings extends GenericListSettings<string, string> {
   options: SelectValueSettings;
   maxBreadcrumbItems: number;
   breadcrumbSeparator: string;
+  backPointer: string;
+  categoryPointer: string;
+  categoryMarker: string;
   keys?: SelectKeys;
 }
 
@@ -79,6 +82,9 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
       prefix: yellow("? "),
       indent: " ",
       listPointer: blue(Figures.POINTER),
+      backPointer: blue(Figures.LEFT_POINTER),
+      categoryPointer: blue(Figures.POINTER),
+      categoryMarker: dim(Figures.FOLDER),
       maxRows: 10,
       searchLabel: blue(Figures.SEARCH),
       maxBreadcrumbItems: 5,
@@ -119,6 +125,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
     isSelected?: boolean,
   ): string {
     let line = this.settings.indent;
+    let itemName = item.name;
 
     if (this.isCurrentlySearching()) {
       line += this.settings.indent.repeat(item.indentLevel);
@@ -126,11 +133,11 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
     } else {
       let pointer = "";
       if (Select.itemIsBackButton(item)) {
-        // TODO: Make configurable
-        pointer = blue(`⮠`);
+        pointer = this.settings.backPointer;
+        itemName = yellow(itemName);
       } else if (Select.itemIsCategory(item)) {
-        // TODO: Make configurable
-        pointer = blue(`⮡`);
+        pointer = this.settings.categoryPointer;
+        itemName = this.settings.categoryMarker + bold(itemName);
       } else {
         pointer = this.settings.listPointer;
       }
@@ -140,8 +147,8 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
 
     line += `${
       isSelected && !item.disabled
-        ? this.highlight(item.name, (val) => val)
-        : this.highlight(item.name)
+        ? this.highlight(itemName, (val) => val)
+        : this.highlight(itemName)
     }`;
 
     return line;
@@ -160,7 +167,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
       if (typeof previousLevel === "object") {
         this.options = previousLevel.options;
         if (this.isCurrentlyInsideCategory()) {
-          this.listIndex = 2;
+          this.listIndex = 1;
         } else {
           this.listIndex = 0;
         }
@@ -171,7 +178,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
         selectedCategoryIndex: this.listIndex,
       });
       this.options = this.itemsInsideCategory(itemToSubmit);
-      this.listIndex = 2;
+      this.listIndex = 1;
     } else {
       await super.submit();
     }
@@ -182,7 +189,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
   ): SelectValueSettings {
     return [
       backItem,
-      ...Select.mapOptions([Select.separator(), ...option.options]),
+      ...Select.mapOptions(option.options),
     ];
   }
 
@@ -230,7 +237,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
           .options[nearestParentCategories.selectedCategoryIndex];
 
         this.options = this.itemsInsideCategory(categoryToRevertTo);
-        this.listIndex = 2;
+        this.listIndex = 1;
       } else {
         this.options = this.settings.options.slice();
         this.clampListIndex();
