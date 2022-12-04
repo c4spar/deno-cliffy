@@ -172,6 +172,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
           this.listIndex = 0;
         }
       }
+      this.listOffset = 0;
     } else if (Select.itemIsCategory(itemToSubmit)) {
       this.#parentCategories.push({
         options: this.options,
@@ -179,6 +180,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
       });
       this.options = this.itemsInsideCategory(itemToSubmit);
       this.listIndex = 1;
+      this.listOffset = 0;
     } else {
       await super.submit();
     }
