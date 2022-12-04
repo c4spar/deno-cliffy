@@ -2,25 +2,75 @@
 
 import { Select } from "../../prompt/select.ts";
 
-const color: string = await Select.prompt({
-  message: "Pick a color",
+const title: string = await Select.prompt({
+  message: "Pick a book",
   search: false,
   maxBreadcrumbItems: 2,
   options: [
-    { name: "Red", value: "#ff0000", options: ["hello", "test"] },
-    { name: "Green", value: "#00ff00", disabled: true },
     {
-      name: "Blue",
-      value: "#0000ff",
-      options: ["hello", {
-        value: "hello2",
-        options: [{ value: "hello3", options: ["hello4"] }],
-      }],
+      name: "Fantasy",
+      value: "",
+      options: [
+        {
+          name: "Harry Potter",
+          value: "",
+          options: [
+            "Harry Potter and the Philosopher's Stone",
+            "Harry Potter and the Chamber of Secrets",
+            "Harry Potter and the Prisoner of Azkaban",
+            "Harry Potter and the Goblet of Fire",
+            "Harry Potter and the Order of the Phoenix",
+            "Harry Potter and the Half-Blood Prince",
+            "Harry Potter and the Deathly Hallows",
+          ],
+        },
+        {
+          name: "Middle-Earth",
+          value: "",
+          options: [
+            "The Hobbit",
+            {
+              name: "The Lord of the Rings",
+              value: "",
+              options: [
+                "The Fellowship of the Ring",
+                "The Two Towers",
+                "The Return of the King",
+              ],
+            },
+            "Silmarillion",
+          ],
+        },
+      ],
     },
-    Select.separator("--------"),
-    { name: "White", value: "#ffffff" },
-    { name: "Black", value: "#000000" },
+    {
+      name: "Young Adult",
+      value: "",
+      options: [
+        {
+          name: "The Hunger Games-series",
+          value: "",
+          options: [
+            "The Hunger Games",
+            "Catching Fire",
+            "Mockingjay",
+            "The Ballad of Songbirds and Snakes",
+          ],
+        },
+        "The Fault in Our Stars",
+      ],
+    },
+    {
+      name: "Classic",
+      value: "",
+      options: [
+        "Moby-Dick",
+        "Pride and Prejudice",
+        "To Kill a Mockingbird",
+        "Brave New World",
+      ],
+    },
   ],
 });
 
-console.log({ color });
+console.log({ title });
