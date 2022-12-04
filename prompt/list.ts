@@ -164,10 +164,10 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
 
     for (const val of values) {
       if (val.length < this.settings.minLength) {
-        return `Value must be longer then ${this.settings.minLength} but has a length of ${val.length}.`;
+        return `Value must be longer than ${this.settings.minLength} but has a length of ${val.length}.`;
       }
       if (val.length > this.settings.maxLength) {
-        return `Value can't be longer then ${this.settings.maxLength} but has a length of ${val.length}.`;
+        return `Value can't be longer than ${this.settings.maxLength} but has a length of ${val.length}.`;
       }
     }
 

@@ -7,7 +7,7 @@ const cmd = new Command()
   });
 
 try {
-  cmd.parse();
+  await cmd.parse();
 } catch (error) {
   console.error("[CUSTOM_ERROR]", error);
   Deno.exit(1);

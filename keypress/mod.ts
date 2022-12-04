@@ -4,6 +4,7 @@ type KeyPressEventType = "keydown";
 
 interface KeyCodeOptions {
   name?: string;
+  char?: string;
   sequence?: string;
   code?: string;
   ctrl?: boolean;
@@ -29,6 +30,7 @@ export type KeyPressEventListenerOrEventListenerObject =
 
 export class KeyPressEvent extends Event {
   public readonly key?: string;
+  public readonly char?: string;
   public readonly sequence?: string;
   public readonly code?: string;
   public readonly ctrlKey: boolean;
@@ -43,6 +45,7 @@ export class KeyPressEvent extends Event {
   ) {
     super(type, eventInitDict);
     this.key = eventInitDict.name;
+    this.char = eventInitDict.char;
     this.sequence = eventInitDict.sequence;
     this.code = eventInitDict.code;
     this.ctrlKey = eventInitDict.ctrl ?? false;
