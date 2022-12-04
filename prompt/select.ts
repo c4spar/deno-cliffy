@@ -59,8 +59,8 @@ const backItem: SelectOptionSettings = {
 };
 
 /** Select prompt representation. */
-export class Select<S extends SelectSettings = SelectSettings>
-  extends GenericList<string, string, S> {
+export class Select<TSettings extends SelectSettings = SelectSettings>
+  extends GenericList<string, string, TSettings> {
   protected listIndex: number = this.getListIndex(this.settings.default);
   #parentCategories: ParentOptions[] = [];
 

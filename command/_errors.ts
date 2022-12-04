@@ -16,6 +16,7 @@ export interface ValidationErrorOptions {
 
 export class ValidationError extends CommandError {
   public readonly exitCode: number;
+  public cmd?: Command;
 
   constructor(message: string, { exitCode }: ValidationErrorOptions = {}) {
     super(message);

@@ -73,10 +73,10 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
       return false;
     }
     if (value.length < this.settings.minLength) {
-      return `Value must be longer then ${this.settings.minLength} but has a length of ${value.length}.`;
+      return `Value must be longer than ${this.settings.minLength} but has a length of ${value.length}.`;
     }
     if (value.length > this.settings.maxLength) {
-      return `Value can't be longer then ${this.settings.maxLength} but has a length of ${value.length}.`;
+      return `Value can't be longer than ${this.settings.maxLength} but has a length of ${value.length}.`;
     }
     return true;
   }

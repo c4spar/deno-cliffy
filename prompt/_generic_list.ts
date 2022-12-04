@@ -37,8 +37,11 @@ export type GenericListValueSettings = GenericListOptionSettings[];
 type UnsupportedInputOptions = "suggestions" | "list";
 
 /** Generic list prompt options. */
-export interface GenericListOptions<T, V>
-  extends Omit<GenericInputPromptOptions<T, V>, UnsupportedInputOptions> {
+export interface GenericListOptions<TValue, TRawValue> extends
+  Omit<
+    GenericInputPromptOptions<TValue, TRawValue>,
+    UnsupportedInputOptions
+  > {
   options: GenericListValueOptions;
   keys?: GenericListKeys;
   indent?: string;
@@ -51,8 +54,8 @@ export interface GenericListOptions<T, V>
 }
 
 /** Generic list prompt settings. */
-export interface GenericListSettings<T, V>
-  extends GenericInputPromptSettings<T, V> {
+export interface GenericListSettings<TValue, TRawValue>
+  extends GenericInputPromptSettings<TValue, TRawValue> {
   options: GenericListValueSettings;
   keys?: GenericListKeys;
   indent: string;
@@ -64,9 +67,12 @@ export interface GenericListSettings<T, V>
 }
 
 /** Generic list prompt representation. */
-export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
-  extends GenericInput<T, V, S> {
-  protected options: S["options"] = this.settings.options;
+export abstract class GenericList<
+  TValue,
+  TRawValue,
+  TSettings extends GenericListSettings<TValue, TRawValue>,
+> extends GenericInput<TValue, TRawValue, TSettings> {
+  protected options: TSettings["options"] = this.settings.options;
   protected listIndex: number = this.getListIndex();
   protected listOffset: number = this.getPageOffset(this.listIndex);
 
@@ -92,7 +98,7 @@ export abstract class GenericList<T, V, S extends GenericListSettings<T, V>>
     };
   }
 
-  constructor(settings: S) {
+  constructor(settings: TSettings) {
     super({
       ...settings,
       keys: {

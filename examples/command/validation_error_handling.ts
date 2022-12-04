@@ -8,7 +8,7 @@ const cmd = new Command()
   });
 
 try {
-  cmd.parse();
+  await cmd.parse();
 } catch (error) {
   if (error instanceof ValidationError) {
     cmd.showHelp();
