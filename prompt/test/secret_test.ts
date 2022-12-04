@@ -32,7 +32,7 @@ Deno.test("prompt secret: empty value", async () => {
     red(
       `${
         Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Password must be longer then 8 but has a length of 0.`,
+      }Password must be longer than 8 but has a length of 0.`,
     ),
   );
 });

@@ -70,7 +70,7 @@ Deno.test("prompt list: min length", async () => {
     red(
       `${
         Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Value must be longer then 3 but has a length of 2.`,
+      }Value must be longer than 3 but has a length of 2.`,
     ),
   );
 });
@@ -89,7 +89,7 @@ Deno.test("prompt list: max length", async () => {
     red(
       `${
         Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
-      }Value can't be longer then 2 but has a length of 3.`,
+      }Value can't be longer than 2 but has a length of 3.`,
     ),
   );
 });
