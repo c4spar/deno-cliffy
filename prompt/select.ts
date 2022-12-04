@@ -66,6 +66,11 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
   extends GenericList<string, string, TSettings> {
   protected listIndex: number = this.getListIndex(this.settings.default);
   #parentCategories: ParentOptions[] = [];
+  /**
+   * Since categories add a "Back" item to the list of options,
+   * they should not use zero as the first selected item.
+   */
+  #indexOfFirstItemInsideCategory = 1;
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -167,7 +172,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
       if (typeof previousLevel === "object") {
         this.options = previousLevel.options;
         if (this.isCurrentlyInsideCategory()) {
-          this.listIndex = 1;
+          this.listIndex = this.#indexOfFirstItemInsideCategory;
         } else {
           this.listIndex = 0;
         }
@@ -179,7 +184,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
         selectedCategoryIndex: this.listIndex,
       });
       this.options = this.itemsInsideCategory(itemToSubmit);
-      this.listIndex = 1;
+      this.listIndex = this.#indexOfFirstItemInsideCategory;
       this.listOffset = 0;
     } else {
       await super.submit();
@@ -239,7 +244,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
           .options[nearestParentCategories.selectedCategoryIndex];
 
         this.options = this.itemsInsideCategory(categoryToRevertTo);
-        this.listIndex = 1;
+        this.listIndex = this.#indexOfFirstItemInsideCategory;
       } else {
         this.options = this.settings.options.slice();
         this.clampListIndex();
