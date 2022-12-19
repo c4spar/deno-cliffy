@@ -126,12 +126,20 @@ ${this.generateCompletions(this.cmd).trim()}`;
     options.standalone && cmd.push("-x");
     cmd.push("-k");
     cmd.push("-f");
+
     if (options.arguments) {
       options.required && cmd.push("-r");
       cmd.push("-a", options.arguments);
     }
-    options.description &&
-      cmd.push("-d", `'${getDescription(options.description, true)}'`);
+
+    if (options.description) {
+      const description: string = getDescription(options.description, true)
+        // escape single quotes
+        .replace(/'/g, "\\'");
+
+      cmd.push("-d", `'${description}'`);
+    }
+
     return cmd.join(" ");
   }
 
