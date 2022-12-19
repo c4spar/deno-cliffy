@@ -289,18 +289,20 @@ function _${replaceSpecialChars(path)}() {` +
 
     const collect: string = option.collect ? "*" : "";
     const equalsSign = option.equalsSign ? "=" : "";
-    const flags = option.flags.map((flag) => `${flag}${equalsSign}`).join(",");
+    const flags = option.flags.map((flag) => `${flag}${equalsSign}`);
 
     if (option.standalone) {
-      return `'(- *)'{${collect}${flags}}'[${description}]${args}'`;
+      return `'(- *)'{${collect}${flags.join(",")}}'[${description}]${args}'`;
     } else {
       const excluded: string = excludedFlags.length
         ? `'(${excludedFlags.join(" ")})'`
         : "";
       if (collect || flags.length > 1) {
-        return `${excluded}{${collect}${flags}}'[${description}]${args}'`;
+        return `${excluded}{${collect}${
+          flags.join(",")
+        }}'[${description}]${args}'`;
       } else {
-        return `${excluded}${flags}'[${description}]${args}'`;
+        return `${excluded}${flags.join(",")}'[${description}]${args}'`;
       }
     }
   }

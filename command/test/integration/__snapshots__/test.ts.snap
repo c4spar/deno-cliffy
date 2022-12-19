@@ -87,7 +87,7 @@ _completions_test() {
   }
 
   __completions_test() {
-    opts=(-h --help -V --version -g --global -m --main -c --color -C --colors foo bar validation-error help completions)
+    opts=(-h --help -V --version -g --global -m --main --color -C --colors foo bar validation-error help completions)
     _completions_test_complete color
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 1 ]] ; then
       return 0
@@ -97,7 +97,7 @@ _completions_test() {
       -V|--version) opts=() ;;
       -g|--global) opts=(); _completions_test_complete boolean ;;
       -m|--main) opts=(); _completions_test_complete boolean ;;
-      -c|--color) opts=(); _completions_test_complete color ;;
+      --color) opts=(); _completions_test_complete color ;;
       -C|--colors) opts=(); _completions_test_complete color ;;
     esac
   }
@@ -373,7 +373,7 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s V -l version -x -k -f -d 'Show the version number for this program.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s g -l global -k -f -r -a '(completions-test completions complete boolean )' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s m -l main -k -f -r -a '(completions-test completions complete boolean )' -d 'Bar option.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s c -l color -k -f -r -a '(completions-test completions complete color )' -d 'Color option.'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -l color -k -f -r -a '(completions-test completions complete color )' -d 'Color option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s C -l colors -k -f -r -a '(completions-test completions complete color )' -d 'Color option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a foo -d 'Foo command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo' -s h -l help -x -k -f -d 'Show this help.'
@@ -492,7 +492,7 @@ function _completions_test() {
     '(- *)'{-V,--version}'[Show the version number for this program.]' \\\\
     '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
     '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\\\
-    '(-h --help -V --version -c --color)'{-c=,--color=}'[Color option.]:val:->val-color' \\\\
+    '(-h --help -V --version --color)'--color='[Color option.]:val:->val-color' \\\\
     '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\\\
     '1:command:_commands'\\\\
     '2::path:_files'\\\\
@@ -906,7 +906,7 @@ snapshot[`command integration > should output command help with help command 1`]
     \\x1b[34m-V\\x1b[39m, \\x1b[34m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                   
     \\x1b[34m-g\\x1b[39m, \\x1b[34m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                 
     \\x1b[34m-m\\x1b[39m, \\x1b[34m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                 
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
@@ -965,7 +965,7 @@ snapshot[`command integration > should output short help with -h flag 1`] = `
     \\x1b[34m-V\\x1b[39m, \\x1b[34m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                   
     \\x1b[34m-g\\x1b[39m, \\x1b[34m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                 
     \\x1b[34m-m\\x1b[39m, \\x1b[34m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                 
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
@@ -1005,7 +1005,7 @@ snapshot[`command integration > should output long help with --help flag 1`] = `
                                                                                                            
                                foo bar baz.                                                                
                                foo bar baz.                                                                
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
@@ -1041,7 +1041,7 @@ snapshot[`command integration > should output short version with -V flag 1`] = `
     \\x1b[34m-V\\x1b[39m, \\x1b[34m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                   
     \\x1b[34m-g\\x1b[39m, \\x1b[34m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                 
     \\x1b[34m-m\\x1b[39m, \\x1b[34m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                 
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
@@ -1081,7 +1081,7 @@ snapshot[`command integration > should output long version with --version flag 1
                                                                                                            
                                foo bar baz.                                                                
                                foo bar baz.                                                                
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
@@ -1137,7 +1137,7 @@ snapshot[`command integration > should print error message for unknown option wi
     \\x1b[34m-V\\x1b[39m, \\x1b[34m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                   
     \\x1b[34m-g\\x1b[39m, \\x1b[34m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                 
     \\x1b[34m-m\\x1b[39m, \\x1b[34m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                 
-    \\x1b[34m-c\\x1b[39m, \\x1b[34m--color\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    \\x1b[34m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[35mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
     \\x1b[34m-C\\x1b[39m, \\x1b[34m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[35mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                              (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
   \\x1b[1mCommands:\\x1b[22m
