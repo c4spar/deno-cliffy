@@ -30,7 +30,7 @@ const cmd = new Command()
           foo bar baz.
   `,
   )
-  .option("-c, --color=<val:color>", "Color option.")
+  .option("--color=<val:color>", "Color option.")
   .option("-C, --colors <val...:color>", "Color option.")
   .arguments("<color:color> [path...:file]")
   .default("help")
