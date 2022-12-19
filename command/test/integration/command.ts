@@ -30,7 +30,10 @@ const cmd = new Command()
           foo bar baz.
   `,
   )
-  .option("--color=<val:color>", "Color option.")
+  .option(
+    "--color=<val:color>",
+    "Color option with \"'quotes'\" and ([{brackets}]) \n and line breaks.",
+  )
   .option("-C, --colors <val...:color>", "Color option.")
   .arguments("<color:color> [path...:file]")
   .default("help")
@@ -38,7 +41,9 @@ const cmd = new Command()
   .command(
     "foo",
     new Command()
-      .description("Foo command.")
+      .description(
+        "Foo command with \"'quotes'\" and ([{brackets}]) \n and line breaks.",
+      )
       .option("-f, --foo", "Foo option.")
       // bar
       .command("bar", "Bar command.")
