@@ -255,31 +255,18 @@ function _${replaceSpecialChars(path)}() {` +
     completionsPath: string,
     excludedOptions: string[],
   ): string {
-    let excludedFlags = option.conflicts?.length
-      ? [
-        ...excludedOptions,
-        ...option.conflicts.map((opt) => "--" + opt.replace(/^--/, "")),
-      ]
-      : excludedOptions;
-    excludedFlags = option.collect ? excludedFlags : [
-      ...excludedFlags,
-      ...option.flags,
-    ];
-
     let args = "";
     for (const arg of option.args) {
       const type = command.getType(arg.type);
+      const optionalValue = arg.optionalValue ? "::" : ":";
       if (type && type.handler instanceof FileType) {
         const fileCompletions = this.getFileCompletions(type);
-        args += `${
-          arg.optionalValue ? "::" : ":"
-        }${arg.name}:${fileCompletions}`;
+        args += `${optionalValue}${arg.name}:${fileCompletions}`;
       } else {
         const action = this.addAction(arg, completionsPath);
-        args += `${arg.optionalValue ? "::" : ":"}${arg.name}:->${action.name}`;
+        args += `${optionalValue}${arg.name}:->${action.name}`;
       }
     }
-
     const description: string = getDescription(option.description, true)
       // escape brackets and quotes
       .replace(/\[/g, "\\[")
@@ -289,20 +276,34 @@ function _${replaceSpecialChars(path)}() {` +
 
     const collect: string = option.collect ? "*" : "";
     const equalsSign = option.equalsSign ? "=" : "";
-    const flags = option.flags.map((flag) => `${flag}${equalsSign}`).join(",");
+    const flags = option.flags.map((flag) => `${flag}${equalsSign}`);
+    let result = "";
 
     if (option.standalone) {
-      return `'(- *)'{${collect}${flags}}'[${description}]${args}'`;
+      result += "'(- *)'";
     } else {
-      const excluded: string = excludedFlags.length
-        ? `'(${excludedFlags.join(" ")})'`
-        : "";
-      if (collect || flags.length > 1) {
-        return `${excluded}{${collect}${flags}}'[${description}]${args}'`;
-      } else {
-        return `${excluded}${flags}'[${description}]${args}'`;
+      const excludedFlags = [...excludedOptions];
+
+      if (option.conflicts?.length) {
+        excludedFlags.push(
+          ...option.conflicts.map((opt) => "--" + opt.replace(/^--/, "")),
+        );
+      }
+      if (!option.collect) {
+        excludedFlags.push(...option.flags);
+      }
+      if (excludedFlags.length) {
+        result += `'(${excludedFlags.join(" ")})'`;
       }
     }
+
+    if (collect || flags.length > 1) {
+      result += `{${collect}${flags.join(",")}}`;
+    } else {
+      result += `${flags.join(",")}`;
+    }
+
+    return `${result}'[${description}]${args}'`;
   }
 
   private getFileCompletions(type: TypeDef) {
