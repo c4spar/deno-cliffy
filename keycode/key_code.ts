@@ -210,6 +210,10 @@ export function parse(data: Uint8Array | string): KeyCode[] {
     } else if (ch in SpecialKeyMap) {
       key.name = SpecialKeyMap[ch];
       key.meta = escaped;
+
+      if (key.name === "space") {
+        key.char = ch;
+      }
     } else if (!escaped && ch <= "\x1a") {
       // ctrl+letter
       key.name = String.fromCharCode(
