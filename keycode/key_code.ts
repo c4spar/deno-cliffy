@@ -210,7 +210,7 @@ export function parse(data: Uint8Array | string): KeyCode[] {
     } else if (ch in SpecialKeyMap) {
       key.name = SpecialKeyMap[ch];
       key.meta = escaped;
-      
+
       if (ch === " ") {
         key.char = " ";
       }
