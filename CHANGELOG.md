@@ -1,3 +1,31 @@
+# [v0.25.6](https://github.com/c4spar/deno-cliffy/compare/v0.25.5...v0.25.6) (Dec 20, 2022)
+
+### Bug Fixes
+
+- **command:** single quotes in option description breaks fish completions
+  (#518) ([c09c74a](https://github.com/c4spar/deno-cliffy/commit/c09c74a))
+- **command:** zsh completion broken for options without aliases (#515)
+  ([f65465a](https://github.com/c4spar/deno-cliffy/commit/f65465a))
+- **kecode:** char property not set for space key (#519)
+  ([eafa1be](https://github.com/c4spar/deno-cliffy/commit/eafa1be))
+
+### Code Refactoring
+
+- **command:** refactor `generateOption` method in zsh completions generator
+  (#517) ([eb53cd2](https://github.com/c4spar/deno-cliffy/commit/eb53cd2))
+
+### Chore
+
+- **task:** fix check:examples task (#516)
+  ([8d753ac](https://github.com/c4spar/deno-cliffy/commit/8d753ac))
+- **upgrade:** deno/std@0.170.0 (#521)
+  ([f9d0252](https://github.com/c4spar/deno-cliffy/commit/f9d0252))
+
+### Unit/Integration Tests
+
+- **prompt:** test spaces in input prompt (#520)
+  ([a68c9d5](https://github.com/c4spar/deno-cliffy/commit/a68c9d5))
+
 # [v0.25.5](https://github.com/c4spar/deno-cliffy/compare/v0.25.4...v0.25.5) (Dec 3, 2022)
 
 ### Features

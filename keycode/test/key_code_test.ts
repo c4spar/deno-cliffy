@@ -79,6 +79,7 @@ for (const code of Object.keys(SpecialKeyMap)) {
       keys,
       [{
         ...defaults,
+        char: name === "space" ? code : undefined,
         name,
         sequence: code,
       }],

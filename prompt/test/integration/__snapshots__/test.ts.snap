@@ -21,7 +21,7 @@ snapshot[`prompt - integration - confirm 1`] = `
 `;
 
 snapshot[`prompt - integration - input 1`] = `
-"? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J? Whats your name? (foo) › bar
+"? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J? Whats your name? (foo) › foo bar
 \\x1b[?25h\\x1b[?25h"
 `;
 
