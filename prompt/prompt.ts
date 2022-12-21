@@ -364,8 +364,7 @@ class PromptList {
   }
 
   private async runPrompt(): Promise<void> {
-    const prompt: StaticGenericPrompt<any, any, any> =
-      this.prompt.type;
+    const prompt: StaticGenericPrompt<any, any, any> = this.prompt.type;
 
     if (typeof injected[this.prompt.name] !== "undefined") {
       if (prompt.inject) {
