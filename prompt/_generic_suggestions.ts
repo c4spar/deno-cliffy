@@ -218,7 +218,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       .filter((value: string | number) =>
         stripColor(value.toString())
           .toLowerCase()
-          .startsWith(input)
+          .startsWith(input.toLowerCase())
       )
       .sort((a: string | number, b: string | number) =>
         distance((a || a).toString(), input) -
@@ -396,10 +396,6 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
   protected async complete(): Promise<string> {
     let input: string = this.getCurrentInputValue();
-
-    if (!input.length) {
-      return input;
-    }
     const suggestion: string | undefined = this
       .suggestions[this.suggestionsIndex]?.toString();
 
