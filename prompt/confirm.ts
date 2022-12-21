@@ -5,10 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-export type ConfirmKeys = GenericSuggestionsKeys;
+import { dim } from "./deps.ts";
 
 type UnsupportedOptions =
   | "files"
@@ -32,35 +29,17 @@ interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
   keys?: ConfirmKeys;
 }
 
+export type ConfirmKeys = GenericSuggestionsKeys;
+
 /** Confirm prompt representation. */
-export class Confirm
-  extends GenericSuggestions<boolean, string, ConfirmSettings> {
+export class Confirm extends GenericSuggestions<boolean, string> {
+  protected readonly settings: ConfirmSettings;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(
     options: string | ConfirmOptions,
   ): Promise<boolean> {
-    if (typeof options === "string") {
-      options = { message: options };
-    }
-
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      active: "Yes",
-      inactive: "No",
-      ...options,
-      files: false,
-      complete: undefined,
-      suggestions: [
-        options.active ?? "Yes",
-        options.inactive ?? "No",
-      ],
-      list: false,
-      info: false,
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -69,6 +48,30 @@ export class Confirm
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: string | ConfirmOptions) {
+    super();
+    if (typeof options === "string") {
+      options = { message: options };
+    }
+    this.settings = this.getDefaultSettings(options);
+  }
+
+  protected getDefaultSettings(options: ConfirmOptions): ConfirmSettings {
+    return {
+      ...super.getDefaultSettings(options),
+      active: options.active || "Yes",
+      inactive: options.inactive || "No",
+      files: false,
+      complete: undefined,
+      suggestions: [
+        options.active ?? "Yes",
+        options.inactive ?? "No",
+      ],
+      list: false,
+      info: false,
+    };
   }
 
   protected defaults(): string {

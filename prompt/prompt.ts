@@ -13,12 +13,12 @@ type Next<TName extends keyof any> = (
 
 type PromptOptions<
   TName extends string,
-  TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any> | void,
+  TStaticPrompt extends StaticGenericPrompt<any, any, any> | void,
   TResult,
-  TOptions = TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any>
+  TOptions = TStaticPrompt extends StaticGenericPrompt<any, any, any>
     ? Parameters<TStaticPrompt["prompt"]>[0]
     : never,
-> = TStaticPrompt extends StaticGenericPrompt<any, any, any, any, any> ? 
+> = TStaticPrompt extends StaticGenericPrompt<any, any, any> ? 
     & {
       name: TName;
       type: TStaticPrompt;
@@ -37,8 +37,8 @@ type PromptOptions<
 
 type PromptResult<
   N extends string,
-  G extends StaticGenericPrompt<any, any, any, any, any> | void,
-> = G extends StaticGenericPrompt<any, any, any, any, any> ? {
+  G extends StaticGenericPrompt<any, any, any> | void,
+> = G extends StaticGenericPrompt<any, any, any> ? {
     [K in N]?: Awaited<ReturnType<G["prompt"]>>;
   }
   : {};
@@ -116,75 +116,75 @@ export function prompt<
   TOptions21 extends GenericPromptOptions<any, any>,
   TOptions22 extends GenericPromptOptions<any, any>,
   TOptions23 extends GenericPromptOptions<any, any>,
-  TStaticPrompt0 extends StaticGenericPrompt<any, any, TOptions0, any, any>,
+  TStaticPrompt0 extends StaticGenericPrompt<any, any, TOptions0>,
   TStaticPrompt1 extends
-    | StaticGenericPrompt<any, any, TOptions1, any, any>
+    | StaticGenericPrompt<any, any, TOptions1>
     | void = void,
   TStaticPrompt2 extends
-    | StaticGenericPrompt<any, any, TOptions2, any, any>
+    | StaticGenericPrompt<any, any, TOptions2>
     | void = void,
   TStaticPrompt3 extends
-    | StaticGenericPrompt<any, any, TOptions3, any, any>
+    | StaticGenericPrompt<any, any, TOptions3>
     | void = void,
   TStaticPrompt4 extends
-    | StaticGenericPrompt<any, any, TOptions4, any, any>
+    | StaticGenericPrompt<any, any, TOptions4>
     | void = void,
   TStaticPrompt5 extends
-    | StaticGenericPrompt<any, any, TOptions5, any, any>
+    | StaticGenericPrompt<any, any, TOptions5>
     | void = void,
   TStaticPrompt6 extends
-    | StaticGenericPrompt<any, any, TOptions6, any, any>
+    | StaticGenericPrompt<any, any, TOptions6>
     | void = void,
   TStaticPrompt7 extends
-    | StaticGenericPrompt<any, any, TOptions7, any, any>
+    | StaticGenericPrompt<any, any, TOptions7>
     | void = void,
   TStaticPrompt8 extends
-    | StaticGenericPrompt<any, any, TOptions8, any, any>
+    | StaticGenericPrompt<any, any, TOptions8>
     | void = void,
   TStaticPrompt9 extends
-    | StaticGenericPrompt<any, any, TOptions9, any, any>
+    | StaticGenericPrompt<any, any, TOptions9>
     | void = void,
   TStaticPrompt10 extends
-    | StaticGenericPrompt<any, any, TOptions10, any, any>
+    | StaticGenericPrompt<any, any, TOptions10>
     | void = void,
   TStaticPrompt11 extends
-    | StaticGenericPrompt<any, any, TOptions11, any, any>
+    | StaticGenericPrompt<any, any, TOptions11>
     | void = void,
   TStaticPrompt12 extends
-    | StaticGenericPrompt<any, any, TOptions12, any, any>
+    | StaticGenericPrompt<any, any, TOptions12>
     | void = void,
   TStaticPrompt13 extends
-    | StaticGenericPrompt<any, any, TOptions13, any, any>
+    | StaticGenericPrompt<any, any, TOptions13>
     | void = void,
   TStaticPrompt14 extends
-    | StaticGenericPrompt<any, any, TOptions14, any, any>
+    | StaticGenericPrompt<any, any, TOptions14>
     | void = void,
   TStaticPrompt15 extends
-    | StaticGenericPrompt<any, any, TOptions15, any, any>
+    | StaticGenericPrompt<any, any, TOptions15>
     | void = void,
   TStaticPrompt16 extends
-    | StaticGenericPrompt<any, any, TOptions16, any, any>
+    | StaticGenericPrompt<any, any, TOptions16>
     | void = void,
   TStaticPrompt17 extends
-    | StaticGenericPrompt<any, any, TOptions17, any, any>
+    | StaticGenericPrompt<any, any, TOptions17>
     | void = void,
   TStaticPrompt18 extends
-    | StaticGenericPrompt<any, any, TOptions18, any, any>
+    | StaticGenericPrompt<any, any, TOptions18>
     | void = void,
   TStaticPrompt19 extends
-    | StaticGenericPrompt<any, any, TOptions19, any, any>
+    | StaticGenericPrompt<any, any, TOptions19>
     | void = void,
   TStaticPrompt20 extends
-    | StaticGenericPrompt<any, any, TOptions20, any, any>
+    | StaticGenericPrompt<any, any, TOptions20>
     | void = void,
   TStaticPrompt21 extends
-    | StaticGenericPrompt<any, any, TOptions21, any, any>
+    | StaticGenericPrompt<any, any, TOptions21>
     | void = void,
   TStaticPrompt22 extends
-    | StaticGenericPrompt<any, any, TOptions22, any, any>
+    | StaticGenericPrompt<any, any, TOptions22>
     | void = void,
   TStaticPrompt23 extends
-    | StaticGenericPrompt<any, any, TOptions23, any, any>
+    | StaticGenericPrompt<any, any, TOptions23>
     | void = void,
   TResult = Id<
     & PromptResult<TName0, TStaticPrompt0>
@@ -364,7 +364,7 @@ class PromptList {
   }
 
   private async runPrompt(): Promise<void> {
-    const prompt: StaticGenericPrompt<any, any, any, any, any> =
+    const prompt: StaticGenericPrompt<any, any, any> =
       this.prompt.type;
 
     if (typeof injected[this.prompt.name] !== "undefined") {
