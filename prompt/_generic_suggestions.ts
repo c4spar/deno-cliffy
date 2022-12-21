@@ -216,7 +216,7 @@ export abstract class GenericSuggestions<
       .filter((value: string | number) =>
         stripColor(value.toString())
           .toLowerCase()
-          .startsWith(input)
+          .startsWith(input.toLowerCase())
       )
       .sort((a: string | number, b: string | number) =>
         distance((a || a).toString(), input) -
