@@ -89,9 +89,9 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   ): GenericSuggestionsSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);
     return {
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
       ...settings,
+      listPointer: options.listPointer ?? blue(Figures.POINTER),
+      maxRows: options.maxRows ?? 8,
       keys: {
         complete: ["tab"],
         next: ["up"],

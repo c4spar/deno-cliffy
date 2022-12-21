@@ -56,11 +56,11 @@ export class Secret extends GenericInput<string, string> {
 
   protected getDefaultSettings(options: SecretOptions): SecretSettings {
     return {
-      label: "Password",
-      hidden: false,
-      minLength: 0,
-      maxLength: Infinity,
       ...super.getDefaultSettings(options),
+      label: options.label ?? "Password",
+      hidden: options.hidden ?? false,
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
     };
   }
 

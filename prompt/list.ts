@@ -58,12 +58,12 @@ export class List extends GenericSuggestions<string[], string> {
 
   protected getDefaultSettings(options: ListOptions): ListSettings {
     return {
-      separator: ",",
-      minLength: 0,
-      maxLength: Infinity,
-      minTags: 0,
-      maxTags: Infinity,
       ...super.getDefaultSettings(options),
+      separator: options.separator ?? ",",
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
+      minTags: options.minTags ?? 0,
+      maxTags: options.maxTags ?? Infinity,
     };
   }
 

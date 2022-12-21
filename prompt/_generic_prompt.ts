@@ -87,10 +87,10 @@ export abstract class GenericPrompt<
     options: GenericPromptOptions<TValue, TRawValue>,
   ): GenericPromptSettings<TValue, TRawValue> {
     return {
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
       ...options,
+      pointer: options.pointer ?? blue(Figures.POINTER_SMALL),
+      prefix: options.prefix ?? yellow("? "),
+      indent: options.indent ?? " ",
       keys: {
         submit: ["enter", "return"],
         ...(options.keys ?? {}),

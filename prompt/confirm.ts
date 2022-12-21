@@ -66,8 +66,8 @@ export class Confirm extends GenericSuggestions<boolean, string> {
       files: false,
       complete: undefined,
       suggestions: [
-        options.active ?? "Yes",
-        options.inactive ?? "No",
+        options.active || "Yes",
+        options.inactive || "No",
       ],
       list: false,
       info: false,

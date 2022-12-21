@@ -63,11 +63,11 @@ export class Number extends GenericSuggestions<number, string> {
   protected getDefaultSettings(options: NumberOptions): NumberSettings {
     const settings = super.getDefaultSettings(options);
     return {
-      min: -Infinity,
-      max: Infinity,
-      float: false,
-      round: 2,
       ...settings,
+      min: options.min ?? -Infinity,
+      max: options.max ?? Infinity,
+      float: options.float ?? false,
+      round: options.round ?? 2,
       files: false,
       keys: {
         increaseValue: ["up", "u", "+"],

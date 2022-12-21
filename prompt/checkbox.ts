@@ -92,11 +92,11 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
   protected getDefaultSettings(options: CheckboxOptions): CheckboxSettings {
     const settings = super.getDefaultSettings(options);
     return {
-      check: green(Figures.TICK),
-      uncheck: red(Figures.CROSS),
-      minOptions: 0,
-      maxOptions: Infinity,
       ...settings,
+      check: options.check ?? green(Figures.TICK),
+      uncheck: options.uncheck ?? red(Figures.CROSS),
+      minOptions: options.minOptions ?? 0,
+      maxOptions: options.maxOptions ?? Infinity,
       options: this.mapOptions(options),
       keys: {
         check: ["space"],

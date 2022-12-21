@@ -51,9 +51,9 @@ export class Input extends GenericSuggestions<string, string> {
 
   protected getDefaultSettings(options: InputOptions): InputSettings {
     return {
-      minLength: 0,
-      maxLength: Infinity,
       ...super.getDefaultSettings(options),
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
     };
   }
 

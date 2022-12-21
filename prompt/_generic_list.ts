@@ -90,10 +90,10 @@ export abstract class GenericList<
   ): GenericListSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);
     return {
-      listPointer: blue(Figures.POINTER),
-      searchLabel: blue(Figures.SEARCH),
-      maxRows: 10,
       ...settings,
+      listPointer: options.listPointer ?? blue(Figures.POINTER),
+      searchLabel: options.searchLabel ?? blue(Figures.SEARCH),
+      maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options).map(
         (option) => this.mapOption(options, option),
       ),
