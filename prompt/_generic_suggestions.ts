@@ -394,10 +394,6 @@ export abstract class GenericSuggestions<
 
   protected async complete(): Promise<string> {
     let input: string = this.getCurrentInputValue();
-
-    if (!input.length) {
-      return input;
-    }
     const suggestion: string | undefined = this
       .suggestions[this.suggestionsIndex]?.toString();
 
