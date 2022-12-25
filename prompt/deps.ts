@@ -1,5 +1,5 @@
 export {
-  blue,
+  brightBlue,
   bold,
   dim,
   green,

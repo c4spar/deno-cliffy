@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, normalize, yellow } from "./deps.ts";
+import { brightBlue, normalize, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 export type InputKeys = GenericSuggestionsKeys;
@@ -34,10 +34,10 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
     }
 
     return new this({
-      pointer: blue(Figures.POINTER_SMALL),
+      pointer: brightBlue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
       indent: " ",
-      listPointer: blue(Figures.POINTER),
+      listPointer: brightBlue(Figures.POINTER),
       maxRows: 8,
       minLength: 0,
       maxLength: Infinity,

@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, yellow } from "./deps.ts";
+import { brightBlue, dim, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 export type ConfirmKeys = GenericSuggestionsKeys;
@@ -44,10 +44,10 @@ export class Confirm
     }
 
     return new this({
-      pointer: blue(Figures.POINTER_SMALL),
+      pointer: brightBlue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
       indent: " ",
-      listPointer: blue(Figures.POINTER),
+      listPointer: brightBlue(Figures.POINTER),
       maxRows: 8,
       active: "Yes",
       inactive: "No",

@@ -1,5 +1,5 @@
 import type { KeyCode } from "../keycode/key_code.ts";
-import { blue, dim, underline, yellow } from "./deps.ts";
+import { brightBlue, dim, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericPrompt,
@@ -43,7 +43,7 @@ export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
     }
 
     return new this({
-      pointer: blue(Figures.POINTER_SMALL),
+      pointer: brightBlue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
       indent: " ",
       active: "Yes",
