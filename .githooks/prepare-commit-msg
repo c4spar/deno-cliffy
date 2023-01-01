@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec < /dev/tty deno run --allow-net --allow-write --allow-run ".githooks/_prepare-commit-msg.ts"
