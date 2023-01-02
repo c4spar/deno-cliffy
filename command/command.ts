@@ -11,7 +11,7 @@ import {
   parseArgumentsDefinition,
   splitArguments,
 } from "./_utils.ts";
-import { brightBlue, bold, red, yellow } from "./deps.ts";
+import { bold, brightBlue, red, yellow } from "./deps.ts";
 import {
   CommandExecutableNotFoundError,
   CommandNotFoundError,

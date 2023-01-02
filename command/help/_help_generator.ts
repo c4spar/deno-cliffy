@@ -3,13 +3,13 @@ import { Table } from "../../table/table.ts";
 import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import {
-  brightBlue,
   bold,
+  brightBlue,
+  brightMagenta,
   dim,
   getColorEnabled,
   green,
   italic,
-  brightMagenta,
   red,
   setColorEnabled,
   yellow,
@@ -241,7 +241,9 @@ export class HelpGenerator {
     return this.label("Commands") +
       Table.from([
         ...commands.map((command: Command) => [
-          [command.getName(), ...command.getAliases()].map((name) => brightBlue(name))
+          [command.getName(), ...command.getAliases()].map((name) =>
+            brightBlue(name)
+          )
             .join(", "),
           red(bold("-")),
           command.getShortDescription(),

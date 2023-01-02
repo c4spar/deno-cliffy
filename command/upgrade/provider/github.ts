@@ -1,5 +1,5 @@
 import { Provider, Versions } from "../provider.ts";
-import { brightBlue, bold } from "../../deps.ts";
+import { bold, brightBlue } from "../../deps.ts";
 
 export interface GithubProviderOptions {
   repository: string;
