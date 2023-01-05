@@ -6,8 +6,8 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import {
-  brightBlue,
   bold,
+  brightBlue,
   dim,
   dirname,
   join,

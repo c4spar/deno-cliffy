@@ -1,7 +1,15 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
-import { brightBlue, bold, dim, green, italic, red, stripColor } from "./deps.ts";
+import {
+  bold,
+  brightBlue,
+  dim,
+  green,
+  italic,
+  red,
+  stripColor,
+} from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Prompt validation return tape. */

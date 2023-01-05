@@ -1,6 +1,6 @@
 export {
-  brightBlue,
   bold,
+  brightBlue,
   dim,
   green,
   italic,
