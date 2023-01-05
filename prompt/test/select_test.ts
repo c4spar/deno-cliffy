@@ -22,9 +22,7 @@ Deno.test("prompt select: empty value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -40,9 +38,7 @@ Deno.test("prompt select: invalid value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -59,9 +55,7 @@ Deno.test("prompt select: null value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
