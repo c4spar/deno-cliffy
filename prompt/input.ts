@@ -5,10 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, normalize, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-export type InputKeys = GenericSuggestionsKeys;
+import { normalize } from "./deps.ts";
 
 /** Input prompt options. */
 export interface InputOptions
@@ -25,24 +22,15 @@ interface InputSettings extends GenericSuggestionsSettings<string, string> {
   keys?: InputKeys;
 }
 
+export type InputKeys = GenericSuggestionsKeys;
+
 /** Input prompt representation. */
-export class Input extends GenericSuggestions<string, string, InputSettings> {
+export class Input extends GenericSuggestions<string, string> {
+  protected readonly settings: InputSettings;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | InputOptions): Promise<string> {
-    if (typeof options === "string") {
-      options = { message: options };
-    }
-
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: "",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      minLength: 0,
-      maxLength: Infinity,
-      ...options,
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -51,6 +39,22 @@ export class Input extends GenericSuggestions<string, string, InputSettings> {
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: string | InputOptions) {
+    super();
+    if (typeof options === "string") {
+      options = { message: options };
+    }
+    this.settings = this.getDefaultSettings(options);
+  }
+
+  protected getDefaultSettings(options: InputOptions): InputSettings {
+    return {
+      ...super.getDefaultSettings(options),
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
+    };
   }
 
   protected success(value: string): string | undefined {

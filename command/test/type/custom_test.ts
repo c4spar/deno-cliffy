@@ -3,7 +3,7 @@ import { Command } from "../../command.ts";
 import type { ArgumentValue, TypeHandler } from "../../types.ts";
 import { Type } from "../../type.ts";
 
-const email = (): TypeHandler<string> => {
+function email(): TypeHandler<string> {
   const emailRegex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -16,7 +16,7 @@ const email = (): TypeHandler<string> => {
 
     return value;
   };
-};
+}
 
 const cmd = new Command()
   .throwErrors()
@@ -75,16 +75,16 @@ Deno.test("command - type - custom - with invalid value on child command", async
   );
 });
 
-class CustomType<T extends string> extends Type<T> {
-  constructor(private formats: ReadonlyArray<T>) {
+class CustomType<TType extends string> extends Type<TType> {
+  constructor(private formats: ReadonlyArray<TType>) {
     super();
   }
 
-  parse(type: ArgumentValue): T {
-    if (!this.formats.includes(type.value as T)) {
+  parse(type: ArgumentValue): TType {
+    if (!this.formats.includes(type.value as TType)) {
       throw new Error(`invalid type: ${type.value}`);
     }
-    return type.value as T;
+    return type.value as TType;
   }
 }
 

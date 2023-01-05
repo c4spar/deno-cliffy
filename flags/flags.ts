@@ -195,6 +195,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       if (!option) {
         const name = current.replace(/^-+/, "");
         option = matchWildCardOptions(name, opts.flags);
+
         if (!option) {
           if (opts.stopOnUnknown) {
             ctx.stopOnUnknown = true;
@@ -232,8 +233,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     if (option.type && !option.args?.length) {
       option.args = [{
         type: option.type,
-        requiredValue: option.requiredValue,
-        optionalValue: option.optionalValue,
+        optional: option.optionalValue,
         variadic: option.variadic,
         list: option.list,
         separator: option.separator,
@@ -255,7 +255,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     parseNext(option);
 
     if (typeof ctx.flags[propName] === "undefined") {
-      if (option.args?.[optionArgsIndex]?.requiredValue) {
+      if (option.args?.length && !option.args?.[optionArgsIndex].optional) {
         throw new MissingOptionValueError(option.name);
       } else if (typeof option.default !== "undefined") {
         ctx.flags[propName] = getDefaultValue(option);
@@ -300,28 +300,16 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         arg.type = OptionType.BOOLEAN;
       }
 
-      if (option.args?.length && !option.type) {
-        // make all values required by default
-        if (
-          (typeof arg.optionalValue === "undefined" ||
-            arg.optionalValue === false) &&
-          typeof arg.requiredValue === "undefined"
-        ) {
-          arg.requiredValue = true;
-        }
-      } else {
-        // make non boolean value required by default
-        if (
-          arg.type !== OptionType.BOOLEAN &&
-          (typeof arg.optionalValue === "undefined" ||
-            arg.optionalValue === false) &&
-          typeof arg.requiredValue === "undefined"
-        ) {
-          arg.requiredValue = true;
-        }
+      // make boolean values optional by default
+      if (
+        !option.args?.length &&
+        arg.type === OptionType.BOOLEAN &&
+        arg.optional === undefined
+      ) {
+        arg.optional = true;
       }
 
-      if (!arg.requiredValue) {
+      if (arg.optional) {
         inOptionalArg = true;
       } else if (inOptionalArg) {
         throw new UnexpectedRequiredArgumentError(option.name);
@@ -351,7 +339,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       } else {
         if (hasNext(arg)) {
           result = parseValue(option, arg, next());
-        } else if (arg.optionalValue && arg.type === OptionType.BOOLEAN) {
+        } else if (arg.optional && arg.type === OptionType.BOOLEAN) {
           result = true;
         }
       }
@@ -394,17 +382,17 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         if (option.args.length > 1 && optionArgsIndex >= option.args.length) {
           return false;
         }
-        if (arg.requiredValue) {
+        if (!arg.optional) {
           return true;
         }
         // require optional values to be called with an equal sign: foo=bar
         if (
-          option.equalsSign && arg.optionalValue && !arg.variadic &&
+          option.equalsSign && arg.optional && !arg.variadic &&
           typeof currentValue === "undefined"
         ) {
           return false;
         }
-        if (arg.optionalValue || arg.variadic) {
+        if (arg.optional || arg.variadic) {
           return nextValue[0] !== "-" ||
             typeof currentValue !== "undefined" ||
             (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
@@ -428,9 +416,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
           })
           : parseDefaultType(option, arg, value);
 
-        if (
-          typeof result !== "undefined"
-        ) {
+        if (typeof result !== "undefined") {
           increase = true;
         }
 

@@ -13,9 +13,10 @@ export interface ParseFlagsOptions<
 }
 
 /** Flag options. */
-export interface FlagOptions extends ArgumentOptions {
+export interface FlagOptions extends Omit<ArgumentOptions, "optional"> {
   name: string;
-  args?: ArgumentOptions[];
+  args?: Array<ArgumentOptions>;
+  optionalValue?: boolean;
   aliases?: string[];
   standalone?: boolean;
   default?: DefaultValue;
@@ -27,11 +28,10 @@ export interface FlagOptions extends ArgumentOptions {
   equalsSign?: boolean;
 }
 
-/** Flag argument definition. */
+/** Options for a flag argument. */
 export interface ArgumentOptions {
   type?: ArgumentType | string;
-  optionalValue?: boolean;
-  requiredValue?: boolean;
+  optional?: boolean;
   variadic?: boolean;
   list?: boolean;
   separator?: string;
@@ -40,21 +40,24 @@ export interface ArgumentOptions {
 /** Available build-in argument types. */
 export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
-/** Default flag value */
+/** Default flag value or a callback method that returns the default value. */
 export type DefaultValue<TValue = unknown> =
   | TValue
   | DefaultValueHandler<TValue>;
 
 export type DefaultValueHandler<TValue = unknown> = () => TValue;
 
-/** Value handler for custom value processing. */
+/** A callback method for custom processing or mapping of flag values. */
 // deno-lint-ignore no-explicit-any
 export type ValueHandler<TValue = any, TReturn = TValue> = (
   val: TValue,
   previous?: TReturn,
 ) => TReturn;
 
-/** Result of the parseFlags method. */
+/**
+ * Parse result. The parse context will be returned by the `parseFlags` method
+ * and can be also passed as first argument to the `parseFlags` method.
+ */
 export interface ParseFlagsContext<
   // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
@@ -68,13 +71,16 @@ export interface ParseFlagsContext<
   stopOnUnknown: boolean;
 }
 
-/** Type details. */
+/** Argument parsing informations. */
 export interface ArgumentValue {
   label: string;
-  type: string;
+  type: ArgumentType | string;
   name: string;
   value: string;
 }
 
-/** Custom type handler/parser. */
+/**
+ * Parse method for custom types. Gets the raw user input passed as argument
+ * and returns the parsed value.
+ */
 export type TypeHandler<TReturn = unknown> = (arg: ArgumentValue) => TReturn;

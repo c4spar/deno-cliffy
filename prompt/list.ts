@@ -5,11 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { blue, dim, normalize, underline, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-/** List key options. */
-export type ListKeys = GenericSuggestionsKeys;
+import { dim, normalize, underline } from "./deps.ts";
 
 /** List prompt options. */
 export interface ListOptions
@@ -32,27 +28,16 @@ interface ListSettings extends GenericSuggestionsSettings<string[], string> {
   keys?: ListKeys;
 }
 
+/** List key options. */
+export type ListKeys = GenericSuggestionsKeys;
+
 /** List prompt representation. */
-export class List extends GenericSuggestions<string[], string, ListSettings> {
+export class List extends GenericSuggestions<string[], string> {
+  protected readonly settings: ListSettings;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
-    if (typeof options === "string") {
-      options = { message: options };
-    }
-
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: "",
-      listPointer: blue(Figures.POINTER),
-      maxRows: 8,
-      separator: ",",
-      minLength: 0,
-      maxLength: Infinity,
-      minTags: 0,
-      maxTags: Infinity,
-      ...options,
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -61,6 +46,25 @@ export class List extends GenericSuggestions<string[], string, ListSettings> {
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: string | ListOptions) {
+    super();
+    if (typeof options === "string") {
+      options = { message: options };
+    }
+    this.settings = this.getDefaultSettings(options);
+  }
+
+  protected getDefaultSettings(options: ListOptions): ListSettings {
+    return {
+      ...super.getDefaultSettings(options),
+      separator: options.separator ?? ",",
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
+      minTags: options.minTags ?? 0,
+      maxTags: options.maxTags ?? Infinity,
+    };
   }
 
   protected input(): string {
