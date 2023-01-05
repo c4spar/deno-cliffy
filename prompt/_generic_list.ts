@@ -91,8 +91,8 @@ export abstract class GenericList<
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,
-      listPointer: options.listPointer ?? blue(Figures.POINTER),
-      searchLabel: options.searchLabel ?? blue(Figures.SEARCH),
+      listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
+      searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
       maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options).map(
         (option) => this.mapOption(options, option),
