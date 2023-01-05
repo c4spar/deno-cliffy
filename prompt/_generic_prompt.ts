@@ -90,7 +90,7 @@ export abstract class GenericPrompt<
       ...options,
       pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
       prefix: options.prefix ?? yellow("? "),
-      indent: options.indent ?? " ",
+      indent: options.indent ?? "",
       keys: {
         submit: ["enter", "return"],
         ...(options.keys ?? {}),
