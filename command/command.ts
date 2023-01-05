@@ -11,7 +11,7 @@ import {
   parseArgumentsDefinition,
   splitArguments,
 } from "./_utils.ts";
-import { blue, bold, red, yellow } from "./deps.ts";
+import { bold, brightBlue, red, yellow } from "./deps.ts";
 import {
   CommandExecutableNotFoundError,
   CommandNotFoundError,
@@ -2188,10 +2188,10 @@ export class Command<
   /** Returns command name, version and meta data. */
   public getLongVersion(): string {
     return `${bold(this.getMainCommand().getName())} ${
-      blue(this.getVersion() ?? "")
+      brightBlue(this.getVersion() ?? "")
     }` +
       Object.entries(this.getMeta()).map(
-        ([k, v]) => `\n${bold(k)} ${blue(v)}`,
+        ([k, v]) => `\n${bold(k)} ${brightBlue(v)}`,
       ).join("");
   }
 

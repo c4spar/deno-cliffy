@@ -1,18 +1,11 @@
 import type { KeyCode } from "../keycode/key_code.ts";
-import { blue, dim, underline, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { dim, underline } from "./deps.ts";
 import {
   GenericPrompt,
   GenericPromptKeys,
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-
-/** Toggle key options. */
-export interface ToggleKeys extends GenericPromptKeys {
-  active?: string[];
-  inactive?: string[];
-}
 
 /** Generic prompt options. */
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
@@ -28,33 +21,47 @@ interface ToggleSettings extends GenericPromptSettings<boolean, string> {
   keys: ToggleKeys;
 }
 
+/** Toggle key options. */
+export interface ToggleKeys extends GenericPromptKeys {
+  active?: string[];
+  inactive?: string[];
+}
+
 /** Toggle prompt representation. */
-export class Toggle extends GenericPrompt<boolean, string, ToggleSettings> {
-  protected status: string = typeof this.settings.default !== "undefined"
-    ? this.format(this.settings.default)
-    : "";
+export class Toggle extends GenericPrompt<boolean, string> {
+  protected readonly settings: ToggleSettings;
+  protected status: string;
 
   /** Execute the prompt and show cursor on end. */
   public static prompt(
     options: string | ToggleOptions,
   ): Promise<boolean> {
+    return new this(options).prompt();
+  }
+
+  constructor(options: string | ToggleOptions) {
+    super();
     if (typeof options === "string") {
       options = { message: options };
     }
+    this.settings = this.getDefaultSettings(options);
+    this.status = typeof this.settings.default !== "undefined"
+      ? this.format(this.settings.default)
+      : "";
+  }
 
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      active: "Yes",
-      inactive: "No",
-      ...options,
+  protected getDefaultSettings(options: ToggleOptions): ToggleSettings {
+    const settings = super.getDefaultSettings(options);
+    return {
+      ...settings,
+      active: options.active || "Yes",
+      inactive: options.inactive || "No",
       keys: {
         active: ["right", "y", "j", "s", "o"],
         inactive: ["left", "n"],
-        ...(options.keys ?? {}),
+        ...(settings.keys ?? {}),
       },
-    }).prompt();
+    };
   }
 
   protected message(): string {
