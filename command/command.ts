@@ -34,7 +34,6 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { DefaultValue, ErrorHandler, OptionValueHandler } from "./types.ts";
 import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { NumberType } from "./types/number.ts";
@@ -50,10 +49,12 @@ import type {
   CompleteHandler,
   CompleteOptions,
   Completion,
+  DefaultValue,
   Description,
   EnvVar,
   EnvVarOptions,
   EnvVarValueHandler,
+  ErrorHandler,
   Example,
   GlobalEnvVarOptions,
   GlobalOptionOptions,
@@ -61,6 +62,7 @@ import type {
   MapTypes,
   Option,
   OptionOptions,
+  OptionValueHandler,
   TypeDef,
   TypeOptions,
   TypeOrTypeHandler,
@@ -1305,7 +1307,7 @@ export class Command<
     opts?: OptionOptions | OptionValueHandler,
   ): Command<any> {
     if (typeof opts === "function") {
-      return this.option(flags, desc, { value: opts });
+      opts = { value: opts };
     }
 
     const result = splitArguments(flags);
@@ -1512,7 +1514,7 @@ export class Command<
 
     if (details.length > 1) {
       throw new TooManyEnvVarValuesError(name);
-    } else if (details.length && details[0].optionalValue) {
+    } else if (details.length && details[0].optional) {
       throw new UnexpectedOptionalEnvVarValueError(name);
     } else if (details.length && details[0].variadic) {
       throw new UnexpectedVariadicEnvVarValueError(name);
@@ -1978,7 +1980,7 @@ export class Command<
     } else {
       if (!args.length) {
         const required = this.getArguments()
-          .filter((expectedArg) => !expectedArg.optionalValue)
+          .filter((expectedArg) => !expectedArg.optional)
           .map((expectedArg) => expectedArg.name);
 
         if (required.length) {
@@ -1994,7 +1996,7 @@ export class Command<
       } else {
         for (const expectedArg of this.getArguments()) {
           if (!args.length) {
-            if (expectedArg.optionalValue) {
+            if (expectedArg.optional) {
               break;
             }
             throw new MissingArgumentError(expectedArg.name);

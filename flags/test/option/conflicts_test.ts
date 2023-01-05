@@ -3,7 +3,7 @@ import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
-const options = <ParseFlagsOptions> {
+const options: ParseFlagsOptions = {
   allowEmpty: false,
   flags: [{
     name: "type",

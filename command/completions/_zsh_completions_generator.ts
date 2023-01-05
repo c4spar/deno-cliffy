@@ -197,14 +197,14 @@ function _${replaceSpecialChars(path)}() {` +
             for (let i = 0; i < 5; i++) {
               args.push(
                 `${argIndex + i}${
-                  arg.optionalValue ? "::" : ":"
+                  arg.optional ? "::" : ":"
                 }${arg.name}:${fileCompletions}`,
               );
             }
           } else {
             args.push(
               `${++argIndex}${
-                arg.optionalValue ? "::" : ":"
+                arg.optional ? "::" : ":"
               }${arg.name}:${fileCompletions}`,
             );
           }
@@ -213,7 +213,7 @@ function _${replaceSpecialChars(path)}() {` +
           const action = this.addAction(arg, completionsPath);
           args.push(
             `${++argIndex}${
-              arg.optionalValue ? "::" : ":"
+              arg.optional ? "::" : ":"
             }${arg.name}:->${action.name}`,
           );
         }
@@ -258,7 +258,7 @@ function _${replaceSpecialChars(path)}() {` +
     let args = "";
     for (const arg of option.args) {
       const type = command.getType(arg.type);
-      const optionalValue = arg.optionalValue ? "::" : ":";
+      const optionalValue = arg.optional ? "::" : ":";
       if (type && type.handler instanceof FileType) {
         const fileCompletions = this.getFileCompletions(type);
         args += `${optionalValue}${arg.name}:${fileCompletions}`;

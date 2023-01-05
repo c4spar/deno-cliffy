@@ -4,7 +4,7 @@ import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
-const options = <ParseFlagsOptions> {
+const options: ParseFlagsOptions = {
   flags: [{
     name: "bitrate.audio",
     aliases: ["b.a", "audio-bitrate"],
