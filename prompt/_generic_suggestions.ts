@@ -18,30 +18,6 @@ import {
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
-interface LocalStorage {
-  getItem(key: string): string | null;
-  removeItem(key: string): void;
-  setItem(key: string, value: string): void;
-}
-
-/** Input keys options. */
-export interface GenericSuggestionsKeys extends GenericInputKeys {
-  complete?: string[];
-  next?: string[];
-  previous?: string[];
-  nextPage?: string[];
-  previousPage?: string[];
-}
-
-export type SuggestionHandler = (
-  input: string,
-) => Array<string | number> | Promise<Array<string | number>>;
-
-export type CompleteHandler = (
-  input: string,
-  suggestion?: string,
-) => Promise<string> | string;
-
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<TValue, TRawValue>
   extends GenericInputPromptOptions<TValue, TRawValue> {
@@ -70,26 +46,52 @@ export interface GenericSuggestionsSettings<TValue, TRawValue>
   maxRows: number;
 }
 
+/** Input keys options. */
+export interface GenericSuggestionsKeys extends GenericInputKeys {
+  complete?: string[];
+  next?: string[];
+  previous?: string[];
+  nextPage?: string[];
+  previousPage?: string[];
+}
+
+export type SuggestionHandler = (
+  input: string,
+) => Array<string | number> | Promise<Array<string | number>>;
+
+export type CompleteHandler = (
+  input: string,
+  suggestion?: string,
+) => Promise<string> | string;
+
+interface LocalStorage {
+  getItem(key: string): string | null;
+  removeItem(key: string): void;
+  setItem(key: string, value: string): void;
+}
+
 const sep = Deno.build.os === "windows" ? "\\" : "/";
 
 /** Generic input prompt representation. */
-export abstract class GenericSuggestions<
-  TValue,
-  TRawValue,
-  TSettings extends GenericSuggestionsSettings<TValue, TRawValue>,
-> extends GenericInput<TValue, TRawValue, TSettings> {
+export abstract class GenericSuggestions<TValue, TRawValue>
+  extends GenericInput<TValue, TRawValue> {
+  protected abstract readonly settings: GenericSuggestionsSettings<
+    TValue,
+    TRawValue
+  >;
   protected suggestionsIndex = -1;
   protected suggestionsOffset = 0;
   protected suggestions: Array<string | number> = [];
   #hasReadPermissions?: boolean;
 
-  /**
-   * Prompt constructor.
-   * @param settings Prompt settings.
-   */
-  protected constructor(settings: TSettings) {
-    super({
+  protected getDefaultSettings(
+    options: GenericSuggestionsOptions<TValue, TRawValue>,
+  ): GenericSuggestionsSettings<TValue, TRawValue> {
+    const settings = super.getDefaultSettings(options);
+    return {
       ...settings,
+      listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
+      maxRows: options.maxRows ?? 8,
       keys: {
         complete: ["tab"],
         next: ["up"],
@@ -98,7 +100,7 @@ export abstract class GenericSuggestions<
         previousPage: ["pagedown"],
         ...(settings.keys ?? {}),
       },
-    });
+    };
   }
 
   protected get localStorage(): LocalStorage | null {

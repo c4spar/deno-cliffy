@@ -9,12 +9,36 @@ import { bold, brightBlue, dim, stripColor } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
-/** Select key options. */
-export interface GenericListKeys extends GenericInputKeys {
-  previous?: string[];
-  next?: string[];
-  previousPage?: string[];
-  nextPage?: string[];
+type UnsupportedInputOptions = "suggestions" | "list";
+
+/** Generic list prompt options. */
+export interface GenericListOptions<TValue, TRawValue> extends
+  Omit<
+    GenericInputPromptOptions<TValue, TRawValue>,
+    UnsupportedInputOptions
+  > {
+  options: Array<string | GenericListOption>;
+  keys?: GenericListKeys;
+  indent?: string;
+  listPointer?: string;
+  searchIcon?: string;
+  maxRows?: number;
+  searchLabel?: string;
+  search?: boolean;
+  info?: boolean;
+}
+
+/** Generic list prompt settings. */
+export interface GenericListSettings<TValue, TRawValue>
+  extends GenericInputPromptSettings<TValue, TRawValue> {
+  options: Array<GenericListOptionSettings>;
+  keys?: GenericListKeys;
+  indent: string;
+  listPointer: string;
+  maxRows: number;
+  searchLabel: string;
+  search?: boolean;
+  info?: boolean;
 }
 
 /** Generic list option options. */
@@ -31,50 +55,26 @@ export interface GenericListOptionSettings extends GenericListOption {
   disabled: boolean;
 }
 
-export type GenericListValueOptions = (string | GenericListOption)[];
-export type GenericListValueSettings = GenericListOptionSettings[];
-
-type UnsupportedInputOptions = "suggestions" | "list";
-
-/** Generic list prompt options. */
-export interface GenericListOptions<TValue, TRawValue> extends
-  Omit<
-    GenericInputPromptOptions<TValue, TRawValue>,
-    UnsupportedInputOptions
-  > {
-  options: GenericListValueOptions;
-  keys?: GenericListKeys;
-  indent?: string;
-  listPointer?: string;
-  searchIcon?: string;
-  maxRows?: number;
-  searchLabel?: string;
-  search?: boolean;
-  info?: boolean;
-}
-
-/** Generic list prompt settings. */
-export interface GenericListSettings<TValue, TRawValue>
-  extends GenericInputPromptSettings<TValue, TRawValue> {
-  options: GenericListValueSettings;
-  keys?: GenericListKeys;
-  indent: string;
-  listPointer: string;
-  maxRows: number;
-  searchLabel: string;
-  search?: boolean;
-  info?: boolean;
+/** Select key options. */
+export interface GenericListKeys extends GenericInputKeys {
+  previous?: string[];
+  next?: string[];
+  previousPage?: string[];
+  nextPage?: string[];
 }
 
 /** Generic list prompt representation. */
 export abstract class GenericList<
   TValue,
   TRawValue,
-  TSettings extends GenericListSettings<TValue, TRawValue>,
-> extends GenericInput<TValue, TRawValue, TSettings> {
-  protected options: TSettings["options"] = this.settings.options;
-  protected listIndex: number = this.getListIndex();
-  protected listOffset: number = this.getPageOffset(this.listIndex);
+> extends GenericInput<TValue, TRawValue> {
+  protected abstract readonly settings: GenericListSettings<
+    TValue,
+    TRawValue
+  >;
+  protected abstract options: Array<GenericListOptionSettings>;
+  protected abstract listIndex: number;
+  protected abstract listOffset: number;
 
   /**
    * Create list separator.
@@ -84,11 +84,49 @@ export abstract class GenericList<
     return { value: label, disabled: true };
   }
 
+  protected getDefaultSettings(
+    options: GenericListOptions<TValue, TRawValue>,
+    // ): Omit<GenericListSettings<TValue, TRawValue>, "options"> {
+  ): GenericListSettings<TValue, TRawValue> {
+    const settings = super.getDefaultSettings(options);
+    return {
+      ...settings,
+      listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
+      searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
+      maxRows: options.maxRows ?? 10,
+      options: this.mapOptions(options).map(
+        (option) => this.mapOption(options, option),
+      ),
+      keys: {
+        previous: options.search ? ["up"] : ["up", "u", "p", "8"],
+        next: options.search ? ["down"] : ["down", "d", "n", "2"],
+        previousPage: ["pageup", "left"],
+        nextPage: ["pagedown", "right"],
+        ...(settings.keys ?? {}),
+      },
+    };
+  }
+
+  protected mapOptions<
+    TOption extends GenericListOption,
+  >(
+    options: GenericListOptions<TValue, TRawValue> & {
+      options: Array<string | TOption>;
+    },
+  ): Array<TOption | { value: string }> {
+    return options.options.map((option) =>
+      typeof option === "string" ? { value: option } : option
+    ).map(
+      (option) => this.mapOption(options, option),
+    );
+  }
+
   /**
    * Set list option defaults.
    * @param option List option.
    */
-  protected static mapOption(
+  protected mapOption(
+    _options: GenericListOptions<TValue, TRawValue>,
     option: GenericListOption,
   ): GenericListOptionSettings {
     return {
@@ -96,19 +134,6 @@ export abstract class GenericList<
       name: typeof option.name === "undefined" ? option.value : option.name,
       disabled: !!option.disabled,
     };
-  }
-
-  constructor(settings: TSettings) {
-    super({
-      ...settings,
-      keys: {
-        previous: settings.search ? ["up"] : ["up", "u", "p", "8"],
-        next: settings.search ? ["down"] : ["down", "d", "n", "2"],
-        previousPage: ["pageup", "left"],
-        nextPage: ["pagedown", "right"],
-        ...(settings.keys ?? {}),
-      },
-    });
   }
 
   protected match(): void {
@@ -387,3 +412,8 @@ export abstract class GenericList<
     }
   }
 }
+
+/** @deprecated Use `Array<string | GenericListOption>` instead. */
+export type GenericListValueOptions = Array<string | GenericListOption>;
+/** @deprecated Use `Array<GenericListOptionSettings>` instead. */
+export type GenericListValueSettings = Array<GenericListOptionSettings>;

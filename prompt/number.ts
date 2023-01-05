@@ -7,14 +7,6 @@ import {
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
-import { brightBlue, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
-
-/** Number key options. */
-export interface NumberKeys extends GenericSuggestionsKeys {
-  increaseValue?: string[];
-  decreaseValue?: string[];
-}
 
 type UnsupportedOptions = "files";
 
@@ -37,32 +29,19 @@ interface NumberSettings extends GenericSuggestionsSettings<number, string> {
   keys?: NumberKeys;
 }
 
+/** Number key options. */
+export interface NumberKeys extends GenericSuggestionsKeys {
+  increaseValue?: string[];
+  decreaseValue?: string[];
+}
+
 /** Number prompt representation. */
-export class Number extends GenericSuggestions<number, string, NumberSettings> {
+export class Number extends GenericSuggestions<number, string> {
+  protected readonly settings: NumberSettings;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | NumberOptions): Promise<number> {
-    if (typeof options === "string") {
-      options = { message: options };
-    }
-
-    return new this({
-      pointer: brightBlue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: brightBlue(Figures.POINTER),
-      maxRows: 8,
-      min: -Infinity,
-      max: Infinity,
-      float: false,
-      round: 2,
-      ...options,
-      files: false,
-      keys: {
-        increaseValue: ["up", "u", "+"],
-        decreaseValue: ["down", "d", "-"],
-        ...(options.keys ?? {}),
-      },
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -71,6 +50,31 @@ export class Number extends GenericSuggestions<number, string, NumberSettings> {
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: string | NumberOptions) {
+    super();
+    if (typeof options === "string") {
+      options = { message: options };
+    }
+    this.settings = this.getDefaultSettings(options);
+  }
+
+  protected getDefaultSettings(options: NumberOptions): NumberSettings {
+    const settings = super.getDefaultSettings(options);
+    return {
+      ...settings,
+      min: options.min ?? -Infinity,
+      max: options.max ?? Infinity,
+      float: options.float ?? false,
+      round: options.round ?? 2,
+      files: false,
+      keys: {
+        increaseValue: ["up", "u", "+"],
+        decreaseValue: ["down", "d", "-"],
+        ...(settings.keys ?? {}),
+      },
+    };
   }
 
   protected success(value: number): string | undefined {

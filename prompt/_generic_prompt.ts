@@ -9,15 +9,19 @@ import {
   italic,
   red,
   stripColor,
+  yellow,
 } from "./deps.ts";
 import { Figures } from "./figures.ts";
 
-/** Prompt validation return tape. */
-export type ValidateResult = string | boolean | Promise<string | boolean>;
+/** Static generic prompt interface. */
+export interface StaticGenericPrompt<
+  TValue,
+  TRawValue,
+  TOptions extends GenericPromptOptions<TValue, TRawValue>,
+> {
+  inject?(value: TValue): void;
 
-/** Input keys options. */
-export interface GenericPromptKeys {
-  submit?: Array<string>;
+  prompt(options: TOptions): Promise<TValue>;
 }
 
 /** Generic prompt options. */
@@ -43,29 +47,25 @@ export interface GenericPromptSettings<TValue, TRawValue>
   prefix: string;
 }
 
-/** Static generic prompt interface. */
-export interface StaticGenericPrompt<
-  TValue,
-  TRawValue,
-  TOptions extends GenericPromptOptions<TValue, TRawValue>,
-  TSettings extends GenericPromptSettings<TValue, TRawValue>,
-  TPrompt extends GenericPrompt<TValue, TRawValue, TSettings>,
-> {
-  inject?(value: TValue): void;
+/** Prompt validation return tape. */
+export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-  prompt(options: TOptions): Promise<TValue>;
+/** Input keys options. */
+export interface GenericPromptKeys {
+  submit?: Array<string>;
 }
 
 /** Generic prompt representation. */
 export abstract class GenericPrompt<
   TValue,
   TRawValue,
-  TSettings extends GenericPromptSettings<TValue, TRawValue>,
 > {
   protected static injectedValue: unknown | undefined;
-  protected readonly settings: TSettings;
+  protected abstract readonly settings: GenericPromptSettings<
+    TValue,
+    TRawValue
+  >;
   protected readonly tty = tty;
-  protected readonly indent: string;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
@@ -83,15 +83,19 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected constructor(settings: TSettings) {
-    this.settings = {
-      ...settings,
+  protected getDefaultSettings(
+    options: GenericPromptOptions<TValue, TRawValue>,
+  ): GenericPromptSettings<TValue, TRawValue> {
+    return {
+      ...options,
+      pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
+      prefix: options.prefix ?? yellow("? "),
+      indent: options.indent ?? " ",
       keys: {
         submit: ["enter", "return"],
-        ...(settings.keys ?? {}),
+        ...(options.keys ?? {}),
       },
     };
-    this.indent = this.settings.indent ?? " ";
   }
 
   /** Execute the prompt and show cursor on end. */
