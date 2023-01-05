@@ -3,13 +3,13 @@ import { Table } from "../../table/table.ts";
 import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import {
-  blue,
   bold,
+  brightBlue,
+  brightMagenta,
   dim,
   getColorEnabled,
   green,
   italic,
-  magenta,
   red,
   setColorEnabled,
   yellow,
@@ -74,7 +74,7 @@ export class HelpGenerator {
     const rows = [
       [
         bold("Usage:"),
-        magenta(
+        brightMagenta(
           this.cmd.getPath() +
             (usage ? " " + highlightArguments(usage, this.options.types) : ""),
         ),
@@ -173,7 +173,7 @@ export class HelpGenerator {
       return this.label(group.name ?? "Options") +
         Table.from([
           ...group.options.map((option: Option) => [
-            option.flags.map((flag) => blue(flag)).join(", "),
+            option.flags.map((flag) => brightBlue(flag)).join(", "),
             highlightArguments(
               option.typeDefinition || "",
               this.options.types,
@@ -193,7 +193,7 @@ export class HelpGenerator {
     return this.label(group.name ?? "Options") +
       Table.from([
         ...group.options.map((option: Option) => [
-          option.flags.map((flag) => blue(flag)).join(", "),
+          option.flags.map((flag) => brightBlue(flag)).join(", "),
           red(bold("-")),
           getDescription(option.description, !this.options.long),
           this.generateHints(option),
@@ -221,7 +221,7 @@ export class HelpGenerator {
         Table.from([
           ...commands.map((command: Command) => [
             [command.getName(), ...command.getAliases()].map((name) =>
-              blue(name)
+              brightBlue(name)
             ).join(", "),
             highlightArguments(
               command.getArgsDefinition() || "",
@@ -241,7 +241,9 @@ export class HelpGenerator {
     return this.label("Commands") +
       Table.from([
         ...commands.map((command: Command) => [
-          [command.getName(), ...command.getAliases()].map((name) => blue(name))
+          [command.getName(), ...command.getAliases()].map((name) =>
+            brightBlue(name)
+          )
             .join(", "),
           red(bold("-")),
           command.getShortDescription(),
@@ -262,7 +264,7 @@ export class HelpGenerator {
     return this.label("Environment variables") +
       Table.from([
         ...envVars.map((envVar: EnvVar) => [
-          envVar.names.map((name: string) => blue(name)).join(", "),
+          envVar.names.map((name: string) => brightBlue(name)).join(", "),
           highlightArgumentDetails(
             envVar.details,
             this.options.types,
@@ -391,7 +393,7 @@ function highlightArgumentDetails(
   if (arg.variadic) {
     name += "...";
   }
-  name = magenta(name);
+  name = brightMagenta(name);
 
   str += name;
 

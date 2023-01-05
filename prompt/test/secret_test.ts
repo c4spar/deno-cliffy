@@ -31,8 +31,8 @@ Deno.test("prompt secret: empty value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Password must be longer than 8 but has a length of 0.`,
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
+      }Secret must be longer than 8 but has a length of 0.`,
     ),
   );
 });
@@ -49,9 +49,7 @@ Deno.test("prompt secret: invalid value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -66,9 +64,7 @@ Deno.test("prompt secret: null value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

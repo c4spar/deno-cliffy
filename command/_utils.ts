@@ -160,5 +160,7 @@ export function getDescription(
   description: string,
   short?: boolean,
 ): string {
-  return short ? description.trim().split("\n", 1)[0] : dedent(description);
+  return short
+    ? description.trim().split("\n", 1)[0].trim()
+    : dedent(description);
 }

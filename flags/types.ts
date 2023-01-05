@@ -62,7 +62,7 @@ export interface ArgumentOptions<TType extends string> {
 /** Available build-in argument types. */
 export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
-/** Default flag value or a method that returns the default value. */
+/** Default flag value or a callback method that returns the default value. */
 export type DefaultValue<TValue = unknown> =
   | TValue
   | DefaultValueHandler<TValue>;

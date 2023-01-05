@@ -13,5 +13,5 @@ export function boolean<TType extends string>(
     return false;
   }
 
-  throw new InvalidTypeError(type);
+  throw new InvalidTypeError(type, ["true", "false", "1", "0"]);
 }

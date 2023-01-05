@@ -130,7 +130,6 @@ export function parse(data: Uint8Array | string): KeyCode[] {
          *
          * We have basically two classes of ascii characters to process:
          *
-         *
          * 1. `\x1b[24;5~` should be parsed as { code: '[24~', modifier: 5 }
          *
          * This particular example is featuring Ctrl+F12 in xterm.
@@ -140,7 +139,6 @@ export function parse(data: Uint8Array | string): KeyCode[] {
          *
          * So the generic regexp is like /^\d\d?(;\d)?[~^$]$/
          *
-         *
          * 2. `\x1b[1;5H` should be parsed as { code: '[H', modifier: 5 }
          *
          * This particular example is featuring Ctrl+Home in xterm.
@@ -149,7 +147,6 @@ export function parse(data: Uint8Array | string): KeyCode[] {
          *  - `1;` part is optional, e.g. it could be `\x1b[5H`
          *
          * So the generic regexp is like /^((\d;)?\d)?[A-Za-z]$/
-         *
          */
         const cmdStart: number = s.length - 1;
 
@@ -210,6 +207,10 @@ export function parse(data: Uint8Array | string): KeyCode[] {
     } else if (ch in SpecialKeyMap) {
       key.name = SpecialKeyMap[ch];
       key.meta = escaped;
+
+      if (key.name === "space") {
+        key.char = ch;
+      }
     } else if (!escaped && ch <= "\x1a") {
       // ctrl+letter
       key.name = String.fromCharCode(
