@@ -132,7 +132,6 @@ Deno.test("[flags] should ignore defaults", () => {
 });
 
 Deno.test("[flags] should parse from context", () => {
-  console.log();
   const { flags, unknown, literal } = parseFlags({
     flags: { bar: true },
     unknown: ["--foo"],
