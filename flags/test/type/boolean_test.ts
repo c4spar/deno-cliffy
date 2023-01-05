@@ -117,6 +117,7 @@ Deno.test("flags - type - boolean - with invalid value", () => {
   assertThrows(
     () => parseFlags(["-f", "unknown"], options),
     Error,
-    `Option "--flag" must be of type "boolean", but got "unknown".`,
+    `Option "--flag" must be of type "boolean", but got "unknown".` +
+      ` Expected values: "true", "false", "1", "0"`,
   );
 });

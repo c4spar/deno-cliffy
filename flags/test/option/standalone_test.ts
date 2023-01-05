@@ -3,18 +3,14 @@ import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
-const options = <ParseFlagsOptions> {
-  stopEarly: false,
-  allowEmpty: false,
+const options: ParseFlagsOptions = {
   flags: [{
     name: "flag",
     aliases: ["f"],
-    type: OptionType.BOOLEAN,
     standalone: true,
   }, {
     name: "all",
     aliases: ["a"],
-    type: OptionType.BOOLEAN,
   }, {
     name: "foo-bar",
     aliases: ["f"],

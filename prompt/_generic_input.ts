@@ -5,15 +5,7 @@ import {
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { blue, dim, stripColor, underline } from "./deps.ts";
-
-/** Input keys options. */
-export interface GenericInputKeys extends GenericPromptKeys {
-  moveCursorLeft?: string[];
-  moveCursorRight?: string[];
-  deleteCharLeft?: string[];
-  deleteCharRight?: string[];
-}
+import { brightBlue, dim, stripColor, underline } from "./deps.ts";
 
 /** Generic input prompt options. */
 export interface GenericInputPromptOptions<TValue, TRawValue>
@@ -27,21 +19,31 @@ export interface GenericInputPromptSettings<TValue, TRawValue>
   keys?: GenericInputKeys;
 }
 
+/** Input keys options. */
+export interface GenericInputKeys extends GenericPromptKeys {
+  moveCursorLeft?: string[];
+  moveCursorRight?: string[];
+  deleteCharLeft?: string[];
+  deleteCharRight?: string[];
+}
+
 /** Generic input prompt representation. */
 export abstract class GenericInput<
   TValue,
   TRawValue,
-  TSettings extends GenericInputPromptSettings<TValue, TRawValue>,
-> extends GenericPrompt<TValue, TRawValue, TSettings> {
+> extends GenericPrompt<TValue, TRawValue> {
+  protected abstract readonly settings: GenericInputPromptSettings<
+    TValue,
+    TRawValue
+  >;
   protected inputValue = "";
   protected inputIndex = 0;
 
-  /**
-   * Prompt constructor.
-   * @param settings Prompt settings.
-   */
-  protected constructor(settings: TSettings) {
-    super({
+  protected getDefaultSettings(
+    options: GenericInputPromptOptions<TValue, TRawValue>,
+  ): GenericInputPromptSettings<TValue, TRawValue> {
+    const settings = super.getDefaultSettings(options);
+    return {
       ...settings,
       keys: {
         moveCursorLeft: ["left"],
@@ -50,7 +52,7 @@ export abstract class GenericInput<
         deleteCharRight: ["delete"],
         ...(settings.keys ?? {}),
       },
-    });
+    };
   }
 
   protected getCurrentInputValue(): string {
@@ -70,7 +72,7 @@ export abstract class GenericInput<
   protected highlight(
     value: string | number,
     color1: (val: string) => string = dim,
-    color2: (val: string) => string = blue,
+    color2: (val: string) => string = brightBlue,
   ): string {
     value = value.toString();
     const inputLowerCase = this.getCurrentInputValue().toLowerCase();

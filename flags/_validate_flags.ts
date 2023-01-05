@@ -17,9 +17,9 @@ import type { ArgumentOptions, FlagOptions } from "./types.ts";
  * @param opts    Parse options.
  * @param options Option name mappings: propertyName -> option
  */
-export function validateFlags<T extends FlagOptions = FlagOptions>(
+export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
-  opts: ParseFlagsOptions<T>,
+  opts: ParseFlagsOptions<TOptions>,
   options: Map<string, FlagOptions> = new Map(),
 ): void {
   if (!opts.flags) {
@@ -52,9 +52,9 @@ export function validateFlags<T extends FlagOptions = FlagOptions>(
   validateRequiredOptions(ctx, options, opts);
 }
 
-function validateUnknownOption<T extends FlagOptions = FlagOptions>(
+function validateUnknownOption<TOptions extends FlagOptions = FlagOptions>(
   option: FlagOptions,
-  opts: ParseFlagsOptions<T>,
+  opts: ParseFlagsOptions<TOptions>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
     throw new UnknownOptionError(option.name, opts.flags ?? []);
@@ -65,9 +65,9 @@ function validateUnknownOption<T extends FlagOptions = FlagOptions>(
  * Adds all default values to ctx.flags and returns a boolean object map with
  * only the default option names `{ [OptionName: string]: boolean }`.
  */
-function setDefaultValues<T extends FlagOptions = FlagOptions>(
+function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
-  opts: ParseFlagsOptions<T>,
+  opts: ParseFlagsOptions<TOptions>,
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
@@ -176,7 +176,7 @@ function validateRequiredValues(
 
   for (let i = 0; i < option.args.length; i++) {
     const arg: ArgumentOptions = option.args[i];
-    if (!arg.requiredValue) {
+    if (arg.optional) {
       continue;
     }
     const hasValue = isArray
@@ -189,10 +189,10 @@ function validateRequiredValues(
   }
 }
 
-function validateRequiredOptions<T extends FlagOptions = FlagOptions>(
+function validateRequiredOptions<TOptions extends FlagOptions = FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
   options: Map<string, FlagOptions>,
-  opts: ParseFlagsOptions<T>,
+  opts: ParseFlagsOptions<TOptions>,
 ): void {
   if (!opts.flags?.length) {
     return;

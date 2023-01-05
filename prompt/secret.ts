@@ -1,15 +1,11 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
-import { blue, underline, yellow } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { underline } from "./deps.ts";
 import {
   GenericInput,
   GenericInputKeys,
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-
-/** Secret key options. */
-export type SecretKeys = GenericInputKeys;
 
 /** Secret prompt options. */
 export interface SecretOptions
@@ -30,24 +26,16 @@ interface SecretSettings extends GenericInputPromptSettings<string, string> {
   keys?: SecretKeys;
 }
 
+/** Secret key options. */
+export type SecretKeys = GenericInputKeys;
+
 /** Secret prompt representation. */
-export class Secret extends GenericInput<string, string, SecretSettings> {
+export class Secret extends GenericInput<string, string> {
+  protected readonly settings: SecretSettings;
+
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: string | SecretOptions): Promise<string> {
-    if (typeof options === "string") {
-      options = { message: options };
-    }
-
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      label: "Secret",
-      hidden: false,
-      minLength: 0,
-      maxLength: Infinity,
-      ...options,
-    }).prompt();
+    return new this(options).prompt();
   }
 
   /**
@@ -56,6 +44,24 @@ export class Secret extends GenericInput<string, string, SecretSettings> {
    */
   public static inject(value: string): void {
     GenericPrompt.inject(value);
+  }
+
+  constructor(options: string | SecretOptions) {
+    super();
+    if (typeof options === "string") {
+      options = { message: options };
+    }
+    this.settings = this.getDefaultSettings(options);
+  }
+
+  protected getDefaultSettings(options: SecretOptions): SecretSettings {
+    return {
+      ...super.getDefaultSettings(options),
+      label: options.label ?? "Secret",
+      hidden: options.hidden ?? false,
+      minLength: options.minLength ?? 0,
+      maxLength: options.maxLength ?? Infinity,
+    };
   }
 
   protected input(): string {

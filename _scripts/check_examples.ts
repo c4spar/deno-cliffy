@@ -1,4 +1,4 @@
-import { expandGlobSync } from "https://deno.land/std@0.167.0/fs/expand_glob.ts";
+import { expandGlobSync } from "https://deno.land/std@0.170.0/fs/expand_glob.ts";
 
 const MAX_PARALLEL = Number(Deno.env.get("MAX_PARALLEL")) || 8;
 const files = [...expandGlobSync("./examples/**/**.ts")];
@@ -16,14 +16,20 @@ if (errors.length) {
 
 async function checkExample(file: string): Promise<void> {
   console.log("Type check example:", file);
-  const output = await Deno.spawn("deno", {
-    args: ["check", "--unstable", file],
+  const proc = Deno.run({
+    cmd: ["deno", "check", "--unstable", file],
+    stderr: "piped",
   });
-  if (!output.success) {
+  const [status, stderrOutput] = await Promise.all([
+    proc.status(),
+    proc.stderrOutput(),
+  ]);
+  proc.close();
+  if (!status.success) {
     errors.push(
       new Error(
         `Type checking failed for ${file} \n${
-          new TextDecoder().decode(output.stderr)
+          new TextDecoder().decode(stderrOutput)
         }`,
       ),
     );
