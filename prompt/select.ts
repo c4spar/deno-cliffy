@@ -1,4 +1,4 @@
-import { blue, underline, yellow } from "./deps.ts";
+import { brightBlue, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -52,12 +52,12 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: SelectOptions): Promise<string> {
     return new this({
-      pointer: blue(Figures.POINTER_SMALL),
+      pointer: brightBlue(Figures.POINTER_SMALL),
       prefix: yellow("? "),
       indent: " ",
-      listPointer: blue(Figures.POINTER),
+      listPointer: brightBlue(Figures.POINTER),
       maxRows: 10,
-      searchLabel: blue(Figures.SEARCH),
+      searchLabel: brightBlue(Figures.SEARCH),
       ...options,
       options: Select.mapOptions(options),
     }).prompt();
@@ -72,7 +72,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
   }
 
   protected input(): string {
-    return underline(blue(this.inputValue));
+    return underline(brightBlue(this.inputValue));
   }
 
   /**

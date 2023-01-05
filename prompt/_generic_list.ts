@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { blue, bold, dim, stripColor } from "./deps.ts";
+import { bold, brightBlue, dim, stripColor } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
@@ -176,7 +176,7 @@ export abstract class GenericList<
       ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
     ];
 
-    return "\n" + this.settings.indent + blue(Figures.INFO) +
+    return "\n" + this.settings.indent + brightBlue(Figures.INFO) +
       bold(` ${selected}/${this.options.length} `) +
       actions
         .map((cur) => `${cur[0]}: ${bold(cur[1].join(", "))}`)

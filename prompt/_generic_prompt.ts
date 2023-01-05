@@ -1,7 +1,15 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
-import { blue, bold, dim, green, italic, red, stripColor } from "./deps.ts";
+import {
+  bold,
+  brightBlue,
+  dim,
+  green,
+  italic,
+  red,
+  stripColor,
+} from "./deps.ts";
 import { Figures } from "./figures.ts";
 
 /** Prompt validation return tape. */
@@ -104,7 +112,7 @@ export abstract class GenericPrompt<
   #execute = async (): Promise<TValue> => {
     // Throw errors on unit tests.
     if (typeof GenericPrompt.injectedValue !== "undefined" && this.#lastError) {
-      throw new Error(await this.error());
+      throw new Error(this.error());
     }
 
     await this.render();
@@ -234,7 +242,7 @@ export abstract class GenericPrompt<
   protected hint(): string | undefined {
     return this.settings.hint
       ? this.settings.indent +
-        italic(blue(dim(`${Figures.POINTER} `) + this.settings.hint))
+        italic(brightBlue(dim(`${Figures.POINTER} `) + this.settings.hint))
       : undefined;
   }
 

@@ -5,7 +5,7 @@ import {
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { blue, dim, stripColor, underline } from "./deps.ts";
+import { brightBlue, dim, stripColor, underline } from "./deps.ts";
 
 /** Input keys options. */
 export interface GenericInputKeys extends GenericPromptKeys {
@@ -70,7 +70,7 @@ export abstract class GenericInput<
   protected highlight(
     value: string | number,
     color1: (val: string) => string = dim,
-    color2: (val: string) => string = blue,
+    color2: (val: string) => string = brightBlue,
   ): string {
     value = value.toString();
     const inputLowerCase = this.getCurrentInputValue().toLowerCase();
