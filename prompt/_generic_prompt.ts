@@ -2,8 +2,8 @@ import type { Cursor } from "../ansi/cursor_position.ts";
 import { tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
 import {
-  blue,
   bold,
+  brightBlue,
   dim,
   green,
   italic,
@@ -246,7 +246,7 @@ export abstract class GenericPrompt<
   protected hint(): string | undefined {
     return this.settings.hint
       ? this.settings.indent +
-        italic(blue(dim(`${Figures.POINTER} `) + this.settings.hint))
+        italic(brightBlue(dim(`${Figures.POINTER} `) + this.settings.hint))
       : undefined;
   }
 

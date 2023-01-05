@@ -1,4 +1,4 @@
-import { blue, underline } from "./deps.ts";
+import { brightBlue, underline } from "./deps.ts";
 import {
   GenericList,
   GenericListKeys,
@@ -68,7 +68,7 @@ export class Select extends GenericList<string, string> {
   }
 
   protected input(): string {
-    return underline(blue(this.inputValue));
+    return underline(brightBlue(this.inputValue));
   }
 
   /**

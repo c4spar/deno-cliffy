@@ -6,8 +6,8 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import {
-  blue,
   bold,
+  brightBlue,
   dim,
   dirname,
   join,
@@ -265,7 +265,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
     let info = this.settings.indent;
     if (this.suggestions.length) {
-      info += blue(Figures.INFO) + bold(` ${selected}/${matched} `);
+      info += brightBlue(Figures.INFO) + bold(` ${selected}/${matched} `);
     }
     info += actions
       .map((cur) => `${cur[0]}: ${bold(cur[1].join(" "))}`)

@@ -1,5 +1,5 @@
 import { Provider, Versions } from "../provider.ts";
-import { blue, bold } from "../../deps.ts";
+import { bold, brightBlue } from "../../deps.ts";
 
 export interface GithubProviderOptions {
   repository: string;
@@ -73,11 +73,11 @@ export class GithubProvider extends Provider {
     const showBranches: boolean = !!this.listBranches && branches.length > 0;
     const indent = showBranches ? 2 : 0;
     if (showBranches) {
-      console.log("\n" + " ".repeat(indent) + bold(blue("Tags:\n")));
+      console.log("\n" + " ".repeat(indent) + bold(brightBlue("Tags:\n")));
     }
     super.printVersions(tags, currentVersion, { indent });
     if (showBranches) {
-      console.log("\n" + " ".repeat(indent) + bold(blue("Branches:\n")));
+      console.log("\n" + " ".repeat(indent) + bold(brightBlue("Branches:\n")));
       super.printVersions(branches, currentVersion, { maxCols: 5, indent });
       console.log();
     }

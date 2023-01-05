@@ -1,3 +1,22 @@
+# [v0.25.7](https://github.com/c4spar/deno-cliffy/compare/v0.25.6...v0.25.7) (Jan 5, 2023)
+
+### Bug Fixes
+
+- **prompt:** suggestions are not completed if input is empty (#528)
+  ([06f71aa](https://github.com/c4spar/deno-cliffy/commit/06f71aa))
+- **prompt:** suggestions only work with lowercase input (#527)
+  ([9da2288](https://github.com/c4spar/deno-cliffy/commit/9da2288))
+
+### Code Refactoring
+
+- **command:** use `brightBlue` and `brightMagenta` instead of `blue` and
+  `magenta` in command output (#533)
+  ([c9e69e2](https://github.com/c4spar/deno-cliffy/commit/c9e69e2))
+- **command:** show expected values in error message for invalid boolean value
+  (#534) ([9d47a5e](https://github.com/c4spar/deno-cliffy/commit/9d47a5e))
+- **prompt:** use `brightBlue` instead of `blue` in prompt output (#530)
+  ([d7388a7](https://github.com/c4spar/deno-cliffy/commit/d7388a7))
+
 # [v0.25.6](https://github.com/c4spar/deno-cliffy/compare/v0.25.5...v0.25.6) (Dec 20, 2022)
 
 ### Bug Fixes

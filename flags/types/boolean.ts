@@ -13,5 +13,5 @@ export const boolean: TypeHandler<boolean> = (
     return false;
   }
 
-  throw new InvalidTypeError(type);
+  throw new InvalidTypeError(type, ["true", "false", "1", "0"]);
 };
