@@ -94,7 +94,7 @@ export abstract class GenericList<
       listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
       searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
       maxRows: options.maxRows ?? 10,
-      options: this.mapOptions(options).map(
+      options: this.mapOptions(options, options.options).map(
         (option) => this.mapOption(options, option),
       ),
       keys: {
@@ -107,17 +107,14 @@ export abstract class GenericList<
     };
   }
 
-  protected mapOptions<
-    TOption extends GenericListOption,
-  >(
-    options: GenericListOptions<TValue, TRawValue> & {
-      options: Array<string | TOption>;
-    },
-  ): Array<TOption | { value: string }> {
-    return options.options.map((option) =>
+  protected mapOptions(
+    promptOptions: GenericListOptions<TValue, TRawValue>,
+    options: Array<string | GenericListOption>,
+  ): Array<GenericListOptionSettings> {
+    return options.map((option) =>
       typeof option === "string" ? { value: option } : option
     ).map(
-      (option) => this.mapOption(options, option),
+      (option) => this.mapOption(promptOptions, option),
     );
   }
 

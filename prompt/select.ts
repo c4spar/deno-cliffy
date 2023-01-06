@@ -1,4 +1,4 @@
-import { blue, bold, dim, underline, yellow } from "./deps.ts";
+import { bold, brightBlue, dim, underline, yellow } from "./deps.ts";
 import { Figures } from "./figures.ts";
 import {
   GenericList,
@@ -11,28 +11,9 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 import { distance } from "../_utils/distance.ts";
 
-/** Select key options. */
-export type SelectKeys = GenericListKeys;
-
-/** Select option options. */
-export interface SelectOption extends GenericListOption {
-  options?: SelectValueOptions;
-}
-
-/** Select option settings. */
-export interface SelectOptionSettings extends GenericListOptionSettings {
-  options: SelectValueSettings;
-  indentLevel: number;
-}
-
-/** Select options type. */
-export type SelectValueOptions = (string | SelectOption)[];
-/** Select option settings type. */
-export type SelectValueSettings = SelectOptionSettings[];
-
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {
-  options: SelectValueOptions;
+  options: Array<string | SelectOption>;
   maxBreadcrumbItems?: number;
   breadcrumbSeparator?: string;
   keys?: SelectKeys;
@@ -40,7 +21,7 @@ export interface SelectOptions extends GenericListOptions<string, string> {
 
 /** Select prompt settings. */
 export interface SelectSettings extends GenericListSettings<string, string> {
-  options: SelectValueSettings;
+  options: Array<SelectOptionSettings>;
   maxBreadcrumbItems: number;
   breadcrumbSeparator: string;
   backPointer: string;
@@ -49,8 +30,22 @@ export interface SelectSettings extends GenericListSettings<string, string> {
   keys?: SelectKeys;
 }
 
+/** Select option options. */
+export interface SelectOption extends GenericListOption {
+  options?: Array<string | SelectOption>;
+}
+
+/** Select option settings. */
+export interface SelectOptionSettings extends GenericListOptionSettings {
+  options: Array<SelectOptionSettings>;
+  indentLevel: number;
+}
+
+/** Select key options. */
+export type SelectKeys = GenericListKeys;
+
 interface ParentOptions {
-  options: SelectValueSettings;
+  options: Array<SelectOptionSettings>;
   selectedCategoryIndex: number;
 }
 
@@ -69,15 +64,22 @@ const backItem: SelectOptionSettings = {
 };
 
 /** Select prompt representation. */
-export class Select<TSettings extends SelectSettings = SelectSettings>
-  extends GenericList<string, string, TSettings> {
-  protected listIndex: number = this.getListIndex(this.settings.default);
-  #parentCategories: ParentOptions[] = [];
+export class Select extends GenericList<string, string> {
+  protected readonly settings: SelectSettings;
+  protected options: Array<SelectOptionSettings>;
+  protected listIndex: number;
+  protected listOffset: number;
+  #parentCategories: Array<ParentOptions> = [];
   /**
    * Since categories add a "Back" item to the list of options,
    * they should not use zero as the first selected item.
    */
   #indexOfFirstItemInsideCategory = 1;
+
+  /** Execute the prompt and show cursor on end. */
+  public static prompt(options: SelectOptions): Promise<string> {
+    return new this(options).prompt();
+  }
 
   /**
    * Inject prompt value. Can be used for unit tests or pre selections.
@@ -87,44 +89,45 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
     GenericPrompt.inject(value);
   }
 
-  /** Execute the prompt and show cursor on end. */
-  public static prompt(options: SelectOptions): Promise<string> {
-    return new this({
-      pointer: blue(Figures.POINTER_SMALL),
-      prefix: yellow("? "),
-      indent: " ",
-      listPointer: blue(Figures.POINTER),
-      backPointer: blue(Figures.LEFT_POINTER),
-      categoryPointer: blue(Figures.POINTER),
-      categoryMarker: dim(Figures.FOLDER),
-      maxRows: 10,
-      searchLabel: blue(Figures.SEARCH),
-      maxBreadcrumbItems: 5,
-      breadcrumbSeparator: " › ",
-      ...options,
-      options: Select.mapOptions(options.options),
-    }).prompt();
+  constructor(options: SelectOptions) {
+    super();
+    this.settings = this.getDefaultSettings(options);
+    this.options = this.settings.options.slice();
+    this.listIndex = this.getListIndex(this.settings.default);
+    this.listOffset = this.getPageOffset(this.listIndex);
   }
 
-  protected static mapOptions(
-    options: SelectValueOptions,
-  ): SelectValueSettings {
-    return options
-      .map((item: string | SelectOption) =>
-        typeof item === "string" ? { value: item } : item
-      )
-      .map((item: SelectOption) => {
-        const settings = this.mapOption(item);
-        return {
-          options: Select.mapOptions(item.options ?? []),
-          indentLevel: 0,
-          ...settings,
-        };
-      });
+  protected getDefaultSettings(options: SelectOptions): SelectSettings {
+    return {
+      backPointer: brightBlue(Figures.LEFT_POINTER),
+      categoryPointer: brightBlue(Figures.POINTER),
+      categoryMarker: dim(Figures.FOLDER),
+      maxBreadcrumbItems: 5,
+      breadcrumbSeparator: " › ",
+      ...super.getDefaultSettings(options),
+      options: this.mapOptions(options, options.options).map(
+        (option) => this.mapOption(options, option),
+      ),
+    };
+  }
+
+  protected mapOption(
+    options: SelectOptions,
+    option: SelectOption,
+  ): SelectOptionSettings {
+    return {
+      indentLevel: 0,
+      ...super.mapOption(options, option),
+      options: option.options
+        ? this.mapOptions(options, option.options) as Array<
+          SelectOptionSettings
+        >
+        : [],
+    };
   }
 
   protected input(): string {
-    return underline(blue(this.inputValue));
+    return underline(brightBlue(this.inputValue));
   }
 
   /**
@@ -200,10 +203,12 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
 
   private itemsInsideCategory(
     option: SelectOptionSettings,
-  ): SelectValueSettings {
+  ): Array<SelectOptionSettings> {
     return [
       backItem,
-      ...Select.mapOptions(option.options),
+      ...this.mapOptions(this.settings, option.options) as Array<
+        SelectOptionSettings
+      >,
     ];
   }
 
@@ -256,7 +261,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
         this.clampListIndex();
       }
     } else {
-      const sortedHits = this.findSearchHits(input,this.itemsToSearchIn());
+      const sortedHits = this.findSearchHits(input, this.itemsToSearchIn());
       this.options = this.buildSearchResultsToDisplay(sortedHits);
       this.listIndex = this.options.findIndex((option) => !option.disabled);
     }
@@ -270,7 +275,7 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
   ): SortedOption[] {
     return options.map((opt) => {
       if (Select.itemIsCategory(opt)) {
-        const sortedChildHits = this.findSearchHits(searchInput,opt.options)
+        const sortedChildHits = this.findSearchHits(searchInput, opt.options)
           .sort(this.sortByDistance);
 
         if (sortedChildHits.length === 0) {
@@ -388,3 +393,15 @@ export class Select<TSettings extends SelectSettings = SelectSettings>
     return this.getCurrentInputValue() !== "";
   }
 }
+
+/**
+ * Select options type.
+ * @deprecated Use `Array<string | SelectOption>` instead.
+ */
+export type SelectValueOptions = Array<string | SelectOption>;
+
+/**
+ * Select option settings type.
+ * @deprecated Use `Array<SelectOptionSettings>` instead.
+ */
+export type SelectValueSettings = Array<SelectOptionSettings>;

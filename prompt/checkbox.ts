@@ -97,7 +97,7 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
       uncheck: options.uncheck ?? red(Figures.CROSS),
       minOptions: options.minOptions ?? 0,
       maxOptions: options.maxOptions ?? Infinity,
-      options: this.mapOptions(options),
+      options: this.mapOptions(options, options.options),
       keys: {
         check: ["space"],
         ...(settings.keys ?? {}),
@@ -107,13 +107,14 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
 
   /**
    * Map string option values to options and set option defaults.
-   * @param options Checkbox options.
+   * @param promptOptions Checkbox options.
    */
   protected mapOptions(
-    options: CheckboxOptions,
+    promptOptions: CheckboxOptions,
+    options: Array<string | CheckboxOption>,
   ): Array<CheckboxOptionSettings> {
-    return super.mapOptions(options).map(
-      (option) => this.mapOption(options, option),
+    return super.mapOptions(promptOptions, options).map(
+      (option) => this.mapOption(promptOptions, option),
     );
   }
 
