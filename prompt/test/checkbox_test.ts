@@ -33,9 +33,7 @@ Deno.test("prompt checkbox: invalid value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -53,9 +51,7 @@ Deno.test("prompt checkbox: null value", async () => {
     },
     Error,
     red(
-      `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
-      }Invalid answer.`,
+      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
@@ -74,7 +70,7 @@ Deno.test("prompt checkbox: min options", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }The minimum number of options is 3 but got 2.`,
     ),
   );
@@ -94,7 +90,7 @@ Deno.test("prompt checkbox: max options", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold(" × ") : bold(" ✘ ")
+        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
       }The maximum number of options is 1 but got 2.`,
     ),
   );

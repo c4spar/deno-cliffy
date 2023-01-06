@@ -99,8 +99,7 @@ export function parseArgumentsDefinition<T extends boolean>(
     const type: string | undefined = parts[2] || OptionType.STRING;
 
     const details: Argument = {
-      optionalValue: arg[0] === "[",
-      requiredValue: arg[0] === "<",
+      optional: arg[0] === "[",
       name: parts[1],
       action: parts[3] || type,
       variadic: false,
@@ -108,7 +107,7 @@ export function parseArgumentsDefinition<T extends boolean>(
       type,
     };
 
-    if (validate && !details.optionalValue && hasOptional) {
+    if (validate && !details.optional && hasOptional) {
       throw new UnexpectedRequiredArgumentError(details.name);
     }
 
@@ -161,5 +160,7 @@ export function getDescription(
   description: string,
   short?: boolean,
 ): string {
-  return short ? description.trim().split("\n", 1)[0] : dedent(description);
+  return short
+    ? description.trim().split("\n", 1)[0].trim()
+    : dedent(description);
 }

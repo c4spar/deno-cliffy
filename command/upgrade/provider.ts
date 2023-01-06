@@ -1,4 +1,4 @@
-import { blue, bold, cyan, green, red, yellow } from "../deps.ts";
+import { bold, brightBlue, cyan, green, red, yellow } from "../deps.ts";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "../../table/table.ts";
 
@@ -46,7 +46,7 @@ export abstract class Provider {
         } is not found.\n\n    ${
           cyan(
             `Visit ${
-              blue(this.getRepositoryUrl(name))
+              brightBlue(this.getRepositoryUrl(name))
             } for available releases or run again with the ${(yellow(
               "-l",
             ))} or ${(yellow("--list-versions"))} command.`,
