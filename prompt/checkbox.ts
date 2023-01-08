@@ -8,6 +8,7 @@ import {
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
+  ParentOptions,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
@@ -24,8 +25,8 @@ export interface CheckboxOptions
 
 /** Checkbox prompt settings. */
 interface CheckboxSettings
-  extends GenericListSettings<Array<string>, Array<string>> {
-  options: Array<CheckboxOptionSettings>;
+  extends
+    GenericListSettings<Array<string>, Array<string>, CheckboxOptionSettings> {
   check: string;
   uncheck: string;
   minOptions: number;
@@ -51,9 +52,11 @@ export interface CheckboxKeys extends GenericListKeys {
 }
 
 /** Checkbox prompt representation. */
-export class Checkbox extends GenericList<Array<string>, Array<string>> {
+export class Checkbox
+  extends GenericList<Array<string>, Array<string>, CheckboxOptionSettings> {
   protected readonly settings: CheckboxSettings;
   protected options: Array<CheckboxOptionSettings>;
+  protected parentOptions: Array<ParentOptions<CheckboxOptionSettings>> = [];
   protected listIndex: number;
   protected listOffset: number;
 
@@ -113,8 +116,12 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
     promptOptions: CheckboxOptions,
     options: Array<string | CheckboxOption>,
   ): Array<CheckboxOptionSettings> {
-    return super.mapOptions(promptOptions, options).map(
-      (option) => this.mapOption(promptOptions, option),
+    return options.map(
+      (option) =>
+        this.mapOption(
+          promptOptions,
+          typeof option === "string" ? { value: option } : option,
+        ),
     );
   }
 
@@ -127,7 +134,8 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
     option: CheckboxOption,
   ): CheckboxOptionSettings {
     return {
-      ...super.mapOption(options, option),
+      ...super.mapOption(options, option, false),
+      options: option.options ? this.mapOptions(options, option.options) : [],
       checked: typeof option.checked === "undefined" && options.default &&
           options.default.indexOf(option.value) !== -1
         ? true
@@ -136,48 +144,26 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
     };
   }
 
-  /**
-   * Render checkbox option.
-   * @param item        Checkbox option settings.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected getListItem(
-    item: CheckboxOptionSettings,
-    isSelected?: boolean,
-  ): string {
-    let line = this.settings.indent;
+  protected getListItemIcon(option: CheckboxOptionSettings): string {
+    return this.getCheckboxIcon(option) + super.getListItemIcon(option);
+  }
 
-    // pointer
-    line += isSelected ? this.settings.listPointer + " " : "  ";
-
-    // icon
-    if (item.icon) {
-      let check = item.checked
-        ? this.settings.check + " "
-        : this.settings.uncheck + " ";
-      if (item.disabled) {
-        check = dim(check);
-      }
-      line += check;
-    } else {
-      line += "  ";
+  private getCheckboxIcon(option: CheckboxOptionSettings): string {
+    if (!option.icon) {
+      return " ";
     }
+    const icon = option.checked
+      ? this.settings.check + " "
+      : this.settings.uncheck + " ";
 
-    // value
-    line += `${
-      isSelected && !item.disabled
-        ? this.highlight(item.name, (val) => val)
-        : this.highlight(item.name)
-    }`;
-
-    return line;
+    return option.disabled ? dim(icon) : icon;
   }
 
   /** Get value of checked options. */
   protected getValue(): Array<string> {
-    return this.settings.options
-      .filter((item) => item.checked)
-      .map((item) => item.value);
+    return this.flatOptions(this.settings.options, false)
+      .filter((option) => option.checked)
+      .map((option) => option.value);
   }
 
   /**
@@ -196,11 +182,28 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
 
   /** Check selected option. */
   protected checkValue(): void {
-    const item = this.options[this.listIndex];
-    if (item.disabled) {
+    const option = this.options[this.listIndex];
+    if (option.disabled) {
       this.setErrorMessage("This option is disabled and cannot be changed.");
-    } else {
-      item.checked = !item.checked;
+      return;
+    }
+    this.checkOption(option, !option.checked);
+    this.checkParentOptions();
+  }
+
+  private checkOption(option: CheckboxOptionSettings, checked: boolean) {
+    option.checked = checked;
+    for (const childOption of option.options) {
+      this.checkOption(childOption, checked);
+    }
+  }
+
+  private checkParentOptions() {
+    for (let i = this.parentOptions.length - 1; i >= 0; i--) {
+      const parentOption = this.getParentOption(i);
+      if (parentOption) {
+        parentOption.checked = parentOption.options.every((opt) => opt.checked);
+      }
     }
   }
 
@@ -210,19 +213,6 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
    * @return True on success, false or error message on error.
    */
   protected validate(value: Array<string>): boolean | string {
-    const isValidValue = Array.isArray(value) &&
-      value.every((val) =>
-        typeof val === "string" &&
-        val.length > 0 &&
-        this.settings.options.findIndex((option: CheckboxOptionSettings) =>
-            option.value === val
-          ) !== -1
-      );
-
-    if (!isValidValue) {
-      return false;
-    }
-
     if (value.length < this.settings.minOptions) {
       return `The minimum number of options is ${this.settings.minOptions} but got ${value.length}.`;
     }

@@ -25,8 +25,9 @@ const main = {
   PAGE_UP: "⇞",
   PAGE_DOWN: "⇟",
   ENTER: "↵",
-  SEARCH: "⌕",
-  FOLDER: "🗀",
+  SEARCH: "🔎",
+  FOLDER: "📁",
+  FOLDER_OPEN: "📂",
 };
 
 const win = {

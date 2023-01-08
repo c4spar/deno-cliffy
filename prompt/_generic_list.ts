@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { bold, brightBlue, dim, stripColor } from "./deps.ts";
+import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
@@ -26,12 +26,17 @@ export interface GenericListOptions<TValue, TRawValue> extends
   searchLabel?: string;
   search?: boolean;
   info?: boolean;
+  maxBreadcrumbItems?: number;
+  breadcrumbSeparator?: string;
 }
 
 /** Generic list prompt settings. */
-export interface GenericListSettings<TValue, TRawValue>
-  extends GenericInputPromptSettings<TValue, TRawValue> {
-  options: Array<GenericListOptionSettings>;
+export interface GenericListSettings<
+  TValue,
+  TRawValue,
+  TOption extends GenericListOptionSettings,
+> extends GenericInputPromptSettings<TValue, TRawValue> {
+  options: Array<TOption>;
   keys?: GenericListKeys;
   indent: string;
   listPointer: string;
@@ -39,6 +44,12 @@ export interface GenericListSettings<TValue, TRawValue>
   searchLabel: string;
   search?: boolean;
   info?: boolean;
+  maxBreadcrumbItems: number;
+  breadcrumbSeparator: string;
+  backPointer: string;
+  groupPointer: string;
+  groupIcon: string;
+  groupOpenIcon: string;
 }
 
 /** Generic list option options. */
@@ -46,6 +57,7 @@ export interface GenericListOption {
   value: string;
   name?: string;
   disabled?: boolean;
+  options?: Array<string | GenericListOption>;
 }
 
 /** Generic list option settings. */
@@ -53,9 +65,11 @@ export interface GenericListOptionSettings extends GenericListOption {
   name: string;
   value: string;
   disabled: boolean;
+  indentLevel: number;
+  options: Array<this>;
 }
 
-/** Select key options. */
+/** GenericList key options. */
 export interface GenericListKeys extends GenericInputKeys {
   previous?: string[];
   next?: string[];
@@ -63,18 +77,39 @@ export interface GenericListKeys extends GenericInputKeys {
   nextPage?: string[];
 }
 
+interface SortedOption<TOption extends GenericListOptionSettings> {
+  originalOption: TOption;
+  distance: number;
+  children: Array<SortedOption<TOption>>;
+}
+
+export interface ParentOptions<TOption extends GenericListOptionSettings> {
+  options: Array<TOption>;
+  selectedCategoryIndex: number;
+}
+
 /** Generic list prompt representation. */
 export abstract class GenericList<
   TValue,
   TRawValue,
+  TOption extends GenericListOptionSettings,
 > extends GenericInput<TValue, TRawValue> {
   protected abstract readonly settings: GenericListSettings<
     TValue,
-    TRawValue
+    TRawValue,
+    TOption
   >;
-  protected abstract options: Array<GenericListOptionSettings>;
+  protected abstract options: Array<TOption>;
+  protected abstract parentOptions: Array<ParentOptions<TOption>>;
   protected abstract listIndex: number;
   protected abstract listOffset: number;
+  #backButton: TOption = {
+    name: "",
+    value: "",
+    options: [],
+    disabled: false,
+    indentLevel: 0,
+  } as unknown as TOption;
 
   /**
    * Create list separator.
@@ -86,17 +121,20 @@ export abstract class GenericList<
 
   protected getDefaultSettings(
     options: GenericListOptions<TValue, TRawValue>,
-    // ): Omit<GenericListSettings<TValue, TRawValue>, "options"> {
-  ): GenericListSettings<TValue, TRawValue> {
+  ): GenericListSettings<TValue, TRawValue, TOption> {
     const settings = super.getDefaultSettings(options);
     return {
+      listPointer: brightBlue(Figures.POINTER),
+      searchLabel: brightBlue(Figures.SEARCH),
+      backPointer: brightBlue(Figures.LEFT_POINTER),
+      groupPointer: brightBlue(Figures.POINTER),
+      groupIcon: Figures.FOLDER,
+      groupOpenIcon: Figures.FOLDER_OPEN,
+      maxBreadcrumbItems: 5,
+      breadcrumbSeparator: "›",
       ...settings,
-      listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
-      searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
       maxRows: options.maxRows ?? 10,
-      options: this.mapOptions(options, options.options).map(
-        (option) => this.mapOption(options, option),
-      ),
+      options: this.mapOptions(options, options.options),
       keys: {
         previous: options.search ? ["up"] : ["up", "u", "p", "8"],
         next: options.search ? ["down"] : ["down", "d", "n", "2"],
@@ -107,77 +145,71 @@ export abstract class GenericList<
     };
   }
 
-  protected mapOptions(
+  protected abstract mapOptions(
     promptOptions: GenericListOptions<TValue, TRawValue>,
     options: Array<string | GenericListOption>,
-  ): Array<GenericListOptionSettings> {
-    return options.map((option) =>
-      typeof option === "string" ? { value: option } : option
-    ).map(
-      (option) => this.mapOption(promptOptions, option),
-    );
-  }
+  ): Array<TOption>;
 
   /**
    * Set list option defaults.
    * @param option List option.
    */
   protected mapOption(
-    _options: GenericListOptions<TValue, TRawValue>,
+    options: GenericListOptions<TValue, TRawValue>,
     option: GenericListOption,
+    recursive = true,
   ): GenericListOptionSettings {
     return {
       value: option.value,
       name: typeof option.name === "undefined" ? option.value : option.name,
       disabled: !!option.disabled,
+      indentLevel: 0,
+      options: recursive && option.options
+        ? this.mapOptions(options, option.options)
+        : [],
     };
+  }
+
+  protected flatOptions(
+    options: Array<TOption>,
+    groups = true,
+  ): Array<TOption> {
+    const opts = [];
+
+    for (const option of options) {
+      if (groups) {
+        opts.push(option);
+      }
+      if (option.options) {
+        opts.push(...this.flatOptions(option.options));
+      }
+    }
+
+    return opts;
   }
 
   protected match(): void {
     const input: string = this.getCurrentInputValue().toLowerCase();
+
     if (!input.length) {
-      this.options = this.settings.options.slice();
+      this.options = this.getCurrentOptions().slice();
+      if (this.hasParent()) {
+        this.options.unshift(this.#backButton);
+      }
     } else {
-      this.options = this.settings.options
-        .filter((option) => GenericList.matchesItem(input, option))
-        .sort((a, b) => GenericList.sortByDistanceToString(input, a, b));
+      const sortedHits = this.findSearchHits(input, this.getCurrentOptions());
+      this.options = this.buildSearchResultsToDisplay(sortedHits);
     }
-    this.clampListIndex();
-    this.clampListOffset();
-  }
 
-  public static matchesItem(
-    inputString: string,
-    option: GenericListOptionSettings,
-  ): boolean {
-    return this.matchInput(inputString, option.name) ||
-      (option.name !== option.value &&
-        this.matchInput(inputString, option.value));
-  }
+    const firstOptionIndex = this.options.findIndex((option) =>
+      !option.disabled && !this.isBackButton(option)
+    );
 
-  private static matchInput(inputString: string, value: string): boolean {
-    return stripColor(value)
-      .toLowerCase()
-      .includes(inputString);
-  }
-
-  public static sortByDistanceToString(
-    stringToDistanceFrom: string,
-    a: GenericListOptionSettings,
-    b: GenericListOptionSettings,
-  ): number {
-    return distance(a.name, stringToDistanceFrom) -
-      distance(b.name, stringToDistanceFrom);
-  }
-
-  protected clampListIndex(): void {
     this.listIndex = Math.max(
-      0,
+      firstOptionIndex,
       Math.min(this.options.length - 1, this.listIndex),
     );
-  }
 
-  protected clampListOffset(): void {
     this.listOffset = Math.max(
       0,
       Math.min(
@@ -185,6 +217,179 @@ export abstract class GenericList<
         this.listOffset,
       ),
     );
+  }
+
+  protected getCurrentOptions(): Array<TOption> {
+    return this.getParentOption()?.options ?? this.settings.options;
+  }
+
+  protected getParentOption(index = -1): TOption | undefined {
+    const group = this.parentOptions.at(index);
+    return group?.options.at(group.selectedCategoryIndex);
+  }
+
+  private findSearchHits(
+    searchInput: string,
+    options: Array<TOption>,
+  ): Array<SortedOption<TOption>> {
+    return options
+      .map((opt) => {
+        if (this.isGroup(opt)) {
+          const sortedChildHits = this
+            .findSearchHits(searchInput, opt.options)
+            .sort(sortByDistance);
+
+          if (sortedChildHits.length === 0) {
+            return [];
+          }
+
+          return [{
+            originalOption: opt,
+            distance: Math.min(...sortedChildHits.map((item) => item.distance)),
+            children: sortedChildHits,
+          }];
+        }
+
+        if (this.matchesOption(searchInput, opt)) {
+          return [{
+            originalOption: opt,
+            distance: distance(opt.name, searchInput),
+            children: [],
+          }];
+        }
+
+        return [];
+      })
+      .flat()
+      .sort(sortByDistance);
+
+    function sortByDistance(
+      a: SortedOption<TOption>,
+      b: SortedOption<TOption>,
+    ): number {
+      return a.distance - b.distance;
+    }
+  }
+
+  private buildSearchResultsToDisplay(
+    sortedOptions: Array<SortedOption<TOption>>,
+  ): Array<TOption> {
+    return sortedOptions
+      .map((option) => this.buildSearchResultHelper(0, option))
+      .flat();
+  }
+
+  private buildSearchResultHelper(
+    indentLevel: number,
+    sortedItem: SortedOption<TOption>,
+  ): Array<TOption> {
+    if (sortedItem.children.length > 0) {
+      const sortedChildItems = sortedItem.children
+        .map((nextLevelOption) =>
+          this.buildSearchResultHelper(indentLevel + 1, nextLevelOption)
+        )
+        .flat();
+
+      const itemForCategoryInSearchResult: TOption = {
+        ...sortedItem.originalOption,
+        name: dim(sortedItem.originalOption.name),
+        disabled: true,
+        indentLevel: indentLevel,
+      };
+
+      return [itemForCategoryInSearchResult, ...sortedChildItems];
+    } else {
+      sortedItem.originalOption.indentLevel = indentLevel;
+      return [sortedItem.originalOption];
+    }
+  }
+
+  private matchesOption(
+    inputString: string,
+    option: TOption,
+  ): boolean {
+    return this.matchInput(inputString, option.name) ||
+      (option.name !== option.value &&
+        this.matchInput(inputString, option.value));
+  }
+
+  private matchInput(inputString: string, value: string): boolean {
+    return stripColor(value)
+      .toLowerCase()
+      .includes(inputString);
+  }
+
+  protected getBreadCrumb() {
+    const parentsCount = this.parentOptions.length;
+    const maxItems = this.settings.maxBreadcrumbItems;
+
+    if (parentsCount === 0 || maxItems === 0) {
+      return "";
+    }
+    const parentOptions = parentsCount > maxItems
+      ? [this.parentOptions[0], ...this.parentOptions.slice(-maxItems + 1)]
+      : this.parentOptions;
+
+    const breadCrumb = parentOptions.map(({ options, selectedCategoryIndex }) =>
+      options[selectedCategoryIndex].name
+    );
+
+    if (parentsCount > maxItems) {
+      breadCrumb.splice(1, 0, "..");
+    }
+
+    return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
+  }
+
+  protected async submit(): Promise<void> {
+    const selectedOption = this.options[this.listIndex];
+
+    if (this.isBackButton(selectedOption)) {
+      this.submitBackButton();
+    } else if (this.isGroup(selectedOption)) {
+      this.submitGroupOption(selectedOption);
+    } else {
+      await super.submit();
+    }
+  }
+
+  protected submitBackButton() {
+    const previousLevel = this.parentOptions.pop();
+    if (!previousLevel) {
+      return;
+    }
+    this.options = previousLevel.options;
+    this.listIndex = previousLevel.selectedCategoryIndex;
+    this.listOffset = 0;
+  }
+
+  protected submitGroupOption(selectedOption: TOption) {
+    this.parentOptions.push({
+      options: this.options,
+      selectedCategoryIndex: this.listIndex,
+    });
+    this.options = [
+      this.#backButton,
+      ...selectedOption.options,
+    ];
+    this.listIndex = 1;
+    this.listOffset = 0;
+  }
+
+  protected isGroup(option: TOption): boolean {
+    return option.options.length > 0;
+  }
+
+  protected isBackButton(option: TOption): boolean {
+    return option === this.#backButton;
+  }
+
+  protected hasParent(): boolean {
+    return this.parentOptions.length > 0;
+  }
+
+  protected isSearching(): boolean {
+    return this.getCurrentInputValue() !== "";
   }
 
   protected message(): string {
@@ -248,13 +453,69 @@ export abstract class GenericList<
 
   /**
    * Render option.
-   * @param item        Option.
+   * @param option        Option.
    * @param isSelected  Set to true if option is selected.
    */
-  protected abstract getListItem(
-    item: GenericListOptionSettings,
-    isSelected?: boolean,
-  ): string;
+  protected getListItem(option: TOption, isSelected?: boolean): string {
+    let line = this.getListItemIndent(option);
+    line += this.getListItemPointer(option, isSelected);
+    line += this.getListItemIcon(option);
+    line += this.getListItemValue(option, isSelected);
+
+    return line;
+  }
+
+  protected getListItemIndent(option: TOption) {
+    const indentLevel = this.isSearching()
+      ? option.indentLevel
+      : this.hasParent() && !this.isBackButton(option)
+      ? 1
+      : 0;
+
+    return this.settings.indent + " ".repeat(indentLevel);
+  }
+
+  protected getListItemPointer(option: TOption, isSelected?: boolean) {
+    if (!isSelected) {
+      return "  ";
+    }
+
+    if (this.isBackButton(option)) {
+      return this.settings.backPointer + " ";
+    } else if (this.isGroup(option)) {
+      return this.settings.groupPointer + " ";
+    }
+
+    return this.settings.listPointer + " ";
+  }
+
+  protected getListItemIcon(option: TOption): string {
+    if (this.isBackButton(option)) {
+      return this.settings.groupOpenIcon + " ";
+    } else if (this.isGroup(option)) {
+      return this.settings.groupIcon + " ";
+    }
+
+    return "";
+  }
+
+  protected getListItemValue(option: TOption, isSelected?: boolean): string {
+    let value = this.isBackButton(option) ? this.getBreadCrumb() : option.name;
+
+    if (this.isBackButton(option)) {
+      value = bold(
+        isSelected && !option.disabled ? yellow(value) : dim(value),
+      );
+    } else {
+      value = isSelected && !option.disabled
+        ? this.highlight(value, (val) => val)
+        : this.highlight(value);
+
+      value = this.isGroup(option) ? bold(value) : value;
+    }
+
+    return value;
+  }
 
   /** Get options row height. */
   protected getListHeight(): number {
@@ -268,12 +529,9 @@ export abstract class GenericList<
     return Math.max(
       0,
       typeof value === "undefined"
-        ? this.options.findIndex((item: GenericListOptionSettings) =>
-          !item.disabled
-        ) || 0
-        : this.options.findIndex((item: GenericListOptionSettings) =>
-          item.value === value
-        ) || 0,
+        ? this.options.findIndex((option: TOption) => !option.disabled) || 0
+        : this.options.findIndex((option: TOption) => option.value === value) ||
+          0,
     );
   }
 
@@ -291,7 +549,7 @@ export abstract class GenericList<
    */
   protected getOptionByValue(
     value: string,
-  ): GenericListOptionSettings | undefined {
+  ): TOption | undefined {
     return this.options.find((option) => option.value === value);
   }
 
