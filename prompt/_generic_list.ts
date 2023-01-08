@@ -181,7 +181,7 @@ export abstract class GenericList<
         opts.push(option);
       }
       if (option.options) {
-        opts.push(...this.flatOptions(option.options));
+        opts.push(...this.flatOptions(option.options, groups));
       }
     }
 

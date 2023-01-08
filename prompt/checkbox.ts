@@ -212,6 +212,20 @@ export class Checkbox
    * @return True on success, false or error message on error.
    */
   protected validate(value: Array<string>): boolean | string {
+    const options = this.flatOptions(this.settings.options, false);
+    const isValidValue = Array.isArray(value) &&
+      value.every((val) =>
+        typeof val === "string" &&
+        val.length > 0 &&
+        options.findIndex((option: CheckboxOptionSettings) =>
+            option.value === val
+          ) !== -1
+      );
+
+    if (!isValidValue) {
+      return false;
+    }
+
     if (value.length < this.settings.minOptions) {
       return `The minimum number of options is ${this.settings.minOptions} but got ${value.length}.`;
     }
