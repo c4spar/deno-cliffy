@@ -177,7 +177,7 @@ export abstract class GenericList<
     const opts = [];
 
     for (const option of options) {
-      if (groups) {
+      if (!this.isGroup(option) || groups) {
         opts.push(option);
       }
       if (option.options) {
