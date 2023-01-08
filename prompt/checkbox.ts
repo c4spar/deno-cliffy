@@ -116,12 +116,11 @@ export class Checkbox
     promptOptions: CheckboxOptions,
     options: Array<string | CheckboxOption>,
   ): Array<CheckboxOptionSettings> {
-    return options.map(
-      (option) =>
-        this.mapOption(
-          promptOptions,
-          typeof option === "string" ? { value: option } : option,
-        ),
+    return options.map((option) =>
+      this.mapOption(
+        promptOptions,
+        typeof option === "string" ? { value: option } : option,
+      )
     );
   }
 

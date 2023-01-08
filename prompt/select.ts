@@ -77,12 +77,11 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
     promptOptions: SelectOptions,
     options: Array<string | SelectOption>,
   ): Array<SelectOptionSettings> {
-    return options.map(
-      (option) =>
-        this.mapOption(
-          promptOptions,
-          typeof option === "string" ? { value: option } : option,
-        ),
+    return options.map((option) =>
+      this.mapOption(
+        promptOptions,
+        typeof option === "string" ? { value: option } : option,
+      )
     );
   }
 
