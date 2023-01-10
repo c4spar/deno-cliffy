@@ -12,17 +12,14 @@ import { distance } from "../_utils/distance.ts";
 type UnsupportedInputOptions = "suggestions" | "list";
 
 /** Generic list prompt options. */
-export interface GenericListOptions<
-  TValue,
-  TRawValue,
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
-> extends
+export interface GenericListOptions<TValue, TRawValue> extends
   Omit<
     GenericInputPromptOptions<TValue, TRawValue>,
     UnsupportedInputOptions
   > {
-  options: Array<string | TOption | TGroup>;
+  options: Array<
+    string | GenericListOption | GenericListOptionGroup<GenericListOption>
+  >;
   keys?: GenericListKeys;
   indent?: string;
   listPointer?: string;
@@ -148,7 +145,7 @@ export abstract class GenericList<
   }
 
   protected getDefaultSettings(
-    options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    options: GenericListOptions<TValue, TRawValue>,
   ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
@@ -174,14 +171,14 @@ export abstract class GenericList<
   }
 
   protected abstract mapOptions(
-    promptOptions: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    promptOptions: GenericListOptions<TValue, TRawValue>,
     options: Array<
       string | GenericListOption | GenericListOptionGroup<GenericListOption>
     >,
   ): Array<TOption | TGroup>;
 
   protected mapOption(
-    _options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    _options: GenericListOptions<TValue, TRawValue>,
     option: GenericListOption,
   ): GenericListOptionSettings {
     return {
@@ -193,7 +190,7 @@ export abstract class GenericList<
   }
 
   protected mapOptionGroup(
-    options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    options: GenericListOptions<TValue, TRawValue>,
     option: GenericListOptionGroup<GenericListOption>,
     recursive = true,
   ): GenericListOptionGroupSettings<GenericListOptionSettings> {

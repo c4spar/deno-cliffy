@@ -15,13 +15,8 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Select prompt options. */
-export interface SelectOptions extends
-  GenericListOptions<
-    string,
-    string,
-    SelectOptionSettings,
-    SelectOptionGroupSettings
-  > {
+export interface SelectOptions extends GenericListOptions<string, string> {
+  options: Array<string | SelectOption | SelectOptionGroup>;
   keys?: SelectKeys;
 }
 

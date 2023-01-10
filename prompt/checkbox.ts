@@ -16,13 +16,9 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Checkbox prompt options. */
-export interface CheckboxOptions extends
-  GenericListOptions<
-    Array<string>,
-    Array<string>,
-    CheckboxOptionSettings,
-    CheckboxOptionGroupSettings
-  > {
+export interface CheckboxOptions
+  extends GenericListOptions<Array<string>, Array<string>> {
+  options: Array<string | CheckboxOption | CheckboxOptionGroup>;
   check?: string;
   uncheck?: string;
   partialCheck?: string;
