@@ -12,12 +12,17 @@ import { distance } from "../_utils/distance.ts";
 type UnsupportedInputOptions = "suggestions" | "list";
 
 /** Generic list prompt options. */
-export interface GenericListOptions<TValue, TRawValue> extends
+export interface GenericListOptions<
+  TValue,
+  TRawValue,
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+> extends
   Omit<
     GenericInputPromptOptions<TValue, TRawValue>,
     UnsupportedInputOptions
   > {
-  options: Array<string | GenericListOption>;
+  options: Array<string | TOption | TGroup>;
   keys?: GenericListKeys;
   indent?: string;
   listPointer?: string;
@@ -35,8 +40,9 @@ export interface GenericListSettings<
   TValue,
   TRawValue,
   TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
 > extends GenericInputPromptSettings<TValue, TRawValue> {
-  options: Array<TOption>;
+  options: Array<TOption | TGroup>;
   keys?: GenericListKeys;
   indent: string;
   listPointer: string;
@@ -57,7 +63,13 @@ export interface GenericListOption {
   value: string;
   name?: string;
   disabled?: boolean;
-  options?: Array<string | GenericListOption>;
+}
+
+/** Generic list option group options. */
+export interface GenericListOptionGroup<TOption extends GenericListOption> {
+  name: string;
+  options: Array<string | TOption | this>;
+  disabled?: boolean;
 }
 
 /** Generic list option settings. */
@@ -66,7 +78,15 @@ export interface GenericListOptionSettings extends GenericListOption {
   value: string;
   disabled: boolean;
   indentLevel: number;
-  options: Array<this>;
+}
+
+/** Generic list option group settings. */
+export interface GenericListOptionGroupSettings<
+  TOption extends GenericListOptionSettings,
+> extends GenericListOptionGroup<TOption> {
+  disabled: boolean;
+  indentLevel: number;
+  options: Array<TOption | this>;
 }
 
 /** GenericList key options. */
@@ -77,14 +97,20 @@ export interface GenericListKeys extends GenericInputKeys {
   nextPage?: string[];
 }
 
-interface SortedOption<TOption extends GenericListOptionSettings> {
-  originalOption: TOption;
+interface SortedOption<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+> {
+  originalOption: TOption | TGroup;
   distance: number;
-  children: Array<SortedOption<TOption>>;
+  children: Array<SortedOption<TOption, TGroup>>;
 }
 
-export interface ParentOptions<TOption extends GenericListOptionSettings> {
-  options: Array<TOption>;
+interface ParentOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+> {
+  options: Array<TOption | TGroup>;
   selectedCategoryIndex: number;
 }
 
@@ -93,16 +119,18 @@ export abstract class GenericList<
   TValue,
   TRawValue,
   TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
 > extends GenericInput<TValue, TRawValue> {
   protected abstract readonly settings: GenericListSettings<
     TValue,
     TRawValue,
-    TOption
+    TOption,
+    TGroup
   >;
-  protected abstract options: Array<TOption>;
-  protected abstract parentOptions: Array<ParentOptions<TOption>>;
+  protected abstract options: Array<TOption | TGroup>;
   protected abstract listIndex: number;
   protected abstract listOffset: number;
+  protected parentOptions: Array<ParentOptions<TOption, TGroup>> = [];
   #backButton: TOption = {
     name: "",
     value: "",
@@ -120,8 +148,8 @@ export abstract class GenericList<
   }
 
   protected getDefaultSettings(
-    options: GenericListOptions<TValue, TRawValue>,
-  ): GenericListSettings<TValue, TRawValue, TOption> {
+    options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+  ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
       listPointer: brightBlue(Figures.POINTER),
@@ -146,22 +174,31 @@ export abstract class GenericList<
   }
 
   protected abstract mapOptions(
-    promptOptions: GenericListOptions<TValue, TRawValue>,
-    options: Array<string | GenericListOption>,
-  ): Array<TOption>;
+    promptOptions: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    options: Array<
+      string | GenericListOption | GenericListOptionGroup<GenericListOption>
+    >,
+  ): Array<TOption | TGroup>;
 
-  /**
-   * Set list option defaults.
-   * @param option List option.
-   */
   protected mapOption(
-    options: GenericListOptions<TValue, TRawValue>,
+    _options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
     option: GenericListOption,
-    recursive = true,
   ): GenericListOptionSettings {
     return {
       value: option.value,
       name: typeof option.name === "undefined" ? option.value : option.name,
+      disabled: !!option.disabled,
+      indentLevel: 0,
+    };
+  }
+
+  protected mapOptionGroup(
+    options: GenericListOptions<TValue, TRawValue, TOption, TGroup>,
+    option: GenericListOptionGroup<GenericListOption>,
+    recursive = true,
+  ): GenericListOptionGroupSettings<GenericListOptionSettings> {
+    return {
+      name: option.name,
       disabled: !!option.disabled,
       indentLevel: 0,
       options: recursive && option.options
@@ -171,16 +208,26 @@ export abstract class GenericList<
   }
 
   protected flatOptions(
-    options: Array<TOption>,
+    options: Array<TOption | TGroup>,
+    groups: false,
+  ): Array<TOption>;
+
+  protected flatOptions(
+    options: Array<TOption | TGroup>,
+    groups?: boolean,
+  ): Array<TOption | TGroup>;
+
+  protected flatOptions(
+    options: Array<TOption | TGroup>,
     groups = true,
-  ): Array<TOption> {
+  ): Array<TOption | TGroup> {
     const opts = [];
 
     for (const option of options) {
-      if (!this.isGroup(option) || groups) {
+      if (isOption(option) || groups) {
         opts.push(option);
       }
-      if (option.options) {
+      if (isOptionGroup(option)) {
         opts.push(...this.flatOptions(option.options, groups));
       }
     }
@@ -201,12 +248,8 @@ export abstract class GenericList<
       this.options = this.buildSearchResultsToDisplay(sortedHits);
     }
 
-    const firstOptionIndex = this.options.findIndex((option) =>
-      !option.disabled && !this.isBackButton(option)
-    );
-
     this.listIndex = Math.max(
-      firstOptionIndex,
+      0,
       Math.min(this.options.length - 1, this.listIndex),
     );
 
@@ -219,22 +262,26 @@ export abstract class GenericList<
     );
   }
 
-  protected getCurrentOptions(): Array<TOption> {
+  protected getCurrentOptions(): Array<TOption | TGroup> {
     return this.getParentOption()?.options ?? this.settings.options;
   }
 
-  protected getParentOption(index = -1): TOption | undefined {
+  protected getParentOption(index = -1): TGroup | undefined {
     const group = this.parentOptions.at(index);
-    return group?.options.at(group.selectedCategoryIndex);
+    const option = group?.options.at(group.selectedCategoryIndex);
+    if (option) {
+      assertIsGroupOption<TGroup>(option);
+    }
+    return option;
   }
 
   private findSearchHits(
     searchInput: string,
-    options: Array<TOption>,
-  ): Array<SortedOption<TOption>> {
+    options: Array<TOption | TGroup>,
+  ): Array<SortedOption<TOption, TGroup>> {
     return options
       .map((opt) => {
-        if (this.isGroup(opt)) {
+        if (isOptionGroup(opt)) {
           const sortedChildHits = this
             .findSearchHits(searchInput, opt.options)
             .sort(sortByDistance);
@@ -250,7 +297,7 @@ export abstract class GenericList<
           }];
         }
 
-        if (this.matchesOption(searchInput, opt)) {
+        if (this.matchOption(searchInput, opt)) {
           return [{
             originalOption: opt,
             distance: distance(opt.name, searchInput),
@@ -264,16 +311,16 @@ export abstract class GenericList<
       .sort(sortByDistance);
 
     function sortByDistance(
-      a: SortedOption<TOption>,
-      b: SortedOption<TOption>,
+      a: SortedOption<TOption, TGroup>,
+      b: SortedOption<TOption, TGroup>,
     ): number {
       return a.distance - b.distance;
     }
   }
 
   private buildSearchResultsToDisplay(
-    sortedOptions: Array<SortedOption<TOption>>,
-  ): Array<TOption> {
+    sortedOptions: Array<SortedOption<TOption, TGroup>>,
+  ): Array<TOption | TGroup> {
     return sortedOptions
       .map((option) => this.buildSearchResultHelper(0, option))
       .flat();
@@ -281,8 +328,10 @@ export abstract class GenericList<
 
   private buildSearchResultHelper(
     indentLevel: number,
-    sortedItem: SortedOption<TOption>,
-  ): Array<TOption> {
+    sortedItem: SortedOption<TOption, TGroup>,
+  ): Array<TOption | TGroup> {
+    sortedItem.originalOption.indentLevel = indentLevel;
+
     if (sortedItem.children.length > 0) {
       const sortedChildItems = sortedItem.children
         .map((nextLevelOption) =>
@@ -290,27 +339,21 @@ export abstract class GenericList<
         )
         .flat();
 
-      const itemForCategoryInSearchResult: TOption = {
-        ...sortedItem.originalOption,
-        name: dim(sortedItem.originalOption.name),
-        disabled: true,
-        indentLevel: indentLevel,
-      };
-
-      return [itemForCategoryInSearchResult, ...sortedChildItems];
+      return [sortedItem.originalOption, ...sortedChildItems];
     } else {
-      sortedItem.originalOption.indentLevel = indentLevel;
       return [sortedItem.originalOption];
     }
   }
 
-  private matchesOption(
+  private matchOption(
     inputString: string,
-    option: TOption,
+    option: TOption | TGroup,
   ): boolean {
-    return this.matchInput(inputString, option.name) ||
-      (option.name !== option.value &&
-        this.matchInput(inputString, option.value));
+    return this.matchInput(inputString, option.name) || (
+      isOption(option) &&
+      option.name !== option.value &&
+      this.matchInput(inputString, option.value)
+    );
   }
 
   private matchInput(inputString: string, value: string): boolean {
@@ -346,7 +389,7 @@ export abstract class GenericList<
 
     if (this.isBackButton(selectedOption)) {
       this.submitBackButton();
-    } else if (this.isGroup(selectedOption)) {
+    } else if (isOptionGroup(selectedOption)) {
       this.submitGroupOption(selectedOption);
     } else {
       await super.submit();
@@ -363,7 +406,7 @@ export abstract class GenericList<
     this.listOffset = 0;
   }
 
-  protected submitGroupOption(selectedOption: TOption) {
+  protected submitGroupOption(selectedOption: TGroup) {
     this.parentOptions.push({
       options: this.options,
       selectedCategoryIndex: this.listIndex,
@@ -376,11 +419,7 @@ export abstract class GenericList<
     this.listOffset = 0;
   }
 
-  protected isGroup(option: TOption): boolean {
-    return option.options.length > 0;
-  }
-
-  protected isBackButton(option: TOption): boolean {
+  protected isBackButton(option: TOption | TGroup): boolean {
     return option === this.#backButton;
   }
 
@@ -456,7 +495,10 @@ export abstract class GenericList<
    * @param option        Option.
    * @param isSelected  Set to true if option is selected.
    */
-  protected getListItem(option: TOption, isSelected?: boolean): string {
+  protected getListItem(
+    option: TOption | TGroup,
+    isSelected?: boolean,
+  ): string {
     let line = this.getListItemIndent(option);
     line += this.getListItemPointer(option, isSelected);
     line += this.getListItemIcon(option);
@@ -465,7 +507,7 @@ export abstract class GenericList<
     return line;
   }
 
-  protected getListItemIndent(option: TOption) {
+  protected getListItemIndent(option: TOption | TGroup) {
     const indentLevel = this.isSearching()
       ? option.indentLevel
       : this.hasParent() && !this.isBackButton(option)
@@ -475,31 +517,34 @@ export abstract class GenericList<
     return this.settings.indent + " ".repeat(indentLevel);
   }
 
-  protected getListItemPointer(option: TOption, isSelected?: boolean) {
+  protected getListItemPointer(option: TOption | TGroup, isSelected?: boolean) {
     if (!isSelected) {
       return "  ";
     }
 
     if (this.isBackButton(option)) {
       return this.settings.backPointer + " ";
-    } else if (this.isGroup(option)) {
+    } else if (isOptionGroup(option)) {
       return this.settings.groupPointer + " ";
     }
 
     return this.settings.listPointer + " ";
   }
 
-  protected getListItemIcon(option: TOption): string {
+  protected getListItemIcon(option: TOption | TGroup): string {
     if (this.isBackButton(option)) {
       return this.settings.groupOpenIcon + " ";
-    } else if (this.isGroup(option)) {
+    } else if (isOptionGroup(option)) {
       return this.settings.groupIcon + " ";
     }
 
     return "";
   }
 
-  protected getListItemValue(option: TOption, isSelected?: boolean): string {
+  protected getListItemValue(
+    option: TOption | TGroup,
+    isSelected?: boolean,
+  ): string {
     let value = this.isBackButton(option) ? this.getBreadCrumb() : option.name;
 
     if (this.isBackButton(option)) {
@@ -511,7 +556,7 @@ export abstract class GenericList<
         ? this.highlight(value, (val) => val)
         : this.highlight(value);
 
-      value = this.isGroup(option) ? bold(value) : value;
+      value = isOptionGroup(option) ? bold(value) : value;
     }
 
     return value;
@@ -529,8 +574,12 @@ export abstract class GenericList<
     return Math.max(
       0,
       typeof value === "undefined"
-        ? this.options.findIndex((option: TOption) => !option.disabled) || 0
-        : this.options.findIndex((option: TOption) => option.value === value) ||
+        ? this.options.findIndex((option: TOption | TGroup) =>
+          !option.disabled
+        ) || 0
+        : this.options.findIndex((option: TOption | TGroup) =>
+          isOption(option) && option.value === value
+        ) ||
           0,
     );
   }
@@ -550,7 +599,11 @@ export abstract class GenericList<
   protected getOptionByValue(
     value: string,
   ): TOption | undefined {
-    return this.options.find((option) => option.value === value);
+    const option = this.options.find((option) =>
+      isOption(option) && option.value === value
+    );
+
+    return option && isOptionGroup(option) ? undefined : option;
   }
 
   /** Read user input. */
@@ -686,6 +739,43 @@ export abstract class GenericList<
         this.listOffset = offset;
       }
     }
+  }
+}
+
+export function isOption<
+  TOption extends GenericListOption,
+>(
+  option: TOption | GenericListOptionGroup<GenericListOption>,
+): option is TOption {
+  return "value" in option;
+}
+
+export function isOptionGroup<
+  TGroup extends GenericListOptionGroup<GenericListOption>,
+>(
+  option: TGroup | GenericListOption | string,
+): option is TGroup {
+  return typeof option === "object" && "options" in option &&
+    option.options.length > 0;
+}
+
+export function assertIsOption<
+  TOption extends GenericListOption,
+>(
+  option: TOption | GenericListOptionGroup<GenericListOption>,
+): asserts option is TOption {
+  if (!isOption(option)) {
+    throw new Error("Expected an option but got an option group.");
+  }
+}
+
+export function assertIsGroupOption<
+  TGroup extends GenericListOptionGroup<GenericListOption>,
+>(
+  option: TGroup | GenericListOption,
+): asserts option is TGroup {
+  if (!isOptionGroup(option)) {
+    throw new Error("Expected a group option but got an option.");
   }
 }
 

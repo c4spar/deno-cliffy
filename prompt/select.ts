@@ -1,41 +1,69 @@
 import { brightBlue, underline } from "./deps.ts";
 import {
+  assertIsOption,
   GenericList,
   GenericListKeys,
   GenericListOption,
+  GenericListOptionGroup,
+  GenericListOptionGroupSettings,
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
-  ParentOptions,
+  isOption,
+  isOptionGroup,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Select prompt options. */
-export interface SelectOptions extends GenericListOptions<string, string> {
-  options: Array<string | SelectOption>;
+export interface SelectOptions extends
+  GenericListOptions<
+    string,
+    string,
+    SelectOptionSettings,
+    SelectOptionGroupSettings
+  > {
   keys?: SelectKeys;
 }
 
 /** Select prompt settings. */
-export interface SelectSettings
-  extends GenericListSettings<string, string, SelectOptionSettings> {
+export interface SelectSettings extends
+  GenericListSettings<
+    string,
+    string,
+    SelectOptionSettings,
+    SelectOptionGroupSettings
+  > {
   keys?: SelectKeys;
 }
 
 /** Select option options. */
 export type SelectOption = GenericListOption;
 
+/** Select option group options. */
+export type SelectOptionGroup = GenericListOptionGroup<
+  GenericListOptionSettings
+>;
+
 /** Select option settings. */
 export type SelectOptionSettings = GenericListOptionSettings;
+
+/** Select option group settings. */
+export type SelectOptionGroupSettings = GenericListOptionGroupSettings<
+  SelectOptionSettings
+>;
 
 /** Select key options. */
 export type SelectKeys = GenericListKeys;
 
 /** Select prompt representation. */
-export class Select extends GenericList<string, string, SelectOptionSettings> {
+export class Select extends GenericList<
+  string,
+  string,
+  SelectOptionSettings,
+  SelectOptionGroupSettings
+> {
   protected readonly settings: SelectSettings;
-  protected options: Array<SelectOptionSettings>;
-  protected parentOptions: Array<ParentOptions<SelectOptionSettings>> = [];
+  protected options: Array<SelectOptionSettings | SelectOptionGroupSettings>;
   protected listIndex: number;
   protected listOffset: number;
 
@@ -63,9 +91,7 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
   protected getDefaultSettings(options: SelectOptions): SelectSettings {
     return {
       ...super.getDefaultSettings(options),
-      options: this.mapOptions(options, options.options).map(
-        (option) => this.mapOption(options, option),
-      ),
+      options: this.mapOptions(options, options.options),
     };
   }
 
@@ -75,13 +101,14 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
    */
   protected mapOptions(
     promptOptions: SelectOptions,
-    options: Array<string | SelectOption>,
-  ): Array<SelectOptionSettings> {
+    options: Array<string | SelectOption | SelectOptionGroup>,
+  ): Array<SelectOptionSettings | SelectOptionGroupSettings> {
     return options.map((option) =>
-      this.mapOption(
-        promptOptions,
-        typeof option === "string" ? { value: option } : option,
-      )
+      isOptionGroup(option)
+        ? this.mapOptionGroup(promptOptions, option)
+        : typeof option === "string"
+        ? this.mapOption(promptOptions, { value: option })
+        : this.mapOption(promptOptions, option)
     );
   }
 
@@ -91,7 +118,9 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
 
   /** Get value of selected option. */
   protected getValue(): string {
-    return this.options[this.listIndex]?.value ?? this.settings.default;
+    const option = this.options[this.listIndex];
+    assertIsOption(option);
+    return option?.value ?? this.settings.default;
   }
 
   /**
@@ -102,8 +131,9 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       value.length > 0 &&
-      this.options.findIndex((option: SelectOptionSettings) =>
-          option.value === value
+      this.options.findIndex((
+          option: SelectOptionSettings | SelectOptionGroupSettings,
+        ) => isOption(option) && option.value === value
         ) !== -1;
   }
 
@@ -127,12 +157,16 @@ export class Select extends GenericList<string, string, SelectOptionSettings> {
 
 /**
  * Select options type.
- * @deprecated Use `Array<string | SelectOption>` instead.
+ * @deprecated Use `Array<string | SelectOption | SelectOptionGroup>` instead.
  */
-export type SelectValueOptions = Array<string | SelectOption>;
+export type SelectValueOptions = Array<
+  string | SelectOption | SelectOptionGroup
+>;
 
 /**
  * Select option settings type.
- * @deprecated Use `Array<SelectOptionSettings>` instead.
+ * @deprecated Use `Array<SelectOptionSettings | SelectOptionGroupSettings>` instead.
  */
-export type SelectValueSettings = Array<SelectOptionSettings>;
+export type SelectValueSettings = Array<
+  SelectOptionSettings | SelectOptionGroupSettings
+>;
