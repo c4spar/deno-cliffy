@@ -201,9 +201,7 @@ export abstract class GenericList<
       name: option.name,
       disabled: !!option.disabled,
       indentLevel: 0,
-      options: recursive && option.options
-        ? this.mapOptions(options, option.options)
-        : [],
+      options: recursive ? this.mapOptions(options, option.options) : [],
     };
   }
 
