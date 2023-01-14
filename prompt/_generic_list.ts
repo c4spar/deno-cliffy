@@ -30,6 +30,10 @@ export interface GenericListOptions<TValue, TRawValue> extends
   info?: boolean;
   maxBreadcrumbItems?: number;
   breadcrumbSeparator?: string;
+  backPointer?: string;
+  groupPointer?: string;
+  groupIcon?: string | boolean;
+  groupOpenIcon?: string | boolean;
 }
 
 /** Generic list prompt settings. */
@@ -51,8 +55,8 @@ export interface GenericListSettings<
   breadcrumbSeparator: string;
   backPointer: string;
   groupPointer: string;
-  groupIcon: string;
-  groupOpenIcon: string;
+  groupIcon: string | false;
+  groupOpenIcon: string | false;
 }
 
 /** Generic list option options. */
@@ -145,19 +149,32 @@ export abstract class GenericList<
   }
 
   protected getDefaultSettings(
-    options: GenericListOptions<TValue, TRawValue>,
+    {
+      groupIcon = true,
+      groupOpenIcon = groupIcon,
+      ...options
+    }: GenericListOptions<TValue, TRawValue>,
   ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
       listPointer: brightBlue(Figures.POINTER),
       searchLabel: brightBlue(Figures.SEARCH),
       backPointer: brightBlue(Figures.LEFT_POINTER),
-      groupPointer: brightBlue(Figures.POINTER),
-      groupIcon: Figures.FOLDER,
-      groupOpenIcon: Figures.FOLDER_OPEN,
       maxBreadcrumbItems: 5,
       breadcrumbSeparator: "›",
       ...settings,
+      groupPointer: options.groupPointer || options.listPointer ||
+        brightBlue(Figures.POINTER),
+      groupIcon: !groupIcon
+        ? false
+        : typeof groupIcon === "string"
+        ? groupIcon
+        : Figures.FOLDER,
+      groupOpenIcon: !groupOpenIcon
+        ? false
+        : typeof groupOpenIcon === "string"
+        ? groupOpenIcon
+        : Figures.FOLDER_OPEN,
       maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options, options.options),
       keys: {
@@ -357,28 +374,6 @@ export abstract class GenericList<
       .includes(inputString);
   }
 
-  protected getBreadCrumb() {
-    const parentsCount = this.parentOptions.length;
-    const maxItems = this.settings.maxBreadcrumbItems;
-
-    if (parentsCount === 0 || maxItems === 0) {
-      return "";
-    }
-    const parentOptions = parentsCount > maxItems
-      ? [this.parentOptions[0], ...this.parentOptions.slice(-maxItems + 1)]
-      : this.parentOptions;
-
-    const breadCrumb = parentOptions.map(({ options, selectedCategoryIndex }) =>
-      options[selectedCategoryIndex].name
-    );
-
-    if (parentsCount > maxItems) {
-      breadCrumb.splice(1, 0, "..");
-    }
-
-    return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
-  }
-
   protected async submit(): Promise<void> {
     const selectedOption = this.options[this.listIndex];
 
@@ -497,7 +492,7 @@ export abstract class GenericList<
     let line = this.getListItemIndent(option);
     line += this.getListItemPointer(option, isSelected);
     line += this.getListItemIcon(option);
-    line += this.getListItemValue(option, isSelected);
+    line += this.getListItemLabel(option, isSelected);
 
     return line;
   }
@@ -528,33 +523,59 @@ export abstract class GenericList<
 
   protected getListItemIcon(option: TOption | TGroup): string {
     if (this.isBackButton(option)) {
-      return this.settings.groupOpenIcon + " ";
+      return this.settings.groupOpenIcon
+        ? this.settings.groupOpenIcon + " "
+        : "";
     } else if (isOptionGroup(option)) {
-      return this.settings.groupIcon + " ";
+      return this.settings.groupIcon ? this.settings.groupIcon + " " : "";
     }
 
     return "";
   }
 
-  protected getListItemValue(
+  protected getListItemLabel(
     option: TOption | TGroup,
     isSelected?: boolean,
   ): string {
-    let value = this.isBackButton(option) ? this.getBreadCrumb() : option.name;
+    let label: string;
 
     if (this.isBackButton(option)) {
-      value = bold(
-        isSelected && !option.disabled ? yellow(value) : dim(value),
-      );
+      label = this.getBreadCrumb();
+      label = isSelected && !option.disabled ? yellow(label) : dim(label);
     } else {
-      value = isSelected && !option.disabled
-        ? this.highlight(value, (val) => val)
-        : this.highlight(value);
-
-      value = isOptionGroup(option) ? bold(value) : value;
+      label = isSelected && !option.disabled
+        ? this.highlight(option.name, (val) => val)
+        : this.highlight(option.name);
     }
 
-    return value;
+    if (this.isBackButton(option) || isOptionGroup(option)) {
+      label = bold(label);
+    }
+
+    return label;
+  }
+
+  protected getBreadCrumb() {
+    const parentsCount = this.parentOptions.length;
+    const maxItems = this.settings.maxBreadcrumbItems;
+
+    if (parentsCount === 0 || maxItems === 0) {
+      return "";
+    }
+    const parentOptions = parentsCount > maxItems
+      ? [this.parentOptions[0], ...this.parentOptions.slice(-maxItems + 1)]
+      : this.parentOptions;
+
+    const breadCrumb = parentOptions.map(
+      ({ options, selectedCategoryIndex }) =>
+        options[selectedCategoryIndex].name,
+    );
+
+    if (parentsCount > maxItems) {
+      breadCrumb.splice(1, 0, "..");
+    }
+
+    return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
   }
 
   /** Get options row height. */
