@@ -186,6 +186,13 @@ export class Checkbox extends GenericList<
     };
   }
 
+  protected match(): void {
+    super.match();
+    if (this.isSearching()) {
+      this.disableList();
+    }
+  }
+
   protected getListItemIcon(
     option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
   ): string {
@@ -220,12 +227,21 @@ export class Checkbox extends GenericList<
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
-      case this.isKey(this.settings.keys, "check", event):
+      case this.isKey(this.settings.keys, "check", event) &&
+        this.isListEnabled():
         this.checkValue();
         break;
       default:
         await super.handleEvent(event);
     }
+  }
+
+  protected isListEnabled(): boolean {
+    return this.listIndex !== -1;
+  }
+
+  protected disableList() {
+    this.listIndex = -1;
   }
 
   /** Check selected option. */
