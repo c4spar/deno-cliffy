@@ -256,7 +256,7 @@ export abstract class GenericList<
         this.options.unshift(this.#backButton);
       }
     } else {
-      const sortedHits = this.findSearchHits(input, this.getCurrentOptions());
+      const sortedHits = this.matchOptions(input, this.getCurrentOptions());
       this.options = this.buildSearchResultsToDisplay(sortedHits);
     }
 
@@ -287,32 +287,32 @@ export abstract class GenericList<
     return option;
   }
 
-  private findSearchHits(
+  private matchOptions(
     searchInput: string,
     options: Array<TOption | TGroup>,
   ): Array<MatchedOption<TOption, TGroup>> {
     return options
-      .map((opt) => {
-        if (isOptionGroup(opt)) {
-          const sortedChildHits = this
-            .findSearchHits(searchInput, opt.options)
+      .map((option) => {
+        if (isOptionGroup(option)) {
+          const children = this
+            .matchOptions(searchInput, option.options)
             .sort(sortByDistance);
 
-          if (sortedChildHits.length === 0) {
+          if (!children.length) {
             return [];
           }
 
           return [{
-            originalOption: opt,
-            distance: Math.min(...sortedChildHits.map((item) => item.distance)),
-            children: sortedChildHits,
+            originalOption: option,
+            distance: Math.min(...children.map((item) => item.distance)),
+            children,
           }];
         }
 
-        if (this.matchOption(searchInput, opt)) {
+        if (this.matchOption(searchInput, option)) {
           return [{
-            originalOption: opt,
-            distance: distance(opt.name, searchInput),
+            originalOption: option,
+            distance: distance(option.name, searchInput),
             children: [],
           }];
         }
