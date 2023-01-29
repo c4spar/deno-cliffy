@@ -196,7 +196,7 @@ export class Checkbox extends GenericList<
     option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
   ): string {
     if (!option.icon) {
-      return " ";
+      return "";
     }
     const icon = option.checked
       ? this.settings.check + " "
@@ -230,8 +230,11 @@ export class Checkbox extends GenericList<
 
   /** Check selected option. */
   protected checkValue(): void {
-    const option = this.options[this.listIndex];
-    if (option.disabled) {
+    const option = this.options.at(this.listIndex);
+    if (!option) {
+      this.setErrorMessage("No option available to select.");
+      return;
+    } else if (option.disabled) {
       this.setErrorMessage("This option is disabled and cannot be changed.");
       return;
     }

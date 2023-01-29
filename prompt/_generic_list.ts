@@ -102,17 +102,9 @@ interface MatchedOption<
   TOption extends GenericListOptionSettings,
   TGroup extends GenericListOptionGroupSettings<TOption>,
 > {
-  originalOption: TOption | TGroup;
+  option: TOption | TGroup;
   distance: number;
   children: Array<MatchedOption<TOption, TGroup>>;
-}
-
-interface ParentOptions<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
-> {
-  options: Array<TOption | TGroup>;
-  selectedCategoryIndex: number;
 }
 
 /** Generic list prompt representation. */
@@ -131,14 +123,7 @@ export abstract class GenericList<
   protected abstract options: Array<TOption | TGroup>;
   protected abstract listIndex: number;
   protected abstract listOffset: number;
-  protected parentOptions: Array<ParentOptions<TOption, TGroup>> = [];
-  #backButton: TOption = {
-    name: "",
-    value: "",
-    options: [],
-    disabled: false,
-    indentLevel: 0,
-  } as unknown as TOption;
+  protected parentOptions: Array<TGroup> = [];
 
   /**
    * Create list separator.
@@ -233,38 +218,52 @@ export abstract class GenericList<
     options: Array<TOption | TGroup>,
     groups = true,
   ): Array<TOption | TGroup> {
-    const opts = [];
+    return flat(options, groups);
 
-    for (const option of options) {
-      if (isOption(option) || groups) {
-        opts.push(option);
+    function flat(
+      options: Array<TOption | TGroup>,
+      groups = true,
+      indentLevel = 0,
+      opts: Array<TOption | TGroup> = [],
+    ): Array<TOption | TGroup> {
+      for (const option of options) {
+        option.indentLevel = indentLevel;
+        if (isOption(option) || groups) {
+          opts.push(option);
+        }
+        if (isOptionGroup(option)) {
+          flat(option.options, groups, ++indentLevel, opts);
+        }
       }
-      if (isOptionGroup(option)) {
-        opts.push(...this.flatOptions(option.options, groups));
-      }
+
+      return opts;
     }
-
-    return opts;
   }
 
   protected match(): void {
     const input: string = this.getCurrentInputValue().toLowerCase();
+    let options: Array<TOption | TGroup> = this.getCurrentOptions().slice();
 
-    if (!input.length) {
-      this.options = this.getCurrentOptions().slice();
-      if (this.hasParent()) {
-        this.options.unshift(this.#backButton);
-      }
-    } else {
-      const sortedHits = this.matchOptions(input, this.getCurrentOptions());
-      this.options = this.buildSearchResultsToDisplay(sortedHits);
+    if (input.length) {
+      const matches = this.matchOptions(input, this.getCurrentOptions());
+      options = this.flatMatchedOptions(matches);
+    }
+
+    this.setOptions(options);
+  }
+
+  protected setOptions(options: Array<TOption | TGroup>, listIndex = 0) {
+    this.options = [...options];
+
+    const parent = this.getParentOption();
+    if (parent && this.options[0] !== parent) {
+      this.options.unshift(parent);
     }
 
     this.listIndex = Math.max(
       0,
       Math.min(this.options.length - 1, this.listIndex),
     );
-
     this.listOffset = Math.max(
       0,
       Math.min(
@@ -279,12 +278,7 @@ export abstract class GenericList<
   }
 
   protected getParentOption(index = -1): TGroup | undefined {
-    const group = this.parentOptions.at(index);
-    const option = group?.options.at(group.selectedCategoryIndex);
-    if (option) {
-      assertIsGroupOption<TGroup>(option);
-    }
-    return option;
+    return this.parentOptions.at(index);
   }
 
   private matchOptions(
@@ -298,20 +292,18 @@ export abstract class GenericList<
             .matchOptions(searchInput, option.options)
             .sort(sortByDistance);
 
-          if (!children.length) {
-            return [];
+          if (children.length) {
+            return [{
+              option,
+              distance: Math.min(...children.map((item) => item.distance)),
+              children,
+            }];
           }
-
-          return [{
-            originalOption: option,
-            distance: Math.min(...children.map((item) => item.distance)),
-            children,
-          }];
         }
 
         if (this.matchOption(searchInput, option)) {
           return [{
-            originalOption: option,
+            option,
             distance: distance(option.name, searchInput),
             children: [],
           }];
@@ -330,31 +322,18 @@ export abstract class GenericList<
     }
   }
 
-  private buildSearchResultsToDisplay(
-    sortedOptions: Array<MatchedOption<TOption, TGroup>>,
+  private flatMatchedOptions(
+    matches: Array<MatchedOption<TOption, TGroup>>,
+    indentLevel = 0,
+    result: Array<TOption | TGroup> = [],
   ): Array<TOption | TGroup> {
-    return sortedOptions
-      .map((option) => this.buildSearchResultHelper(0, option))
-      .flat();
-  }
-
-  private buildSearchResultHelper(
-    indentLevel: number,
-    sortedItem: MatchedOption<TOption, TGroup>,
-  ): Array<TOption | TGroup> {
-    sortedItem.originalOption.indentLevel = indentLevel;
-
-    if (sortedItem.children.length > 0) {
-      const sortedChildItems = sortedItem.children
-        .map((nextLevelOption) =>
-          this.buildSearchResultHelper(indentLevel + 1, nextLevelOption)
-        )
-        .flat();
-
-      return [sortedItem.originalOption, ...sortedChildItems];
-    } else {
-      return [sortedItem.originalOption];
+    for (const { option, children } of matches) {
+      option.indentLevel = indentLevel;
+      result.push(option);
+      this.flatMatchedOptions(children, indentLevel + 1, result);
     }
+
+    return result;
   }
 
   private matchOption(
@@ -387,30 +366,23 @@ export abstract class GenericList<
   }
 
   protected submitBackButton() {
-    const previousLevel = this.parentOptions.pop();
-    if (!previousLevel) {
+    const parentOption = this.parentOptions.pop();
+    if (!parentOption) {
       return;
     }
-    this.options = previousLevel.options;
-    this.listIndex = previousLevel.selectedCategoryIndex;
-    this.listOffset = 0;
+    const options = this.getCurrentOptions();
+    this.setOptions(options);
+    this.listIndex = this.options.indexOf(parentOption);
   }
 
   protected submitGroupOption(selectedOption: TGroup) {
-    this.parentOptions.push({
-      options: this.options,
-      selectedCategoryIndex: this.listIndex,
-    });
-    this.options = [
-      this.#backButton,
-      ...selectedOption.options,
-    ];
+    this.parentOptions.push(selectedOption);
+    this.setOptions(selectedOption.options);
     this.listIndex = 1;
-    this.listOffset = 0;
   }
 
   protected isBackButton(option: TOption | TGroup): boolean {
-    return option === this.#backButton;
+    return option === this.getParentOption();
   }
 
   protected hasParent(): boolean {
@@ -537,15 +509,15 @@ export abstract class GenericList<
     option: TOption | TGroup,
     isSelected?: boolean,
   ): string {
-    let label: string;
+    let label: string = option.name;
 
     if (this.isBackButton(option)) {
       label = this.getBreadCrumb();
       label = isSelected && !option.disabled ? yellow(label) : dim(label);
     } else {
       label = isSelected && !option.disabled
-        ? this.highlight(option.name, (val) => val)
-        : this.highlight(option.name);
+        ? this.highlight(label, (val) => val)
+        : this.highlight(label);
     }
 
     if (this.isBackButton(option) || isOptionGroup(option)) {
@@ -556,24 +528,13 @@ export abstract class GenericList<
   }
 
   protected getBreadCrumb() {
-    const parentsCount = this.parentOptions.length;
-    const maxItems = this.settings.maxBreadcrumbItems;
-
-    if (parentsCount === 0 || maxItems === 0) {
+    if (!this.parentOptions.length || !this.settings.maxBreadcrumbItems) {
       return "";
     }
-    const parentOptions = parentsCount > maxItems
-      ? [this.parentOptions[0], ...this.parentOptions.slice(-maxItems + 1)]
-      : this.parentOptions;
-
-    const breadCrumb = parentOptions.map(
-      ({ options, selectedCategoryIndex }) =>
-        options[selectedCategoryIndex].name,
-    );
-
-    if (parentsCount > maxItems) {
-      breadCrumb.splice(1, 0, "..");
-    }
+    const names = this.parentOptions.map((option) => option.name);
+    const breadCrumb = names.length > this.settings.maxBreadcrumbItems
+      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 1)]
+      : names;
 
     return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
   }
@@ -782,16 +743,6 @@ export function assertIsOption<
 ): asserts option is TOption {
   if (!isOption(option)) {
     throw new Error("Expected an option but got an option group.");
-  }
-}
-
-export function assertIsGroupOption<
-  TGroup extends GenericListOptionGroup<GenericListOption>,
->(
-  option: TGroup | GenericListOption,
-): asserts option is TGroup {
-  if (!isOptionGroup(option)) {
-    throw new Error("Expected a group option but got an option.");
   }
 }
 
