@@ -98,13 +98,13 @@ export interface GenericListKeys extends GenericInputKeys {
   nextPage?: string[];
 }
 
-interface SortedOption<
+interface MatchedOption<
   TOption extends GenericListOptionSettings,
   TGroup extends GenericListOptionGroupSettings<TOption>,
 > {
   originalOption: TOption | TGroup;
   distance: number;
-  children: Array<SortedOption<TOption, TGroup>>;
+  children: Array<MatchedOption<TOption, TGroup>>;
 }
 
 interface ParentOptions<
@@ -290,7 +290,7 @@ export abstract class GenericList<
   private findSearchHits(
     searchInput: string,
     options: Array<TOption | TGroup>,
-  ): Array<SortedOption<TOption, TGroup>> {
+  ): Array<MatchedOption<TOption, TGroup>> {
     return options
       .map((opt) => {
         if (isOptionGroup(opt)) {
@@ -323,15 +323,15 @@ export abstract class GenericList<
       .sort(sortByDistance);
 
     function sortByDistance(
-      a: SortedOption<TOption, TGroup>,
-      b: SortedOption<TOption, TGroup>,
+      a: MatchedOption<TOption, TGroup>,
+      b: MatchedOption<TOption, TGroup>,
     ): number {
       return a.distance - b.distance;
     }
   }
 
   private buildSearchResultsToDisplay(
-    sortedOptions: Array<SortedOption<TOption, TGroup>>,
+    sortedOptions: Array<MatchedOption<TOption, TGroup>>,
   ): Array<TOption | TGroup> {
     return sortedOptions
       .map((option) => this.buildSearchResultHelper(0, option))
@@ -340,7 +340,7 @@ export abstract class GenericList<
 
   private buildSearchResultHelper(
     indentLevel: number,
-    sortedItem: SortedOption<TOption, TGroup>,
+    sortedItem: MatchedOption<TOption, TGroup>,
   ): Array<TOption | TGroup> {
     sortedItem.originalOption.indentLevel = indentLevel;
 
