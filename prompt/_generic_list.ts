@@ -252,7 +252,7 @@ export abstract class GenericList<
     this.setOptions(options);
   }
 
-  protected setOptions(options: Array<TOption | TGroup>, listIndex = 0) {
+  protected setOptions(options: Array<TOption | TGroup>) {
     this.options = [...options];
 
     const parent = this.getParentOption();
