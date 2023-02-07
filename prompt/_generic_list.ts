@@ -96,6 +96,8 @@ export interface GenericListKeys extends GenericInputKeys {
   next?: string[];
   previousPage?: string[];
   nextPage?: string[];
+  enterGroup?: string[];
+  leaveGroup?: string[];
 }
 
 interface MatchedOption<
@@ -167,6 +169,8 @@ export abstract class GenericList<
         next: options.search ? ["down"] : ["down", "d", "n", "2"],
         previousPage: ["pageup", "left"],
         nextPage: ["pagedown", "right"],
+        leaveGroup: ["left", "escape"],
+        enterGroup: ["right"],
         ...(settings.keys ?? {}),
       },
     };
@@ -351,18 +355,6 @@ export abstract class GenericList<
     return stripColor(value)
       .toLowerCase()
       .includes(inputString);
-  }
-
-  protected async submit(): Promise<void> {
-    const selectedOption = this.options[this.listIndex];
-
-    if (this.isBackButton(selectedOption)) {
-      this.submitBackButton();
-    } else if (isOptionGroup(selectedOption)) {
-      this.submitGroupOption(selectedOption);
-    } else {
-      await super.submit();
-    }
   }
 
   protected submitBackButton() {
@@ -596,21 +588,28 @@ export abstract class GenericList<
    * @param event Key event.
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
-    switch (true) {
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-      case this.isKey(this.settings.keys, "nextPage", event):
-        this.selectNextPage();
-        break;
-      case this.isKey(this.settings.keys, "previousPage", event):
-        this.selectPreviousPage();
-        break;
-      default:
-        await super.handleEvent(event);
+    const selectedOption = this.options[this.listIndex];
+
+    if (
+      this.isKey(this.settings.keys, "enterGroup", event) &&
+      isOptionGroup(selectedOption)
+    ) {
+      this.submitGroupOption(selectedOption);
+    } else if (
+      this.isKey(this.settings.keys, "leaveGroup", event) &&
+      this.isBackButton(selectedOption)
+    ) {
+      this.submitBackButton();
+    } else if (this.isKey(this.settings.keys, "next", event)) {
+      this.selectNext();
+    } else if (this.isKey(this.settings.keys, "previous", event)) {
+      this.selectPrevious();
+    } else if (this.isKey(this.settings.keys, "nextPage", event)) {
+      this.selectNextPage();
+    } else if (this.isKey(this.settings.keys, "previousPage", event)) {
+      this.selectPreviousPage();
+    } else {
+      await super.handleEvent(event);
     }
   }
 
@@ -699,6 +698,8 @@ export abstract class GenericList<
       } else if (this.listOffset > 0) {
         this.listIndex -= this.listOffset;
         this.listOffset = 0;
+      } else {
+        this.listIndex = 0;
       }
     }
   }
@@ -714,6 +715,8 @@ export abstract class GenericList<
         const offset = this.options.length - height;
         this.listIndex += offset - this.listOffset;
         this.listOffset = offset;
+      } else {
+        this.listIndex = this.options.length - 1;
       }
     }
   }
