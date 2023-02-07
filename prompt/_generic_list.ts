@@ -285,34 +285,34 @@ export abstract class GenericList<
     searchInput: string,
     options: Array<TOption | TGroup>,
   ): Array<MatchedOption<TOption, TGroup>> {
-    return options
-      .map((option) => {
-        if (isOptionGroup(option)) {
-          const children = this
-            .matchOptions(searchInput, option.options)
-            .sort(sortByDistance);
+    const matched: Array<MatchedOption<TOption, TGroup>> = [];
 
-          if (children.length) {
-            return [{
-              option,
-              distance: Math.min(...children.map((item) => item.distance)),
-              children,
-            }];
-          }
-        }
+    for (const option of options) {
+      if (isOptionGroup(option)) {
+        const children = this
+          .matchOptions(searchInput, option.options)
+          .sort(sortByDistance);
 
-        if (this.matchOption(searchInput, option)) {
-          return [{
+        if (children.length) {
+          matched.push({
             option,
-            distance: distance(option.name, searchInput),
-            children: [],
-          }];
+            distance: Math.min(...children.map((item) => item.distance)),
+            children,
+          });
+          continue;
         }
+      }
 
-        return [];
-      })
-      .flat()
-      .sort(sortByDistance);
+      if (this.matchOption(searchInput, option)) {
+        matched.push({
+          option,
+          distance: distance(option.name, searchInput),
+          children: [],
+        });
+      }
+    }
+
+    return matched.sort(sortByDistance);
 
     function sortByDistance(
       a: MatchedOption<TOption, TGroup>,
