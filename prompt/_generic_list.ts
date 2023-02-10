@@ -587,6 +587,14 @@ export abstract class GenericList<
     return super.read();
   }
 
+  protected isListDisabled(): boolean {
+    return this.listIndex === -1;
+  }
+
+  protected disableList() {
+    this.listIndex = -1;
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
@@ -596,21 +604,30 @@ export abstract class GenericList<
 
     if (
       this.isKey(this.settings.keys, "enterGroup", event) &&
-      isOptionGroup(selectedOption)
+      isOptionGroup(selectedOption) &&
+      !this.isBackButton(selectedOption) &&
+      !this.isListDisabled()
     ) {
       this.submitGroupOption(selectedOption);
     } else if (
       this.isKey(this.settings.keys, "leaveGroup", event) &&
-      this.isBackButton(selectedOption)
+      (this.isBackButton(selectedOption) || event.name !== "left") &&
+      !this.isListDisabled()
     ) {
       this.submitBackButton();
     } else if (this.isKey(this.settings.keys, "next", event)) {
       this.selectNext();
     } else if (this.isKey(this.settings.keys, "previous", event)) {
       this.selectPrevious();
-    } else if (this.isKey(this.settings.keys, "nextPage", event)) {
+    } else if (
+      this.isKey(this.settings.keys, "nextPage", event) &&
+      !this.isListDisabled()
+    ) {
       this.selectNextPage();
-    } else if (this.isKey(this.settings.keys, "previousPage", event)) {
+    } else if (
+      this.isKey(this.settings.keys, "previousPage", event) &&
+      !this.isListDisabled()
+    ) {
       this.selectPreviousPage();
     } else {
       await super.handleEvent(event);
@@ -662,6 +679,11 @@ export abstract class GenericList<
       if (this.options[this.listIndex].disabled) {
         this.selectPrevious();
       }
+    } else if (
+      this.settings.search && this.listIndex === 0 &&
+      this.getCurrentInputValue().length
+    ) {
+      this.listIndex = -1;
     } else {
       this.listIndex = this.options.length - 1;
       this.listOffset = this.options.length - this.getListHeight();
@@ -684,6 +706,11 @@ export abstract class GenericList<
       if (this.options[this.listIndex].disabled) {
         this.selectNext();
       }
+    } else if (
+      this.settings.search && this.listIndex === this.options.length - 1 &&
+      this.getCurrentInputValue().length
+    ) {
+      this.listIndex = -1;
     } else {
       this.listIndex = this.listOffset = 0;
       if (this.options[this.listIndex].disabled) {

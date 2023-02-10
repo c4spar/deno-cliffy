@@ -228,20 +228,12 @@ export class Checkbox extends GenericList<
   protected async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "check", event) &&
-        this.isListEnabled():
+        !this.isListDisabled():
         this.checkValue();
         break;
       default:
         await super.handleEvent(event);
     }
-  }
-
-  protected isListEnabled(): boolean {
-    return this.listIndex !== -1;
-  }
-
-  protected disableList() {
-    this.listIndex = -1;
   }
 
   /** Check selected option. */
