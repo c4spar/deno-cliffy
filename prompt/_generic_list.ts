@@ -389,11 +389,15 @@ export abstract class GenericList<
     let message = `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) +
       this.defaults();
+
     if (this.settings.search) {
+      const input = !this.isListDisabled() ? dim(this.input()) : this.input();
       message += " " + this.settings.searchLabel + " ";
+      this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+      message += input;
     }
-    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
-    return message + this.input();
+
+    return message;
   }
 
   /** Render options. */
