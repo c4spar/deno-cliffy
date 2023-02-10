@@ -16,3 +16,19 @@ cell1              cell2 豆贝
 cell1              豆 贝 cell3`.slice(1),
   );
 });
+
+Deno.test("table - special chars - japanese characters", () => {
+  assertEquals(
+    Table.from([
+      ["私は ふわっち クン", "cell2", "cell3"],
+      ["cell1", "cell2", "ふわふわ"],
+      ["cell1", "ふわ ふわ", "cell3"],
+    ])
+      .padding(1)
+      .toString(),
+    `
+私は ふわっち クン cell2     cell3   
+cell1              cell2     ふわふわ
+cell1              ふわ ふわ cell3   `.slice(1),
+  );
+});
