@@ -361,17 +361,6 @@ export abstract class GenericList<
       .includes(inputString);
   }
 
-  protected async submit(): Promise<void> {
-    if (
-      this.isBackButton(this.selectedOption) ||
-      isOptionGroup(this.selectedOption)
-    ) {
-      return;
-    }
-
-    await super.submit();
-  }
-
   protected submitBackButton() {
     const parentOption = this.parentOptions.pop();
     if (!parentOption) {

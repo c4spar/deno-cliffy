@@ -13,6 +13,7 @@ import {
   isOptionGroup,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
+import { getFiguresByKeys } from "./figures.ts";
 
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {
@@ -109,6 +110,23 @@ export class Select extends GenericList<
 
   protected input(): string {
     return underline(brightBlue(this.inputValue));
+  }
+
+  protected async submit(): Promise<void> {
+    if (
+      this.isBackButton(this.selectedOption) ||
+      isOptionGroup(this.selectedOption)
+    ) {
+      const info = isOptionGroup(this.selectedOption)
+        ? ` To select a group use ${
+          getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
+        }.`
+        : "";
+      this.setErrorMessage(`No option selected.${info}`);
+      return;
+    }
+
+    await super.submit();
   }
 
   /** Get value of selected option. */
