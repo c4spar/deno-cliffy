@@ -36,9 +36,7 @@ export interface SelectSettings extends
 export type SelectOption = GenericListOption;
 
 /** Select option group options. */
-export type SelectOptionGroup = GenericListOptionGroup<
-  GenericListOptionSettings
->;
+export type SelectOptionGroup = GenericListOptionGroup<GenericListOption>;
 
 /** Select option settings. */
 export type SelectOptionSettings = GenericListOptionSettings;
