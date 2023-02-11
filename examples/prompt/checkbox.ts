@@ -9,11 +9,9 @@ const title: Array<string> = await Checkbox.prompt({
   options: [
     {
       name: "Fantasy",
-      value: "",
       options: [
         {
           name: "Harry Potter",
-          value: "",
           options: [
             "Harry Potter and the Philosopher's Stone",
             "Harry Potter and the Chamber of Secrets",
@@ -26,12 +24,10 @@ const title: Array<string> = await Checkbox.prompt({
         },
         {
           name: "Middle-Earth",
-          value: "",
           options: [
             "The Hobbit",
             {
               name: "The Lord of the Rings",
-              value: "",
               options: [
                 "The Fellowship of the Ring",
                 "The Two Towers",
@@ -45,11 +41,9 @@ const title: Array<string> = await Checkbox.prompt({
     },
     {
       name: "Young Adult",
-      value: "",
       options: [
         {
           name: "The Hunger Games-series",
-          value: "",
           options: [
             "The Hunger Games",
             "Catching Fire",
@@ -62,7 +56,6 @@ const title: Array<string> = await Checkbox.prompt({
     },
     {
       name: "Classic",
-      value: "",
       options: [
         "Moby-Dick",
         "Pride and Prejudice",
