@@ -17,6 +17,17 @@ snapshot[`prompt - integration - checkbox 1`] = `
 \\x1b[?25h\\x1b[?25h"
 `;
 
+snapshot[`prompt - integration - checkbox group 1`] = `
+"? Select an option
+❯ × Foo
+  × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J? Select an option
+  × Foo
+❯ × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J? Select an option » beep, boop
+\\x1b[?25h\\x1b[?25h"
+`;
+
 snapshot[`prompt - integration - confirm 1`] = `
 "? Please confirm (y/N) » 
 ❯ some hint
@@ -96,6 +107,17 @@ snapshot[`prompt - integration - select 1`] = `
 ❯ Bar
   Baz
 \\x1b[1A\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J? Select an option » Baz
+\\x1b[?25h\\x1b[?25h"
+`;
+
+snapshot[`prompt - integration - select group 1`] = `
+"? Select an option
+❯ Foo
+  Bar
+  📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J? Select an option
+  Foo
+❯ Bar
+  📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J? Select an option » Beep
 \\x1b[?25h\\x1b[?25h"
 `;
 
