@@ -28,7 +28,7 @@ export interface SelectSettings extends
     SelectOptionSettings,
     SelectOptionGroupSettings
   > {
-  keys?: SelectKeys;
+  keys: SelectKeys;
 }
 
 /** Select option options. */

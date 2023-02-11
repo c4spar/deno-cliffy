@@ -1,6 +1,6 @@
 import type { KeyCode } from "../keycode/mod.ts";
-import { dim, green, red } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { brightBlue, dim, green, red } from "./deps.ts";
+import { Figures, getFiguresByKeys } from "./figures.ts";
 import {
   GenericList,
   GenericListKeys,
@@ -19,6 +19,7 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 export interface CheckboxOptions
   extends GenericListOptions<Array<string>, Array<string>> {
   options: Array<string | CheckboxOption | CheckboxOptionGroup>;
+  confirmSubmit?: boolean;
   check?: string;
   uncheck?: string;
   partialCheck?: string;
@@ -35,12 +36,13 @@ interface CheckboxSettings extends
     CheckboxOptionSettings,
     CheckboxOptionGroupSettings
   > {
+  confirmSubmit: boolean;
   check: string;
   uncheck: string;
   partialCheck: string;
   minOptions: number;
   maxOptions: number;
-  keys?: CheckboxKeys;
+  keys: CheckboxKeys;
 }
 
 /** Checkbox option options. */
@@ -86,6 +88,8 @@ export class Checkbox extends GenericList<
   >;
   protected listIndex: number;
   protected listOffset: number;
+  private confirmSubmit = false;
+  private isConfirmationActive = false;
 
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: CheckboxOptions): Promise<Array<string>> {
@@ -122,6 +126,7 @@ export class Checkbox extends GenericList<
   protected getDefaultSettings(options: CheckboxOptions): CheckboxSettings {
     const settings = super.getDefaultSettings(options);
     return {
+      confirmSubmit: true,
       ...settings,
       check: options.check ?? green(Figures.TICK),
       uncheck: options.uncheck ?? red(Figures.CROSS),
@@ -132,6 +137,8 @@ export class Checkbox extends GenericList<
       keys: {
         check: ["space"],
         ...(settings.keys ?? {}),
+        open: options.keys?.open ?? ["right"],
+        back: options.keys?.back ?? ["left", "escape"],
       },
     };
   }
@@ -189,7 +196,7 @@ export class Checkbox extends GenericList<
   protected match(): void {
     super.match();
     if (this.isSearching()) {
-      this.disableList();
+      this.selectSearch();
     }
   }
 
@@ -226,14 +233,54 @@ export class Checkbox extends GenericList<
    * @param event Key event.
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
+    const hasConfirmed: boolean = this.confirmSubmit;
+    this.confirmSubmit = false;
+
     switch (true) {
       case this.isKey(this.settings.keys, "check", event) &&
-        !this.isListDisabled():
+        !this.isSearchSelected():
         this.checkValue();
+        break;
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit(hasConfirmed);
         break;
       default:
         await super.handleEvent(event);
     }
+  }
+
+  protected hint(): string | undefined {
+    if (this.confirmSubmit) {
+      const info = this.selectedOption && this.isBackButton(this.selectedOption)
+        ? ` To leave a group use ${
+          getFiguresByKeys(this.settings.keys.back ?? []).join(", ")
+        }.`
+        : ` To select a group use ${
+          getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
+        }.`;
+
+      return this.settings.indent +
+        brightBlue(
+          `Press ${
+            getFiguresByKeys(this.settings.keys.submit ?? [])
+          } again to submit.${info}`,
+        );
+    }
+
+    return super.hint();
+  }
+
+  protected async submit(hasConfirmed?: boolean): Promise<void> {
+    if (
+      !hasConfirmed &&
+      this.settings.confirmSubmit &&
+      Deno.isatty(Deno.stdout.rid)
+    ) {
+      this.confirmSubmit = true;
+      return;
+    }
+
+    await super.submit();
   }
 
   /** Check selected option. */

@@ -44,7 +44,7 @@ export interface GenericListSettings<
   TGroup extends GenericListOptionGroupSettings<TOption>,
 > extends GenericInputPromptSettings<TValue, TRawValue> {
   options: Array<TOption | TGroup>;
-  keys?: GenericListKeys;
+  keys: GenericListKeys;
   indent: string;
   listPointer: string;
   maxRows: number;
@@ -96,8 +96,8 @@ export interface GenericListKeys extends GenericInputKeys {
   next?: string[];
   previousPage?: string[];
   nextPage?: string[];
-  enterGroup?: string[];
-  leaveGroup?: string[];
+  open?: string[];
+  back?: string[];
 }
 
 interface MatchedOption<
@@ -126,6 +126,10 @@ export abstract class GenericList<
   protected abstract listIndex: number;
   protected abstract listOffset: number;
   protected parentOptions: Array<TGroup> = [];
+
+  protected get selectedOption() {
+    return this.options.at(this.listIndex);
+  }
 
   /**
    * Create list separator.
@@ -169,8 +173,8 @@ export abstract class GenericList<
         next: options.search ? ["down"] : ["down", "d", "n", "2"],
         previousPage: ["pageup", "left"],
         nextPage: ["pagedown", "right"],
-        leaveGroup: ["left", "escape"],
-        enterGroup: ["right"],
+        open: ["right", "enter", "return"],
+        back: ["left", "escape", "enter", "return"],
         ...(settings.keys ?? {}),
       },
     };
@@ -357,6 +361,17 @@ export abstract class GenericList<
       .includes(inputString);
   }
 
+  protected async submit(): Promise<void> {
+    if (
+      this.isBackButton(this.selectedOption) ||
+      isOptionGroup(this.selectedOption)
+    ) {
+      return;
+    }
+
+    await super.submit();
+  }
+
   protected submitBackButton() {
     const parentOption = this.parentOptions.pop();
     if (!parentOption) {
@@ -368,12 +383,15 @@ export abstract class GenericList<
   }
 
   protected submitGroupOption(selectedOption: TGroup) {
+    if (this.isSearching()) {
+      return;
+    }
     this.parentOptions.push(selectedOption);
     this.setOptions(selectedOption.options);
     this.listIndex = 1;
   }
 
-  protected isBackButton(option: TOption | TGroup): boolean {
+  protected isBackButton(option: TOption | TGroup | undefined): boolean {
     return option === this.getParentOption();
   }
 
@@ -391,7 +409,7 @@ export abstract class GenericList<
       this.defaults();
 
     if (this.settings.search) {
-      const input = !this.isListDisabled() ? dim(this.input()) : this.input();
+      const input = this.isSearchSelected() ? this.input() : dim(this.input());
       message += " " + this.settings.searchLabel + " ";
       this.cursor.x = stripColor(message).length + this.inputIndex + 1;
       message += input;
@@ -410,15 +428,25 @@ export abstract class GenericList<
       return "";
     }
     const selected: number = this.listIndex + 1;
+    const hasGroups = this.options.some((option) => isOptionGroup(option));
+
+    const groupActions: Array<[string, Array<string>]> = hasGroups
+      ? [
+        ["Open", getFiguresByKeys(this.settings.keys.open ?? [])],
+        ["Back", getFiguresByKeys(this.settings.keys.back ?? [])],
+      ]
+      : [];
+
     const actions: Array<[string, Array<string>]> = [
-      ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
-      ["Previous", getFiguresByKeys(this.settings.keys?.previous ?? [])],
-      ["Next Page", getFiguresByKeys(this.settings.keys?.nextPage ?? [])],
+      ["Next", getFiguresByKeys(this.settings.keys.next ?? [])],
+      ["Previous", getFiguresByKeys(this.settings.keys.previous ?? [])],
+      ...groupActions,
+      ["Next Page", getFiguresByKeys(this.settings.keys.nextPage ?? [])],
       [
         "Previous Page",
-        getFiguresByKeys(this.settings.keys?.previousPage ?? []),
+        getFiguresByKeys(this.settings.keys.previousPage ?? []),
       ],
-      ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
+      ["Submit", getFiguresByKeys(this.settings.keys.submit ?? [])],
     ];
 
     return "\n" + this.settings.indent + brightBlue(Figures.INFO) +
@@ -587,12 +615,12 @@ export abstract class GenericList<
     return super.read();
   }
 
-  protected isListDisabled(): boolean {
-    return this.listIndex === -1;
+  protected selectSearch() {
+    this.listIndex = -1;
   }
 
-  protected disableList() {
-    this.listIndex = -1;
+  protected isSearchSelected(): boolean {
+    return this.listIndex === -1;
   }
 
   /**
@@ -600,19 +628,17 @@ export abstract class GenericList<
    * @param event Key event.
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
-    const selectedOption = this.options[this.listIndex];
-
     if (
-      this.isKey(this.settings.keys, "enterGroup", event) &&
-      isOptionGroup(selectedOption) &&
-      !this.isBackButton(selectedOption) &&
-      !this.isListDisabled()
+      this.isKey(this.settings.keys, "open", event) &&
+      isOptionGroup(this.selectedOption) &&
+      !this.isBackButton(this.selectedOption) &&
+      !this.isSearchSelected()
     ) {
-      this.submitGroupOption(selectedOption);
+      this.submitGroupOption(this.selectedOption);
     } else if (
-      this.isKey(this.settings.keys, "leaveGroup", event) &&
-      (this.isBackButton(selectedOption) || event.name !== "left") &&
-      !this.isListDisabled()
+      this.isKey(this.settings.keys, "back", event) &&
+      (this.isBackButton(this.selectedOption) || event.name === "escape") &&
+      !this.isSearchSelected()
     ) {
       this.submitBackButton();
     } else if (this.isKey(this.settings.keys, "next", event)) {
@@ -621,12 +647,12 @@ export abstract class GenericList<
       this.selectPrevious();
     } else if (
       this.isKey(this.settings.keys, "nextPage", event) &&
-      !this.isListDisabled()
+      !this.isSearchSelected()
     ) {
       this.selectNextPage();
     } else if (
       this.isKey(this.settings.keys, "previousPage", event) &&
-      !this.isListDisabled()
+      !this.isSearchSelected()
     ) {
       this.selectPreviousPage();
     } else {
@@ -676,7 +702,7 @@ export abstract class GenericList<
       if (this.listIndex < this.listOffset) {
         this.listOffset--;
       }
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectPrevious();
       }
     } else if (
@@ -687,7 +713,7 @@ export abstract class GenericList<
     } else {
       this.listIndex = this.options.length - 1;
       this.listOffset = this.options.length - this.getListHeight();
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectPrevious();
       }
     }
@@ -703,7 +729,7 @@ export abstract class GenericList<
       if (this.listIndex >= this.listOffset + this.getListHeight()) {
         this.listOffset++;
       }
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectNext();
       }
     } else if (
@@ -713,7 +739,7 @@ export abstract class GenericList<
       this.listIndex = -1;
     } else {
       this.listIndex = this.listOffset = 0;
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectNext();
       }
     }
@@ -756,15 +782,15 @@ export abstract class GenericList<
 export function isOption<
   TOption extends GenericListOption,
 >(
-  option: TOption | GenericListOptionGroup<GenericListOption>,
+  option: TOption | GenericListOptionGroup<GenericListOption> | undefined,
 ): option is TOption {
-  return "value" in option;
+  return !!option && typeof option === "object" && "value" in option;
 }
 
 export function isOptionGroup<
   TGroup extends GenericListOptionGroup<GenericListOption>,
 >(
-  option: TGroup | GenericListOption | string,
+  option: TGroup | GenericListOption | string | undefined,
 ): option is TGroup {
   return typeof option === "object" && "options" in option &&
     option.options.length > 0;
