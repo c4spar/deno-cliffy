@@ -1,27 +1,45 @@
+import { eraseDown } from "../../../ansi/ansi_escapes.ts";
 import {
-  assert,
   assertSnapshot,
-  copy,
   dirname,
   expandGlob,
   lt,
   WalkEntry,
 } from "../../../dev_deps.ts";
 
+type TestModule = {
+  tests?: Record<string, Array<string>>;
+};
+
 const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
 
 for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
   if (file.isFile) {
     const name = file.name.replace(/_/g, " ").replace(".ts", "");
+
     Deno.test({
       name: `prompt - integration - ${name}`,
       ignore: lt(Deno.version.deno, "1.10.0"),
-      async fn(t) {
-        const output: string = await runPrompt(file);
-        const os = Deno.build.os === "windows" ? ".windows" : "";
-        await assertSnapshot(t, output, {
-          path: `__snapshots__/test.ts${os}.snap`,
-        });
+      async fn(ctx) {
+        const testModule: TestModule = await import(file.path);
+        const tests = Object.entries(testModule.tests ?? {});
+
+        if (!tests.length) {
+          throw new Error(`Now tests defined for: ${file.path}`);
+        }
+
+        for (const [name, inputs] of tests) {
+          await ctx.step({
+            name,
+            async fn() {
+              const output: string = await runPrompt(file, inputs);
+              const os = Deno.build.os === "windows" ? ".windows" : "";
+              await assertSnapshot(ctx, output, {
+                path: `__snapshots__/test.ts${os}.snap`,
+              });
+            },
+          });
+        }
       },
     });
   }
@@ -42,15 +60,15 @@ function getCmdFlagsForFile(file: WalkEntry): string[] {
   ];
 }
 
-async function runPrompt(file: WalkEntry): Promise<string> {
-  const inputPath: string = file.path.replace(/\.ts$/, ".in");
-  const inputFile = await Deno.open(inputPath);
+async function runPrompt(
+  file: WalkEntry,
+  inputs: Array<string>,
+): Promise<string> {
   const flags = getCmdFlagsForFile(file);
-  const process = Deno.run({
+  const cmd = new Deno.Command("deno", {
     stdin: "piped",
     stdout: "piped",
-    cmd: [
-      "deno",
+    args: [
       "run",
       ...flags,
       file.path,
@@ -59,16 +77,25 @@ async function runPrompt(file: WalkEntry): Promise<string> {
       NO_COLOR: "true",
     },
   });
+  const child: Deno.ChildProcess = cmd.spawn();
+  const writer = child.stdin.getWriter();
 
-  const [output, bytesCopied] = await Promise.all([
-    process.output(),
-    copy(inputFile, process.stdin),
-  ]);
-  inputFile.close();
-  process.stdin.close();
-  process.close();
+  for (const input of inputs) {
+    await writer.write(new TextEncoder().encode(input));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
 
-  assert(bytesCopied > 0, "No bytes copied");
+  const { success, stdout } = await child.output();
+  writer.releaseLock();
+  child.stdin.close();
 
-  return new TextDecoder().decode(output);
+  if (!success) {
+    throw new Error(`test failed: ${file}`);
+  }
+
+  // Add a line break after each test input.
+  return new TextDecoder().decode(stdout).replaceAll(
+    eraseDown(),
+    eraseDown() + "\n",
+  );
 }
