@@ -82,7 +82,7 @@ async function runPrompt(
 
   for (const input of inputs) {
     await writer.write(new TextEncoder().encode(input));
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 200));
   }
 
   const { success, stdout } = await child.output();
