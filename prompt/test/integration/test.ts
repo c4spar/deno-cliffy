@@ -21,7 +21,7 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
       name: `prompt - integration - ${name}`,
       ignore: lt(Deno.version.deno, "1.10.0"),
       async fn(ctx) {
-        const testModule: TestModule = await import(file.path);
+        const testModule: TestModule = await import("file://" + file.path);
         const tests = Object.entries(testModule.tests ?? {});
 
         if (!tests.length) {
