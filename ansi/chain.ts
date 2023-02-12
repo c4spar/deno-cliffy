@@ -5,6 +5,7 @@ import type { ImageOptions } from "./ansi_escapes.ts";
 export interface Chain<T extends Chain<T>> {
   /** Add text. */
   text: (text: string) => T;
+  toArray: () => Array<string>;
   /** Ring audio bell: `\u0007` */
   bel: T;
   /** Get cursor position. */
