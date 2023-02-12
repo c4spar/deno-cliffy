@@ -32,3 +32,19 @@ cell1              cell2     ふわふわ
 cell1              ふわ ふわ cell3   `.slice(1),
   );
 });
+
+Deno.test("table - special chars - full width & cjk sybmol characters", () => {
+  assertEquals(
+    Table.from([
+      ["！、￥", "cell2", "cell3"],
+      ["cell1", "cell2", "｜ａ"],
+      ["cell1", "〜 〜", "cell3"],
+    ])
+      .padding(1)
+      .toString(),
+    `
+！、￥ cell2 cell3
+cell1  cell2 ｜ａ 
+cell1  〜 〜 cell3`.slice(1),
+  );
+});

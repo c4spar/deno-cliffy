@@ -67,11 +67,15 @@ function factory(): Ansi {
     return this;
   };
 
-  ansi.toString = function (): string {
+  ansi.toArray = function (): Array<string> {
     update();
-    const str: string = result.join("");
+    const ret: Array<string> = result;
     result = [];
-    return str;
+    return ret;
+  };
+
+  ansi.toString = function (): string {
+    return this.toArray().join("");
   };
 
   ansi.toBuffer = function (): Uint8Array {
