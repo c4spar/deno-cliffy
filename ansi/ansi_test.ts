@@ -12,6 +12,16 @@ Deno.test({
 });
 
 Deno.test({
+  name: "ansi - toArray",
+  fn() {
+    assertEquals(
+      ansi.cursorTo(3, 2).eraseDown.cursorHide.toArray(),
+      ["\x1B[2;3H", "\x1B[0J", "\x1B[?25l"],
+    );
+  },
+});
+
+Deno.test({
   name: "ansi - chainable ansi escape custom instance",
   fn() {
     const myAnsi = ansi();

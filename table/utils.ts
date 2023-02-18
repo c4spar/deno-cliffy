@@ -62,8 +62,16 @@ export const strLength = (str: string): number => {
   let length = 0;
   for (let i = 0; i < str.length; i++) {
     const charCode = str.charCodeAt(i);
-    // Check for chinese characters: \u4e00 - \u9fa5
-    if (charCode >= 19968 && charCode <= 40869) {
+    if (
+      // chinese characters: \u4e00 - \u9fa5
+      (charCode >= 19968 && charCode <= 40869) ||
+      // japanese characters \u3040 - \u30ff
+      (charCode >= 12352 && charCode <= 12543) ||
+      // full width characters \uff00 - \uffef
+      (charCode >= 65280 && charCode <= 65519) ||
+      // cjk symbol and punctuation characters \u3000 - \u303f
+      (charCode >= 12288 && charCode <= 12351)
+    ) {
       length += 2;
     } else {
       length += 1;
