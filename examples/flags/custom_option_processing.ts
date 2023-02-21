@@ -7,18 +7,19 @@ const result = parseFlags(Deno.args, {
     name: "foo",
     type: "float",
   }],
-}, ({ label, name, value, type }: ArgumentValue<"float">) => {
-  switch (type) {
-    case "float":
-      if (isNaN(Number(value))) {
-        throw new Error(
-          `${label} "${name}" must be of type "${type}", but got "${value}".`,
-        );
-      }
-      return parseFloat(value);
-    default:
-      throw new Error(`Unknown type "${type}".`);
-  }
+  parse: ({ label, name, value, type }: ArgumentValue) => {
+    switch (type) {
+      case "float":
+        if (isNaN(Number(value))) {
+          throw new Error(
+            `${label} "${name}" must be of type "${type}", but got "${value}".`,
+          );
+        }
+        return parseFloat(value);
+      default:
+        throw new Error(`Unknown type "${type}".`);
+    }
+  },
 });
 
 console.log(result);

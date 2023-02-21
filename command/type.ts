@@ -28,8 +28,8 @@ import type {
  * }
  * ```
  */
-export abstract class Type<TType extends string, TValue> {
-  public abstract parse(type: ArgumentValue<TType>): TValue;
+export abstract class Type<TValue> {
+  public abstract parse(type: ArgumentValue): TValue;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,
@@ -52,8 +52,6 @@ export abstract class Type<TType extends string, TValue> {
 
 // deno-lint-ignore no-namespace
 export namespace Type {
-  export type infer<TTypeHandler, TDefaultValue = TTypeHandler> =
-    // deno-lint-ignore no-explicit-any
-    TTypeHandler extends TypeOrTypeHandler<any, infer Value> ? Value
-      : TDefaultValue;
+  export type infer<TType, TDefault = TType> = TType extends
+    TypeOrTypeHandler<infer Value> ? Value : TDefault;
 }

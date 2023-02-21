@@ -4,9 +4,7 @@ import { ArgumentValue, Command } from "../../command/mod.ts";
 
 const colors = ["red", "blue", "yellow"];
 
-function colorType<TType extends string>(
-  { label, name, value }: ArgumentValue<TType>,
-): string {
+function colorType({ label, name, value }: ArgumentValue): string {
   if (!colors.includes(value.toLowerCase())) {
     throw new Error(
       `${label} "${name}" must be a valid color, but got "${value}". Possible values are: ${

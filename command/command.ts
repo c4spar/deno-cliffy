@@ -868,7 +868,7 @@ export class Command<
   }
 
   public globalType<
-    THandler extends TypeOrTypeHandler<TName, unknown>,
+    THandler extends TypeOrTypeHandler<unknown>,
     TName extends string = string,
   >(
     name: TName,
@@ -894,7 +894,7 @@ export class Command<
    * @param options Type options.
    */
   public type<
-    THandler extends TypeOrTypeHandler<TName, unknown>,
+    THandler extends TypeOrTypeHandler<unknown>,
     TName extends string = string,
   >(
     name: TName,
@@ -917,7 +917,7 @@ export class Command<
     this.cmd.types.set(name, {
       ...options,
       name,
-      handler: handler as TypeOrTypeHandler<string, unknown>,
+      handler: handler as TypeOrTypeHandler<unknown>,
     });
 
     if (
@@ -1847,11 +1847,11 @@ export class Command<
           ctx.action = option as ActionOption;
         }
       },
-    }, (type: ArgumentValue<string>) => this.parseType(type));
+    }, (type: ArgumentValue) => this.parseType(type));
   }
 
   /** Parse argument type. */
-  protected parseType(type: ArgumentValue<string>): unknown {
+  protected parseType(type: ArgumentValue): unknown {
     const typeSettings: TypeDef | undefined = this.getType(type.type);
 
     if (!typeSettings) {
@@ -2847,8 +2847,7 @@ interface DefaultOption {
 
 type ActionOption = Option & { action: ActionHandler };
 
-interface ParseContext
-  extends ParseFlagsContext<string, Record<string, unknown>, Option> {
+interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
   action?: ActionOption;
   env: Record<string, unknown>;
 }
@@ -3008,11 +3007,11 @@ type SingleArg = OptionalOrRequiredValue<
 >;
 
 type DefaultTypes = {
-  number: NumberType<"number">;
-  integer: IntegerType<"integer">;
-  string: StringType<"string">;
-  boolean: BooleanType<"boolean">;
-  file: FileType<"file">;
+  number: NumberType;
+  integer: IntegerType;
+  string: StringType;
+  boolean: BooleanType;
+  file: FileType;
 };
 
 type ArgumentType<
@@ -3308,8 +3307,8 @@ type TypedEnv<
 
 type TypedType<
   TName extends string,
-  THandler extends TypeOrTypeHandler<TName, unknown>,
-> = { [N in TName]: THandler };
+  THandler extends TypeOrTypeHandler<unknown>,
+> = { [Name in TName]: THandler };
 
 type RequiredKeys<TRecord> = {
   // deno-lint-ignore ban-types

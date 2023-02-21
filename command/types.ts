@@ -17,9 +17,7 @@ export type { ArgumentValue, DefaultValue, TypeHandler };
 
 type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
 
-export type TypeOrTypeHandler<TType extends string, TValue> =
-  | Type<TType, TValue>
-  | TypeHandler<TType, TValue>;
+export type TypeOrTypeHandler<TValue> = Type<TValue> | TypeHandler<TValue>;
 
 type Id<TValue> = TValue extends Record<string, unknown>
   ? TValue extends infer U ? { [K in keyof U]: Id<U[K]> } : never
@@ -133,8 +131,7 @@ export type ActionHandler<
 ) => unknown | Promise<unknown>;
 
 /** Argument details. */
-export interface Argument<TType extends string = string>
-  extends ArgumentOptions<TType> {
+export interface Argument extends ArgumentOptions {
   /** Argument name. */
   name: string;
   /** Shell completion action. */
@@ -290,7 +287,7 @@ export interface Option<
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
-  args: Array<Argument<Extract<keyof TTypes & keyof TGlobalTypes, string>>>;
+  args: Array<Argument>;
   groupName?: string;
   separator?: string;
 }
@@ -315,13 +312,13 @@ export interface EnvVarOptions extends GlobalEnvVarOptions {
 }
 
 /** Environment variable settings. */
-export interface EnvVar<TType extends string = string> extends EnvVarOptions {
+export interface EnvVar extends EnvVarOptions {
   name: string;
   names: string[];
   description: string;
   // @TODO: extend EnvVar from Argument
-  type: TType;
-  details: Argument<TType>;
+  type: string;
+  details: Argument;
 }
 
 /* TYPE TYPES */
@@ -333,10 +330,9 @@ export interface TypeOptions {
 }
 
 /** Type settings. */
-export interface TypeDef<TType extends string = string, TReturn = unknown>
-  extends TypeOptions {
+export interface TypeDef extends TypeOptions {
   name: string;
-  handler: TypeOrTypeHandler<TType, TReturn>;
+  handler: TypeOrTypeHandler<unknown>;
 }
 
 /* EXAMPLE TYPES */

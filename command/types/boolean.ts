@@ -3,9 +3,9 @@ import type { ArgumentValue } from "../types.ts";
 import { Type } from "../type.ts";
 
 /** Boolean type with auto completion. Allows `true`, `false`, `0` and `1`. */
-export class BooleanType<TType extends string> extends Type<TType, boolean> {
+export class BooleanType extends Type<boolean> {
   /** Parse boolean type. */
-  public parse(type: ArgumentValue<TType>): boolean {
+  public parse(type: ArgumentValue): boolean {
     return boolean(type);
   }
 

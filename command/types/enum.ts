@@ -3,10 +3,8 @@ import type { ArgumentValue } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
-export class EnumType<
-  TType extends string,
-  TValue extends string | number | boolean,
-> extends Type<TType, TValue> {
+export class EnumType<TValue extends string | number | boolean>
+  extends Type<TValue> {
   private readonly allowedValues: ReadonlyArray<TValue>;
 
   constructor(values: ReadonlyArray<TValue> | Record<string, TValue>) {
@@ -14,7 +12,7 @@ export class EnumType<
     this.allowedValues = Array.isArray(values) ? values : Object.values(values);
   }
 
-  public parse(type: ArgumentValue<TType>): TValue {
+  public parse(type: ArgumentValue): TValue {
     for (const value of this.allowedValues) {
       if (value.toString() === type.value) {
         return value;

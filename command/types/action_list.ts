@@ -2,7 +2,7 @@ import type { Command } from "../command.ts";
 import { StringType } from "./string.ts";
 
 /** Completion list type. */
-export class ActionListType<TType extends string> extends StringType<TType> {
+export class ActionListType extends StringType {
   constructor(protected cmd: Command) {
     super();
   }

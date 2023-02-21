@@ -7,7 +7,7 @@ import { StringType } from "./string.ts";
 // }
 
 /** Integer type. */
-export class FileType<TType extends string> extends StringType<TType> {
+export class FileType extends StringType {
   constructor() {
     super();
   }

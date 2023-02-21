@@ -2,7 +2,7 @@
 
 import { Command, StringType } from "../../command/mod.ts";
 
-class EmailType<TType extends string> extends StringType<TType> {
+class EmailType extends StringType {
   complete(): string[] {
     return ["aaa@example.com", "bbb@example.com", "ccc@example.com"];
   }

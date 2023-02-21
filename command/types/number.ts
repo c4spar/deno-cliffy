@@ -3,9 +3,9 @@ import { Type } from "../type.ts";
 import type { ArgumentValue } from "../types.ts";
 
 /** Number type. */
-export class NumberType<TType extends string> extends Type<TType, number> {
+export class NumberType extends Type<number> {
   /** Parse number type. */
-  public parse(type: ArgumentValue<TType>): number {
+  public parse(type: ArgumentValue): number {
     return number(type);
   }
 }

@@ -10,7 +10,7 @@ const cmd = () =>
     .option("-b, --base", "Only available on this command.")
     .type(
       "custom",
-      ({ value }: ArgumentValue<"custom">) => value.toUpperCase(),
+      ({ value }: ArgumentValue) => value.toUpperCase(),
       { global: true },
     )
     .option(

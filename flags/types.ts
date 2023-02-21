@@ -1,7 +1,6 @@
 /** Options for the `parseFlags` method. */
 export interface ParseFlagsOptions<
-  TType extends string = ArgumentType,
-  TFlagOptions extends FlagOptions<TType> = FlagOptions<TType>,
+  TFlagOptions extends FlagOptions = FlagOptions,
 > {
   flags?: Array<TFlagOptions>;
   option?: (option: TFlagOptions, value?: unknown) => void;
@@ -13,11 +12,11 @@ export interface ParseFlagsOptions<
 }
 
 /** Base flag options. */
-export interface BaseFlagOptions<TDefault = unknown> {
+export interface BaseFlagOptions {
   name: string;
   aliases?: string[];
   standalone?: boolean;
-  default?: DefaultValue<TDefault>;
+  default?: DefaultValue;
   required?: boolean;
   depends?: string[];
   conflicts?: string[];
@@ -30,8 +29,7 @@ export interface BaseFlagOptions<TDefault = unknown> {
 export type BooleanFlagOptions = BaseFlagOptions;
 
 /** Options for a flag with an argument. */
-export interface ValueFlagOptions<TType extends string>
-  extends BaseFlagOptions, ArgumentOptions<TType> {
+export interface ValueFlagOptions extends BaseFlagOptions, ArgumentOptions {
   optionalValue?: boolean;
 }
 
@@ -40,25 +38,25 @@ export interface ValueFlagOptions<TType extends string>
  * `args` array. Each argument can have it's own type specified with the `type`
  * option.
  */
-export interface ValuesFlagOptions<TType extends string>
-  extends BaseFlagOptions {
-  args: Array<ArgumentOptions<TType>>;
+export interface ValuesFlagOptions extends BaseFlagOptions {
+  args: Array<ArgumentOptions>;
 }
 
 /** Flag options. */
-export type FlagOptions<TType extends string> =
+export type FlagOptions =
   | BooleanFlagOptions
-  | ValueFlagOptions<TType>
-  | ValuesFlagOptions<TType>;
+  | ValueFlagOptions
+  | ValuesFlagOptions;
 
 /** Options for a flag argument. */
-export interface ArgumentOptions<TType extends string> {
-  type: TType;
+export interface ArgumentOptions {
+  type: ArgumentType | string;
   optional?: boolean;
   variadic?: boolean;
   list?: boolean;
   separator?: string;
 }
+
 /** Available build-in argument types. */
 export type ArgumentType = "string" | "boolean" | "number" | "integer";
 
@@ -80,24 +78,23 @@ export type ValueHandler<TValue = any, TReturn = TValue> = (
  * Parse result. The parse context will be returned by the `parseFlags` method
  * and can be also passed as first argument to the `parseFlags` method.
  */
-export type ParseFlagsContext<
-  TType extends string = string,
+export interface ParseFlagsContext<
   // deno-lint-ignore no-explicit-any
   TFlags extends Record<string, any> = Record<string, any>,
-  TStandaloneOption extends FlagOptions<TType> = FlagOptions<TType>,
-> = {
+  TStandaloneOption extends FlagOptions = FlagOptions,
+> {
   flags: TFlags;
   unknown: Array<string>;
   literal: Array<string>;
   standalone?: TStandaloneOption;
   stopEarly: boolean;
   stopOnUnknown: boolean;
-};
+}
 
 /** Argument parsing informations. */
-export interface ArgumentValue<TType extends string = ArgumentType> {
+export interface ArgumentValue {
   label: string;
-  type: TType;
+  type: ArgumentType | string;
   name: string;
   value: string;
 }
@@ -106,9 +103,4 @@ export interface ArgumentValue<TType extends string = ArgumentType> {
  * Parse method for custom types. Gets the raw user input passed as argument
  * and returns the parsed value.
  */
-export type TypeHandler<
-  TType extends string,
-  TReturn = unknown,
-> = (
-  arg: ArgumentValue<TType>,
-) => TReturn;
+export type TypeHandler<TReturn = unknown> = (arg: ArgumentValue) => TReturn;

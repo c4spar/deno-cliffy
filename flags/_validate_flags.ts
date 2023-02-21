@@ -26,10 +26,10 @@ import {
  * @param opts    Parse options.
  * @param options Option name mappings: propertyName -> option
  */
-export function validateFlags<TType extends string>(
-  ctx: ParseFlagsContext,
-  opts: ParseFlagsOptions<TType>,
-  options: Map<string, FlagOptions<TType>> = new Map(),
+export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  opts: ParseFlagsOptions<TOptions>,
+  options: Map<string, FlagOptions> = new Map(),
 ): void {
   if (!opts.flags) {
     return;
@@ -61,9 +61,9 @@ export function validateFlags<TType extends string>(
   validateRequiredOptions(ctx, options, opts);
 }
 
-function validateUnknownOption<TType extends string>(
-  option: FlagOptions<TType>,
-  opts: ParseFlagsOptions<TType>,
+function validateUnknownOption<TOptions extends FlagOptions = FlagOptions>(
+  option: FlagOptions,
+  opts: ParseFlagsOptions<TOptions>,
 ) {
   if (!getOption(opts.flags ?? [], option.name)) {
     throw new UnknownOptionError(option.name, opts.flags ?? []);
@@ -74,9 +74,9 @@ function validateUnknownOption<TType extends string>(
  * Adds all default values to ctx.flags and returns a boolean object map with
  * only the default option names `{ [OptionName: string]: boolean }`.
  */
-function setDefaultValues<TType extends string>(
-  ctx: ParseFlagsContext,
-  opts: ParseFlagsOptions<TType>,
+function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  opts: ParseFlagsOptions<TOptions>,
 ) {
   const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
@@ -125,9 +125,9 @@ function setDefaultValues<TType extends string>(
   return defaultValues;
 }
 
-function validateStandaloneOption<TType extends string>(
+function validateStandaloneOption(
   ctx: ParseFlagsContext,
-  options: Map<string, FlagOptions<TType>>,
+  options: Map<string, FlagOptions>,
   optionNames: Array<string>,
   defaultValues: Record<string, boolean>,
 ): void {
@@ -143,9 +143,9 @@ function validateStandaloneOption<TType extends string>(
   }
 }
 
-function validateConflictingOptions<TType extends string>(
-  ctx: ParseFlagsContext,
-  option: FlagOptions<TType>,
+function validateConflictingOptions(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
 ): void {
   if (!option.conflicts?.length) {
     return;
@@ -157,9 +157,9 @@ function validateConflictingOptions<TType extends string>(
   }
 }
 
-function validateDependingOptions<TType extends string>(
-  ctx: ParseFlagsContext,
-  option: FlagOptions<TType>,
+function validateDependingOptions(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
   defaultValues: Record<string, boolean>,
 ): void {
   if (!option.depends) {
@@ -173,9 +173,9 @@ function validateDependingOptions<TType extends string>(
   }
 }
 
-function validateRequiredValues<TType extends string>(
-  ctx: ParseFlagsContext,
-  option: FlagOptions<TType>,
+function validateRequiredValues(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  option: FlagOptions,
   name: string,
 ): void {
   if (!isValueFlag(option)) {
@@ -184,7 +184,7 @@ function validateRequiredValues<TType extends string>(
   const isArray = option.args.length > 1;
 
   for (let i = 0; i < option.args.length; i++) {
-    const arg: ArgumentOptions<TType> = option.args[i];
+    const arg: ArgumentOptions = option.args[i];
     if (arg.optional) {
       continue;
     }
@@ -198,10 +198,10 @@ function validateRequiredValues<TType extends string>(
   }
 }
 
-function validateRequiredOptions<TType extends string>(
-  ctx: ParseFlagsContext,
-  options: Map<string, FlagOptions<TType>>,
-  opts: ParseFlagsOptions<TType>,
+function validateRequiredOptions<TOptions extends FlagOptions = FlagOptions>(
+  ctx: ParseFlagsContext<Record<string, unknown>>,
+  options: Map<string, FlagOptions>,
+  opts: ParseFlagsOptions<TOptions>,
 ): void {
   if (!opts.flags?.length) {
     return;
