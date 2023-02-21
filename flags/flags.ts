@@ -1,6 +1,7 @@
 import {
   getDefaultValue,
   getOption,
+  isValueFlag,
   matchWildCardOptions,
   paramCaseToCamelCase,
 } from "./_utils.ts";
@@ -25,6 +26,7 @@ import type {
   ParseFlagsContext,
   ParseFlagsOptions,
   TypeHandler,
+  ValuesFlagOptions,
 } from "./types.ts";
 import { boolean } from "./types/boolean.ts";
 import { number } from "./types/number.ts";
@@ -75,8 +77,9 @@ export function parseFlags<
   TFlagOptions extends FlagOptions,
   TFlagsResult extends ParseFlagsContext,
 >(
-  argsOrCtx: string[] | TFlagsResult,
+  argsOrCtx: Array<string> | TFlagsResult,
   opts: ParseFlagsOptions<TFlagOptions> = {},
+  parse?: TypeHandler,
 ): TFlagsResult & ParseFlagsContext<TFlags, TFlagOptions> {
   let args: Array<string>;
   let ctx: ParseFlagsContext<Record<string, unknown>>;
@@ -100,7 +103,7 @@ export function parseFlags<
   opts.dotted ??= true;
 
   validateOptions(opts);
-  const options = parseArgs(ctx, args, opts);
+  const options = parseArgs(ctx, args, opts, parse);
   validateFlags(ctx, opts, options);
 
   if (opts.dotted) {
@@ -131,6 +134,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
   args: Array<string>,
   opts: ParseFlagsOptions<TFlagOptions>,
+  parseCustomType?: TypeHandler,
 ): Map<string, FlagOptions> {
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, FlagOptions> = new Map();
@@ -230,8 +234,8 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       }
     }
 
-    if (option.type && !option.args?.length) {
-      option.args = [{
+    if ("type" in option && option.type && !isValueFlag(option)) {
+      (option as unknown as ValuesFlagOptions).args = [{
         type: option.type,
         optional: option.optionalValue,
         variadic: option.variadic,
@@ -241,7 +245,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     }
 
     if (
-      opts.flags?.length && !option.args?.length &&
+      opts.flags?.length && !isValueFlag(option) &&
       typeof currentValue !== "undefined"
     ) {
       throw new UnexpectedOptionValueError(option.name, currentValue);
@@ -255,7 +259,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     parseNext(option);
 
     if (typeof ctx.flags[propName] === "undefined") {
-      if (option.args?.length && !option.args?.[optionArgsIndex].optional) {
+      if (isValueFlag(option) && !option.args[optionArgsIndex].optional) {
         throw new MissingOptionValueError(option.name);
       } else if (typeof option.default !== "undefined") {
         ctx.flags[propName] = getDefaultValue(option);
@@ -285,7 +289,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       if (negate) {
         ctx.flags[propName] = false;
         return;
-      } else if (!option.args?.length) {
+      } else if (!isValueFlag(option)) {
         ctx.flags[propName] = undefined;
         return;
       }
@@ -294,19 +298,6 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       if (!arg) {
         const flag = next();
         throw new UnknownOptionError(flag, opts.flags ?? []);
-      }
-
-      if (!arg.type) {
-        arg.type = OptionType.BOOLEAN;
-      }
-
-      // make boolean values optional by default
-      if (
-        !option.args?.length &&
-        arg.type === OptionType.BOOLEAN &&
-        arg.optional === undefined
-      ) {
-        arg.optional = true;
       }
 
       if (arg.optional) {
@@ -372,7 +363,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Check if current option should have an argument. */
       function hasNext(arg: ArgumentOptions): boolean {
-        if (!option.args?.length) {
+        if (!isValueFlag(option)) {
           return false;
         }
         const nextValue = currentValue ?? args[argsIndex + 1];
@@ -403,18 +394,22 @@ function parseArgs<TFlagOptions extends FlagOptions>(
 
       /** Parse argument value.  */
       function parseValue(
-        option: FlagOptions,
+        option: ValuesFlagOptions,
         arg: ArgumentOptions,
         value: string,
       ): unknown {
-        const result: unknown = opts.parse
-          ? opts.parse({
+        const result: unknown = parseCustomType
+          ? parseCustomType({
             label: "Option",
-            type: arg.type || OptionType.STRING,
+            type: arg.type,
             name: `--${option.name}`,
             value,
           })
-          : parseDefaultType(option, arg, value);
+          : parseDefaultType(
+            option as ValuesFlagOptions,
+            arg as ArgumentOptions,
+            value,
+          );
 
         if (typeof result !== "undefined") {
           increase = true;
@@ -482,7 +477,7 @@ function splitFlags(flag: string): Array<string> {
 }
 
 function parseDefaultType(
-  option: FlagOptions,
+  option: ValuesFlagOptions,
   arg: ArgumentOptions,
   value: string,
 ): unknown {

@@ -789,23 +789,6 @@ export class Command<
    * Don't throw an error if the command was called without arguments.
    * @param allowEmpty Enable/disable allow empty.
    */
-  // public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
-  //   allowEmpty?: TAllowEmpty,
-  // ): false extends TAllowEmpty ? this
-  //   : Command<
-  //     Partial<TParentCommandGlobals>,
-  //     TParentCommandTypes,
-  //     Partial<TCommandOptions>,
-  //     TCommandArguments,
-  //     TCommandGlobals,
-  //     TCommandTypes,
-  //     TCommandGlobalTypes,
-  //     TParentCommand
-  //   > {
-  //   this.cmd._allowEmpty = allowEmpty !== false;
-  //   return this;
-  // }
-
   public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
     allowEmpty?: TAllowEmpty,
   ): false extends TAllowEmpty ? this
@@ -1859,13 +1842,12 @@ export class Command<
       allowEmpty: this._allowEmpty,
       flags: options,
       ignoreDefaults: ctx.env,
-      parse: (type: ArgumentValue) => this.parseType(type),
-      option: (option: Option) => {
+      option: (option) => {
         if (!ctx.action && option.action) {
           ctx.action = option as ActionOption;
         }
       },
-    });
+    }, (type: ArgumentValue) => this.parseType(type));
   }
 
   /** Parse argument type. */

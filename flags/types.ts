@@ -1,9 +1,8 @@
-/** Parser options. */
+/** Options for the `parseFlags` method. */
 export interface ParseFlagsOptions<
   TFlagOptions extends FlagOptions = FlagOptions,
 > {
   flags?: Array<TFlagOptions>;
-  parse?: TypeHandler<unknown>;
   option?: (option: TFlagOptions, value?: unknown) => void;
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
@@ -12,11 +11,9 @@ export interface ParseFlagsOptions<
   dotted?: boolean;
 }
 
-/** Flag options. */
-export interface FlagOptions extends Omit<ArgumentOptions, "optional"> {
+/** Base flag options. */
+export interface BaseFlagOptions {
   name: string;
-  args?: Array<ArgumentOptions>;
-  optionalValue?: boolean;
   aliases?: string[];
   standalone?: boolean;
   default?: DefaultValue;
@@ -28,9 +25,32 @@ export interface FlagOptions extends Omit<ArgumentOptions, "optional"> {
   equalsSign?: boolean;
 }
 
+/** Options for a flag with no arguments. */
+export type BooleanFlagOptions = BaseFlagOptions;
+
+/** Options for a flag with an argument. */
+export interface ValueFlagOptions extends BaseFlagOptions, ArgumentOptions {
+  optionalValue?: boolean;
+}
+
+/**
+ * Options for a flag with multiple arguments. Arguments are defined with the
+ * `args` array. Each argument can have it's own type specified with the `type`
+ * option.
+ */
+export interface ValuesFlagOptions extends BaseFlagOptions {
+  args: Array<ArgumentOptions>;
+}
+
+/** Flag options. */
+export type FlagOptions =
+  | BooleanFlagOptions
+  | ValueFlagOptions
+  | ValuesFlagOptions;
+
 /** Options for a flag argument. */
 export interface ArgumentOptions {
-  type?: ArgumentType | string;
+  type: ArgumentType | string;
   optional?: boolean;
   variadic?: boolean;
   list?: boolean;

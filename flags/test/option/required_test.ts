@@ -8,6 +8,7 @@ const options: ParseFlagsOptions = {
     name: "required",
     type: OptionType.STRING,
     required: true,
+    optionalValue: true,
   }, {
     name: "required-value",
     type: OptionType.STRING,

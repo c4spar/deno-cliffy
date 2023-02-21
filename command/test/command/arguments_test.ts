@@ -4,7 +4,7 @@ import {
   describe,
   it,
 } from "../../../dev_deps.ts";
-import type { ArgumentValue } from "../../../flags/types.ts";
+import type { ArgumentValue } from "../../types.ts";
 import { ValidationError } from "../../_errors.ts";
 import { Command } from "../../command.ts";
 

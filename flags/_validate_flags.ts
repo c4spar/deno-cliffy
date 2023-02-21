@@ -1,4 +1,9 @@
-import { getDefaultValue, getOption, paramCaseToCamelCase } from "./_utils.ts";
+import {
+  getDefaultValue,
+  getOption,
+  isValueFlag,
+  paramCaseToCamelCase,
+} from "./_utils.ts";
 import {
   ConflictingOptionError,
   DependingOptionError,
@@ -7,8 +12,12 @@ import {
   OptionNotCombinableError,
   UnknownOptionError,
 } from "./_errors.ts";
-import { ParseFlagsContext, ParseFlagsOptions } from "./types.ts";
-import type { ArgumentOptions, FlagOptions } from "./types.ts";
+import {
+  ArgumentOptions,
+  FlagOptions,
+  ParseFlagsContext,
+  ParseFlagsOptions,
+} from "./types.ts";
 
 /**
  * Flags post validation. Validations that are not already done by the parser.
@@ -169,7 +178,7 @@ function validateRequiredValues(
   option: FlagOptions,
   name: string,
 ): void {
-  if (!option.args) {
+  if (!isValueFlag(option)) {
     return;
   }
   const isArray = option.args.length > 1;

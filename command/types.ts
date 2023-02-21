@@ -3,8 +3,8 @@
 import type {
   ArgumentOptions,
   ArgumentValue,
+  BaseFlagOptions,
   DefaultValue,
-  FlagOptions,
   TypeHandler,
   ValueHandler,
 } from "../flags/types.ts";
@@ -136,8 +136,6 @@ export interface Argument extends ArgumentOptions {
   name: string;
   /** Shell completion action. */
   action: string;
-  /** Arguments type. */
-  type: string;
 }
 
 /** Result of `cmd.parse()` method. */
@@ -183,18 +181,6 @@ export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TReturn
 >;
 
-type ExcludedCommandOptions =
-  | "name"
-  | "args"
-  | "type"
-  | "optionalValue"
-  | "requiredValue"
-  | "aliases"
-  | "variadic"
-  | "list"
-  | "value"
-  | "default";
-
 /** Command option options. */
 export interface GlobalOptionOptions<
   TOptions extends Record<string, any> | void = any,
@@ -215,7 +201,7 @@ export interface GlobalOptionOptions<
   TParentCommand extends Command<any> | undefined = TOptions extends number
     ? any
     : undefined,
-> extends Omit<FlagOptions, ExcludedCommandOptions> {
+> extends Omit<BaseFlagOptions, "name" | "aliases" | "equalsSign"> {
   override?: boolean;
   hidden?: boolean;
   action?: ActionHandler<
@@ -230,7 +216,7 @@ export interface GlobalOptionOptions<
   >;
   prepend?: boolean;
   value?: OptionValueHandler;
-  default?: DefaultValue;
+  separator?: string;
 }
 
 export interface OptionOptions<
@@ -297,12 +283,13 @@ export interface Option<
     TParentTypes,
     TParentCommand
   >,
-  Omit<FlagOptions, "value"> {
+  BaseFlagOptions {
   description: string;
   flags: Array<string>;
   typeDefinition?: string;
-  args: Argument[];
+  args: Array<Argument>;
   groupName?: string;
+  separator?: string;
 }
 
 /* ENV VARS TYPES */
@@ -329,6 +316,7 @@ export interface EnvVar extends EnvVarOptions {
   name: string;
   names: string[];
   description: string;
+  // @TODO: extend EnvVar from Argument
   type: string;
   details: Argument;
 }
@@ -344,7 +332,7 @@ export interface TypeOptions {
 /** Type settings. */
 export interface TypeDef extends TypeOptions {
   name: string;
-  handler: Type<unknown> | TypeHandler<unknown>;
+  handler: TypeOrTypeHandler<unknown>;
 }
 
 /* EXAMPLE TYPES */
@@ -436,6 +424,8 @@ export type CompleteHandler<
   >,
   parent?: Command<any>,
 ) => CompleteHandlerResult;
+
+/* HELP */
 
 /**
  * Help callback method to print the help.
