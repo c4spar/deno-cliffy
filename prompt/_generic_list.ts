@@ -546,7 +546,7 @@ export abstract class GenericList<
     }
     const names = this.parentOptions.map((option) => option.name);
     const breadCrumb = names.length > this.settings.maxBreadcrumbItems
-      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 1)]
+      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 2)]
       : names;
 
     return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
