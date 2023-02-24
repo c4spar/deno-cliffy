@@ -83,7 +83,7 @@ async function runPrompt(
   for (const input of inputs) {
     await writer.write(new TextEncoder().encode(input));
     // Ensure all inputs are processed and rendered separately.
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
   }
 
   const { success, stdout } = await child.output();
