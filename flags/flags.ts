@@ -96,6 +96,7 @@ export function parseFlags<
   ctx.unknown ??= [];
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
+  ctx.defaults ??= {};
 
   opts.dotted ??= true;
 
@@ -135,6 +136,8 @@ function parseArgs<TFlagOptions extends FlagOptions>(
   /** Option name mapping: propertyName -> option.name */
   const optionsMap: Map<string, FlagOptions> = new Map();
   let inLiteral = false;
+
+  // validateDuplicateFlagValues(opts, args);
 
   for (
     let argsIndex = 0;
@@ -225,7 +228,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     if (typeof ctx.flags[propName] !== "undefined") {
       if (!opts.flags?.length) {
         option.collect = true;
-      } else if (!option.collect) {
+      } else if (!option.collect && !ctx.defaults[option.name]) {
         throw new DuplicateOptionError(current);
       }
     }

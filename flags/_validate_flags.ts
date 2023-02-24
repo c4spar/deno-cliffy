@@ -106,7 +106,7 @@ function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
 
     if (hasDefaultValue) {
       ctx.flags[name] = getDefaultValue(option) ?? defaultValue;
-      defaultValues[option.name] = true;
+      ctx.defaults[option.name] = true;
       if (typeof option.value === "function") {
         ctx.flags[name] = option.value(ctx.flags[name]);
       }

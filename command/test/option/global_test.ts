@@ -145,3 +145,53 @@ Deno.test("[command] should not disable global --help option with noGlobals", as
     ["cmd1", "cmd3", "--help"],
   );
 });
+
+const cmdWithDefaults = () =>
+  new Command()
+    .noExit()
+    .version("0.1.0")
+    .option(
+      "-g, --global [val:boolean]",
+      "Available on all commands.",
+      {
+        global: true,
+        default: true,
+      },
+    )
+    .option(
+      "-a, --alt [val:boolean]",
+      "Available on all commands.",
+      {
+        global: true,
+        default: false,
+      },
+    )
+    .command(
+      "cmd1",
+      new Command()
+        .description("Some sub command.")
+        .command(
+          "cmd2",
+          new Command()
+            .option(
+              "-l, --level3 [val:boolean]",
+              "Only available on this command.",
+            )
+            .description("Some nested sub command."),
+        ),
+    );
+
+Deno.test("[command] should parse options when used interchangable and global options have defaults", async () => {
+  const { options, args } = await cmdWithDefaults().parse([
+    "cmd1",
+    "cmd2",
+    "-a",
+    "-l",
+    "false",
+    "-g",
+    "false",
+  ]);
+
+  assertEquals(options, { global: false, alt: true, level3: false });
+  assertEquals(args, []);
+});
