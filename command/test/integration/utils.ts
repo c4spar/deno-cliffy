@@ -15,7 +15,6 @@ export async function runCommand(
     cmd: [
       "deno",
       "run",
-      "--unstable",
       "--allow-all",
       `${baseDir}/command.ts`,
       ...args,
