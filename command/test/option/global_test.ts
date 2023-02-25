@@ -181,7 +181,7 @@ const cmdWithDefaults = () =>
         ),
     );
 
-Deno.test("[command] should parse options when used interchangable and global options have defaults", async () => {
+Deno.test("[command] should parse options when used interchangeable and global options have defaults", async () => {
   const { options, args } = await cmdWithDefaults().parse([
     "cmd1",
     "cmd2",

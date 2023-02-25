@@ -26,7 +26,6 @@ export interface FlagOptions extends Omit<ArgumentOptions, "optional"> {
   value?: ValueHandler;
   collect?: boolean;
   equalsSign?: boolean;
-  flags?: string[];
 }
 
 /** Options for a flag argument. */

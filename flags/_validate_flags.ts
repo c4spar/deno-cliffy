@@ -25,7 +25,7 @@ export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
   if (!opts.flags) {
     return;
   }
-  const defaultValues = setDefaultValues(ctx, opts);
+  setDefaultValues(ctx, opts);
 
   const optionNames = Object.keys(ctx.flags);
   if (!optionNames.length && opts.allowEmpty) {
@@ -37,7 +37,6 @@ export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
       ctx,
       options,
       optionNames,
-      defaultValues,
     );
     return;
   }
@@ -45,7 +44,7 @@ export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
   for (const [name, option] of options) {
     validateUnknownOption(option, opts);
     validateConflictingOptions(ctx, option);
-    validateDependingOptions(ctx, option, defaultValues);
+    validateDependingOptions(ctx, option);
     validateRequiredValues(ctx, option, name);
   }
 
@@ -69,9 +68,8 @@ function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
   opts: ParseFlagsOptions<TOptions>,
 ) {
-  const defaultValues: Record<string, boolean> = {};
   if (!opts.flags?.length) {
-    return defaultValues;
+    return;
   }
 
   // Set default values
@@ -112,15 +110,12 @@ function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
       }
     }
   }
-
-  return defaultValues;
 }
 
 function validateStandaloneOption(
   ctx: ParseFlagsContext,
   options: Map<string, FlagOptions>,
   optionNames: Array<string>,
-  defaultValues: Record<string, boolean>,
 ): void {
   if (!ctx.standalone || optionNames.length === 1) {
     return;
@@ -128,7 +123,7 @@ function validateStandaloneOption(
 
   // Don't throw an error if all values are coming from the default option.
   for (const [_, opt] of options) {
-    if (!defaultValues[opt.name] && opt !== ctx.standalone) {
+    if (!ctx.defaults[opt.name] && opt !== ctx.standalone) {
       throw new OptionNotCombinableError(ctx.standalone.name);
     }
   }
@@ -151,14 +146,13 @@ function validateConflictingOptions(
 function validateDependingOptions(
   ctx: ParseFlagsContext<Record<string, unknown>>,
   option: FlagOptions,
-  defaultValues: Record<string, boolean>,
 ): void {
   if (!option.depends) {
     return;
   }
   for (const flag of option.depends) {
     // Don't throw an error if the value is coming from the default option.
-    if (!isset(flag, ctx.flags) && !defaultValues[option.name]) {
+    if (!isset(flag, ctx.flags) && !ctx.defaults[option.name]) {
       throw new DependingOptionError(option.name, flag);
     }
   }
