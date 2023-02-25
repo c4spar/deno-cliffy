@@ -113,6 +113,21 @@ Deno.test("flags - type - boolean - negatable option with argument", () => {
   assertEquals(literal, []);
 });
 
+Deno.test("flags - type - boolean - no value option with default value", () => {
+  const parseOptions = {
+    flags: [{
+      name: "foo",
+      default: false,
+    }],
+  };
+
+  const result1 = parseFlags([], parseOptions);
+  assertEquals(result1.flags, { foo: false });
+
+  const result2 = parseFlags(["--foo"], parseOptions);
+  assertEquals(result2.flags, { foo: true });
+});
+
 Deno.test("flags - type - boolean - with invalid value", () => {
   assertThrows(
     () => parseFlags(["-f", "unknown"], options),
