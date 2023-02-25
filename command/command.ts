@@ -1634,11 +1634,11 @@ export class Command<
             args,
             cmd: this,
             literal: this.literalArgs,
-          } as any;
+          };
         }
       }
 
-      return await this.execute(options, ...args) as any;
+      return await this.execute(options, ...args);
     } catch (error: unknown) {
       this.handleError(error);
     }
