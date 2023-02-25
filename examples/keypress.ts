@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run
 
 import { keypress, KeyPressEvent } from "../keypress/mod.ts";
 

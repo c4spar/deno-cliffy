@@ -1,6 +1,7 @@
 import {
   assertEquals,
   assertInstanceOf,
+  assertRejects,
   assertSpyCalls,
   spy,
 } from "../../../dev_deps.ts";
@@ -80,4 +81,56 @@ Deno.test("[command] should call child error handler on child error", async () =
   assertInstanceOf(error, ValidationError);
   assertInstanceOf(error.cmd, Command);
   assertEquals(error.cmd.getName(), "child2");
+});
+
+Deno.test("[command] should handle error with useRawArgs enabled", async () => {
+  const errorHandlerSpy = spy();
+
+  await assertRejects(
+    () =>
+      new Command()
+        .throwErrors()
+        .error(errorHandlerSpy)
+        .option("-f, --foo", "...")
+        .arguments("[bar:string]")
+        .useRawArgs()
+        .action(() => {
+          throw new Error("foo");
+        })
+        .parse([
+          "-f",
+          "test",
+        ]),
+    Error,
+    "foo",
+  );
+
+  assertSpyCalls(errorHandlerSpy, 1);
+});
+
+Deno.test("[command] should handle error on sub command with useRawArgs enabled", async () => {
+  const errorHandlerSpy = spy();
+
+  await assertRejects(
+    () =>
+      new Command()
+        .throwErrors()
+        .error(errorHandlerSpy)
+        .command("foo")
+        .option("-f, --foo", "...")
+        .arguments("[bar:string]")
+        .useRawArgs()
+        .action(() => {
+          throw new Error("foo");
+        })
+        .parse([
+          "foo",
+          "-f",
+          "test",
+        ]),
+    Error,
+    "foo",
+  );
+
+  assertSpyCalls(errorHandlerSpy, 1);
 });

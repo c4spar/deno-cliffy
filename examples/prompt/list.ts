@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run
 
 import { List } from "../../prompt/list.ts";
 

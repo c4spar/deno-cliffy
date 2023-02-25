@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run
 
 import { prompt } from "../../prompt/prompt.ts";
 import { Input } from "../../prompt/input.ts";

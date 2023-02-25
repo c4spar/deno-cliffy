@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run
 
 import { BufReader } from "https://deno.land/std@0.170.0/io/buffer.ts";
 import { tty } from "../../ansi/tty.ts";

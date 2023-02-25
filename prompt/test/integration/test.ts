@@ -3,7 +3,6 @@ import {
   assertSnapshot,
   dirname,
   expandGlob,
-  lt,
   WalkEntry,
 } from "../../../dev_deps.ts";
 
@@ -12,6 +11,7 @@ type TestModule = {
 };
 
 const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
+const encoder = new TextEncoder();
 
 for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
   if (file.isFile) {
@@ -19,7 +19,6 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
 
     Deno.test({
       name: `prompt - integration - ${name}`,
-      ignore: lt(Deno.version.deno, "1.10.0"),
       async fn(ctx) {
         const testModule: TestModule = await import("file://" + file.path);
         const tests = Object.entries(testModule.tests ?? {});
@@ -48,12 +47,10 @@ for await (const file: WalkEntry of expandGlob(`${baseDir}/fixtures/*.ts`)) {
 function getCmdFlagsForFile(file: WalkEntry): string[] {
   if (file.name === "input_no_location_flag.ts") {
     return [
-      "--unstable",
       "--allow-all",
     ];
   }
   return [
-    "--unstable",
     "--allow-all",
     "--location",
     "https://cliffy.io",
@@ -81,14 +78,14 @@ async function runPrompt(
   const writer = child.stdin.getWriter();
 
   for (const input of inputs) {
-    await writer.write(new TextEncoder().encode(input));
+    await writer.write(encoder.encode(input));
     // Ensure all inputs are processed and rendered separately.
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
   const { success, stdout } = await child.output();
   writer.releaseLock();
-  child.stdin.close();
+  await child.stdin.close();
 
   if (!success) {
     throw new Error(`test failed: ${file}`);
