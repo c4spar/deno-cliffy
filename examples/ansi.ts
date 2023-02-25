@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable
+#!/usr/bin/env -S deno run
 
 import { colors, tty } from "../ansi/mod.ts";
 import { delay } from "https://deno.land/std@0.170.0/async/delay.ts";

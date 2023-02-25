@@ -17,7 +17,7 @@ if (errors.length) {
 async function checkExample(file: string): Promise<void> {
   console.log("Type check example:", file);
   const proc = Deno.run({
-    cmd: ["deno", "check", "--unstable", file],
+    cmd: ["deno", "check", file],
     stderr: "piped",
   });
   const [status, stderrOutput] = await Promise.all([
