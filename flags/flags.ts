@@ -257,7 +257,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     if (typeof ctx.flags[propName] === "undefined") {
       if (option.args?.length && !option.args?.[optionArgsIndex].optional) {
         throw new MissingOptionValueError(option.name);
-      } else if (typeof option.default !== "undefined") {
+      } else if (
+        typeof option.default !== "undefined" &&
+        (option.type || option.value || option.args?.length)
+      ) {
         ctx.flags[propName] = getDefaultValue(option);
       } else {
         ctx.flags[propName] = true;
