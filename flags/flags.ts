@@ -96,6 +96,7 @@ export function parseFlags<
   ctx.unknown ??= [];
   ctx.stopEarly = false;
   ctx.stopOnUnknown = false;
+  ctx.defaults ??= {};
 
   opts.dotted ??= true;
 
@@ -225,7 +226,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     if (typeof ctx.flags[propName] !== "undefined") {
       if (!opts.flags?.length) {
         option.collect = true;
-      } else if (!option.collect) {
+      } else if (!option.collect && !ctx.defaults[option.name]) {
         throw new DuplicateOptionError(current);
       }
     }
@@ -263,19 +264,20 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       ) {
         ctx.flags[propName] = getDefaultValue(option);
       } else {
-        ctx.flags[propName] = true;
+        setFlagValue(true);
       }
     }
 
     if (option.value) {
-      ctx.flags[propName] = option.value(ctx.flags[propName], previous);
+      const value = option.value(ctx.flags[propName], previous);
+      setFlagValue(value);
     } else if (option.collect) {
       const value: unknown[] = typeof previous !== "undefined"
         ? (Array.isArray(previous) ? previous : [previous])
         : [];
 
       value.push(ctx.flags[propName]);
-      ctx.flags[propName] = value;
+      setFlagValue(value);
     }
 
     optionsMap.set(propName, option);
@@ -286,10 +288,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     // deno-lint-ignore no-inner-declarations
     function parseNext(option: FlagOptions): void {
       if (negate) {
-        ctx.flags[propName] = false;
+        setFlagValue(false);
         return;
       } else if (!option.args?.length) {
-        ctx.flags[propName] = undefined;
+        setFlagValue(undefined);
         return;
       }
       const arg: ArgumentOptions | undefined = option.args[optionArgsIndex];
@@ -361,7 +363,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         (option.args.length > 1 || arg.variadic)
       ) {
         if (!ctx.flags[propName]) {
-          ctx.flags[propName] = [];
+          setFlagValue([]);
         }
 
         (ctx.flags[propName] as Array<unknown>).push(result);
@@ -370,7 +372,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
           parseNext(option);
         }
       } else {
-        ctx.flags[propName] = result;
+        setFlagValue(result);
       }
 
       /** Check if current option should have an argument. */
@@ -424,6 +426,14 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
 
         return result;
+      }
+    }
+
+    // deno-lint-ignore no-inner-declarations
+    function setFlagValue(value: unknown) {
+      ctx.flags[propName] = value;
+      if (ctx.defaults[propName]) {
+        delete ctx.defaults[propName];
       }
     }
   }

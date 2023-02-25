@@ -138,6 +138,7 @@ Deno.test("[flags] should parse from context", () => {
     literal: [],
     stopEarly: false,
     stopOnUnknown: false,
+    defaults: {},
   }, {
     ...options,
     flags: [
@@ -163,6 +164,7 @@ Deno.test("[flags] should ignore missing required options which are already pars
     literal: [],
     stopEarly: false,
     stopOnUnknown: false,
+    defaults: {},
   }, {
     ...options,
     flags: [

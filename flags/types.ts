@@ -69,6 +69,7 @@ export interface ParseFlagsContext<
   standalone?: TStandaloneOption;
   stopEarly: boolean;
   stopOnUnknown: boolean;
+  defaults: Record<string, boolean>;
 }
 
 /** Argument parsing informations. */

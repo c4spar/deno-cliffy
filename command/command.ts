@@ -1571,6 +1571,7 @@ export class Command<
       literal: [],
       stopEarly: false,
       stopOnUnknown: false,
+      defaults: {},
     };
     return this.parseCommand(ctx) as any;
   }

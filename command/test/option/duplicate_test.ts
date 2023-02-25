@@ -1,4 +1,4 @@
-import { assertRejects } from "../../../dev_deps.ts";
+import { assert, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
@@ -7,10 +7,15 @@ const cmd = new Command()
   .option("--no-flag", "description ...")
   .action(() => {});
 
+Deno.test("should not throw an error if single flag is used", async () => {
+  const parsedArgs = await cmd.parse(["-f", "true"]);
+  assert(parsedArgs.options.flag === true);
+});
+
 Deno.test("command optionDuplicate flag", async () => {
   await assertRejects(
     async () => {
-      await cmd.parse(["-f", "-f", "unknown"]);
+      await cmd.parse(["-f", "-f", "true"]);
     },
     Error,
     `Option "-f" can only occur once, but was found several times.`,
