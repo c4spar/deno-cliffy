@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --unstable --allow-net=deno.land
+#!/usr/bin/env -S deno run --allow-net=deno.land
 
 import { colors } from "../../ansi/colors.ts";
 import { tty } from "../../ansi/tty.ts";
