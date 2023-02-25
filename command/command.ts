@@ -1583,10 +1583,10 @@ export class Command<
 
       if (this.isExecutable) {
         await this.executeExecutable(ctx.unknown);
-        return { options: {}, args: [], cmd: this, literal: [] } as any;
+        return { options: {}, args: [], cmd: this, literal: [] };
       } else if (this._useRawArgs) {
         await this.parseEnvVars(ctx, this.envVars);
-        return this.execute(ctx.env, ...ctx.unknown) as any;
+        return await this.execute(ctx.env, ...ctx.unknown);
       }
 
       let preParseGlobals = false;
