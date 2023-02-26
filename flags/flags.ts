@@ -45,13 +45,13 @@ const DefaultTypes: Record<ArgumentType, TypeHandler> = {
  * @param opts      Parse options.
  *
  * ```
- * // examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land --deno.com -- --cliffy
+ * import { parseFlags } from "./flags.ts";
+ *
  * parseFlags(Deno.args);
  * ```
  *
- * Output:
- *
- * ```
+ * ```console
+ * $ examples/flags/flags.ts -x 3 -y.z -n5 -abc --beep=boop foo bar baz --deno.land --deno.com -- --cliffy
  * {
  *   flags: {
  *     x: "3",

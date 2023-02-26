@@ -180,11 +180,15 @@ export const clearTerminal = Deno.build.os === "windows"
 
 /**
  * Create link.
+ *
  * @param text Link text.
  * @param url Link url.
- * ```
+ *
+ * ```ts
+ * import { link } from "./mod.ts";
+ *
  * console.log(
- *   ansi.link("Click me.", "https://deno.land"),
+ *   link("Click me.", "https://deno.land"),
  * );
  * ```
  */
@@ -214,13 +218,17 @@ export interface ImageOptions {
 
 /**
  * Create image.
+ *
  * @param buffer  Image buffer.
  * @param options Image options.
- * ```
+ *
+ * ```ts
+ * import { image } from "./mod.ts";
+ *
  * const response = await fetch("https://deno.land/images/hashrock_simple.png");
  * const imageBuffer: ArrayBuffer = await response.arrayBuffer();
  * console.log(
- *   ansi.image(imageBuffer),
+ *   image(imageBuffer),
  * );
  * ```
  */
