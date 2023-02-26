@@ -10,11 +10,14 @@ import type {
  * Base class for custom types.
  *
  * **Custom type example:**
- * ```
+ *
+ * ```ts
+ * import { Type, ArgumentValue } from "./mod.ts";
+ *
  * export class ColorType extends Type<string> {
  *   public parse({ label, name, value, type }: ArgumentValue): string {
  *     if (["red", "blue"].includes(value)) {
- *       trow new Error(
+ *       throw new Error(
  *         `${label} "${name}" must be of type "${type}", but got "${value}".` +
  *         "Valid colors are: red, blue"
  *       );

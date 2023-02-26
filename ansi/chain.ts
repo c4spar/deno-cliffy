@@ -104,9 +104,13 @@ export interface Chain<T extends Chain<T>> {
   clearTerminal: T;
   /**
    * Create link.
+   *
    * @param text Link text.
    * @param url Link url.
-   * ```
+   *
+   * ```ts
+   * import { ansi } from "./mod.ts";
+   *
    * console.log(
    *   ansi.link("Click me.", "https://deno.land"),
    * );
@@ -115,9 +119,13 @@ export interface Chain<T extends Chain<T>> {
   link: (text: string, url: string) => T;
   /**
    * Create image.
+   *
    * @param buffer  Image buffer.
    * @param options Image options.
-   * ```
+   *
+   * ```ts
+   * import { ansi } from "./mod.ts";
+   *
    * const response = await fetch("https://deno.land/images/hashrock_simple.png");
    * const imageBuffer: ArrayBuffer = await response.arrayBuffer();
    * console.log(
