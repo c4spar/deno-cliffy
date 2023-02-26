@@ -260,6 +260,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Check if table bordy has border. */
   public hasBodyBorder(): boolean {
     return this.getBorder() ||
+      this.options.columnDefs.some((column) => column.getBorder()) ||
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()

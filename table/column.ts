@@ -22,10 +22,6 @@ export class Column {
     return this;
   }
 
-  width(width: number): this {
-    return this.minWidth(width).maxWidth(width);
-  }
-
   minWidth(width: number): this {
     this.opts.minWidth = width;
     return this;

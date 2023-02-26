@@ -1,5 +1,6 @@
-import { Cell, Direction, ICell } from "./cell.ts";
-import { IRow, Row } from "./row.ts";
+import { Cell, Direction, type ICell } from "./cell.ts";
+import type { Column } from "./column.ts";
+import { type IRow, Row } from "./row.ts";
 import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
 import { consumeWords, longest, strLength } from "./utils.ts";
 
@@ -207,8 +208,12 @@ export class TableLayout {
    * @param cell  Original cell.
    * @param row   Parent row.
    */
-  protected createCell(cell: ICell | null | undefined, row: Row, colIndex: number): Cell {
-    const column = this.options.columnDefs.at(colIndex);
+  protected createCell(
+    cell: ICell | null | undefined,
+    row: Row,
+    colIndex: number,
+  ): Cell {
+    const column: Column | undefined = this.options.columnDefs.at(colIndex);
     return Cell.from(cell ?? "")
       .border(column?.getBorder() ?? row.getBorder(), false)
       .align(column?.getAlign() ?? row.getAlign(), false);
