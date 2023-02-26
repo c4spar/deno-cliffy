@@ -1,6 +1,11 @@
+import { Direction } from "./cell.ts";
+
 export interface ColumnOptions {
+  border?: boolean;
+  align?: Direction;
   minWidth?: number;
   maxWidth?: number;
+  padding?: number;
 }
 
 export class Column {
@@ -31,11 +36,38 @@ export class Column {
     return this;
   }
 
+  border(border = true): this {
+    this.opts.border = border;
+    return this;
+  }
+
+  padding(padding: number): this {
+    this.opts.padding = padding;
+    return this;
+  }
+
+  align(direction: Direction): this {
+    this.opts.align = direction;
+    return this;
+  }
+
   getMinWidth(): number | undefined {
     return this.opts.minWidth;
   }
 
   getMaxWidth(): number | undefined {
     return this.opts.maxWidth;
+  }
+
+  getBorder(): boolean | undefined {
+    return this.opts.border;
+  }
+
+  getPadding(): number | undefined {
+    return this.opts.padding;
+  }
+
+  getAlign(): Direction | undefined {
+    return this.opts.align;
   }
 }
