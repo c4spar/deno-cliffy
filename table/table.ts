@@ -1,5 +1,6 @@
 import { border, IBorder } from "./border.ts";
 import { Cell, Direction } from "./cell.ts";
+import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
 
@@ -21,6 +22,7 @@ export interface ITableOptions {
 export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
   chars: IBorder;
   align?: Direction;
+  columnDefs: Array<Column>;
 }
 
 /** Table type. */
@@ -36,6 +38,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     minColWidth: 0,
     padding: 1,
     chars: { ...Table._chars },
+    columnDefs: [],
   };
   private headerRow?: Row;
 
@@ -272,5 +275,34 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Get table alignment. */
   public getAlign(): Direction {
     return this.options.align ?? "left";
+  }
+
+  public columns(columns: Array<Column | ColumnOptions>): this {
+    this.options.columnDefs = columns.map((column) =>
+      column instanceof Column ? column : Column.from(column)
+    );
+    return this;
+  }
+
+  public column(
+    index: number,
+    column: Column | ColumnOptions,
+  ): this {
+    if (column instanceof Column) {
+      this.options.columnDefs[index] = column;
+    } else if (this.options.columnDefs[index]) {
+      this.options.columnDefs[index].options(column);
+    } else {
+      this.options.columnDefs[index] = Column.from(column);
+    }
+    return this;
+  }
+
+  public getColumns(): Array<Column> {
+    return this.options.columnDefs;
+  }
+
+  public getColumn(index: number): Column | undefined {
+    return this.options.columnDefs[index];
   }
 }

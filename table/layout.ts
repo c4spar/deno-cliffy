@@ -65,12 +65,17 @@ export class TableLayout {
     const padding: number[] = [];
     const width: number[] = [];
     for (let colIndex = 0; colIndex < columns; colIndex++) {
-      const minColWidth: number = Array.isArray(this.options.minColWidth)
-        ? this.options.minColWidth[colIndex]
-        : this.options.minColWidth;
-      const maxColWidth: number = Array.isArray(this.options.maxColWidth)
-        ? this.options.maxColWidth[colIndex]
-        : this.options.maxColWidth;
+      const column = this.options.columnDefs.at(colIndex);
+      const minColWidth: number = column?.getMinWidth() ??
+        (Array.isArray(this.options.minColWidth)
+          ? this.options.minColWidth[colIndex]
+          : this.options.minColWidth);
+
+      const maxColWidth: number = column?.getMaxWidth() ??
+        (Array.isArray(this.options.maxColWidth)
+          ? this.options.maxColWidth[colIndex]
+          : this.options.maxColWidth);
+
       const colWidth: number = longest(colIndex, rows, maxColWidth);
       width[colIndex] = Math.min(maxColWidth, Math.max(minColWidth, colWidth));
       padding[colIndex] = Array.isArray(this.options.padding)
