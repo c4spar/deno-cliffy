@@ -22,7 +22,7 @@ export interface ITableOptions {
 export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
   chars: IBorder;
   align?: Direction;
-  columnDefs: Array<Column>;
+  columns: Array<Column>;
 }
 
 /** Table type. */
@@ -38,7 +38,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     minColWidth: 0,
     padding: 1,
     chars: { ...Table._chars },
-    columnDefs: [],
+    columns: [],
   };
   private headerRow?: Row;
 
@@ -260,7 +260,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Check if table bordy has border. */
   public hasBodyBorder(): boolean {
     return this.getBorder() ||
-      this.options.columnDefs.some((column) => column.getBorder()) ||
+      this.options.columns.some((column) => column.getBorder()) ||
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
@@ -279,7 +279,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   public columns(columns: Array<Column | ColumnOptions>): this {
-    this.options.columnDefs = columns.map((column) =>
+    this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
     );
     return this;
@@ -290,20 +290,20 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     column: Column | ColumnOptions,
   ): this {
     if (column instanceof Column) {
-      this.options.columnDefs[index] = column;
-    } else if (this.options.columnDefs[index]) {
-      this.options.columnDefs[index].options(column);
+      this.options.columns[index] = column;
+    } else if (this.options.columns[index]) {
+      this.options.columns[index].options(column);
     } else {
-      this.options.columnDefs[index] = Column.from(column);
+      this.options.columns[index] = Column.from(column);
     }
     return this;
   }
 
   public getColumns(): Array<Column> {
-    return this.options.columnDefs;
+    return this.options.columns;
   }
 
   public getColumn(index: number): Column | undefined {
-    return this.options.columnDefs[index];
+    return this.options.columns[index];
   }
 }

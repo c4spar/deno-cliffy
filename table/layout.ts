@@ -66,7 +66,7 @@ export class TableLayout {
     const padding: number[] = [];
     const width: number[] = [];
     for (let colIndex = 0; colIndex < columns; colIndex++) {
-      const column = this.options.columnDefs.at(colIndex);
+      const column = this.options.columns.at(colIndex);
       const minColWidth: number = column?.getMinWidth() ??
         (Array.isArray(this.options.minColWidth)
           ? this.options.minColWidth[colIndex]
@@ -213,7 +213,7 @@ export class TableLayout {
     row: Row,
     colIndex: number,
   ): Cell {
-    const column: Column | undefined = this.options.columnDefs.at(colIndex);
+    const column: Column | undefined = this.options.columns.at(colIndex);
     return Cell.from(cell ?? "")
       .border(column?.getBorder() ?? row.getBorder(), false)
       .align(column?.getAlign() ?? row.getAlign(), false);

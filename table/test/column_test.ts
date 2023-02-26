@@ -116,3 +116,33 @@ Deno.test("[table] should set padding on columns", () => {
       .slice(1),
   );
 });
+
+Deno.test("[table] should set column options with column method", () => {
+  const table = createTable().columns([{}, {}, {}]);
+  table.getColumn(0)?.padding(5);
+  table.getColumn(0)?.align("left");
+
+  table.getColumn(1)?.padding(5);
+  table.getColumn(1)?.minWidth(20);
+  table.getColumn(1)?.align("center");
+
+  table.getColumn(2)?.padding(5);
+  table.getColumn(2)?.align("right");
+
+  assertEquals(
+    table
+      .border(true)
+      .toString(),
+    `
+┌─────────────────────┬──────────────────────────────┬─────────────────────┐
+│     Foo             │             Bar              │             Baz     │
+├─────────────────────┼──────────────────────────────┼─────────────────────┤
+│     foo bar baz     │             baz              │       beep boop     │
+├─────────────────────┼──────────────────────────────┼─────────────────────┤
+│     baz             │          beep boop           │     foo bar baz     │
+├─────────────────────┼──────────────────────────────┼─────────────────────┤
+│     beep boop       │         foo bar baz          │             baz     │
+└─────────────────────┴──────────────────────────────┴─────────────────────┘`
+      .slice(1),
+  );
+});
