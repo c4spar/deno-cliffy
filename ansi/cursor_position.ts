@@ -15,7 +15,10 @@ export interface CursorPositionOptions {
 /**
  * Get cursor position.
  * @param options  Options.
- * ```
+ *
+ * ```ts
+ * import { Cursor, getCursorPosition } from "./mod.ts";
+ *
  * const cursor: Cursor = getCursorPosition();
  * console.log(cursor); // { x: 0, y: 14}
  * ```

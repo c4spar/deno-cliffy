@@ -33,7 +33,10 @@ export type Tty = TtyFactory & TtyChain;
 /**
  * Chainable ansi escape sequences.
  * If invoked as method, a new Tty instance will be returned.
- * ```
+ *
+ * ```ts
+ * import { tty } from "./mod.ts";
+ *
  * tty.cursorTo(0, 0).eraseScreen();
  * ```
  */

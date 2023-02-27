@@ -54,7 +54,7 @@ export class Row<T extends ICell | undefined = ICell | undefined>
    * @param enable    Enable/disable cell border.
    * @param override  Override existing value.
    */
-  public border(enable: boolean, override = true): this {
+  public border(enable = true, override = true): this {
     if (override || typeof this.options.border === "undefined") {
       this.options.border = enable;
     }

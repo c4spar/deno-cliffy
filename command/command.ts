@@ -1046,7 +1046,12 @@ export class Command<
    *
    * **Example:**
    *
-   * ```
+   * ```ts
+   * import { Command, ValidationError } from "./mod.ts";
+   *
+   * const cmd = new Command();
+   * // ...
+   *
    * try {
    *   cmd.parse();
    * } catch(error) {
