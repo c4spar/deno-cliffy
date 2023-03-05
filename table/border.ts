@@ -1,24 +1,5 @@
-/** Border characters interface. */
-export interface IBorder {
-  top: string;
-  topMid: string;
-  topLeft: string;
-  topRight: string;
-  bottom: string;
-  bottomMid: string;
-  bottomLeft: string;
-  bottomRight: string;
-  left: string;
-  leftMid: string;
-  mid: string;
-  midMid: string;
-  right: string;
-  rightMid: string;
-  middle: string;
-}
-
 /** Default border characters. */
-export const border: IBorder = {
+export const border = {
   top: "─",
   topMid: "┬",
   topLeft: "┌",
@@ -35,3 +16,6 @@ export const border: IBorder = {
   rightMid: "┤",
   middle: "│",
 };
+
+/** Default border characters. */
+export type Border = typeof border;

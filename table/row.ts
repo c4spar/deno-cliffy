@@ -1,14 +1,17 @@
-import { Cell, Direction, ICell } from "./cell.ts";
+import { Cell, CellType, Direction } from "./cell.ts";
 
 /** Row type */
-export type IRow<T extends ICell | undefined = ICell | undefined> =
+export type RowType<
+  T extends CellType | undefined = CellType | undefined,
+> =
   | T[]
   | Row<T>;
+
 /** Json row. */
-export type IDataRow = Record<string, string | number>;
+export type DataRow = Record<string, string | number>;
 
 /** Row options. */
-export interface IRowOptions {
+export interface RowOptions {
   indent?: number;
   border?: boolean;
   align?: Direction;
@@ -17,17 +20,18 @@ export interface IRowOptions {
 /**
  * Row representation.
  */
-export class Row<T extends ICell | undefined = ICell | undefined>
-  extends Array<T> {
-  protected options: IRowOptions = {};
+export class Row<
+  T extends CellType | undefined = CellType | undefined,
+> extends Array<T> {
+  protected options: RowOptions = {};
 
   /**
    * Create a new row. If cells is a row, all cells and options of the row will
    * be copied to the new row.
    * @param cells Cells or row.
    */
-  public static from<T extends ICell | undefined>(
-    cells: IRow<T>,
+  public static from<T extends CellType | undefined>(
+    cells: RowType<T>,
   ): Row<T> {
     const row = new this(...cells);
     if (cells instanceof Row) {
