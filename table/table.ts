@@ -93,6 +93,27 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  public columns(columns: Array<Column | ColumnOptions>): this {
+    this.options.columns = columns.map((column) =>
+      column instanceof Column ? column : Column.from(column)
+    );
+    return this;
+  }
+
+  public column(
+    index: number,
+    column: Column | ColumnOptions,
+  ): this {
+    if (column instanceof Column) {
+      this.options.columns[index] = column;
+    } else if (this.options.columns[index]) {
+      this.options.columns[index].options(column);
+    } else {
+      this.options.columns[index] = Column.from(column);
+    }
+    return this;
+  }
+
   /**
    * Set table header.
    * @param header Header row or cells.
@@ -276,27 +297,6 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Get table alignment. */
   public getAlign(): Direction {
     return this.options.align ?? "left";
-  }
-
-  public columns(columns: Array<Column | ColumnOptions>): this {
-    this.options.columns = columns.map((column) =>
-      column instanceof Column ? column : Column.from(column)
-    );
-    return this;
-  }
-
-  public column(
-    index: number,
-    column: Column | ColumnOptions,
-  ): this {
-    if (column instanceof Column) {
-      this.options.columns[index] = column;
-    } else if (this.options.columns[index]) {
-      this.options.columns[index].options(column);
-    } else {
-      this.options.columns[index] = Column.from(column);
-    }
-    return this;
   }
 
   public getColumns(): Array<Column> {
