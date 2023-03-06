@@ -61,7 +61,7 @@ function factory(stack: Array<ColorMethods> = []): Colors {
     str?: string,
     ...args: Array<unknown>
   ): string | ColorsChain {
-    if (str) {
+    if (typeof str !== "undefined") {
       const lastIndex = stack.length - 1;
       return stack.reduce(
         (str: string, name: PropertyNames, index: number) =>
