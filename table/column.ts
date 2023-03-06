@@ -1,4 +1,4 @@
-import { Direction } from "./cell.ts";
+import { Direction, Renderer, ValueParser } from "./cell.ts";
 
 export interface ColumnOptions {
   border?: boolean;
@@ -6,6 +6,10 @@ export interface ColumnOptions {
   minWidth?: number;
   maxWidth?: number;
   padding?: number;
+  headerValue?: ValueParser;
+  cellValue?: ValueParser;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
 
 export class Column {
@@ -47,6 +51,26 @@ export class Column {
     return this;
   }
 
+  headerValue(fn: ValueParser): this {
+    this.opts.headerValue = fn;
+    return this;
+  }
+
+  cellValue(fn: ValueParser): this {
+    this.opts.cellValue = fn;
+    return this;
+  }
+
+  headerRenderer(fn: Renderer): this {
+    this.opts.headerRenderer = fn;
+    return this;
+  }
+
+  cellRenderer(fn: Renderer): this {
+    this.opts.cellRenderer = fn;
+    return this;
+  }
+
   getMinWidth(): number | undefined {
     return this.opts.minWidth;
   }
@@ -65,5 +89,21 @@ export class Column {
 
   getAlign(): Direction | undefined {
     return this.opts.align;
+  }
+
+  getHeaderValueParser(): ValueParser | undefined {
+    return this.opts.headerValue;
+  }
+
+  getCellValueParser(): ValueParser | undefined {
+    return this.opts.cellValue;
+  }
+
+  getHeaderRenderer(): Renderer | undefined {
+    return this.opts.headerRenderer;
+  }
+
+  getCellRenderer(): Renderer | undefined {
+    return this.opts.cellRenderer;
   }
 }

@@ -1,5 +1,5 @@
 import { border, IBorder } from "./border.ts";
-import { Cell, Direction } from "./cell.ts";
+import { Cell, Direction, Renderer, ValueParser } from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
@@ -16,13 +16,31 @@ export interface ITableOptions {
   minColWidth?: number | number[];
   padding?: number | number[];
   chars?: IBorderOptions;
+  headerValue?: ValueParser;
+  cellValue?: ValueParser;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
 
 /** Table settings. */
-export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
+export interface ITableSettings extends
+  Required<
+    Omit<
+      ITableOptions,
+      | "align"
+      | "headerValue"
+      | "cellValue"
+      | "headerRenderer"
+      | "cellRenderer"
+    >
+  > {
   chars: IBorder;
   align?: Direction;
   columns: Array<Column>;
+  headerValue?: ValueParser;
+  cellValue?: ValueParser;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
 
 /** Table type. */
@@ -237,6 +255,26 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  public headerValue(fn: ValueParser): this {
+    this.options.headerValue = fn;
+    return this;
+  }
+
+  public cellValue(fn: ValueParser): this {
+    this.options.cellValue = fn;
+    return this;
+  }
+
+  public headerRenderer(fn: Renderer): this {
+    this.options.headerRenderer = fn;
+    return this;
+  }
+
+  public cellRenderer(fn: Renderer): this {
+    this.options.cellRenderer = fn;
+    return this;
+  }
+
   /** Get table header. */
   public getHeader(): Row | undefined {
     return this.headerRow;
@@ -268,14 +306,15 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Check if table has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if header row has border. */
   public hasHeaderBorder(): boolean {
     const hasBorder = this.headerRow?.hasBorder();
-    return hasBorder === true || (this.getBorder() && hasBorder !== false);
+    return hasBorder === true ||
+      (this.getBorder() === true && hasBorder !== false);
   }
 
   /** Check if table bordy has border. */
@@ -295,8 +334,8 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Get table alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
   }
 
   public getColumns(): Array<Column> {
@@ -305,5 +344,21 @@ export class Table<T extends IRow = IRow> extends Array<T> {
 
   public getColumn(index: number): Column {
     return this.options.columns[index] ??= new Column();
+  }
+
+  public getHeaderValueParser(): ValueParser | undefined {
+    return this.options.headerValue;
+  }
+
+  public getCellValueParser(): ValueParser | undefined {
+    return this.options.cellValue;
+  }
+
+  public getHeaderRenderer(): Renderer | undefined {
+    return this.options.headerRenderer;
+  }
+
+  public getCellRenderer(): Renderer | undefined {
+    return this.options.cellRenderer;
   }
 }

@@ -1,4 +1,4 @@
-import { Cell, Direction, ICell } from "./cell.ts";
+import { Cell, Direction, ICell, Renderer, ValueParser } from "./cell.ts";
 
 /** Row type */
 export type IRow<T extends ICell | undefined = ICell | undefined> =
@@ -12,6 +12,10 @@ export interface IRowOptions {
   indent?: number;
   border?: boolean;
   align?: Direction;
+  cellValue?: (
+    value: string | number | undefined | null,
+  ) => string | number | undefined | null;
+  cellRenderer?: (value: string) => string;
 }
 
 /**
@@ -73,13 +77,27 @@ export class Row<T extends ICell | undefined = ICell | undefined>
     return this;
   }
 
+  public cellValue(fn: ValueParser, override = true): this {
+    if (override || typeof this.options.cellValue === "undefined") {
+      this.options.cellValue = fn;
+    }
+    return this;
+  }
+
+  public cellRenderer(fn: Renderer, override = true): this {
+    if (override || typeof this.options.cellRenderer === "undefined") {
+      this.options.cellRenderer = fn;
+    }
+    return this;
+  }
+
   /**
    * Getter:
    */
 
   /** Check if row has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if row or any child cell has border. */
@@ -89,7 +107,15 @@ export class Row<T extends ICell | undefined = ICell | undefined>
   }
 
   /** Get row alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
+  }
+
+  public getCellValueParser(): ValueParser | undefined {
+    return this.options.cellValue;
+  }
+
+  public getCellRenderer(): Renderer | undefined {
+    return this.options.cellRenderer;
   }
 }
