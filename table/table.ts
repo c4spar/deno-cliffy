@@ -260,7 +260,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
-          : row.some((cell) => cell instanceof Cell ? cell.getBorder : false)
+          : row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
       );
   }
 
