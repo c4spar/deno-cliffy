@@ -118,7 +118,7 @@ Deno.test("[table] should set padding on columns", () => {
 });
 
 Deno.test("[table] should set column options with column method", () => {
-  const table = createTable().columns([{}, {}, {}]);
+  const table = createTable();
   table.getColumn(0)?.padding(5);
   table.getColumn(0)?.align("left");
 

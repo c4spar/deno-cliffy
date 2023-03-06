@@ -303,7 +303,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this.options.columns;
   }
 
-  public getColumn(index: number): Column | undefined {
-    return this.options.columns[index];
+  public getColumn(index: number): Column {
+    return this.options.columns[index] ??= new Column();
   }
 }
