@@ -77,17 +77,21 @@ export class Row<T extends ICell | undefined = ICell | undefined>
     return this;
   }
 
-  public cellValue(fn: ValueParser, override = true): this {
-    if (override || typeof this.options.cellValue === "undefined") {
-      this.options.cellValue = fn;
-    }
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public cellValue(fn: ValueParser): this {
+    this.options.cellValue = fn;
     return this;
   }
 
-  public cellRenderer(fn: Renderer, override = true): this {
-    if (override || typeof this.options.cellRenderer === "undefined") {
-      this.options.cellRenderer = fn;
-    }
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public cellRenderer(fn: Renderer): this {
+    this.options.cellRenderer = fn;
     return this;
   }
 
@@ -111,10 +115,12 @@ export class Row<T extends ICell | undefined = ICell | undefined>
     return this.options.align;
   }
 
+  /** Get value parser. */
   public getCellValueParser(): ValueParser | undefined {
     return this.options.cellValue;
   }
 
+  /** Get cell renderer. */
   public getCellRenderer(): Renderer | undefined {
     return this.options.cellRenderer;
   }

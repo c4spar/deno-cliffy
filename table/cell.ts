@@ -126,17 +126,21 @@ export class Cell {
     return this;
   }
 
-  public value(fn: ValueParser, override = true): this {
-    if (override || typeof this.options.value === "undefined") {
-      this.options.value = fn;
-    }
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public value(fn: ValueParser): this {
+    this.options.value = fn;
     return this;
   }
 
-  public renderer(fn: Renderer, override = true): this {
-    if (override || typeof this.options.render === "undefined") {
-      this.options.render = fn;
-    }
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public renderer(fn: Renderer): this {
+    this.options.render = fn;
     return this;
   }
 
@@ -163,15 +167,17 @@ export class Cell {
       : 1;
   }
 
-  /** Get row span. */
+  /** Get cell alignment. */
   public getAlign(): Direction | undefined {
     return this.options.align;
   }
 
+  /** Get value parser. */
   public getValueParser(): ValueParser | undefined {
     return this.options.value;
   }
 
+  /** Get cell renderer. */
   public getRenderer(): Renderer | undefined {
     return this.options.render;
   }

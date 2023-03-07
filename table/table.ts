@@ -111,6 +111,10 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Set column definitions.
+   * @param columns Array of columns or column options.
+   */
   public columns(columns: Array<Column | ColumnOptions>): this {
     this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
@@ -118,6 +122,11 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Set column definitions for a single column.
+   * @param index   Column index.
+   * @param column  Column or column options.
+   */
   public column(
     index: number,
     column: Column | ColumnOptions,
@@ -255,21 +264,37 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Register header value parser.
+   * @param fn  Value parser callback function.
+   */
   public headerValue(fn: ValueParser): this {
     this.options.headerValue = fn;
     return this;
   }
 
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
   public cellValue(fn: ValueParser): this {
     this.options.cellValue = fn;
     return this;
   }
 
+  /**
+   * Register header renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
   public headerRenderer(fn: Renderer): this {
     this.options.headerRenderer = fn;
     return this;
   }
 
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
   public cellRenderer(fn: Renderer): this {
     this.options.cellRenderer = fn;
     return this;
@@ -285,7 +310,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return [...this];
   }
 
-  /** Get mac col widrth. */
+  /** Get max col width. */
   public getMaxColWidth(): number | number[] {
     return this.options.maxColWidth;
   }
@@ -338,26 +363,32 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this.options.align;
   }
 
+  /** Get column definitions. */
   public getColumns(): Array<Column> {
     return this.options.columns;
   }
 
+  /** Get column definition by column index. */
   public getColumn(index: number): Column {
     return this.options.columns[index] ??= new Column();
   }
 
+  /** Get header value parser. */
   public getHeaderValueParser(): ValueParser | undefined {
     return this.options.headerValue;
   }
 
+  /** Get value parser. */
   public getCellValueParser(): ValueParser | undefined {
     return this.options.cellValue;
   }
 
+  /** Get header renderer. */
   public getHeaderRenderer(): Renderer | undefined {
     return this.options.headerRenderer;
   }
 
+  /** Get cell renderer. */
   public getCellRenderer(): Renderer | undefined {
     return this.options.cellRenderer;
   }
