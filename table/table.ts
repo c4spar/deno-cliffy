@@ -4,9 +4,6 @@ import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { GetRowValue, JsonData, Row, RowOrValue } from "./row.ts";
 
-/** Border characters settings. */
-export type BorderOptions = Partial<IBorder>;
-
 /** Table options. */
 export interface TableSettings<
   TValue extends CellValue,
@@ -27,6 +24,26 @@ export interface TableSettings<
   cellRenderer?: Renderer;
 }
 
+/** Border characters settings. */
+export type BorderOptions = Partial<IBorder>;
+
+export type Columns<
+  TRows,
+  THeaderRows,
+> = keyof TRows extends keyof THeaderRows ? {
+    [Key in keyof THeaderRows]?: ColumnOptions<
+      Key extends keyof TRows ? TRows[Key] : unknown,
+      Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
+    >;
+  }
+  : keyof THeaderRows extends keyof TRows ? {
+      [Key in keyof TRows]?: ColumnOptions<
+        Key extends keyof TRows ? TRows[Key] : unknown,
+        Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
+      >;
+    }
+  : Array<ColumnOptions<TRows, THeaderRows>>;
+
 /** Table representation. */
 export class Table<
   TRow extends RowOrValue<CellValue>,
@@ -45,11 +62,6 @@ export class Table<
       isDataTable: false,
     };
   private headerRow?: Row<GetRowValue<THeaderRow>>;
-
-  /** Generate table string. */
-  public toString(): string {
-    return new TableLayout(this, this.options).toString();
-  }
 
   /**
    * Create a new table. If rows is a table, all rows and options of the table
@@ -77,7 +89,7 @@ export class Table<
    */
   public static fromJson<TValue extends CellValue>(
     rows: Array<JsonData<TValue>>,
-  ): Table<Array<TValue>, Row<string>> {
+  ): Table<Array<TValue>, Array<string>> {
     return new this().fromJson(rows);
   }
 
@@ -110,8 +122,8 @@ export class Table<
    */
   public fromJson<TJsonValue extends CellValue>(
     rows: Array<JsonData<TJsonValue>>,
-  ): Table<Array<TJsonValue>, Row<string>> {
-    return (this as Table<Array<TJsonValue>, Row<string>>)
+  ): Table<Array<TJsonValue>, Array<string>> {
+    return (this as Table<Array<TJsonValue>, Array<string>>)
       .header(Object.keys(rows[0]))
       .body(rows.map((row) => Object.values(row)));
   }
@@ -121,14 +133,12 @@ export class Table<
    * @param columns Array of columns or column options.
    */
   public columns(
-    columns: Array<
-      | Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>
-      | ColumnOptions<GetRowValue<TRow>, GetRowValue<THeaderRow>>
-    >,
+    columns: Columns<TRow, THeaderRow>,
   ): this {
-    this.options.columns = columns.map((column) =>
+    const cols = columns as Array<ColumnOptions<TRow, THeaderRow>>;
+    this.options.columns = cols.map((column) =>
       column instanceof Column ? column : Column.from(column)
-    );
+    ) as Array<Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>>;
     return this;
   }
 
@@ -157,14 +167,24 @@ export class Table<
    * Set table header.
    * @param header Header row or cells.
    */
-  public header<
-    THeader extends THeaderRow,
-    THeaderValue extends GetRowValue<THeader>,
-  >(
-    header: RowOrValue<THeaderValue>,
-  ): Table<TRow, Row<RowOrValue<THeaderValue>>> {
-    const table = this as Table<TRow, Row<RowOrValue<THeaderValue>>>;
-    table.headerRow = header instanceof Row ? header : Row.from(header);
+  // public header<
+  //   THeader extends THeaderRow,
+  //   THeaderValue extends GetRowValue<THeader>,
+  // >(
+  //   header: RowOrValue<THeaderValue>,
+  // ): Table<TRow, Row<THeaderValue>> {
+  //   const table = this as Table<TRow, Row<THeaderValue>>;
+  //   table.headerRow = header instanceof Row ? header : Row.from(header);
+  //   return table;
+  // }
+
+  public header<THeader extends THeaderRow>(
+    header: THeader,
+  ): Table<TRow, THeader> {
+    const table = this as Table<TRow, THeader>;
+    table.headerRow = header instanceof Row
+      ? header
+      : Row.from(header) as Row<GetRowValue<THeaderRow>>;
     return table;
   }
 
@@ -214,6 +234,11 @@ export class Table<
     table.options = { ...this.options };
     table.headerRow = this.headerRow?.clone();
     return table;
+  }
+
+  /** Generate table string. */
+  public toString(): string {
+    return new TableLayout(this, this.options).toString();
   }
 
   /** Write table to stdout. */

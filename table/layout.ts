@@ -118,8 +118,7 @@ export class TableLayout<
       header = Row.from(
         this.options.columns.map((column) => column.getHeader()),
       );
-      // deno-lint-ignore no-explicit-any
-      this.table.header(header as Row<any>);
+      this.table.header(header as THeaderRow);
     }
 
     const rows = header ? [header, ...this.table] : this.table.slice();
