@@ -1,20 +1,39 @@
+export type CellValue = unknown;
+
 /** Cell type */
-// deno-lint-ignore ban-types
-export type ICell = number | string | String | Cell;
+export type CellOrValue<TValue extends CellValue> =
+  | TValue
+  | Cell<TValue>;
+
+export type GetCellValue<TCell extends CellOrValue<CellValue>> = TCell extends
+  infer TCell ? TCell extends Cell<infer Value> ? Value
+  : TCell
+  : never;
 
 export type Direction = "left" | "right" | "center";
 
+export type ValueParserResult = string | number | undefined | null;
+
+export type ValueParser<in out TValue extends CellValue> = (
+  value: TValue,
+) => ValueParserResult;
+
+export type Renderer = (value: string) => string;
+
 /** Cell options. */
-export interface ICellOptions {
+export interface CellOptions<TValue extends CellValue> {
   border?: boolean;
   colSpan?: number;
   rowSpan?: number;
   align?: Direction;
+  // value?: ValueParser<TValue>;
+  value?(value: TValue): ValueParserResult;
+  render?: Renderer;
 }
 
 /** Cell representation. */
-export class Cell {
-  protected options: ICellOptions = {};
+export class Cell<TValue extends CellValue = CellValue> {
+  protected options: CellOptions<TValue> = {};
 
   /** Get cell length. */
   public get length(): number {
@@ -26,31 +45,42 @@ export class Cell {
    * will be copied to the new cell.
    * @param value Cell or cell value.
    */
-  public static from(value: ICell): Cell {
-    const cell = new this(value);
+  public static from<TValue extends CellValue>(
+    value: CellOrValue<TValue>,
+  ): Cell<TValue> {
     if (value instanceof Cell) {
+      const cell = new this(value.getValue());
       cell.options = { ...value.options };
+      return cell;
     }
-    return cell;
+
+    return new this(value);
   }
 
   /**
    * Cell constructor.
-   * @param value Cell value.
+   * @param cellValue Cell value.
    */
-  public constructor(private value: ICell) {}
+  public constructor(
+    private cellValue?: TValue | undefined | null,
+  ) {}
+
+  /** Get cell string value. */
+  public toString(): string {
+    return this.cellValue?.toString() ?? "";
+  }
 
   /** Get cell value. */
-  public toString(): string {
-    return this.value.toString();
+  public getValue(): TValue | undefined | null {
+    return this.cellValue;
   }
 
   /**
    * Set cell value.
    * @param value Cell or cell value.
    */
-  public setValue(value: ICell): this {
-    this.value = value;
+  public setValue(value: TValue | undefined | null): this {
+    this.cellValue = value;
     return this;
   }
 
@@ -58,9 +88,11 @@ export class Cell {
    * Clone cell with all options.
    * @param value Cell or cell value.
    */
-  public clone(value?: ICell): Cell {
-    const cell = new Cell(value ?? this);
-    cell.options = { ...this.options };
+  public clone<TCloneValue extends CellValue = TValue>(
+    value: TCloneValue = this.getValue() as TCloneValue,
+  ): Cell<TCloneValue> {
+    const cell = new Cell(value);
+    cell.options = { ...this.options } as CellOptions<TCloneValue>;
     return cell;
   }
 
@@ -117,12 +149,30 @@ export class Cell {
   }
 
   /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public value(fn: ValueParser<TValue>): this {
+    this.options.value = fn;
+    return this;
+  }
+
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public renderer(fn: Renderer): this {
+    this.options.render = fn;
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
   /** Check if cell has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Get col span. */
@@ -139,8 +189,21 @@ export class Cell {
       : 1;
   }
 
-  /** Get row span. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  /** Get cell alignment. */
+  public getAlign(): Direction | undefined {
+    return this.options.align;
+  }
+
+  /** Get value parser. */
+  // public getValueParser(): ValueParser<TValue> | undefined {
+  public getValueParser<TParserValue extends TValue>():
+    | ValueParser<TParserValue>
+    | undefined {
+    return this.options.value;
+  }
+
+  /** Get cell renderer. */
+  public getRenderer(): Renderer | undefined {
+    return this.options.render;
   }
 }

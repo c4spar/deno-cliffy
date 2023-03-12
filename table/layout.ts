@@ -1,7 +1,13 @@
-import { Cell, Direction, type ICell } from "./cell.ts";
+import {
+  Cell,
+  type CellOrValue,
+  type CellValue,
+  type Direction,
+  type ValueParser,
+} from "./cell.ts";
 import type { Column } from "./column.ts";
-import { type IRow, Row } from "./row.ts";
-import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
+import { type GetRowValue, Row, type RowOrValue } from "./row.ts";
+import type { BorderOptions, Table, TableSettings } from "./table.ts";
 import { consumeWords, longest, strLength } from "./utils.ts";
 
 /** Layout render settings. */
@@ -16,15 +22,18 @@ interface IRenderSettings {
 }
 
 /** Table layout renderer. */
-export class TableLayout {
+export class TableLayout<
+  TRow extends RowOrValue<CellValue>,
+  THeaderRow extends RowOrValue<CellValue>,
+> {
   /**
    * Table layout constructor.
    * @param table   Table instance.
    * @param options Render options.
    */
   public constructor(
-    private table: Table,
-    private options: ITableSettings,
+    private table: Table<TRow, THeaderRow>,
+    private options: TableSettings<GetRowValue<TRow>, GetRowValue<THeaderRow>>,
   ) {}
 
   /** Generate table string. */
@@ -40,8 +49,8 @@ export class TableLayout {
    */
   protected createLayout(): IRenderSettings {
     Object.keys(this.options.chars).forEach((key: string) => {
-      if (typeof this.options.chars[key as keyof IBorderOptions] !== "string") {
-        this.options.chars[key as keyof IBorderOptions] = "";
+      if (typeof this.options.chars[key as keyof BorderOptions] !== "string") {
+        this.options.chars[key as keyof BorderOptions] = "";
       }
     });
 
@@ -52,13 +61,17 @@ export class TableLayout {
 
     const rows = this.#getRows();
 
-    const columns: number = Math.max(...rows.map((row) => row.length));
-    for (const row of rows) {
+    const columns: number = Math.max(
+      this.options.columns.length,
+      ...rows.map((row) => row.length),
+    );
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const row = rows[rowIndex];
       const length: number = row.length;
       if (length < columns) {
         const diff = columns - length;
         for (let i = 0; i < diff; i++) {
-          row.push(this.createCell(null, row, length + i));
+          row.push(this.createCell(null, row, rowIndex, length + i));
         }
       }
     }
@@ -98,9 +111,20 @@ export class TableLayout {
   }
 
   #getRows(): Array<Row<Cell>> {
-    const header: Row | undefined = this.table.getHeader();
+    let header: Row<GetRowValue<CellValue>> | undefined = this.table
+      .getHeader();
+
+    if (!header && this.options.columns.length) {
+      header = Row.from(
+        this.options.columns.map((column) => column.getHeader()),
+      );
+      // deno-lint-ignore no-explicit-any
+      this.table.header(header as Row<any>);
+    }
+
     const rows = header ? [header, ...this.table] : this.table.slice();
     const hasSpan = rows.some((row) =>
+      Array.isArray(row) &&
       row.some((cell) =>
         cell instanceof Cell && (cell.getColSpan() > 1 || cell.getRowSpan() > 1)
       )
@@ -110,11 +134,22 @@ export class TableLayout {
       return this.spanRows(rows);
     }
 
-    return rows.map((row) => {
-      const newRow = this.createRow(row);
-      for (let colIndex = 0; colIndex < row.length; colIndex++) {
-        newRow[colIndex] = this.createCell(row[colIndex], newRow, colIndex);
+    return rows.map((row, rowIndex) => {
+      const newRow = Row.from(row) as Row<Cell>;
+      const dataCell = this.options.isDataTable ? Cell.from(newRow[0]) : null;
+      const length = this.options.isDataTable
+        ? this.options.columns.length
+        : newRow.length;
+
+      for (let colIndex = 0; colIndex < length; colIndex++) {
+        newRow[colIndex] = this.createCell(
+          newRow[colIndex] ?? dataCell,
+          newRow,
+          rowIndex,
+          colIndex,
+        );
       }
+
       return newRow;
     });
   }
@@ -123,7 +158,7 @@ export class TableLayout {
    * Fills rows and cols by specified row/col span with a reference of the
    * original cell.
    */
-  protected spanRows(rows: Array<IRow>) {
+  protected spanRows(rows: Array<RowOrValue<CellOrValue<CellValue>>>) {
     const rowSpan: Array<number> = [];
     let colSpan = 1;
     let rowIndex = -1;
@@ -133,7 +168,7 @@ export class TableLayout {
       if (rowIndex === rows.length && rowSpan.every((span) => span === 1)) {
         break;
       }
-      const row = rows[rowIndex] = this.createRow(rows[rowIndex] || []);
+      const row = rows[rowIndex] = Row.from<unknown>(rows[rowIndex] || []);
       let colIndex = -1;
 
       while (true) {
@@ -159,10 +194,11 @@ export class TableLayout {
 
         if (rowSpan[colIndex] > 1) {
           rowSpan[colIndex]--;
-          rows[rowIndex].splice(
+          const prevRow = rows[rowIndex - 1] as Row<CellOrValue<CellValue>>;
+          row.splice(
             colIndex,
             this.getDeleteCount(rows, rowIndex, colIndex),
-            rows[rowIndex - 1][colIndex],
+            prevRow[colIndex],
           );
 
           continue;
@@ -171,6 +207,7 @@ export class TableLayout {
         const cell = row[colIndex] = this.createCell(
           row[colIndex] || null,
           row,
+          rowIndex,
           colIndex,
         );
 
@@ -183,40 +220,91 @@ export class TableLayout {
   }
 
   protected getDeleteCount(
-    rows: Array<Array<unknown>>,
+    rows: Array<RowOrValue<CellOrValue<CellValue>>>,
     rowIndex: number,
     colIndex: number,
   ) {
-    return colIndex <= rows[rowIndex].length - 1 &&
-        typeof rows[rowIndex][colIndex] === "undefined"
+    const row: RowOrValue<CellOrValue<CellValue>> = rows[rowIndex];
+    return Array.isArray(row) && colIndex <= row.length - 1 &&
+        typeof row[colIndex] === "undefined"
       ? 1
       : 0;
   }
 
-  /**
-   * Create a new row from existing row or cell array.
-   * @param row Original row.
-   */
-  protected createRow(row: IRow): Row<Cell> {
-    return Row.from(row)
-      .border(this.table.getBorder(), false)
-      .align(this.table.getAlign(), false) as Row<Cell>;
-  }
-
-  /**
-   * Create a new cell from existing cell or cell value.
-   * @param cell  Original cell.
-   * @param row   Parent row.
-   */
+  /** Create a new cell from existing cell or cell value. */
   protected createCell(
-    cell: ICell | null | undefined,
-    row: Row,
+    value: CellOrValue<CellValue>,
+    row: Row<CellOrValue<CellValue>>,
+    rowIndex: number,
     colIndex: number,
   ): Cell {
-    const column: Column | undefined = this.options.columns.at(colIndex);
-    return Cell.from(cell ?? "")
-      .border(column?.getBorder() ?? row.getBorder(), false)
-      .align(column?.getAlign() ?? row.getAlign(), false);
+    const column:
+      | Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>
+      | undefined = this.options.columns
+        .at(colIndex);
+    const field = column?.getField();
+    const isHeader = rowIndex === 0 && this.table.getHeader() !== undefined;
+    const cell = Cell.from(value ?? "") as Cell;
+
+    if (typeof cell.getBorder() === "undefined") {
+      cell.border(
+        row.getBorder() ?? column?.getBorder() ?? this.table.getBorder() ??
+          false,
+      );
+    }
+
+    if (!cell.getAlign()) {
+      cell.align(
+        row.getAlign() ?? column?.getAlign() ?? this.table.getAlign() ?? "left",
+      );
+    }
+
+    if (!cell.getRenderer()) {
+      const cellRenderer = row.getCellRenderer() ?? (
+        isHeader ? column?.getHeaderRenderer() : column?.getCellRenderer()
+      ) ?? (
+        isHeader ? this.table.getHeaderRenderer() : this.table.getCellRenderer()
+      );
+
+      if (cellRenderer) {
+        cell.renderer(cellRenderer);
+      }
+    }
+
+    const cellValueParser =
+      (cell.getValueParser() ?? row.getCellValueParser() ??
+        (
+          isHeader
+            ? column?.getHeaderValueParser()
+            : column?.getCellValueParser()
+        ) ??
+        (isHeader
+          ? this.table.getHeaderValueParser()
+          : this.table.getCellValueParser())) as ValueParser<CellValue>;
+
+    if (field && !isHeader) {
+      const data = cell.getValue();
+      if (!data || typeof data !== "object") {
+        throw new Error(
+          "Invalid data: When the field option is used, the data must be an object.",
+        );
+      }
+      if (!(field in data)) {
+        throw new Error(
+          "Invalid data: Field name does not exist in data.",
+        );
+      }
+      // deno-lint-ignore no-explicit-any
+      const dataVal = (data as any)[field];
+      cell.setValue(dataVal);
+    }
+
+    if (cellValueParser) {
+      cell.value(cellValueParser);
+      cell.setValue(cellValueParser(cell.getValue()));
+    }
+
+    return cell;
   }
 
   /**
@@ -373,7 +461,7 @@ export class TableLayout {
       result += " ".repeat(opts.padding[colIndex]);
     }
 
-    result += current;
+    result += row[colIndex].getRenderer()?.(current) ?? current;
 
     if (opts.hasBorder || colIndex < opts.columns - 1) {
       result += " ".repeat(opts.padding[colIndex]);
@@ -391,12 +479,13 @@ export class TableLayout {
   protected renderCellValue(
     cell: Cell,
     maxLength: number,
-  ): { current: string; next: Cell } {
+  ): { current: string; next: string } {
+    const value = cell.toString();
     const length: number = Math.min(
       maxLength,
-      strLength(cell.toString()),
+      strLength(value),
     );
-    let words: string = consumeWords(length, cell.toString());
+    let words: string = consumeWords(length, value);
 
     // break word if word is longer than max length
     const breakWord = strLength(words) > length;
@@ -405,11 +494,11 @@ export class TableLayout {
     }
 
     // get next content and remove leading space if breakWord is not true
-    const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
+    const next = value.slice(words.length + (breakWord ? 0 : 1));
     const fillLength = maxLength - strLength(words);
 
     // Align content
-    const align: Direction = cell.getAlign();
+    const align: Direction = cell.getAlign() ?? "left";
     let current: string;
     if (fillLength === 0) {
       current = words;
@@ -426,7 +515,7 @@ export class TableLayout {
 
     return {
       current,
-      next: cell.clone(next),
+      next,
     };
   }
 

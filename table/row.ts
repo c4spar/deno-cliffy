@@ -1,46 +1,76 @@
-import { Cell, Direction, ICell } from "./cell.ts";
+import {
+  Cell,
+  CellOrValue,
+  CellValue,
+  Direction,
+  GetCellValue,
+  Renderer,
+  ValueParser,
+} from "./cell.ts";
 
 /** Row type */
-export type IRow<T extends ICell | undefined = ICell | undefined> =
-  | T[]
-  | Row<T>;
+export type RowOrValue<TValue extends CellOrValue<CellValue>> =
+  | TValue
+  | Array<TValue>
+  | Row<TValue>;
+
+export type GetRowValue<TRow extends RowOrValue<CellOrValue<CellValue>>> =
+  TRow extends infer TRow
+    ? TRow extends Array<infer Value extends CellOrValue<CellValue>>
+      ? GetCellValue<Value>
+    : TRow extends CellOrValue<CellValue> ? GetCellValue<TRow>
+    : never
+    : never;
+
 /** Json row. */
-export type IDataRow = Record<string, string | number>;
+export type JsonData<TValue extends CellValue> = Record<string, TValue>;
 
 /** Row options. */
-export interface IRowOptions {
+export interface RowOptions<
+  TValue extends CellValue,
+> {
   indent?: number;
   border?: boolean;
   align?: Direction;
+  cellValue?: ValueParser<TValue>;
+  cellRenderer?: Renderer;
 }
 
 /**
  * Row representation.
  */
-export class Row<T extends ICell | undefined = ICell | undefined>
-  extends Array<T> {
-  protected options: IRowOptions = {};
+export class Row<
+  TCell extends CellOrValue<CellValue>,
+> extends Array<TCell> {
+  protected options: RowOptions<GetCellValue<TCell>> = {};
 
   /**
    * Create a new row. If cells is a row, all cells and options of the row will
    * be copied to the new row.
-   * @param cells Cells or row.
+   * @param value Cells or row.
    */
-  public static from<T extends ICell | undefined>(
-    cells: IRow<T>,
-  ): Row<T> {
-    const row = new this(...cells);
-    if (cells instanceof Row) {
-      row.options = { ...(cells as Row).options };
+  public static from<
+    TCell extends CellOrValue<CellValue>,
+  >(
+    value: RowOrValue<TCell>,
+  ): Row<TCell> {
+    if (Array.isArray(value)) {
+      const row = new this<TCell>(...value);
+      if (value instanceof Row) {
+        row.options = { ...(value as Row<TCell>).options };
+      }
+      return row;
     }
-    return row;
+
+    return new this(value);
   }
 
   /** Clone row recursively with all options. */
-  public clone(): Row {
-    const row = new Row(
-      ...this.map((cell: T) => cell instanceof Cell ? cell.clone() : cell),
+  public clone(): this {
+    const cells = this.map((cell) =>
+      cell instanceof Cell ? cell.clone() : cell
     );
+    const row = Row.from(cells) as this;
     row.options = { ...this.options };
     return row;
   }
@@ -74,12 +104,30 @@ export class Row<T extends ICell | undefined = ICell | undefined>
   }
 
   /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public cellValue(fn: ValueParser<GetCellValue<TCell>>): this {
+    this.options.cellValue = fn;
+    return this;
+  }
+
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public cellRenderer(fn: Renderer): this {
+    this.options.cellRenderer = fn;
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
   /** Check if row has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if row or any child cell has border. */
@@ -89,7 +137,17 @@ export class Row<T extends ICell | undefined = ICell | undefined>
   }
 
   /** Get row alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
+  }
+
+  /** Get value parser. */
+  public getCellValueParser(): ValueParser<GetCellValue<TCell>> | undefined {
+    return this.options.cellValue;
+  }
+
+  /** Get cell renderer. */
+  public getCellRenderer(): Renderer | undefined {
+    return this.options.cellRenderer;
   }
 }

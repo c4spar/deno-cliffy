@@ -1,56 +1,70 @@
 import { border, IBorder } from "./border.ts";
-import { Cell, Direction } from "./cell.ts";
+import { Cell, CellValue, Direction, Renderer, ValueParser } from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
-import { IDataRow, IRow, Row } from "./row.ts";
+import { GetRowValue, JsonData, Row, RowOrValue } from "./row.ts";
 
 /** Border characters settings. */
-export type IBorderOptions = Partial<IBorder>;
+export type BorderOptions = Partial<IBorder>;
 
 /** Table options. */
-export interface ITableOptions {
-  indent?: number;
-  border?: boolean;
+export interface TableSettings<
+  TValue extends CellValue,
+  THeaderValue extends CellValue,
+> {
+  indent: number;
+  border: boolean;
   align?: Direction;
-  maxColWidth?: number | number[];
-  minColWidth?: number | number[];
-  padding?: number | number[];
-  chars?: IBorderOptions;
-}
-
-/** Table settings. */
-export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
+  maxColWidth: number | number[];
+  minColWidth: number | number[];
+  padding: number | number[];
   chars: IBorder;
-  align?: Direction;
-  columns: Array<Column>;
+  columns: Array<Column<TValue, THeaderValue>>;
+  isDataTable: boolean;
+  headerValue?: ValueParser<THeaderValue>;
+  cellValue?: ValueParser<TValue>;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
-
-/** Table type. */
-export type ITable<T extends IRow = IRow> = T[] | Table<T>;
 
 /** Table representation. */
-export class Table<T extends IRow = IRow> extends Array<T> {
+export class Table<
+  TRow extends RowOrValue<CellValue>,
+  THeaderRow extends RowOrValue<CellValue> = TRow,
+> extends Array<TRow> {
   protected static _chars: IBorder = { ...border };
-  protected options: ITableSettings = {
-    indent: 0,
-    border: false,
-    maxColWidth: Infinity,
-    minColWidth: 0,
-    padding: 1,
-    chars: { ...Table._chars },
-    columns: [],
-  };
-  private headerRow?: Row;
+  protected options: TableSettings<GetRowValue<TRow>, GetRowValue<THeaderRow>> =
+    {
+      indent: 0,
+      border: false,
+      maxColWidth: Infinity,
+      minColWidth: 0,
+      padding: 1,
+      chars: { ...Table._chars },
+      columns: [],
+      isDataTable: false,
+    };
+  private headerRow?: Row<GetRowValue<THeaderRow>>;
+
+  /** Generate table string. */
+  public toString(): string {
+    return new TableLayout(this, this.options).toString();
+  }
 
   /**
    * Create a new table. If rows is a table, all rows and options of the table
    * will be copied to the new table.
    * @param rows
    */
-  public static from<T extends IRow>(rows: ITable<T>): Table<T> {
-    const table = new this(...rows);
+  public static from<
+    TRow extends RowOrValue<CellValue>,
+    THeaderRow extends RowOrValue<CellValue>,
+  >(
+    rows: Array<TRow> | Table<TRow, THeaderRow>,
+  ): Table<TRow, THeaderRow> {
+    const table = new this<TRow, THeaderRow>(...rows);
     if (rows instanceof Table) {
-      table.options = { ...(rows as Table).options };
+      table.options = { ...(rows as Table<TRow, THeaderRow>).options };
       table.headerRow = rows.headerRow ? Row.from(rows.headerRow) : undefined;
     }
     return table;
@@ -61,7 +75,9 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * row and each property a column.
    * @param rows Array of objects.
    */
-  public static fromJson(rows: IDataRow[]): Table {
+  public static fromJson<TValue extends CellValue>(
+    rows: Array<JsonData<TValue>>,
+  ): Table<Array<TValue>, Row<string>> {
     return new this().fromJson(rows);
   }
 
@@ -69,7 +85,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set global default border characters.
    * @param chars Border options.
    */
-  public static chars(chars: IBorderOptions): typeof Table {
+  public static chars(chars: BorderOptions): typeof Table {
     Object.assign(this._chars, chars);
     return this;
   }
@@ -78,7 +94,12 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Write table or rows to stdout.
    * @param rows Table or rows.
    */
-  public static render<T extends IRow>(rows: ITable<T>): void {
+  public static render<
+    TRow extends RowOrValue<CellValue>,
+    THeaderRow extends RowOrValue<CellValue>,
+  >(
+    rows: Array<TRow> | Table<TRow, THeaderRow>,
+  ): void {
     Table.from(rows).render();
   }
 
@@ -87,22 +108,40 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * row and each property a column.
    * @param rows Array of objects.
    */
-  public fromJson(rows: IDataRow[]): this {
-    this.header(Object.keys(rows[0]));
-    this.body(rows.map((row) => Object.values(row) as T));
-    return this;
+  public fromJson<TJsonValue extends CellValue>(
+    rows: Array<JsonData<TJsonValue>>,
+  ): Table<Array<TJsonValue>, Row<string>> {
+    return (this as Table<Array<TJsonValue>, Row<string>>)
+      .header(Object.keys(rows[0]))
+      .body(rows.map((row) => Object.values(row)));
   }
 
-  public columns(columns: Array<Column | ColumnOptions>): this {
+  /**
+   * Set column definitions.
+   * @param columns Array of columns or column options.
+   */
+  public columns(
+    columns: Array<
+      | Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>
+      | ColumnOptions<GetRowValue<TRow>, GetRowValue<THeaderRow>>
+    >,
+  ): this {
     this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
     );
     return this;
   }
 
+  /**
+   * Set column definitions for a single column.
+   * @param index   Column index.
+   * @param column  Column or column options.
+   */
   public column(
     index: number,
-    column: Column | ColumnOptions,
+    column:
+      | Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>
+      | ColumnOptions<GetRowValue<TRow>, GetRowValue<THeaderRow>>,
   ): this {
     if (column instanceof Column) {
       this.options.columns[index] = column;
@@ -118,36 +157,63 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set table header.
    * @param header Header row or cells.
    */
-  public header(header: IRow): this {
-    this.headerRow = header instanceof Row ? header : Row.from(header);
-    return this;
+  public header<
+    THeader extends THeaderRow,
+    THeaderValue extends GetRowValue<THeader>,
+  >(
+    header: RowOrValue<THeaderValue>,
+  ): Table<TRow, Row<RowOrValue<THeaderValue>>> {
+    const table = this as Table<TRow, Row<RowOrValue<THeaderValue>>>;
+    table.headerRow = header instanceof Row ? header : Row.from(header);
+    return table;
+  }
+
+  /**
+   * Add an array of rows.
+   * @param rows Table rows.
+   */
+  public rows<TBodyRow extends TRow>(
+    rows: Array<TBodyRow>,
+  ): Table<TBodyRow, THeaderRow> {
+    const table = this as Table<RowOrValue<CellValue>, THeaderRow> as Table<
+      TBodyRow,
+      THeaderRow
+    >;
+    table.push(...rows);
+    return table;
   }
 
   /**
    * Set table body.
    * @param rows Table rows.
    */
-  public body(rows: T[]): this {
+  public body<TBodyRow extends TRow>(
+    rows: Array<TBodyRow>,
+  ): Table<TBodyRow, THeaderRow> {
     this.length = 0;
-    this.push(...rows);
-    return this;
+    return this.rows(rows);
+  }
+
+  /**
+   * Set table data.
+   * @param rows Table rows.
+   */
+  public data<TBodyRow extends TRow>(
+    rows: Array<TBodyRow>,
+  ): Table<TBodyRow, THeaderRow> {
+    this.length = 0;
+    return this.fillRows().rows(rows);
   }
 
   /** Clone table recursively with header and options. */
-  public clone(): Table {
-    const table = new Table(
-      ...this.map((row: T) =>
-        row instanceof Row ? row.clone() : Row.from(row).clone()
-      ),
+  public clone(): this {
+    const rows = this.map((row) =>
+      row instanceof Row ? row.clone() : Row.from(row).clone()
     );
+    const table = Table.from(rows) as this;
     table.options = { ...this.options };
     table.headerRow = this.headerRow?.clone();
     return table;
-  }
-
-  /** Generate table string. */
-  public toString(): string {
-    return new TableLayout(this, this.options).toString();
   }
 
   /** Write table to stdout. */
@@ -232,22 +298,58 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set border characters.
    * @param chars Border options.
    */
-  public chars(chars: IBorderOptions): this {
+  public chars(chars: BorderOptions): this {
     Object.assign(this.options.chars, chars);
     return this;
   }
 
+  /**
+   * Register header value parser.
+   * @param fn  Value parser callback function.
+   */
+  public headerValue(fn: ValueParser<GetRowValue<THeaderRow>>): this {
+    this.options.headerValue = fn;
+    return this;
+  }
+
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public cellValue(fn: ValueParser<GetRowValue<TRow>>): this {
+    this.options.cellValue = fn;
+    return this;
+  }
+
+  /**
+   * Register header renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public headerRenderer(fn: Renderer): this {
+    this.options.headerRenderer = fn;
+    return this;
+  }
+
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public cellRenderer(fn: Renderer): this {
+    this.options.cellRenderer = fn;
+    return this;
+  }
+
   /** Get table header. */
-  public getHeader(): Row | undefined {
+  public getHeader(): Row<GetRowValue<THeaderRow>> | undefined {
     return this.headerRow;
   }
 
   /** Get table body. */
-  public getBody(): T[] {
+  public getBody(): TRow[] {
     return [...this];
   }
 
-  /** Get mac col widrth. */
+  /** Get max col width. */
   public getMaxColWidth(): number | number[] {
     return this.options.maxColWidth;
   }
@@ -268,14 +370,15 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Check if table has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if header row has border. */
   public hasHeaderBorder(): boolean {
     const hasBorder = this.headerRow?.hasBorder();
-    return hasBorder === true || (this.getBorder() && hasBorder !== false);
+    return hasBorder === true ||
+      (this.getBorder() === true && hasBorder !== false);
   }
 
   /** Check if table bordy has border. */
@@ -285,7 +388,9 @@ export class Table<T extends IRow = IRow> extends Array<T> {
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
-          : row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
+          : Array.isArray(row)
+          ? row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
+          : false
       );
   }
 
@@ -295,15 +400,48 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Get table alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
   }
 
-  public getColumns(): Array<Column> {
+  /** Get column definitions. */
+  public getColumns(): Array<
+    Column<GetRowValue<TRow>, GetRowValue<THeaderRow>>
+  > {
     return this.options.columns;
   }
 
-  public getColumn(index: number): Column {
+  /** Get column definition by column index. */
+  public getColumn(
+    index: number,
+  ): Column<GetRowValue<TRow>, GetRowValue<THeaderRow>> {
     return this.options.columns[index] ??= new Column();
+  }
+
+  /** Get header value parser. */
+  public getHeaderValueParser():
+    | ValueParser<GetRowValue<THeaderRow>>
+    | undefined {
+    return this.options.headerValue;
+  }
+
+  /** Get value parser. */
+  public getCellValueParser(): ValueParser<GetRowValue<TRow>> | undefined {
+    return this.options.cellValue;
+  }
+
+  /** Get header renderer. */
+  public getHeaderRenderer(): Renderer | undefined {
+    return this.options.headerRenderer;
+  }
+
+  /** Get cell renderer. */
+  public getCellRenderer(): Renderer | undefined {
+    return this.options.cellRenderer;
+  }
+
+  fillRows(enable = true): this {
+    this.options.isDataTable = enable;
+    return this;
   }
 }
