@@ -26,3 +26,9 @@ export { copy } from "https://deno.land/std@0.170.0/streams/conversion.ts";
 /* 3rd party */
 export { gt, lt } from "https://deno.land/x/semver@v1.4.1/mod.ts";
 export { default as sinon } from "https://cdn.skypack.dev/sinon@v13.0.2?dts";
+
+export {
+  assert as assertType,
+  type IsAny,
+  type IsExact,
+} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";

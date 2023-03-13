@@ -1,7 +1,7 @@
 export type CellValue = unknown;
 
 /** Cell type */
-export type CellOrValue<TValue extends CellValue> =
+export type CellOrValue<TValue extends CellValue = CellValue> =
   | TValue
   | Cell<TValue>;
 
@@ -12,7 +12,7 @@ export type GetCellValue<TCell extends CellOrValue<CellValue>> = TCell extends
 
 export type Direction = "left" | "right" | "center";
 
-export type ValueParserResult = string | number | undefined | null;
+export type ValueParserResult = string | number | undefined | null | void;
 
 export type ValueParser<in out TValue extends CellValue> = (
   value: TValue,

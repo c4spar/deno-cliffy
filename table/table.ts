@@ -27,27 +27,139 @@ export interface TableSettings<
 /** Border characters settings. */
 export type BorderOptions = Partial<IBorder>;
 
+// type AnyToTuple<T> = 0 extends T & 1 ? [] : T;
+// type UnknownToTuple<T> = T extends unknown ? [] : T;
+//
+// type Foo = keyof unknown extends keyof unknown ? 1 : 2;
+
+// export type Columns<
+//   TRow,
+//   THeaderRow,
+// > = number extends keyof THeaderRow ? {
+//   [Key in keyof THeaderRow]: ColumnOptions<
+//     Key extends keyof TRow ? TRow[Key] : unknown,
+//     Key extends keyof THeaderRow ? THeaderRow[Key] : unknown
+//   >;
+// } : number extends keyof TRow ? {
+//   [Key in keyof TRow]: ColumnOptions<
+//     Key extends keyof TRow ? TRow[Key] : unknown,
+//     Key extends keyof THeaderRow ? THeaderRow[Key] : unknown
+//   >;
+// } :Array<ColumnOptions<TRow, THeaderRow>>;
+
+// export type Columns<
+//   TRow,
+//   THeaderRow,
+// > = keyof TRow | keyof THeaderRow extends infer Keys ? Keys extends number ? {
+//       [Key in Keys]: ColumnOptions<
+//         Key extends keyof TRow ? TRow[Key] : unknown,
+//         Key extends keyof THeaderRow ? THeaderRow[Key] : unknown
+//       >;
+//     }
+//   : Array<ColumnOptions<TRow, THeaderRow>>
+//   : never;
+
+type MakeTuple<T> = T extends ReadonlyArray<unknown> ? T : [T];
+type MakeArray<T> = T extends ReadonlyArray<unknown> ? T : ReadonlyArray<T>;
+
 export type Columns<
-  TRows,
-  THeaderRows,
-> = keyof TRows extends keyof THeaderRows ? {
-    [Key in keyof THeaderRows]?: ColumnOptions<
-      Key extends keyof TRows ? TRows[Key] : unknown,
-      Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
-    >;
-  }
-  : keyof THeaderRows extends keyof TRows ? {
-      [Key in keyof TRows]?: ColumnOptions<
-        Key extends keyof TRows ? TRows[Key] : unknown,
-        Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
-      >;
-    }
-  : Array<ColumnOptions<TRows, THeaderRows>>;
+  TRow,
+  THeaderRow,
+> = ColumnsDef<MakeArray<TRow>, MakeArray<THeaderRow>>;
+// = ColumnsDef<TRow, THeaderRow>;
+
+// export type ColumnsDef<
+//   TRow,
+//   THeaderRow,
+// > = unknown extends THeaderRow
+//     ? (Array<ColumnOptions<TRow, THeaderRow>>)
+//   : keyof TRow extends keyof THeaderRow
+//     ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+//   : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+//   : Array<ColumnOptions<TRow, THeaderRow>>;
+
+export type ColumnsDef<
+  TRow,
+  THeaderRow,
+> = keyof TRow extends keyof THeaderRow
+  ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+  : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+  : ReadonlyArray<ColumnOptions<TRow, THeaderRow>>;
+
+// export type ColumnsDef<
+//   TRow,
+//   THeaderRow,
+// > = unknown extends TRow & THeaderRow
+//     ? Array<ColumnOptions<TRow, THeaderRow>>
+//     : unknown extends THeaderRow
+//     ? (TRow extends ReadonlyArray<unknown> ? ColumnsMap<TRow, TRow, THeaderRow> : Array<ColumnOptions<TRow, THeaderRow>>)
+//   : keyof TRow extends keyof THeaderRow
+//     ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+//   : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+//   : Array<ColumnOptions<TRow, THeaderRow>>;
+
+// export type ColumnsDef<
+//   TRow,
+//   THeaderRow,
+// > = unknown extends THeaderRow
+//     ? (keyof TRow extends number ? ColumnsMap<TRow, TRow, THeaderRow>
+//     : Array<ColumnOptions<TRow, THeaderRow>>)
+//   : keyof TRow extends keyof THeaderRow
+//     ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+//   : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+//   : Array<ColumnOptions<TRow, THeaderRow>>;
+
+// export type Columns<
+//   TRow,
+//   THeaderRow,
+// > = keyof THeaderRow extends never ? (keyof THeaderRow extends never ? never
+//     : keyof THeaderRow extends keyof TRow
+//       ? ColumnsMap<TRow, TRow, THeaderRow>
+//       : Array<ColumnOptions<TRow, THeaderRow>>)
+//   : keyof TRow extends keyof THeaderRow
+//     ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+//     : keyof THeaderRow extends keyof TRow
+//       ? ColumnsMap<TRow, TRow, THeaderRow>
+//       : Array<ColumnOptions<TRow, THeaderRow>>;
+
+// export type Columns3<
+//   TRow,
+//   THeaderRow,
+// > =
+//   keyof TRow extends keyof THeaderRow
+//   ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+//   : keyof THeaderRow extends keyof TRow
+//   ? ColumnsMap<TRow, TRow, THeaderRow>
+//   : Array<ColumnOptions<TRow, THeaderRow>>;
+
+// export type Columns<
+//   TRows,
+//   THeaderRows,
+// > =
+//   // unknown extends TRows & THeaderRows
+//   // ? Array<ColumnOptions<Array<"unknown">, Array<"unknown">>>
+//   // : unknown extends TRows
+//   // ? ColumnsMap<THeaderRows, Array<unknown>, THeaderRows>
+//   // : unknown extends THeaderRows
+//   // ? ColumnsMap<TRows, TRows, Array<unknown>>
+//   // :
+//   keyof TRows extends keyof THeaderRows
+//   ? ColumnsMap<THeaderRows, TRows, THeaderRows>
+//   : keyof THeaderRows extends keyof TRows
+//   ? ColumnsMap<TRows, TRows, THeaderRows>
+//   : Array<ColumnOptions<TRows, THeaderRows>>;
+
+type ColumnsMap<TBaseRows, TRows, THeaderRows> = {
+  [Key in keyof TBaseRows]?: ColumnOptions<
+    Key extends keyof TRows ? TRows[Key] : unknown,
+    Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
+  >;
+};
 
 /** Table representation. */
 export class Table<
-  TRow extends RowOrValue<CellValue>,
-  THeaderRow extends RowOrValue<CellValue> = TRow,
+  TRow extends RowOrValue<CellValue> = unknown,
+  THeaderRow extends RowOrValue<CellValue> = unknown,
 > extends Array<TRow> {
   protected static _chars: IBorder = { ...border };
   protected options: TableSettings<GetRowValue<TRow>, GetRowValue<THeaderRow>> =
@@ -123,7 +235,7 @@ export class Table<
   public fromJson<TJsonValue extends CellValue>(
     rows: Array<JsonData<TJsonValue>>,
   ): Table<Array<TJsonValue>, Array<string>> {
-    return (this as Table<Array<TJsonValue>, Array<string>>)
+    return (this as unknown as Table<Array<TJsonValue>, Array<string>>)
       .header(Object.keys(rows[0]))
       .body(rows.map((row) => Object.values(row)));
   }
@@ -221,8 +333,7 @@ export class Table<
   public data<TBodyRow extends TRow>(
     rows: Array<TBodyRow>,
   ): Table<TBodyRow, THeaderRow> {
-    this.length = 0;
-    return this.fillRows().rows(rows);
+    return this.fillRows().body(rows);
   }
 
   /** Clone table recursively with header and options. */
