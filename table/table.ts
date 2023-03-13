@@ -65,8 +65,8 @@ type MakeArray<T> = T extends ReadonlyArray<unknown> ? T : ReadonlyArray<T>;
 export type Columns<
   TRow,
   THeaderRow,
-> = ColumnsDef<MakeArray<TRow>, MakeArray<THeaderRow>>;
-// = ColumnsDef<TRow, THeaderRow>;
+> = ColumnsDef<TRow, THeaderRow>;
+// > = ColumnsDef<MakeArray<TRow>, MakeArray<THeaderRow>>;
 
 // export type ColumnsDef<
 //   TRow,
@@ -78,12 +78,26 @@ export type Columns<
 //   : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
 //   : Array<ColumnOptions<TRow, THeaderRow>>;
 
+type IsArrayAndNotArray<T, V> = T extends ReadonlyArray<unknown>
+  ? (V extends ReadonlyArray<unknown> ? false : true)
+  : false;
+
+type IsArrayAndArray<T, V> = T extends ReadonlyArray<unknown>
+  ? (V extends ReadonlyArray<unknown> ? true : false)
+  : false;
+
 export type ColumnsDef<
   TRow,
   THeaderRow,
-> = keyof TRow extends keyof THeaderRow
-  ? ColumnsMap<THeaderRow, TRow, THeaderRow>
-  : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+> = IsArrayAndNotArray<TRow, THeaderRow> extends true
+  ? ColumnsMap<TRow, TRow, ReadonlyArray<THeaderRow>>
+  : IsArrayAndNotArray<THeaderRow, TRow> extends true
+    ? ColumnsMap<THeaderRow, ReadonlyArray<TRow>, THeaderRow>
+  : IsArrayAndArray<TRow, THeaderRow> extends true
+    ? keyof TRow extends keyof THeaderRow
+      ? ColumnsMap<THeaderRow, TRow, THeaderRow>
+    : keyof THeaderRow extends keyof TRow ? ColumnsMap<TRow, TRow, THeaderRow>
+    : ReadonlyArray<ColumnOptions<TRow, THeaderRow>>
   : ReadonlyArray<ColumnOptions<TRow, THeaderRow>>;
 
 // export type ColumnsDef<
@@ -151,8 +165,12 @@ export type ColumnsDef<
 
 type ColumnsMap<TBaseRows, TRows, THeaderRows> = {
   [Key in keyof TBaseRows]?: ColumnOptions<
-    Key extends keyof TRows ? TRows[Key] : unknown,
-    Key extends keyof THeaderRows ? THeaderRows[Key] : unknown
+    Key extends keyof TRows ? TRows[Key]
+      : TRows extends ReadonlyArray<unknown> ? TRows[0]
+      : unknown,
+    Key extends keyof THeaderRows ? THeaderRows[Key]
+      : THeaderRows extends ReadonlyArray<unknown> ? THeaderRows[0]
+      : unknown
   >;
 };
 

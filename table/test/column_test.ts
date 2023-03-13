@@ -368,3 +368,57 @@ Deno.test("[table] should have correct cellValue argument types for data table",
       },
     }]);
 });
+
+Deno.test("[table] should have correct cellValue argument types for data table with header", () => {
+  type Data = {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly age: number;
+    readonly email: string;
+  };
+
+  new Table()
+    .header([1, "2", 3] as const)
+    .body([
+      {
+        firstName: "Gino",
+        lastName: "Aicheson",
+        age: 21,
+        email: "gaicheson0@nydailynews.com",
+      },
+      {
+        firstName: "Godfry",
+        lastName: "Pedycan",
+        age: 33,
+        email: "gpedycan1@state.gov",
+      },
+      {
+        firstName: "Loni",
+        lastName: "Miller",
+        age: 24,
+        email: "lmiller2@chron.com",
+      },
+    ])
+    .columns([{
+      headerValue: (...args) => {
+        assertType<IsExact<typeof args, [1]>>(true);
+      },
+      cellValue: (...args) => {
+        assertType<IsExact<typeof args, [Data]>>(true);
+      },
+    }, {
+      headerValue: (...args) => {
+        assertType<IsExact<typeof args, ["2"]>>(true);
+      },
+      cellValue: (...args) => {
+        assertType<IsExact<typeof args, [Data]>>(true);
+      },
+    }, {
+      headerValue: (...args) => {
+        assertType<IsExact<typeof args, [3]>>(true);
+      },
+      cellValue: (...args) => {
+        assertType<IsExact<typeof args, [Data]>>(true);
+      },
+    }]);
+});
