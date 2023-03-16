@@ -42,3 +42,13 @@ Deno.test({
     );
   },
 });
+
+Deno.test({
+  name: "ansi - colors - empty string argument",
+  fn() {
+    assertEquals(
+      colors.red.underline.bold(""),
+      bold(underline(red(""))),
+    );
+  },
+});
