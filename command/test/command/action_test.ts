@@ -133,3 +133,24 @@ Deno.test("[flags] should call global action handler", async () => {
   assertSpyCall(barGlobalSpy, 0, { args });
   assertSpyCall(barSpy, 0, { args });
 });
+
+Deno.test("[flags] should call global and base action handler", async () => {
+  const globalSpy = spy();
+  const baseSpy = spy();
+
+  const cmd = new Command()
+    .throwErrors()
+    .globalOption("--main", "...")
+    .globalAction(globalSpy)
+    .action(baseSpy);
+
+  await cmd.parse(["--main"]);
+
+  assertSpyCalls(globalSpy, 1);
+  assertSpyCalls(baseSpy, 1);
+
+  const args = [{ main: true }];
+
+  assertSpyCall(globalSpy, 0, { args });
+  assertSpyCall(baseSpy, 0, { args });
+});
