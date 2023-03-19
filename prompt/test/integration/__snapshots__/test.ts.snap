@@ -25,7 +25,8 @@ stderr:
 `;
 
 snapshot[`prompt - integration - checkbox group 1`] = `
-"? Select an option
+"stdout:
+? Select an option
 ❯ ✘ Foo
   ✘ Bar
   ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
@@ -42,11 +43,14 @@ snapshot[`prompt - integration - checkbox group 1`] = `
   ✘ Bar
 ❯ ✔ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › beep, boop
-\\x1b[?25h\\x1b[?25h"
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
 `;
 
 snapshot[`prompt - integration - checkbox group 2`] = `
-"? Select an option
+"stdout:
+? Select an option
 ❯ ✘ Foo
   ✘ Bar
   ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
@@ -71,11 +75,14 @@ snapshot[`prompt - integration - checkbox group 2`] = `
    ✘ Beep
  ❯ ✔ Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Boop
-\\x1b[?25h\\x1b[?25h"
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
 `;
 
 snapshot[`prompt - integration - checkbox group breadcrumb 1`] = `
-"? Select an option
+"stdout:
+? Select an option
 ❯ ✘ 📁 Foo\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ 📂 Foo
@@ -102,7 +109,9 @@ snapshot[`prompt - integration - checkbox group breadcrumb 1`] = `
   ✔ 📂 Foo # .. # Boop # Fiz
  ❯ ✔ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Faz
-\\x1b[?25h\\x1b[?25h"
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
 `;
 
 snapshot[`prompt - integration - confirm 1`] = `
@@ -269,7 +278,8 @@ stderr:
 `;
 
 snapshot[`prompt - integration - select group 1`] = `
-"? Select an option
+"stdout:
+? Select an option
 ❯ Foo
   Bar
   📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
@@ -286,11 +296,14 @@ snapshot[`prompt - integration - select group 1`] = `
  ❯ Beep
    Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Beep
-\\x1b[?25h\\x1b[?25h"
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
 `;
 
 snapshot[`prompt - integration - select group breadcrumb 1`] = `
-"? Select an option
+"stdout:
+? Select an option
 ❯ 📁 Foo\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   📂 Foo
@@ -311,7 +324,9 @@ snapshot[`prompt - integration - select group breadcrumb 1`] = `
   📂 Foo # .. # Boop # Fiz
  ❯ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Faz
-\\x1b[?25h\\x1b[?25h"
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
 `;
 
 snapshot[`prompt - integration - toggle 1`] = `
