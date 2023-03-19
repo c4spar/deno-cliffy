@@ -5,7 +5,10 @@ import { Cursor, getCursorPosition } from "./cursor_position.ts";
 /** Create new `Ansi` instance. */
 export interface TtyOptions {
   stdout?: Deno.WriterSync;
-  stdin?: Deno.ReaderSync & { rid: number };
+  stdin?: Deno.ReaderSync & {
+    readonly rid: number;
+    setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+  };
 }
 
 type Executor = (this: TtyChain, ...args: Args) => string;
@@ -45,8 +48,8 @@ export const tty: Tty = factory();
 function factory(options?: TtyOptions): Tty {
   let result = "";
   let stack: Array<[Property, Args]> = [];
-  const stdout: Deno.WriterSync = options?.stdout ?? Deno.stdout;
-  const stdin: Deno.ReaderSync & { rid: number } = options?.stdin ?? Deno.stdin;
+  const stdout = options?.stdout ?? Deno.stdout;
+  const stdin = options?.stdin ?? Deno.stdin;
 
   const tty: Tty = function (
     this: TtyChain | undefined,
