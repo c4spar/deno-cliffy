@@ -1598,6 +1598,7 @@ export class Command<
       stopEarly: false,
       stopOnUnknown: false,
       defaults: {},
+      actionOptions: [],
     };
     return this.parseCommand(ctx) as any;
   }
@@ -1652,17 +1653,21 @@ export class Command<
       this.literalArgs = ctx.literal;
 
       // Execute option action.
-      if (ctx.action) {
-        await ctx.action.action.call(this, options, ...args);
+      if (ctx.actionOptions.length) {
+        await Promise.all(
+          ctx.actionOptions.map((option) =>
+            option.action.call(this, options, ...args)
+          ),
+        );
+      }
 
-        if (ctx.action.standalone) {
-          return {
-            options,
-            args,
-            cmd: this,
-            literal: this.literalArgs,
-          };
-        }
+      if (ctx.standalone) {
+        return {
+          options,
+          args,
+          cmd: this,
+          literal: this.literalArgs,
+        };
       }
 
       return await this.execute(options, args);
@@ -1902,8 +1907,8 @@ export class Command<
       ignoreDefaults: ctx.env,
       parse: (type: ArgumentValue) => this.parseType(type),
       option: (option: Option) => {
-        if (!ctx.action && option.action) {
-          ctx.action = option as ActionOption;
+        if (option.action) {
+          ctx.actionOptions.push(option as ActionOption);
         }
       },
     });
@@ -2907,7 +2912,7 @@ interface DefaultOption {
 type ActionOption = Option & { action: ActionHandler };
 
 interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
-  action?: ActionOption;
+  actionOptions: Array<ActionOption>;
   env: Record<string, unknown>;
 }
 
