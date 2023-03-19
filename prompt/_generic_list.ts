@@ -366,17 +366,13 @@ export abstract class GenericList<
     if (!parentOption) {
       return;
     }
-    const options = this.getCurrentOptions();
-    this.setOptions(options);
+    this.match();
     this.listIndex = this.options.indexOf(parentOption);
   }
 
   protected submitGroupOption(selectedOption: TGroup) {
-    if (this.isSearching()) {
-      return;
-    }
     this.parentOptions.push(selectedOption);
-    this.setOptions(selectedOption.options);
+    this.match();
     this.listIndex = 1;
   }
 
