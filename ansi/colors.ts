@@ -39,11 +39,18 @@ export const colors: Colors = factory();
 
 /**
  * Chainable colors module.
- * ```
+ *
+ * ```ts
+ * import { colors } from "./mod.ts";
+ *
  * console.log(colors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
+ *
  * If invoked as method, a new Ansi instance will be returned.
- * ```
+ *
+ * ```ts
+ * import { Colors, colors } from "./mod.ts";
+ *
  * const myColors: Colors = colors();
  * console.log(myColors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
@@ -54,7 +61,7 @@ function factory(stack: Array<ColorMethods> = []): Colors {
     str?: string,
     ...args: Array<unknown>
   ): string | ColorsChain {
-    if (str) {
+    if (typeof str !== "undefined") {
       const lastIndex = stack.length - 1;
       return stack.reduce(
         (str: string, name: PropertyNames, index: number) =>

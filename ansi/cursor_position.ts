@@ -9,13 +9,19 @@ export interface Cursor {
 /** Cursor position options. */
 export interface CursorPositionOptions {
   stdout?: Deno.WriterSync;
-  stdin?: Deno.ReaderSync & { rid: number };
+  stdin?: Deno.ReaderSync & {
+    readonly rid: number;
+    setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+  };
 }
 
 /**
  * Get cursor position.
  * @param options  Options.
- * ```
+ *
+ * ```ts
+ * import { Cursor, getCursorPosition } from "./mod.ts";
+ *
  * const cursor: Cursor = getCursorPosition();
  * console.log(cursor); // { x: 0, y: 14}
  * ```
@@ -28,10 +34,10 @@ export function getCursorPosition(
 ): Cursor {
   const data = new Uint8Array(8);
 
-  Deno.stdin.setRaw(true);
+  stdin.setRaw(true);
   stdout.writeSync(new TextEncoder().encode(cursorPosition));
   stdin.readSync(data);
-  Deno.stdin.setRaw(false);
+  stdin.setRaw(false);
 
   const [y, x] = new TextDecoder()
     .decode(data)

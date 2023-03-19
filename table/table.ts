@@ -1,5 +1,6 @@
 import { border, IBorder } from "./border.ts";
 import { Cell, Direction } from "./cell.ts";
+import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
 
@@ -21,6 +22,7 @@ export interface ITableOptions {
 export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
   chars: IBorder;
   align?: Direction;
+  columns: Array<Column>;
 }
 
 /** Table type. */
@@ -36,6 +38,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     minColWidth: 0,
     padding: 1,
     chars: { ...Table._chars },
+    columns: [],
   };
   private headerRow?: Row;
 
@@ -87,6 +90,27 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   public fromJson(rows: IDataRow[]): this {
     this.header(Object.keys(rows[0]));
     this.body(rows.map((row) => Object.values(row) as T));
+    return this;
+  }
+
+  public columns(columns: Array<Column | ColumnOptions>): this {
+    this.options.columns = columns.map((column) =>
+      column instanceof Column ? column : Column.from(column)
+    );
+    return this;
+  }
+
+  public column(
+    index: number,
+    column: Column | ColumnOptions,
+  ): this {
+    if (column instanceof Column) {
+      this.options.columns[index] = column;
+    } else if (this.options.columns[index]) {
+      this.options.columns[index].options(column);
+    } else {
+      this.options.columns[index] = Column.from(column);
+    }
     return this;
   }
 
@@ -185,7 +209,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * @param enable    Enable/disable cell border.
    * @param override  Override existing value.
    */
-  public border(enable: boolean, override = true): this {
+  public border(enable = true, override = true): this {
     if (override || typeof this.options.border === "undefined") {
       this.options.border = enable;
     }
@@ -257,10 +281,11 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Check if table bordy has border. */
   public hasBodyBorder(): boolean {
     return this.getBorder() ||
+      this.options.columns.some((column) => column.getBorder()) ||
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
-          : row.some((cell) => cell instanceof Cell ? cell.getBorder : false)
+          : row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
       );
   }
 
@@ -272,5 +297,13 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Get table alignment. */
   public getAlign(): Direction {
     return this.options.align ?? "left";
+  }
+
+  public getColumns(): Array<Column> {
+    return this.options.columns;
+  }
+
+  public getColumn(index: number): Column {
+    return this.options.columns[index] ??= new Column();
   }
 }

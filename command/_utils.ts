@@ -34,10 +34,10 @@ interface SplitArgumentsResult {
  * For example: `-c, --color <color1:string> <color2:string>`
  *
  * Will result in:
- * ```
+ * ```json
  * {
  *   flags: [ "-c", "--color" ],
- *   typeDefinition: "<color1:string> <color2:string>"
+ *   typeDefinition: "<color1:string> <color2:string>",
  * }
  * ```
  */

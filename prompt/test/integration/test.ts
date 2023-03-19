@@ -65,6 +65,7 @@ async function runPrompt(
   const cmd = new Deno.Command("deno", {
     stdin: "piped",
     stdout: "piped",
+    stderr: "piped",
     args: [
       "run",
       ...flags,
@@ -83,7 +84,7 @@ async function runPrompt(
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  const { success, stdout } = await child.output();
+  const { success, stdout, stderr } = await child.output();
   writer.releaseLock();
   await child.stdin.close();
 
@@ -92,7 +93,10 @@ async function runPrompt(
   }
 
   // Add a line break after each test input.
-  return new TextDecoder().decode(stdout).replaceAll(
+  return "stdout:\n" + new TextDecoder().decode(stdout).replaceAll(
+    eraseDown(),
+    eraseDown() + "\n",
+  ) + "\nstderr:\n" + new TextDecoder().decode(stderr).replaceAll(
     eraseDown(),
     eraseDown() + "\n",
   );

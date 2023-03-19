@@ -12,7 +12,7 @@
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
-    "test": "deno test --allow-env --allow-read=./ --allow-run=deno --parallel",
+    "test": "deno test --doc --allow-env --allow-read=./ --allow-run=deno --ignore=./CHANGELOG.md --parallel",
     "snapshot": "deno task test --allow-write=./ -- --update",
     "check:examples": "deno run --allow-env=MAX_PARALLEL --allow-read=./ --allow-run=deno ./_scripts/check_examples.ts",
     "coverage": "deno task test --coverage=./dist/coverage/all/result && deno coverage --lcov ./dist/coverage/all/result > ./dist/coverage/all/cov.lcov",

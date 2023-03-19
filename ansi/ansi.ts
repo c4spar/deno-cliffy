@@ -10,8 +10,10 @@ type PropertyNames = keyof Chain<AnsiChain>;
 export interface AnsiChain extends Chain<AnsiChain> {
   /** Get ansi escape sequence. */
   (): string;
+
   /** Get ansi escape sequence. */
   toString(): string;
+
   /** Get ansi escape sequence as Uint8Array. */
   toBuffer(): Uint8Array;
 }
@@ -28,15 +30,22 @@ export type Ansi = AnsiFactory & AnsiChain;
 /**
  * Chainable ansi escape sequences.
  * If invoked as method, a new Ansi instance will be returned.
- * ```
+ *
+ * ```ts
+ * import { ansi } from "./mod.ts";
+ *
  * await Deno.stdout.write(
  *   new TextEncoder().encode(
  *     ansi.cursorTo(0, 0).eraseScreen(),
  *   ),
  * );
  * ```
+ *
  * Or shorter:
- * ```
+ *
+ * ```ts
+ * import { ansi } from "./mod.ts";
+ *
  * await Deno.stdout.write(
  *   ansi.cursorTo(0, 0).eraseScreen.toBuffer(),
  * );

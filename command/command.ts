@@ -105,7 +105,8 @@ export class Command<
   private ver?: VersionHandler;
   private desc: Description = "";
   private _usage?: string;
-  private fn?: ActionHandler;
+  private actionHandler?: ActionHandler;
+  private globalActionHandler?: ActionHandler;
   private options: Array<Option> = [];
   private commands: Map<string, Command<any>> = new Map();
   private examples: Array<Example> = [];
@@ -781,7 +782,27 @@ export class Command<
       TParentCommand
     >,
   ): this {
-    this.cmd.fn = fn;
+    this.cmd.actionHandler = fn;
+    return this;
+  }
+
+  /**
+   * Set command callback method.
+   * @param fn Command action handler.
+   */
+  public globalAction(
+    fn: ActionHandler<
+      Partial<TCommandOptions>,
+      TCommandArguments,
+      TCommandGlobals,
+      TParentCommandGlobals,
+      TCommandTypes,
+      TCommandGlobalTypes,
+      TParentCommandTypes,
+      TParentCommand
+    >,
+  ): this {
+    this.cmd.globalActionHandler = fn;
     return this;
   }
 
@@ -1046,7 +1067,12 @@ export class Command<
    *
    * **Example:**
    *
-   * ```
+   * ```ts
+   * import { Command, ValidationError } from "./mod.ts";
+   *
+   * const cmd = new Command();
+   * // ...
+   *
    * try {
    *   cmd.parse();
    * } catch(error) {
@@ -1587,7 +1613,7 @@ export class Command<
         return { options: {}, args: [], cmd: this, literal: [] };
       } else if (this._useRawArgs) {
         await this.parseEnvVars(ctx, this.envVars);
-        return await this.execute(ctx.env, ...ctx.unknown);
+        return await this.execute(ctx.env, ctx.unknown);
       }
 
       let preParseGlobals = false;
@@ -1639,7 +1665,7 @@ export class Command<
         }
       }
 
-      return await this.execute(options, ...args);
+      return await this.execute(options, args);
     } catch (error: unknown) {
       this.handleError(error);
     }
@@ -1789,13 +1815,11 @@ export class Command<
    * @param options A map of options.
    * @param args Command arguments.
    */
-  protected async execute(
+  private async execute(
     options: Record<string, unknown>,
-    ...args: Array<unknown>
+    args: Array<unknown>,
   ): Promise<CommandResult> {
-    if (this.fn) {
-      await this.fn(options, ...args);
-    } else if (this.defaultCommand) {
+    if (this.defaultCommand) {
       const cmd = this.getCommand(this.defaultCommand, true);
 
       if (!cmd) {
@@ -1806,7 +1830,15 @@ export class Command<
       }
       cmd._globalParent = this;
 
-      return cmd.execute(options, ...args);
+      return cmd.execute(options, args);
+    }
+
+    if (this.globalActionHandler) {
+      await this.executeGlobalAction(options, args);
+    }
+
+    if (this.actionHandler) {
+      await this.actionHandler(options, ...args);
     }
 
     return {
@@ -1815,6 +1847,14 @@ export class Command<
       cmd: this,
       literal: this.literalArgs,
     };
+  }
+
+  private async executeGlobalAction(
+    options: Record<string, unknown>,
+    args: Array<unknown>,
+  ) {
+    await this._parent?.executeGlobalAction(options, args);
+    await this.globalActionHandler?.(options, ...args);
   }
 
   /**
