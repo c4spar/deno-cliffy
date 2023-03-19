@@ -171,12 +171,7 @@ export abstract class GenericPrompt<
     }
     this.#isFirstRun = false;
 
-    if (Deno.build.os === "windows") {
-      console.log(content);
-      this.tty.cursorUp();
-    } else {
-      Deno.stdout.writeSync(this.#encoder.encode(content));
-    }
+    Deno.stdout.writeSync(this.#encoder.encode(content));
 
     if (y) {
       this.tty.cursorUp(y);
