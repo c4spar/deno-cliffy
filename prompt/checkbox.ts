@@ -252,10 +252,10 @@ export class Checkbox extends GenericList<
   protected hint(): string | undefined {
     if (this.confirmSubmit) {
       const info = this.selectedOption && this.isBackButton(this.selectedOption)
-        ? ` To leave a group use ${
+        ? ` To leave the group use ${
           getFiguresByKeys(this.settings.keys.back ?? []).join(", ")
         }.`
-        : ` To select a group use ${
+        : ` To open the selected group ${
           getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
         }.`;
 

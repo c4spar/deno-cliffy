@@ -522,7 +522,7 @@ export abstract class GenericList<
 
     if (this.isBackButton(option)) {
       label = this.getBreadCrumb();
-      label = isSelected && !option.disabled ? yellow(label) : dim(label);
+      label = isSelected && !option.disabled ? label : yellow(label);
     } else {
       label = isSelected && !option.disabled
         ? this.highlight(label, (val) => val)
@@ -542,7 +542,7 @@ export abstract class GenericList<
     }
     const names = this.parentOptions.map((option) => option.name);
     const breadCrumb = names.length > this.settings.maxBreadcrumbItems
-      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 2)]
+      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 1)]
       : names;
 
     return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);

@@ -97,16 +97,16 @@ snapshot[`prompt - integration - checkbox group breadcrumb 1`] = `
   × 📂 Foo # Bar # Baz # Beep
  ❯ × 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  × 📂 Foo # .. # Beep # Boop
+  × 📂 Foo # .. # Baz # Beep # Boop
  ❯ × 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  × 📂 Foo # .. # Boop # Fiz
+  × 📂 Foo # .. # Beep # Boop # Fiz
  ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  × 📂 Foo # .. # Boop # Fiz
+  × 📂 Foo # .. # Beep # Boop # Fiz
  ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  √ 📂 Foo # .. # Boop # Fiz
+  √ 📂 Foo # .. # Beep # Boop # Fiz
  ❯ √ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Faz
 \\x1b[?25h\\x1b[?25h
@@ -318,10 +318,10 @@ snapshot[`prompt - integration - select group breadcrumb 1`] = `
   📂 Foo # Bar # Baz # Beep
  ❯ 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  📂 Foo # .. # Beep # Boop
+  📂 Foo # .. # Baz # Beep # Boop
  ❯ 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  📂 Foo # .. # Boop # Fiz
+  📂 Foo # .. # Beep # Boop # Fiz
  ❯ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Faz
 \\x1b[?25h\\x1b[?25h
