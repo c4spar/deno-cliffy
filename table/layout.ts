@@ -633,5 +633,5 @@ export class TableLayout {
   }
 }
 
-/** @deprecated Use `Border` instead. */
+/** @deprecated Use `RenderSettings` instead. */
 export type IRenderSettings = RenderSettings;

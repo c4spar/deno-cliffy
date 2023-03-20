@@ -152,7 +152,7 @@ export class Cell {
   }
 }
 
-/** @deprecated Use `Border` instead. */
+/** @deprecated Use `CellType` instead. */
 export type ICell = CellType;
 
 /** @deprecated Use `CellOptions` instead. */
