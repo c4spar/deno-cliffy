@@ -88,6 +88,16 @@ stderr:
 "
 `;
 
+snapshot[`prompt - integration - input output stream 1`] = `
+"stdout:
+
+stderr:
+? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar\\x1b[35G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar
+\\x1b[?25h\\x1b[?25h"
+`;
+
 snapshot[`prompt - integration - input prefix 1`] = `
 "stdout:
 PREFIX Whats your name? (foo) › \\x1b[33G\\x1b[G\\x1b[0J
