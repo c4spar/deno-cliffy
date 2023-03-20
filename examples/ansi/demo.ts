@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run
+
 import * as stdColors from "https://deno.land/std@0.170.0/fmt/colors.ts";
 import * as ansiEscapes from "../../ansi/ansi_escapes.ts";
 

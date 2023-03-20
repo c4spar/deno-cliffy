@@ -1,4 +1,11 @@
-import { assert, assertEquals, sinon } from "../../../dev_deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertSpyCall,
+  assertSpyCalls,
+  sinon,
+  spy,
+} from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 
 Deno.test("[command] should execute the action from an option", async () => {
@@ -93,7 +100,7 @@ Deno.test("[command] should execute the action from an option and the command ac
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute the action from an standalon option and but not the command action", async () => {
+Deno.test("[command] should not execute the command action when executing an option action", async () => {
   const commandSpy = sinon.spy();
   const optionSpy = sinon.spy();
 
@@ -114,4 +121,29 @@ Deno.test("[command] should execute the action from an standalon option and but 
   assertEquals(optionSpy.firstCall.thisValue, cmd);
   assertEquals(optionSpy.firstCall.args, [{ fooBar: "beep" }, "boop"]);
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
+});
+
+Deno.test("[command] should execute multiple option actions", async () => {
+  const commandSpy = spy();
+  const fooOptionSpy = spy();
+  const barOptionSpy = spy();
+
+  const cmd = new Command()
+    .throwErrors()
+    .arguments("[beep:string]")
+    .option("-f, --foo", "...", { action: fooOptionSpy })
+    .option("-b, --bar", "...", { action: barOptionSpy })
+    .action(commandSpy);
+
+  await cmd.parse(["-fb"]);
+
+  assertSpyCalls(commandSpy, 1);
+  assertSpyCalls(fooOptionSpy, 1);
+  assertSpyCalls(barOptionSpy, 1);
+
+  const expectedArgs = [{ foo: true, bar: true }];
+
+  assertSpyCall(commandSpy, 0, { args: expectedArgs });
+  assertSpyCall(fooOptionSpy, 0, { args: expectedArgs });
+  assertSpyCall(barOptionSpy, 0, { args: expectedArgs });
 });
