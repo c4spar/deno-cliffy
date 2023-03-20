@@ -1,3 +1,4 @@
+import type { Column } from "./column.ts";
 import { Cell, CellType, Direction } from "./cell.ts";
 import { Row, RowType } from "./row.ts";
 import type { BorderOptions, Table, TableSettings } from "./table.ts";
@@ -57,7 +58,7 @@ export class TableLayout {
       if (length < columns) {
         const diff = columns - length;
         for (let i = 0; i < diff; i++) {
-          row.push(this.createCell(null, row));
+          row.push(this.createCell(null, row, length + i));
         }
       }
     }
@@ -65,17 +66,24 @@ export class TableLayout {
     const padding: number[] = [];
     const width: number[] = [];
     for (let colIndex = 0; colIndex < columns; colIndex++) {
-      const minColWidth: number = Array.isArray(this.options.minColWidth)
-        ? this.options.minColWidth[colIndex]
-        : this.options.minColWidth;
-      const maxColWidth: number = Array.isArray(this.options.maxColWidth)
-        ? this.options.maxColWidth[colIndex]
-        : this.options.maxColWidth;
+      const column = this.options.columns.at(colIndex);
+      const minColWidth: number = column?.getMinWidth() ??
+        (Array.isArray(this.options.minColWidth)
+          ? this.options.minColWidth[colIndex]
+          : this.options.minColWidth);
+
+      const maxColWidth: number = column?.getMaxWidth() ??
+        (Array.isArray(this.options.maxColWidth)
+          ? this.options.maxColWidth[colIndex]
+          : this.options.maxColWidth);
+
       const colWidth: number = longest(colIndex, rows, maxColWidth);
       width[colIndex] = Math.min(maxColWidth, Math.max(minColWidth, colWidth));
-      padding[colIndex] = Array.isArray(this.options.padding)
-        ? this.options.padding[colIndex]
-        : this.options.padding;
+
+      padding[colIndex] = column?.getPadding() ??
+        (Array.isArray(this.options.padding)
+          ? this.options.padding[colIndex]
+          : this.options.padding);
     }
 
     return {
@@ -104,8 +112,8 @@ export class TableLayout {
 
     return rows.map((row) => {
       const newRow = this.createRow(row);
-      for (let i = 0; i < row.length; i++) {
-        newRow[i] = this.createCell(row[i], newRow);
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        newRow[colIndex] = this.createCell(row[colIndex], newRow, colIndex);
       }
       return newRow;
     });
@@ -163,6 +171,7 @@ export class TableLayout {
         const cell = row[colIndex] = this.createCell(
           row[colIndex] || null,
           row,
+          colIndex,
         );
 
         colSpan = cell.getColSpan();
@@ -202,10 +211,12 @@ export class TableLayout {
   protected createCell(
     cell: CellType | null | undefined,
     row: Row,
+    colIndex: number,
   ): Cell {
+    const column: Column | undefined = this.options.columns.at(colIndex);
     return Cell.from(cell ?? "")
-      .border(row.getBorder(), false)
-      .align(row.getAlign(), false);
+      .border(column?.getBorder() ?? row.getBorder(), false)
+      .align(column?.getAlign() ?? row.getAlign(), false);
   }
 
   /**
