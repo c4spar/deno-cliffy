@@ -1655,9 +1655,7 @@ export class Command<
       // Execute option action.
       if (ctx.actions.length) {
         await Promise.all(
-          ctx.actions.map((action) =>
-            action.call(this, options, ...args)
-          ),
+          ctx.actions.map((action) => action.call(this, options, ...args)),
         );
       }
 
