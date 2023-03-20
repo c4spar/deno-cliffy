@@ -82,7 +82,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
 
   /** Read user input from stdin, handle events and validate user input. */
   protected read(): Promise<boolean> {
-    this.tty.cursorHide();
+    this.settings.tty.cursorHide();
     return super.read();
   }
 

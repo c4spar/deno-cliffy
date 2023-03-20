@@ -280,7 +280,7 @@ export abstract class GenericList<
   /** Read user input. */
   protected read(): Promise<boolean> {
     if (!this.settings.search) {
-      this.tty.cursorHide();
+      this.settings.tty.cursorHide();
     }
     return super.read();
   }
