@@ -4,8 +4,8 @@ import { Cursor, getCursorPosition } from "./cursor_position.ts";
 
 /** Create new `Ansi` instance. */
 export interface TtyOptions {
-  stdout?: Deno.WriterSync;
-  stdin?: Deno.ReaderSync & {
+  writer?: Deno.WriterSync;
+  reader?: Deno.ReaderSync & {
     readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
   };
@@ -45,11 +45,13 @@ export type Tty = TtyFactory & TtyChain;
  */
 export const tty: Tty = factory();
 
+const encoder = new TextEncoder();
+
 function factory(options?: TtyOptions): Tty {
   let result = "";
   let stack: Array<[Property, Args]> = [];
-  const stdout = options?.stdout ?? Deno.stdout;
-  const stdin = options?.stdin ?? Deno.stdin;
+  const writer = options?.writer ?? Deno.stdout;
+  const reader = options?.reader ?? Deno.stdin;
 
   const tty: Tty = function (
     this: TtyChain | undefined,
@@ -57,7 +59,7 @@ function factory(options?: TtyOptions): Tty {
   ): TtyChain {
     if (this) {
       update(args);
-      stdout.writeSync(new TextEncoder().encode(result));
+      writer.writeSync(encoder.encode(result));
       return this;
     }
     return factory(args[0] as TtyOptions ?? options);
@@ -66,11 +68,11 @@ function factory(options?: TtyOptions): Tty {
   tty.text = function (text: string): TtyChain {
     stack.push([text, []]);
     update();
-    stdout.writeSync(new TextEncoder().encode(result));
+    writer.writeSync(encoder.encode(result));
     return this;
   };
 
-  tty.getCursorPosition = (): Cursor => getCursorPosition({ stdout, stdin });
+  tty.getCursorPosition = (): Cursor => getCursorPosition({ writer, reader });
 
   const methodList: Array<[PropertyNames, Property]> = Object.entries(
     ansiEscapes,
