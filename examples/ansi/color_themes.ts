@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run
+
 import { colors } from "../../ansi/colors.ts";
 
 // Define theme colors.
