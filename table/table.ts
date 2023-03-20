@@ -4,11 +4,6 @@ import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { DataRow, Row, RowType } from "./row.ts";
 
-/** Table type. */
-export type TableType<TRow extends RowType = RowType> =
-  | Array<TRow>
-  | Table<TRow>;
-
 /** Border characters settings. */
 export type BorderOptions = Partial<Border>;
 
@@ -23,6 +18,11 @@ export interface TableSettings {
   align?: Direction;
   columns: Array<Column>;
 }
+
+/** Table type. */
+export type TableType<TRow extends RowType = RowType> =
+  | Array<TRow>
+  | Table<TRow>;
 
 /** Table representation. */
 export class Table<TRow extends RowType = RowType> extends Array<TRow> {
@@ -303,3 +303,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return this.options.columns[index] ??= new Column();
   }
 }
+
+/** @deprecated Use `BorderOptions` instead. */
+export type IBorderOptions = BorderOptions;
+
+/** @deprecated Use `TableType` instead. */
+export type ITable = TableType;

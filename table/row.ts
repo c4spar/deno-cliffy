@@ -97,3 +97,12 @@ export class Row<
     return this.options.align ?? "left";
   }
 }
+
+/** @deprecated Use `RowType` instead. */
+export type IRow = RowType;
+
+/** @deprecated Use `DataRow` instead. */
+export type IDataRow = DataRow;
+
+/** @deprecated Use `RowOptions` instead. */
+export type IRowOptions = RowOptions;

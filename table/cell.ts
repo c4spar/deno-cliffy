@@ -151,3 +151,9 @@ export class Cell {
     return this.options.align ?? "left";
   }
 }
+
+/** @deprecated Use `Border` instead. */
+export type ICell = CellType;
+
+/** @deprecated Use `CellOptions` instead. */
+export type ICellOptions = CellOptions;

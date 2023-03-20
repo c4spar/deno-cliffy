@@ -19,3 +19,6 @@ export const border = {
 
 /** Default border characters. */
 export type Border = typeof border;
+
+/** @deprecated Use `Border` instead. */
+export type IBorder = Border;
