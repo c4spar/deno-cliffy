@@ -104,8 +104,8 @@ export abstract class GenericPrompt<
       ...options,
       tty: tty({
         // Stdin is only used by getCursorPosition which we don't need.
-        stdin: Deno.stdin,
-        stdout: options.writer ?? Deno.stdout,
+        reader: Deno.stdin,
+        writer: options.writer ?? Deno.stdout,
       }),
       pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
       prefix: options.prefix ?? yellow("? "),
