@@ -3,7 +3,7 @@ import type { ArgumentValue } from "../types.ts";
 import { InvalidTypeError } from "../../flags/_errors.ts";
 
 /** Enum type. Allows only provided values. */
-export class EnumType<TValue extends string | number | boolean>
+export class EnumType<const TValue extends string | number | boolean>
   extends Type<TValue> {
   private readonly allowedValues: ReadonlyArray<TValue>;
 
