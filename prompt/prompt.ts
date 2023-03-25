@@ -55,6 +55,8 @@ interface PromptListOptions<R, N extends keyof R = keyof R> {
     opts: R,
     next: Next<Exclude<N, symbol>>,
   ) => void | Promise<void>;
+  reader?: GenericPromptOptions<unknown, unknown>["reader"];
+  writer?: GenericPromptOptions<unknown, unknown>["writer"];
 }
 
 /** Global prompt options. */
@@ -376,6 +378,8 @@ class PromptList {
 
     try {
       this.result[this.prompt.name] = await prompt.prompt({
+        reader: this.options?.reader,
+        writer: this.options?.writer,
         cbreak: this.options?.cbreak,
         ...this.prompt,
       });
