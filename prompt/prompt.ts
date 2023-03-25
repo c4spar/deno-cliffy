@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any ban-types
 
-import { tty } from "../ansi/tty.ts";
+import { Tty, tty } from "../ansi/tty.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
@@ -55,6 +55,8 @@ interface PromptListOptions<R, N extends keyof R = keyof R> {
     opts: R,
     next: Next<Exclude<N, symbol>>,
   ) => void | Promise<void>;
+  reader?: GenericPromptOptions<unknown, unknown>["reader"];
+  writer?: GenericPromptOptions<unknown, unknown>["writer"];
 }
 
 /** Global prompt options. */
@@ -259,6 +261,7 @@ class PromptList {
   private index = -1;
   private names: Array<string>;
   private isInBeforeHook = false;
+  private tty: Tty;
 
   private get prompt(): PromptOptions<string, any, any> {
     return this.prompts[this.index];
@@ -269,6 +272,9 @@ class PromptList {
     private options?: PromptListOptions<any>,
   ) {
     this.names = this.prompts.map((prompt) => prompt.name);
+    this.tty = tty({
+      writer: options?.writer ?? Deno.stdout,
+    });
   }
 
   public async run(
@@ -376,11 +382,13 @@ class PromptList {
 
     try {
       this.result[this.prompt.name] = await prompt.prompt({
+        reader: this.options?.reader,
+        writer: this.options?.writer,
         cbreak: this.options?.cbreak,
         ...this.prompt,
       });
     } finally {
-      tty.cursorShow();
+      this.tty.cursorShow();
     }
   }
 
