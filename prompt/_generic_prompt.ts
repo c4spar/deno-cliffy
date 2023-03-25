@@ -98,15 +98,15 @@ export abstract class GenericPrompt<
     options: GenericPromptOptions<TValue, TRawValue>,
   ): GenericPromptSettings<TValue, TRawValue> {
     return {
-      reader: Deno.stdin,
-      writer: Deno.stdout,
-      cbreak: false,
       ...options,
       tty: tty({
         // Stdin is only used by getCursorPosition which we don't need.
         reader: Deno.stdin,
         writer: options.writer ?? Deno.stdout,
       }),
+      cbreak: options.cbreak ?? false,
+      reader: options.reader ?? Deno.stdin,
+      writer: options.writer ?? Deno.stdout,
       pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
       prefix: options.prefix ?? yellow("? "),
       indent: options.indent ?? "",
