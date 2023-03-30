@@ -53,6 +53,8 @@ export type Ansi = AnsiFactory & AnsiChain;
  */
 export const ansi: Ansi = factory();
 
+const encoder = new TextEncoder();
+
 function factory(): Ansi {
   let result: Array<string> = [];
   let stack: Array<[Property, Args]> = [];
@@ -88,7 +90,7 @@ function factory(): Ansi {
   };
 
   ansi.toBuffer = function (): Uint8Array {
-    return new TextEncoder().encode(this.toString());
+    return encoder.encode(this.toString());
   };
 
   const methodList: Array<[PropertyNames, Property]> = Object.entries(

@@ -8,9 +8,15 @@ export interface Cursor {
 
 /** Cursor position options. */
 export interface CursorPositionOptions {
-  stdout?: Deno.WriterSync;
-  stdin?: Deno.ReaderSync & { rid: number };
+  writer?: Deno.WriterSync;
+  reader?: Deno.ReaderSync & {
+    readonly rid: number;
+    setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+  };
 }
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 /**
  * Get cursor position.
@@ -25,18 +31,18 @@ export interface CursorPositionOptions {
  */
 export function getCursorPosition(
   {
-    stdin = Deno.stdin,
-    stdout = Deno.stdout,
+    reader = Deno.stdin,
+    writer = Deno.stdout,
   }: CursorPositionOptions = {},
 ): Cursor {
   const data = new Uint8Array(8);
 
-  Deno.stdin.setRaw(true);
-  stdout.writeSync(new TextEncoder().encode(cursorPosition));
-  stdin.readSync(data);
-  Deno.stdin.setRaw(false);
+  reader.setRaw(true);
+  writer.writeSync(encoder.encode(cursorPosition));
+  reader.readSync(data);
+  reader.setRaw(false);
 
-  const [y, x] = new TextDecoder()
+  const [y, x] = decoder
     .decode(data)
     .match(/\[(\d+);(\d+)R/)
     ?.slice(1, 3)

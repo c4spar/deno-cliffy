@@ -1,5 +1,5 @@
 import type { Cursor } from "../ansi/cursor_position.ts";
-import { tty } from "../ansi/tty.ts";
+import { Tty, tty } from "../ansi/tty.ts";
 import { KeyCode, parse } from "../keycode/key_code.ts";
 import {
   bold,
@@ -37,6 +37,11 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   keys?: GenericPromptKeys;
   cbreak?: boolean;
   prefix?: string;
+  reader?: Deno.Reader & {
+    readonly rid: number;
+    setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+  };
+  writer?: Deno.WriterSync;
 }
 
 /** Generic prompt settings. */
@@ -45,6 +50,13 @@ export interface GenericPromptSettings<TValue, TRawValue>
   pointer: string;
   indent: string;
   prefix: string;
+  cbreak: boolean;
+  tty: Tty;
+  reader: Deno.Reader & {
+    readonly rid: number;
+    setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+  };
+  writer: Deno.WriterSync;
 }
 
 /** Prompt validation return tape. */
@@ -65,7 +77,6 @@ export abstract class GenericPrompt<
     TValue,
     TRawValue
   >;
-  protected readonly tty = tty;
   protected readonly cursor: Cursor = {
     x: 0,
     y: 0,
@@ -88,6 +99,14 @@ export abstract class GenericPrompt<
   ): GenericPromptSettings<TValue, TRawValue> {
     return {
       ...options,
+      tty: tty({
+        // Stdin is only used by getCursorPosition which we don't need.
+        reader: Deno.stdin,
+        writer: options.writer ?? Deno.stdout,
+      }),
+      cbreak: options.cbreak ?? false,
+      reader: options.reader ?? Deno.stdin,
+      writer: options.writer ?? Deno.stdout,
       pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
       prefix: options.prefix ?? yellow("? "),
       indent: options.indent ?? "",
@@ -103,13 +122,13 @@ export abstract class GenericPrompt<
     try {
       return await this.#execute();
     } finally {
-      this.tty.cursorShow();
+      this.settings.tty.cursorShow();
     }
   }
 
   /** Clear prompt output. */
   protected clear(): void {
-    this.tty.cursorLeft.eraseDown();
+    this.settings.tty.cursorLeft.eraseDown();
   }
 
   /** Execute the prompt. */
@@ -134,12 +153,15 @@ export abstract class GenericPrompt<
     const successMessage: string | undefined = this.success(
       this.#value,
     );
+
     if (successMessage) {
-      console.log(successMessage);
+      this.settings.writer.writeSync(
+        this.#encoder.encode(successMessage + "\n"),
+      );
     }
 
     GenericPrompt.injectedValue = undefined;
-    this.tty.cursorShow();
+    this.settings.tty.cursorShow();
 
     return this.#value;
   };
@@ -170,18 +192,12 @@ export abstract class GenericPrompt<
       this.clear();
     }
     this.#isFirstRun = false;
-
-    if (Deno.build.os === "windows") {
-      console.log(content);
-      this.tty.cursorUp();
-    } else {
-      Deno.stdout.writeSync(this.#encoder.encode(content));
-    }
+    this.settings.writer.writeSync(this.#encoder.encode(content));
 
     if (y) {
-      this.tty.cursorUp(y);
+      this.settings.tty.cursorUp(y);
     }
-    this.tty.cursorTo(this.cursor.x);
+    this.settings.tty.cursorTo(this.cursor.x);
   }
 
   /** Read user input from stdin, handle events and validate user input. */
@@ -262,7 +278,7 @@ export abstract class GenericPrompt<
     switch (true) {
       case event.name === "c" && event.ctrl:
         this.clear();
-        this.tty.cursorShow();
+        this.settings.tty.cursorShow();
         Deno.exit(130);
         return;
       case this.isKey(this.settings.keys, "submit", event):
@@ -304,19 +320,18 @@ export abstract class GenericPrompt<
   /** Read user input from stdin. */
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
-    const isTty = Deno.isatty(Deno.stdin.rid);
+    const isTty = Deno.isatty(this.settings.reader.rid);
 
     if (isTty) {
-      // cbreak is only supported on deno >= 1.6.0, suppress ts-error.
-      (Deno.stdin.setRaw as setRaw)(
+      this.settings.reader.setRaw(
         true,
-        { cbreak: this.settings.cbreak === true },
+        { cbreak: this.settings.cbreak },
       );
     }
-    const nread: number | null = await Deno.stdin.read(buffer);
+    const nread: number | null = await this.settings.reader.read(buffer);
 
     if (isTty) {
-      Deno.stdin.setRaw(false);
+      this.settings.reader.setRaw(false);
     }
 
     if (nread === null) {
@@ -393,17 +408,10 @@ export abstract class GenericPrompt<
   }
 }
 
-type setRaw = (
-  mode: boolean,
-  options?: { cbreak?: boolean },
-) => void;
-
 function getColumns(): number | null {
   try {
     // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
-    // And keep backwards compatibility for deno < 1.27.0.
-    // deno-lint-ignore no-explicit-any
-    return (Deno as any).consoleSize(Deno.stdout.rid).columns;
+    return Deno.consoleSize().columns ?? null;
   } catch (_error) {
     return null;
   }

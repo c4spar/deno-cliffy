@@ -26,8 +26,8 @@ Deno.test({
   fn() {
     assertEquals(
       typeof tty({
-        stdout: Deno.stdout,
-        stdin: Deno.stdin,
+        writer: Deno.stdout,
+        reader: Deno.stdin,
       })() === "function",
       true,
     );
