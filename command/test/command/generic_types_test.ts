@@ -518,9 +518,8 @@ import {
   Deno.test({
     name: "[command] - generic types - return types",
     fn() {
-      const colorType = new EnumType(["red", "blue"]);
       new Command()
-        .type("color", colorType)
+        .type("color", new EnumType(["red", "blue"]))
         .option("--num [val:number]", "")
         .option("--str [val:string]", "")
         .option("--bool [val:boolean]", "")

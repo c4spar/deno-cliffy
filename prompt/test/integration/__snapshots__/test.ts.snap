@@ -178,6 +178,16 @@ stderr:
 "
 `;
 
+snapshot[`prompt - integration - input output stream 1`] = `
+"stdout:
+
+stderr:
+? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar\\x1b[35G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar
+\\x1b[?25h\\x1b[?25h"
+`;
+
 snapshot[`prompt - integration - input prefix 1`] = `
 "stdout:
 PREFIX Whats your name? (foo) › \\x1b[33G\\x1b[G\\x1b[0J
@@ -245,6 +255,44 @@ snapshot[`prompt - integration - number decimal 1`] = `
 \\x1b[?25h\\x1b[?25h
 stderr:
 "
+`;
+
+snapshot[`prompt - integration - prompt list 1`] = `
+"stdout:
+
+stderr:
+? Select an option
+❯ ✘ Foo
+  ✘ Bar
+  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ Foo
+❯ ✘ Bar
+  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ Foo
+  ✘ Bar
+❯ ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ Foo
+  ✘ Bar
+❯ ✔ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option › Baz
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › f\\x1b[29G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › fo\\x1b[30G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo\\x1b[31G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please confirm (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) › Yes
+\\x1b[?25h\\x1b[?25h\\x1b[?25h"
 `;
 
 snapshot[`prompt - integration - secret 1`] = `
