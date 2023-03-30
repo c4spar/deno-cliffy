@@ -148,13 +148,11 @@ export abstract class GenericList<
   ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
-      listPointer: brightBlue(Figures.POINTER),
-      searchLabel: brightBlue(Figures.SEARCH),
-      backPointer: brightBlue(Figures.LEFT_POINTER),
-      maxBreadcrumbItems: 5,
-      breadcrumbSeparator: "›",
       ...settings,
-      groupPointer: options.groupPointer || options.listPointer ||
+      listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
+      searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
+      backPointer: options.backPointer ?? brightBlue(Figures.POINTER_LEFT),
+      groupPointer: options.groupPointer ?? options.listPointer ??
         brightBlue(Figures.POINTER),
       groupIcon: !groupIcon
         ? false
@@ -166,6 +164,8 @@ export abstract class GenericList<
         : typeof groupOpenIcon === "string"
         ? groupOpenIcon
         : Figures.FOLDER_OPEN,
+      maxBreadcrumbItems: options.maxBreadcrumbItems ?? 5,
+      breadcrumbSeparator: options.breadcrumbSeparator ?? "›",
       maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options, options.options),
       keys: {

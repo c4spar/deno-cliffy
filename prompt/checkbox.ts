@@ -89,7 +89,6 @@ export class Checkbox extends GenericList<
   protected listIndex: number;
   protected listOffset: number;
   private confirmSubmit = false;
-  private isConfirmationActive = false;
 
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: CheckboxOptions): Promise<Array<string>> {
