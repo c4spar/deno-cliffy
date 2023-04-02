@@ -4,7 +4,12 @@ import { Checkbox, CheckboxOptions } from "../../../checkbox.ts";
 import { Confirm } from "../../../confirm.ts";
 import { Input } from "../../../input.ts";
 import { Number } from "../../../number.ts";
-import { prompt, PromptMiddleware, PromptOptions } from "../../../prompt.ts";
+import {
+  MappedPromptOptions,
+  prompt,
+  PromptMiddleware,
+  PromptOptions,
+} from "../../../prompt.ts";
 import { Toggle } from "../../../toggle.ts";
 
 export const tests = import.meta.main ? null : {
@@ -63,16 +68,18 @@ if (import.meta.main) {
   }, {
     name: "number",
     type: Number,
-    message: "Enter a number",
+    message: ({ input }) => `Input is ${input}. Enter a number`,
+    default: ({ input }) => input?.length,
   }, {
     name: "confirm",
     type: Confirm,
     message: "Please confirm",
+    hint: "a hint",
   }, {
     name: "toggle",
     type: Toggle,
     message: "Please toggle",
-    hint: "some hint",
+    hint: ({ number }) => `number is ${number} some hint`,
     default: false,
   }, checkboxOptions], {
     reader: Deno.stdin,
@@ -92,12 +99,16 @@ if (import.meta.main) {
   assertType<
     IsExact<
       typeof checkboxOptions,
-      {
+      & {
         name: "checkbox";
         type: typeof Checkbox;
         before?: PromptMiddleware<{ checkbox?: Array<string>; input?: string }>;
         after?: PromptMiddleware<{ checkbox?: Array<string>; input?: string }>;
-      } & CheckboxOptions
+      }
+      & MappedPromptOptions<
+        CheckboxOptions,
+        { checkbox?: Array<string>; input?: string }
+      >
     >
   >(true);
 

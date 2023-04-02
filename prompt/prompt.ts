@@ -38,8 +38,18 @@ export type PromptOptions<
       before?: PromptMiddleware<Result>;
       after?: PromptMiddleware<Result>;
     }
-    & Parameters<TStaticPrompt["prompt"]>[0]
+    & MappedPromptOptions<Parameters<TStaticPrompt["prompt"]>[0], TResult>
   : never;
+
+export type MappedPromptOptions<TOptions, TResult> = {
+  [Key in keyof TOptions]: Key extends "message" | "default" | "hint" ? 
+      | TOptions[Key]
+      | ((
+        result: TResult,
+      ) => undefined extends TOptions[Key] ? TOptions[Key] | void
+        : TOptions[Key])
+    : TOptions[Key];
+};
 
 /**
  * Global prompt options used together with the `prompt()` method.
@@ -593,6 +603,15 @@ class PromptList {
         writer: this.options?.writer,
         cbreak: this.options?.cbreak,
         ...this.prompt,
+        message: typeof this.prompt.message === "function"
+          ? this.prompt.message(this.result)
+          : this.prompt.message,
+        default: typeof this.prompt.default === "function"
+          ? this.prompt.default(this.result)
+          : this.prompt.default,
+        hint: typeof this.prompt.hint === "function"
+          ? this.prompt.hint(this.result) ?? undefined
+          : this.prompt.hint,
       });
     } finally {
       this.tty.cursorShow();
