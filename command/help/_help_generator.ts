@@ -22,6 +22,8 @@ export interface HelpOptions {
   hints?: boolean;
   colors?: boolean;
   long?: boolean;
+  indent?: boolean;
+  compact?: boolean;
 }
 
 interface OptionGroup {
@@ -48,6 +50,8 @@ export class HelpGenerator {
       hints: true,
       colors: true,
       long: false,
+      indent: options.compact !== true,
+      compact: false,
       ...options,
     };
   }
@@ -66,7 +70,9 @@ export class HelpGenerator {
 
     setColorEnabled(areColorsEnabled);
 
-    return result;
+    return this.options.compact
+      ? result.replace(/^\n/, "").replace(/\n$/, "")
+      : result;
   }
 
   private generateHeader(): string {
@@ -86,7 +92,7 @@ export class HelpGenerator {
     }
     return "\n" +
       Table.from(rows)
-        .indent(this.indent)
+        .indent(this.options.indent ? this.indent : 0)
         .padding(1)
         .toString() +
       "\n";
@@ -105,7 +111,7 @@ export class HelpGenerator {
 
     return "\n" +
       Table.from(rows)
-        .indent(this.indent)
+        .indent(this.options.indent ? this.indent : 0)
         .padding(1)
         .toString() +
       "\n";
@@ -119,7 +125,7 @@ export class HelpGenerator {
       Table.from([
         [dedent(this.cmd.getDescription())],
       ])
-        .indent(this.indent * 2)
+        .indent(this.options.indent ? this.indent * 2 : this.indent)
         .maxColWidth(140)
         .padding(1)
         .toString() +
@@ -184,7 +190,7 @@ export class HelpGenerator {
           ]),
         ])
           .padding([2, 2, 1, 2])
-          .indent(this.indent * 2)
+          .indent(this.options.indent ? this.indent * 2 : this.indent)
           .maxColWidth([60, 60, 1, 80, 60])
           .toString() +
         "\n";
@@ -199,7 +205,7 @@ export class HelpGenerator {
           this.generateHints(option),
         ]),
       ])
-        .indent(this.indent * 2)
+        .indent(this.options.indent ? this.indent * 2 : this.indent)
         .maxColWidth([60, 1, 80, 60])
         .padding([2, 1, 2])
         .toString() +
@@ -231,7 +237,7 @@ export class HelpGenerator {
             command.getShortDescription(),
           ]),
         ])
-          .indent(this.indent * 2)
+          .indent(this.options.indent ? this.indent * 2 : this.indent)
           .maxColWidth([60, 60, 1, 80])
           .padding([2, 2, 1, 2])
           .toString() +
@@ -251,7 +257,7 @@ export class HelpGenerator {
       ])
         .maxColWidth([60, 1, 80])
         .padding([2, 1, 2])
-        .indent(this.indent * 2)
+        .indent(this.options.indent ? this.indent * 2 : this.indent)
         .toString() +
       "\n";
   }
@@ -277,7 +283,7 @@ export class HelpGenerator {
         ]),
       ])
         .padding([2, 2, 1, 2])
-        .indent(this.indent * 2)
+        .indent(this.options.indent ? this.indent * 2 : this.indent)
         .maxColWidth([60, 60, 1, 80, 10])
         .toString() +
       "\n";
@@ -294,7 +300,7 @@ export class HelpGenerator {
         dedent(example.description),
       ]))
         .padding(1)
-        .indent(this.indent * 2)
+        .indent(this.options.indent ? this.indent * 2 : this.indent)
         .maxColWidth(150)
         .toString() +
       "\n";
@@ -341,8 +347,8 @@ export class HelpGenerator {
 
   private label(label: string) {
     return "\n" +
-      " ".repeat(this.indent) + bold(`${label}:`) +
-      "\n\n";
+      " ".repeat(this.options.indent ? this.indent : 0) + bold(`${label}:`) +
+      "\n" + (this.options.compact ? "" : "\n");
   }
 }
 
