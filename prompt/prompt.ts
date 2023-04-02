@@ -452,7 +452,7 @@ export function prompt<
 ): Promise<TResult> {
   return new PromptList(
     prompts as Array<
-      PromptOptions<string, StaticGenericPrompt<any, any>>
+      PromptOptions<string, StaticGenericPrompt<unknown, unknown>>
     >,
     options,
   ).run(options?.initial) as Promise<TResult>;
@@ -465,13 +465,16 @@ class PromptList {
   private isInBeforeHook = false;
   private tty: Tty;
 
-  private get prompt(): PromptOptions<string, StaticGenericPrompt<any, any>> {
+  private get prompt(): PromptOptions<
+    string,
+    StaticGenericPrompt<unknown, unknown>
+  > {
     return this.prompts[this.index];
   }
 
   public constructor(
     private prompts: Array<
-      PromptOptions<string, StaticGenericPrompt<any, any>>
+      PromptOptions<string, StaticGenericPrompt<unknown, unknown>>
     >,
     private options?: GlobalPromptOptions<any>,
   ) {
@@ -574,7 +577,7 @@ class PromptList {
   }
 
   private async runPrompt(): Promise<void> {
-    const prompt: StaticGenericPrompt<any, any> = this.prompt.type;
+    const prompt: StaticGenericPrompt<unknown, unknown> = this.prompt.type;
 
     if (typeof injected[this.prompt.name] !== "undefined") {
       if (prompt.inject) {

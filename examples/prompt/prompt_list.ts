@@ -6,7 +6,11 @@ import { Number } from "../../prompt/number.ts";
 import { Confirm } from "../../prompt/confirm.ts";
 import { Checkbox } from "../../prompt/checkbox.ts";
 
-const animalsPrompt: PromptOptions<"animals", typeof Checkbox, { name?: string }> = {
+const animalsPrompt: PromptOptions<
+  "animals",
+  typeof Checkbox,
+  { name?: string }
+> = {
   name: "animals",
   message: "Select some animals",
   type: Checkbox,
