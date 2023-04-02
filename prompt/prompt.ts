@@ -451,7 +451,9 @@ export function prompt<
   options?: GlobalPromptOptions<TResult>,
 ): Promise<TResult> {
   return new PromptList(
-    prompts as Array<any>,
+    prompts as Array<
+      PromptOptions<string, StaticGenericPrompt<any, any>>
+    >,
     options,
   ).run(options?.initial) as Promise<TResult>;
 }
