@@ -7,68 +7,197 @@ import {
   StaticGenericPrompt,
 } from "./_generic_prompt.ts";
 
-type Next<TName extends keyof any> = (
-  next?: TName | number | true | null,
-) => Promise<void>;
-
-type PromptOptions<
+/**
+ * Prompt options used together with the `prompt()` method.
+ *
+ * ```ts
+ * import { PromptOptions } from "./prompt.ts";
+ * import { Checkbox } from "./checkbox.ts";
+ *
+ * const options: PromptOptions<"color", typeof Checkbox> = {
+ *   name: "color",
+ *   message: "Select a color",
+ *   type: Checkbox,
+ *   options: ["red", "green", "blue"],
+ * };
+ * ```
+ */
+export type PromptOptions<
   TName extends string,
-  TStaticPrompt extends StaticGenericPrompt<any, any, any> | void,
-  TResult,
-  TOptions = TStaticPrompt extends StaticGenericPrompt<any, any, any>
-    ? Parameters<TStaticPrompt["prompt"]>[0]
-    : never,
-> = TStaticPrompt extends StaticGenericPrompt<any, any, any> ? 
+  TStaticPrompt extends StaticGenericPrompt<any, any>,
+  TResult extends
+    & PromptResult<TName, TStaticPrompt>
+    & Record<string, unknown> = PromptResult<
+      TName,
+      TStaticPrompt
+    >,
+> = Id<TResult & PromptResult<TName, TStaticPrompt>> extends infer Result ? 
     & {
       name: TName;
       type: TStaticPrompt;
       before?: (
-        opts: TResult,
-        next: Next<Exclude<keyof TResult, symbol>>,
+        result: Result,
+        next: Next<Exclude<keyof Result, symbol>>,
       ) => void | Promise<void>;
       after?: (
-        opts: TResult,
-        next: Next<Exclude<keyof TResult, symbol>>,
+        result: Result,
+        next: Next<Exclude<keyof Result, symbol>>,
       ) => void | Promise<void>;
     }
-    // exclude none options parameter
-    & (TOptions extends GenericPromptOptions<any, any> ? TOptions : {})
+    & Parameters<TStaticPrompt["prompt"]>[0]
   : never;
 
-type PromptResult<
-  N extends string,
-  G extends StaticGenericPrompt<any, any, any> | void,
-> = G extends StaticGenericPrompt<any, any, any> ? {
-    [K in N]?: Awaited<ReturnType<G["prompt"]>>;
-  }
-  : {};
-
-interface PromptListOptions<R, N extends keyof R = keyof R> {
+/**
+ * Global prompt options used together with the `prompt()` method.
+ *
+ * ```ts
+ * import { PromptOptions } from "./prompt.ts";
+ * import { Checkbox } from "./checkbox.ts";
+ *
+ * const options: PromptOptions<"color", typeof Checkbox> = {
+ *   name: "color",
+ *   message: "Select a color",
+ *   type: Checkbox,
+ *   options: ["red", "green", "blue"],
+ * };
+ * ```
+ */
+export interface GlobalPromptOptions<TResult> {
   cbreak?: boolean;
-  before?: (
-    name: N,
-    opts: R,
-    next: Next<Exclude<N, symbol>>,
-  ) => void | Promise<void>;
-  after?: (
-    name: N,
-    opts: R,
-    next: Next<Exclude<N, symbol>>,
-  ) => void | Promise<void>;
+  before?: PromptMiddleware<TResult>;
+  after?: PromptMiddleware<TResult>;
   reader?: GenericPromptOptions<unknown, unknown>["reader"];
   writer?: GenericPromptOptions<unknown, unknown>["writer"];
+  initial?: keyof TResult extends infer U ? Extract<U, string> : never;
 }
 
-/** Global prompt options. */
-export interface GlobalPromptOptions<R, N extends keyof R = keyof R>
-  extends PromptListOptions<R, N> {
-  initial?: N extends symbol ? never : N;
-}
+/**
+ * Prompt middleware function.
+ *
+ * ```ts
+ * import { prompt } from "./prompt.ts";
+ * import { Input } from "./input.ts";
+ *
+ * const result = await prompt([{
+ *   name: "name",
+ *   message: "Project name",
+ *   type: Input,
+ *   async after({ name }, next) {
+ *     // name prompt executed.
+ *     await next();
+ *     // path prompt executed.
+ *   }
+ * }, {
+ *   name: "path",
+ *   message: "Project path",
+ *   type: Input,
+ *   async before({ name }, next) {
+ *     // name prompt executed.
+ *     await next();
+ *     // path prompt executed.
+ *   }
+ * }]);
+ * ```
+ */
+export type PromptMiddleware<TResult> = (
+  name: keyof TResult,
+  result: TResult,
+  next: Next<Exclude<keyof TResult, symbol>>,
+) => void | Promise<void>;
+
+/** Runs the next prompt. */
+export type Next<TName extends keyof any> = (
+  next?: TName | number | true | null,
+) => Promise<void>;
+
+/** Single prompt result. */
+type PromptResult<
+  TName extends string,
+  TStaticPrompt extends StaticGenericPrompt<any, any> | void,
+> = string extends TName ? {}
+  : TStaticPrompt extends StaticGenericPrompt<any, any> ? {
+      [Key in TName]?: Awaited<ReturnType<TStaticPrompt["prompt"]>>;
+    }
+  : {};
 
 type Id<T> = T extends Record<string, unknown>
   ? T extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : T;
 
+let injected: Record<string, any> = {};
+
+/**
+ * Inject prompt values. Can be used for unit tests.
+ *
+ * In the following example, the `prompt()` method only asks for the color.
+ * The values for `name' and `age' are selected from the values injected by the
+ * `inject()' method and the prompts are skipped.
+ *
+ * ```ts
+ * import { inject, prompt } from "./prompt.ts";
+ * import { Input } from "./input.ts";
+ * import { Number } from "./number.ts";
+ * import { Confirm } from "./confirm.ts";
+ * import { Checkbox } from "./checkbox.ts";
+ *
+ * inject({
+ *   name: "Joe",
+ *   age: 34,
+ * });
+ *
+ * const result = await prompt([{
+ *   name: "name",
+ *   message: "What's your name?",
+ *   type: Input,
+ * }, {
+ *   name: "age",
+ *   message: "How old are you?",
+ *   type: Confirm,
+ * }, {
+ *   name: "color",
+ *   message: "Whats your favorit color?",
+ *   type: Checkbox,
+ *   options: ["red", "green", "blue"],
+ * }]);
+ * ```
+ * @param values Input values object.
+ */
+export function inject(values: Record<string, any>): void {
+  injected = values;
+}
+
+/**
+ * Runs an array of prompts.
+ *
+ * ```ts
+ * import { prompt } from "./prompt.ts";
+ * import { Input } from "./input.ts";
+ * import { Confirm } from "./confirm.ts";
+ * import { Checkbox } from "./checkbox.ts";
+ *
+ * const result = await prompt([{
+ *   name: "name",
+ *   message: "What's your name?",
+ *   type: Input,
+ * }, {
+ *   name: "age",
+ *   message: "How old are you?",
+ *   type: Confirm,
+ * }, {
+ *   name: "color",
+ *   message: "Whats your favorit color?",
+ *   type: Checkbox,
+ *   options: ["red", "green", "blue"],
+ * }]);
+ *
+ * console.log(result);
+ * ```
+ *
+ * @param prompts Array of prompt options.
+ * @param options Global prompt options.
+ *
+ * @returns Returns an object with the result of all prompts.
+ */
 export function prompt<
   TName0 extends string,
   TName1 extends string,
@@ -119,75 +248,29 @@ export function prompt<
   TOptions22 extends GenericPromptOptions<any, any>,
   TOptions23 extends GenericPromptOptions<any, any>,
   TStaticPrompt0 extends StaticGenericPrompt<any, any, TOptions0>,
-  TStaticPrompt1 extends
-    | StaticGenericPrompt<any, any, TOptions1>
-    | void = void,
-  TStaticPrompt2 extends
-    | StaticGenericPrompt<any, any, TOptions2>
-    | void = void,
-  TStaticPrompt3 extends
-    | StaticGenericPrompt<any, any, TOptions3>
-    | void = void,
-  TStaticPrompt4 extends
-    | StaticGenericPrompt<any, any, TOptions4>
-    | void = void,
-  TStaticPrompt5 extends
-    | StaticGenericPrompt<any, any, TOptions5>
-    | void = void,
-  TStaticPrompt6 extends
-    | StaticGenericPrompt<any, any, TOptions6>
-    | void = void,
-  TStaticPrompt7 extends
-    | StaticGenericPrompt<any, any, TOptions7>
-    | void = void,
-  TStaticPrompt8 extends
-    | StaticGenericPrompt<any, any, TOptions8>
-    | void = void,
-  TStaticPrompt9 extends
-    | StaticGenericPrompt<any, any, TOptions9>
-    | void = void,
-  TStaticPrompt10 extends
-    | StaticGenericPrompt<any, any, TOptions10>
-    | void = void,
-  TStaticPrompt11 extends
-    | StaticGenericPrompt<any, any, TOptions11>
-    | void = void,
-  TStaticPrompt12 extends
-    | StaticGenericPrompt<any, any, TOptions12>
-    | void = void,
-  TStaticPrompt13 extends
-    | StaticGenericPrompt<any, any, TOptions13>
-    | void = void,
-  TStaticPrompt14 extends
-    | StaticGenericPrompt<any, any, TOptions14>
-    | void = void,
-  TStaticPrompt15 extends
-    | StaticGenericPrompt<any, any, TOptions15>
-    | void = void,
-  TStaticPrompt16 extends
-    | StaticGenericPrompt<any, any, TOptions16>
-    | void = void,
-  TStaticPrompt17 extends
-    | StaticGenericPrompt<any, any, TOptions17>
-    | void = void,
-  TStaticPrompt18 extends
-    | StaticGenericPrompt<any, any, TOptions18>
-    | void = void,
-  TStaticPrompt19 extends
-    | StaticGenericPrompt<any, any, TOptions19>
-    | void = void,
-  TStaticPrompt20 extends
-    | StaticGenericPrompt<any, any, TOptions20>
-    | void = void,
-  TStaticPrompt21 extends
-    | StaticGenericPrompt<any, any, TOptions21>
-    | void = void,
-  TStaticPrompt22 extends
-    | StaticGenericPrompt<any, any, TOptions22>
-    | void = void,
-  TStaticPrompt23 extends
-    | StaticGenericPrompt<any, any, TOptions23>
-    | void = void,
+  TStaticPrompt1 extends StaticGenericPrompt<any, any, TOptions1>,
+  TStaticPrompt2 extends StaticGenericPrompt<any, any, TOptions2>,
+  TStaticPrompt3 extends StaticGenericPrompt<any, any, TOptions3>,
+  TStaticPrompt4 extends StaticGenericPrompt<any, any, TOptions4>,
+  TStaticPrompt5 extends StaticGenericPrompt<any, any, TOptions5>,
+  TStaticPrompt6 extends StaticGenericPrompt<any, any, TOptions6>,
+  TStaticPrompt7 extends StaticGenericPrompt<any, any, TOptions7>,
+  TStaticPrompt8 extends StaticGenericPrompt<any, any, TOptions8>,
+  TStaticPrompt9 extends StaticGenericPrompt<any, any, TOptions9>,
+  TStaticPrompt10 extends StaticGenericPrompt<any, any, TOptions10>,
+  TStaticPrompt11 extends StaticGenericPrompt<any, any, TOptions11>,
+  TStaticPrompt12 extends StaticGenericPrompt<any, any, TOptions12>,
+  TStaticPrompt13 extends StaticGenericPrompt<any, any, TOptions13>,
+  TStaticPrompt14 extends StaticGenericPrompt<any, any, TOptions14>,
+  TStaticPrompt15 extends StaticGenericPrompt<any, any, TOptions15>,
+  TStaticPrompt16 extends StaticGenericPrompt<any, any, TOptions16>,
+  TStaticPrompt17 extends StaticGenericPrompt<any, any, TOptions17>,
+  TStaticPrompt18 extends StaticGenericPrompt<any, any, TOptions18>,
+  TStaticPrompt19 extends StaticGenericPrompt<any, any, TOptions19>,
+  TStaticPrompt20 extends StaticGenericPrompt<any, any, TOptions20>,
+  TStaticPrompt21 extends StaticGenericPrompt<any, any, TOptions21>,
+  TStaticPrompt22 extends StaticGenericPrompt<any, any, TOptions22>,
+  TStaticPrompt23 extends StaticGenericPrompt<any, any, TOptions23>,
   TResult = Id<
     & PromptResult<TName0, TStaticPrompt0>
     & PromptResult<TName1, TStaticPrompt1>
@@ -214,46 +297,135 @@ export function prompt<
     & PromptResult<TName22, TStaticPrompt22>
     & PromptResult<TName23, TStaticPrompt23>
   >,
->(prompts: [
-  PromptOptions<TName0, TStaticPrompt0, TResult>,
-  PromptOptions<TName1, TStaticPrompt1, TResult>?,
-  PromptOptions<TName2, TStaticPrompt2, TResult>?,
-  PromptOptions<TName3, TStaticPrompt3, TResult>?,
-  PromptOptions<TName4, TStaticPrompt4, TResult>?,
-  PromptOptions<TName5, TStaticPrompt5, TResult>?,
-  PromptOptions<TName6, TStaticPrompt6, TResult>?,
-  PromptOptions<TName7, TStaticPrompt7, TResult>?,
-  PromptOptions<TName8, TStaticPrompt8, TResult>?,
-  PromptOptions<TName9, TStaticPrompt9, TResult>?,
-  PromptOptions<TName10, TStaticPrompt10, TResult>?,
-  PromptOptions<TName11, TStaticPrompt11, TResult>?,
-  PromptOptions<TName12, TStaticPrompt12, TResult>?,
-  PromptOptions<TName13, TStaticPrompt13, TResult>?,
-  PromptOptions<TName14, TStaticPrompt14, TResult>?,
-  PromptOptions<TName15, TStaticPrompt15, TResult>?,
-  PromptOptions<TName16, TStaticPrompt16, TResult>?,
-  PromptOptions<TName17, TStaticPrompt17, TResult>?,
-  PromptOptions<TName18, TStaticPrompt18, TResult>?,
-  PromptOptions<TName19, TStaticPrompt19, TResult>?,
-  PromptOptions<TName20, TStaticPrompt20, TResult>?,
-  PromptOptions<TName21, TStaticPrompt21, TResult>?,
-  PromptOptions<TName22, TStaticPrompt22, TResult>?,
-  PromptOptions<TName23, TStaticPrompt23, TResult>?,
-], options?: GlobalPromptOptions<TResult>): Promise<TResult> {
+>(
+  prompts: [
+    PromptOptions<
+      TName0,
+      TStaticPrompt0,
+      TResult & PromptResult<TName0, TStaticPrompt0>
+    >,
+    PromptOptions<
+      TName1,
+      TStaticPrompt1,
+      TResult & PromptResult<TName1, TStaticPrompt1>
+    >?,
+    PromptOptions<
+      TName2,
+      TStaticPrompt2,
+      TResult & PromptResult<TName2, TStaticPrompt2>
+    >?,
+    PromptOptions<
+      TName3,
+      TStaticPrompt3,
+      TResult & PromptResult<TName3, TStaticPrompt3>
+    >?,
+    PromptOptions<
+      TName4,
+      TStaticPrompt4,
+      TResult & PromptResult<TName4, TStaticPrompt4>
+    >?,
+    PromptOptions<
+      TName5,
+      TStaticPrompt5,
+      TResult & PromptResult<TName5, TStaticPrompt5>
+    >?,
+    PromptOptions<
+      TName6,
+      TStaticPrompt6,
+      TResult & PromptResult<TName6, TStaticPrompt6>
+    >?,
+    PromptOptions<
+      TName7,
+      TStaticPrompt7,
+      TResult & PromptResult<TName7, TStaticPrompt7>
+    >?,
+    PromptOptions<
+      TName8,
+      TStaticPrompt8,
+      TResult & PromptResult<TName8, TStaticPrompt8>
+    >?,
+    PromptOptions<
+      TName9,
+      TStaticPrompt9,
+      TResult & PromptResult<TName9, TStaticPrompt9>
+    >?,
+    PromptOptions<
+      TName10,
+      TStaticPrompt10,
+      TResult & PromptResult<TName10, TStaticPrompt10>
+    >?,
+    PromptOptions<
+      TName11,
+      TStaticPrompt11,
+      TResult & PromptResult<TName11, TStaticPrompt11>
+    >?,
+    PromptOptions<
+      TName12,
+      TStaticPrompt12,
+      TResult & PromptResult<TName12, TStaticPrompt12>
+    >?,
+    PromptOptions<
+      TName13,
+      TStaticPrompt13,
+      TResult & PromptResult<TName13, TStaticPrompt13>
+    >?,
+    PromptOptions<
+      TName14,
+      TStaticPrompt14,
+      TResult & PromptResult<TName14, TStaticPrompt14>
+    >?,
+    PromptOptions<
+      TName15,
+      TStaticPrompt15,
+      TResult & PromptResult<TName15, TStaticPrompt15>
+    >?,
+    PromptOptions<
+      TName16,
+      TStaticPrompt16,
+      TResult & PromptResult<TName16, TStaticPrompt16>
+    >?,
+    PromptOptions<
+      TName17,
+      TStaticPrompt17,
+      TResult & PromptResult<TName17, TStaticPrompt17>
+    >?,
+    PromptOptions<
+      TName18,
+      TStaticPrompt18,
+      TResult & PromptResult<TName18, TStaticPrompt18>
+    >?,
+    PromptOptions<
+      TName19,
+      TStaticPrompt19,
+      TResult & PromptResult<TName19, TStaticPrompt19>
+    >?,
+    PromptOptions<
+      TName20,
+      TStaticPrompt20,
+      TResult & PromptResult<TName20, TStaticPrompt20>
+    >?,
+    PromptOptions<
+      TName21,
+      TStaticPrompt21,
+      TResult & PromptResult<TName21, TStaticPrompt21>
+    >?,
+    PromptOptions<
+      TName22,
+      TStaticPrompt22,
+      TResult & PromptResult<TName22, TStaticPrompt22>
+    >?,
+    PromptOptions<
+      TName23,
+      TStaticPrompt23,
+      TResult & PromptResult<TName23, TStaticPrompt23>
+    >?,
+  ],
+  options?: GlobalPromptOptions<TResult>,
+): Promise<TResult> {
   return new PromptList(
-    prompts as PromptOptions<any, any, any, any>,
-    options as PromptListOptions<any>,
+    prompts as Array<any>,
+    options,
   ).run(options?.initial) as Promise<TResult>;
-}
-
-let injected: Record<string, any> = {};
-
-/**
- * Inject prompt values. Can be used for unit tests or pre selections.
- * @param values Input values object.
- */
-export function inject(values: Record<string, any>): void {
-  injected = values;
 }
 
 class PromptList {
@@ -263,13 +435,15 @@ class PromptList {
   private isInBeforeHook = false;
   private tty: Tty;
 
-  private get prompt(): PromptOptions<string, any, any> {
+  private get prompt(): PromptOptions<string, StaticGenericPrompt<any, any>> {
     return this.prompts[this.index];
   }
 
   public constructor(
-    private prompts: Array<PromptOptions<string, any, any>>,
-    private options?: PromptListOptions<any>,
+    private prompts: Array<
+      PromptOptions<string, StaticGenericPrompt<any, any>>
+    >,
+    private options?: GlobalPromptOptions<any>,
   ) {
     this.names = this.prompts.map((prompt) => prompt.name);
     this.tty = tty({
@@ -370,7 +544,7 @@ class PromptList {
   }
 
   private async runPrompt(): Promise<void> {
-    const prompt: StaticGenericPrompt<any, any, any> = this.prompt.type;
+    const prompt: StaticGenericPrompt<any, any> = this.prompt.type;
 
     if (typeof injected[this.prompt.name] !== "undefined") {
       if (prompt.inject) {
