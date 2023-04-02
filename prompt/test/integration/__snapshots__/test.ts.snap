@@ -168,10 +168,33 @@ stderr:
 `;
 
 snapshot[`prompt - integration - prompt list 1`] = `
-"stdout:
+'stdout:
+[checkbox:before] input is: foo
+{ input: "foo", number: 43, confirm: true, toggle: true, checkbox: [ "bar", "baz" ] }
 
 stderr:
-? Select an option
+? Enter some text (default value) › \\x1b[37G\\x1b[G\\x1b[0J
+? Enter some text (default value) › f\\x1b[38G\\x1b[G\\x1b[0J
+? Enter some text (default value) › fo\\x1b[39G\\x1b[G\\x1b[0J
+? Enter some text (default value) › foo\\x1b[40G\\x1b[G\\x1b[0J
+? Enter some text (default value) › foo
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Enter a number › \\x1b[20G\\x1b[G\\x1b[0J
+? Enter a number › 4\\x1b[21G\\x1b[G\\x1b[0J
+? Enter a number › 43\\x1b[22G\\x1b[G\\x1b[0J
+? Enter a number › 43
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please confirm (y/n) › \\x1b[26G\\x1b[G\\x1b[0J
+? Please confirm (y/n) › yes\\x1b[27G\\x1b[G\\x1b[0J
+? Please confirm (y/n) › Yes
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please toggle (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please toggle (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please toggle (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please toggle (No) › No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please toggle (No) › Yes
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Select an option
 ❯ ✘ Foo
   ✘ Bar
   ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
@@ -181,28 +204,18 @@ stderr:
   ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ Foo
-  ✘ Bar
+❯ ✔ Bar
+  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ Foo
+  ✔ Bar
 ❯ ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ Foo
-  ✘ Bar
+  ✔ Bar
 ❯ ✔ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
-? Select an option › Baz
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
-? Whats your name? (foo) › f\\x1b[29G\\x1b[G\\x1b[0J
-? Whats your name? (foo) › fo\\x1b[30G\\x1b[G\\x1b[0J
-? Whats your name? (foo) › foo\\x1b[31G\\x1b[G\\x1b[0J
-? Whats your name? (foo) › foo
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please confirm (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Please confirm (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Please confirm (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Please confirm (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Please confirm (No) › Yes
-\\x1b[?25h\\x1b[?25h\\x1b[?25h"
+? Select an option › Bar, Baz
+\\x1b[?25h\\x1b[?25h\\x1b[?25h'
 `;
 
 snapshot[`prompt - integration - secret 1`] = `

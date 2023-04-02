@@ -17,7 +17,8 @@ import { Figures } from "./figures.ts";
 export interface StaticGenericPrompt<
   TValue,
   TRawValue,
-  TOptions extends GenericPromptOptions<TValue, TRawValue>,
+  TOptions extends GenericPromptOptions<TValue, TRawValue> =
+    GenericPromptOptions<TValue, TRawValue>,
 > {
   inject?(value: TValue): void;
 
