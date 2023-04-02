@@ -35,14 +35,8 @@ export type PromptOptions<
     & {
       name: TName;
       type: TStaticPrompt;
-      before?: (
-        result: Result,
-        next: Next<Exclude<keyof Result, symbol>>,
-      ) => void | Promise<void>;
-      after?: (
-        result: Result,
-        next: Next<Exclude<keyof Result, symbol>>,
-      ) => void | Promise<void>;
+      before?: PromptMiddleware<Result>;
+      after?: PromptMiddleware<Result>;
     }
     & Parameters<TStaticPrompt["prompt"]>[0]
   : never;
@@ -64,8 +58,8 @@ export type PromptOptions<
  */
 export interface GlobalPromptOptions<TResult> {
   cbreak?: boolean;
-  before?: PromptMiddleware<TResult>;
-  after?: PromptMiddleware<TResult>;
+  before?: GlobalPromptMiddleware<TResult>;
+  after?: GlobalPromptMiddleware<TResult>;
   reader?: GenericPromptOptions<unknown, unknown>["reader"];
   writer?: GenericPromptOptions<unknown, unknown>["writer"];
   initial?: keyof TResult extends infer U ? Extract<U, string> : never;
@@ -100,6 +94,40 @@ export interface GlobalPromptOptions<TResult> {
  * ```
  */
 export type PromptMiddleware<TResult> = (
+  result: TResult,
+  next: Next<Exclude<keyof TResult, symbol>>,
+) => void | Promise<void>;
+
+/**
+ * Prompt middleware function.
+ *
+ * ```ts
+ * import { prompt } from "./prompt.ts";
+ * import { Input } from "./input.ts";
+ *
+ * const result = await prompt([{
+ *   name: "name",
+ *   message: "Project name",
+ *   type: Input,
+ * }, {
+ *   name: "path",
+ *   message: "Project path",
+ *   type: Input,
+ * }], {
+ *   async before(promptName, { name }, next) {
+ *     // do something before {promptName} excution.
+ *     await next();
+ *     // all prompts executed.
+ *   },
+ *   async after(promptName, { name }, next) {
+ *     // do something after {promptName} excution.
+ *     await next();
+ *     // all prompts executed.
+ *   }
+ * });
+ * ```
+ */
+export type GlobalPromptMiddleware<TResult> = (
   name: keyof TResult,
   result: TResult,
   next: Next<Exclude<keyof TResult, symbol>>,
