@@ -5,7 +5,6 @@ await assertPromptSnapshot({
   name: "input prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  args: [],
   steps: {
     "should enter som text": ["foo bar", "\n"],
   },
