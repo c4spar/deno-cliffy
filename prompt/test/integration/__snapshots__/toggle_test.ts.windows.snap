@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - toggle_test.ts 1`] = `
+snapshot[`toggle prompt > should toggle the prompt 1`] = `
 "stdout:
 ? Please confirm (No) » No / Yes
 ❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J

@@ -2,9 +2,10 @@ import { Input } from "../../input.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "input prompt without prefix",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should disable prefix": ["bar", "\n"],
   },
   async fn() {

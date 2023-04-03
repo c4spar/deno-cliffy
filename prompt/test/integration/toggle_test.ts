@@ -2,9 +2,10 @@ import { Toggle } from "../../toggle.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "toggle prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should toggle the prompt": ["y", "n", "y", "\n"],
   },
   async fn() {

@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - input_no_location_flag_test.ts 1`] = `
+snapshot[`input prompt with no location flag > should work without --location flag 1`] = `
 "stdout:
 ? Works without --location? (hope so) › \\x1b[41G\\x1b[G\\x1b[0J
 ? Works without --location? (hope so) › yes\\x1b[44G\\x1b[G\\x1b[0J

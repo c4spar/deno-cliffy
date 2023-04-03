@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - input_prefix_test.ts 1`] = `
+snapshot[`input prompt with prefix > should change prefix 1`] = `
 "stdout:
 PREFIX Whats your name? (foo) › \\x1b[33G\\x1b[G\\x1b[0J
 PREFIX Whats your name? (foo) › bar\\x1b[36G\\x1b[G\\x1b[0J

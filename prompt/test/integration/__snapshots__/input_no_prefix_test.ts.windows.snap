@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - input_no_prefix_test.ts 1`] = `
+snapshot[`input prompt without prefix > should disable prefix 1`] = `
 "stdout:
 Whats your name? (foo) » \\x1b[26G\\x1b[G\\x1b[0J
 Whats your name? (foo) » bar\\x1b[29G\\x1b[G\\x1b[0J

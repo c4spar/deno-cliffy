@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - number_test.ts 1`] = `
+snapshot[`number prompt > should enter a number 1`] = `
 "stdout:
 ? How old are you? (7) › \\x1b[26G\\x1b[G\\x1b[0J
 ? How old are you? (7) › 19\\x1b[28G\\x1b[G\\x1b[0J

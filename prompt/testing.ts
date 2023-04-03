@@ -4,26 +4,34 @@ import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { basename } from "./deps.ts";
 
 export interface AssertPromptSnapshotOptions {
+  /** Test name. */
+  name: string;
+  /** Import meta. Required to determine the import url of the test file. */
   meta: ImportMeta;
-  tests: Record<string, Array<string>>;
-  osSuffix?: Array<typeof Deno.build.os>;
-  args?: Array<string>;
+  /**
+   * Object of test steps. Key is the test name and the value is an array of
+   * input sequences/characters.
+   */
+  steps: Record<string, Array<string>>;
+  /** Test function. */
   fn(): Promise<unknown>;
+  /**
+   * Operating system snapshot suffix. This is useful when your test produces
+   * different output on different operating systems.
+   */
+  osSuffix?: Array<typeof Deno.build.os>;
+  /**
+   * Arguments passed to the `deno test` command when executing the snapshot
+   * tests. `--allow-env=__CLIFFY_TEST_NAME__` is passed by default.
+   */
+  args?: Array<string>;
+  /**
+   * Enable/disable colors. Default is `false`.
+   */
+  colors?: boolean;
 }
 
 const encoder = new TextEncoder();
-
-/** Run prompt snapshot tests. */
-export function assertPromptSnapshot(
-  options: AssertPromptSnapshotOptions,
-): Promise<void>;
-
-/** Run prompt snapshot tests. */
-export function assertPromptSnapshot(
-  meta: ImportMeta,
-  tests: Record<string, Array<string>>,
-  fn: () => Promise<unknown>,
-): Promise<void>;
 
 /**
  * Run prompt snapshot tests.
@@ -33,8 +41,11 @@ export function assertPromptSnapshot(
  * import { Input } from "./input.ts";
  *
  * await assertPromptSnapshot({
+ *   name: "test name",
  *   meta: import.meta,
- *   tests: {
+ *   osSuffix: ["windows"],
+ *   args: [],
+ *   steps: {
  *     "should enter som text": ["foo bar", "\n"],
  *   },
  *   async fn() {
@@ -46,26 +57,16 @@ export function assertPromptSnapshot(
  * });
  * ```
  *
- * @param optionsOrMeta import.meta
- * @param tests         Object of tests. Key is the test name and the value is
- *                      an array of input sequences/characters.
- * @param fn            Test function.
+ * @param options Test options
  */
 export async function assertPromptSnapshot(
-  optionsOrMeta: AssertPromptSnapshotOptions | ImportMeta,
-  tests?: Record<string, Array<string>>,
-  fn?: () => Promise<unknown>,
+  options: AssertPromptSnapshotOptions,
 ): Promise<void> {
-  const options: AssertPromptSnapshotOptions = "meta" in optionsOrMeta
-    ? optionsOrMeta
-    : {
-      meta: optionsOrMeta,
-      tests: tests!,
-      fn: fn!,
-    };
-
   if (options.meta.main) {
-    await options.fn();
+    const testName = Deno.env.get("__CLIFFY_TEST_NAME__");
+    if (testName === options.name) {
+      await options.fn();
+    }
   } else {
     registerTest(options);
   }
@@ -75,9 +76,9 @@ function registerTest(options: AssertPromptSnapshotOptions) {
   const fileName = basename(options.meta.url);
 
   Deno.test({
-    name: `assert prompt snapshot - ${fileName}`,
+    name: options.name,
     async fn(ctx) {
-      const tests = Object.entries(options.tests ?? {});
+      const tests = Object.entries(options.steps ?? {});
       if (!tests.length) {
         throw new Error(`No tests defined for: ${options.meta.url}`);
       }
@@ -85,13 +86,13 @@ function registerTest(options: AssertPromptSnapshotOptions) {
       for (const [name, inputs] of tests) {
         await ctx.step({
           name,
-          async fn() {
-            const output: string = await runPrompt(options.meta.url, inputs, options.args);
+          async fn(stepCtx) {
+            const output: string = await runPrompt(inputs, options);
             const suffix = options.osSuffix?.includes(Deno.build.os)
               ? `.${Deno.build.os}`
               : "";
 
-            await assertSnapshot(ctx, output, {
+            await assertSnapshot(stepCtx, output, {
               path: `__snapshots__/${fileName}${suffix}.snap`,
             });
           },
@@ -102,46 +103,57 @@ function registerTest(options: AssertPromptSnapshotOptions) {
 }
 
 async function runPrompt(
-  url: string,
   inputs: Array<string>,
-  args?: Array<string>,
+  options: AssertPromptSnapshotOptions,
 ): Promise<string> {
-  const cmd = new Deno.Command("deno", {
-    stdin: "piped",
-    stdout: "piped",
-    stderr: "piped",
-    args: [
-      "run",
-      ...args ?? [],
-      url,
-    ],
-    env: {
-      NO_COLOR: "true",
-    },
-  });
-  const child: Deno.ChildProcess = cmd.spawn();
-  const writer = child.stdin.getWriter();
+  try {
+    const cmd = new Deno.Command("deno", {
+      stdin: "piped",
+      stdout: "piped",
+      stderr: "piped",
+      args: [
+        "run",
+        "--allow-env=__CLIFFY_TEST_NAME__",
+        ...options.args ?? [],
+        options.meta.url,
+      ],
+      env: {
+        __CLIFFY_TEST_NAME__: options.name ?? "",
+        NO_COLOR: options.colors ? "false" : "true",
+      },
+    });
+    const child: Deno.ChildProcess = cmd.spawn();
+    const writer = child.stdin.getWriter();
 
-  for (const input of inputs) {
-    await writer.write(encoder.encode(input));
-    // Ensure all inputs are processed and rendered separately.
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    for (const input of inputs) {
+      await writer.write(encoder.encode(input));
+      // Ensure all inputs are processed and rendered separately.
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
+
+    const { success, stdout, stderr, code } = await child.output();
+    writer.releaseLock();
+    await child.stdin.close();
+
+    if (!success) {
+      throw new Error(
+        `Test command failed with a none zero exit code: ${code}. ${stderr}`,
+      );
+    }
+
+    // Add a line break after each test input.
+    return "stdout:\n" + new TextDecoder().decode(stdout).replaceAll(
+      eraseDown(),
+      eraseDown() + "\n",
+    ) + "\nstderr:\n" + new TextDecoder().decode(stderr).replaceAll(
+      eraseDown(),
+      eraseDown() + "\n",
+    );
+  } catch (error: unknown) {
+    const assertionError = new AssertionError(
+      `Test failed: ${options.meta.url}`,
+    );
+    assertionError.cause = error;
+    throw error;
   }
-
-  const { success, stdout, stderr } = await child.output();
-  writer.releaseLock();
-  await child.stdin.close();
-
-  if (!success) {
-    throw new AssertionError(`test failed: ${url}`);
-  }
-
-  // Add a line break after each test input.
-  return "stdout:\n" + new TextDecoder().decode(stdout).replaceAll(
-    eraseDown(),
-    eraseDown() + "\n",
-  ) + "\nstderr:\n" + new TextDecoder().decode(stderr).replaceAll(
-    eraseDown(),
-    eraseDown() + "\n",
-  );
 }

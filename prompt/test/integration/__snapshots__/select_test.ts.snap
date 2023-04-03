@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - select_test.ts 1`] = `
+snapshot[`select prompt > should select an option 1`] = `
 "stdout:
 ? Select an option
 ❯ Foo

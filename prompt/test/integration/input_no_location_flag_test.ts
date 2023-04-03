@@ -2,9 +2,10 @@ import { Input } from "../../input.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "input prompt with no location flag",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should work without --location flag": ["yes", "\n"],
   },
   async fn() {

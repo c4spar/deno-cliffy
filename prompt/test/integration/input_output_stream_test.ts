@@ -2,9 +2,10 @@ import { Input } from "../../input.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "input prompt with writer set to stderr",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should enter some text": ["foo bar", "\n"],
   },
   async fn() {

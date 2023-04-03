@@ -9,9 +9,10 @@ import { Toggle } from "../../toggle.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "prompt list",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should check an option": ansi
       // input
       .text("f")

@@ -3,9 +3,10 @@ import { Checkbox } from "../../checkbox.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "checkbox prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should check an option": ansi
       .cursorDown
       .cursorDown

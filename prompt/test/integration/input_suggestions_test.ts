@@ -2,9 +2,10 @@ import { Input } from "../../input.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "input prompt with suggestions",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should enable suggestions and list": ["foo", "\n"],
   },
   async fn() {

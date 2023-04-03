@@ -3,9 +3,10 @@ import { Number } from "../../number.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "number prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should enter a number": ansi
       .text("19")
       .cursorUp

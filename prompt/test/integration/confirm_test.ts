@@ -2,9 +2,10 @@ import { Confirm } from "../../confirm.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "confirm prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should confirm": ["y", "\n"],
     "should not confirm": ["n", "\n"],
     "should not confirm by default": ["", "\n"],

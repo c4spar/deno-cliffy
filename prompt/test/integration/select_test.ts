@@ -3,9 +3,10 @@ import { Select } from "../../select.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "select prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should select an option": ansi
       .cursorDown
       .cursorDown

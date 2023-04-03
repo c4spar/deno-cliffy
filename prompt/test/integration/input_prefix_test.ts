@@ -2,9 +2,10 @@ import { Input } from "../../input.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "input prompt with prefix",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should change prefix": ["bar", "\n"],
   },
   async fn() {

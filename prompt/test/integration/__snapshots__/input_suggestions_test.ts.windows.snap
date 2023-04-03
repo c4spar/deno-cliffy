@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - input_suggestions_test.ts 1`] = `
+snapshot[`input prompt with suggestions > should enable suggestions and list 1`] = `
 "stdout:
 ? Whats your name? (foo) » 
   foo

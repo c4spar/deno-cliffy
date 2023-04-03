@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - checkbox_test.ts 1`] = `
+snapshot[`checkbox prompt > should check an option 1`] = `
 "stdout:
 ? Select an option
 ❯ ✘ Foo

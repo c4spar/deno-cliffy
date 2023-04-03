@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`assert prompt snapshot - list_test.ts 1`] = `
+snapshot[`list prompt > should enter some keywords 1`] = `
 "stdout:
 ? Enter some keywords (foo, far) » 
 ❯ some hint...\\x1b[1A\\x1b[36G\\x1b[G\\x1b[0J

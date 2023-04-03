@@ -2,9 +2,10 @@ import { List } from "../../list.ts";
 import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
+  name: "list prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  tests: {
+  steps: {
     "should enter some keywords": ["foo,bar", "\n"],
   },
   async fn() {
