@@ -75,12 +75,14 @@ function registerTest(options: AssertPromptSnapshotOptions) {
   Deno.test({
     name: options.name,
     async fn(ctx) {
-      const tests = Object.entries(options.steps ?? {});
-      if (!tests.length) {
-        throw new Error(`No tests defined for: ${options.meta.url}`);
+      const steps = Object.entries(options.steps ?? {});
+      if (!steps.length) {
+        throw new Error(
+          `No steps defined for test: ${options.meta.name} -> ${options.meta.url}`,
+        );
       }
 
-      for (const [name, inputs] of tests) {
+      for (const [name, inputs] of steps) {
         await ctx.step({
           name,
           async fn(stepCtx) {
