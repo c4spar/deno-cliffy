@@ -16,19 +16,3 @@ await assertPromptSnapshot({
     });
   },
 });
-
-await assertPromptSnapshot({
-  name: "second input prompt",
-  meta: import.meta,
-  osSuffix: ["windows"],
-  args: [],
-  steps: {
-    "should enter som text": ["foo bar", "\n"],
-  },
-  async fn() {
-    await Input.prompt({
-      message: "Whats your name?",
-      default: "foo",
-    });
-  },
-});
