@@ -12,7 +12,7 @@ stderr:
 "
 `;
 
-snapshot[`confirm prompt > should not confirm 2`] = `
+snapshot[`confirm prompt > should not confirm 1`] = `
 "stdout:
 ? Please confirm (y/N) » 
 ❯ some hint\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
@@ -24,7 +24,7 @@ stderr:
 "
 `;
 
-snapshot[`confirm prompt > should not confirm by default 3`] = `
+snapshot[`confirm prompt > should not confirm by default 1`] = `
 "stdout:
 ? Please confirm (y/N) » 
 ❯ some hint\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
