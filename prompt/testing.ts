@@ -1,6 +1,7 @@
+import { AssertionError } from "https://deno.land/std@0.170.0/testing/asserts.ts";
+import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.ts";
 import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { basename } from "./deps.ts";
-import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.ts";
 
 export interface AssertPromptSnapshotOptions {
   meta: ImportMeta;
@@ -130,7 +131,7 @@ async function runPrompt(
   await child.stdin.close();
 
   if (!success) {
-    throw new Error(`test failed: ${url}`);
+    throw new AssertionError(`test failed: ${url}`);
   }
 
   // Add a line break after each test input.
