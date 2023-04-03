@@ -78,7 +78,7 @@ function registerTest(options: AssertPromptSnapshotOptions) {
       const steps = Object.entries(options.steps ?? {});
       if (!steps.length) {
         throw new Error(
-          `No steps defined for test: ${options.meta.name} -> ${options.meta.url}`,
+          `No steps defined for test: ${options.name} -> ${options.meta.url}`,
         );
       }
 
