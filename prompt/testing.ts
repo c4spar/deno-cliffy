@@ -25,10 +25,15 @@ export interface AssertPromptSnapshotOptions {
    * tests. `--allow-env=ASSERT_PROMPT_SNAPSHOT` is passed by default.
    */
   args?: Array<string>;
-  /**
-   * Enable/disable colors. Default is `false`.
-   */
+  /** Enable/disable colors. Default is `false`. */
   colors?: boolean;
+  /**
+   * Timeout in milliseconds to wait until the input stream data is buffered
+   * before writing the next data to the stream. This ensures that each user
+   * input is rendered as separate line in the snapshot file. If your test gets
+   * flaky, try to increase the timeout. The default timeout is `600`.
+   */
+  timeout?: number;
 }
 
 const encoder = new TextEncoder();
@@ -132,7 +137,9 @@ async function runPrompt(
     for (const input of inputs) {
       await writer.write(encoder.encode(input));
       // Ensure all inputs are processed and rendered separately.
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) =>
+        setTimeout(resolve, options.timeout ?? 600)
+      );
     }
 
     output = await child.output();
