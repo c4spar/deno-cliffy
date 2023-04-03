@@ -70,8 +70,10 @@ export async function assertPromptSnapshot(
 }
 
 function registerTest(options: AssertPromptSnapshotOptions) {
+  const fileName = basename(options.meta.url);
+
   Deno.test({
-    name: `prompt snapshot tests ${options.meta.url}`,
+    name: `assert prompt snapshot - ${fileName}`,
     async fn(ctx) {
       const tests = Object.entries(options.tests ?? {});
       if (!tests.length) {
@@ -88,7 +90,7 @@ function registerTest(options: AssertPromptSnapshotOptions) {
               : "";
 
             await assertSnapshot(ctx, output, {
-              path: `__snapshots__/${basename(options.meta.url)}${suffix}.snap`,
+              path: `__snapshots__/${fileName}${suffix}.snap`,
             });
           },
         });

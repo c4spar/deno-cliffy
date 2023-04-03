@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/select_test.ts 1`] = `
+snapshot[`assert prompt snapshot - select_test.ts 1`] = `
 "stdout:
 ? Select an option
 ❯ Foo
