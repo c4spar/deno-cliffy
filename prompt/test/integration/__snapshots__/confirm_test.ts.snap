@@ -1,0 +1,35 @@
+export const snapshot = {};
+
+snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/confirm_test.ts 1`] = `
+"stdout:
+? Please confirm (y/N) › 
+❯ some hint\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Please confirm (y/N) › yes
+❯ some hint\\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J
+? Please confirm (y/N) › Yes
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
+`;
+
+snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/confirm_test.ts 2`] = `
+"stdout:
+? Please confirm (y/N) › 
+❯ some hint\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Please confirm (y/N) › no
+❯ some hint\\x1b[1A\\x1b[27G\\x1b[G\\x1b[0J
+? Please confirm (y/N) › No
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
+`;
+
+snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/confirm_test.ts 3`] = `
+"stdout:
+? Please confirm (y/N) › 
+❯ some hint\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Please confirm (y/N) › No
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
+`;

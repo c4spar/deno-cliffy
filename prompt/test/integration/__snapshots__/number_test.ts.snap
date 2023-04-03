@@ -1,0 +1,20 @@
+export const snapshot = {};
+
+snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/number_test.ts 1`] = `
+"stdout:
+? How old are you? (7) › \\x1b[26G\\x1b[G\\x1b[0J
+? How old are you? (7) › 19\\x1b[28G\\x1b[G\\x1b[0J
+? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 21\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 19\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 18\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 17\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 18\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 19\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
+? How old are you? (7) › 20
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
+`;

@@ -1,0 +1,21 @@
+export const snapshot = {};
+
+snapshot[`prompt snapshot tests file:///Users/c4spar/workspace/deno/deno-cliffy/prompt/test/integration/select_test.ts 1`] = `
+"stdout:
+? Select an option
+❯ Foo
+  Bar
+  Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  Foo
+❯ Bar
+  Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  Foo
+  Bar
+❯ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option » Baz
+\\x1b[?25h\\x1b[?25h
+stderr:
+"
+`;
