@@ -3,6 +3,7 @@ import { assertPromptSnapshot } from "../../testing.ts";
 
 await assertPromptSnapshot({
   meta: import.meta,
+  osSuffix: ["windows"],
   tests: {
     "should enter som text": ["foo bar", "\n"],
   },
