@@ -1,7 +1,7 @@
 import { AssertionError } from "https://deno.land/std@0.170.0/testing/asserts.ts";
 import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.ts";
 import { eraseDown } from "../ansi/ansi_escapes.ts";
-import { basename } from "./deps.ts";
+import { basename, red } from "./deps.ts";
 
 export interface AssertPromptSnapshotOptions {
   /** Test name. */
@@ -22,7 +22,7 @@ export interface AssertPromptSnapshotOptions {
   osSuffix?: Array<typeof Deno.build.os>;
   /**
    * Arguments passed to the `deno test` command when executing the snapshot
-   * tests. `--allow-env=__CLIFFY_TEST_NAME__` is passed by default.
+   * tests. `--allow-env=ASSERT_PROMPT_SNAPSHOT` is passed by default.
    */
   args?: Array<string>;
   /**
@@ -63,10 +63,7 @@ export async function assertPromptSnapshot(
   options: AssertPromptSnapshotOptions,
 ): Promise<void> {
   if (options.meta.main) {
-    const testName = Deno.env.get("__CLIFFY_TEST_NAME__");
-    if (testName === options.name) {
-      await options.fn();
-    }
+    await runTest(options);
   } else {
     registerTest(options);
   }
@@ -106,6 +103,10 @@ async function runPrompt(
   inputs: Array<string>,
   options: AssertPromptSnapshotOptions,
 ): Promise<string> {
+  let output: Deno.CommandOutput | undefined;
+  let stdout: string | undefined;
+  let stderr: string | undefined;
+
   try {
     const cmd = new Deno.Command("deno", {
       stdin: "piped",
@@ -113,12 +114,13 @@ async function runPrompt(
       stderr: "piped",
       args: [
         "run",
-        "--allow-env=__CLIFFY_TEST_NAME__",
-        ...options.args ?? [],
+        ...options.args?.length
+          ? options.args
+          : ["--allow-env=ASSERT_PROMPT_SNAPSHOT"],
         options.meta.url,
       ],
       env: {
-        __CLIFFY_TEST_NAME__: options.name ?? "",
+        ASSERT_PROMPT_SNAPSHOT: options.name,
         NO_COLOR: options.colors ? "false" : "true",
       },
     });
@@ -131,29 +133,36 @@ async function runPrompt(
       await new Promise((resolve) => setTimeout(resolve, 600));
     }
 
-    const { success, stdout, stderr, code } = await child.output();
+    output = await child.output();
+    stdout = new TextDecoder().decode(output.stdout);
+    stderr = new TextDecoder().decode(output.stderr);
     writer.releaseLock();
     await child.stdin.close();
-
-    if (!success) {
-      throw new Error(
-        `Test command failed with a none zero exit code: ${code}. ${stderr}`,
-      );
-    }
-
-    // Add a line break after each test input.
-    return "stdout:\n" + new TextDecoder().decode(stdout).replaceAll(
-      eraseDown(),
-      eraseDown() + "\n",
-    ) + "\nstderr:\n" + new TextDecoder().decode(stderr).replaceAll(
-      eraseDown(),
-      eraseDown() + "\n",
-    );
   } catch (error: unknown) {
     const assertionError = new AssertionError(
-      `Test failed: ${options.meta.url}`,
+      `Prompt snapshot test failed: ${options.meta.url}.\n${red(stderr ?? "")}`,
     );
     assertionError.cause = error;
-    throw error;
+    throw assertionError;
+  }
+
+  if (!output.success) {
+    throw new AssertionError(
+      `Prompt snapshot test: ${options.meta.url}.` +
+        `Test command failed with a none zero exit code: ${output.code}.\n${
+          red(stderr ?? "")
+        }`,
+    );
+  }
+
+  // Add a line break after each test input.
+  return "stdout:\n" + stdout.replaceAll(eraseDown(), eraseDown() + "\n") +
+    "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
+}
+
+async function runTest(options: AssertPromptSnapshotOptions) {
+  const testName = Deno.env.get("ASSERT_PROMPT_SNAPSHOT");
+  if (testName === options.name) {
+    await options.fn();
   }
 }
