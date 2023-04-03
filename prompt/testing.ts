@@ -7,6 +7,7 @@ export interface AssertPromptSnapshotOptions {
   meta: ImportMeta;
   tests: Record<string, Array<string>>;
   osSuffix?: Array<typeof Deno.build.os>;
+  args?: Array<string>;
   fn(): Promise<unknown>;
 }
 
@@ -85,7 +86,7 @@ function registerTest(options: AssertPromptSnapshotOptions) {
         await ctx.step({
           name,
           async fn() {
-            const output: string = await runPrompt(options.meta.url, inputs);
+            const output: string = await runPrompt(options.meta.url, inputs, options.args);
             const suffix = options.osSuffix?.includes(Deno.build.os)
               ? `.${Deno.build.os}`
               : "";
@@ -103,6 +104,7 @@ function registerTest(options: AssertPromptSnapshotOptions) {
 async function runPrompt(
   url: string,
   inputs: Array<string>,
+  args?: Array<string>,
 ): Promise<string> {
   const cmd = new Deno.Command("deno", {
     stdin: "piped",
@@ -110,7 +112,7 @@ async function runPrompt(
     stderr: "piped",
     args: [
       "run",
-      "--allow-all",
+      ...args ?? [],
       url,
     ],
     env: {
