@@ -17,23 +17,39 @@ export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
   meta: ImportMeta;
+  /** Test function. */
+  fn(): Promise<unknown>;
   /**
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
    */
   steps?: Record<string, AssertSnapshotCallStep>;
-  /** Test function. */
-  fn(): Promise<unknown>;
-  /**
-   * Operating system snapshot suffix. This is useful when your test produces
-   * different output on different operating systems.
-   */
-  osSuffix?: Array<typeof Deno.build.os>;
   /**
    * Arguments passed to the `deno test` command when executing the snapshot
    * tests. `--allow-env=ASSERT_SNAPSHOT_CALL` is passed by default.
    */
   denoArgs?: Array<string>;
+  /**
+   * Snapshot output directory. Snapshot files will be written to this directory.
+   * This can be relative to the test directory or an absolute path.
+   *
+   * If both `dir` and `path` are specified, the `dir` option will be ignored and
+   * the `path` option will be handled as normal.
+   */
+  dir?: string;
+  /**
+   * Snapshot output path. The snapshot will be written to this file. This can be
+   * a path relative to the test directory or an absolute path.
+   *
+   * If both `dir` and `path` are specified, the `dir` option will be ignored and
+   * the `path` option will be handled as normal.
+   */
+  path?: string;
+  /**
+   * Operating system snapshot suffix. This is useful when your test produces
+   * different output on different operating systems.
+   */
+  osSuffix?: Array<typeof Deno.build.os>;
   /** Enable/disable colors. Default is `false`. */
   colors?: boolean;
   /**
@@ -120,7 +136,9 @@ function registerTest(options: AssertSnapshotCallOptions) {
       : "";
 
     await assertSnapshot(ctx, output, {
-      path: `__snapshots__/${fileName}${suffix}.snap`,
+      dir: options.dir,
+      path: options.path ??
+        (options.dir ? undefined : `__snapshots__/${fileName}${suffix}.snap`),
     });
   }
 }
