@@ -8,6 +8,8 @@ export interface AssertSnapshotCallStep {
   stdin?: Array<string> | string;
   /** Arguments passed to the test file. */
   args?: Array<string>;
+  /** If enabled, test error will be ignored. */
+  canFail?: true;
 }
 
 export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
@@ -180,9 +182,9 @@ async function runPrompt(
     throw assertionError;
   }
 
-  if (!output.success) {
+  if (!output.success && !options.canFail && !step?.canFail) {
     throw new AssertionError(
-      `Prompt snapshot test: ${options.meta.url}.` +
+      `Prompt snapshot test failed: ${options.meta.url}.` +
         `Test command failed with a none zero exit code: ${output.code}.\n${
           red(stderr ?? "")
         }`,
