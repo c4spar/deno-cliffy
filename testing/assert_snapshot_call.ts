@@ -147,7 +147,7 @@ async function runPrompt(
       ],
       env: {
         ASSERT_SNAPSHOT_CALL: options.name,
-        NO_COLOR: options.colors ? "false" : "true",
+        ...options.colors ? {} : { NO_COLOR: "true" },
       },
     });
     const child: Deno.ChildProcess = cmd.spawn();
