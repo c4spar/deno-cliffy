@@ -7,14 +7,16 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should enter a floating number": ansi
-      .text("19.")
-      .cursorUp
-      .cursorUp
-      .cursorUp
-      .cursorUp
-      .text("\n")
-      .toArray(),
+    "should enter a floating number": {
+      stdin: ansi
+        .text("19.")
+        .cursorUp
+        .cursorUp
+        .cursorUp
+        .cursorUp
+        .text("\n")
+        .toArray(),
+    },
   },
   async fn() {
     await Number.prompt({

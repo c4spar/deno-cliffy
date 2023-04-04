@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should toggle the prompt": ["y", "n", "y", "\n"],
+    "should toggle the prompt": { stdin: ["y", "n", "y", "\n"] },
   },
   async fn() {
     await Toggle.prompt({

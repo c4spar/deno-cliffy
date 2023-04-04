@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should work without --location flag": ["yes", "\n"],
+    "should work without --location flag": { stdin: ["yes", "\n"] },
   },
   async fn() {
     await Input.prompt({

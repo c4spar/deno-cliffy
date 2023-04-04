@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should change prefix": ["bar", "\n"],
+    "should change prefix": { stdin: ["bar", "\n"] },
   },
   async fn() {
     await Input.prompt({

@@ -3,7 +3,14 @@ import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.t
 import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { basename, red } from "./deps.ts";
 
-export interface assertSnapshotCallOptions {
+export interface AssertSnapshotCallStep {
+  /** Data written to the test process. */
+  stdin?: Array<string> | string;
+  /** Arguments passed to the test file. */
+  args?: Array<string>;
+}
+
+export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
   /** Test name. */
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
@@ -12,7 +19,7 @@ export interface assertSnapshotCallOptions {
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
    */
-  steps: Record<string, Array<string>>;
+  steps?: Record<string, AssertSnapshotCallStep>;
   /** Test function. */
   fn(): Promise<unknown>;
   /**
@@ -24,7 +31,7 @@ export interface assertSnapshotCallOptions {
    * Arguments passed to the `deno test` command when executing the snapshot
    * tests. `--allow-env=ASSERT_SNAPSHOT_CALL` is passed by default.
    */
-  args?: Array<string>;
+  denoArgs?: Array<string>;
   /** Enable/disable colors. Default is `false`. */
   colors?: boolean;
   /**
@@ -50,7 +57,7 @@ const encoder = new TextEncoder();
  *   meta: import.meta,
  *   osSuffix: ["windows"],
  *   steps: {
- *     "should enter som text": ["foo bar", "\n"],
+ *     "should enter som text": { stdin: ["foo bar", "\n"] },
  *   },
  *   async fn() {
  *     await Input.prompt({
@@ -64,7 +71,7 @@ const encoder = new TextEncoder();
  * @param options Test options
  */
 export async function assertSnapshotCall(
-  options: assertSnapshotCallOptions,
+  options: AssertSnapshotCallOptions,
 ): Promise<void> {
   if (options.meta.main) {
     await runTest(options);
@@ -73,41 +80,41 @@ export async function assertSnapshotCall(
   }
 }
 
-function registerTest(options: assertSnapshotCallOptions) {
+function registerTest(options: AssertSnapshotCallOptions) {
   const fileName = basename(options.meta.url);
 
   Deno.test({
     name: options.name,
     async fn(ctx) {
       const steps = Object.entries(options.steps ?? {});
-      if (!steps.length) {
-        throw new Error(
-          `No steps defined for test: ${options.name} -> ${options.meta.url}`,
-        );
-      }
-
-      for (const [name, inputs] of steps) {
-        await ctx.step({
-          name,
-          async fn(stepCtx) {
-            const output: string = await runPrompt(inputs, options);
-            const suffix = options.osSuffix?.includes(Deno.build.os)
-              ? `.${Deno.build.os}`
-              : "";
-
-            await assertSnapshot(stepCtx, output, {
-              path: `__snapshots__/${fileName}${suffix}.snap`,
-            });
-          },
-        });
+      if (steps.length) {
+        for (const [name, inputs] of steps) {
+          await ctx.step({
+            name,
+            fn: (ctx) => fn(ctx, inputs),
+          });
+        }
+      } else {
+        await fn(ctx);
       }
     },
   });
+
+  async function fn(ctx: Deno.TestContext, step?: AssertSnapshotCallStep) {
+    const output: string = await runPrompt(options, step);
+    const suffix = options.osSuffix?.includes(Deno.build.os)
+      ? `.${Deno.build.os}`
+      : "";
+
+    await assertSnapshot(ctx, output, {
+      path: `__snapshots__/${fileName}${suffix}.snap`,
+    });
+  }
 }
 
 async function runPrompt(
-  inputs: Array<string>,
-  options: assertSnapshotCallOptions,
+  options: AssertSnapshotCallOptions,
+  step?: AssertSnapshotCallStep,
 ): Promise<string> {
   let output: Deno.CommandOutput | undefined;
   let stdout: string | undefined;
@@ -120,10 +127,10 @@ async function runPrompt(
       stderr: "piped",
       args: [
         "run",
-        ...options.args?.length
-          ? options.args
-          : ["--allow-env=ASSERT_SNAPSHOT_CALL"],
+        ...options.denoArgs ?? ["--allow-env=ASSERT_SNAPSHOT_CALL"],
         options.meta.url,
+        ...options.args ?? [],
+        ...step?.args ?? [],
       ],
       env: {
         ASSERT_SNAPSHOT_CALL: options.name,
@@ -133,17 +140,25 @@ async function runPrompt(
     const child: Deno.ChildProcess = cmd.spawn();
     const writer = child.stdin.getWriter();
 
-    for (const input of inputs) {
-      await writer.write(encoder.encode(input));
-      // Ensure all inputs are processed and rendered separately.
-      await new Promise((resolve) =>
-        setTimeout(resolve, options.timeout ?? 600)
-      );
+    const stdin = [
+      ...options?.stdin ?? [],
+      ...step?.stdin ?? [],
+    ];
+
+    if (stdin.length) {
+      for (const data of stdin) {
+        await writer.write(encoder.encode(data));
+        // Ensure all inputs are processed and rendered separately.
+        await new Promise((resolve) =>
+          setTimeout(resolve, options.timeout ?? 600)
+        );
+      }
     }
 
     output = await child.output();
     stdout = new TextDecoder().decode(output.stdout);
     stderr = new TextDecoder().decode(output.stderr);
+
     writer.releaseLock();
     await child.stdin.close();
   } catch (error: unknown) {
@@ -168,7 +183,7 @@ async function runPrompt(
     "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
 }
 
-async function runTest(options: assertSnapshotCallOptions) {
+async function runTest(options: AssertSnapshotCallOptions) {
   const testName = Deno.env.get("ASSERT_SNAPSHOT_CALL");
   if (testName === options.name) {
     await options.fn();

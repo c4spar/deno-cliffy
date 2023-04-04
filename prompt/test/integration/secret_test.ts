@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should enter a secret": ["123", "\n"],
+    "should enter a secret": { stdin: ["123", "\n"] },
   },
   async fn() {
     await Secret.prompt({

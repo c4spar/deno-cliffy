@@ -7,19 +7,21 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should enter a number": ansi
-      .text("19")
-      .cursorUp
-      .text("u")
-      .cursorDown
-      .cursorDown
-      .cursorDown
-      .cursorDown
-      .cursorUp
-      .cursorUp
-      .cursorUp
-      .text("\n")
-      .toArray(),
+    "should enter a number": {
+      stdin: ansi
+        .text("19")
+        .cursorUp
+        .text("u")
+        .cursorDown
+        .cursorDown
+        .cursorDown
+        .cursorDown
+        .cursorUp
+        .cursorUp
+        .cursorUp
+        .text("\n")
+        .toArray(),
+    },
   },
   async fn() {
     await Number.prompt({

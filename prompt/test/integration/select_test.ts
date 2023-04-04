@@ -7,11 +7,13 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should select an option": ansi
-      .cursorDown
-      .cursorDown
-      .text("\n")
-      .toArray(),
+    "should select an option": {
+      stdin: ansi
+        .cursorDown
+        .cursorDown
+        .text("\n")
+        .toArray(),
+    },
   },
   async fn() {
     await Select.prompt({

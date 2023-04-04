@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should enable suggestions and list": ["foo", "\n"],
+    "should enable suggestions and list": { stdin: ["foo", "\n"] },
   },
   async fn() {
     await Input.prompt({

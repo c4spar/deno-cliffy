@@ -13,31 +13,33 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should check an option": ansi
-      // input
-      .text("f")
-      .text("o")
-      .text("o")
-      .text("\n")
-      // number
-      .text("4")
-      .text("3")
-      .text("\n")
-      // confirm
-      .text("y")
-      .text("\n")
-      // toggle
-      .text("y")
-      .text("n")
-      .text("y")
-      .text("\n")
-      // checkbox
-      .cursorDown
-      .text(" ")
-      .cursorDown
-      .text(" ")
-      .text("\n")
-      .toArray(),
+    "should check an option": {
+      stdin: ansi
+        // input
+        .text("f")
+        .text("o")
+        .text("o")
+        .text("\n")
+        // number
+        .text("4")
+        .text("3")
+        .text("\n")
+        // confirm
+        .text("y")
+        .text("\n")
+        // toggle
+        .text("y")
+        .text("n")
+        .text("y")
+        .text("\n")
+        // checkbox
+        .cursorDown
+        .text(" ")
+        .cursorDown
+        .text(" ")
+        .text("\n")
+        .toArray(),
+    },
   },
   async fn() {
     const checkboxOptions: PromptOptions<
