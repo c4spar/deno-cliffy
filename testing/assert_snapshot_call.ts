@@ -3,7 +3,7 @@ import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.t
 import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { basename, red } from "./deps.ts";
 
-export interface AssertPromptSnapshotOptions {
+export interface assertSnapshotCallOptions {
   /** Test name. */
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
@@ -22,7 +22,7 @@ export interface AssertPromptSnapshotOptions {
   osSuffix?: Array<typeof Deno.build.os>;
   /**
    * Arguments passed to the `deno test` command when executing the snapshot
-   * tests. `--allow-env=ASSERT_PROMPT_SNAPSHOT` is passed by default.
+   * tests. `--allow-env=ASSERT_SNAPSHOT_CALL` is passed by default.
    */
   args?: Array<string>;
   /** Enable/disable colors. Default is `false`. */
@@ -42,14 +42,13 @@ const encoder = new TextEncoder();
  * Run prompt snapshot tests.
  *
  * ```ts
- * import { assertPromptSnapshot } from "./testing.ts";
- * import { Input } from "./input.ts";
+ * import { assertSnapshotCall } from "./assert_snapshot_call.ts";
+ * import { Input } from "../prompt/input.ts";
  *
- * await assertPromptSnapshot({
+ * await assertSnapshotCall({
  *   name: "test name",
  *   meta: import.meta,
  *   osSuffix: ["windows"],
- *   args: [],
  *   steps: {
  *     "should enter som text": ["foo bar", "\n"],
  *   },
@@ -64,8 +63,8 @@ const encoder = new TextEncoder();
  *
  * @param options Test options
  */
-export async function assertPromptSnapshot(
-  options: AssertPromptSnapshotOptions,
+export async function assertSnapshotCall(
+  options: assertSnapshotCallOptions,
 ): Promise<void> {
   if (options.meta.main) {
     await runTest(options);
@@ -74,7 +73,7 @@ export async function assertPromptSnapshot(
   }
 }
 
-function registerTest(options: AssertPromptSnapshotOptions) {
+function registerTest(options: assertSnapshotCallOptions) {
   const fileName = basename(options.meta.url);
 
   Deno.test({
@@ -108,7 +107,7 @@ function registerTest(options: AssertPromptSnapshotOptions) {
 
 async function runPrompt(
   inputs: Array<string>,
-  options: AssertPromptSnapshotOptions,
+  options: assertSnapshotCallOptions,
 ): Promise<string> {
   let output: Deno.CommandOutput | undefined;
   let stdout: string | undefined;
@@ -123,11 +122,11 @@ async function runPrompt(
         "run",
         ...options.args?.length
           ? options.args
-          : ["--allow-env=ASSERT_PROMPT_SNAPSHOT"],
+          : ["--allow-env=ASSERT_SNAPSHOT_CALL"],
         options.meta.url,
       ],
       env: {
-        ASSERT_PROMPT_SNAPSHOT: options.name,
+        ASSERT_SNAPSHOT_CALL: options.name,
         NO_COLOR: options.colors ? "false" : "true",
       },
     });
@@ -169,8 +168,8 @@ async function runPrompt(
     "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
 }
 
-async function runTest(options: AssertPromptSnapshotOptions) {
-  const testName = Deno.env.get("ASSERT_PROMPT_SNAPSHOT");
+async function runTest(options: assertSnapshotCallOptions) {
+  const testName = Deno.env.get("ASSERT_SNAPSHOT_CALL");
   if (testName === options.name) {
     await options.fn();
   }

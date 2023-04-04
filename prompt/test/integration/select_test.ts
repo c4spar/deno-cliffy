@@ -1,8 +1,8 @@
 import { ansi } from "../../../ansi/ansi.ts";
 import { Select } from "../../select.ts";
-import { assertPromptSnapshot } from "../../testing.ts";
+import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
 
-await assertPromptSnapshot({
+await assertSnapshotCall({
   name: "select prompt",
   meta: import.meta,
   osSuffix: ["windows"],

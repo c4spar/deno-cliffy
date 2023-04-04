@@ -1,7 +1,7 @@
 import { Input } from "../../input.ts";
-import { assertPromptSnapshot } from "../../testing.ts";
+import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
 
-await assertPromptSnapshot({
+await assertSnapshotCall({
   name: "input prompt with no location flag",
   meta: import.meta,
   osSuffix: ["windows"],

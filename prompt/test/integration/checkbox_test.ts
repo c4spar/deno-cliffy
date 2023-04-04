@@ -1,8 +1,8 @@
 import { ansi } from "../../../ansi/ansi.ts";
 import { Checkbox } from "../../checkbox.ts";
-import { assertPromptSnapshot } from "../../testing.ts";
+import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
 
-await assertPromptSnapshot({
+await assertSnapshotCall({
   name: "checkbox prompt",
   meta: import.meta,
   osSuffix: ["windows"],

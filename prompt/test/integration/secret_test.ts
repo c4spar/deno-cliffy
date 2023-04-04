@@ -1,7 +1,7 @@
 import { Secret } from "../../secret.ts";
-import { assertPromptSnapshot } from "../../testing.ts";
+import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
 
-await assertPromptSnapshot({
+await assertSnapshotCall({
   name: "secret prompt",
   meta: import.meta,
   osSuffix: ["windows"],
