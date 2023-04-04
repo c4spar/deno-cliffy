@@ -41,6 +41,15 @@ export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
    * flaky, try to increase the timeout. The default timeout is `600`.
    */
   timeout?: number;
+  /** If truthy the current test step will be ignored.
+   *
+   * It is a quick way to skip over a step, but also can be used for
+   * conditional logic, like determining if an environment feature is present.
+   */
+  ignore?: boolean;
+  /** If at least one test has `only` set to `true`, only run tests that have
+   * `only` set to `true` and fail the test suite. */
+  only?: boolean;
 }
 
 const encoder = new TextEncoder();
@@ -85,6 +94,8 @@ function registerTest(options: AssertSnapshotCallOptions) {
 
   Deno.test({
     name: options.name,
+    ignore: options.ignore,
+    only: options.only,
     async fn(ctx) {
       const steps = Object.entries(options.steps ?? {});
       if (steps.length) {
