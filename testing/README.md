@@ -28,6 +28,9 @@ await assertSnapshotCall({
 #### Test commands
 
 ```ts
+import { assertSnapshotCall } from "./assert_snapshot_call.ts";
+import { Command } from "../command/mod.ts";
+
 await assertSnapshotCall({
   name: "command integration",
   meta: import.meta,
@@ -46,6 +49,7 @@ await assertSnapshotCall({
       .version("1.0.0")
       .name("rm")
       .option("-r, --recursive", "Delete recursive.")
+      .arguments("<path>")
       .action(({ recursive }, path) => {
         if (recursive) {
           console.log("Delete recursive: %s", path);

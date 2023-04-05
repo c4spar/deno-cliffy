@@ -1,7 +1,5 @@
-import { AssertionError } from "https://deno.land/std@0.170.0/testing/asserts.ts";
-import { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.ts";
 import { eraseDown } from "../ansi/ansi_escapes.ts";
-import { basename, red } from "./deps.ts";
+import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
 
 export interface AssertSnapshotCallStep {
   /** Data written to the test process. */
@@ -18,7 +16,7 @@ export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
   /** Import meta. Required to determine the import url of the test file. */
   meta: ImportMeta;
   /** Test function. */
-  fn(): Promise<unknown>;
+  fn(): void | Promise<void>;
   /**
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
