@@ -9,7 +9,7 @@ import { Toggle } from "../../toggle.ts";
 import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
 
 await assertSnapshotCall({
-  name: "prompt list",
+  name: "prompt method",
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
