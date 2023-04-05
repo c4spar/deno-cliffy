@@ -7,3 +7,4 @@
 dist
 testing/__snapshots__/assert_snapshot_call_test_fixture.ts.snap
 testing/__snapshots__/assert_snapshot_call_test_fixture_2.ts.snap
+__snapshots_test__

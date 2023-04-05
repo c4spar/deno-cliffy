@@ -63,3 +63,17 @@ bar
 \`;
 '
 `;
+
+snapshot[`should run snapshot tests 3`] = `
+'export const snapshot = {};
+
+snapshot[\`should change the snapshot dir 1\`] = \`
+"stdout:
+foo
+
+stderr:
+bar
+"
+\`;
+'
+`;

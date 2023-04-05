@@ -4,36 +4,44 @@ import { dirname, fromFileUrl } from "./deps.ts";
 Deno.test({
   name: "should run snapshot tests",
   async fn(ctx) {
-    const snapshotsDir = dirname(fromFileUrl(import.meta.url)) +
-      "/__snapshots__";
+    const testDir = dirname(fromFileUrl(import.meta.url));
+    const snapshotDir = testDir + "/__snapshots__";
+    const snapshotTestDir = testDir + "/__snapshots_test__";
+
     const snapshotPath =
-      `${snapshotsDir}/assert_snapshot_call_test_fixture.ts.snap`;
+      `${snapshotDir}/assert_snapshot_call_test_fixture.ts.snap`;
     const snapshot2Path =
-      `${snapshotsDir}/assert_snapshot_call_test_fixture_2.ts.snap`;
+      `${snapshotDir}/assert_snapshot_call_test_fixture_2.ts.snap`;
+    const snapshot3Path =
+      `${snapshotTestDir}/assert_snapshot_call_test_fixture.ts.snap`;
 
-    const cmd = new Deno.Command("deno", {
-      args: [
-        "test",
-        "--allow-run=deno",
-        `--allow-read=${snapshotsDir}`,
-        `--allow-write=${snapshotPath},${snapshot2Path}`,
-        "testing/assert_snapshot_call_test_fixture.ts",
-        "--",
-        "--update",
-      ],
-    });
+    const args = [
+      "test",
+      "--allow-run=deno",
+      `--allow-read=${testDir}`,
+      `--allow-write=${testDir}`,
+      "testing/assert_snapshot_call_test_fixture.ts",
+      "--",
+      "--update",
+    ];
 
-    const { success, stderr } = await cmd.output();
+    const cmd = new Deno.Command("deno", { args });
 
-    assert(success, new TextDecoder().decode(stderr));
+    const { success, stdout, stderr } = await cmd.output();
+
+    const decoder = new TextDecoder();
+    assert(success, decoder.decode(stderr) + decoder.decode(stdout));
 
     const snapshotContent = await Deno.readTextFile(snapshotPath);
     const snapshot2Content = await Deno.readTextFile(snapshot2Path);
+    const snapshot3Content = await Deno.readTextFile(snapshot3Path);
 
     await assertSnapshot(ctx, snapshotContent);
     await assertSnapshot(ctx, snapshot2Content);
+    await assertSnapshot(ctx, snapshot3Content);
 
     await Deno.remove(snapshotPath);
     await Deno.remove(snapshot2Path);
+    await Deno.remove(snapshotTestDir, { recursive: true });
   },
 });

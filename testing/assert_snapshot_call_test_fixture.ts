@@ -20,6 +20,16 @@ await assertSnapshotCall({
 });
 
 await assertSnapshotCall({
+  name: "should change the snapshot dir",
+  meta: import.meta,
+  dir: "__snapshots_test__",
+  fn() {
+    console.log("foo");
+    console.error("bar");
+  },
+});
+
+await assertSnapshotCall({
   name: "should set deno args",
   meta: import.meta,
   args: ["foo", "bar"],
