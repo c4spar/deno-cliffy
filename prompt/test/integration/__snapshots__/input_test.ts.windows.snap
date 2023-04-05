@@ -1,6 +1,6 @@
 export const snapshot = {};
 
-snapshot[`input prompt > should enter som text 1`] = `
+snapshot[`input prompt > should enter some text 1`] = `
 "stdout:
 ? Whats your name? (foo) » \\x1b[28G\\x1b[G\\x1b[0J
 ? Whats your name? (foo) » foo bar\\x1b[35G\\x1b[G\\x1b[0J

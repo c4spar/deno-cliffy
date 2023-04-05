@@ -14,7 +14,7 @@ await assertSnapshotCall({
   name: "test name",
   meta: import.meta,
   steps: {
-    "should enter som text": { stdin: ["foo bar", "\n"] },
+    "should enter some text": { stdin: ["foo bar", "\n"] },
   },
   async fn() {
     await Input.prompt({

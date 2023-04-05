@@ -6,7 +6,7 @@ await assertSnapshotCall({
   meta: import.meta,
   osSuffix: ["windows"],
   steps: {
-    "should enter som text": { stdin: ["foo bar", "\n"] },
+    "should enter some text": { stdin: ["foo bar", "\n"] },
   },
   async fn() {
     await Input.prompt({
