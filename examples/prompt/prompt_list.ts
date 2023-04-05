@@ -27,7 +27,7 @@ const result = await prompt([{
   type: Input,
 }, {
   name: "age",
-  message: "How old are you?",
+  message: ({ name }) => `Hi ${name}, how old are you?`,
   type: Number,
 }, {
   name: "like",
