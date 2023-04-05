@@ -2,24 +2,47 @@
 
 Read the full documentation at https://cliffy.io/docs/testing.
 
-### Snapshot testing
+## Snapshot testing
+
+### assertSnapshotCall
+
+```ts
+import { assertSnapshotCall } from "./assert_snapshot_call.ts";
+
+await assertSnapshotCall({
+  name: "should log to stdout and atderr",
+  meta: import.meta,
+  async fn() {
+    console.log("foo");
+    console.error("bar");
+  },
+});
+```
 
 #### Test user input
 
 ```ts
 import { assertSnapshotCall } from "./assert_snapshot_call.ts";
-import { Input } from "../prompt/input.ts";
+import { Checkbox } from "../prompt/checkbox.ts";
+import { ansi } from "../ansi/ansi.ts";
 
 await assertSnapshotCall({
-  name: "test name",
+  name: "should check an option",
   meta: import.meta,
-  steps: {
-    "should enter some text": { stdin: ["foo bar", "\n"] },
-  },
+  stdin: ansi
+    .cursorDown
+    .cursorDown
+    .text(" ")
+    .text("\n")
+    .toArray(),
   async fn() {
-    await Input.prompt({
-      message: "Whats your name?",
-      default: "foo",
+    await Checkbox.prompt({
+      message: "Select an option",
+      options: [
+        { name: "Foo", value: "foo" },
+        { name: "Bar", value: "bar" },
+        { name: "Baz", value: "baz" },
+      ],
     });
   },
 });
@@ -32,15 +55,15 @@ import { assertSnapshotCall } from "./assert_snapshot_call.ts";
 import { Command } from "../command/mod.ts";
 
 await assertSnapshotCall({
-  name: "command integration",
+  name: "command",
   meta: import.meta,
   ignore: Deno.build.os === "windows",
   colors: true,
   steps: {
-    "should delete file": {
+    "should delete a file": {
       args: ["/foo/bar"],
     },
-    "should delete directory recursive": {
+    "should delete a directory recursively": {
       args: ["--recursive", "/foo/bar"],
     },
   },
