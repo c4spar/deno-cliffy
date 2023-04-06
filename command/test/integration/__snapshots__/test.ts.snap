@@ -1,36 +1,52 @@
 export const snapshot = {};
 
 snapshot[`command integration > should complete boolean arg 1`] = `
-"true
-false"
+"stdout:
+true
+false
+stderr:
+"
 `;
 
 snapshot[`command integration > should complete boolean arg from foo command 1`] = `
-"true
-false"
+"stdout:
+true
+false
+stderr:
+"
 `;
 
 snapshot[`command integration > should complete boolean arg from foo bar command 1`] = `
-"true
-false"
+"stdout:
+true
+false
+stderr:
+"
 `;
 
 snapshot[`command integration > should complete available commands for help command 1`] = `
-"foo
+"stdout:
+foo
 bar
 validation-error
 help
-completions"
+completions
+stderr:
+"
 `;
 
 snapshot[`command integration > should complete enum 1`] = `
-"blue
+"stdout:
+blue
 yellow
-red"
+red
+stderr:
+"
 `;
 
 snapshot[`command integration > should generate bash completions 1`] = `
-\`#!/usr/bin/env bash
+\`stdout:
+#!/usr/bin/env bash
 # bash completion support for completions-test v1.0.0
 
 _completions_test() {
@@ -339,11 +355,14 @@ _completions_test() {
 }
 
 complete -F _completions_test -o bashdefault -o default completions-test
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should generate fish completions 1`] = `
-\`#!/usr/bin/env fish
+\`stdout:
+#!/usr/bin/env fish
 # fish completion support for completions-test v1.0.0
 
 function __fish_completions_test_using_command
@@ -425,11 +444,14 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should generate zsh completions 1`] = `
-\`#!/usr/bin/env zsh
+\`stdout:
+#!/usr/bin/env zsh
 # zsh completion support for completions-test v1.0.0
 
 autoload -U is-at-least
@@ -881,11 +903,14 @@ function _completions_test_completions_zsh_help() {
 # _completions_test "\${@}"
 
 compdef _completions_test completions-test
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should output command help with help command 1`] = `
-\`
+\`stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -917,11 +942,14 @@ snapshot[`command integration > should output command help with help command 1`]
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should output sub-command help with help command 1`] = `
-\`
+\`stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
@@ -941,11 +969,14 @@ snapshot[`command integration > should output sub-command help with help command
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
     \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
 
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should output short help with -h flag 1`] = `
-\`
+\`stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -977,11 +1008,14 @@ snapshot[`command integration > should output short help with -h flag 1`] = `
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should output long help with --help flag 1`] = `
-\`
+\`stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -1018,88 +1052,33 @@ snapshot[`command integration > should output long help with --help flag 1`] = `
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
+
+stderr:
 \`
 `;
 
 snapshot[`command integration > should output short version with -V flag 1`] = `
-\`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+"stdout:
+1.0.0
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
-
-  \\x1b[1mDescription:\\x1b[22m
-
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
-
-  \\x1b[1mOptions:\\x1b[22m
-
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-
-  \\x1b[1mCommands:\\x1b[22m
-
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
-
-\`
+stderr:
+"
 `;
 
 snapshot[`command integration > should output long version with --version flag 1`] = `
-\`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+"stdout:
+\\x1b[1mcompletions-test\\x1b[22m \\x1b[94m1.0.0\\x1b[39m
+\\x1b[1mmeta1\\x1b[22m \\x1b[94mvalue1\\x1b[39m
+\\x1b[1mmeta2\\x1b[22m \\x1b[94mvalue2\\x1b[39m
+\\x1b[1mmeta3\\x1b[22m \\x1b[94mvalue3\\x1b[39m
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
-
-  \\x1b[1mDescription:\\x1b[22m
-
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
-
-  \\x1b[1mOptions:\\x1b[22m
-
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                    
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                          
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                        
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                        
-                                 foo bar baz. foo bar baz.                                                        
-                                                                                                                  
-                               foo bar baz.                                                                       
-                               foo bar baz.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])   (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-                                and line breaks.                                                                  
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                     (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-
-  \\x1b[1mCommands:\\x1b[22m
-
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
-
-\`
+stderr:
+"
 `;
 
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
-'
+'stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
@@ -1113,13 +1092,16 @@ snapshot[`command integration > should print the help of sub-command on validati
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
+
+stderr:
 \\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
 \\x1b[39m
 '
 `;
 
 snapshot[`command integration > should print error message for unknown option with suggestion 1`] = `
-\`
+\`stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -1151,13 +1133,16 @@ snapshot[`command integration > should print error message for unknown option wi
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
+
+stderr:
 \\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
 \\x1b[39m
 \`
 `;
 
-snapshot[`command integration > should print help and error message when validation error is thrown 1`] = `
-"
+snapshot[`command integration > should print help and error message when validation error 1`] = `
+"stdout:
+
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
 
@@ -1170,6 +1155,8 @@ snapshot[`command integration > should print help and error message when validat
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
+
+stderr:
 \\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
 \\x1b[39m
 "

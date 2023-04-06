@@ -1,0 +1,47 @@
+import { assert, assertSnapshot } from "../dev_deps.ts";
+import { dirname, fromFileUrl } from "./deps.ts";
+
+Deno.test({
+  name: "should run snapshot tests",
+  async fn(ctx) {
+    const testDir = dirname(fromFileUrl(import.meta.url));
+    const snapshotDir = testDir + "/__snapshots__";
+    const snapshotTestDir = testDir + "/__snapshots_test__";
+
+    const snapshotPath =
+      `${snapshotDir}/assert_snapshot_call_test_fixture.ts.snap`;
+    const snapshot2Path =
+      `${snapshotDir}/assert_snapshot_call_test_fixture_2.ts.snap`;
+    const snapshot3Path =
+      `${snapshotTestDir}/assert_snapshot_call_test_fixture.ts.snap`;
+
+    const args = [
+      "test",
+      "--allow-run=deno",
+      `--allow-read=${testDir}`,
+      `--allow-write=${testDir}`,
+      "testing/assert_snapshot_call_test_fixture.ts",
+      "--",
+      "--update",
+    ];
+
+    const cmd = new Deno.Command("deno", { args });
+
+    const { success, stdout, stderr } = await cmd.output();
+
+    const decoder = new TextDecoder();
+    assert(success, decoder.decode(stderr) + decoder.decode(stdout));
+
+    const snapshotContent = await Deno.readTextFile(snapshotPath);
+    const snapshot2Content = await Deno.readTextFile(snapshot2Path);
+    const snapshot3Content = await Deno.readTextFile(snapshot3Path);
+
+    await assertSnapshot(ctx, snapshotContent);
+    await assertSnapshot(ctx, snapshot2Content);
+    await assertSnapshot(ctx, snapshot3Content);
+
+    await Deno.remove(snapshotPath);
+    await Deno.remove(snapshot2Path);
+    await Deno.remove(snapshotTestDir, { recursive: true });
+  },
+});
