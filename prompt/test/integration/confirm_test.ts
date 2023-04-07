@@ -1,11 +1,10 @@
 import { Confirm } from "../../confirm.ts";
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "confirm prompt",
   meta: import.meta,
   osSuffix: ["windows"],
-  // args: ["--allow-env=ASSERT_SNAPSHOT_CALL_TEST_NAME"],
   steps: {
     "should confirm": { stdin: ["y", "\n"] },
     "should not confirm": { stdin: ["n", "\n"] },

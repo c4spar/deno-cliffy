@@ -1,1 +1,1 @@
-export * from "./assert_snapshot_call.ts";
+export * from "./snapshot.ts";

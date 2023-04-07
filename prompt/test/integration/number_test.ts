@@ -1,8 +1,8 @@
 import { ansi } from "../../../ansi/ansi.ts";
 import { Number } from "../../number.ts";
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "number prompt",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -33,7 +33,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "number prompt with float",
   meta: import.meta,
   osSuffix: ["windows"],

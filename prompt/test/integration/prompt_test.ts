@@ -6,9 +6,9 @@ import { Input } from "../../input.ts";
 import { Number } from "../../number.ts";
 import { prompt, PromptMiddleware, PromptOptions } from "../../prompt.ts";
 import { Toggle } from "../../toggle.ts";
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "prompt method",
   meta: import.meta,
   osSuffix: ["windows"],

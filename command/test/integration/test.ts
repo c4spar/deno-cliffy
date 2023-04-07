@@ -1,4 +1,4 @@
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 import {
   Command,
   CompletionsCommand,
@@ -7,7 +7,7 @@ import {
   ValidationError,
 } from "../../mod.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "command integration",
   meta: import.meta,
   ignore: Deno.build.os === "windows",

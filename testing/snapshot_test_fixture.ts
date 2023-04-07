@@ -1,6 +1,6 @@
-import { assertSnapshotCall } from "./assert_snapshot_call.ts";
+import { snapshotTest } from "./snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "should create a simple snapshot",
   meta: import.meta,
   fn() {
@@ -9,17 +9,17 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "should change the snapshot path",
   meta: import.meta,
-  path: "__snapshots__/assert_snapshot_call_test_fixture_2.ts.snap",
+  path: "__snapshots__/snapshot_test_fixture_2.ts.snap",
   fn() {
     console.log("foo");
     console.error("bar");
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "should change the snapshot dir",
   meta: import.meta,
   dir: "__snapshots_test__",
@@ -29,7 +29,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "should set deno args",
   meta: import.meta,
   args: ["foo", "bar"],
@@ -42,7 +42,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "should write to stdin",
   meta: import.meta,
   args: ["foo", "bar"],

@@ -9,18 +9,18 @@ Deno.test({
     const snapshotTestDir = testDir + "/__snapshots_test__";
 
     const snapshotPath =
-      `${snapshotDir}/assert_snapshot_call_test_fixture.ts.snap`;
+      `${snapshotDir}/snapshot_test_fixture.ts.snap`;
     const snapshot2Path =
-      `${snapshotDir}/assert_snapshot_call_test_fixture_2.ts.snap`;
+      `${snapshotDir}/snapshot_test_fixture_2.ts.snap`;
     const snapshot3Path =
-      `${snapshotTestDir}/assert_snapshot_call_test_fixture.ts.snap`;
+      `${snapshotTestDir}/snapshot_test_fixture.ts.snap`;
 
     const args = [
       "test",
       "--allow-run=deno",
       `--allow-read=${testDir}`,
       `--allow-write=${testDir}`,
-      "testing/assert_snapshot_call_test_fixture.ts",
+      "testing/snapshot_test_fixture.ts",
       "--",
       "--update",
     ];
