@@ -1,7 +1,7 @@
 import { Input } from "../../input.ts";
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -16,7 +16,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt with suggestions",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -33,7 +33,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt with prefix",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -49,7 +49,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt with writer set to stderr",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -65,7 +65,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt without prefix",
   meta: import.meta,
   osSuffix: ["windows"],
@@ -81,7 +81,7 @@ await assertSnapshotCall({
   },
 });
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "input prompt with no location flag",
   meta: import.meta,
   osSuffix: ["windows"],

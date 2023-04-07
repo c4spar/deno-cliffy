@@ -5,6 +5,6 @@
 .DS_Store
 .DS_Store?
 dist
-testing/__snapshots__/assert_snapshot_call_test_fixture.ts.snap
-testing/__snapshots__/assert_snapshot_call_test_fixture_2.ts.snap
+testing/__snapshots__/snapshot_test_fixture.ts.snap
+testing/__snapshots__/snapshot_test_fixture_2.ts.snap
 __snapshots_test__

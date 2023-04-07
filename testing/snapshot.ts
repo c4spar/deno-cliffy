@@ -1,7 +1,7 @@
 import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
 
-export interface AssertSnapshotCallStep {
+export interface SnapshotTestStep {
   /** Data written to the test process. */
   stdin?: Array<string> | string;
   /** Arguments passed to the test file. */
@@ -10,7 +10,7 @@ export interface AssertSnapshotCallStep {
   canFail?: true;
 }
 
-export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
+export interface SnapshotTestOptions extends SnapshotTestStep {
   /** Test name. */
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
@@ -21,10 +21,10 @@ export interface AssertSnapshotCallOptions extends AssertSnapshotCallStep {
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
    */
-  steps?: Record<string, AssertSnapshotCallStep>;
+  steps?: Record<string, SnapshotTestStep>;
   /**
    * Arguments passed to the `deno test` command when executing the snapshot
-   * tests. `--allow-env=ASSERT_SNAPSHOT_CALL` is passed by default.
+   * tests. `--allow-env=SNAPSHOT_TEST_NAME` is passed by default.
    */
   denoArgs?: Array<string>;
   /**
@@ -74,10 +74,10 @@ const encoder = new TextEncoder();
  * Run prompt snapshot tests.
  *
  * ```ts
- * import { assertSnapshotCall } from "./assert_snapshot_call.ts";
+ * import { snapshotTest } from "./snapshot.ts";
  * import { Input } from "../prompt/input.ts";
  *
- * await assertSnapshotCall({
+ * await snapshotTest({
  *   name: "test name",
  *   meta: import.meta,
  *   osSuffix: ["windows"],
@@ -95,8 +95,8 @@ const encoder = new TextEncoder();
  *
  * @param options Test options
  */
-export async function assertSnapshotCall(
-  options: AssertSnapshotCallOptions,
+export async function snapshotTest(
+  options: SnapshotTestOptions,
 ): Promise<void> {
   if (options.meta.main) {
     await runTest(options);
@@ -105,7 +105,7 @@ export async function assertSnapshotCall(
   }
 }
 
-function registerTest(options: AssertSnapshotCallOptions) {
+function registerTest(options: SnapshotTestOptions) {
   const fileName = basename(options.meta.url);
 
   Deno.test({
@@ -127,7 +127,7 @@ function registerTest(options: AssertSnapshotCallOptions) {
     },
   });
 
-  async function fn(ctx: Deno.TestContext, step?: AssertSnapshotCallStep) {
+  async function fn(ctx: Deno.TestContext, step?: SnapshotTestStep) {
     const output: string = await runPrompt(options, step);
     const suffix = options.osSuffix?.includes(Deno.build.os)
       ? `.${Deno.build.os}`
@@ -142,8 +142,8 @@ function registerTest(options: AssertSnapshotCallOptions) {
 }
 
 async function runPrompt(
-  options: AssertSnapshotCallOptions,
-  step?: AssertSnapshotCallStep,
+  options: SnapshotTestOptions,
+  step?: SnapshotTestStep,
 ): Promise<string> {
   let output: Deno.CommandOutput | undefined;
   let stdout: string | undefined;
@@ -156,13 +156,13 @@ async function runPrompt(
       stderr: "piped",
       args: [
         "run",
-        ...options.denoArgs ?? ["--allow-env=ASSERT_SNAPSHOT_CALL"],
+        ...options.denoArgs ?? ["--allow-env=SNAPSHOT_TEST_NAME"],
         options.meta.url,
         ...options.args ?? [],
         ...step?.args ?? [],
       ],
       env: {
-        ASSERT_SNAPSHOT_CALL: options.name,
+        SNAPSHOT_TEST_NAME: options.name,
         ...options.colors ? {} : { NO_COLOR: "true" },
       },
     });
@@ -212,8 +212,8 @@ async function runPrompt(
     "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
 }
 
-async function runTest(options: AssertSnapshotCallOptions) {
-  const testName = Deno.env.get("ASSERT_SNAPSHOT_CALL");
+async function runTest(options: SnapshotTestOptions) {
+  const testName = Deno.env.get("SNAPSHOT_TEST_NAME");
   if (testName === options.name) {
     await options.fn();
   }

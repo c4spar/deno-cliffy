@@ -1,7 +1,7 @@
 import { Toggle } from "../../toggle.ts";
-import { assertSnapshotCall } from "../../../testing/assert_snapshot_call.ts";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 
-await assertSnapshotCall({
+await snapshotTest({
   name: "toggle prompt",
   meta: import.meta,
   osSuffix: ["windows"],
