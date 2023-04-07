@@ -8,12 +8,9 @@ Deno.test({
     const snapshotDir = testDir + "/__snapshots__";
     const snapshotTestDir = testDir + "/__snapshots_test__";
 
-    const snapshotPath =
-      `${snapshotDir}/snapshot_test_fixture.ts.snap`;
-    const snapshot2Path =
-      `${snapshotDir}/snapshot_test_fixture_2.ts.snap`;
-    const snapshot3Path =
-      `${snapshotTestDir}/snapshot_test_fixture.ts.snap`;
+    const snapshotPath = `${snapshotDir}/snapshot_test_fixture.ts.snap`;
+    const snapshot2Path = `${snapshotDir}/snapshot_test_fixture_2.ts.snap`;
+    const snapshot3Path = `${snapshotTestDir}/snapshot_test_fixture.ts.snap`;
 
     const args = [
       "test",
