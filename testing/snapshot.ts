@@ -110,8 +110,8 @@ function registerTest(options: SnapshotTestOptions) {
 
   Deno.test({
     name: options.name,
-    ignore: options.ignore,
-    only: options.only,
+    ignore: options.ignore ?? false,
+    only: options.only ?? false,
     async fn(ctx) {
       const steps = Object.entries(options.steps ?? {});
       if (steps.length) {
