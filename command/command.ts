@@ -2150,11 +2150,15 @@ export class Command<
     return this.aliases;
   }
 
-  /** Get full command path. */
-  public getPath(): string {
+  /**
+   * Get full command path.
+   *
+   * @param name Override the main command name.
+   */
+  public getPath(name?: string): string {
     return this._parent
-      ? this._parent.getPath() + " " + this._name
-      : this._name;
+      ? this._parent.getPath(name) + " " + this._name
+      : name || this._name;
   }
 
   /** Get arguments definition. E.g: <input-file:string> <output-file:string> */

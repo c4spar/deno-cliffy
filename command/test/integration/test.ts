@@ -27,8 +27,17 @@ await snapshotTest({
     },
     "should complete enum": { args: ["completions", "complete", "color"] },
     "should generate bash completions": { args: ["completions", "bash"] },
+    "should override name in bash completions": {
+      args: ["completions", "bash", "--name", "foo-command"],
+    },
     "should generate fish completions": { args: ["completions", "fish"] },
+    "should override name in fish completions": {
+      args: ["completions", "fish", "--name", "foo-command"],
+    },
     "should generate zsh completions": { args: ["completions", "zsh"] },
+    "should override name in zsh completions": {
+      args: ["completions", "zsh", "--name", "foo-command"],
+    },
     "should output command help with help command": { args: ["help"] },
     "should output sub-command help with help command": {
       args: ["help", "foo"],
