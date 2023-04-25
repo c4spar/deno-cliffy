@@ -1,4 +1,4 @@
-import { getFlag } from "../../flags/_utils.ts";
+import { getDefaultValue, getFlag } from "../../flags/_utils.ts";
 import { Table } from "../../table/table.ts";
 import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
@@ -313,13 +313,21 @@ export class HelpGenerator {
     const hints = [];
 
     option.required && hints.push(yellow(`required`));
-    typeof option.default !== "undefined" && hints.push(
-      bold(`Default: `) + inspect(option.default, this.options.colors),
-    );
+
+    if (typeof option.default !== "undefined") {
+      const defaultValue = getDefaultValue(option);
+      if (typeof defaultValue !== "undefined") {
+        hints.push(
+          bold(`Default: `) + inspect(defaultValue, this.options.colors),
+        );
+      }
+    }
+
     option.depends?.length && hints.push(
       yellow(bold(`Depends: `)) +
         italic(option.depends.map(getFlag).join(", ")),
     );
+
     option.conflicts?.length && hints.push(
       red(bold(`Conflicts: `)) +
         italic(option.conflicts.map(getFlag).join(", ")),

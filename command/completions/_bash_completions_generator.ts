@@ -5,15 +5,18 @@ import { FileType } from "../types/file.ts";
 /** Generates bash completions script. */
 export class BashCompletionsGenerator {
   /** Generates bash completions script for given command. */
-  public static generate(cmd: Command) {
-    return new BashCompletionsGenerator(cmd).generate();
+  public static generate(name: string, cmd: Command) {
+    return new BashCompletionsGenerator(name, cmd).generate();
   }
 
-  private constructor(protected cmd: Command) {}
+  private constructor(
+    protected name: string,
+    protected cmd: Command,
+  ) {}
 
   /** Generates bash completions code. */
   private generate(): string {
-    const path = this.cmd.getPath();
+    const path = this.cmd.getPath(this.name);
     const version: string | undefined = this.cmd.getVersion()
       ? ` v${this.cmd.getVersion()}`
       : "";
@@ -31,15 +34,15 @@ _${replaceSpecialChars(path)}() {
   opts=()
   listFiles=0
 
-  _${replaceSpecialChars(this.cmd.getName())}_complete() {
+  _${replaceSpecialChars(this.name)}_complete() {
     local action="$1"; shift
-    mapfile -t values < <( ${this.cmd.getName()} completions complete "\${action}" "\${@}" )
+    mapfile -t values < <( ${this.name} completions complete "\${action}" "\${@}" )
     for i in "\${values[@]}"; do
       opts+=("$i")
     done
   }
 
-  _${replaceSpecialChars(this.cmd.getName())}_expand() {
+  _${replaceSpecialChars(this.name)}_expand() {
     [ "$cur" != "\${cur%\\\\}" ] && cur="$cur\\\\"
   
     # expand ~username type directory specifications
@@ -56,10 +59,10 @@ _${replaceSpecialChars(path)}() {
   }
 
   # shellcheck disable=SC2120
-  _${replaceSpecialChars(this.cmd.getName())}_file_dir() {
+  _${replaceSpecialChars(this.name)}_file_dir() {
     listFiles=1
     local IFS=$'\\t\\n' xspec #glob
-    _${replaceSpecialChars(this.cmd.getName())}_expand || return 0
+    _${replaceSpecialChars(this.name)}_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
       # shellcheck disable=SC2206,SC2207,SC2086
@@ -74,7 +77,7 @@ _${replaceSpecialChars(path)}() {
           $( compgen -d -- "$cur" ) )
   }
 
-  ${this.generateCompletions(this.cmd).trim()}
+  ${this.generateCompletions(this.name, this.cmd).trim()}
 
   for word in "\${COMP_WORDS[@]}"; do
     case "\${word}" in
@@ -119,8 +122,13 @@ complete -F _${replaceSpecialChars(path)} -o bashdefault -o default ${path}`;
   }
 
   /** Generates bash completions method for given command and child commands. */
-  private generateCompletions(command: Command, path = "", index = 1): string {
-    path = (path ? path + " " : "") + command.getName();
+  private generateCompletions(
+    name: string,
+    command: Command,
+    path = "",
+    index = 1,
+  ): string {
+    path = (path ? path + " " : "") + name;
     const commandCompletions = this.generateCommandCompletions(
       command,
       path,
@@ -129,7 +137,12 @@ complete -F _${replaceSpecialChars(path)} -o bashdefault -o default ${path}`;
     const childCommandCompletions: string = command.getCommands(false)
       .filter((subCommand: Command) => subCommand !== command)
       .map((subCommand: Command) =>
-        this.generateCompletions(subCommand, path, index + 1)
+        this.generateCompletions(
+          subCommand.getName(),
+          subCommand,
+          path,
+          index + 1,
+        )
       )
       .join("");
 
@@ -214,10 +227,10 @@ ${childCommandCompletions}`;
     if (args.length) {
       const type = command.getType(args[0].type);
       if (type && type.handler instanceof FileType) {
-        return `_${replaceSpecialChars(this.cmd.getName())}_file_dir`;
+        return `_${replaceSpecialChars(this.name)}_file_dir`;
       }
       // @TODO: add support for multiple arguments
-      return `_${replaceSpecialChars(this.cmd.getName())}_complete ${
+      return `_${replaceSpecialChars(this.name)}_complete ${
         args[0].action
       }${path}`;
     }
@@ -234,10 +247,10 @@ ${childCommandCompletions}`;
     if (args.length) {
       const type = command.getType(args[0].type);
       if (type && type.handler instanceof FileType) {
-        return `opts=(); _${replaceSpecialChars(this.cmd.getName())}_file_dir`;
+        return `opts=(); _${replaceSpecialChars(this.name)}_file_dir`;
       }
       // @TODO: add support for multiple arguments
-      return `opts=(); _${replaceSpecialChars(this.cmd.getName())}_complete ${
+      return `opts=(); _${replaceSpecialChars(this.name)}_complete ${
         args[0].action
       }${path}`;
     }
