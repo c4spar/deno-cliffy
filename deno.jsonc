@@ -1,14 +1,5 @@
 {
-  "fmt": {
-    "files": {
-      "exclude": ["dist"]
-    }
-  },
-  "lint": {
-    "files": {
-      "exclude": ["dist"]
-    }
-  },
+  "exclude": ["dist"],
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
