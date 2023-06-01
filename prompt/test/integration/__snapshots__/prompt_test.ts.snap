@@ -1,52 +1,61 @@
 export const snapshot = {};
 
 snapshot[`prompt method > should check an option 1`] = `
-'stdout:
+stdout:
+--------------------------
 [checkbox:before] input is: foo
-{ input: "foo", number: 43, confirm: true, toggle: true, checkbox: [ "bar", "baz" ] }
+{
+  input: "foo",
+  number: 43,
+  confirm: true,
+  toggle: true,
+  checkbox: [ "bar", "baz" ]
+}
 
+--------------------------
 stderr:
-? Enter some text (default value) › \\x1b[37G\\x1b[G\\x1b[0J
-? Enter some text (default value) › f\\x1b[38G\\x1b[G\\x1b[0J
-? Enter some text (default value) › fo\\x1b[39G\\x1b[G\\x1b[0J
-? Enter some text (default value) › foo\\x1b[40G\\x1b[G\\x1b[0J
+--------------------------
+? Enter some text (default value) › [37G[G[0J
+? Enter some text (default value) › f[38G[G[0J
+? Enter some text (default value) › fo[39G[G[0J
+? Enter some text (default value) › foo[40G[G[0J
 ? Enter some text (default value) › foo
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Enter a number › \\x1b[20G\\x1b[G\\x1b[0J
-? Enter a number › 4\\x1b[21G\\x1b[G\\x1b[0J
-? Enter a number › 43\\x1b[22G\\x1b[G\\x1b[0J
+[?25h[?25h[?25h? Enter a number › [20G[G[0J
+? Enter a number › 4[21G[G[0J
+? Enter a number › 43[22G[G[0J
 ? Enter a number › 43
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please confirm (y/n) › \\x1b[26G\\x1b[G\\x1b[0J
-? Please confirm (y/n) › yes\\x1b[27G\\x1b[G\\x1b[0J
+[?25h[?25h[?25h? Please confirm (y/n) › [26G[G[0J
+? Please confirm (y/n) › yes[27G[G[0J
 ? Please confirm (y/n) › Yes
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Please toggle (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+[?25h[?25h[?25h? Please toggle (No) › No / Yes
+❯ some hint[1A[0G[?25l[G[0J
 ? Please toggle (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ some hint[1A[0G[?25l[G[0J
 ? Please toggle (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ some hint[1A[0G[?25l[G[0J
 ? Please toggle (No) › No / Yes
-❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ some hint[1A[0G[?25l[G[0J
 ? Please toggle (No) › Yes
-\\x1b[?25h\\x1b[?25h\\x1b[?25h? Select an option
+[?25h[?25h[?25h? Select an option
 ❯ ✘ Foo
   ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
 ❯ ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
 ❯ ✔ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
   ✔ Bar
-❯ ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
   ✔ Bar
-❯ ✔ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✔ Baz[3A[19G[?25l[G[0J
 ? Select an option › Bar, Baz
-\\x1b[?25h\\x1b[?25h\\x1b[?25h'
+[?25h[?25h[?25h--------------------------
 `;

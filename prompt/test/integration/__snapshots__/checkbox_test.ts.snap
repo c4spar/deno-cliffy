@@ -1,25 +1,28 @@
 export const snapshot = {};
 
 snapshot[`checkbox prompt > should check an option 1`] = `
-"stdout:
+stdout:
+--------------------------
 ? Select an option
 ❯ ✘ Foo
   ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
 ❯ ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
   ✘ Bar
-❯ ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✘ Baz[3A[19G[?25l[G[0J
 ? Select an option
   ✘ Foo
   ✘ Bar
-❯ ✔ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✔ Baz[3A[19G[?25l[G[0J
 ? Select an option › Baz
-\\x1b[?25h\\x1b[?25h
+[?25h[?25h
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;

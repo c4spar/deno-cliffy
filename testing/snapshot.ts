@@ -137,6 +137,7 @@ function registerTest(options: SnapshotTestOptions) {
       dir: options.dir,
       path: options.path ??
         (options.dir ? undefined : `__snapshots__/${fileName}${suffix}.snap`),
+      serializer: (actual) => `${actual}`,
     });
   }
 }
@@ -208,8 +209,11 @@ async function runPrompt(
   }
 
   // Add a line break after each test input.
-  return "stdout:\n" + stdout.replaceAll(eraseDown(), eraseDown() + "\n") +
-    "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
+  return "stdout:\n--------------------------\n" +
+    stdout.replaceAll(eraseDown(), eraseDown() + "\n") +
+    "\n--------------------------\nstderr:\n--------------------------\n" +
+    stderr.replaceAll(eraseDown(), eraseDown() + "\n") +
+    "--------------------------";
 }
 
 async function runTest(options: SnapshotTestOptions) {

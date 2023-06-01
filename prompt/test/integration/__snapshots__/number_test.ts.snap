@@ -1,34 +1,40 @@
 export const snapshot = {};
 
 snapshot[`number prompt > should enter a number 1`] = `
-"stdout:
-? How old are you? (7) › \\x1b[26G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19\\x1b[28G\\x1b[G\\x1b[0J
-? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 21\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 18\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 17\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 18\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19\\x1b[27G\\x1b[G\\x1b[0J
-? How old are you? (7) › 20\\x1b[27G\\x1b[G\\x1b[0J
+stdout:
+--------------------------
+? How old are you? (7) › [26G[G[0J
+? How old are you? (7) › 19[28G[G[0J
+? How old are you? (7) › 20[27G[G[0J
+? How old are you? (7) › 21[27G[G[0J
+? How old are you? (7) › 20[27G[G[0J
+? How old are you? (7) › 19[27G[G[0J
+? How old are you? (7) › 18[27G[G[0J
+? How old are you? (7) › 17[27G[G[0J
+? How old are you? (7) › 18[27G[G[0J
+? How old are you? (7) › 19[27G[G[0J
+? How old are you? (7) › 20[27G[G[0J
 ? How old are you? (7) › 20
-\\x1b[?25h\\x1b[?25h
+[?25h[?25h
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`number prompt with float > should enter a floating number 1`] = `
-"stdout:
-? How old are you? (7) › \\x1b[26G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19.\\x1b[29G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19.1\\x1b[29G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19.2\\x1b[29G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19.3\\x1b[29G\\x1b[G\\x1b[0J
-? How old are you? (7) › 19.4\\x1b[29G\\x1b[G\\x1b[0J
+stdout:
+--------------------------
+? How old are you? (7) › [26G[G[0J
+? How old are you? (7) › 19.[29G[G[0J
+? How old are you? (7) › 19.1[29G[G[0J
+? How old are you? (7) › 19.2[29G[G[0J
+? How old are you? (7) › 19.3[29G[G[0J
+? How old are you? (7) › 19.4[29G[G[0J
 ? How old are you? (7) › 19.4
-\\x1b[?25h\\x1b[?25h
+[?25h[?25h
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;

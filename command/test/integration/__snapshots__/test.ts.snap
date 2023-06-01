@@ -1,51 +1,67 @@
 export const snapshot = {};
 
 snapshot[`command integration > should complete boolean arg 1`] = `
-"stdout:
+stdout:
+--------------------------
 true
 false
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should complete boolean arg from foo command 1`] = `
-"stdout:
+stdout:
+--------------------------
 true
 false
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should complete boolean arg from foo bar command 1`] = `
-"stdout:
+stdout:
+--------------------------
 true
 false
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should complete available commands for help command 1`] = `
-"stdout:
+stdout:
+--------------------------
 foo
 bar
 validation-error
 help
 completions
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should complete enum 1`] = `
-"stdout:
+stdout:
+--------------------------
 blue
 yellow
 red
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should generate bash completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env bash
 # bash completion support for completions-test v1.0.0
 
@@ -68,15 +84,15 @@ _completions_test() {
   }
 
   _completions_test_expand() {
-    [ "\$cur" != "\${cur%\\\\\\\\}" ] && cur="\$cur\\\\\\\\"
+    [ "\$cur" != "\${cur%\\\\}" ] && cur="\$cur\\\\"
   
     # expand ~username type directory specifications
-    if [[ "\$cur" == \\\\~*/* ]]; then
+    if [[ "\$cur" == \\~*/* ]]; then
       # shellcheck disable=SC2086
       eval cur=\$cur
       
-    elif [[ "\$cur" == \\\\~* ]]; then
-      cur=\${cur#\\\\~}
+    elif [[ "\$cur" == \\~* ]]; then
+      cur=\${cur#\\~}
       # shellcheck disable=SC2086,SC2207
       COMPREPLY=( \$( compgen -P '~' -u \$cur ) )
       return \${#COMPREPLY[@]}
@@ -86,8 +102,7 @@ _completions_test() {
   # shellcheck disable=SC2120
   _completions_test_file_dir() {
     listFiles=1
-    local IFS=\$'\\\\t\\
-' xspec #glob
+    local IFS=\$'\\t\\n' xspec #glob
     _completions_test_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
@@ -97,7 +112,7 @@ _completions_test() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
@@ -339,10 +354,8 @@ _completions_test() {
   fi
 
   local values
-  values="\$( printf "\\
-%s" "\${opts[@]}" )"
-  local IFS=\$'\\
-'
+  values="\$( printf "\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\n'
   # shellcheck disable=SC2207
   local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
   if [[ \${#result[@]} -eq 0 ]]; then
@@ -350,8 +363,7 @@ _completions_test() {
     COMPREPLY=(\$(compgen -f "\${cur}"))
   else
     # shellcheck disable=SC2207
-    COMPREPLY=(\$(printf '%q\\
-' "\${result[@]}"))
+    COMPREPLY=(\$(printf '%q\\n' "\${result[@]}"))
   fi
 
   return 0
@@ -359,12 +371,15 @@ _completions_test() {
 
 complete -F _completions_test -o bashdefault -o default completions-test
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should override name in bash completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env bash
 # bash completion support for foo-command v1.0.0
 
@@ -387,15 +402,15 @@ _foo_command() {
   }
 
   _foo_command_expand() {
-    [ "\$cur" != "\${cur%\\\\\\\\}" ] && cur="\$cur\\\\\\\\"
+    [ "\$cur" != "\${cur%\\\\}" ] && cur="\$cur\\\\"
   
     # expand ~username type directory specifications
-    if [[ "\$cur" == \\\\~*/* ]]; then
+    if [[ "\$cur" == \\~*/* ]]; then
       # shellcheck disable=SC2086
       eval cur=\$cur
       
-    elif [[ "\$cur" == \\\\~* ]]; then
-      cur=\${cur#\\\\~}
+    elif [[ "\$cur" == \\~* ]]; then
+      cur=\${cur#\\~}
       # shellcheck disable=SC2086,SC2207
       COMPREPLY=( \$( compgen -P '~' -u \$cur ) )
       return \${#COMPREPLY[@]}
@@ -405,8 +420,7 @@ _foo_command() {
   # shellcheck disable=SC2120
   _foo_command_file_dir() {
     listFiles=1
-    local IFS=\$'\\\\t\\
-' xspec #glob
+    local IFS=\$'\\t\\n' xspec #glob
     _foo_command_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
@@ -416,7 +430,7 @@ _foo_command() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
@@ -658,10 +672,8 @@ _foo_command() {
   fi
 
   local values
-  values="\$( printf "\\
-%s" "\${opts[@]}" )"
-  local IFS=\$'\\
-'
+  values="\$( printf "\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\n'
   # shellcheck disable=SC2207
   local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
   if [[ \${#result[@]} -eq 0 ]]; then
@@ -669,8 +681,7 @@ _foo_command() {
     COMPREPLY=(\$(compgen -f "\${cur}"))
   else
     # shellcheck disable=SC2207
-    COMPREPLY=(\$(printf '%q\\
-' "\${result[@]}"))
+    COMPREPLY=(\$(printf '%q\\n' "\${result[@]}"))
   fi
 
   return 0
@@ -678,12 +689,15 @@ _foo_command() {
 
 complete -F _foo_command -o bashdefault -o default foo-command
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should generate fish completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env fish
 # fish completion support for completions-test v1.0.0
 
@@ -696,7 +710,7 @@ function __fish_completions_test_using_command
       case '-*'
         continue
       case '*'
-        set word (string replace -r -a '\\\\W' '_' \$word)
+        set word (string replace -r -a '\\W' '_' \$word)
         set -l cmd_tmp \$cmd"_\$word"
         if contains \$cmd_tmp \$cmds
           set cmd \$cmd_tmp
@@ -714,9 +728,9 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s V -l version -x -k -f -d 'Show the version number for this program.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s g -l global -k -f -r -a '(completions-test completions complete boolean )' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s m -l main -k -f -r -a '(completions-test completions complete boolean )' -d 'Bar option.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -l color -k -f -r -a '(completions-test completions complete color )' -d 'Color option with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -l color -k -f -r -a '(completions-test completions complete color )' -d 'Color option with "\\'quotes\\'" and ([{brackets}])'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -s C -l colors -k -f -r -a '(completions-test completions complete color )' -d 'Color option.'
-complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a foo -d 'Foo command with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a foo -d 'Foo command with "\\'quotes\\'" and ([{brackets}])'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo' -s h -l help -x -k -f -d 'Show this help.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo' -s g -l global -k -f -r -a '(completions-test completions complete boolean foo)' -d 'Foo option.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_foo' -s f -l foo -k -f -d 'Foo option.'
@@ -770,12 +784,15 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should override name in fish completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env fish
 # fish completion support for foo-command v1.0.0
 
@@ -788,7 +805,7 @@ function __fish_foo_command_using_command
       case '-*'
         continue
       case '*'
-        set word (string replace -r -a '\\\\W' '_' \$word)
+        set word (string replace -r -a '\\W' '_' \$word)
         set -l cmd_tmp \$cmd"_\$word"
         if contains \$cmd_tmp \$cmds
           set cmd \$cmd_tmp
@@ -806,9 +823,9 @@ complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s h
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s V -l version -x -k -f -d 'Show the version number for this program.'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s g -l global -k -f -r -a '(foo-command completions complete boolean )' -d 'Foo option.'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s m -l main -k -f -r -a '(foo-command completions complete boolean )' -d 'Bar option.'
-complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -l color -k -f -r -a '(foo-command completions complete color )' -d 'Color option with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -l color -k -f -r -a '(foo-command completions complete color )' -d 'Color option with "\\'quotes\\'" and ([{brackets}])'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s C -l colors -k -f -r -a '(foo-command completions complete color )' -d 'Color option.'
-complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a foo -d 'Foo command with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a foo -d 'Foo command with "\\'quotes\\'" and ([{brackets}])'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s h -l help -x -k -f -d 'Show this help.'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s g -l global -k -f -r -a '(foo-command completions complete boolean foo)' -d 'Foo option.'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s f -l foo -k -f -d 'Foo option.'
@@ -862,12 +879,15 @@ complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should generate zsh completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env zsh
 # zsh completion support for completions-test v1.0.0
 
@@ -886,8 +906,7 @@ function __completions_test_complete {
     if _requested "\$name"; then
       # shellcheck disable=SC2034
       lines="\$(completions-test completions complete "\${action}" "\${@}")"
-      values=("\${(ps:\\
-:)lines}")
+      values=("\${(ps:\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "\$name" expl "\$action"; do
           compadd -S '' "\${expl[@]}" "\${values[@]}"
@@ -926,19 +945,19 @@ function _completions_test() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(- *)'{-V,--version}'[Show the version number for this program.]' \\\\
-    '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\\\
-    '(-h --help -V --version --color)'--color='[Color option with \\\\"'"'"'quotes'"'"'\\\\" and (\\\\[{brackets}\\\\])]:val:->val-color' \\\\
-    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\\\
-    '1:command:_commands'\\\\
-    '2::path:_files'\\\\
-    '3::path:_files'\\\\
-    '4::path:_files'\\\\
-    '5::path:_files'\\\\
-    '6::path:_files' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(- *)'{-V,--version}'[Show the version number for this program.]' \\
+    '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\
+    '(-h --help -V --version --color)'--color='[Color option with \\"'"'"'quotes'"'"'\\" and (\\[{brackets}\\])]:val:->val-color' \\
+    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\
+    '1:command:_commands'\\
+    '2::path:_files'\\
+    '3::path:_files'\\
+    '4::path:_files'\\
+    '5::path:_files'\\
+    '6::path:_files' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -969,11 +988,11 @@ function _completions_test_foo() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -f --foo)'{-f,--foo}'[Foo option.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -f --foo)'{-f,--foo}'[Foo option.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -990,8 +1009,8 @@ function _completions_test_foo_help() {
     __completions_test_complete command command foo help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1014,11 +1033,11 @@ function _completions_test_foo_bar() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -b --bar)'{-b,--bar}'[Bar option.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -b --bar)'{-b,--bar}'[Bar option.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1035,8 +1054,8 @@ function _completions_test_foo_bar_help() {
     __completions_test_complete command command foo bar help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1059,11 +1078,11 @@ function _completions_test_bar() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -f --file)'{-f,--file}'[...]:path:->path-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -f --file)'{-f,--file}'[...]:path:->path-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1081,8 +1100,8 @@ function _completions_test_bar_help() {
     __completions_test_complete command command bar help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1105,10 +1124,10 @@ function _completions_test_validation_error() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1125,8 +1144,8 @@ function _completions_test_validation_error_help() {
     __completions_test_complete command command validation-error help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1138,8 +1157,8 @@ function _completions_test_help() {
     __completions_test_complete command command help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1168,9 +1187,9 @@ function _completions_test_completions() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1186,8 +1205,8 @@ function _completions_test_completions_help() {
     __completions_test_complete command command completions help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1210,10 +1229,10 @@ function _completions_test_completions_bash() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1230,8 +1249,8 @@ function _completions_test_completions_bash_help() {
     __completions_test_complete command command completions bash help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1254,10 +1273,10 @@ function _completions_test_completions_fish() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1274,8 +1293,8 @@ function _completions_test_completions_fish_help() {
     __completions_test_complete command command completions fish help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1298,10 +1317,10 @@ function _completions_test_completions_zsh() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1318,8 +1337,8 @@ function _completions_test_completions_zsh_help() {
     __completions_test_complete command command completions zsh help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1327,12 +1346,15 @@ function _completions_test_completions_zsh_help() {
 
 compdef _completions_test completions-test
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should override name in zsh completions 1`] = `
-\`stdout:
+stdout:
+--------------------------
 #!/usr/bin/env zsh
 # zsh completion support for foo-command v1.0.0
 
@@ -1351,8 +1373,7 @@ function __foo_command_complete {
     if _requested "\$name"; then
       # shellcheck disable=SC2034
       lines="\$(foo-command completions complete "\${action}" "\${@}")"
-      values=("\${(ps:\\
-:)lines}")
+      values=("\${(ps:\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "\$name" expl "\$action"; do
           compadd -S '' "\${expl[@]}" "\${values[@]}"
@@ -1391,19 +1412,19 @@ function _foo_command() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(- *)'{-V,--version}'[Show the version number for this program.]' \\\\
-    '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\\\
-    '(-h --help -V --version --color)'--color='[Color option with \\\\"'"'"'quotes'"'"'\\\\" and (\\\\[{brackets}\\\\])]:val:->val-color' \\\\
-    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\\\
-    '1:command:_commands'\\\\
-    '2::path:_files'\\\\
-    '3::path:_files'\\\\
-    '4::path:_files'\\\\
-    '5::path:_files'\\\\
-    '6::path:_files' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(- *)'{-V,--version}'[Show the version number for this program.]' \\
+    '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\
+    '(-h --help -V --version --color)'--color='[Color option with \\"'"'"'quotes'"'"'\\" and (\\[{brackets}\\])]:val:->val-color' \\
+    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\
+    '1:command:_commands'\\
+    '2::path:_files'\\
+    '3::path:_files'\\
+    '4::path:_files'\\
+    '5::path:_files'\\
+    '6::path:_files' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1434,11 +1455,11 @@ function _foo_command_foo() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -f --foo)'{-f,--foo}'[Foo option.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -f --foo)'{-f,--foo}'[Foo option.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1455,8 +1476,8 @@ function _foo_command_foo_help() {
     __foo_command_complete command command foo help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1479,11 +1500,11 @@ function _foo_command_foo_bar() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -b --bar)'{-b,--bar}'[Bar option.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -b --bar)'{-b,--bar}'[Bar option.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1500,8 +1521,8 @@ function _foo_command_foo_bar_help() {
     __foo_command_complete command command foo bar help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1524,11 +1545,11 @@ function _foo_command_bar() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '(-h --help -f --file)'{-f,--file}'[...]:path:->path-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '(-h --help -f --file)'{-f,--file}'[...]:path:->path-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1546,8 +1567,8 @@ function _foo_command_bar_help() {
     __foo_command_complete command command bar help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1570,10 +1591,10 @@ function _foo_command_validation_error() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1590,8 +1611,8 @@ function _foo_command_validation_error_help() {
     __foo_command_complete command command validation-error help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1603,8 +1624,8 @@ function _foo_command_help() {
     __foo_command_complete command command help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1633,9 +1654,9 @@ function _foo_command_completions() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1651,8 +1672,8 @@ function _foo_command_completions_help() {
     __foo_command_complete command command completions help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1675,10 +1696,10 @@ function _foo_command_completions_bash() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1695,8 +1716,8 @@ function _foo_command_completions_bash_help() {
     __foo_command_complete command command completions bash help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1719,10 +1740,10 @@ function _foo_command_completions_fish() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1739,8 +1760,8 @@ function _foo_command_completions_fish_help() {
     __foo_command_complete command command completions fish help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1763,10 +1784,10 @@ function _foo_command_completions_zsh() {
     esac
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
-    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
-    '1:command:_commands' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\
+    '1:command:_commands' \\
     '*::sub command:->command_args'
 
   case "\$state" in
@@ -1783,8 +1804,8 @@ function _foo_command_completions_zsh_help() {
     __foo_command_complete command command completions zsh help
   }
 
-  _arguments -w -s -S -C \\\\
-    '(- *)'{-h,--help}'[Show this help.]' \\\\
+  _arguments -w -s -S -C \\
+    '(- *)'{-h,--help}'[Show this help.]' \\
     '1:command:_commands'
 }
 
@@ -1792,260 +1813,289 @@ function _foo_command_completions_zsh_help() {
 
 compdef _foo_command foo-command
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output command help with help command 1`] = `
-\`stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+  [1mUsage:[22m   [95mcompletions-test [33m<[95m[95mcolor[95m[33m>[95m [33m[[95m[95mpath...[95m[33m][95m[39m
+  [1mVersion:[22m [33m1.0.0[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+  [1mmeta1: [22mvalue1
+  [1mmeta2: [22mvalue2
+  [1mmeta3: [22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+  [1mDescription:[22m
 
     Completions test.  
                        
       Completions test.
     Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    [94m-h[39m, [94m--help[39m               [31m[1m-[22m[39m Show this help.                                                                   
+    [94m-V[39m, [94m--version[39m            [31m[1m-[22m[39m Show the version number for this program.                                         
+    [94m-g[39m, [94m--global[39m   [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Foo option.                                                                       
+    [94m-m[39m, [94m--main[39m     [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Bar option.                                                                       
+    [94m--color[39m        [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Color option with "'quotes'" and ([{brackets}])  ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
+    [94m-C[39m, [94m--colors[39m   [33m<[39m[95mval...[39m[33m>[39m  [31m[1m-[22m[39m Color option.                                    ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+    [94mfoo[39m                          [31m[1m-[22m[39m Foo command with "'quotes'" and ([{brackets}])
+    [94mbar[39m                          [31m[1m-[22m[39m                                               
+    [94mvalidation-error[39m             [31m[1m-[22m[39m                                               
+    [94mhelp[39m              [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.  
+    [94mcompletions[39m                  [31m[1m-[22m[39m Generate shell completions.                   
 
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output sub-command help with help command 1`] = `
-\`stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
+  [1mUsage:[22m   [95mcompletions-test foo[39m
+  [1mVersion:[22m [33m1.0.0[39m               
 
-  \\x1b[1mDescription:\\x1b[22m
+  [1mDescription:[22m
 
     Foo command with "'quotes'" and ([{brackets}]) 
      and line breaks.                              
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
-    \\x1b[94m-f\\x1b[39m, \\x1b[94m--foo\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
+    [94m-h[39m, [94m--help[39m           [31m[1m-[22m[39m Show this help.  
+    [94m-g[39m, [94m--global[39m  [33m<[39m[95mval[39m[33m>[39m  [31m[1m-[22m[39m Foo option.      
+    [94m-f[39m, [94m--foo[39m            [31m[1m-[22m[39m Foo option.      
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
-    \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
+    [94mhelp[39m  [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.
+    [94mbar[39m              [31m[1m-[22m[39m Bar command.                                
 
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output short help with -h flag 1`] = `
-\`stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+  [1mUsage:[22m   [95mcompletions-test [33m<[95m[95mcolor[95m[33m>[95m [33m[[95m[95mpath...[95m[33m][95m[39m
+  [1mVersion:[22m [33m1.0.0[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+  [1mmeta1: [22mvalue1
+  [1mmeta2: [22mvalue2
+  [1mmeta3: [22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+  [1mDescription:[22m
 
     Completions test.  
                        
       Completions test.
     Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    [94m-h[39m, [94m--help[39m               [31m[1m-[22m[39m Show this help.                                                                   
+    [94m-V[39m, [94m--version[39m            [31m[1m-[22m[39m Show the version number for this program.                                         
+    [94m-g[39m, [94m--global[39m   [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Foo option.                                                                       
+    [94m-m[39m, [94m--main[39m     [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Bar option.                                                                       
+    [94m--color[39m        [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Color option with "'quotes'" and ([{brackets}])  ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
+    [94m-C[39m, [94m--colors[39m   [33m<[39m[95mval...[39m[33m>[39m  [31m[1m-[22m[39m Color option.                                    ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+    [94mfoo[39m                          [31m[1m-[22m[39m Foo command with "'quotes'" and ([{brackets}])
+    [94mbar[39m                          [31m[1m-[22m[39m                                               
+    [94mvalidation-error[39m             [31m[1m-[22m[39m                                               
+    [94mhelp[39m              [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.  
+    [94mcompletions[39m                  [31m[1m-[22m[39m Generate shell completions.                   
 
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output long help with --help flag 1`] = `
-\`stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+  [1mUsage:[22m   [95mcompletions-test [33m<[95m[95mcolor[95m[33m>[95m [33m[[95m[95mpath...[95m[33m][95m[39m
+  [1mVersion:[22m [33m1.0.0[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+  [1mmeta1: [22mvalue1
+  [1mmeta2: [22mvalue2
+  [1mmeta3: [22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+  [1mDescription:[22m
 
     Completions test.  
                        
       Completions test.
     Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                    
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                          
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                        
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                        
+    [94m-h[39m, [94m--help[39m               [31m[1m-[22m[39m Show this help.                                                                    
+    [94m-V[39m, [94m--version[39m            [31m[1m-[22m[39m Show the version number for this program.                                          
+    [94m-g[39m, [94m--global[39m   [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Foo option.                                                                        
+    [94m-m[39m, [94m--main[39m     [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Bar option.                                                                        
                                  foo bar baz. foo bar baz.                                                        
                                                                                                                   
                                foo bar baz.                                                                       
                                foo bar baz.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])   (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    [94m--color[39m        [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Color option with "'quotes'" and ([{brackets}])   ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
                                 and line breaks.                                                                  
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                     (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    [94m-C[39m, [94m--colors[39m   [33m<[39m[95mval...[39m[33m>[39m  [31m[1m-[22m[39m Color option.                                     ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+    [94mfoo[39m                          [31m[1m-[22m[39m Foo command with "'quotes'" and ([{brackets}])
+    [94mbar[39m                          [31m[1m-[22m[39m                                               
+    [94mvalidation-error[39m             [31m[1m-[22m[39m                                               
+    [94mhelp[39m              [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.  
+    [94mcompletions[39m                  [31m[1m-[22m[39m Generate shell completions.                   
 
 
+--------------------------
 stderr:
-\`
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output short version with -V flag 1`] = `
-"stdout:
+stdout:
+--------------------------
 1.0.0
 
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should output long version with --version flag 1`] = `
-"stdout:
-\\x1b[1mcompletions-test\\x1b[22m \\x1b[94m1.0.0\\x1b[39m
-\\x1b[1mmeta1\\x1b[22m \\x1b[94mvalue1\\x1b[39m
-\\x1b[1mmeta2\\x1b[22m \\x1b[94mvalue2\\x1b[39m
-\\x1b[1mmeta3\\x1b[22m \\x1b[94mvalue3\\x1b[39m
+stdout:
+--------------------------
+[1mcompletions-test[22m [94m1.0.0[39m
+[1mmeta1[22m [94mvalue1[39m
+[1mmeta2[22m [94mvalue2[39m
+[1mmeta3[22m [94mvalue3[39m
 
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
 
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
-'stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
+  [1mUsage:[22m   [95mcompletions-test bar[39m
+  [1mVersion:[22m [33m1.0.0[39m               
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.            
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m   \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                
-    \\x1b[94m-f\\x1b[39m, \\x1b[94m--file\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[95mpath\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m ...              (\\x1b[33mrequired\\x1b[39m)
+    [94m-h[39m, [94m--help[39m            [31m[1m-[22m[39m Show this help.            
+    [94m-g[39m, [94m--global[39m  [33m<[39m[95mval[39m[33m>[39m   [31m[1m-[22m[39m Foo option.                
+    [94m-f[39m, [94m--file[39m    [33m<[39m[95mpath[39m[33m>[39m  [31m[1m-[22m[39m ...              ([33mrequired[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
+    [94mhelp[39m  [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.
 
 
+--------------------------
 stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
-\\x1b[39m
-'
+--------------------------
+[31m  [1merror[22m: Missing required option "--file".
+[39m
+--------------------------
 `;
 
 snapshot[`command integration > should print error message for unknown option with suggestion 1`] = `
-\`stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+  [1mUsage:[22m   [95mcompletions-test [33m<[95m[95mcolor[95m[33m>[95m [33m[[95m[95mpath...[95m[33m][95m[39m
+  [1mVersion:[22m [33m1.0.0[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+  [1mmeta1: [22mvalue1
+  [1mmeta2: [22mvalue2
+  [1mmeta3: [22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+  [1mDescription:[22m
 
     Completions test.  
                        
       Completions test.
     Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+    [94m-h[39m, [94m--help[39m               [31m[1m-[22m[39m Show this help.                                                                   
+    [94m-V[39m, [94m--version[39m            [31m[1m-[22m[39m Show the version number for this program.                                         
+    [94m-g[39m, [94m--global[39m   [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Foo option.                                                                       
+    [94m-m[39m, [94m--main[39m     [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Bar option.                                                                       
+    [94m--color[39m        [33m<[39m[95mval[39m[33m>[39m     [31m[1m-[22m[39m Color option with "'quotes'" and ([{brackets}])  ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
+    [94m-C[39m, [94m--colors[39m   [33m<[39m[95mval...[39m[33m>[39m  [31m[1m-[22m[39m Color option.                                    ([1mValues: [22m[32m"blue"[39m, [32m"yellow"[39m, [32m"red"[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+    [94mfoo[39m                          [31m[1m-[22m[39m Foo command with "'quotes'" and ([{brackets}])
+    [94mbar[39m                          [31m[1m-[22m[39m                                               
+    [94mvalidation-error[39m             [31m[1m-[22m[39m                                               
+    [94mhelp[39m              [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.  
+    [94mcompletions[39m                  [31m[1m-[22m[39m Generate shell completions.                   
 
 
+--------------------------
 stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
-\\x1b[39m
-\`
+--------------------------
+[31m  [1merror[22m: Unknown option "--colorr". Did you mean option "--color"?
+[39m
+--------------------------
 `;
 
 snapshot[`command integration > should print help and error message when validation error 1`] = `
-"stdout:
+stdout:
+--------------------------
 
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
+  [1mUsage:[22m   [95mcompletions-test validation-error[39m
+  [1mVersion:[22m [33m1.0.0[39m                            
 
-  \\x1b[1mOptions:\\x1b[22m
+  [1mOptions:[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
+    [94m-h[39m, [94m--help[39m           [31m[1m-[22m[39m Show this help.  
+    [94m-g[39m, [94m--global[39m  [33m<[39m[95mval[39m[33m>[39m  [31m[1m-[22m[39m Foo option.      
 
-  \\x1b[1mCommands:\\x1b[22m
+  [1mCommands:[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
+    [94mhelp[39m  [33m[[39m[95mcommand[39m[33m][39m  [31m[1m-[22m[39m Show this help or the help of a sub-command.
 
 
+--------------------------
 stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
-\\x1b[39m
-"
+--------------------------
+[31m  [1merror[22m: Validation error message.
+[39m
+--------------------------
 `;

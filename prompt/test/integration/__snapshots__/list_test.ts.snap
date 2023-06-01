@@ -1,13 +1,16 @@
 export const snapshot = {};
 
 snapshot[`list prompt > should enter some keywords 1`] = `
-"stdout:
+stdout:
+--------------------------
 ? Enter some keywords (foo, far) › 
-❯ some hint...\\x1b[1A\\x1b[36G\\x1b[G\\x1b[0J
+❯ some hint...[1A[36G[G[0J
 ? Enter some keywords (foo, far) › foo, bar
-❯ some hint...\\x1b[1A\\x1b[44G\\x1b[G\\x1b[0J
+❯ some hint...[1A[44G[G[0J
 ? Enter some keywords (foo, far) › foo, bar
-\\x1b[?25h\\x1b[?25h
+[?25h[?25h
+--------------------------
 stderr:
-"
+--------------------------
+--------------------------
 `;
