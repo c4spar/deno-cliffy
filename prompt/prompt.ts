@@ -31,7 +31,7 @@ export type PromptOptions<
       TName,
       TStaticPrompt
     >,
-> = Id<TResult & PromptResult<TName, TStaticPrompt>> extends infer Result ? 
+> = Id<TResult & PromptResult<TName, TStaticPrompt>> extends infer Result ?
     & {
       name: TName;
       type: TStaticPrompt;
