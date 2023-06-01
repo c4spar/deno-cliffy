@@ -1867,13 +1867,13 @@ export class Command<
     await Deno.permissions.request({ name: "run", command });
 
     try {
-      const process: Deno.Process = Deno.run({
-        cmd: [command, ...args],
+      const cmd: Deno.Command = new Deno.Command(command, {
+        args,
       });
-      const status: Deno.ProcessStatus = await process.status();
+      const output: Deno.CommandOutput = await cmd.output();
 
-      if (!status.success) {
-        Deno.exit(status.code);
+      if (!output.success) {
+        Deno.exit(output.code);
       }
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {

@@ -86,37 +86,41 @@ export abstract class Provider {
     }
     const registry: string = new URL(main, this.getRegistryUrl(name, to)).href;
 
-    const cmd = [Deno.execPath(), "install"];
+    const cmdArgs = ["install"];
 
     if (importMap) {
       const importJson: string =
         new URL(importMap, this.getRegistryUrl(name, to)).href;
 
-      cmd.push("--import-map", importJson);
+      cmdArgs.push("--import-map", importJson);
     }
 
     if (args.length) {
-      cmd.push(...args, "--force", "--name", name, registry);
+      cmdArgs.push(...args, "--force", "--name", name, registry);
     } else {
-      cmd.push("--no-check", "--quiet", "--force", "--name", name, registry);
+      cmdArgs.push(
+        "--no-check",
+        "--quiet",
+        "--force",
+        "--name",
+        name,
+        registry,
+      );
     }
 
-    const process = Deno.run({ cmd, stdout: "piped", stderr: "piped" });
+    const cmd = new Deno.Command(Deno.execPath(), {
+      args: cmdArgs,
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const {success, stderr} = await cmd.output();
 
-    const [status, stderr] = await Promise.all([
-      process.status(),
-      process.stderrOutput(),
-      process.output(),
-    ]);
-
-    if (!status.success) {
-      process.close();
+    if (!success) {
       await Deno.stderr.write(stderr);
       throw new Error(
         `Failed to upgrade ${name} from ${from} to version ${to}!`,
       );
     }
-    process.close();
 
     console.info(
       `Successfully upgraded ${name} from ${from} to version ${to}! (${
