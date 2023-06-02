@@ -1,0 +1,65 @@
+export const snapshot = {};
+
+snapshot[`input prompt > should enter some text 1`] = `
+stdout:
+"? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar\\x1b[35G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;
+
+snapshot[`input prompt with suggestions > should enable suggestions and list 1`] = `
+stdout:
+"? Whats your name? (foo) › 
+  foo
+  bar
+  baz\\x1b[3A\\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo
+❯ foo\\x1b[1A\\x1b[31G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;
+
+snapshot[`input prompt with prefix > should change prefix 1`] = `
+stdout:
+"PREFIX Whats your name? (foo) › \\x1b[33G\\x1b[G\\x1b[0J
+PREFIX Whats your name? (foo) › bar\\x1b[36G\\x1b[G\\x1b[0J
+PREFIX Whats your name? (foo) › bar
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;
+
+snapshot[`input prompt with writer set to stderr > should enter some text 1`] = `
+stdout:
+""
+stderr:
+"? Whats your name? (foo) › \\x1b[28G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar\\x1b[35G\\x1b[G\\x1b[0J
+? Whats your name? (foo) › foo bar
+\\x1b[?25h\\x1b[?25h"
+`;
+
+snapshot[`input prompt without prefix > should disable prefix 1`] = `
+stdout:
+"Whats your name? (foo) › \\x1b[26G\\x1b[G\\x1b[0J
+Whats your name? (foo) › bar\\x1b[29G\\x1b[G\\x1b[0J
+Whats your name? (foo) › bar
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;
+
+snapshot[`input prompt with no location flag > should work without --location flag 1`] = `
+stdout:
+"? Works without --location? (hope so) › \\x1b[41G\\x1b[G\\x1b[0J
+? Works without --location? (hope so) › yes\\x1b[44G\\x1b[G\\x1b[0J
+? Works without --location? (hope so) › yes
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;

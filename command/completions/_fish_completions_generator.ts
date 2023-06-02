@@ -16,15 +16,18 @@ interface CompleteOptions {
 /** Fish completions generator. */
 export class FishCompletionsGenerator {
   /** Generates fish completions script for given command. */
-  public static generate(cmd: Command) {
-    return new FishCompletionsGenerator(cmd).generate();
+  public static generate(name: string, cmd: Command) {
+    return new FishCompletionsGenerator(name, cmd).generate();
   }
 
-  private constructor(protected cmd: Command) {}
+  private constructor(
+    protected name: string,
+    protected cmd: Command,
+  ) {}
 
   /** Generates fish completions script. */
   private generate(): string {
-    const path = this.cmd.getPath();
+    const path = this.cmd.getPath(this.name);
     const version: string | undefined = this.cmd.getVersion()
       ? ` v${this.cmd.getVersion()}`
       : "";
@@ -32,8 +35,8 @@ export class FishCompletionsGenerator {
     return `#!/usr/bin/env fish
 # fish completion support for ${path}${version}
 
-function __fish_${replaceSpecialChars(this.cmd.getName())}_using_command
-  set -l cmds ${getCommandFnNames(this.cmd).join(" ")}
+function __fish_${replaceSpecialChars(this.name)}_using_command
+  set -l cmds ${getCommandFnNames(this.name, this.cmd).join(" ")}
   set -l words (commandline -opc)
   set -l cmd "_"
   for word in $words
@@ -54,10 +57,10 @@ function __fish_${replaceSpecialChars(this.cmd.getName())}_using_command
   return 1
 end
 
-${this.generateCompletions(this.cmd).trim()}`;
+${this.generateCompletions(this.name, this.cmd).trim()}`;
   }
 
-  private generateCompletions(command: Command): string {
+  private generateCompletions(name: string, command: Command): string {
     const parent: Command | undefined = command.getParent();
     let result = ``;
 
@@ -65,7 +68,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
       // command
       result += "\n" + this.complete(parent, {
         description: command.getShortDescription(),
-        arguments: command.getName(),
+        arguments: name,
       });
     }
 
@@ -85,7 +88,7 @@ ${this.generateCompletions(this.cmd).trim()}`;
     }
 
     for (const subCommand of command.getCommands(false)) {
-      result += this.generateCompletions(subCommand);
+      result += this.generateCompletions(subCommand.getName(), subCommand);
     }
 
     return result;
@@ -114,11 +117,11 @@ ${this.generateCompletions(this.cmd).trim()}`;
 
   private complete(command: Command, options: CompleteOptions) {
     const cmd = ["complete"];
-    cmd.push("-c", this.cmd.getName());
+    cmd.push("-c", this.name);
     cmd.push(
       "-n",
-      `'__fish_${replaceSpecialChars(this.cmd.getName())}_using_command __${
-        replaceSpecialChars(command.getPath())
+      `'__fish_${replaceSpecialChars(this.name)}_using_command __${
+        replaceSpecialChars(command.getPath(this.name))
       }'`,
     );
     options.shortOption && cmd.push("-s", options.shortOption);
@@ -148,19 +151,20 @@ ${this.generateCompletions(this.cmd).trim()}`;
     if (type && type.handler instanceof FileType) {
       return `'(__fish_complete_path)'`;
     }
-    return `'(${this.cmd.getName()} completions complete ${
+    return `'(${this.name} completions complete ${
       arg.action + " " + getCompletionsPath(cmd)
     })'`;
   }
 }
 
 function getCommandFnNames(
+  name: string,
   cmd: Command,
   cmds: Array<string> = [],
 ): Array<string> {
-  cmds.push(`__${replaceSpecialChars(cmd.getPath())}`);
+  cmds.push(`__${replaceSpecialChars(cmd.getPath(name))}`);
   cmd.getCommands(false).forEach((command) => {
-    getCommandFnNames(command, cmds);
+    getCommandFnNames(name, command, cmds);
   });
   return cmds;
 }

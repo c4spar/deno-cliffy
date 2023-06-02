@@ -1,35 +1,51 @@
 export const snapshot = {};
 
 snapshot[`command integration > should complete boolean arg 1`] = `
+stdout:
 "true
 false"
+stderr:
+""
 `;
 
 snapshot[`command integration > should complete boolean arg from foo command 1`] = `
+stdout:
 "true
 false"
+stderr:
+""
 `;
 
 snapshot[`command integration > should complete boolean arg from foo bar command 1`] = `
+stdout:
 "true
 false"
+stderr:
+""
 `;
 
 snapshot[`command integration > should complete available commands for help command 1`] = `
+stdout:
 "foo
 bar
 validation-error
 help
 completions"
+stderr:
+""
 `;
 
 snapshot[`command integration > should complete enum 1`] = `
+stdout:
 "blue
 yellow
 red"
+stderr:
+""
 `;
 
 snapshot[`command integration > should generate bash completions 1`] = `
+stdout:
 \`#!/usr/bin/env bash
 # bash completion support for completions-test v1.0.0
 
@@ -70,8 +86,7 @@ _completions_test() {
   # shellcheck disable=SC2120
   _completions_test_file_dir() {
     listFiles=1
-    local IFS=\$'\\\\t\\
-' xspec #glob
+    local IFS=\$'\\\\t\\\\n' xspec #glob
     _completions_test_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
@@ -231,13 +246,14 @@ _completions_test() {
   }
 
   __completions_test_completions_bash() {
-    opts=(-h --help help)
+    opts=(-h --help -n --name help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
+      -n|--name) opts=(); _completions_test_complete string completions bash ;;
     esac
   }
 
@@ -253,13 +269,14 @@ _completions_test() {
   }
 
   __completions_test_completions_fish() {
-    opts=(-h --help help)
+    opts=(-h --help -n --name help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
+      -n|--name) opts=(); _completions_test_complete string completions fish ;;
     esac
   }
 
@@ -275,13 +292,14 @@ _completions_test() {
   }
 
   __completions_test_completions_zsh() {
-    opts=(-h --help help)
+    opts=(-h --help -n --name help)
     
     if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
       return 0
     fi
     case "\${prev}" in
       -h|--help) opts=() ;;
+      -n|--name) opts=(); _completions_test_complete string completions zsh ;;
     esac
   }
 
@@ -320,10 +338,8 @@ _completions_test() {
   fi
 
   local values
-  values="\$( printf "\\
-%s" "\${opts[@]}" )"
-  local IFS=\$'\\
-'
+  values="\$( printf "\\\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\\\n'
   # shellcheck disable=SC2207
   local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
   if [[ \${#result[@]} -eq 0 ]]; then
@@ -331,8 +347,7 @@ _completions_test() {
     COMPREPLY=(\$(compgen -f "\${cur}"))
   else
     # shellcheck disable=SC2207
-    COMPREPLY=(\$(printf '%q\\
-' "\${result[@]}"))
+    COMPREPLY=(\$(printf '%q\\\\n' "\${result[@]}"))
   fi
 
   return 0
@@ -340,9 +355,327 @@ _completions_test() {
 
 complete -F _completions_test -o bashdefault -o default completions-test
 \`
+stderr:
+""
+`;
+
+snapshot[`command integration > should override name in bash completions 1`] = `
+stdout:
+\`#!/usr/bin/env bash
+# bash completion support for foo-command v1.0.0
+
+_foo_command() {
+  local word cur prev listFiles
+  local -a opts
+  COMPREPLY=()
+  cur="\${COMP_WORDS[COMP_CWORD]}"
+  prev="\${COMP_WORDS[COMP_CWORD-1]}"
+  cmd="_"
+  opts=()
+  listFiles=0
+
+  _foo_command_complete() {
+    local action="\$1"; shift
+    mapfile -t values < <( foo-command completions complete "\${action}" "\${@}" )
+    for i in "\${values[@]}"; do
+      opts+=("\$i")
+    done
+  }
+
+  _foo_command_expand() {
+    [ "\$cur" != "\${cur%\\\\\\\\}" ] && cur="\$cur\\\\\\\\"
+  
+    # expand ~username type directory specifications
+    if [[ "\$cur" == \\\\~*/* ]]; then
+      # shellcheck disable=SC2086
+      eval cur=\$cur
+      
+    elif [[ "\$cur" == \\\\~* ]]; then
+      cur=\${cur#\\\\~}
+      # shellcheck disable=SC2086,SC2207
+      COMPREPLY=( \$( compgen -P '~' -u \$cur ) )
+      return \${#COMPREPLY[@]}
+    fi
+  }
+
+  # shellcheck disable=SC2120
+  _foo_command_file_dir() {
+    listFiles=1
+    local IFS=\$'\\\\t\\\\n' xspec #glob
+    _foo_command_expand || return 0
+  
+    if [ "\${1:-}" = -d ]; then
+      # shellcheck disable=SC2206,SC2207,SC2086
+      COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -d -- \$cur ) )
+      #eval "\$glob"    # restore glob setting.
+      return 0
+    fi
+  
+    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    # shellcheck disable=SC2206,SC2207
+    COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
+  }
+
+  __foo_command() {
+    opts=(-h --help -V --version -g --global -m --main --color -C --colors foo bar validation-error help completions)
+    _foo_command_complete color
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 1 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -V|--version) opts=() ;;
+      -g|--global) opts=(); _foo_command_complete boolean ;;
+      -m|--main) opts=(); _foo_command_complete boolean ;;
+      --color) opts=(); _foo_command_complete color ;;
+      -C|--colors) opts=(); _foo_command_complete color ;;
+    esac
+  }
+
+  __foo_command_foo() {
+    opts=(-h --help -g --global -f --foo help bar)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _foo_command_complete boolean foo ;;
+      -f|--foo)  ;;
+    esac
+  }
+
+  __foo_command_foo_help() {
+    opts=(-h --help)
+    _foo_command_complete command foo help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_foo_bar() {
+    opts=(-h --help -g --global -b --bar help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _foo_command_complete boolean foo bar ;;
+      -b|--bar)  ;;
+    esac
+  }
+
+  __foo_command_foo_bar_help() {
+    opts=(-h --help)
+    _foo_command_complete command foo bar help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_bar() {
+    opts=(-h --help -g --global -f --file help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _foo_command_complete boolean bar ;;
+      -f|--file) opts=(); _foo_command_complete string bar ;;
+    esac
+  }
+
+  __foo_command_bar_help() {
+    opts=(-h --help)
+    _foo_command_complete command bar help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_validation_error() {
+    opts=(-h --help -g --global help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -g|--global) opts=(); _foo_command_complete boolean validation-error ;;
+    esac
+  }
+
+  __foo_command_validation_error_help() {
+    opts=(-h --help)
+    _foo_command_complete command validation-error help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_help() {
+    opts=(-h --help)
+    _foo_command_complete command help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_completions() {
+    opts=(-h --help help bash fish zsh)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 2 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_completions_help() {
+    opts=(-h --help)
+    _foo_command_complete command completions help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_completions_bash() {
+    opts=(-h --help -n --name help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -n|--name) opts=(); _foo_command_complete string completions bash ;;
+    esac
+  }
+
+  __foo_command_completions_bash_help() {
+    opts=(-h --help)
+    _foo_command_complete command completions bash help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_completions_fish() {
+    opts=(-h --help -n --name help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -n|--name) opts=(); _foo_command_complete string completions fish ;;
+    esac
+  }
+
+  __foo_command_completions_fish_help() {
+    opts=(-h --help)
+    _foo_command_complete command completions fish help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  __foo_command_completions_zsh() {
+    opts=(-h --help -n --name help)
+    
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 3 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+      -n|--name) opts=(); _foo_command_complete string completions zsh ;;
+    esac
+  }
+
+  __foo_command_completions_zsh_help() {
+    opts=(-h --help)
+    _foo_command_complete command completions zsh help
+    if [[ \${cur} == -* || \${COMP_CWORD} -eq 4 ]] ; then
+      return 0
+    fi
+    case "\${prev}" in
+      -h|--help) opts=() ;;
+    esac
+  }
+
+  for word in "\${COMP_WORDS[@]}"; do
+    case "\${word}" in
+      -*) ;;
+      *)
+        cmd_tmp="\${cmd}_\${word//[^[:alnum:]]/_}"
+        if type "\${cmd_tmp}" &>/dev/null; then
+          cmd="\${cmd_tmp}"
+        fi
+    esac
+  done
+
+  \${cmd}
+
+  if [[ listFiles -eq 1 ]]; then
+    return 0
+  fi
+
+  if [[ \${#opts[@]} -eq 0 ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=(\$(compgen -f "\${cur}"))
+    return 0
+  fi
+
+  local values
+  values="\$( printf "\\\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\\\n'
+  # shellcheck disable=SC2207
+  local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
+  if [[ \${#result[@]} -eq 0 ]]; then
+    # shellcheck disable=SC2207
+    COMPREPLY=(\$(compgen -f "\${cur}"))
+  else
+    # shellcheck disable=SC2207
+    COMPREPLY=(\$(printf '%q\\\\n' "\${result[@]}"))
+  fi
+
+  return 0
+}
+
+complete -F _foo_command -o bashdefault -o default foo-command
+\`
+stderr:
+""
 `;
 
 snapshot[`command integration > should generate fish completions 1`] = `
+stdout:
 \`#!/usr/bin/env fish
 # fish completion support for completions-test v1.0.0
 
@@ -412,23 +745,121 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a bash -d 'Generate shell completions for bash.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_bash' -s h -l help -x -k -f -d 'Show this help.'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_bash' -s n -l name -k -f -r -a '(completions-test completions complete string completions bash)' -d 'The name of the main command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a fish -d 'Generate shell completions for fish.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_fish' -s h -l help -x -k -f -d 'Show this help.'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_fish' -s n -l name -k -f -r -a '(completions-test completions complete string completions fish)' -d 'The name of the main command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions' -k -f -a zsh -d 'Generate shell completions for zsh.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_zsh' -s h -l help -x -k -f -d 'Show this help.'
+complete -c completions-test -n '__fish_completions_test_using_command __completions_test_completions_zsh' -s n -l name -k -f -r -a '(completions-test completions complete string completions zsh)' -d 'The name of the main command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
 \`
+stderr:
+""
+`;
+
+snapshot[`command integration > should override name in fish completions 1`] = `
+stdout:
+\`#!/usr/bin/env fish
+# fish completion support for foo-command v1.0.0
+
+function __fish_foo_command_using_command
+  set -l cmds __foo_command __foo_command_foo __foo_command_help __foo_command_foo_bar __foo_command_help __foo_command_bar __foo_command_help __foo_command_validation_error __foo_command_help __foo_command_help __foo_command_completions __foo_command_help __foo_command_completions_bash __foo_command_help __foo_command_completions_fish __foo_command_help __foo_command_completions_zsh __foo_command_help
+  set -l words (commandline -opc)
+  set -l cmd "_"
+  for word in \$words
+    switch \$word
+      case '-*'
+        continue
+      case '*'
+        set word (string replace -r -a '\\\\W' '_' \$word)
+        set -l cmd_tmp \$cmd"_\$word"
+        if contains \$cmd_tmp \$cmds
+          set cmd \$cmd_tmp
+        end
+    end
+  end
+  if test "\$cmd" = "\$argv[1]"
+    return 0
+  end
+  return 1
+end
+
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a '(foo-command completions complete color )'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s V -l version -x -k -f -d 'Show the version number for this program.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s g -l global -k -f -r -a '(foo-command completions complete boolean )' -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s m -l main -k -f -r -a '(foo-command completions complete boolean )' -d 'Bar option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -l color -k -f -r -a '(foo-command completions complete color )' -d 'Color option with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -s C -l colors -k -f -r -a '(foo-command completions complete color )' -d 'Color option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a foo -d 'Foo command with "\\\\'quotes\\\\'" and ([{brackets}])'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s g -l global -k -f -r -a '(foo-command completions complete boolean foo)' -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -s f -l foo -k -f -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo' -k -f -a bar -d 'Bar command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo_bar' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo_bar' -s g -l global -k -f -r -a '(foo-command completions complete boolean foo bar)' -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_foo_bar' -s b -l bar -k -f -d 'Bar option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a bar
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_bar' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_bar' -s g -l global -k -f -r -a '(foo-command completions complete boolean bar)' -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_bar' -s f -l file -k -f -r -a '(foo-command completions complete string bar)' -d '...'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a validation-error
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_validation_error' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_validation_error' -s g -l global -k -f -r -a '(foo-command completions complete boolean validation-error)' -d 'Foo option.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a completions -d 'Generate shell completions.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions' -k -f -a bash -d 'Generate shell completions for bash.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_bash' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_bash' -s n -l name -k -f -r -a '(foo-command completions complete string completions bash)' -d 'The name of the main command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions' -k -f -a fish -d 'Generate shell completions for fish.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_fish' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_fish' -s n -l name -k -f -r -a '(foo-command completions complete string completions fish)' -d 'The name of the main command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions' -k -f -a zsh -d 'Generate shell completions for zsh.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_zsh' -s h -l help -x -k -f -d 'Show this help.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_completions_zsh' -s n -l name -k -f -r -a '(foo-command completions complete string completions zsh)' -d 'The name of the main command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
+complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
+\`
+stderr:
+""
 `;
 
 snapshot[`command integration > should generate zsh completions 1`] = `
+stdout:
 \`#!/usr/bin/env zsh
 # zsh completion support for completions-test v1.0.0
 
@@ -447,8 +878,7 @@ function __completions_test_complete {
     if _requested "\$name"; then
       # shellcheck disable=SC2034
       lines="\$(completions-test completions complete "\${action}" "\${@}")"
-      values=("\${(ps:\\
-:)lines}")
+      values=("\${(ps:\\\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "\$name" expl "\$action"; do
           compadd -S '' "\${expl[@]}" "\${values[@]}"
@@ -773,11 +1203,13 @@ function _completions_test_completions_bash() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
+    command-name-string) __completions_test_complete command-name string completions bash ;;
   esac
 }
 
@@ -815,11 +1247,13 @@ function _completions_test_completions_fish() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
+    command-name-string) __completions_test_complete command-name string completions fish ;;
   esac
 }
 
@@ -857,11 +1291,13 @@ function _completions_test_completions_zsh() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
     '1:command:_commands' \\\\
     '*::sub command:->command_args'
 
   case "\$state" in
     command_args) _command_args ;;
+    command-name-string) __completions_test_complete command-name string completions zsh ;;
   esac
 }
 
@@ -882,9 +1318,476 @@ function _completions_test_completions_zsh_help() {
 
 compdef _completions_test completions-test
 \`
+stderr:
+""
+`;
+
+snapshot[`command integration > should override name in zsh completions 1`] = `
+stdout:
+\`#!/usr/bin/env zsh
+# zsh completion support for foo-command v1.0.0
+
+autoload -U is-at-least
+
+# shellcheck disable=SC2154
+(( \$+functions[__foo_command_complete] )) ||
+function __foo_command_complete {
+  local name="\$1"; shift
+  local action="\$1"; shift
+  integer ret=1
+  local -a values
+  local expl lines
+  _tags "\$name"
+  while _tags; do
+    if _requested "\$name"; then
+      # shellcheck disable=SC2034
+      lines="\$(foo-command completions complete "\${action}" "\${@}")"
+      values=("\${(ps:\\\\n:)lines}")
+      if (( \${#values[@]} )); then
+        while _next_label "\$name" expl "\$action"; do
+          compadd -S '' "\${expl[@]}" "\${values[@]}"
+        done
+      fi
+    fi
+  done
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command] )) ||
+function _foo_command() {
+  local state
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'foo:Foo command with "'"'"'quotes'"'"'" and ([{brackets}])'
+      'bar:'
+      'validation-error:'
+      'help:Show this help or the help of a sub-command.'
+      'completions:Generate shell completions.'
+    )
+    _describe 'command' commands
+    __foo_command_complete color color 
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      foo) _foo_command_foo ;;
+      bar) _foo_command_bar ;;
+      validation-error) _foo_command_validation_error ;;
+      help) _foo_command_help ;;
+      completions) _foo_command_completions ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(- *)'{-V,--version}'[Show the version number for this program.]' \\\\
+    '(-h --help -V --version -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
+    '(-h --help -V --version -m --main)'{-m,--main}'[Bar option.]:val:->val-boolean' \\\\
+    '(-h --help -V --version --color)'--color='[Color option with \\\\"'"'"'quotes'"'"'\\\\" and (\\\\[{brackets}\\\\])]:val:->val-color' \\\\
+    '(-h --help -V --version -C --colors)'{-C,--colors}'[Color option.]:val:->val-color' \\\\
+    '1:command:_commands'\\\\
+    '2::path:_files'\\\\
+    '3::path:_files'\\\\
+    '4::path:_files'\\\\
+    '5::path:_files'\\\\
+    '6::path:_files' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    val-boolean) __foo_command_complete val boolean  ;;
+    val-color) __foo_command_complete val color  ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_foo] )) ||
+function _foo_command_foo() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+      'bar:Bar command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_foo_help ;;
+      bar) _foo_command_foo_bar ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
+    '(-h --help -f --foo)'{-f,--foo}'[Foo option.]' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    val-boolean) __foo_command_complete val boolean foo ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_foo_help] )) ||
+function _foo_command_foo_help() {
+
+  function _commands() {
+    __foo_command_complete command command foo help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_foo_bar] )) ||
+function _foo_command_foo_bar() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_foo_bar_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
+    '(-h --help -b --bar)'{-b,--bar}'[Bar option.]' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    val-boolean) __foo_command_complete val boolean foo bar ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_foo_bar_help] )) ||
+function _foo_command_foo_bar_help() {
+
+  function _commands() {
+    __foo_command_complete command command foo bar help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_bar] )) ||
+function _foo_command_bar() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_bar_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
+    '(-h --help -f --file)'{-f,--file}'[...]:path:->path-string' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    val-boolean) __foo_command_complete val boolean bar ;;
+    path-string) __foo_command_complete path string bar ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_bar_help] )) ||
+function _foo_command_bar_help() {
+
+  function _commands() {
+    __foo_command_complete command command bar help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_validation_error] )) ||
+function _foo_command_validation_error() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_validation_error_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -g --global)'{-g,--global}'[Foo option.]:val:->val-boolean' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    val-boolean) __foo_command_complete val boolean validation-error ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_validation_error_help] )) ||
+function _foo_command_validation_error_help() {
+
+  function _commands() {
+    __foo_command_complete command command validation-error help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_help] )) ||
+function _foo_command_help() {
+
+  function _commands() {
+    __foo_command_complete command command help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions] )) ||
+function _foo_command_completions() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+      'bash:Generate shell completions for bash.'
+      'fish:Generate shell completions for fish.'
+      'zsh:Generate shell completions for zsh.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_completions_help ;;
+      bash) _foo_command_completions_bash ;;
+      fish) _foo_command_completions_fish ;;
+      zsh) _foo_command_completions_zsh ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_help] )) ||
+function _foo_command_completions_help() {
+
+  function _commands() {
+    __foo_command_complete command command completions help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_bash] )) ||
+function _foo_command_completions_bash() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_completions_bash_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    command-name-string) __foo_command_complete command-name string completions bash ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_bash_help] )) ||
+function _foo_command_completions_bash_help() {
+
+  function _commands() {
+    __foo_command_complete command command completions bash help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_fish] )) ||
+function _foo_command_completions_fish() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_completions_fish_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    command-name-string) __foo_command_complete command-name string completions fish ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_fish_help] )) ||
+function _foo_command_completions_fish_help() {
+
+  function _commands() {
+    __foo_command_complete command command completions fish help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_zsh] )) ||
+function _foo_command_completions_zsh() {
+
+  function _commands() {
+    local -a commands
+    # shellcheck disable=SC2034
+    commands=(
+      'help:Show this help or the help of a sub-command.'
+    )
+    _describe 'command' commands
+  }
+
+  function _command_args() {
+    case "\${words[1]}" in
+      help) _foo_command_completions_zsh_help ;;
+    esac
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '(-h --help -n --name)'{-n,--name}'[The name of the main command.]:command-name:->command-name-string' \\\\
+    '1:command:_commands' \\\\
+    '*::sub command:->command_args'
+
+  case "\$state" in
+    command_args) _command_args ;;
+    command-name-string) __foo_command_complete command-name string completions zsh ;;
+  esac
+}
+
+# shellcheck disable=SC2154
+(( \$+functions[_foo_command_completions_zsh_help] )) ||
+function _foo_command_completions_zsh_help() {
+
+  function _commands() {
+    __foo_command_complete command command completions zsh help
+  }
+
+  _arguments -w -s -S -C \\\\
+    '(- *)'{-h,--help}'[Show this help.]' \\\\
+    '1:command:_commands'
+}
+
+# _foo_command "\${@}"
+
+compdef _foo_command foo-command
+\`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output command help with help command 1`] = `
+stdout:
 \`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
@@ -918,9 +1821,12 @@ snapshot[`command integration > should output command help with help command 1`]
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output sub-command help with help command 1`] = `
+stdout:
 \`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
@@ -942,9 +1848,12 @@ snapshot[`command integration > should output sub-command help with help command
     \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
 
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output short help with -h flag 1`] = `
+stdout:
 \`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
@@ -978,9 +1887,12 @@ snapshot[`command integration > should output short help with -h flag 1`] = `
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output long help with --help flag 1`] = `
+stdout:
 \`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
@@ -1019,87 +1931,32 @@ snapshot[`command integration > should output long help with --help flag 1`] = `
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output short version with -V flag 1`] = `
-\`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
-
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
-
-  \\x1b[1mDescription:\\x1b[22m
-
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
-
-  \\x1b[1mOptions:\\x1b[22m
-
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-
-  \\x1b[1mCommands:\\x1b[22m
-
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
-
-\`
+stdout:
+"1.0.0
+"
+stderr:
+""
 `;
 
 snapshot[`command integration > should output long version with --version flag 1`] = `
-\`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
-
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
-
-  \\x1b[1mDescription:\\x1b[22m
-
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
-
-  \\x1b[1mOptions:\\x1b[22m
-
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                    
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                          
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                        
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                        
-                                 foo bar baz. foo bar baz.                                                        
-                                                                                                                  
-                               foo bar baz.                                                                       
-                               foo bar baz.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])   (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-                                and line breaks.                                                                  
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                     (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-
-  \\x1b[1mCommands:\\x1b[22m
-
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
-
-\`
+stdout:
+"\\x1b[1mcompletions-test\\x1b[22m \\x1b[94m1.0.0\\x1b[39m
+\\x1b[1mmeta1\\x1b[22m \\x1b[94mvalue1\\x1b[39m
+\\x1b[1mmeta2\\x1b[22m \\x1b[94mvalue2\\x1b[39m
+\\x1b[1mmeta3\\x1b[22m \\x1b[94mvalue3\\x1b[39m
+"
+stderr:
+""
 `;
 
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
-'
+stdout:
+"
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
@@ -1113,12 +1970,15 @@ snapshot[`command integration > should print the help of sub-command on validati
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
+"
+stderr:
+'\\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
 \\x1b[39m
 '
 `;
 
 snapshot[`command integration > should print error message for unknown option with suggestion 1`] = `
+stdout:
 \`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
@@ -1151,12 +2011,15 @@ snapshot[`command integration > should print error message for unknown option wi
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
-\\x1b[39m
 \`
+stderr:
+'\\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
+\\x1b[39m
+'
 `;
 
-snapshot[`command integration > should print help and error message when validation error is thrown 1`] = `
+snapshot[`command integration > should print help and error message when validation error 1`] = `
+stdout:
 "
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
@@ -1170,7 +2033,9 @@ snapshot[`command integration > should print help and error message when validat
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
+"
+stderr:
+"\\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
 \\x1b[39m
 "
 `;

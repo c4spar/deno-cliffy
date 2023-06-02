@@ -9,11 +9,10 @@ export async function runCommand(
   if (typeof args === "string") {
     args = args.split(" ");
   }
-  const process = Deno.run({
+  const cmd = new Deno.Command("deno", {
     stdout: "piped",
     stderr: "piped",
-    cmd: [
-      "deno",
+    args: [
       "run",
       "--allow-all",
       `${baseDir}/command.ts`,
@@ -21,19 +20,14 @@ export async function runCommand(
     ],
   });
 
-  const [status, output, errorOutput] = await Promise.all([
-    process.status(),
-    process.output(),
-    process.stderrOutput(),
-  ]);
-  process.close();
+  const { success, stderr, stdout } = await cmd.output();
 
-  if (!status.success && !canFail) {
+  if (!success && !canFail) {
     throw new Error(
-      "test command failed: " + new TextDecoder().decode(errorOutput),
+      "test command failed: " + new TextDecoder().decode(stderr),
     );
   }
 
-  return new TextDecoder().decode(output) +
-    (canFail ? new TextDecoder().decode(errorOutput) : "");
+  return new TextDecoder().decode(stdout) +
+    (canFail ? new TextDecoder().decode(stderr) : "");
 }

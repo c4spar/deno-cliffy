@@ -6,7 +6,8 @@ import { FishCompletionsCommand } from "./fish.ts";
 import { ZshCompletionsCommand } from "./zsh.ts";
 
 /** Generates shell completion scripts for various shells. */
-export class CompletionsCommand extends Command {
+export class CompletionsCommand
+  extends Command<void, void, void, [], { name: string }> {
   #cmd?: Command;
 
   public constructor(cmd?: Command) {
@@ -33,7 +34,8 @@ To enable shell completions for this program add the following line to your ${
       .command("bash", new BashCompletionsCommand(this.#cmd))
       .command("fish", new FishCompletionsCommand(this.#cmd))
       .command("zsh", new ZshCompletionsCommand(this.#cmd))
-      .command("complete", new CompleteCommand(this.#cmd).hidden())
+      .command("complete", new CompleteCommand(this.#cmd))
+      .hidden()
       .reset();
   }
 }
