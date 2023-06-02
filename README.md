@@ -39,6 +39,8 @@ The [documentation](https://cliffy.io/docs) is available on
 - **[table](https://cliffy.io/docs/table/):** Create cli tables with border,
   padding, nested tables, etc...
 
+- **[testing](https://cliffy.io/docs/testing/):** Helper functions for testing.
+
 ## Contributing
 
 Any kind of contribution is welcome! Please take a look at the
