@@ -192,7 +192,7 @@ async function runPrompt(
         await writer.write(encoder.encode(data));
         // Ensure all inputs are processed and rendered separately.
         await new Promise((resolve) =>
-          setTimeout(resolve, options.timeout ?? 700)
+          setTimeout(resolve, options.timeout ?? 1000)
         );
       }
     }
