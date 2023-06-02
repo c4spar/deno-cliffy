@@ -36,7 +36,7 @@ await snapshotTest({
     .toArray(),
   async fn() {
     await Checkbox.prompt({
-      message: "Search an option",
+      message: "Select an option",
       search: true,
       options: [
         { name: "Foo", value: "foo" },
