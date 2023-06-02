@@ -121,7 +121,7 @@ function registerTest(options: SnapshotTestOptions) {
         for (const [name, step] of steps) {
           await ctx.step({
             name,
-            fn: (ctx) => fn(ctx, step, name),
+            fn: (ctx) => fn(ctx, step),
           });
         }
       } else {
@@ -133,7 +133,6 @@ function registerTest(options: SnapshotTestOptions) {
   async function fn(
     ctx: Deno.TestContext,
     step?: SnapshotTestStep,
-    name?: string,
   ) {
     const { stdout, stderr } = await runPrompt(options, step);
 
