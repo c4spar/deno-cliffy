@@ -113,7 +113,7 @@ export abstract class Provider {
       stdout: "piped",
       stderr: "piped",
     });
-    const {success, stderr} = await cmd.output();
+    const { success, stderr } = await cmd.output();
 
     if (!success) {
       await Deno.stderr.write(stderr);
