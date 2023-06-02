@@ -96,7 +96,7 @@ _completions_test() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
@@ -411,7 +411,7 @@ _foo_command() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }

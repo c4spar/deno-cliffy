@@ -1,4 +1,4 @@
-const EXCLUDE_MAP: Partial<Record<string, string>> = Object.freeze({
+const ESCAPE_MAP: Partial<Record<string, string>> = Object.freeze({
   "\b": "\\b",
   "\f": "\\f",
   "\n": "\\n",
@@ -6,6 +6,7 @@ const EXCLUDE_MAP: Partial<Record<string, string>> = Object.freeze({
   "\t": "\\t",
   "\v": "\\v",
 });
+const EXCLUDE_LIST = ["\n", "\r"];
 const ESCAPE_PATTERN = new RegExp("[\x00-\x1f\x7f-\x9f]", "g");
 const QUOTES = ['"', "'", "`"];
 
@@ -24,9 +25,11 @@ function replaceEscapeSequences(str: string) {
     .replace(
       new RegExp(ESCAPE_PATTERN),
       (sequence) =>
-        EXCLUDE_MAP[sequence] ? sequence : "\\x" + sequence
-          .charCodeAt(0)
-          .toString(16)
-          .padStart(2, "0"),
+        EXCLUDE_LIST.includes(sequence)
+          ? sequence
+          : ESCAPE_MAP[sequence] || "\\x" + sequence
+                .charCodeAt(0)
+                .toString(16)
+                .padStart(2, "0"),
     );
 }
