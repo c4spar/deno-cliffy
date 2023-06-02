@@ -1,12 +1,18 @@
 export const snapshot = {};
 
 snapshot[`prompt method > should check an option 1`] = `
-'stdout:
-[checkbox:before] input is: foo
-{ input: "foo", number: 43, confirm: true, toggle: true, checkbox: [ "bar", "baz" ] }
-
+stdout:
+'[checkbox:before] input is: foo
+{
+  input: "foo",
+  number: 43,
+  confirm: true,
+  toggle: true,
+  checkbox: [ "bar", "baz" ]
+}
+'
 stderr:
-? Enter some text (default value) » \\x1b[37G\\x1b[G\\x1b[0J
+"? Enter some text (default value) » \\x1b[37G\\x1b[G\\x1b[0J
 ? Enter some text (default value) » f\\x1b[38G\\x1b[G\\x1b[0J
 ? Enter some text (default value) » fo\\x1b[39G\\x1b[G\\x1b[0J
 ? Enter some text (default value) » foo\\x1b[40G\\x1b[G\\x1b[0J
@@ -48,5 +54,5 @@ stderr:
   √ Bar
 ❯ √ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Bar, Baz
-\\x1b[?25h\\x1b[?25h\\x1b[?25h'
+\\x1b[?25h\\x1b[?25h\\x1b[?25h"
 `;

@@ -1,4 +1,5 @@
 import { eraseDown } from "../ansi/ansi_escapes.ts";
+import { quoteString } from "./_quote_string.ts";
 import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
 
 export interface SnapshotTestStep {
@@ -66,6 +67,8 @@ export interface SnapshotTestOptions extends SnapshotTestStep {
   /** If at least one test has `only` set to `true`, only run tests that have
    * `only` set to `true` and fail the test suite. */
   only?: boolean;
+  /** Function to use when serializing the snapshot. */
+  serializer?: (actual: string) => string;
 }
 
 const encoder = new TextEncoder();
@@ -115,10 +118,10 @@ function registerTest(options: SnapshotTestOptions) {
     async fn(ctx) {
       const steps = Object.entries(options.steps ?? {});
       if (steps.length) {
-        for (const [name, inputs] of steps) {
+        for (const [name, step] of steps) {
           await ctx.step({
             name,
-            fn: (ctx) => fn(ctx, inputs),
+            fn: (ctx) => fn(ctx, step, name),
           });
         }
       } else {
@@ -127,8 +130,18 @@ function registerTest(options: SnapshotTestOptions) {
     },
   });
 
-  async function fn(ctx: Deno.TestContext, step?: SnapshotTestStep) {
-    const output: string = await runPrompt(options, step);
+  async function fn(
+    ctx: Deno.TestContext,
+    step?: SnapshotTestStep,
+    name?: string,
+  ) {
+    const { stdout, stderr } = await runPrompt(options, step);
+
+    const serializer = options.serializer ?? quoteString;
+    const output = `stdout:\n${serializer(stdout)}\nstderr:\n${
+      serializer(stderr)
+    }`;
+
     const suffix = options.osSuffix?.includes(Deno.build.os)
       ? `.${Deno.build.os}`
       : "";
@@ -137,6 +150,7 @@ function registerTest(options: SnapshotTestOptions) {
       dir: options.dir,
       path: options.path ??
         (options.dir ? undefined : `__snapshots__/${fileName}${suffix}.snap`),
+      serializer: (value) => value,
     });
   }
 }
@@ -144,7 +158,7 @@ function registerTest(options: SnapshotTestOptions) {
 async function runPrompt(
   options: SnapshotTestOptions,
   step?: SnapshotTestStep,
-): Promise<string> {
+): Promise<{ stdout: string; stderr: string }> {
   let output: Deno.CommandOutput | undefined;
   let stdout: string | undefined;
   let stderr: string | undefined;
@@ -185,8 +199,8 @@ async function runPrompt(
     }
 
     output = await child.output();
-    stdout = new TextDecoder().decode(output.stdout);
-    stderr = new TextDecoder().decode(output.stderr);
+    stdout = addLineBreaks(new TextDecoder().decode(output.stdout));
+    stderr = addLineBreaks(new TextDecoder().decode(output.stderr));
 
     writer.releaseLock();
     await child.stdin.close();
@@ -207,9 +221,15 @@ async function runPrompt(
     );
   }
 
-  // Add a line break after each test input.
-  return "stdout:\n" + stdout.replaceAll(eraseDown(), eraseDown() + "\n") +
-    "\nstderr:\n" + stderr.replaceAll(eraseDown(), eraseDown() + "\n");
+  return { stdout, stderr };
+}
+
+/** Add a line break after each test input. */
+function addLineBreaks(str: string) {
+  return str.replaceAll(
+    eraseDown(),
+    eraseDown() + "\n",
+  );
 }
 
 async function runTest(options: SnapshotTestOptions) {
