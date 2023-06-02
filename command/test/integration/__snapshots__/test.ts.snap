@@ -1,52 +1,52 @@
 export const snapshot = {};
 
 snapshot[`command integration > should complete boolean arg 1`] = `
-"stdout:
-true
-false
+stdout:
+"true
+false"
 stderr:
-"
+""
 `;
 
 snapshot[`command integration > should complete boolean arg from foo command 1`] = `
-"stdout:
-true
-false
+stdout:
+"true
+false"
 stderr:
-"
+""
 `;
 
 snapshot[`command integration > should complete boolean arg from foo bar command 1`] = `
-"stdout:
-true
-false
+stdout:
+"true
+false"
 stderr:
-"
+""
 `;
 
 snapshot[`command integration > should complete available commands for help command 1`] = `
-"stdout:
-foo
+stdout:
+"foo
 bar
 validation-error
 help
-completions
+completions"
 stderr:
-"
+""
 `;
 
 snapshot[`command integration > should complete enum 1`] = `
-"stdout:
-blue
+stdout:
+"blue
 yellow
-red
+red"
 stderr:
-"
+""
 `;
 
 snapshot[`command integration > should generate bash completions 1`] = `
-\`stdout:
-#!/usr/bin/env bash
+stdout:
+\`#!/usr/bin/env bash
 # bash completion support for completions-test v1.0.0
 
 _completions_test() {
@@ -86,8 +86,7 @@ _completions_test() {
   # shellcheck disable=SC2120
   _completions_test_file_dir() {
     listFiles=1
-    local IFS=\$'\\\\t\\
-' xspec #glob
+    local IFS=\$'\\\\t\\\\n' xspec #glob
     _completions_test_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
@@ -97,7 +96,7 @@ _completions_test() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
@@ -339,10 +338,8 @@ _completions_test() {
   fi
 
   local values
-  values="\$( printf "\\
-%s" "\${opts[@]}" )"
-  local IFS=\$'\\
-'
+  values="\$( printf "\\\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\\\n'
   # shellcheck disable=SC2207
   local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
   if [[ \${#result[@]} -eq 0 ]]; then
@@ -350,22 +347,21 @@ _completions_test() {
     COMPREPLY=(\$(compgen -f "\${cur}"))
   else
     # shellcheck disable=SC2207
-    COMPREPLY=(\$(printf '%q\\
-' "\${result[@]}"))
+    COMPREPLY=(\$(printf '%q\\\\n' "\${result[@]}"))
   fi
 
   return 0
 }
 
 complete -F _completions_test -o bashdefault -o default completions-test
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should override name in bash completions 1`] = `
-\`stdout:
-#!/usr/bin/env bash
+stdout:
+\`#!/usr/bin/env bash
 # bash completion support for foo-command v1.0.0
 
 _foo_command() {
@@ -405,8 +401,7 @@ _foo_command() {
   # shellcheck disable=SC2120
   _foo_command_file_dir() {
     listFiles=1
-    local IFS=\$'\\\\t\\
-' xspec #glob
+    local IFS=\$'\\\\t\\\\n' xspec #glob
     _foo_command_expand || return 0
   
     if [ "\${1:-}" = -d ]; then
@@ -416,7 +411,7 @@ _foo_command() {
       return 0
     fi
   
-    xspec=\${1:+"!*.\$1"}\\t# set only if glob passed in as \$1
+    xspec=\${1:+"!*.\$1"}	# set only if glob passed in as \$1
     # shellcheck disable=SC2206,SC2207
     COMPREPLY=( \${COMPREPLY[@]:-} \$( compgen -f -X "\$xspec" -- "\$cur" )           \$( compgen -d -- "\$cur" ) )
   }
@@ -658,10 +653,8 @@ _foo_command() {
   fi
 
   local values
-  values="\$( printf "\\
-%s" "\${opts[@]}" )"
-  local IFS=\$'\\
-'
+  values="\$( printf "\\\\n%s" "\${opts[@]}" )"
+  local IFS=\$'\\\\n'
   # shellcheck disable=SC2207
   local result=(\$(compgen -W "\${values[@]}" -- "\${cur}"))
   if [[ \${#result[@]} -eq 0 ]]; then
@@ -669,22 +662,21 @@ _foo_command() {
     COMPREPLY=(\$(compgen -f "\${cur}"))
   else
     # shellcheck disable=SC2207
-    COMPREPLY=(\$(printf '%q\\
-' "\${result[@]}"))
+    COMPREPLY=(\$(printf '%q\\\\n' "\${result[@]}"))
   fi
 
   return 0
 }
 
 complete -F _foo_command -o bashdefault -o default foo-command
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should generate fish completions 1`] = `
-\`stdout:
-#!/usr/bin/env fish
+stdout:
+\`#!/usr/bin/env fish
 # fish completion support for completions-test v1.0.0
 
 function __fish_completions_test_using_command
@@ -769,14 +761,14 @@ complete -c completions-test -n '__fish_completions_test_using_command __complet
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -k -f -a '(completions-test completions complete command help)'
 complete -c completions-test -n '__fish_completions_test_using_command __completions_test_help' -s h -l help -x -k -f -d 'Show this help.'
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should override name in fish completions 1`] = `
-\`stdout:
-#!/usr/bin/env fish
+stdout:
+\`#!/usr/bin/env fish
 # fish completion support for foo-command v1.0.0
 
 function __fish_foo_command_using_command
@@ -861,14 +853,14 @@ complete -c foo-command -n '__fish_foo_command_using_command __foo_command_compl
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command' -k -f -a help -d 'Show this help or the help of a sub-command.'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -k -f -a '(foo-command completions complete command help)'
 complete -c foo-command -n '__fish_foo_command_using_command __foo_command_help' -s h -l help -x -k -f -d 'Show this help.'
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should generate zsh completions 1`] = `
-\`stdout:
-#!/usr/bin/env zsh
+stdout:
+\`#!/usr/bin/env zsh
 # zsh completion support for completions-test v1.0.0
 
 autoload -U is-at-least
@@ -886,8 +878,7 @@ function __completions_test_complete {
     if _requested "\$name"; then
       # shellcheck disable=SC2034
       lines="\$(completions-test completions complete "\${action}" "\${@}")"
-      values=("\${(ps:\\
-:)lines}")
+      values=("\${(ps:\\\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "\$name" expl "\$action"; do
           compadd -S '' "\${expl[@]}" "\${values[@]}"
@@ -1326,14 +1317,14 @@ function _completions_test_completions_zsh_help() {
 # _completions_test "\${@}"
 
 compdef _completions_test completions-test
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should override name in zsh completions 1`] = `
-\`stdout:
-#!/usr/bin/env zsh
+stdout:
+\`#!/usr/bin/env zsh
 # zsh completion support for foo-command v1.0.0
 
 autoload -U is-at-least
@@ -1351,8 +1342,7 @@ function __foo_command_complete {
     if _requested "\$name"; then
       # shellcheck disable=SC2034
       lines="\$(foo-command completions complete "\${action}" "\${@}")"
-      values=("\${(ps:\\
-:)lines}")
+      values=("\${(ps:\\\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "\$name" expl "\$action"; do
           compadd -S '' "\${expl[@]}" "\${values[@]}"
@@ -1791,14 +1781,14 @@ function _foo_command_completions_zsh_help() {
 # _foo_command "\${@}"
 
 compdef _foo_command foo-command
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output command help with help command 1`] = `
-\`stdout:
-
+stdout:
+\`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -1830,14 +1820,14 @@ snapshot[`command integration > should output command help with help command 1`]
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output sub-command help with help command 1`] = `
-\`stdout:
-
+stdout:
+\`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
@@ -1857,14 +1847,14 @@ snapshot[`command integration > should output sub-command help with help command
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
     \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
 
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output short help with -h flag 1`] = `
-\`stdout:
-
+stdout:
+\`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -1896,14 +1886,14 @@ snapshot[`command integration > should output short help with -h flag 1`] = `
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output long help with --help flag 1`] = `
-\`stdout:
-
+stdout:
+\`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -1940,33 +1930,33 @@ snapshot[`command integration > should output long help with --help flag 1`] = `
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
-
-stderr:
 \`
+stderr:
+""
 `;
 
 snapshot[`command integration > should output short version with -V flag 1`] = `
-"stdout:
-1.0.0
-
-stderr:
+stdout:
+"1.0.0
 "
+stderr:
+""
 `;
 
 snapshot[`command integration > should output long version with --version flag 1`] = `
-"stdout:
-\\x1b[1mcompletions-test\\x1b[22m \\x1b[94m1.0.0\\x1b[39m
+stdout:
+"\\x1b[1mcompletions-test\\x1b[22m \\x1b[94m1.0.0\\x1b[39m
 \\x1b[1mmeta1\\x1b[22m \\x1b[94mvalue1\\x1b[39m
 \\x1b[1mmeta2\\x1b[22m \\x1b[94mvalue2\\x1b[39m
 \\x1b[1mmeta3\\x1b[22m \\x1b[94mvalue3\\x1b[39m
-
-stderr:
 "
+stderr:
+""
 `;
 
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
-'stdout:
-
+stdout:
+"
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
@@ -1980,16 +1970,16 @@ snapshot[`command integration > should print the help of sub-command on validati
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
-
+"
 stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
+'\\x1b[31m  \\x1b[1merror\\x1b[22m: Missing required option "--file".
 \\x1b[39m
 '
 `;
 
 snapshot[`command integration > should print error message for unknown option with suggestion 1`] = `
-\`stdout:
-
+stdout:
+\`
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
@@ -2021,16 +2011,16 @@ snapshot[`command integration > should print error message for unknown option wi
     \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
     \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
-
-stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
-\\x1b[39m
 \`
+stderr:
+'\\x1b[31m  \\x1b[1merror\\x1b[22m: Unknown option "--colorr". Did you mean option "--color"?
+\\x1b[39m
+'
 `;
 
 snapshot[`command integration > should print help and error message when validation error 1`] = `
-"stdout:
-
+stdout:
+"
   \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
   \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
 
@@ -2043,9 +2033,9 @@ snapshot[`command integration > should print help and error message when validat
 
     \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
-
+"
 stderr:
-\\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
+"\\x1b[31m  \\x1b[1merror\\x1b[22m: Validation error message.
 \\x1b[39m
 "
 `;

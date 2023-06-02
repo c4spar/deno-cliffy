@@ -1,4 +1,5 @@
 import { assert, assertSnapshot } from "../dev_deps.ts";
+import { quoteString } from "./_quote_string.ts";
 import { dirname, fromFileUrl } from "./deps.ts";
 
 Deno.test({
@@ -33,9 +34,9 @@ Deno.test({
     const snapshot2Content = await Deno.readTextFile(snapshot2Path);
     const snapshot3Content = await Deno.readTextFile(snapshot3Path);
 
-    await assertSnapshot(ctx, snapshotContent);
-    await assertSnapshot(ctx, snapshot2Content);
-    await assertSnapshot(ctx, snapshot3Content);
+    await assertSnapshot(ctx, snapshotContent, { serializer: quoteString });
+    await assertSnapshot(ctx, snapshot2Content, { serializer: quoteString });
+    await assertSnapshot(ctx, snapshot3Content, { serializer: quoteString });
 
     await Deno.remove(snapshotPath);
     await Deno.remove(snapshot2Path);
