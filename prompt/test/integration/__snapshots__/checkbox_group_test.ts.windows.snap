@@ -3,21 +3,21 @@ export const snapshot = {};
 snapshot[`checkbox prompt with groups > should select a group option 1`] = `
 stdout:
 "? Select an option
-❯ ✘ Foo
-  ✘ Bar
-  ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ × Foo
+  × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ Foo
-❯ ✘ Bar
-  ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × Foo
+❯ × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ Foo
-  ✘ Bar
-❯ ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × Foo
+  × Bar
+❯ × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ Foo
-  ✘ Bar
-❯ ✔ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × Foo
+  × Bar
+❯ √ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » beep, boop
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -27,29 +27,29 @@ stderr:
 snapshot[`checkbox prompt with groups > should select a child option 1`] = `
 stdout:
 "? Select an option
-❯ ✘ Foo
-  ✘ Bar
-  ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ × Foo
+  × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ Foo
-❯ ✘ Bar
-  ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × Foo
+❯ × Bar
+  × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ Foo
-  ✘ Bar
-❯ ✘ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × Foo
+  × Bar
+❯ × 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ 📂 Baz
- ❯ ✘ Beep
-   ✘ Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × 📂 Baz
+ ❯ × Beep
+   × Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
-  ✘ 📂 Baz
-   ✘ Beep
- ❯ ✘ Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+  × 📂 Baz
+   × Beep
+ ❯ × Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ◉ 📂 Baz
-   ✘ Beep
- ❯ ✔ Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+   × Beep
+ ❯ √ Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Boop
 \\x1b[?25h\\x1b[?25h"
 stderr:
