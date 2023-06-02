@@ -161,3 +161,67 @@ Deno.test("[command] help - should ignore required options for help option", asy
 
   assertEquals(ctx.options, { help: true });
 });
+
+Deno.test("[command] help - should disable indentation", () => {
+  const cmd = new Command()
+    .throwErrors()
+    .help({ indent: false, colors: false })
+    .command("foo", "foo...")
+    .command("bar", "bar...");
+
+  assertEquals(
+    `
+Usage: COMMAND
+
+Options:
+
+  -h, --help  - Show this help.  
+
+Commands:
+
+  foo  - foo...
+  bar  - bar...
+`,
+    cmd.getHelp(),
+  );
+});
+
+Deno.test("[command] help - should enable compact mode", () => {
+  const cmd = new Command()
+    .throwErrors()
+    .help({ compact: true, colors: false })
+    .command("foo", "foo...")
+    .command("bar", "bar...");
+
+  assertEquals(
+    `Usage: COMMAND
+
+Options:
+  -h, --help  - Show this help.  
+
+Commands:
+  foo  - foo...
+  bar  - bar...`,
+    cmd.getHelp(),
+  );
+});
+
+Deno.test("[command] help - should enable compact mode and indentation", () => {
+  const cmd = new Command()
+    .throwErrors()
+    .help({ compact: true, indent: true, colors: false })
+    .command("foo", "foo...")
+    .command("bar", "bar...");
+
+  assertEquals(
+    `  Usage: COMMAND
+
+  Options:
+    -h, --help  - Show this help.  
+
+  Commands:
+    foo  - foo...
+    bar  - bar...`,
+    cmd.getHelp(),
+  );
+});
