@@ -1756,10 +1756,7 @@ export class Command<
       this.type("file", new FileType(), { global: true });
 
     if (!this._help) {
-      this.help({
-        hints: true,
-        types: false,
-      });
+      this.help({});
     }
 
     if (this._versionOptions !== false && (this._versionOptions || this.ver)) {
@@ -1870,13 +1867,13 @@ export class Command<
     await Deno.permissions.request({ name: "run", command });
 
     try {
-      const process: Deno.Process = Deno.run({
-        cmd: [command, ...args],
+      const cmd: Deno.Command = new Deno.Command(command, {
+        args,
       });
-      const status: Deno.ProcessStatus = await process.status();
+      const output: Deno.CommandOutput = await cmd.output();
 
-      if (!status.success) {
-        Deno.exit(status.code);
+      if (!output.success) {
+        Deno.exit(output.code);
       }
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
@@ -2153,11 +2150,15 @@ export class Command<
     return this.aliases;
   }
 
-  /** Get full command path. */
-  public getPath(): string {
+  /**
+   * Get full command path.
+   *
+   * @param name Override the main command name.
+   */
+  public getPath(name?: string): string {
     return this._parent
-      ? this._parent.getPath() + " " + this._name
-      : this._name;
+      ? this._parent.getPath(name) + " " + this._name
+      : name || this._name;
   }
 
   /** Get arguments definition. E.g: <input-file:string> <output-file:string> */
@@ -3177,21 +3178,21 @@ type ValueOption<
     })
   : (TRequired extends true ? {
       [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
-        ? 
+        ?
           | NonNullable<TDefault>
           | true
           | ArgumentType<GetArguments<TRestFlags>, TTypes>
-        : 
+        :
           | NonNullable<TDefault>
           | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     }
     : {
       [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
-        `[${string}]` ? 
+        `[${string}]` ?
           | NonNullable<TDefault>
           | true
           | ArgumentType<GetArguments<TRestFlags>, TTypes>
-        : 
+        :
           | NonNullable<TDefault>
           | ArgumentType<GetArguments<TRestFlags>, TTypes>;
     });
@@ -3223,21 +3224,21 @@ type ValuesOption<
     })
   : (TRequired extends true ? {
       [Key in OptionName<TName>]: GetArguments<TRestFlags> extends `[${string}]`
-        ? 
+        ?
           | NonNullable<TDefault>
           | true
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
-        : 
+        :
           | NonNullable<TDefault>
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     }
     : {
       [Key in OptionName<TName>]?: GetArguments<TRestFlags> extends
-        `[${string}]` ? 
+        `[${string}]` ?
           | NonNullable<TDefault>
           | true
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>
-        : 
+        :
           | NonNullable<TDefault>
           | ArgumentTypes<GetArguments<TRestFlags>, TTypes>;
     });
@@ -3402,7 +3403,7 @@ type SpreadOptionalProperties<
 type Spread<TTarget, TSource> = TTarget extends void ? TSource
   : TSource extends void ? TTarget
   // Properties in L that don't exist in R.
-  : 
+  :
     & Omit<TTarget, keyof TSource>
     // Properties in R that don't exist in L.
     & Omit<TSource, keyof TTarget>

@@ -1,0 +1,79 @@
+export const snapshot = {};
+
+snapshot[`should run snapshot tests 1`] = `
+"export const snapshot = {};
+
+snapshot[\`should create a simple snapshot 1\`] = \`
+stdout:
+\\"foo
+\\"
+stderr:
+\\"bar
+\\"
+\`;
+
+snapshot[\`should set deno args > step 1 1\`] = \`
+stdout:
+'[ \\"foo\\", \\"bar\\", \\"beep\\" ]
+'
+stderr:
+\\"\\"
+\`;
+
+snapshot[\`should set deno args > step 2 1\`] = \`
+stdout:
+'[ \\"foo\\", \\"bar\\", \\"boop\\" ]
+'
+stderr:
+\\"\\"
+\`;
+
+snapshot[\`should write to stdin > step 1 1\`] = \`
+stdout:
+\\"# stdin start
+foo
+# stdin end
+\\"
+stderr:
+\\"\\"
+\`;
+
+snapshot[\`should write to stdin > step 2 1\`] = \`
+stdout:
+\\"# stdin start
+bar
+# stdin end
+\\"
+stderr:
+\\"\\"
+\`;
+"
+`;
+
+snapshot[`should run snapshot tests 2`] = `
+'export const snapshot = {};
+
+snapshot[\`should change the snapshot path 1\`] = \`
+stdout:
+"foo
+"
+stderr:
+"bar
+"
+\`;
+'
+`;
+
+snapshot[`should run snapshot tests 3`] = `
+'export const snapshot = {};
+
+snapshot[\`should change the snapshot dir 1\`] = \`
+stdout:
+"foo
+"
+stderr:
+"bar
+"
+\`;
+'
+`;

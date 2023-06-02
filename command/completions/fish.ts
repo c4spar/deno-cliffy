@@ -3,8 +3,10 @@ import { dim, italic } from "../deps.ts";
 import { FishCompletionsGenerator } from "./_fish_completions_generator.ts";
 
 /** Generates fish completions script. */
-export class FishCompletionsCommand extends Command {
-  #cmd?: Command;
+export class FishCompletionsCommand
+  extends Command<void, void, { name: string }> {
+  readonly #cmd?: Command;
+
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;
@@ -20,9 +22,10 @@ To enable fish completions for this program add following line to your ${
     ${dim(italic(`source (${baseCmd.getPath()} completions fish | psub)`))}`;
       })
       .noGlobals()
-      .action(() => {
+      .option("-n, --name <command-name>", "The name of the main command.")
+      .action(({ name = this.getMainCommand().getName() }) => {
         const baseCmd = this.#cmd || this.getMainCommand();
-        console.log(FishCompletionsGenerator.generate(baseCmd));
+        console.log(FishCompletionsGenerator.generate(name, baseCmd));
       });
   }
 }
