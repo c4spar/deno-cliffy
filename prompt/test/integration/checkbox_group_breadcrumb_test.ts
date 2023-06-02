@@ -19,7 +19,7 @@ await snapshotTest({
         .text(" ")
         .text("\n")
         .toArray(),
-    }
+    },
   },
   async fn() {
     await Checkbox.prompt({

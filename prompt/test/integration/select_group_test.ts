@@ -14,7 +14,7 @@ await snapshotTest({
         .text("\n")
         .text("\n")
         .toArray(),
-    }
+    },
   },
   async fn() {
     await Select.prompt({

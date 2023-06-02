@@ -13,7 +13,7 @@ await snapshotTest({
         .cursorDown
         .text(" ")
         .text("\n")
-        .toArray()
+        .toArray(),
     },
     "should select a child option": {
       stdin: ansi
@@ -23,7 +23,7 @@ await snapshotTest({
         .cursorDown
         .text(" ")
         .text("\n")
-        .toArray()
+        .toArray(),
     },
   },
   async fn() {
