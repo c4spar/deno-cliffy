@@ -30,12 +30,13 @@ await snapshotTest({
   osSuffix: ["windows"],
   stdin: ansi
     .text("baz")
+    .text("\n")
     .text(" ")
     .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
-      message: "Select an option",
+      message: "Search an option",
       search: true,
       options: [
         { name: "Foo", value: "foo" },

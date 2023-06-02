@@ -26,15 +26,17 @@ stderr:
 
 snapshot[`checkbox prompt > should search an option 1`] = `
 stdout:
-"? Select an option 🔎 
+"? Search an option 🔎 
 ❯ ✘ Foo
   ✘ Bar
   ✘ Baz\\x1b[3A\\x1b[23G\\x1b[G\\x1b[0J
-? Select an option 🔎 baz
+? Search an option 🔎 baz
+  ✘ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Search an option 🔎 baz
 ❯ ✘ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
-? Select an option 🔎 baz
+? Search an option 🔎 baz
 ❯ ✔ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
-? Select an option › Baz
+? Search an option › Baz
 \\x1b[?25h\\x1b[?25h"
 stderr:
 ""

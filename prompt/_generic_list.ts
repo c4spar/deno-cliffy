@@ -165,7 +165,8 @@ export abstract class GenericList<
         ? groupOpenIcon
         : Figures.FOLDER_OPEN,
       maxBreadcrumbItems: options.maxBreadcrumbItems ?? 5,
-      breadcrumbSeparator: options.breadcrumbSeparator ?? "›",
+      breadcrumbSeparator: options.breadcrumbSeparator ??
+        ` ${Figures.POINTER_SMALL} `,
       maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options, options.options),
       keys: {
@@ -545,7 +546,7 @@ export abstract class GenericList<
       ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 1)]
       : names;
 
-    return breadCrumb.join(` ${this.settings.breadcrumbSeparator} `);
+    return breadCrumb.join(this.settings.breadcrumbSeparator);
   }
 
   /** Get options row height. */
@@ -645,6 +646,14 @@ export abstract class GenericList<
     }
   }
 
+  protected async submit(): Promise<void> {
+    if (this.isSearchSelected()) {
+      this.selectNext();
+      return;
+    }
+    await super.submit();
+  }
+
   protected moveCursorLeft(): void {
     if (this.settings.search) {
       super.moveCursorLeft();
@@ -679,7 +688,7 @@ export abstract class GenericList<
 
   /** Select previous option. */
   protected selectPrevious(): void {
-    if (this.options.length < 2) {
+    if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
     if (this.listIndex > 0) {
@@ -706,7 +715,7 @@ export abstract class GenericList<
 
   /** Select next option. */
   protected selectNext(): void {
-    if (this.options.length < 2) {
+    if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
     if (this.listIndex < this.options.length - 1) {

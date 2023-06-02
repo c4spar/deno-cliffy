@@ -273,7 +273,8 @@ export class Checkbox extends GenericList<
     if (
       !hasConfirmed &&
       this.settings.confirmSubmit &&
-      Deno.isatty(Deno.stdout.rid)
+      Deno.isatty(Deno.stdout.rid) &&
+      !this.isSearchSelected()
     ) {
       this.confirmSubmit = true;
       return;
