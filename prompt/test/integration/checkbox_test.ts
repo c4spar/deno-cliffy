@@ -23,3 +23,25 @@ await snapshotTest({
     });
   },
 });
+
+await snapshotTest({
+  name: "checkbox prompt > should search an option",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .text("baz")
+    .text(" ")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Select an option",
+      search: true,
+      options: [
+        { name: "Foo", value: "foo" },
+        { name: "Bar", value: "bar" },
+        { name: "Baz", value: "baz" },
+      ],
+    });
+  },
+});
