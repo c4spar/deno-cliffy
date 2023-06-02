@@ -23,7 +23,7 @@ export function quoteString(str: string) {
 function replaceEscapeSequences(str: string) {
   return str
     .replace(
-      new RegExp(ESCAPE_PATTERN),
+      ESCAPE_PATTERN,
       (sequence) =>
         EXCLUDE_LIST.includes(sequence)
           ? sequence
