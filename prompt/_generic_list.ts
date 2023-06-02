@@ -213,49 +213,16 @@ export abstract class GenericList<
     };
   }
 
-  protected flatOptions(
-    options: Array<TOption | TGroup>,
-    groups: false,
-  ): Array<TOption>;
-
-  protected flatOptions(
-    options: Array<TOption | TGroup>,
-    groups?: boolean,
-  ): Array<TOption | TGroup>;
-
-  protected flatOptions(
-    options: Array<TOption | TGroup>,
-    groups = true,
-  ): Array<TOption | TGroup> {
-    return flat(options, groups);
-
-    function flat(
-      options: Array<TOption | TGroup>,
-      groups = true,
-      indentLevel = 0,
-      opts: Array<TOption | TGroup> = [],
-    ): Array<TOption | TGroup> {
-      for (const option of options) {
-        option.indentLevel = indentLevel;
-        if (isOption(option) || groups) {
-          opts.push(option);
-        }
-        if (isOptionGroup(option)) {
-          flat(option.options, groups, ++indentLevel, opts);
-        }
-      }
-
-      return opts;
-    }
-  }
-
   protected match(): void {
     const input: string = this.getCurrentInputValue().toLowerCase();
     let options: Array<TOption | TGroup> = this.getCurrentOptions().slice();
 
     if (input.length) {
-      const matches = this.matchOptions(input, this.getCurrentOptions());
-      options = this.flatMatchedOptions(matches);
+      const matches = matchOptions<TOption, TGroup>(
+        input,
+        this.getCurrentOptions(),
+      );
+      options = flatMatchedOptions(matches);
     }
 
     this.setOptions(options);
@@ -288,78 +255,6 @@ export abstract class GenericList<
 
   protected getParentOption(index = -1): TGroup | undefined {
     return this.parentOptions.at(index);
-  }
-
-  private matchOptions(
-    searchInput: string,
-    options: Array<TOption | TGroup>,
-  ): Array<MatchedOption<TOption, TGroup>> {
-    const matched: Array<MatchedOption<TOption, TGroup>> = [];
-
-    for (const option of options) {
-      if (isOptionGroup(option)) {
-        const children = this
-          .matchOptions(searchInput, option.options)
-          .sort(sortByDistance);
-
-        if (children.length) {
-          matched.push({
-            option,
-            distance: Math.min(...children.map((item) => item.distance)),
-            children,
-          });
-          continue;
-        }
-      }
-
-      if (this.matchOption(searchInput, option)) {
-        matched.push({
-          option,
-          distance: distance(option.name, searchInput),
-          children: [],
-        });
-      }
-    }
-
-    return matched.sort(sortByDistance);
-
-    function sortByDistance(
-      a: MatchedOption<TOption, TGroup>,
-      b: MatchedOption<TOption, TGroup>,
-    ): number {
-      return a.distance - b.distance;
-    }
-  }
-
-  private flatMatchedOptions(
-    matches: Array<MatchedOption<TOption, TGroup>>,
-    indentLevel = 0,
-    result: Array<TOption | TGroup> = [],
-  ): Array<TOption | TGroup> {
-    for (const { option, children } of matches) {
-      option.indentLevel = indentLevel;
-      result.push(option);
-      this.flatMatchedOptions(children, indentLevel + 1, result);
-    }
-
-    return result;
-  }
-
-  private matchOption(
-    inputString: string,
-    option: TOption | TGroup,
-  ): boolean {
-    return this.matchInput(inputString, option.name) || (
-      isOption(option) &&
-      option.name !== option.value &&
-      this.matchInput(inputString, option.value)
-    );
-  }
-
-  private matchInput(inputString: string, value: string): boolean {
-    return stripColor(value)
-      .toLowerCase()
-      .includes(inputString);
   }
 
   protected submitBackButton() {
@@ -798,6 +693,86 @@ export function assertIsOption<
   if (!isOption(option)) {
     throw new Error("Expected an option but got an option group.");
   }
+}
+
+function matchOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  searchInput: string,
+  options: Array<TOption | TGroup>,
+): Array<MatchedOption<TOption, TGroup>> {
+  const matched: Array<MatchedOption<TOption, TGroup>> = [];
+
+  for (const option of options) {
+    if (isOptionGroup(option)) {
+      const children = matchOptions(searchInput, option.options)
+        .sort(sortByDistance);
+
+      if (children.length) {
+        matched.push({
+          option,
+          distance: Math.min(...children.map((item) => item.distance)),
+          children,
+        });
+        continue;
+      }
+    }
+
+    if (matchOption(searchInput, option)) {
+      matched.push({
+        option,
+        distance: distance(option.name, searchInput),
+        children: [],
+      });
+    }
+  }
+
+  return matched.sort(sortByDistance);
+
+  function sortByDistance(
+    a: MatchedOption<TOption, TGroup>,
+    b: MatchedOption<TOption, TGroup>,
+  ): number {
+    return a.distance - b.distance;
+  }
+}
+
+function matchOption<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  inputString: string,
+  option: TOption | TGroup,
+): boolean {
+  return matchInput(inputString, option.name) || (
+    isOption(option) &&
+    option.name !== option.value &&
+    matchInput(inputString, option.value)
+  );
+}
+
+function matchInput(inputString: string, value: string): boolean {
+  return stripColor(value)
+    .toLowerCase()
+    .includes(inputString);
+}
+
+function flatMatchedOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  matches: Array<MatchedOption<TOption, TGroup>>,
+  indentLevel = 0,
+  result: Array<TOption | TGroup> = [],
+): Array<TOption | TGroup> {
+  for (const { option, children } of matches) {
+    option.indentLevel = indentLevel;
+    result.push(option);
+    flatMatchedOptions(children, indentLevel + 1, result);
+  }
+
+  return result;
 }
 
 /** @deprecated Use `Array<string | GenericListOption>` instead. */

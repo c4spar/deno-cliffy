@@ -222,7 +222,9 @@ export class Checkbox extends GenericList<
 
   /** Get value of checked options. */
   protected getValue(): Array<string> {
-    return this.flatOptions(this.settings.options, false)
+    return flatOptions<CheckboxOptionSettings, CheckboxOptionGroupSettings>(
+      this.settings.options,
+    )
       .filter((option) => option.checked)
       .map((option) => option.value);
   }
@@ -315,7 +317,10 @@ export class Checkbox extends GenericList<
    * @return True on success, false or error message on error.
    */
   protected validate(value: Array<string>): boolean | string {
-    const options = this.flatOptions(this.settings.options, false);
+    const options = flatOptions<
+      CheckboxOptionSettings,
+      CheckboxOptionGroupSettings
+    >(this.settings.options);
     const isValidValue = Array.isArray(value) &&
       value.every((val) =>
         typeof val === "string" &&
@@ -374,6 +379,32 @@ function areAllChecked(
   );
 }
 
+function flatOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  options: Array<TOption | TGroup>,
+): Array<TOption> {
+  return flat(options);
+
+  function flat(
+    options: Array<TOption | TGroup>,
+    indentLevel = 0,
+    opts: Array<TOption> = [],
+  ): Array<TOption> {
+    for (const option of options) {
+      option.indentLevel = indentLevel;
+      if (isOption(option)) {
+        opts.push(option);
+      }
+      if (isOptionGroup(option)) {
+        flat(option.options, ++indentLevel, opts);
+      }
+    }
+
+    return opts;
+  }
+}
 /**
  * Checkbox options type.
  * @deprecated Use `Array<string | CheckboxOption>` instead.
