@@ -4,7 +4,7 @@ import { Cell, CellType, Direction } from "./cell.ts";
 export type RowType<
   T extends CellType | undefined = CellType | undefined,
 > =
-  | T[]
+  | Array<T>
   | Row<T>;
 
 /** Json row. */

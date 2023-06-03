@@ -2,7 +2,7 @@ import { strLength } from "./_utils.ts";
 
 export function consumeWords(length: number, content: string): string {
   let consumed = "";
-  const words: string[] = content.split("\n")[0]?.split(/ /g);
+  const words: Array<string> = content.split("\n")[0]?.split(/ /g);
 
   for (let i = 0; i < words.length; i++) {
     const word: string = words[i];

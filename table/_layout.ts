@@ -7,13 +7,13 @@ import { longest, strLength } from "./_utils.ts";
 
 /** Layout render settings. */
 interface RenderSettings {
-  padding: number[];
-  width: number[];
+  padding: Array<number>;
+  width: Array<number>;
   columns: number;
   hasBorder: boolean;
   hasHeaderBorder: boolean;
   hasBodyBorder: boolean;
-  rows: Row<Cell>[];
+  rows: Array<Row<Cell>>;
 }
 
 /** Table layout renderer. */
@@ -64,8 +64,8 @@ export class TableLayout {
       }
     }
 
-    const padding: number[] = [];
-    const width: number[] = [];
+    const padding: Array<number> = [];
+    const width: Array<number> = [];
     for (let colIndex = 0; colIndex < columns; colIndex++) {
       const column = this.options.columns.at(colIndex);
       const minColWidth: number = column?.getMinWidth() ??
@@ -226,7 +226,7 @@ export class TableLayout {
    */
   protected renderRows(opts: RenderSettings): string {
     let result = "";
-    const rowSpan: number[] = new Array(opts.columns).fill(1);
+    const rowSpan: Array<number> = new Array(opts.columns).fill(1);
 
     for (let rowIndex = 0; rowIndex < opts.rows.length; rowIndex++) {
       result += this.renderRow(rowSpan, rowIndex, opts);
@@ -243,7 +243,7 @@ export class TableLayout {
    * @param isMultiline Is multiline row.
    */
   protected renderRow(
-    rowSpan: number[],
+    rowSpan: Array<number>,
     rowIndex: number,
     opts: RenderSettings,
     isMultiline?: boolean,
@@ -441,7 +441,7 @@ export class TableLayout {
   protected renderBorderRow(
     prevRow: Row<Cell> | undefined,
     nextRow: Row<Cell> | undefined,
-    rowSpan: number[],
+    rowSpan: Array<number>,
     opts: RenderSettings,
   ): string {
     let result = "";
@@ -482,7 +482,7 @@ export class TableLayout {
     colIndex: number,
     prevRow: Row<Cell> | undefined,
     nextRow: Row<Cell> | undefined,
-    rowSpan: number[],
+    rowSpan: Array<number>,
     opts: RenderSettings,
   ): string {
     // a1 | b1
