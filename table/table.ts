@@ -1,7 +1,7 @@
 import { Border, border } from "./border.ts";
 import { Cell, Direction } from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
-import { TableLayout } from "./layout.ts";
+import { TableLayout } from "./_layout.ts";
 import { DataRow, Row, RowType } from "./row.ts";
 
 /** Border characters settings. */

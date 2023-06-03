@@ -632,6 +632,3 @@ export class TableLayout {
     return result;
   }
 }
-
-/** @deprecated Use `RenderSettings` instead. */
-export type IRenderSettings = RenderSettings;
