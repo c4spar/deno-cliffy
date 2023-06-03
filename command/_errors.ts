@@ -1,6 +1,7 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 import { getFlag } from "../flags/_utils.ts";
+import { bold } from "./deps.ts";
 import { EnvVar } from "./types.ts";
 
 export class CommandError extends Error {
@@ -29,6 +30,24 @@ export class DuplicateOptionNameError extends CommandError {
   constructor(name: string) {
     super(`Option with name "${getFlag(name)}" already exists.`);
     Object.setPrototypeOf(this, DuplicateOptionNameError.prototype);
+  }
+}
+
+export class MissingCommandNameCompletionsError extends CommandError {
+  constructor(shell: string) {
+    super(
+      `Failed to generate shell completions. Missing main command name. Use '${
+        bold('cmd.name("<comand-name>")')
+      }' to set the name of the main command or use the '${
+        bold("--name")
+      }' option from the '${bold("completions")}' command to set the cli name: '${
+        bold(`<command> completions ${shell} --name <cli-name>`)
+      }'.`,
+    );
+    Object.setPrototypeOf(
+      this,
+      MissingCommandNameCompletionsError.prototype,
+    );
   }
 }
 

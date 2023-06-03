@@ -97,8 +97,6 @@ export class Command<
   private types: Map<string, TypeDef> = new Map();
   private rawArgs: Array<string> = [];
   private literalArgs: Array<string> = [];
-  // @TODO: get script name: https://github.com/denoland/deno/pull/5034
-  // private name: string = location.pathname.split( '/' ).pop() as string;
   private _name = "COMMAND";
   private _parent?: TParentCommand;
   private _globalParent?: Command<any>;
@@ -621,7 +619,7 @@ export class Command<
    **** SUB HANDLER ************************************************************
    *****************************************************************************/
 
-  /** Set command name. */
+  /** Set command name. Used in auto generated help and shell completions */
   public name(name: string): this {
     this.cmd._name = name;
     return this;

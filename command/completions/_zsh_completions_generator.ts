@@ -1,3 +1,4 @@
+import { MissingCommandNameCompletionsError } from "../_errors.ts";
 import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import type { Argument, Option, TypeDef } from "../types.ts";
@@ -16,6 +17,9 @@ export class ZshCompletionsGenerator {
 
   /** Generates zsh completions script for given command. */
   public static generate(name: string, cmd: Command) {
+    if (!name || name === "COMMAND") {
+      throw new MissingCommandNameCompletionsError("zsh");
+    }
     return new ZshCompletionsGenerator(name, cmd).generate();
   }
 
