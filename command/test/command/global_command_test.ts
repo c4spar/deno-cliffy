@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import { ValidationError } from "../../_errors.ts";
-import { HelpCommand } from "../../help/mod.ts";
+import { HelpCommand } from "../../help/help_command.ts";
 
 const cmd = () =>
   new Command()

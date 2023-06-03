@@ -1,6 +1,6 @@
 import { assertEquals, stripColor } from "../../../dev_deps.ts";
-import { CompletionsCommand } from "../../completions/mod.ts";
-import { HelpCommand } from "../../help/mod.ts";
+import { CompletionsCommand } from "../../completions/completions_command.ts";
+import { HelpCommand } from "../../help/help_command.ts";
 import { Command } from "../../command.ts";
 
 function command() {
