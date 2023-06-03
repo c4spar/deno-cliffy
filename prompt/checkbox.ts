@@ -1,41 +1,59 @@
 import type { KeyCode } from "../keycode/mod.ts";
-import { dim, green, red } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { brightBlue, dim, green, red } from "./deps.ts";
+import { Figures, getFiguresByKeys } from "./figures.ts";
 import {
   GenericList,
   GenericListKeys,
   GenericListOption,
+  GenericListOptionGroup,
+  GenericListOptionGroupSettings,
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
+  isOption,
+  isOptionGroup,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Checkbox prompt options. */
 export interface CheckboxOptions
   extends GenericListOptions<Array<string>, Array<string>> {
-  options: Array<string | CheckboxOption>;
+  options: Array<string | CheckboxOption | CheckboxOptionGroup>;
+  confirmSubmit?: boolean;
   check?: string;
   uncheck?: string;
+  partialCheck?: string;
   minOptions?: number;
   maxOptions?: number;
   keys?: CheckboxKeys;
 }
 
 /** Checkbox prompt settings. */
-interface CheckboxSettings
-  extends GenericListSettings<Array<string>, Array<string>> {
-  options: Array<CheckboxOptionSettings>;
+interface CheckboxSettings extends
+  GenericListSettings<
+    Array<string>,
+    Array<string>,
+    CheckboxOptionSettings,
+    CheckboxOptionGroupSettings
+  > {
+  confirmSubmit: boolean;
   check: string;
   uncheck: string;
+  partialCheck: string;
   minOptions: number;
   maxOptions: number;
-  keys?: CheckboxKeys;
+  keys: CheckboxKeys;
 }
 
 /** Checkbox option options. */
 export interface CheckboxOption extends GenericListOption {
   checked?: boolean;
+  icon?: boolean;
+}
+
+/** Checkbox option group options. */
+export interface CheckboxOptionGroup
+  extends GenericListOptionGroup<CheckboxOption> {
   icon?: boolean;
 }
 
@@ -45,17 +63,32 @@ export interface CheckboxOptionSettings extends GenericListOptionSettings {
   icon: boolean;
 }
 
+/** Checkbox option group settings. */
+export interface CheckboxOptionGroupSettings
+  extends GenericListOptionGroupSettings<CheckboxOptionSettings> {
+  readonly checked: boolean;
+  icon: boolean;
+}
+
 /** Checkbox key options. */
 export interface CheckboxKeys extends GenericListKeys {
   check?: Array<string>;
 }
 
 /** Checkbox prompt representation. */
-export class Checkbox extends GenericList<Array<string>, Array<string>> {
+export class Checkbox extends GenericList<
+  Array<string>,
+  Array<string>,
+  CheckboxOptionSettings,
+  CheckboxOptionGroupSettings
+> {
   protected readonly settings: CheckboxSettings;
-  protected options: Array<CheckboxOptionSettings>;
+  protected options: Array<
+    CheckboxOptionSettings | CheckboxOptionGroupSettings
+  >;
   protected listIndex: number;
   protected listOffset: number;
+  private confirmSubmit = false;
 
   /** Execute the prompt and show cursor on end. */
   public static prompt(options: CheckboxOptions): Promise<Array<string>> {
@@ -92,28 +125,37 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
   protected getDefaultSettings(options: CheckboxOptions): CheckboxSettings {
     const settings = super.getDefaultSettings(options);
     return {
+      confirmSubmit: true,
       ...settings,
       check: options.check ?? green(Figures.TICK),
       uncheck: options.uncheck ?? red(Figures.CROSS),
+      partialCheck: options.partialCheck ?? green(Figures.RADIO_ON),
       minOptions: options.minOptions ?? 0,
       maxOptions: options.maxOptions ?? Infinity,
-      options: this.mapOptions(options),
+      options: this.mapOptions(options, options.options),
       keys: {
         check: ["space"],
         ...(settings.keys ?? {}),
+        open: options.keys?.open ?? ["right"],
+        back: options.keys?.back ?? ["left", "escape"],
       },
     };
   }
 
   /**
    * Map string option values to options and set option defaults.
-   * @param options Checkbox options.
+   * @param promptOptions Checkbox options.
    */
   protected mapOptions(
-    options: CheckboxOptions,
-  ): Array<CheckboxOptionSettings> {
-    return super.mapOptions(options).map(
-      (option) => this.mapOption(options, option),
+    promptOptions: CheckboxOptions,
+    options: Array<string | CheckboxOption | CheckboxOptionGroup>,
+  ): Array<CheckboxOptionSettings | CheckboxOptionGroupSettings> {
+    return options.map((option) =>
+      isOptionGroup(option)
+        ? this.mapOptionGroup(promptOptions, option)
+        : typeof option === "string"
+        ? this.mapOption(promptOptions, { value: option })
+        : this.mapOption(promptOptions, option)
     );
   }
 
@@ -135,48 +177,56 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
     };
   }
 
-  /**
-   * Render checkbox option.
-   * @param item        Checkbox option settings.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected getListItem(
-    item: CheckboxOptionSettings,
-    isSelected?: boolean,
-  ): string {
-    let line = this.settings.indent;
+  protected mapOptionGroup(
+    promptOptions: CheckboxOptions,
+    option: CheckboxOptionGroup,
+  ): CheckboxOptionGroupSettings {
+    const options = this.mapOptions(promptOptions, option.options);
+    return {
+      ...super.mapOptionGroup(promptOptions, option, false),
+      get checked() {
+        return areAllChecked(options);
+      },
+      options,
+      icon: typeof option.icon === "undefined" ? true : option.icon,
+    };
+  }
 
-    // pointer
-    line += isSelected ? this.settings.listPointer + " " : "  ";
-
-    // icon
-    if (item.icon) {
-      let check = item.checked
-        ? this.settings.check + " "
-        : this.settings.uncheck + " ";
-      if (item.disabled) {
-        check = dim(check);
-      }
-      line += check;
-    } else {
-      line += "  ";
+  protected match(): void {
+    super.match();
+    if (this.isSearching()) {
+      this.selectSearch();
     }
+  }
 
-    // value
-    line += `${
-      isSelected && !item.disabled
-        ? this.highlight(item.name, (val) => val)
-        : this.highlight(item.name)
-    }`;
+  protected getListItemIcon(
+    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+  ): string {
+    return this.getCheckboxIcon(option) + super.getListItemIcon(option);
+  }
 
-    return line;
+  private getCheckboxIcon(
+    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+  ): string {
+    if (!option.icon) {
+      return "";
+    }
+    const icon = option.checked
+      ? this.settings.check + " "
+      : isOptionGroup(option) && areSomeChecked(option.options)
+      ? this.settings.partialCheck + " "
+      : this.settings.uncheck + " ";
+
+    return option.disabled ? dim(icon) : icon;
   }
 
   /** Get value of checked options. */
   protected getValue(): Array<string> {
-    return this.settings.options
-      .filter((item) => item.checked)
-      .map((item) => item.value);
+    return flatOptions<CheckboxOptionSettings, CheckboxOptionGroupSettings>(
+      this.settings.options,
+    )
+      .filter((option) => option.checked)
+      .map((option) => option.value);
   }
 
   /**
@@ -184,22 +234,80 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
    * @param event Key event.
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
+    const hasConfirmed: boolean = this.confirmSubmit;
+    this.confirmSubmit = false;
+
     switch (true) {
-      case this.isKey(this.settings.keys, "check", event):
+      case this.isKey(this.settings.keys, "check", event) &&
+        !this.isSearchSelected():
         this.checkValue();
+        break;
+      case this.isKey(this.settings.keys, "submit", event):
+        await this.submit(hasConfirmed);
         break;
       default:
         await super.handleEvent(event);
     }
   }
 
+  protected hint(): string | undefined {
+    if (this.confirmSubmit) {
+      const info = this.selectedOption && this.isBackButton(this.selectedOption)
+        ? ` To leave the group use ${
+          getFiguresByKeys(this.settings.keys.back ?? []).join(", ")
+        }.`
+        : ` To open the selected group ${
+          getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
+        }.`;
+
+      return this.settings.indent +
+        brightBlue(
+          `Press ${
+            getFiguresByKeys(this.settings.keys.submit ?? [])
+          } again to submit.${info}`,
+        );
+    }
+
+    return super.hint();
+  }
+
+  protected async submit(hasConfirmed?: boolean): Promise<void> {
+    if (
+      !hasConfirmed &&
+      this.settings.confirmSubmit &&
+      Deno.isatty(Deno.stdout.rid) &&
+      !this.isSearchSelected()
+    ) {
+      this.confirmSubmit = true;
+      return;
+    }
+
+    await super.submit();
+  }
+
   /** Check selected option. */
   protected checkValue(): void {
-    const item = this.options[this.listIndex];
-    if (item.disabled) {
+    const option = this.options.at(this.listIndex);
+    if (!option) {
+      this.setErrorMessage("No option available to select.");
+      return;
+    } else if (option.disabled) {
       this.setErrorMessage("This option is disabled and cannot be changed.");
+      return;
+    }
+    this.checkOption(option, !option.checked);
+  }
+
+  private checkOption(
+    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+    checked: boolean,
+  ) {
+    if (isOption(option)) {
+      option.checked = checked;
     } else {
-      item.checked = !item.checked;
+      for (const childOption of option.options) {
+        this.checkOption(childOption, checked);
+      }
     }
   }
 
@@ -209,11 +317,15 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
    * @return True on success, false or error message on error.
    */
   protected validate(value: Array<string>): boolean | string {
+    const options = flatOptions<
+      CheckboxOptionSettings,
+      CheckboxOptionGroupSettings
+    >(this.settings.options);
     const isValidValue = Array.isArray(value) &&
       value.every((val) =>
         typeof val === "string" &&
         val.length > 0 &&
-        this.settings.options.findIndex((option: CheckboxOptionSettings) =>
+        options.findIndex((option: CheckboxOptionSettings) =>
             option.value === val
           ) !== -1
       );
@@ -251,6 +363,48 @@ export class Checkbox extends GenericList<Array<string>, Array<string>> {
   }
 }
 
+function areSomeChecked(
+  options: Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>,
+): boolean {
+  return options.some((option) =>
+    isOptionGroup(option) ? areSomeChecked(option.options) : option.checked
+  );
+}
+
+function areAllChecked(
+  options: Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>,
+): boolean {
+  return options.every((option) =>
+    isOptionGroup(option) ? areAllChecked(option.options) : option.checked
+  );
+}
+
+function flatOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  options: Array<TOption | TGroup>,
+): Array<TOption> {
+  return flat(options);
+
+  function flat(
+    options: Array<TOption | TGroup>,
+    indentLevel = 0,
+    opts: Array<TOption> = [],
+  ): Array<TOption> {
+    for (const option of options) {
+      option.indentLevel = indentLevel;
+      if (isOption(option)) {
+        opts.push(option);
+      }
+      if (isOptionGroup(option)) {
+        flat(option.options, ++indentLevel, opts);
+      }
+    }
+
+    return opts;
+  }
+}
 /**
  * Checkbox options type.
  * @deprecated Use `Array<string | CheckboxOption>` instead.
@@ -259,6 +413,8 @@ export type CheckboxValueOptions = Array<string | CheckboxOption>;
 
 /**
  * Checkbox option settings type.
- * @deprecated Use `Array<CheckboxOptionSettings>` instead.
+ * @deprecated Use `Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>` instead.
  */
-export type CheckboxValueSettings = Array<CheckboxOptionSettings>;
+export type CheckboxValueSettings = Array<
+  CheckboxOptionSettings | CheckboxOptionGroupSettings
+>;

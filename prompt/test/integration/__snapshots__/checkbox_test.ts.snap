@@ -5,19 +5,19 @@ stdout:
 "? Select an option
 ❯ ✘ Foo
   ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ Foo
 ❯ ✘ Bar
-  ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+  ✘ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ Foo
   ✘ Bar
-❯ ✘ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✘ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   ✘ Foo
   ✘ Bar
-❯ ✔ Baz\\x1b[3A\\x1b[19G\\x1b[?25l\\x1b[G\\x1b[0J
+❯ ✔ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Baz
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -30,6 +30,8 @@ stdout:
 ❯ ✘ Foo
   ✘ Bar
   ✘ Baz\\x1b[3A\\x1b[23G\\x1b[G\\x1b[0J
+? Select an option 🔎 baz
+  ✘ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
 ? Select an option 🔎 baz
 ❯ ✘ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
 ? Select an option 🔎 baz

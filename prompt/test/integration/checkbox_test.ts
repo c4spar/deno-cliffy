@@ -30,6 +30,7 @@ await snapshotTest({
   osSuffix: ["windows"],
   stdin: ansi
     .text("baz")
+    .text("\n")
     .text(" ")
     .text("\n")
     .toArray(),

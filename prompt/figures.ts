@@ -13,8 +13,10 @@ const main = {
   CROSS: "✘",
   ELLIPSIS: "…",
   POINTER_SMALL: "›",
+  POINTER_SMALL_LEFT: "‹",
   LINE: "─",
   POINTER: "❯",
+  POINTER_LEFT: "❮",
   INFO: "ℹ",
   TAB_LEFT: "⇤",
   TAB_RIGHT: "⇥",
@@ -24,6 +26,8 @@ const main = {
   PAGE_DOWN: "⇟",
   ENTER: "↵",
   SEARCH: "🔎",
+  FOLDER: "📁",
+  FOLDER_OPEN: "📂",
 };
 
 const win = {
