@@ -4,7 +4,7 @@
  * @param length    Max length of all words.
  * @param content   The text content.
  */
-import { Cell, ICell } from "./cell.ts";
+import { Cell, CellOrValue, CellValue } from "./cell.ts";
 import { stripColor } from "./deps.ts";
 
 export function consumeWords(length: number, content: string): string {
@@ -34,7 +34,7 @@ export function consumeWords(length: number, content: string): string {
  */
 export function longest(
   index: number,
-  rows: ICell[][],
+  rows: Array<Array<CellOrValue<CellValue>>>,
   maxWidth?: number,
 ): number {
   const cellLengths = rows.map((row) => {
