@@ -1,0 +1,13 @@
+export const snapshot = {};
+
+snapshot[`[table] should call parser and renderer callback methods 1`] = `
+"┌──────────────┬──────────────┬──────────────┐
+│ \\x1b[35mFooa        \\x1b[39m │ \\x1b[34mBarb        \\x1b[39m │ \\x1b[33mBazc        \\x1b[39m │
+├──────────────┼──────────────┼──────────────┤
+│ \\x1b[34mfoo bar baz1\\x1b[39m │ \\x1b[35mbaz2        \\x1b[39m │ \\x1b[32mbeep boop3  \\x1b[39m │
+├──────────────┼──────────────┼──────────────┤
+│ \\x1b[34mbaz1        \\x1b[39m │ \\x1b[35mbeep boop2  \\x1b[39m │ \\x1b[32mfoo bar baz3\\x1b[39m │
+├──────────────┼──────────────┼──────────────┤
+│ \\x1b[34mbeep boop1  \\x1b[39m │ \\x1b[35mfoo bar baz2\\x1b[39m │ \\x1b[32mbaz3        \\x1b[39m │
+└──────────────┴──────────────┴──────────────┘"
+`;

@@ -53,12 +53,13 @@ export class TableLayout {
     const rows = this.#getRows();
 
     const columns: number = Math.max(...rows.map((row) => row.length));
-    for (const row of rows) {
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const row = rows[rowIndex];
       const length: number = row.length;
       if (length < columns) {
         const diff = columns - length;
         for (let i = 0; i < diff; i++) {
-          row.push(this.createCell(null, row, length + i));
+          row.push(this.createCell(null, row, rowIndex, length + i));
         }
       }
     }
@@ -110,11 +111,18 @@ export class TableLayout {
       return this.spanRows(rows);
     }
 
-    return rows.map((row) => {
-      const newRow = this.createRow(row);
+    return rows.map((row, rowIndex) => {
+      const newRow = Row.from(row) as Row<Cell>;
+
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
-        newRow[colIndex] = this.createCell(row[colIndex], newRow, colIndex);
+        newRow[colIndex] = this.createCell(
+          row[colIndex],
+          newRow,
+          rowIndex,
+          colIndex,
+        );
       }
+
       return newRow;
     });
   }
@@ -133,7 +141,7 @@ export class TableLayout {
       if (rowIndex === rows.length && rowSpan.every((span) => span === 1)) {
         break;
       }
-      const row = rows[rowIndex] = this.createRow(rows[rowIndex] || []);
+      const row = rows[rowIndex] = Row.from(rows[rowIndex] || []);
       let colIndex = -1;
 
       while (true) {
@@ -171,6 +179,7 @@ export class TableLayout {
         const cell = row[colIndex] = this.createCell(
           row[colIndex] || null,
           row,
+          rowIndex,
           colIndex,
         );
 
@@ -193,30 +202,57 @@ export class TableLayout {
       : 0;
   }
 
-  /**
-   * Create a new row from existing row or cell array.
-   * @param row Original row.
-   */
-  protected createRow(row: IRow): Row<Cell> {
-    return Row.from(row)
-      .border(this.table.getBorder(), false)
-      .align(this.table.getAlign(), false) as Row<Cell>;
-  }
-
-  /**
-   * Create a new cell from existing cell or cell value.
-   * @param cell  Original cell.
-   * @param row   Parent row.
-   */
+  /** Create a new cell from existing cell or cell value. */
   protected createCell(
-    cell: ICell | null | undefined,
+    value: ICell | null | undefined,
     row: Row,
+    rowIndex: number,
     colIndex: number,
   ): Cell {
     const column: Column | undefined = this.options.columns.at(colIndex);
-    return Cell.from(cell ?? "")
-      .border(column?.getBorder() ?? row.getBorder(), false)
-      .align(column?.getAlign() ?? row.getAlign(), false);
+    const isHeader = rowIndex === 0 && this.table.getHeader() !== undefined;
+    const cell = Cell.from(value ?? "");
+
+    if (typeof cell.getBorder() === "undefined") {
+      cell.border(
+        row.getBorder() ?? column?.getBorder() ?? this.table.getBorder() ??
+          false,
+      );
+    }
+
+    if (!cell.getAlign()) {
+      cell.align(
+        row.getAlign() ?? column?.getAlign() ?? this.table.getAlign() ?? "left",
+      );
+    }
+
+    if (!cell.getRenderer()) {
+      const cellRenderer = row.getCellRenderer() ?? (
+        isHeader ? column?.getHeaderRenderer() : column?.getCellRenderer()
+      ) ?? (
+        isHeader ? this.table.getHeaderRenderer() : this.table.getCellRenderer()
+      );
+
+      if (cellRenderer) {
+        cell.renderer(cellRenderer);
+      }
+    }
+
+    const cellValueParser = cell.getValueParser() ?? row.getCellValueParser() ??
+      (
+        isHeader ? column?.getHeaderValueParser() : column?.getCellValueParser()
+      ) ?? (
+        isHeader
+          ? this.table.getHeaderValueParser()
+          : this.table.getCellValueParser()
+      );
+
+    if (cellValueParser) {
+      cell.value(cellValueParser);
+      cell.setValue(cellValueParser(cell.toString()));
+    }
+
+    return cell;
   }
 
   /**
@@ -373,7 +409,7 @@ export class TableLayout {
       result += " ".repeat(opts.padding[colIndex]);
     }
 
-    result += current;
+    result += row[colIndex].getRenderer()?.(current) ?? current;
 
     if (opts.hasBorder || colIndex < opts.columns - 1) {
       result += " ".repeat(opts.padding[colIndex]);
@@ -409,7 +445,7 @@ export class TableLayout {
     const fillLength = maxLength - strLength(words);
 
     // Align content
-    const align: Direction = cell.getAlign();
+    const align: Direction = cell.getAlign() ?? "left";
     let current: string;
     if (fillLength === 0) {
       current = words;

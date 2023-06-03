@@ -1,5 +1,6 @@
+import { colors } from "../../ansi/colors.ts";
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
+import { assertEquals, assertSnapshot } from "../../dev_deps.ts";
 
 const createTable = () =>
   new Table()
@@ -114,6 +115,31 @@ Deno.test("[table] should set padding on columns", () => {
 │     beep boop       │         foo bar baz          │             baz     │
 └─────────────────────┴──────────────────────────────┴─────────────────────┘`
       .slice(1),
+  );
+});
+
+Deno.test("[table] should call parser and renderer callback methods", async (t) => {
+  await assertSnapshot(
+    t,
+    createTable()
+      .columns([{
+        headerValue: (value) => value + "a",
+        cellValue: (value) => value + "1",
+        headerRenderer: colors.magenta,
+        cellRenderer: colors.blue,
+      }, {
+        headerValue: (value) => value + "b",
+        cellValue: (value) => value + "2",
+        headerRenderer: colors.blue,
+        cellRenderer: colors.magenta,
+      }, {
+        headerValue: (value) => value + "c",
+        cellValue: (value) => value + "3",
+        headerRenderer: colors.yellow,
+        cellRenderer: colors.green,
+      }])
+      .border(true)
+      .toString(),
   );
 });
 

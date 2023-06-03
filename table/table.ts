@@ -1,5 +1,5 @@
 import { border, IBorder } from "./border.ts";
-import { Cell, Direction } from "./cell.ts";
+import { Cell, Direction, Renderer, ValueParser } from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./layout.ts";
 import { IDataRow, IRow, Row } from "./row.ts";
@@ -16,13 +16,31 @@ export interface ITableOptions {
   minColWidth?: number | number[];
   padding?: number | number[];
   chars?: IBorderOptions;
+  headerValue?: ValueParser;
+  cellValue?: ValueParser;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
 
 /** Table settings. */
-export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
+export interface ITableSettings extends
+  Required<
+    Omit<
+      ITableOptions,
+      | "align"
+      | "headerValue"
+      | "cellValue"
+      | "headerRenderer"
+      | "cellRenderer"
+    >
+  > {
   chars: IBorder;
   align?: Direction;
   columns: Array<Column>;
+  headerValue?: ValueParser;
+  cellValue?: ValueParser;
+  headerRenderer?: Renderer;
+  cellRenderer?: Renderer;
 }
 
 /** Table type. */
@@ -93,6 +111,10 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Set column definitions.
+   * @param columns Array of columns or column options.
+   */
   public columns(columns: Array<Column | ColumnOptions>): this {
     this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
@@ -100,6 +122,11 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Set column definitions for a single column.
+   * @param index   Column index.
+   * @param column  Column or column options.
+   */
   public column(
     index: number,
     column: Column | ColumnOptions,
@@ -237,6 +264,42 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this;
   }
 
+  /**
+   * Register header value parser.
+   * @param fn  Value parser callback function.
+   */
+  public headerValue(fn: ValueParser): this {
+    this.options.headerValue = fn;
+    return this;
+  }
+
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public cellValue(fn: ValueParser): this {
+    this.options.cellValue = fn;
+    return this;
+  }
+
+  /**
+   * Register header renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public headerRenderer(fn: Renderer): this {
+    this.options.headerRenderer = fn;
+    return this;
+  }
+
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public cellRenderer(fn: Renderer): this {
+    this.options.cellRenderer = fn;
+    return this;
+  }
+
   /** Get table header. */
   public getHeader(): Row | undefined {
     return this.headerRow;
@@ -247,7 +310,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return [...this];
   }
 
-  /** Get mac col widrth. */
+  /** Get max col width. */
   public getMaxColWidth(): number | number[] {
     return this.options.maxColWidth;
   }
@@ -268,14 +331,15 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Check if table has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if header row has border. */
   public hasHeaderBorder(): boolean {
     const hasBorder = this.headerRow?.hasBorder();
-    return hasBorder === true || (this.getBorder() && hasBorder !== false);
+    return hasBorder === true ||
+      (this.getBorder() === true && hasBorder !== false);
   }
 
   /** Check if table bordy has border. */
@@ -295,15 +359,37 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Get table alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
   }
 
+  /** Get column definitions. */
   public getColumns(): Array<Column> {
     return this.options.columns;
   }
 
+  /** Get column definition by column index. */
   public getColumn(index: number): Column {
     return this.options.columns[index] ??= new Column();
+  }
+
+  /** Get header value parser. */
+  public getHeaderValueParser(): ValueParser | undefined {
+    return this.options.headerValue;
+  }
+
+  /** Get value parser. */
+  public getCellValueParser(): ValueParser | undefined {
+    return this.options.cellValue;
+  }
+
+  /** Get header renderer. */
+  public getHeaderRenderer(): Renderer | undefined {
+    return this.options.headerRenderer;
+  }
+
+  /** Get cell renderer. */
+  public getCellRenderer(): Renderer | undefined {
+    return this.options.cellRenderer;
   }
 }

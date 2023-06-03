@@ -4,12 +4,20 @@ export type ICell = number | string | String | Cell;
 
 export type Direction = "left" | "right" | "center";
 
+export type ValueParser = (
+  value: string | number | undefined | null,
+) => string | number | undefined | null;
+
+export type Renderer = (value: string) => string;
+
 /** Cell options. */
 export interface ICellOptions {
   border?: boolean;
   colSpan?: number;
   rowSpan?: number;
   align?: Direction;
+  value?: ValueParser;
+  render?: Renderer;
 }
 
 /** Cell representation. */
@@ -36,21 +44,23 @@ export class Cell {
 
   /**
    * Cell constructor.
-   * @param value Cell value.
+   * @param cellValue Cell value.
    */
-  public constructor(private value: ICell) {}
+  public constructor(
+    private cellValue?: ICell | undefined | null,
+  ) {}
 
   /** Get cell value. */
   public toString(): string {
-    return this.value.toString();
+    return this.cellValue?.toString() ?? "";
   }
 
   /**
    * Set cell value.
    * @param value Cell or cell value.
    */
-  public setValue(value: ICell): this {
-    this.value = value;
+  public setValue(value: ICell | undefined | null): this {
+    this.cellValue = value;
     return this;
   }
 
@@ -117,12 +127,30 @@ export class Cell {
   }
 
   /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public value(fn: ValueParser): this {
+    this.options.value = fn;
+    return this;
+  }
+
+  /**
+   * Register cell renderer. Will be called once for each line in the cell.
+   * @param fn  Cell renderer callback function.
+   */
+  public renderer(fn: Renderer): this {
+    this.options.render = fn;
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
   /** Check if cell has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Get col span. */
@@ -139,8 +167,18 @@ export class Cell {
       : 1;
   }
 
-  /** Get row span. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  /** Get cell alignment. */
+  public getAlign(): Direction | undefined {
+    return this.options.align;
+  }
+
+  /** Get value parser. */
+  public getValueParser(): ValueParser | undefined {
+    return this.options.value;
+  }
+
+  /** Get cell renderer. */
+  public getRenderer(): Renderer | undefined {
+    return this.options.render;
   }
 }
