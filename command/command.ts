@@ -1368,7 +1368,7 @@ export class Command<
         if (opts?.override) {
           this.removeOption(name);
         } else {
-          throw new DuplicateOptionNameError(name);
+          throw new DuplicateOptionNameError(name, this.getPath());
         }
       }
 
