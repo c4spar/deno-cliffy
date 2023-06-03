@@ -1,4 +1,4 @@
-import { consumeWords } from "../utils.ts";
+import { consumeWords } from "../_utils.ts";
 import { assertEquals } from "../../dev_deps.ts";
 
 const str =
