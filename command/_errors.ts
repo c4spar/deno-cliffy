@@ -27,8 +27,16 @@ export class ValidationError extends CommandError {
 }
 
 export class DuplicateOptionNameError extends CommandError {
-  constructor(name: string) {
-    super(`Option with name "${getFlag(name)}" already exists.`);
+  constructor(optionName: string, commandName: string) {
+    super(
+      `An option with name '${
+        bold(getFlag(optionName))
+      }' is already registered on command '${
+        bold(commandName)
+      }'. If it is intended to override the option, set the '${
+        bold("override")
+      }' option of the '${bold("option")}' method to true.`,
+    );
     Object.setPrototypeOf(this, DuplicateOptionNameError.prototype);
   }
 }

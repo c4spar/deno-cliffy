@@ -1,6 +1,6 @@
 // deno-fmt-ignore-file
 
-import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows, bold } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
 import type { Option } from "../../types.ts";
 
@@ -239,7 +239,13 @@ Deno.test("command - option - duplicate option", () => {
         .option("-x, --foo", "...");
     },
     Error,
-    `Option with name "--foo" already exists.`,
+    `An option with name '${
+      bold("--foo")
+    }' is already registered on command '${
+      bold("COMMAND")
+    }'. If it is intended to override the option, set the '${
+      bold("override")
+    }' option of the '${bold("option")}' method to true`,
   );
 });
 
