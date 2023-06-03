@@ -685,16 +685,6 @@ export function isOptionGroup<
     option.options.length > 0;
 }
 
-export function assertIsOption<
-  TOption extends GenericListOption,
->(
-  option: TOption | GenericListOptionGroup<GenericListOption>,
-): asserts option is TOption {
-  if (!isOption(option)) {
-    throw new Error("Expected an option but got an option group.");
-  }
-}
-
 function matchOptions<
   TOption extends GenericListOptionSettings,
   TGroup extends GenericListOptionGroupSettings<TOption>,

@@ -1,6 +1,5 @@
 import { brightBlue, underline } from "./deps.ts";
 import {
-  assertIsOption,
   GenericList,
   GenericListKeys,
   GenericListOption,
@@ -163,6 +162,16 @@ export class Select extends GenericList<
    */
   protected format(value: string): string {
     return this.getOptionByValue(value)?.name ?? value;
+  }
+}
+
+function assertIsOption<
+  TOption extends GenericListOption,
+>(
+  option: TOption | GenericListOptionGroup<GenericListOption>,
+): asserts option is TOption {
+  if (!isOption(option)) {
+    throw new Error("Expected an option but got an option group.");
   }
 }
 
