@@ -15,16 +15,18 @@ export class ZshCompletionsGenerator {
   private actions: Map<string, ICompletionAction> = new Map();
 
   /** Generates zsh completions script for given command. */
-  public static generate(cmd: Command) {
-    return new ZshCompletionsGenerator(cmd).generate();
+  public static generate(name: string, cmd: Command) {
+    return new ZshCompletionsGenerator(name, cmd).generate();
   }
 
-  private constructor(protected cmd: Command) {}
+  private constructor(
+    protected name: string,
+    protected cmd: Command,
+  ) {}
 
   /** Generates zsh completions code. */
   private generate(): string {
-    const path = this.cmd.getPath();
-    const name = this.cmd.getName();
+    const path = this.cmd.getPath(this.name);
     const version: string | undefined = this.cmd.getVersion()
       ? ` v${this.cmd.getVersion()}`
       : "";
@@ -35,8 +37,8 @@ export class ZshCompletionsGenerator {
 autoload -U is-at-least
 
 # shellcheck disable=SC2154
-(( $+functions[__${replaceSpecialChars(name)}_complete] )) ||
-function __${replaceSpecialChars(name)}_complete {
+(( $+functions[__${replaceSpecialChars(this.name)}_complete] )) ||
+function __${replaceSpecialChars(this.name)}_complete {
   local name="$1"; shift
   local action="$1"; shift
   integer ret=1
@@ -46,7 +48,7 @@ function __${replaceSpecialChars(name)}_complete {
   while _tags; do
     if _requested "$name"; then
       # shellcheck disable=SC2034
-      lines="$(${name} completions complete "\${action}" "\${@}")"
+      lines="$(${this.name} completions complete "\${action}" "\${@}")"
       values=("\${(ps:\\n:)lines}")
       if (( \${#values[@]} )); then
         while _next_label "$name" expl "$action"; do
@@ -57,7 +59,7 @@ function __${replaceSpecialChars(name)}_complete {
   done
 }
 
-${this.generateCompletions(this.cmd).trim()}
+${this.generateCompletions(this.name, this.cmd).trim()}
 
 # _${replaceSpecialChars(path)} "\${@}"
 
@@ -65,7 +67,11 @@ compdef _${replaceSpecialChars(path)} ${path}`;
   }
 
   /** Generates zsh completions method for given command and child commands. */
-  private generateCompletions(command: Command, path = ""): string {
+  private generateCompletions(
+    name: string,
+    command: Command,
+    path = "",
+  ): string {
     if (
       !command.hasCommands(false) && !command.hasOptions(false) &&
       !command.hasArguments()
@@ -73,7 +79,7 @@ compdef _${replaceSpecialChars(path)} ${path}`;
       return "";
     }
 
-    path = (path ? path + " " : "") + command.getName();
+    path = (path ? path + " " : "") + name;
 
     return `# shellcheck disable=SC2154
 (( $+functions[_${replaceSpecialChars(path)}] )) ||
@@ -90,7 +96,7 @@ function _${replaceSpecialChars(path)}() {` +
       command.getCommands(false)
         .filter((subCommand: Command) => subCommand !== command)
         .map((subCommand: Command) =>
-          this.generateCompletions(subCommand, path)
+          this.generateCompletions(subCommand.getName(), subCommand, path)
         )
         .join("");
   }
@@ -125,7 +131,7 @@ function _${replaceSpecialChars(path)}() {` +
       const action = this.addAction(arg, completionsPath);
       if (action && command.getCompletion(arg.action)) {
         completions += `\n    __${
-          replaceSpecialChars(this.cmd.getName())
+          replaceSpecialChars(this.name)
         }_complete ${action.arg.name} ${action.arg.action} ${action.cmd}`;
       }
     }
@@ -348,7 +354,7 @@ function _${replaceSpecialChars(path)}() {` +
         .from(this.actions)
         .map(([name, action]) =>
           `${name}) __${
-            replaceSpecialChars(this.cmd.getName())
+            replaceSpecialChars(this.name)
           }_complete ${action.arg.name} ${action.arg.action} ${action.cmd} ;;`
         );
     }

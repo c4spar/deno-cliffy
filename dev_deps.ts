@@ -15,6 +15,10 @@ export {
 export { assertSnapshot } from "https://deno.land/std@0.170.0/testing/snapshot.ts";
 export { describe, it } from "https://deno.land/std@0.170.0/testing/bdd.ts";
 export {
+  assertType,
+  type IsExact,
+} from "https://deno.land/std@0.170.0/testing/types.ts";
+export {
   bold,
   red,
   stripColor,

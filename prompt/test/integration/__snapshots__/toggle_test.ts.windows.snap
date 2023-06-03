@@ -1,0 +1,17 @@
+export const snapshot = {};
+
+snapshot[`toggle prompt > should toggle the prompt 1`] = `
+stdout:
+"? Please confirm (No) » No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) » No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) » No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) » No / Yes
+❯ some hint\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Please confirm (No) » Yes
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;

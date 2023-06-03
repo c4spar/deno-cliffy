@@ -3,8 +3,10 @@ import { dim, italic } from "../deps.ts";
 import { BashCompletionsGenerator } from "./_bash_completions_generator.ts";
 
 /** Generates bash completions script. */
-export class BashCompletionsCommand extends Command {
-  #cmd?: Command;
+export class BashCompletionsCommand
+  extends Command<void, void, { name: string }> {
+  readonly #cmd?: Command;
+
   public constructor(cmd?: Command) {
     super();
     this.#cmd = cmd;
@@ -20,9 +22,10 @@ To enable bash completions for this program add following line to your ${
     ${dim(italic(`source <(${baseCmd.getPath()} completions bash)`))}`;
       })
       .noGlobals()
-      .action(() => {
+      .option("-n, --name <command-name>", "The name of the main command.")
+      .action(({ name = this.getMainCommand().getName() }) => {
         const baseCmd = this.#cmd || this.getMainCommand();
-        console.log(BashCompletionsGenerator.generate(baseCmd));
+        console.log(BashCompletionsGenerator.generate(name, baseCmd));
       });
   }
 }

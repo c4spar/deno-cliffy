@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { bold, brightBlue, dim, stripColor } from "./deps.ts";
+import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./figures.ts";
 import { distance } from "../_utils/distance.ts";
 
@@ -17,7 +17,9 @@ export interface GenericListOptions<TValue, TRawValue> extends
     GenericInputPromptOptions<TValue, TRawValue>,
     UnsupportedInputOptions
   > {
-  options: Array<string | GenericListOption>;
+  options: Array<
+    string | GenericListOption | GenericListOptionGroup<GenericListOption>
+  >;
   keys?: GenericListKeys;
   indent?: string;
   listPointer?: string;
@@ -26,19 +28,35 @@ export interface GenericListOptions<TValue, TRawValue> extends
   searchLabel?: string;
   search?: boolean;
   info?: boolean;
+  maxBreadcrumbItems?: number;
+  breadcrumbSeparator?: string;
+  backPointer?: string;
+  groupPointer?: string;
+  groupIcon?: string | boolean;
+  groupOpenIcon?: string | boolean;
 }
 
 /** Generic list prompt settings. */
-export interface GenericListSettings<TValue, TRawValue>
-  extends GenericInputPromptSettings<TValue, TRawValue> {
-  options: Array<GenericListOptionSettings>;
-  keys?: GenericListKeys;
+export interface GenericListSettings<
+  TValue,
+  TRawValue,
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+> extends GenericInputPromptSettings<TValue, TRawValue> {
+  options: Array<TOption | TGroup>;
+  keys: GenericListKeys;
   indent: string;
   listPointer: string;
   maxRows: number;
   searchLabel: string;
   search?: boolean;
   info?: boolean;
+  maxBreadcrumbItems: number;
+  breadcrumbSeparator: string;
+  backPointer: string;
+  groupPointer: string;
+  groupIcon: string | false;
+  groupOpenIcon: string | false;
 }
 
 /** Generic list option options. */
@@ -48,33 +66,70 @@ export interface GenericListOption {
   disabled?: boolean;
 }
 
+/** Generic list option group options. */
+export interface GenericListOptionGroup<TOption extends GenericListOption> {
+  name: string;
+  options: Array<string | TOption | this>;
+  disabled?: boolean;
+}
+
 /** Generic list option settings. */
 export interface GenericListOptionSettings extends GenericListOption {
   name: string;
   value: string;
   disabled: boolean;
+  indentLevel: number;
 }
 
-/** Select key options. */
+/** Generic list option group settings. */
+export interface GenericListOptionGroupSettings<
+  TOption extends GenericListOptionSettings,
+> extends GenericListOptionGroup<TOption> {
+  disabled: boolean;
+  indentLevel: number;
+  options: Array<TOption | this>;
+}
+
+/** GenericList key options. */
 export interface GenericListKeys extends GenericInputKeys {
   previous?: string[];
   next?: string[];
   previousPage?: string[];
   nextPage?: string[];
+  open?: string[];
+  back?: string[];
+}
+
+interface MatchedOption<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+> {
+  option: TOption | TGroup;
+  distance: number;
+  children: Array<MatchedOption<TOption, TGroup>>;
 }
 
 /** Generic list prompt representation. */
 export abstract class GenericList<
   TValue,
   TRawValue,
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
 > extends GenericInput<TValue, TRawValue> {
   protected abstract readonly settings: GenericListSettings<
     TValue,
-    TRawValue
+    TRawValue,
+    TOption,
+    TGroup
   >;
-  protected abstract options: Array<GenericListOptionSettings>;
+  protected abstract options: Array<TOption | TGroup>;
   protected abstract listIndex: number;
   protected abstract listOffset: number;
+  protected parentOptions: Array<TGroup> = [];
+
+  protected get selectedOption() {
+    return this.options.at(this.listIndex);
+  }
 
   /**
    * Create list separator.
@@ -85,46 +140,54 @@ export abstract class GenericList<
   }
 
   protected getDefaultSettings(
-    options: GenericListOptions<TValue, TRawValue>,
-    // ): Omit<GenericListSettings<TValue, TRawValue>, "options"> {
-  ): GenericListSettings<TValue, TRawValue> {
+    {
+      groupIcon = true,
+      groupOpenIcon = groupIcon,
+      ...options
+    }: GenericListOptions<TValue, TRawValue>,
+  ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,
       listPointer: options.listPointer ?? brightBlue(Figures.POINTER),
       searchLabel: options.searchLabel ?? brightBlue(Figures.SEARCH),
+      backPointer: options.backPointer ?? brightBlue(Figures.POINTER_LEFT),
+      groupPointer: options.groupPointer ?? options.listPointer ??
+        brightBlue(Figures.POINTER),
+      groupIcon: !groupIcon
+        ? false
+        : typeof groupIcon === "string"
+        ? groupIcon
+        : Figures.FOLDER,
+      groupOpenIcon: !groupOpenIcon
+        ? false
+        : typeof groupOpenIcon === "string"
+        ? groupOpenIcon
+        : Figures.FOLDER_OPEN,
+      maxBreadcrumbItems: options.maxBreadcrumbItems ?? 5,
+      breadcrumbSeparator: options.breadcrumbSeparator ??
+        ` ${Figures.POINTER_SMALL} `,
       maxRows: options.maxRows ?? 10,
-      options: this.mapOptions(options).map(
-        (option) => this.mapOption(options, option),
-      ),
+      options: this.mapOptions(options, options.options),
       keys: {
         previous: options.search ? ["up"] : ["up", "u", "p", "8"],
         next: options.search ? ["down"] : ["down", "d", "n", "2"],
         previousPage: ["pageup", "left"],
         nextPage: ["pagedown", "right"],
+        open: ["right", "enter", "return"],
+        back: ["left", "escape", "enter", "return"],
         ...(settings.keys ?? {}),
       },
     };
   }
 
-  protected mapOptions<
-    TOption extends GenericListOption,
-  >(
-    options: GenericListOptions<TValue, TRawValue> & {
-      options: Array<string | TOption>;
-    },
-  ): Array<TOption | { value: string }> {
-    return options.options.map((option) =>
-      typeof option === "string" ? { value: option } : option
-    ).map(
-      (option) => this.mapOption(options, option),
-    );
-  }
+  protected abstract mapOptions(
+    promptOptions: GenericListOptions<TValue, TRawValue>,
+    options: Array<
+      string | GenericListOption | GenericListOptionGroup<GenericListOption>
+    >,
+  ): Array<TOption | TGroup>;
 
-  /**
-   * Set list option defaults.
-   * @param option List option.
-   */
   protected mapOption(
     _options: GenericListOptions<TValue, TRawValue>,
     option: GenericListOption,
@@ -133,23 +196,46 @@ export abstract class GenericList<
       value: option.value,
       name: typeof option.name === "undefined" ? option.value : option.name,
       disabled: !!option.disabled,
+      indentLevel: 0,
+    };
+  }
+
+  protected mapOptionGroup(
+    options: GenericListOptions<TValue, TRawValue>,
+    option: GenericListOptionGroup<GenericListOption>,
+    recursive = true,
+  ): GenericListOptionGroupSettings<GenericListOptionSettings> {
+    return {
+      name: option.name,
+      disabled: !!option.disabled,
+      indentLevel: 0,
+      options: recursive ? this.mapOptions(options, option.options) : [],
     };
   }
 
   protected match(): void {
     const input: string = this.getCurrentInputValue().toLowerCase();
-    if (!input.length) {
-      this.options = this.settings.options.slice();
-    } else {
-      this.options = this.settings.options
-        .filter((option: GenericListOptionSettings) =>
-          match(option.name) ||
-          (option.name !== option.value && match(option.value))
-        )
-        .sort((a: GenericListOptionSettings, b: GenericListOptionSettings) =>
-          distance(a.name, input) - distance(b.name, input)
-        );
+    let options: Array<TOption | TGroup> = this.getCurrentOptions().slice();
+
+    if (input.length) {
+      const matches = matchOptions<TOption, TGroup>(
+        input,
+        this.getCurrentOptions(),
+      );
+      options = flatMatchedOptions(matches);
     }
+
+    this.setOptions(options);
+  }
+
+  protected setOptions(options: Array<TOption | TGroup>) {
+    this.options = [...options];
+
+    const parent = this.getParentOption();
+    if (parent && this.options[0] !== parent) {
+      this.options.unshift(parent);
+    }
+
     this.listIndex = Math.max(
       0,
       Math.min(this.options.length - 1, this.listIndex),
@@ -161,23 +247,56 @@ export abstract class GenericList<
         this.listOffset,
       ),
     );
+  }
 
-    function match(value: string): boolean {
-      return stripColor(value)
-        .toLowerCase()
-        .includes(input);
+  protected getCurrentOptions(): Array<TOption | TGroup> {
+    return this.getParentOption()?.options ?? this.settings.options;
+  }
+
+  protected getParentOption(index = -1): TGroup | undefined {
+    return this.parentOptions.at(index);
+  }
+
+  protected submitBackButton() {
+    const parentOption = this.parentOptions.pop();
+    if (!parentOption) {
+      return;
     }
+    this.match();
+    this.listIndex = this.options.indexOf(parentOption);
+  }
+
+  protected submitGroupOption(selectedOption: TGroup) {
+    this.parentOptions.push(selectedOption);
+    this.match();
+    this.listIndex = 1;
+  }
+
+  protected isBackButton(option: TOption | TGroup | undefined): boolean {
+    return option === this.getParentOption();
+  }
+
+  protected hasParent(): boolean {
+    return this.parentOptions.length > 0;
+  }
+
+  protected isSearching(): boolean {
+    return this.getCurrentInputValue() !== "";
   }
 
   protected message(): string {
     let message = `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) +
       this.defaults();
+
     if (this.settings.search) {
+      const input = this.isSearchSelected() ? this.input() : dim(this.input());
       message += " " + this.settings.searchLabel + " ";
+      this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+      message += input;
     }
-    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
-    return message + this.input();
+
+    return message;
   }
 
   /** Render options. */
@@ -190,15 +309,25 @@ export abstract class GenericList<
       return "";
     }
     const selected: number = this.listIndex + 1;
+    const hasGroups = this.options.some((option) => isOptionGroup(option));
+
+    const groupActions: Array<[string, Array<string>]> = hasGroups
+      ? [
+        ["Open", getFiguresByKeys(this.settings.keys.open ?? [])],
+        ["Back", getFiguresByKeys(this.settings.keys.back ?? [])],
+      ]
+      : [];
+
     const actions: Array<[string, Array<string>]> = [
-      ["Next", getFiguresByKeys(this.settings.keys?.next ?? [])],
-      ["Previous", getFiguresByKeys(this.settings.keys?.previous ?? [])],
-      ["Next Page", getFiguresByKeys(this.settings.keys?.nextPage ?? [])],
+      ["Next", getFiguresByKeys(this.settings.keys.next ?? [])],
+      ["Previous", getFiguresByKeys(this.settings.keys.previous ?? [])],
+      ...groupActions,
+      ["Next Page", getFiguresByKeys(this.settings.keys.nextPage ?? [])],
       [
         "Previous Page",
-        getFiguresByKeys(this.settings.keys?.previousPage ?? []),
+        getFiguresByKeys(this.settings.keys.previousPage ?? []),
       ],
-      ["Submit", getFiguresByKeys(this.settings.keys?.submit ?? [])],
+      ["Submit", getFiguresByKeys(this.settings.keys.submit ?? [])],
     ];
 
     return "\n" + this.settings.indent + brightBlue(Figures.INFO) +
@@ -230,13 +359,90 @@ export abstract class GenericList<
 
   /**
    * Render option.
-   * @param item        Option.
+   * @param option        Option.
    * @param isSelected  Set to true if option is selected.
    */
-  protected abstract getListItem(
-    item: GenericListOptionSettings,
+  protected getListItem(
+    option: TOption | TGroup,
     isSelected?: boolean,
-  ): string;
+  ): string {
+    let line = this.getListItemIndent(option);
+    line += this.getListItemPointer(option, isSelected);
+    line += this.getListItemIcon(option);
+    line += this.getListItemLabel(option, isSelected);
+
+    return line;
+  }
+
+  protected getListItemIndent(option: TOption | TGroup) {
+    const indentLevel = this.isSearching()
+      ? option.indentLevel
+      : this.hasParent() && !this.isBackButton(option)
+      ? 1
+      : 0;
+
+    return this.settings.indent + " ".repeat(indentLevel);
+  }
+
+  protected getListItemPointer(option: TOption | TGroup, isSelected?: boolean) {
+    if (!isSelected) {
+      return "  ";
+    }
+
+    if (this.isBackButton(option)) {
+      return this.settings.backPointer + " ";
+    } else if (isOptionGroup(option)) {
+      return this.settings.groupPointer + " ";
+    }
+
+    return this.settings.listPointer + " ";
+  }
+
+  protected getListItemIcon(option: TOption | TGroup): string {
+    if (this.isBackButton(option)) {
+      return this.settings.groupOpenIcon
+        ? this.settings.groupOpenIcon + " "
+        : "";
+    } else if (isOptionGroup(option)) {
+      return this.settings.groupIcon ? this.settings.groupIcon + " " : "";
+    }
+
+    return "";
+  }
+
+  protected getListItemLabel(
+    option: TOption | TGroup,
+    isSelected?: boolean,
+  ): string {
+    let label: string = option.name;
+
+    if (this.isBackButton(option)) {
+      label = this.getBreadCrumb();
+      label = isSelected && !option.disabled ? label : yellow(label);
+    } else {
+      label = isSelected && !option.disabled
+        ? this.highlight(label, (val) => val)
+        : this.highlight(label);
+    }
+
+    if (this.isBackButton(option) || isOptionGroup(option)) {
+      label = bold(label);
+    }
+
+    return label;
+  }
+
+  protected getBreadCrumb() {
+    if (!this.parentOptions.length || !this.settings.maxBreadcrumbItems) {
+      return "";
+    }
+    const names = this.parentOptions.map((option) => option.name);
+    const breadCrumb = names.length > this.settings.maxBreadcrumbItems
+      ? [names[0], "..", ...names.slice(-this.settings.maxBreadcrumbItems + 1)]
+      : names;
+
+    return breadCrumb.join(this.settings.breadcrumbSeparator);
+  }
 
   /** Get options row height. */
   protected getListHeight(): number {
@@ -250,12 +456,13 @@ export abstract class GenericList<
     return Math.max(
       0,
       typeof value === "undefined"
-        ? this.options.findIndex((item: GenericListOptionSettings) =>
-          !item.disabled
+        ? this.options.findIndex((option: TOption | TGroup) =>
+          !option.disabled
         ) || 0
-        : this.options.findIndex((item: GenericListOptionSettings) =>
-          item.value === value
-        ) || 0,
+        : this.options.findIndex((option: TOption | TGroup) =>
+          isOption(option) && option.value === value
+        ) ||
+          0,
     );
   }
 
@@ -273,8 +480,12 @@ export abstract class GenericList<
    */
   protected getOptionByValue(
     value: string,
-  ): GenericListOptionSettings | undefined {
-    return this.options.find((option) => option.value === value);
+  ): TOption | undefined {
+    const option = this.options.find((option) =>
+      isOption(option) && option.value === value
+    );
+
+    return option && isOptionGroup(option) ? undefined : option;
   }
 
   /** Read user input. */
@@ -285,27 +496,57 @@ export abstract class GenericList<
     return super.read();
   }
 
+  protected selectSearch() {
+    this.listIndex = -1;
+  }
+
+  protected isSearchSelected(): boolean {
+    return this.listIndex === -1;
+  }
+
   /**
    * Handle user input event.
    * @param event Key event.
    */
   protected async handleEvent(event: KeyCode): Promise<void> {
-    switch (true) {
-      case this.isKey(this.settings.keys, "previous", event):
-        this.selectPrevious();
-        break;
-      case this.isKey(this.settings.keys, "next", event):
-        this.selectNext();
-        break;
-      case this.isKey(this.settings.keys, "nextPage", event):
-        this.selectNextPage();
-        break;
-      case this.isKey(this.settings.keys, "previousPage", event):
-        this.selectPreviousPage();
-        break;
-      default:
-        await super.handleEvent(event);
+    if (
+      this.isKey(this.settings.keys, "open", event) &&
+      isOptionGroup(this.selectedOption) &&
+      !this.isBackButton(this.selectedOption) &&
+      !this.isSearchSelected()
+    ) {
+      this.submitGroupOption(this.selectedOption);
+    } else if (
+      this.isKey(this.settings.keys, "back", event) &&
+      (this.isBackButton(this.selectedOption) || event.name === "escape") &&
+      !this.isSearchSelected()
+    ) {
+      this.submitBackButton();
+    } else if (this.isKey(this.settings.keys, "next", event)) {
+      this.selectNext();
+    } else if (this.isKey(this.settings.keys, "previous", event)) {
+      this.selectPrevious();
+    } else if (
+      this.isKey(this.settings.keys, "nextPage", event) &&
+      !this.isSearchSelected()
+    ) {
+      this.selectNextPage();
+    } else if (
+      this.isKey(this.settings.keys, "previousPage", event) &&
+      !this.isSearchSelected()
+    ) {
+      this.selectPreviousPage();
+    } else {
+      await super.handleEvent(event);
     }
+  }
+
+  protected async submit(): Promise<void> {
+    if (this.isSearchSelected()) {
+      this.selectNext();
+      return;
+    }
+    await super.submit();
   }
 
   protected moveCursorLeft(): void {
@@ -342,7 +583,7 @@ export abstract class GenericList<
 
   /** Select previous option. */
   protected selectPrevious(): void {
-    if (this.options.length < 2) {
+    if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
     if (this.listIndex > 0) {
@@ -350,13 +591,18 @@ export abstract class GenericList<
       if (this.listIndex < this.listOffset) {
         this.listOffset--;
       }
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectPrevious();
       }
+    } else if (
+      this.settings.search && this.listIndex === 0 &&
+      this.getCurrentInputValue().length
+    ) {
+      this.listIndex = -1;
     } else {
       this.listIndex = this.options.length - 1;
       this.listOffset = this.options.length - this.getListHeight();
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectPrevious();
       }
     }
@@ -364,7 +610,7 @@ export abstract class GenericList<
 
   /** Select next option. */
   protected selectNext(): void {
-    if (this.options.length < 2) {
+    if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
     if (this.listIndex < this.options.length - 1) {
@@ -372,12 +618,17 @@ export abstract class GenericList<
       if (this.listIndex >= this.listOffset + this.getListHeight()) {
         this.listOffset++;
       }
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectNext();
       }
+    } else if (
+      this.settings.search && this.listIndex === this.options.length - 1 &&
+      this.getCurrentInputValue().length
+    ) {
+      this.listIndex = -1;
     } else {
       this.listIndex = this.listOffset = 0;
-      if (this.options[this.listIndex].disabled) {
+      if (this.selectedOption?.disabled) {
         this.selectNext();
       }
     }
@@ -393,6 +644,8 @@ export abstract class GenericList<
       } else if (this.listOffset > 0) {
         this.listIndex -= this.listOffset;
         this.listOffset = 0;
+      } else {
+        this.listIndex = 0;
       }
     }
   }
@@ -408,9 +661,108 @@ export abstract class GenericList<
         const offset = this.options.length - height;
         this.listIndex += offset - this.listOffset;
         this.listOffset = offset;
+      } else {
+        this.listIndex = this.options.length - 1;
       }
     }
   }
+}
+
+export function isOption<
+  TOption extends GenericListOption,
+>(
+  option: TOption | GenericListOptionGroup<GenericListOption> | undefined,
+): option is TOption {
+  return !!option && typeof option === "object" && "value" in option;
+}
+
+export function isOptionGroup<
+  TGroup extends GenericListOptionGroup<GenericListOption>,
+>(
+  option: TGroup | GenericListOption | string | undefined,
+): option is TGroup {
+  return typeof option === "object" && "options" in option &&
+    option.options.length > 0;
+}
+
+function matchOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  searchInput: string,
+  options: Array<TOption | TGroup>,
+): Array<MatchedOption<TOption, TGroup>> {
+  const matched: Array<MatchedOption<TOption, TGroup>> = [];
+
+  for (const option of options) {
+    if (isOptionGroup(option)) {
+      const children = matchOptions(searchInput, option.options)
+        .sort(sortByDistance);
+
+      if (children.length) {
+        matched.push({
+          option,
+          distance: Math.min(...children.map((item) => item.distance)),
+          children,
+        });
+        continue;
+      }
+    }
+
+    if (matchOption(searchInput, option)) {
+      matched.push({
+        option,
+        distance: distance(option.name, searchInput),
+        children: [],
+      });
+    }
+  }
+
+  return matched.sort(sortByDistance);
+
+  function sortByDistance(
+    a: MatchedOption<TOption, TGroup>,
+    b: MatchedOption<TOption, TGroup>,
+  ): number {
+    return a.distance - b.distance;
+  }
+}
+
+function matchOption<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  inputString: string,
+  option: TOption | TGroup,
+): boolean {
+  return matchInput(inputString, option.name) || (
+    isOption(option) &&
+    option.name !== option.value &&
+    matchInput(inputString, option.value)
+  );
+}
+
+function matchInput(inputString: string, value: string): boolean {
+  return stripColor(value)
+    .toLowerCase()
+    .includes(inputString);
+}
+
+function flatMatchedOptions<
+  TOption extends GenericListOptionSettings,
+  TGroup extends GenericListOptionGroupSettings<TOption>,
+>(
+  matches: Array<MatchedOption<TOption, TGroup>>,
+  indentLevel = 0,
+  result: Array<TOption | TGroup> = [],
+): Array<TOption | TGroup> {
+  for (const { option, children } of matches) {
+    option.indentLevel = indentLevel;
+    result.push(option);
+    flatMatchedOptions(children, indentLevel + 1, result);
+  }
+
+  return result;
 }
 
 /** @deprecated Use `Array<string | GenericListOption>` instead. */
