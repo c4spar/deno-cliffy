@@ -1,18 +1,19 @@
-import { Cell, Direction, type ICell } from "./cell.ts";
 import type { Column } from "./column.ts";
-import { type IRow, Row } from "./row.ts";
-import type { IBorderOptions, ITableSettings, Table } from "./table.ts";
-import { consumeWords, longest, strLength } from "./utils.ts";
+import { Cell, CellType, Direction } from "./cell.ts";
+import { consumeWords } from "./consume_words.ts";
+import { Row, RowType } from "./row.ts";
+import type { BorderOptions, Table, TableSettings } from "./table.ts";
+import { longest, strLength } from "./_utils.ts";
 
 /** Layout render settings. */
-interface IRenderSettings {
-  padding: number[];
-  width: number[];
+interface RenderSettings {
+  padding: Array<number>;
+  width: Array<number>;
   columns: number;
   hasBorder: boolean;
   hasHeaderBorder: boolean;
   hasBodyBorder: boolean;
-  rows: Row<Cell>[];
+  rows: Array<Row<Cell>>;
 }
 
 /** Table layout renderer. */
@@ -24,12 +25,12 @@ export class TableLayout {
    */
   public constructor(
     private table: Table,
-    private options: ITableSettings,
+    private options: TableSettings,
   ) {}
 
   /** Generate table string. */
   public toString(): string {
-    const opts: IRenderSettings = this.createLayout();
+    const opts: RenderSettings = this.createLayout();
     return opts.rows.length ? this.renderRows(opts) : "";
   }
 
@@ -38,10 +39,10 @@ export class TableLayout {
    * Cell/Row values to Cells and Rows and returns the layout rendering
    * settings.
    */
-  protected createLayout(): IRenderSettings {
+  protected createLayout(): RenderSettings {
     Object.keys(this.options.chars).forEach((key: string) => {
-      if (typeof this.options.chars[key as keyof IBorderOptions] !== "string") {
-        this.options.chars[key as keyof IBorderOptions] = "";
+      if (typeof this.options.chars[key as keyof BorderOptions] !== "string") {
+        this.options.chars[key as keyof BorderOptions] = "";
       }
     });
 
@@ -63,8 +64,8 @@ export class TableLayout {
       }
     }
 
-    const padding: number[] = [];
-    const width: number[] = [];
+    const padding: Array<number> = [];
+    const width: Array<number> = [];
     for (let colIndex = 0; colIndex < columns; colIndex++) {
       const column = this.options.columns.at(colIndex);
       const minColWidth: number = column?.getMinWidth() ??
@@ -123,7 +124,7 @@ export class TableLayout {
    * Fills rows and cols by specified row/col span with a reference of the
    * original cell.
    */
-  protected spanRows(rows: Array<IRow>) {
+  protected spanRows(rows: Array<RowType>) {
     const rowSpan: Array<number> = [];
     let colSpan = 1;
     let rowIndex = -1;
@@ -197,7 +198,7 @@ export class TableLayout {
    * Create a new row from existing row or cell array.
    * @param row Original row.
    */
-  protected createRow(row: IRow): Row<Cell> {
+  protected createRow(row: RowType): Row<Cell> {
     return Row.from(row)
       .border(this.table.getBorder(), false)
       .align(this.table.getAlign(), false) as Row<Cell>;
@@ -209,7 +210,7 @@ export class TableLayout {
    * @param row   Parent row.
    */
   protected createCell(
-    cell: ICell | null | undefined,
+    cell: CellType | null | undefined,
     row: Row,
     colIndex: number,
   ): Cell {
@@ -223,9 +224,9 @@ export class TableLayout {
    * Render table layout.
    * @param opts Render options.
    */
-  protected renderRows(opts: IRenderSettings): string {
+  protected renderRows(opts: RenderSettings): string {
     let result = "";
-    const rowSpan: number[] = new Array(opts.columns).fill(1);
+    const rowSpan: Array<number> = new Array(opts.columns).fill(1);
 
     for (let rowIndex = 0; rowIndex < opts.rows.length; rowIndex++) {
       result += this.renderRow(rowSpan, rowIndex, opts);
@@ -242,9 +243,9 @@ export class TableLayout {
    * @param isMultiline Is multiline row.
    */
   protected renderRow(
-    rowSpan: number[],
+    rowSpan: Array<number>,
     rowIndex: number,
-    opts: IRenderSettings,
+    opts: RenderSettings,
     isMultiline?: boolean,
   ): string {
     const row: Row<Cell> = opts.rows[rowIndex];
@@ -327,7 +328,7 @@ export class TableLayout {
   protected renderCell(
     colIndex: number,
     row: Row<Cell>,
-    opts: IRenderSettings,
+    opts: RenderSettings,
     noBorder?: boolean,
   ): string {
     let result = "";
@@ -367,7 +368,7 @@ export class TableLayout {
 
     const { current, next } = this.renderCellValue(cell, maxLength);
 
-    row[colIndex].setValue(next);
+    row[colIndex].setValue(next.getValue());
 
     if (opts.hasBorder) {
       result += " ".repeat(opts.padding[colIndex]);
@@ -440,8 +441,8 @@ export class TableLayout {
   protected renderBorderRow(
     prevRow: Row<Cell> | undefined,
     nextRow: Row<Cell> | undefined,
-    rowSpan: number[],
-    opts: IRenderSettings,
+    rowSpan: Array<number>,
+    opts: RenderSettings,
   ): string {
     let result = "";
 
@@ -481,8 +482,8 @@ export class TableLayout {
     colIndex: number,
     prevRow: Row<Cell> | undefined,
     nextRow: Row<Cell> | undefined,
-    rowSpan: number[],
-    opts: IRenderSettings,
+    rowSpan: Array<number>,
+    opts: RenderSettings,
   ): string {
     // a1 | b1
     // -------

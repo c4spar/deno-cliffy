@@ -4,37 +4,16 @@
  * @param length    Max length of all words.
  * @param content   The text content.
  */
-import { Cell, ICell } from "./cell.ts";
+import { Cell, CellType } from "./cell.ts";
+import { consumeWords } from "./consume_words.ts";
 import { stripColor } from "./deps.ts";
-
-export function consumeWords(length: number, content: string): string {
-  let consumed = "";
-  const words: string[] = content.split("\n")[0]?.split(/ /g);
-
-  for (let i = 0; i < words.length; i++) {
-    const word: string = words[i];
-
-    // consume minimum one word
-    if (consumed) {
-      const nextLength = strLength(word);
-      const consumedLength = strLength(consumed);
-      if (consumedLength + nextLength >= length) {
-        break;
-      }
-    }
-
-    consumed += (i > 0 ? " " : "") + word;
-  }
-
-  return consumed;
-}
 
 /**
  * Get longest cell from given row index.
  */
 export function longest(
   index: number,
-  rows: ICell[][],
+  rows: Array<Array<CellType>>,
   maxWidth?: number,
 ): number {
   const cellLengths = rows.map((row) => {

@@ -1,37 +1,33 @@
-import { border, IBorder } from "./border.ts";
+import { Border, border } from "./border.ts";
 import { Cell, Direction } from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
-import { TableLayout } from "./layout.ts";
-import { IDataRow, IRow, Row } from "./row.ts";
+import { TableLayout } from "./_layout.ts";
+import { DataRow, Row, RowType } from "./row.ts";
 
 /** Border characters settings. */
-export type IBorderOptions = Partial<IBorder>;
-
-/** Table options. */
-export interface ITableOptions {
-  indent?: number;
-  border?: boolean;
-  align?: Direction;
-  maxColWidth?: number | number[];
-  minColWidth?: number | number[];
-  padding?: number | number[];
-  chars?: IBorderOptions;
-}
+export type BorderOptions = Partial<Border>;
 
 /** Table settings. */
-export interface ITableSettings extends Required<Omit<ITableOptions, "align">> {
-  chars: IBorder;
+export interface TableSettings {
+  indent: number;
+  border: boolean;
+  maxColWidth: number | Array<number>;
+  minColWidth: number | Array<number>;
+  padding: number | Array<number>;
+  chars: Border;
   align?: Direction;
   columns: Array<Column>;
 }
 
 /** Table type. */
-export type ITable<T extends IRow = IRow> = T[] | Table<T>;
+export type TableType<TRow extends RowType = RowType> =
+  | Array<TRow>
+  | Table<TRow>;
 
 /** Table representation. */
-export class Table<T extends IRow = IRow> extends Array<T> {
-  protected static _chars: IBorder = { ...border };
-  protected options: ITableSettings = {
+export class Table<TRow extends RowType = RowType> extends Array<TRow> {
+  protected static _chars: Border = { ...border };
+  protected options: TableSettings = {
     indent: 0,
     border: false,
     maxColWidth: Infinity,
@@ -47,7 +43,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * will be copied to the new table.
    * @param rows
    */
-  public static from<T extends IRow>(rows: ITable<T>): Table<T> {
+  public static from<TRow extends RowType>(rows: TableType<TRow>): Table<TRow> {
     const table = new this(...rows);
     if (rows instanceof Table) {
       table.options = { ...(rows as Table).options };
@@ -61,7 +57,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * row and each property a column.
    * @param rows Array of objects.
    */
-  public static fromJson(rows: IDataRow[]): Table {
+  public static fromJson(rows: Array<DataRow>): Table {
     return new this().fromJson(rows);
   }
 
@@ -69,7 +65,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set global default border characters.
    * @param chars Border options.
    */
-  public static chars(chars: IBorderOptions): typeof Table {
+  public static chars(chars: BorderOptions): typeof Table {
     Object.assign(this._chars, chars);
     return this;
   }
@@ -78,7 +74,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Write table or rows to stdout.
    * @param rows Table or rows.
    */
-  public static render<T extends IRow>(rows: ITable<T>): void {
+  public static render<TRow extends RowType>(rows: TableType<TRow>): void {
     Table.from(rows).render();
   }
 
@@ -87,9 +83,9 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * row and each property a column.
    * @param rows Array of objects.
    */
-  public fromJson(rows: IDataRow[]): this {
+  public fromJson(rows: Array<DataRow>): this {
     this.header(Object.keys(rows[0]));
-    this.body(rows.map((row) => Object.values(row) as T));
+    this.body(rows.map((row) => Object.values(row) as TRow));
     return this;
   }
 
@@ -118,7 +114,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set table header.
    * @param header Header row or cells.
    */
-  public header(header: IRow): this {
+  public header(header: RowType): this {
     this.headerRow = header instanceof Row ? header : Row.from(header);
     return this;
   }
@@ -127,7 +123,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set table body.
    * @param rows Table rows.
    */
-  public body(rows: T[]): this {
+  public body(rows: Array<TRow>): this {
     this.length = 0;
     this.push(...rows);
     return this;
@@ -136,7 +132,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   /** Clone table recursively with header and options. */
   public clone(): Table {
     const table = new Table(
-      ...this.map((row: T) =>
+      ...this.map((row: TRow) =>
         row instanceof Row ? row.clone() : Row.from(row).clone()
       ),
     );
@@ -161,7 +157,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * @param width     Max col width.
    * @param override  Override existing value.
    */
-  public maxColWidth(width: number | number[], override = true): this {
+  public maxColWidth(width: number | Array<number>, override = true): this {
     if (override || typeof this.options.maxColWidth === "undefined") {
       this.options.maxColWidth = width;
     }
@@ -173,7 +169,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * @param width     Min col width.
    * @param override  Override existing value.
    */
-  public minColWidth(width: number | number[], override = true): this {
+  public minColWidth(width: number | Array<number>, override = true): this {
     if (override || typeof this.options.minColWidth === "undefined") {
       this.options.minColWidth = width;
     }
@@ -197,7 +193,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * @param padding   Cell padding.
    * @param override  Override existing value.
    */
-  public padding(padding: number | number[], override = true): this {
+  public padding(padding: number | Array<number>, override = true): this {
     if (override || typeof this.options.padding === "undefined") {
       this.options.padding = padding;
     }
@@ -232,7 +228,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
    * Set border characters.
    * @param chars Border options.
    */
-  public chars(chars: IBorderOptions): this {
+  public chars(chars: BorderOptions): this {
     Object.assign(this.options.chars, chars);
     return this;
   }
@@ -243,17 +239,17 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Get table body. */
-  public getBody(): T[] {
+  public getBody(): Array<TRow> {
     return [...this];
   }
 
   /** Get mac col widrth. */
-  public getMaxColWidth(): number | number[] {
+  public getMaxColWidth(): number | Array<number> {
     return this.options.maxColWidth;
   }
 
   /** Get min col width. */
-  public getMinColWidth(): number | number[] {
+  public getMinColWidth(): number | Array<number> {
     return this.options.minColWidth;
   }
 
@@ -263,7 +259,7 @@ export class Table<T extends IRow = IRow> extends Array<T> {
   }
 
   /** Get cell padding. */
-  public getPadding(): number | number[] {
+  public getPadding(): number | Array<number> {
     return this.options.padding;
   }
 
@@ -307,3 +303,9 @@ export class Table<T extends IRow = IRow> extends Array<T> {
     return this.options.columns[index] ??= new Column();
   }
 }
+
+/** @deprecated Use `BorderOptions` instead. */
+export type IBorderOptions = BorderOptions;
+
+/** @deprecated Use `TableType` instead. */
+export type ITable = TableType;

@@ -1,11 +1,12 @@
 /** Cell type */
-// deno-lint-ignore ban-types
-export type ICell = number | string | String | Cell;
+export type CellValue = number | string;
+
+export type CellType = CellValue | Cell;
 
 export type Direction = "left" | "right" | "center";
 
 /** Cell options. */
-export interface ICellOptions {
+interface CellOptions {
   border?: boolean;
   colSpan?: number;
   rowSpan?: number;
@@ -14,7 +15,7 @@ export interface ICellOptions {
 
 /** Cell representation. */
 export class Cell {
-  protected options: ICellOptions = {};
+  protected options: CellOptions = {};
 
   /** Get cell length. */
   public get length(): number {
@@ -26,10 +27,13 @@ export class Cell {
    * will be copied to the new cell.
    * @param value Cell or cell value.
    */
-  public static from(value: ICell): Cell {
-    const cell = new this(value);
+  public static from(value: CellType): Cell {
+    let cell: Cell;
     if (value instanceof Cell) {
+      cell = new this(value.getValue());
       cell.options = { ...value.options };
+    } else {
+      cell = new this(value);
     }
     return cell;
   }
@@ -38,18 +42,23 @@ export class Cell {
    * Cell constructor.
    * @param value Cell value.
    */
-  public constructor(private value: ICell) {}
+  public constructor(private value: CellValue) {}
 
-  /** Get cell value. */
+  /** Get cell string value. */
   public toString(): string {
     return this.value.toString();
+  }
+
+  /** Get cell value. */
+  public getValue(): CellValue {
+    return this.value;
   }
 
   /**
    * Set cell value.
    * @param value Cell or cell value.
    */
-  public setValue(value: ICell): this {
+  public setValue(value: CellValue): this {
     this.value = value;
     return this;
   }
@@ -58,10 +67,8 @@ export class Cell {
    * Clone cell with all options.
    * @param value Cell or cell value.
    */
-  public clone(value?: ICell): Cell {
-    const cell = new Cell(value ?? this);
-    cell.options = { ...this.options };
-    return cell;
+  public clone(value?: CellValue): Cell {
+    return Cell.from(value ?? this);
   }
 
   /**
@@ -144,3 +151,6 @@ export class Cell {
     return this.options.align ?? "left";
   }
 }
+
+/** @deprecated Use `CellType` instead. */
+export type ICell = CellType;

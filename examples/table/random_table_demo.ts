@@ -13,7 +13,7 @@ import {
   yellow,
 } from "https://deno.land/std@0.170.0/fmt/colors.ts";
 import { tty } from "../../ansi/tty.ts";
-import { Cell, ICell } from "../../table/cell.ts";
+import { Cell, CellType } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
 
 tty.cursorHide();
@@ -83,12 +83,12 @@ function createTable(): Table {
           "0.102.177.91",
         ],
         ["6", "Lilla", "Cattel", "lcattel5@gov.uk", "Female", "253.205.45.62"],
-      ].map<ICell[]>((row: ICell[]) => randomizeRow(row)),
+      ].map<Array<CellType>>((row: Array<CellType>) => randomizeRow(row)),
     )
     .padding(1);
 }
 
-function randomizeRow(row: ICell[]) {
+function randomizeRow(row: Array<CellType>) {
   // return row;
   const rnd = (index: number = row.length) =>
     Math.round(Math.random() * (index - 2)) + 1;
@@ -106,7 +106,7 @@ function randomizeRow(row: ICell[]) {
     dim,
   ];
   const style = (val: string) => styles[rnd(styles.length)](val);
-  const cell: ICell = row[0];
+  const cell: CellType = row[0];
 
   if (cell instanceof Cell) {
     // cell.setValue( style( cell.toString() ) );
@@ -120,7 +120,7 @@ function randomizeRow(row: ICell[]) {
     }
   }
 
-  const cells: ICell[] = row;
+  const cells: Array<CellType> = row;
   const r1 = rnd();
   if (typeof cells[r1] === "string") {
     cells[r1] = Cell.from(cells[r1]).border(true);
