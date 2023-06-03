@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
 import { Command } from "../../command/command.ts";
-import { CompletionsCommand } from "../../command/completions/mod.ts";
-import { HelpCommand } from "../../command/help/mod.ts";
+import { CompletionsCommand } from "../../command/completions/completions_command.ts";
+import { HelpCommand } from "../../command/help/help_command.ts";
 
 await new Command()
   .name("cliffy")

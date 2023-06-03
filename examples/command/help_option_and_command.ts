@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { HelpCommand } from "../../command/help/mod.ts";
+import { HelpCommand } from "../../command/help/help_command.ts";
 import { Command } from "../../command/command.ts";
 
 await new Command()

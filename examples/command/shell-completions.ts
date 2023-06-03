@@ -1,7 +1,7 @@
 #!/usr/bin/env deno run
 
 import { Command } from "../../command/command.ts";
-import { CompletionsCommand } from "../../command/completions/mod.ts";
+import { CompletionsCommand } from "../../command/completions/completions_command.ts";
 
 await new Command()
   .throwErrors()

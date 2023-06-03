@@ -8,24 +8,20 @@ import type {
   TypeHandler,
   ValueHandler,
 } from "../flags/types.ts";
+import { MapTypes } from "./_argument_types.ts";
 import type { ValidationError } from "./_errors.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";
 import type { Type } from "./type.ts";
+import type { Merge } from "./_type_utils.ts";
 
 export type { ArgumentValue, DefaultValue, TypeHandler };
 
-type Merge<T, V> = T extends void ? V : V extends void ? T : T & V;
-
 export type TypeOrTypeHandler<TValue> = Type<TValue> | TypeHandler<TValue>;
 
-type Id<TValue> = TValue extends Record<string, unknown>
+export type Id<TValue> = TValue extends Record<string, unknown>
   ? TValue extends infer U ? { [K in keyof U]: Id<U[K]> } : never
   : TValue;
-
-export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
-  ? { [K in keyof T]: MapTypes<T[K]> }
-  : Type.infer<T>;
 
 /* COMMAND TYPES */
 
@@ -126,9 +122,18 @@ export type ActionHandler<
     TGlobalTypes,
     TParentCommand
   >,
-  options: MapTypes<Merge<TParentGlobals, Merge<TGlobals, TOptions>>>,
+  options: CommandOptions<TOptions, TGlobals, TParentGlobals>,
   ...args: MapTypes<TArguments>
-) => unknown | Promise<unknown>;
+) => unknown;
+
+export type CommandOptions<
+  TOptions extends Record<string, any> | void = any,
+  TGlobals extends Record<string, any> | void = TOptions extends number ? any
+    : void,
+  TParentGlobals extends Record<string, any> | void = TOptions extends number
+    ? any
+    : void,
+> = MapTypes<Merge<TParentGlobals, Merge<TGlobals, TOptions>>>;
 
 /** Argument details. */
 export interface Argument extends ArgumentOptions {
@@ -317,6 +322,7 @@ export interface GlobalEnvVarOptions {
   required?: boolean;
   prefix?: string | undefined;
   value?: EnvVarValueHandler;
+  exitCode?: number;
 }
 
 /** Environment variable options */
