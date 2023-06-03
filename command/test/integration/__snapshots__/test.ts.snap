@@ -1957,8 +1957,8 @@ stderr:
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
 stdout:
 "
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
+  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar --file \\x1b[33m<\\x1b[95m\\x1b[95mpath\\x1b[95m\\x1b[33m>\\x1b[95m\\x1b[39m
+  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
   \\x1b[1mOptions:\\x1b[22m
 
