@@ -3,37 +3,60 @@ import {
   GenericList,
   GenericListKeys,
   GenericListOption,
+  GenericListOptionGroup,
+  GenericListOptionGroupSettings,
   GenericListOptions,
   GenericListOptionSettings,
   GenericListSettings,
+  isOption,
+  isOptionGroup,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
+import { getFiguresByKeys } from "./figures.ts";
 
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {
-  options: Array<string | SelectOption>;
+  options: Array<string | SelectOption | SelectOptionGroup>;
   keys?: SelectKeys;
 }
 
 /** Select prompt settings. */
-export interface SelectSettings extends GenericListSettings<string, string> {
-  options: Array<SelectOptionSettings>;
-  keys?: SelectKeys;
+export interface SelectSettings extends
+  GenericListSettings<
+    string,
+    string,
+    SelectOptionSettings,
+    SelectOptionGroupSettings
+  > {
+  keys: SelectKeys;
 }
 
 /** Select option options. */
 export type SelectOption = GenericListOption;
 
+/** Select option group options. */
+export type SelectOptionGroup = GenericListOptionGroup<GenericListOption>;
+
 /** Select option settings. */
 export type SelectOptionSettings = GenericListOptionSettings;
+
+/** Select option group settings. */
+export type SelectOptionGroupSettings = GenericListOptionGroupSettings<
+  SelectOptionSettings
+>;
 
 /** Select key options. */
 export type SelectKeys = GenericListKeys;
 
 /** Select prompt representation. */
-export class Select extends GenericList<string, string> {
+export class Select extends GenericList<
+  string,
+  string,
+  SelectOptionSettings,
+  SelectOptionGroupSettings
+> {
   protected readonly settings: SelectSettings;
-  protected options: Array<SelectOptionSettings>;
+  protected options: Array<SelectOptionSettings | SelectOptionGroupSettings>;
   protected listIndex: number;
   protected listOffset: number;
 
@@ -61,38 +84,53 @@ export class Select extends GenericList<string, string> {
   protected getDefaultSettings(options: SelectOptions): SelectSettings {
     return {
       ...super.getDefaultSettings(options),
-      options: this.mapOptions(options).map(
-        (option) => this.mapOption(options, option),
-      ),
+      options: this.mapOptions(options, options.options),
     };
+  }
+
+  /**
+   * Map string option values to options and set option defaults.
+   * @param promptOptions Select options.
+   */
+  protected mapOptions(
+    promptOptions: SelectOptions,
+    options: Array<string | SelectOption | SelectOptionGroup>,
+  ): Array<SelectOptionSettings | SelectOptionGroupSettings> {
+    return options.map((option) =>
+      isOptionGroup(option)
+        ? this.mapOptionGroup(promptOptions, option)
+        : typeof option === "string"
+        ? this.mapOption(promptOptions, { value: option })
+        : this.mapOption(promptOptions, option)
+    );
   }
 
   protected input(): string {
     return underline(brightBlue(this.inputValue));
   }
 
-  /**
-   * Render select option.
-   * @param item        Select option settings.
-   * @param isSelected  Set to true if option is selected.
-   */
-  protected getListItem(
-    item: SelectOptionSettings,
-    isSelected?: boolean,
-  ): string {
-    let line = this.settings.indent;
-    line += isSelected ? `${this.settings.listPointer} ` : "  ";
-    line += `${
-      isSelected && !item.disabled
-        ? this.highlight(item.name, (val) => val)
-        : this.highlight(item.name)
-    }`;
-    return line;
+  protected async submit(): Promise<void> {
+    if (
+      this.isBackButton(this.selectedOption) ||
+      isOptionGroup(this.selectedOption)
+    ) {
+      const info = isOptionGroup(this.selectedOption)
+        ? ` To select a group use ${
+          getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
+        }.`
+        : "";
+      this.setErrorMessage(`No option selected.${info}`);
+      return;
+    }
+
+    await super.submit();
   }
 
   /** Get value of selected option. */
   protected getValue(): string {
-    return this.options[this.listIndex]?.value ?? this.settings.default;
+    const option = this.options[this.listIndex];
+    assertIsOption(option);
+    return option?.value ?? this.settings.default;
   }
 
   /**
@@ -103,8 +141,9 @@ export class Select extends GenericList<string, string> {
   protected validate(value: string): boolean | string {
     return typeof value === "string" &&
       value.length > 0 &&
-      this.options.findIndex((option: SelectOptionSettings) =>
-          option.value === value
+      this.options.findIndex((
+          option: SelectOptionSettings | SelectOptionGroupSettings,
+        ) => isOption(option) && option.value === value
         ) !== -1;
   }
 
@@ -126,13 +165,28 @@ export class Select extends GenericList<string, string> {
   }
 }
 
+function assertIsOption<
+  TOption extends GenericListOption,
+>(
+  option: TOption | GenericListOptionGroup<GenericListOption>,
+): asserts option is TOption {
+  if (!isOption(option)) {
+    throw new Error("Expected an option but got an option group.");
+  }
+}
+
 /**
  * Select options type.
- * @deprecated Use `Array<string | SelectOption>` instead.
+ * @deprecated Use `Array<string | SelectOption | SelectOptionGroup>` instead.
  */
-export type SelectValueOptions = Array<string | SelectOption>;
+export type SelectValueOptions = Array<
+  string | SelectOption | SelectOptionGroup
+>;
+
 /**
  * Select option settings type.
- * @deprecated Use `Array<SelectOptionSettings>` instead.
+ * @deprecated Use `Array<SelectOptionSettings | SelectOptionGroupSettings>` instead.
  */
-export type SelectValueSettings = Array<SelectOptionSettings>;
+export type SelectValueSettings = Array<
+  SelectOptionSettings | SelectOptionGroupSettings
+>;
