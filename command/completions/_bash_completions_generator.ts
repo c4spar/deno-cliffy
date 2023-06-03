@@ -1,3 +1,4 @@
+import { MissingCommandNameCompletionsError } from "../_errors.ts";
 import type { Command } from "../command.ts";
 import type { Argument } from "../types.ts";
 import { FileType } from "../types/file.ts";
@@ -6,6 +7,9 @@ import { FileType } from "../types/file.ts";
 export class BashCompletionsGenerator {
   /** Generates bash completions script for given command. */
   public static generate(name: string, cmd: Command) {
+    if (!name || name === "COMMAND") {
+      throw new MissingCommandNameCompletionsError("bash");
+    }
     return new BashCompletionsGenerator(name, cmd).generate();
   }
 

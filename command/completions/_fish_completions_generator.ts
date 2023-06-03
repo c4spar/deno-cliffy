@@ -1,3 +1,4 @@
+import { MissingCommandNameCompletionsError } from "../_errors.ts";
 import { getDescription } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import type { Argument, Option } from "../types.ts";
@@ -17,6 +18,9 @@ interface CompleteOptions {
 export class FishCompletionsGenerator {
   /** Generates fish completions script for given command. */
   public static generate(name: string, cmd: Command) {
+    if (!name || name === "COMMAND") {
+      throw new MissingCommandNameCompletionsError("fish");
+    }
     return new FishCompletionsGenerator(name, cmd).generate();
   }
 
