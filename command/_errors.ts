@@ -40,7 +40,9 @@ export class MissingCommandNameCompletionsError extends CommandError {
         bold('cmd.name("<comand-name>")')
       }' to set the name of the main command or use the '${
         bold("--name")
-      }' option from the '${bold("completions")}' command to set the cli name: '${
+      }' option from the '${
+        bold("completions")
+      }' command to set the cli name: '${
         bold(`<command> completions ${shell} --name <cli-name>`)
       }'.`,
     );
