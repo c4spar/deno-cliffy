@@ -6,7 +6,7 @@ export type CellType = CellValue | Cell;
 export type Direction = "left" | "right" | "center";
 
 /** Cell options. */
-export interface CellOptions {
+interface CellOptions {
   border?: boolean;
   colSpan?: number;
   rowSpan?: number;
@@ -154,6 +154,3 @@ export class Cell {
 
 /** @deprecated Use `CellType` instead. */
 export type ICell = CellType;
-
-/** @deprecated Use `CellOptions` instead. */
-export type ICellOptions = CellOptions;

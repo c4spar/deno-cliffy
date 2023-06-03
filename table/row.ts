@@ -11,7 +11,7 @@ export type RowType<
 export type DataRow = Record<string, string | number>;
 
 /** Row options. */
-export interface RowOptions {
+interface RowOptions {
   indent?: number;
   border?: boolean;
   align?: Direction;
@@ -103,6 +103,3 @@ export type IRow = RowType;
 
 /** @deprecated Use `DataRow` instead. */
 export type IDataRow = DataRow;
-
-/** @deprecated Use `RowOptions` instead. */
-export type IRowOptions = RowOptions;
