@@ -22,7 +22,7 @@ export class ValidationError extends CommandError {
   constructor(message: string, { exitCode }: ValidationErrorOptions = {}) {
     super(message);
     Object.setPrototypeOf(this, ValidationError.prototype);
-    this.exitCode = exitCode ?? 1;
+    this.exitCode = exitCode ?? 2;
   }
 }
 
