@@ -1,5 +1,5 @@
-import { consumeWords } from "../_utils.ts";
 import { assertEquals } from "../../dev_deps.ts";
+import { consumeWords } from "../consume_words.ts";
 
 const str =
   "│cell1│cell2 cell2 cell2 cell2 cell2 cell2 cell2 cell2 cell2 cell2│cell3│";

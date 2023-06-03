@@ -1,8 +1,9 @@
 import type { Column } from "./column.ts";
 import { Cell, CellType, Direction } from "./cell.ts";
+import { consumeWords } from "./consume_words.ts";
 import { Row, RowType } from "./row.ts";
 import type { BorderOptions, Table, TableSettings } from "./table.ts";
-import { consumeWords, longest, strLength } from "./_utils.ts";
+import { longest, strLength } from "./_utils.ts";
 
 /** Layout render settings. */
 interface RenderSettings {

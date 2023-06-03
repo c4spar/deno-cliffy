@@ -9,6 +9,7 @@ export {
   type ICellOptions,
 } from "./cell.ts";
 export { Column, type ColumnOptions } from "./column.ts";
+export { consumeWords } from "./consume_words.ts";
 export {
   type DataRow,
   type IDataRow,

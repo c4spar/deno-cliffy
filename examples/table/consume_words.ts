@@ -1,4 +1,4 @@
-import { consumeWords } from "../../table/_utils.ts";
+import { consumeWords } from "../../table/consume_words.ts";
 
 const maxLength = 50;
 let text =
