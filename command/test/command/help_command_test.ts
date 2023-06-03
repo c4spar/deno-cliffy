@@ -77,8 +77,8 @@ Deno.test({
     assertEquals(
       output,
       `
-  Usage:   COMMAND
-  Version: 1.0.0  
+  Usage:   COMMAND --required [val:string] --all <val:string>
+  Version: 1.0.0                                             
 
   Description:
 
@@ -120,8 +120,8 @@ Deno.test({
     assertEquals(
       output,
       `
-  Usage:   COMMAND
-  Version: 1.0.0  
+  Usage:   COMMAND --required [val:string] --all <val:string>
+  Version: 1.0.0                                             
 
   Description:
 

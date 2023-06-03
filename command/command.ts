@@ -2207,7 +2207,21 @@ export class Command<
   }
 
   public getUsage() {
-    return this._usage ?? this.getArgsDefinition();
+    return this._usage ??
+      [this.getArgsDefinition(), this.getRequiredOptionsDefinition()]
+        .join(" ")
+        .trim();
+  }
+
+  private getRequiredOptionsDefinition() {
+    return this.getOptions()
+      .filter((option) => option.required)
+      .map((option) =>
+        [findFlag(option.flags), option.typeDefinition].filter((v) => v)
+          .join(" ")
+          .trim()
+      )
+      .join(" ");
   }
 
   /** Get short command description. This is the first line of the description. */
@@ -3428,3 +3442,12 @@ type Spread<TTarget, TSource> = TTarget extends void ? TSource
 
 type ValueOf<TValue> = TValue extends Record<string, infer V> ? ValueOf<V>
   : TValue;
+
+function findFlag(flags: Array<string>): string {
+  for (const flag of flags) {
+    if (flag.startsWith("--")) {
+      return flag;
+    }
+  }
+  return flags[0];
+}
