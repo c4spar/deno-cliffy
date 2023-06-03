@@ -31,6 +31,8 @@ stdout:
   × Bar
   × Baz\\x1b[3A\\x1b[23G\\x1b[G\\x1b[0J
 ? Select an option 🔎 baz
+  × Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Select an option 🔎 baz
 ❯ × Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
 ? Select an option 🔎 baz
 ❯ √ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
