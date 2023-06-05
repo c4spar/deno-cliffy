@@ -1840,9 +1840,7 @@ export class Command<
       return cmd.execute(options, args);
     }
 
-    if (this.globalActionHandler) {
-      await this.executeGlobalAction(options, args);
-    }
+    await this.executeGlobalAction(options, args);
 
     if (this.actionHandler) {
       await this.actionHandler(options, ...args);
@@ -1860,7 +1858,9 @@ export class Command<
     options: Record<string, unknown>,
     args: Array<unknown>,
   ) {
-    await this._parent?.executeGlobalAction(options, args);
+    if (!this._noGlobals) {
+      await this._parent?.executeGlobalAction(options, args);
+    }
     await this.globalActionHandler?.(options, ...args);
   }
 
