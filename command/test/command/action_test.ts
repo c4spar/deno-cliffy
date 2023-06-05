@@ -161,7 +161,7 @@ Deno.test("[flags] should not call global action handler with noGlobals", async 
   const fooGlobalSpy = spy();
   const fooBaseSpy = spy();
 
-  const cmd = () => new Command()
+  const cmd = new Command()
     .throwErrors()
     .option("--main", "...")
     .globalAction(globalSpy)
@@ -174,7 +174,7 @@ Deno.test("[flags] should not call global action handler with noGlobals", async 
 
   const args = [{ main: true }];
 
-  await cmd().parse(["foo", "--main"]);
+  await cmd.parse(["foo", "--main"]);
 
   assertSpyCalls(globalSpy, 0);
   assertSpyCalls(baseSpy, 0);
