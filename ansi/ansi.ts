@@ -11,11 +11,11 @@ export interface AnsiChain extends Chain<AnsiChain> {
   /** Get ansi escape sequence. */
   (): string;
 
-  /** Get ansi escape sequence. */
+  /** Get ansi escape sequences as string. */
   toString(): string;
 
-  /** Get ansi escape sequence as Uint8Array. */
-  toBuffer(): Uint8Array;
+  /** Get ansi escape sequences as bytes. */
+  bytes(): Uint8Array;
 }
 
 /** Create new `Ansi` instance. */
@@ -47,7 +47,7 @@ export type Ansi = AnsiFactory & AnsiChain;
  * import { ansi } from "./mod.ts";
  *
  * await Deno.stdout.write(
- *   ansi.cursorTo(0, 0).eraseScreen.toBuffer(),
+ *   ansi.cursorTo(0, 0).eraseScreen.bytes(),
  * );
  * ```
  */
@@ -89,7 +89,7 @@ function factory(): Ansi {
     return this.toArray().join("");
   };
 
-  ansi.toBuffer = function (): Uint8Array {
+  ansi.bytes = function (): Uint8Array {
     return encoder.encode(this.toString());
   };
 

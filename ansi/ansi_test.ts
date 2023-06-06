@@ -32,7 +32,7 @@ Deno.test({
           .text("FOO")
           .eraseDown
           .cursorHide
-          .toBuffer(),
+          .bytes(),
       ),
       "\x1B[2;3HFOO\x1B[0J\x1B[?25l",
     );
