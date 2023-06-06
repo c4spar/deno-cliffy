@@ -1763,7 +1763,10 @@ export class Command<
       this.type("file", new FileType(), { global: true });
 
     if (!this._help) {
-      this.help({});
+      this.help({
+        hints: true,
+        types: false,
+      });
     }
 
     if (this._versionOptions !== false && (this._versionOptions || this.ver)) {
