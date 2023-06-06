@@ -800,7 +800,7 @@ export class Command<
   public globalAction(
     fn: ActionHandler<
       Partial<TCommandOptions>,
-      TCommandArguments,
+      Array<unknown>,
       TCommandGlobals,
       TParentCommandGlobals,
       TCommandTypes,
