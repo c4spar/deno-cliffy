@@ -86,7 +86,6 @@ export class HelpGenerator {
     }
     return "\n" +
       Table.from(rows)
-        .indent(this.indent)
         .padding(1)
         .toString() +
       "\n";
@@ -105,7 +104,6 @@ export class HelpGenerator {
 
     return "\n" +
       Table.from(rows)
-        .indent(this.indent)
         .padding(1)
         .toString() +
       "\n";
@@ -119,7 +117,7 @@ export class HelpGenerator {
       Table.from([
         [dedent(this.cmd.getDescription())],
       ])
-        .indent(this.indent * 2)
+        .indent(this.indent)
         .maxColWidth(140)
         .padding(1)
         .toString() +
@@ -184,7 +182,7 @@ export class HelpGenerator {
           ]),
         ])
           .padding([2, 2, 1, 2])
-          .indent(this.indent * 2)
+          .indent(this.indent)
           .maxColWidth([60, 60, 1, 80, 60])
           .toString() +
         "\n";
@@ -199,7 +197,7 @@ export class HelpGenerator {
           this.generateHints(option),
         ]),
       ])
-        .indent(this.indent * 2)
+        .indent(this.indent)
         .maxColWidth([60, 1, 80, 60])
         .padding([2, 1, 2])
         .toString() +
@@ -231,7 +229,7 @@ export class HelpGenerator {
             command.getShortDescription(),
           ]),
         ])
-          .indent(this.indent * 2)
+          .indent(this.indent)
           .maxColWidth([60, 60, 1, 80])
           .padding([2, 2, 1, 2])
           .toString() +
@@ -251,7 +249,7 @@ export class HelpGenerator {
       ])
         .maxColWidth([60, 1, 80])
         .padding([2, 1, 2])
-        .indent(this.indent * 2)
+        .indent(this.indent)
         .toString() +
       "\n";
   }
@@ -277,7 +275,7 @@ export class HelpGenerator {
         ]),
       ])
         .padding([2, 2, 1, 2])
-        .indent(this.indent * 2)
+        .indent(this.indent)
         .maxColWidth([60, 60, 1, 80, 10])
         .toString() +
       "\n";
@@ -294,7 +292,7 @@ export class HelpGenerator {
         dedent(example.description),
       ]))
         .padding(1)
-        .indent(this.indent * 2)
+        .indent(this.indent)
         .maxColWidth(150)
         .toString() +
       "\n";
@@ -348,9 +346,7 @@ export class HelpGenerator {
   }
 
   private label(label: string) {
-    return "\n" +
-      " ".repeat(this.indent) + bold(`${label}:`) +
-      "\n\n";
+    return "\n" + bold(`${label}:`) + "\n\n";
   }
 }
 

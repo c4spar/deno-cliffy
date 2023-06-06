@@ -37,22 +37,22 @@ Deno.test("hidden command help", () => {
   assertEquals(
     stripColor(output),
     `
-  Usage:   COMMAND
-  Version: 1.0.0  
+Usage:   COMMAND
+Version: 1.0.0  
 
-  Description:
+Description:
 
-    Test description ...
+  Test description ...
 
-  Options:
+Options:
 
-    -h, --help     - Show this help.                            
-    -V, --version  - Show the version number for this program.  
+  -h, --help     - Show this help.                            
+  -V, --version  - Show the version number for this program.  
 
-  Commands:
+Commands:
 
-    help         [command:command]  - Show this help or the help of a sub-command.
-    completions                     - Generate shell completions.                 
+  help         [command:command]  - Show this help or the help of a sub-command.
+  completions                     - Generate shell completions.                 
 `,
   );
 });
