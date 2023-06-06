@@ -2,6 +2,8 @@ import {
   assertEquals,
   assertSpyCall,
   assertSpyCalls,
+  assertType,
+  IsExact,
   spy,
 } from "../../../dev_deps.ts";
 import { Command } from "../../command.ts";
@@ -79,25 +81,71 @@ Deno.test("[flags] should call global action handler", async () => {
   const barGlobalSpy = spy();
   const barSpy = spy();
 
-  const barCmd = new Command()
+  const barCmd = new Command<{ main?: true; foo?: true }>()
     .globalOption("--bar", "...")
     .option("--baz", "...")
     .arguments("<foo> <bar>")
-    .globalAction(barGlobalSpy)
+    .globalAction((opts, ...args) => {
+      assertType<
+        IsExact<typeof opts, {
+          main?: true;
+          foo?: true;
+          bar?: true;
+          baz?: true;
+        }>
+      >(true);
+      assertType<IsExact<typeof args, Array<unknown>>>(true);
+      barGlobalSpy(opts, ...args);
+    })
     .action(barSpy);
 
-  const fooCmd = new Command()
+  const fooCmd = new Command<{ main?: true }>()
     .globalOption("--foo", "...")
-    .globalAction(fooGlobalSpy)
+    .globalAction((opts, ...args) => {
+      assertType<
+        IsExact<typeof opts, {
+          main?: true;
+          foo?: true;
+        }>
+      >(true);
+      assertType<IsExact<typeof args, Array<unknown>>>(true);
+      fooGlobalSpy(opts, ...args);
+    })
     .action(fooSpy)
     .command("bar", barCmd);
 
   const cmd = new Command()
     .throwErrors()
     .globalOption("--main", "...")
-    .globalAction(mainGlobalSpy)
-    .action(mainSpy)
-    .command("foo", fooCmd);
+    .option("--test", "...")
+    .globalAction((opts, ...args) => {
+      assertType<
+        IsExact<typeof opts, {
+          main?: true;
+          test?: true;
+        }>
+      >(true);
+      assertType<IsExact<typeof args, Array<unknown>>>(true);
+      mainGlobalSpy(opts, ...args);
+    })
+    .action((opts, ...args) => {
+      mainSpy(opts, ...args);
+      assertType<
+        IsExact<typeof opts, {
+          main?: true;
+          test?: true;
+        }>
+      >(true);
+    })
+    .command("foo", fooCmd)
+    .command("other", "desc...")
+    .action((opts) => {
+      assertType<
+        IsExact<typeof opts, {
+          main?: true;
+        }>
+      >(true);
+    });
 
   await cmd.parse([
     "--main",
