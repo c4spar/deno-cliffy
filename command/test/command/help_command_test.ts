@@ -77,36 +77,36 @@ Deno.test({
     assertEquals(
       output,
       `
-  Usage:   COMMAND --required [val:string] --all <val:string>
-  Version: 1.0.0                                             
+Usage:   COMMAND --required [val:string] --all <val:string>
+Version: 1.0.0                                             
 
-  Description:
+Description:
 
-    Test description ...
+  Test description ...
 
-  Options:
+Options:
 
-    -h, --help                     - Show this help.                                                                                   
-    -V, --version                  - Show the version number for this program.                                                         
-    -t, --test       [val:string]  - test description                                                                                  
-    -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                      
-    -r, --required   [val:string]  - I am required!                             (required)                                             
-    -d, --depends    [val:string]  - I depend on test!                          (Depends: --test)                                      
-    -c, --conflicts  [val:string]  - I conflict with test!                      (Conflicts: --test)                                    
-    -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", Depends: --test, Conflicts:
-                                                                                --depends)                                             
+  -h, --help                     - Show this help.                                                                                   
+  -V, --version                  - Show the version number for this program.                                                         
+  -t, --test       [val:string]  - test description                                                                                  
+  -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                      
+  -r, --required   [val:string]  - I am required!                             (required)                                             
+  -d, --depends    [val:string]  - I depend on test!                          (Depends: --test)                                      
+  -c, --conflicts  [val:string]  - I conflict with test!                      (Conflicts: --test)                                    
+  -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", Depends: --test, Conflicts:
+                                                                              --depends)                                             
 
-  Commands:
+Commands:
 
-    help         [command:command]               - Show this help or the help of a sub-command.
-    completions                                  - Generate shell completions.                 
-    sub-command  <input:string> <output:string>  - sub command description.                    
+  help         [command:command]               - Show this help or the help of a sub-command.
+  completions                                  - Generate shell completions.                 
+  sub-command  <input:string> <output:string>  - sub command description.                    
 
-  Environment variables:
+Environment variables:
 
-    SOME_ENV_VAR           <value:number>  - Description ...                  
-    SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
-    SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
+  SOME_ENV_VAR           <value:number>  - Description ...                  
+  SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
+  SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
 `,
     );
   },
@@ -120,34 +120,34 @@ Deno.test({
     assertEquals(
       output,
       `
-  Usage:   COMMAND --required [val:string] --all <val:string>
-  Version: 1.0.0                                             
+Usage:   COMMAND --required [val:string] --all <val:string>
+Version: 1.0.0                                             
 
-  Description:
+Description:
 
-    Test description ...
+  Test description ...
 
-  Options:
+Options:
 
-    -t, --test       [val:string]  - test description                                                                
-    -D, --default    [val:string]  - I have a default value!  (Default: "test")                                      
-    -r, --required   [val:string]  - I am required!           (required)                                             
-    -d, --depends    [val:string]  - I depend on test!        (Depends: --test)                                      
-    -c, --conflicts  [val:string]  - I conflict with test!    (Conflicts: --test)                                    
-    -a, --all        <val:string>  - I have many hints!       (required, Default: "test", Depends: --test, Conflicts:
-                                                              --depends)                                             
+  -t, --test       [val:string]  - test description                                                                
+  -D, --default    [val:string]  - I have a default value!  (Default: "test")                                      
+  -r, --required   [val:string]  - I am required!           (required)                                             
+  -d, --depends    [val:string]  - I depend on test!        (Depends: --test)                                      
+  -c, --conflicts  [val:string]  - I conflict with test!    (Conflicts: --test)                                    
+  -a, --all        <val:string>  - I have many hints!       (required, Default: "test", Depends: --test, Conflicts:
+                                                            --depends)                                             
 
-  Commands:
+Commands:
 
-    help         [command:command]               - Show this help or the help of a sub-command.
-    completions                                  - Generate shell completions.                 
-    sub-command  <input:string> <output:string>  - sub command description.                    
+  help         [command:command]               - Show this help or the help of a sub-command.
+  completions                                  - Generate shell completions.                 
+  sub-command  <input:string> <output:string>  - sub command description.                    
 
-  Environment variables:
+Environment variables:
 
-    SOME_ENV_VAR           <value:number>  - Description ...                  
-    SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
-    SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
+  SOME_ENV_VAR           <value:number>  - Description ...                  
+  SOME_ENV_VAR_2         <value:string>  - Description 2 ...                
+  SOME_REQUIRED_ENV_VAR  <value:string>  - This one is required!  (required)
 `,
     );
   },

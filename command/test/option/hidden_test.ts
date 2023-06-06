@@ -28,17 +28,17 @@ Deno.test("hidden option help", () => {
 
   assertEquals(
     `
-  Usage:   COMMAND
-  Version: 1.0.0  
+Usage:   COMMAND
+Version: 1.0.0  
 
-  Description:
+Description:
 
-    Test description ...
+  Test description ...
 
-  Options:
+Options:
 
-    -h, --help     - Show this help.                            
-    -V, --version  - Show the version number for this program.  
+  -h, --help     - Show this help.                            
+  -V, --version  - Show the version number for this program.  
 `,
     stripColor(output),
   );

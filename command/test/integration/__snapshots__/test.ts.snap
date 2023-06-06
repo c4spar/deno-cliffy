@@ -1789,36 +1789,36 @@ stderr:
 snapshot[`command integration > should output command help with help command 1`] = `
 stdout:
 \`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+\\x1b[1mmeta1: \\x1b[22mvalue1
+\\x1b[1mmeta2: \\x1b[22mvalue2
+\\x1b[1mmeta3: \\x1b[22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+\\x1b[1mDescription:\\x1b[22m
 
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
+  Completions test.  
+                     
+    Completions test.
+  Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
+  \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
+  \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
+  \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+  \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
+  \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
+  \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
 stderr:
@@ -1828,24 +1828,24 @@ stderr:
 snapshot[`command integration > should output sub-command help with help command 1`] = `
 stdout:
 \`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test foo\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m               
 
-  \\x1b[1mDescription:\\x1b[22m
+\\x1b[1mDescription:\\x1b[22m
 
-    Foo command with "'quotes'" and ([{brackets}]) 
-     and line breaks.                              
+  Foo command with "'quotes'" and ([{brackets}]) 
+   and line breaks.                              
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
-    \\x1b[94m-f\\x1b[39m, \\x1b[94m--foo\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
+  \\x1b[94m-f\\x1b[39m, \\x1b[94m--foo\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
-    \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
+  \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
+  \\x1b[94mbar\\x1b[39m              \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar command.                                
 
 \`
 stderr:
@@ -1855,36 +1855,36 @@ stderr:
 snapshot[`command integration > should output short help with -h flag 1`] = `
 stdout:
 \`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+\\x1b[1mmeta1: \\x1b[22mvalue1
+\\x1b[1mmeta2: \\x1b[22mvalue2
+\\x1b[1mmeta3: \\x1b[22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+\\x1b[1mDescription:\\x1b[22m
 
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
+  Completions test.  
+                     
+    Completions test.
+  Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
+  \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
+  \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
+  \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+  \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
+  \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
+  \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
 stderr:
@@ -1894,41 +1894,41 @@ stderr:
 snapshot[`command integration > should output long help with --help flag 1`] = `
 stdout:
 \`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+\\x1b[1mmeta1: \\x1b[22mvalue1
+\\x1b[1mmeta2: \\x1b[22mvalue2
+\\x1b[1mmeta3: \\x1b[22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+\\x1b[1mDescription:\\x1b[22m
 
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
+  Completions test.  
+                     
+    Completions test.
+  Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                    
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                          
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                        
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                        
-                                 foo bar baz. foo bar baz.                                                        
-                                                                                                                  
-                               foo bar baz.                                                                       
-                               foo bar baz.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])   (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-                                and line breaks.                                                                  
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                     (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                    
+  \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                          
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                        
+  \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                        
+                               foo bar baz. foo bar baz.                                                        
+                                                                                                                
+                             foo bar baz.                                                                       
+                             foo bar baz.                                                                       
+  \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])   (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+                              and line breaks.                                                                  
+  \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                     (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+  \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
+  \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
+  \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
 stderr:
@@ -1957,18 +1957,18 @@ stderr:
 snapshot[`command integration > should print the help of sub-command on validation error 1`] = `
 stdout:
 "
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar --file \\x1b[33m<\\x1b[95m\\x1b[95mpath\\x1b[95m\\x1b[33m>\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test bar --file \\x1b[33m<\\x1b[95m\\x1b[95mpath\\x1b[95m\\x1b[33m>\\x1b[95m\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.            
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m   \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                
-    \\x1b[94m-f\\x1b[39m, \\x1b[94m--file\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[95mpath\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m ...              (\\x1b[33mrequired\\x1b[39m)
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.            
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m   \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                
+  \\x1b[94m-f\\x1b[39m, \\x1b[94m--file\\x1b[39m    \\x1b[33m<\\x1b[39m\\x1b[95mpath\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m ...              (\\x1b[33mrequired\\x1b[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
+  \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
 "
 stderr:
@@ -1980,36 +1980,36 @@ stderr:
 snapshot[`command integration > should print error message for unknown option with suggestion 1`] = `
 stdout:
 \`
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test \\x1b[33m<\\x1b[95m\\x1b[95mcolor\\x1b[95m\\x1b[33m>\\x1b[95m \\x1b[33m[\\x1b[95m\\x1b[95mpath...\\x1b[95m\\x1b[33m]\\x1b[95m\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                             
 
-  \\x1b[1mmeta1: \\x1b[22mvalue1
-  \\x1b[1mmeta2: \\x1b[22mvalue2
-  \\x1b[1mmeta3: \\x1b[22mvalue3
+\\x1b[1mmeta1: \\x1b[22mvalue1
+\\x1b[1mmeta2: \\x1b[22mvalue2
+\\x1b[1mmeta3: \\x1b[22mvalue3
 
-  \\x1b[1mDescription:\\x1b[22m
+\\x1b[1mDescription:\\x1b[22m
 
-    Completions test.  
-                       
-      Completions test.
-    Completions test.  
+  Completions test.  
+                     
+    Completions test.
+  Completions test.  
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
-    \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
-    \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
-    \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
-    \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m               \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.                                                                   
+  \\x1b[94m-V\\x1b[39m, \\x1b[94m--version\\x1b[39m            \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show the version number for this program.                                         
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.                                                                       
+  \\x1b[94m-m\\x1b[39m, \\x1b[94m--main\\x1b[39m     \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Bar option.                                                                       
+  \\x1b[94m--color\\x1b[39m        \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m     \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option with "'quotes'" and ([{brackets}])  (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
+  \\x1b[94m-C\\x1b[39m, \\x1b[94m--colors\\x1b[39m   \\x1b[33m<\\x1b[39m\\x1b[95mval...\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Color option.                                    (\\x1b[1mValues: \\x1b[22m\\x1b[32m"blue"\\x1b[39m, \\x1b[32m"yellow"\\x1b[39m, \\x1b[32m"red"\\x1b[39m)
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
-    \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
-    \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
-    \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
+  \\x1b[94mfoo\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo command with "'quotes'" and ([{brackets}])
+  \\x1b[94mbar\\x1b[39m                          \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mvalidation-error\\x1b[39m             \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m                                               
+  \\x1b[94mhelp\\x1b[39m              \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.  
+  \\x1b[94mcompletions\\x1b[39m                  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Generate shell completions.                   
 
 \`
 stderr:
@@ -2021,17 +2021,17 @@ stderr:
 snapshot[`command integration > should print help and error message when validation error 1`] = `
 stdout:
 "
-  \\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
-  \\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
+\\x1b[1mUsage:\\x1b[22m   \\x1b[95mcompletions-test validation-error\\x1b[39m
+\\x1b[1mVersion:\\x1b[22m \\x1b[33m1.0.0\\x1b[39m                            
 
-  \\x1b[1mOptions:\\x1b[22m
+\\x1b[1mOptions:\\x1b[22m
 
-    \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
-    \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
+  \\x1b[94m-h\\x1b[39m, \\x1b[94m--help\\x1b[39m           \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help.  
+  \\x1b[94m-g\\x1b[39m, \\x1b[94m--global\\x1b[39m  \\x1b[33m<\\x1b[39m\\x1b[95mval\\x1b[39m\\x1b[33m>\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Foo option.      
 
-  \\x1b[1mCommands:\\x1b[22m
+\\x1b[1mCommands:\\x1b[22m
 
-    \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
+  \\x1b[94mhelp\\x1b[39m  \\x1b[33m[\\x1b[39m\\x1b[95mcommand\\x1b[39m\\x1b[33m]\\x1b[39m  \\x1b[31m\\x1b[1m-\\x1b[22m\\x1b[39m Show this help or the help of a sub-command.
 
 "
 stderr:
