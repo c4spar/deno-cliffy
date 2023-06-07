@@ -54,12 +54,13 @@ export class TableLayout {
     const rows = this.#getRows();
 
     const columns: number = Math.max(...rows.map((row) => row.length));
-    for (const row of rows) {
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const row = rows[rowIndex];
       const length: number = row.length;
       if (length < columns) {
         const diff = columns - length;
         for (let i = 0; i < diff; i++) {
-          row.push(this.createCell(null, row, length + i));
+          row.push(this.createCell(null, row, rowIndex, length + i));
         }
       }
     }
@@ -111,10 +112,15 @@ export class TableLayout {
       return this.spanRows(rows);
     }
 
-    return rows.map((row) => {
+    return rows.map((row, rowIndex) => {
       const newRow = this.createRow(row);
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
-        newRow[colIndex] = this.createCell(row[colIndex], newRow, colIndex);
+        newRow[colIndex] = this.createCell(
+          row[colIndex],
+          newRow,
+          rowIndex,
+          colIndex,
+        );
       }
       return newRow;
     });
@@ -172,6 +178,7 @@ export class TableLayout {
         const cell = row[colIndex] = this.createCell(
           row[colIndex] || null,
           row,
+          rowIndex,
           colIndex,
         );
 
@@ -206,18 +213,33 @@ export class TableLayout {
 
   /**
    * Create a new cell from existing cell or cell value.
-   * @param cell  Original cell.
-   * @param row   Parent row.
+   *
+   * @param cell      Original cell.
+   * @param row       Parent row.
+   * @param rowIndex  The row index of the cell.
+   * @param colIndex  The column index of the cell.
    */
   protected createCell(
     cell: CellType | null | undefined,
     row: Row,
+    rowIndex: number,
     colIndex: number,
   ): Cell {
     const column: Column | undefined = this.options.columns.at(colIndex);
+    const isHeaderRow = this.isHeaderRow(rowIndex);
     return Cell.from(cell ?? "")
-      .border(column?.getBorder() ?? row.getBorder(), false)
-      .align(column?.getAlign() ?? row.getAlign(), false);
+      .border(
+        (isHeaderRow ? null : column?.getBorder()) ?? row.getBorder(),
+        false,
+      )
+      .align(
+        (isHeaderRow ? null : column?.getAlign()) ?? row.getAlign(),
+        false,
+      );
+  }
+
+  private isHeaderRow(rowIndex: number) {
+    return rowIndex === 0 && this.table.getHeader() !== undefined;
   }
 
   /**
