@@ -1,6 +1,5 @@
 import { snapshotTest } from "../../testing/snapshot.ts";
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
 
 const createTable = () =>
   new Table()
