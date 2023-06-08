@@ -80,6 +80,35 @@ import type {
   VersionHandler,
 } from "./types.ts";
 
+/**
+ * Chainable command factory class.
+ *
+ * ```ts
+ * import { Command } from "./mod.ts";
+ *
+ * export const cli = new Command()
+ *   .name("todo")
+ *   .description("Example command description")
+ *   .globalOption("--verbose", "Enable verbose output.")
+ *   .globalEnv("VERBOSE=<value>", "Enable verbose output.")
+ *   .command("add <todo>", "Add todo.")
+ *   .action(({ verbose }, todo: string) => {
+ *     if (verbose) {
+ *       console.log("Add todo '%s'.", todo);
+ *     }
+ *   })
+ *   .command("delete <id>", "Delete todo.")
+ *   .action(({ verbose }, id: string) => {
+ *     if (verbose) {
+ *       console.log("Delete todo with id '%s'.", id);
+ *     }
+ *   });
+ *
+ * if (import.meta.main) {
+ *   await cli.parse();
+ * }
+ * ```
+ */
 export class Command<
   TParentCommandGlobals extends Record<string, unknown> | void = void,
   TParentCommandTypes extends Record<string, unknown> | void =
@@ -148,6 +177,7 @@ export class Command<
 
   /**
    * Set global version option.
+   *
    * @param flags The flags of the version option.
    * @param desc  The description of the version option.
    * @param opts  Version option options.
@@ -173,6 +203,7 @@ export class Command<
 
   /**
    * Set version option.
+   *
    * @param flags The flags of the version option.
    * @param desc  The description of the version option.
    * @param opts  Version option options.
@@ -194,6 +225,7 @@ export class Command<
 
   /**
    * Set version option.
+   *
    * @param flags The flags of the version option.
    * @param desc  The description of the version option.
    * @param opts  The action of the version option.
@@ -264,6 +296,7 @@ export class Command<
 
   /**
    * Set global help option.
+   *
    * @param flags The flags of the help option.
    * @param desc  The description of the help option.
    * @param opts  Help option options.
@@ -289,6 +322,7 @@ export class Command<
 
   /**
    * Set help option.
+   *
    * @param flags The flags of the help option.
    * @param desc  The description of the help option.
    * @param opts  Help option options.
@@ -310,6 +344,7 @@ export class Command<
 
   /**
    * Set help option.
+   *
    * @param flags The flags of the help option.
    * @param desc  The description of the help option.
    * @param opts  The action of the help option.
@@ -377,6 +412,7 @@ export class Command<
 
   /**
    * Add new sub-command.
+   *
    * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param cmd       The new child command to register.
    * @param override  Override existing child command.
@@ -434,6 +470,7 @@ export class Command<
 
   /**
    * Add new sub-command.
+   *
    * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param cmd       The new child command to register.
    * @param override  Override existing child command.
@@ -482,6 +519,7 @@ export class Command<
 
   /**
    * Add new sub-command.
+   *
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param desc              The description of the new child command.
    * @param override          Override existing child command.
@@ -574,6 +612,7 @@ export class Command<
 
   /**
    * Add new command alias.
+   *
    * @param alias Tha name of the alias.
    */
   public alias(alias: string): this {
@@ -636,6 +675,7 @@ export class Command<
 
   /**
    * Set command version.
+   *
    * @param version Semantic version string string or method that returns the version string.
    */
   public version(
@@ -660,19 +700,31 @@ export class Command<
     return this;
   }
 
+  /**
+   * Add meta data. Will be displayed in the auto generated help and in the
+   * output of the long version.
+   *
+   * @param name  The name/label of the metadata.
+   * @param value The value of the metadata.
+   */
   public meta(name: string, value: string): this {
     this.cmd._meta[name] = value;
     return this;
   }
 
+  /** Returns an object of metadata. */
   public getMeta(): Record<string, string>;
+
+  /** Get metadata value by name. */
   public getMeta(name: string): string;
+
   public getMeta(name?: string): Record<string, string> | string {
     return typeof name === "undefined" ? this._meta : this._meta[name];
   }
 
   /**
    * Set command help.
+   *
    * @param help Help string, method, or config for generator that returns the help string.
    */
   public help(
@@ -699,6 +751,7 @@ export class Command<
 
   /**
    * Set the long command description.
+   *
    * @param description The command description.
    */
   public description(
@@ -719,6 +772,7 @@ export class Command<
 
   /**
    * Set the command usage. Defaults to arguments.
+   *
    * @param usage The command usage.
    */
   public usage(usage: string): this {
@@ -726,9 +780,7 @@ export class Command<
     return this;
   }
 
-  /**
-   * Hide command from help, completions, etc.
-   */
+  /** Hide command from help, completions, etc. */
   public hidden(): this {
     this.cmd.isHidden = true;
     return this;
@@ -775,6 +827,7 @@ export class Command<
 
   /**
    * Set command callback method.
+   *
    * @param fn Command action handler.
    */
   public action(
@@ -795,6 +848,7 @@ export class Command<
 
   /**
    * Set command callback method.
+   *
    * @param fn Command action handler.
    */
   public globalAction(
@@ -815,25 +869,9 @@ export class Command<
 
   /**
    * Don't throw an error if the command was called without arguments.
+   *
    * @param allowEmpty Enable/disable allow empty.
    */
-  // public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
-  //   allowEmpty?: TAllowEmpty,
-  // ): false extends TAllowEmpty ? this
-  //   : Command<
-  //     Partial<TParentCommandGlobals>,
-  //     TParentCommandTypes,
-  //     Partial<TCommandOptions>,
-  //     TCommandArguments,
-  //     TCommandGlobals,
-  //     TCommandTypes,
-  //     TCommandGlobalTypes,
-  //     TParentCommand
-  //   > {
-  //   this.cmd._allowEmpty = allowEmpty !== false;
-  //   return this;
-  // }
-
   public allowEmpty<TAllowEmpty extends boolean | undefined = undefined>(
     allowEmpty?: TAllowEmpty,
   ): false extends TAllowEmpty ? this
@@ -870,7 +908,7 @@ export class Command<
    *     `command --debug-level warning server --port 80`
    *
    * Will result in:
-   *     - options: `{debugLevel: 'warning'}`
+   *     - options: `{ debugLevel: 'warning' }`
    *     - args: `['server', '--port', '80']`
    *
    * @param stopEarly Enable/disable stop early.
@@ -884,6 +922,7 @@ export class Command<
    * Disable parsing arguments. If enabled the raw arguments will be passed to
    * the action handler. This has no effect for parent or child commands. Only
    * for the command on which this method was called.
+   *
    * @param useRawArgs Enable/disable raw arguments.
    */
   public useRawArgs(
@@ -905,6 +944,7 @@ export class Command<
   /**
    * Set default command. The default command is executed when the program
    * was called without any argument and if no action handler is registered.
+   *
    * @param name Name of the default command.
    */
   public default(name: string): this {
@@ -934,6 +974,7 @@ export class Command<
 
   /**
    * Register custom type.
+   *
    * @param name    The name of the type.
    * @param handler The callback method to parse the type.
    * @param options Type options.
@@ -980,6 +1021,13 @@ export class Command<
     return this as Command<any>;
   }
 
+  /**
+   * Register global complete handler.
+   *
+   * @param name      The name of the completion.
+   * @param complete  The callback method to complete the type.
+   * @param options   Complete options.
+   */
   public globalComplete(
     name: string,
     complete: CompleteHandler,
@@ -989,7 +1037,8 @@ export class Command<
   }
 
   /**
-   * Register command specific custom type.
+   * Register global complete handler.
+   *
    * @param name      The name of the completion.
    * @param complete  The callback method to complete the type.
    * @param options   Complete options.
@@ -1008,6 +1057,14 @@ export class Command<
     >,
     options: CompleteOptions & { global: boolean },
   ): this;
+
+  /**
+   * Register complete handler.
+   *
+   * @param name      The name of the completion.
+   * @param complete  The callback method to complete the type.
+   * @param options   Complete options.
+   */
   public complete(
     name: string,
     complete: CompleteHandler<
@@ -1098,11 +1155,17 @@ export class Command<
     return this;
   }
 
+  /**
+   * Set custom error handler.
+   *
+   * @param handler Error handler callback function.
+   */
   public error(handler: ErrorHandler): this {
     this.cmd.errorHandler = handler;
     return this;
   }
 
+  /** Get error handler callback function. */
   private getErrorHandler(): ErrorHandler | undefined {
     return this.errorHandler ?? this._parent?.errorHandler;
   }
@@ -1136,6 +1199,26 @@ export class Command<
     return this._shouldExit ?? this._parent?.shouldExit() ?? true;
   }
 
+  /**
+   * Enable grouping of options and set the name of the group.
+   * All option which are added after calling the `.group()` method will be
+   * grouped in the help output. If the `.group()` method can be use multiple
+   * times to create more groups.
+   *
+   * @param name The name of the option group.
+   */
+  public group(name: string | null): this {
+    this.cmd._groupName = name;
+    return this;
+  }
+
+  /**
+   * Register a global option.
+   *
+   * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
+   * @param desc Flag description.
+   * @param opts Flag options or custom handler for processing flag value.
+   */
   public globalOption<
     TFlags extends string,
     TGlobalOptions extends TypedOption<
@@ -1207,20 +1290,8 @@ export class Command<
   }
 
   /**
-   * Enable grouping of options and set the name of the group.
-   * All option which are added after calling the `.group()` method will be
-   * grouped in the help output. If the `.group()` method can be use multiple
-   * times to create more groups.
+   * Add a global option.
    *
-   * @param name The name of the option group.
-   */
-  public group(name: string | null): this {
-    this.cmd._groupName = name;
-    return this;
-  }
-
-  /**
-   * Add a new option.
    * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
    * @param desc Flag description.
    * @param opts Flag options or custom handler for processing flag value.
@@ -1283,6 +1354,13 @@ export class Command<
     TParentCommand
   >;
 
+  /**
+   * Register an option.
+   *
+   * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
+   * @param desc Flag description.
+   * @param opts Flag options or custom handler for processing flag value.
+   */
   public option<
     TFlags extends string,
     TOptions extends TypedOption<
@@ -1400,7 +1478,8 @@ export class Command<
   }
 
   /**
-   * Add new command example.
+   * Register command example.
+   *
    * @param name          Name of the example.
    * @param description   The content of the example.
    */
@@ -1414,6 +1493,19 @@ export class Command<
     return this;
   }
 
+  /**
+   * @param flags Flags string e.g: -h, --help, --manual <requiredArg:string> [optionalArg:number] [...restArgs:string]
+   * @param desc Flag description.
+   * @param opts Flag options or custom handler for processing flag value.
+   */
+
+  /**
+   * Register a global environment variable.
+   *
+   * @param name        Name of the environment variable.
+   * @param description The description of the environment variable.
+   * @param options     Environment variable options.
+   */
   public globalEnv<
     TNameAndValue extends string,
     TGlobalEnvVars extends TypedEnv<
@@ -1456,10 +1548,11 @@ export class Command<
   }
 
   /**
-   * Add new environment variable.
-   * @param name          Name of the environment variable.
-   * @param description   The description of the environment variable.
-   * @param options       Environment variable options.
+   * Register a global environment variable.
+   *
+   * @param name        Name of the environment variable.
+   * @param description The description of the environment variable.
+   * @param options     Environment variable options.
    */
   public env<
     N extends string,
@@ -1494,6 +1587,13 @@ export class Command<
     TParentCommand
   >;
 
+  /**
+   * Register an environment variable.
+   *
+   * @param name        Name of the environment variable.
+   * @param description The description of the environment variable.
+   * @param options     Environment variable options.
+   */
   public env<
     TNameAndValue extends string,
     TEnvVar extends TypedEnv<
@@ -1571,6 +1671,7 @@ export class Command<
 
   /**
    * Parse command line arguments and execute matched command.
+   *
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
    */
   public parse(
@@ -2175,6 +2276,7 @@ export class Command<
 
   /**
    * Get argument by name.
+   *
    * @param name Name of the argument.
    */
   public getArgument(name: string): Argument | undefined {
@@ -2213,6 +2315,7 @@ export class Command<
       : this.desc;
   }
 
+  /** Get auto generated command usage. */
   public getUsage() {
     return this._usage ??
       [this.getArgsDefinition(), this.getRequiredOptionsDefinition()]
@@ -2314,6 +2417,7 @@ export class Command<
 
   /**
    * Checks whether the command has options or not.
+   *
    * @param hidden Include hidden options.
    */
   public hasOptions(hidden?: boolean): boolean {
@@ -2322,6 +2426,7 @@ export class Command<
 
   /**
    * Get options.
+   *
    * @param hidden Include hidden options.
    */
   public getOptions(hidden?: boolean): Option[] {
@@ -2330,6 +2435,7 @@ export class Command<
 
   /**
    * Get base options.
+   *
    * @param hidden Include hidden options.
    */
   public getBaseOptions(hidden?: boolean): Option[] {
@@ -2344,6 +2450,7 @@ export class Command<
 
   /**
    * Get global options.
+   *
    * @param hidden Include hidden options.
    */
   public getGlobalOptions(hidden?: boolean): Option[] {
@@ -2387,6 +2494,7 @@ export class Command<
 
   /**
    * Checks whether the command has an option with given name or not.
+   *
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
@@ -2396,6 +2504,7 @@ export class Command<
 
   /**
    * Get option by name.
+   *
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
@@ -2406,6 +2515,7 @@ export class Command<
 
   /**
    * Get base option by name.
+   *
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
@@ -2419,6 +2529,7 @@ export class Command<
 
   /**
    * Get global option from parent commands by name.
+   *
    * @param name Name of the option. Must be in param-case.
    * @param hidden Include hidden options.
    */
@@ -2454,6 +2565,7 @@ export class Command<
 
   /**
    * Remove option by name.
+   *
    * @param name Name of the option. Must be in param-case.
    */
   public removeOption(name: string): Option | undefined {
@@ -2468,6 +2580,7 @@ export class Command<
 
   /**
    * Checks whether the command has sub-commands or not.
+   *
    * @param hidden Include hidden commands.
    */
   public hasCommands(hidden?: boolean): boolean {
@@ -2476,6 +2589,7 @@ export class Command<
 
   /**
    * Get commands.
+   *
    * @param hidden Include hidden commands.
    */
   public getCommands(hidden?: boolean): Array<Command<any>> {
@@ -2484,6 +2598,7 @@ export class Command<
 
   /**
    * Get base commands.
+   *
    * @param hidden Include hidden commands.
    */
   public getBaseCommands(hidden?: boolean): Array<Command<any>> {
@@ -2493,6 +2608,7 @@ export class Command<
 
   /**
    * Get global commands.
+   *
    * @param hidden Include hidden commands.
    */
   public getGlobalCommands(hidden?: boolean): Array<Command<any>> {
@@ -2536,6 +2652,7 @@ export class Command<
 
   /**
    * Checks whether a child command exists by given name or alias.
+   *
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
@@ -2545,6 +2662,7 @@ export class Command<
 
   /**
    * Get command by name or alias.
+   *
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
@@ -2558,6 +2676,7 @@ export class Command<
 
   /**
    * Get base command by name or alias.
+   *
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
@@ -2576,6 +2695,7 @@ export class Command<
 
   /**
    * Get global command by name or alias.
+   *
    * @param name Name or alias of the command.
    * @param hidden Include hidden commands.
    */
@@ -2606,6 +2726,7 @@ export class Command<
 
   /**
    * Remove sub-command by name or alias.
+   *
    * @param name Name or alias of the command.
    */
   public removeCommand(name: string): Command<any> | undefined {
@@ -2660,6 +2781,7 @@ export class Command<
 
   /**
    * Get type by name.
+   *
    * @param name Name of the type.
    */
   public getType(name: string): TypeDef | undefined {
@@ -2668,6 +2790,7 @@ export class Command<
 
   /**
    * Get base type by name.
+   *
    * @param name Name of the type.
    */
   public getBaseType(name: string): TypeDef | undefined {
@@ -2676,6 +2799,7 @@ export class Command<
 
   /**
    * Get global type by name.
+   *
    * @param name Name of the type.
    */
   public getGlobalType(name: string): TypeDef | undefined {
@@ -2734,6 +2858,7 @@ export class Command<
 
   /**
    * Get completion by name.
+   *
    * @param name Name of the completion.
    */
   public getCompletion(name: string): Completion | undefined {
@@ -2742,6 +2867,7 @@ export class Command<
 
   /**
    * Get base completion by name.
+   *
    * @param name Name of the completion.
    */
   public getBaseCompletion(name: string): Completion | undefined {
@@ -2750,6 +2876,7 @@ export class Command<
 
   /**
    * Get global completions by name.
+   *
    * @param name Name of the completion.
    */
   public getGlobalCompletion(name: string): Completion | undefined {
@@ -2770,6 +2897,7 @@ export class Command<
 
   /**
    * Checks whether the command has environment variables or not.
+   *
    * @param hidden Include hidden environment variable.
    */
   public hasEnvVars(hidden?: boolean): boolean {
@@ -2778,6 +2906,7 @@ export class Command<
 
   /**
    * Get environment variables.
+   *
    * @param hidden Include hidden environment variable.
    */
   public getEnvVars(hidden?: boolean): EnvVar[] {
@@ -2786,6 +2915,7 @@ export class Command<
 
   /**
    * Get base environment variables.
+   *
    * @param hidden Include hidden environment variable.
    */
   public getBaseEnvVars(hidden?: boolean): EnvVar[] {
@@ -2800,6 +2930,7 @@ export class Command<
 
   /**
    * Get global environment variables.
+   *
    * @param hidden Include hidden environment variable.
    */
   public getGlobalEnvVars(hidden?: boolean): EnvVar[] {
@@ -2838,6 +2969,7 @@ export class Command<
 
   /**
    * Checks whether the command has an environment variable with given name or not.
+   *
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
@@ -2847,6 +2979,7 @@ export class Command<
 
   /**
    * Get environment variable by name.
+   *
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
@@ -2857,6 +2990,7 @@ export class Command<
 
   /**
    * Get base environment variable by name.
+   *
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
@@ -2870,6 +3004,7 @@ export class Command<
 
   /**
    * Get global environment variable by name.
+   *
    * @param name Name of the environment variable.
    * @param hidden Include hidden environment variable.
    */
