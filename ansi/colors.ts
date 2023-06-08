@@ -17,8 +17,8 @@ export type ColorsChain =
 export type ColorsFactory = () => Colors;
 
 /**
- * Chainable colors module.
- * If invoked as method, a new `Colors` instance will be returned.
+ * Chainable colors module. If invoked as method, a new `Colors` instance will
+ * be returned.
  */
 export type Colors = ColorsFactory & ColorsChain;
 
@@ -34,8 +34,6 @@ for (const name of methodNames) {
     },
   });
 }
-
-export const colors: Colors = factory();
 
 /**
  * Chainable colors module.
@@ -55,6 +53,8 @@ export const colors: Colors = factory();
  * console.log(myColors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
  */
+export const colors: Colors = factory();
+
 function factory(stack: Array<ColorMethods> = []): Colors {
   const colors: Colors = function (
     this: ColorsChain | undefined,
