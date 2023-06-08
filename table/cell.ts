@@ -116,6 +116,20 @@ export class Cell {
   /**
    * Set col span.
    *
+   * ```ts
+   *  Table
+   *    .from([
+   *      [
+   *        new Cell("Row 1 & 2 Column 1").rowSpan(2),
+   *        "Row 1 Column 2",
+   *        "Row 1 Column 3",
+   *      ],
+   *      [new Cell("Row 2 Column 2 & 3").colSpan(2)],
+   *    ])
+   *    .border()
+   *    .render();
+   * ```
+   *
    * @param span      Number of cols to span.
    * @param override  Override existing value.
    */
@@ -128,6 +142,20 @@ export class Cell {
 
   /**
    * Set row span.
+   *
+   * ```ts
+   *  Table
+   *    .from([
+   *      [
+   *        new Cell("Row 1 & 2 Column 1").rowSpan(2),
+   *        "Row 1 Column 2",
+   *        "Row 1 Column 3",
+   *      ],
+   *      [null, new Cell("Row 2 Column 2 & 3").colSpan(2)],
+   *    ])
+   *    .border()
+   *    .render();
+   * ```
    *
    * @param span      Number of rows to span.
    * @param override  Override existing value.
