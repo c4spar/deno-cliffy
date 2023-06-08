@@ -195,9 +195,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   }
 
   /**
-   * Set max col with.
+   * Set max column width.
    *
-   * @param width     Max col width.
+   * @param width     Max column width.
    * @param override  Override existing value.
    */
   public maxColWidth(width: number | Array<number>, override = true): this {
@@ -208,9 +208,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   }
 
   /**
-   * Set min col width.
+   * Set min column width.
    *
-   * @param width     Min col width.
+   * @param width     Min column width.
    * @param override  Override existing value.
    */
   public minColWidth(width: number | Array<number>, override = true): this {
@@ -292,12 +292,12 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return [...this];
   }
 
-  /** Get max col width. */
+  /** Get max column width. */
   public getMaxColWidth(): number | Array<number> {
     return this.options.maxColWidth;
   }
 
-  /** Get min col width. */
+  /** Get min column width. */
   public getMinColWidth(): number | Array<number> {
     return this.options.minColWidth;
   }
