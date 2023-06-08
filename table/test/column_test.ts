@@ -1,5 +1,5 @@
+import { snapshotTest } from "../../testing/snapshot.ts";
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
 
 const createTable = () =>
   new Table()
@@ -10,8 +10,10 @@ const createTable = () =>
       ["beep boop", "foo bar baz", "baz"],
     ]);
 
-Deno.test("[table] should set border on columns", () => {
-  assertEquals(
+await snapshotTest({
+  name: "[table] should set border on columns",
+  meta: import.meta,
+  fn() {
     createTable()
       .columns([{
         border: true,
@@ -20,22 +22,14 @@ Deno.test("[table] should set border on columns", () => {
       }, {
         border: true,
       }])
-      .toString(),
-    `
-┌─────────────┐             ┌─────────────┐
-│ Foo         │ Bar         │ Baz         │
-├─────────────┤             ├─────────────┤
-│ foo bar baz │ baz         │ beep boop   │
-├─────────────┤             ├─────────────┤
-│ baz         │ beep boop   │ foo bar baz │
-├─────────────┤             ├─────────────┤
-│ beep boop   │ foo bar baz │ baz         │
-└─────────────┘             └─────────────┘`.slice(1),
-  );
+      .render();
+  },
 });
 
-Deno.test("[table] should set align on columns", () => {
-  assertEquals(
+await snapshotTest({
+  name: "[table] should set align on columns",
+  meta: import.meta,
+  fn() {
     createTable()
       .columns([{
         align: "left",
@@ -45,22 +39,14 @@ Deno.test("[table] should set align on columns", () => {
         align: "right",
       }])
       .border(true)
-      .toString(),
-    `
-┌─────────────┬─────────────┬─────────────┐
-│ Foo         │     Bar     │         Baz │
-├─────────────┼─────────────┼─────────────┤
-│ foo bar baz │     baz     │   beep boop │
-├─────────────┼─────────────┼─────────────┤
-│ baz         │  beep boop  │ foo bar baz │
-├─────────────┼─────────────┼─────────────┤
-│ beep boop   │ foo bar baz │         baz │
-└─────────────┴─────────────┴─────────────┘`.slice(1),
-  );
+      .render();
+  },
 });
 
-Deno.test("[table] should set width on columns", () => {
-  assertEquals(
+await snapshotTest({
+  name: "[table] should set width on columns",
+  meta: import.meta,
+  fn() {
     createTable()
       .columns([{
         maxWidth: 4,
@@ -70,25 +56,14 @@ Deno.test("[table] should set width on columns", () => {
         align: "right",
       }])
       .border(true)
-      .toString(),
-    `
-┌──────┬──────────────────────┬─────────────┐
-│ Foo  │ Bar                  │         Baz │
-├──────┼──────────────────────┼─────────────┤
-│ foo  │ baz                  │   beep boop │
-│ bar  │                      │             │
-│ baz  │                      │             │
-├──────┼──────────────────────┼─────────────┤
-│ baz  │ beep boop            │ foo bar baz │
-├──────┼──────────────────────┼─────────────┤
-│ beep │ foo bar baz          │         baz │
-│ boop │                      │             │
-└──────┴──────────────────────┴─────────────┘`.slice(1),
-  );
+      .render();
+  },
 });
 
-Deno.test("[table] should set padding on columns", () => {
-  assertEquals(
+await snapshotTest({
+  name: "[table] should set padding on columns",
+  meta: import.meta,
+  fn() {
     createTable()
       .columns([{
         padding: 5,
@@ -102,47 +77,27 @@ Deno.test("[table] should set padding on columns", () => {
         align: "right",
       }])
       .border(true)
-      .toString(),
-    `
-┌─────────────────────┬──────────────────────────────┬─────────────────────┐
-│     Foo             │             Bar              │             Baz     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     foo bar baz     │             baz              │       beep boop     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     baz             │          beep boop           │     foo bar baz     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     beep boop       │         foo bar baz          │             baz     │
-└─────────────────────┴──────────────────────────────┴─────────────────────┘`
-      .slice(1),
-  );
+      .render();
+  },
 });
 
-Deno.test("[table] should set column options with column method", () => {
-  const table = createTable();
-  table.getColumn(0)?.padding(5);
-  table.getColumn(0)?.align("left");
+await snapshotTest({
+  name: "[table] should set column options with column method",
+  meta: import.meta,
+  fn() {
+    const table = createTable();
+    table.getColumn(0)?.padding(5);
+    table.getColumn(0)?.align("left");
 
-  table.getColumn(1)?.padding(5);
-  table.getColumn(1)?.minWidth(20);
-  table.getColumn(1)?.align("center");
+    table.getColumn(1)?.padding(5);
+    table.getColumn(1)?.minWidth(20);
+    table.getColumn(1)?.align("center");
 
-  table.getColumn(2)?.padding(5);
-  table.getColumn(2)?.align("right");
+    table.getColumn(2)?.padding(5);
+    table.getColumn(2)?.align("right");
 
-  assertEquals(
     table
       .border(true)
-      .toString(),
-    `
-┌─────────────────────┬──────────────────────────────┬─────────────────────┐
-│     Foo             │             Bar              │             Baz     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     foo bar baz     │             baz              │       beep boop     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     baz             │          beep boop           │     foo bar baz     │
-├─────────────────────┼──────────────────────────────┼─────────────────────┤
-│     beep boop       │         foo bar baz          │             baz     │
-└─────────────────────┴──────────────────────────────┴─────────────────────┘`
-      .slice(1),
-  );
+      .render();
+  },
 });
