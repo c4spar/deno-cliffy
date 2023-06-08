@@ -151,7 +151,7 @@ export class Cell {
    *        "Row 1 Column 2",
    *        "Row 1 Column 3",
    *      ],
-   *      [null, new Cell("Row 2 Column 2 & 3").colSpan(2)],
+   *      [new Cell("Row 2 Column 2 & 3").colSpan(2)],
    *    ])
    *    .border()
    *    .render();
