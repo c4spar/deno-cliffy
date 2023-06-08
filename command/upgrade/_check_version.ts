@@ -2,6 +2,7 @@ import { bold, yellow } from "../deps.ts";
 import { Command } from "../command.ts";
 
 /** Check if new version is available and add hint to version. */
+// deno-lint-ignore no-explicit-any
 export async function checkVersion(cmd: Command<any>): Promise<void> {
   const mainCommand = cmd.getMainCommand();
   const upgradeCommand = mainCommand.getCommand("upgrade");
