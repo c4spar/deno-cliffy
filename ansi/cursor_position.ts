@@ -20,6 +20,7 @@ const decoder = new TextDecoder();
 
 /**
  * Get cursor position.
+ *
  * @param options  Options.
  *
  * ```ts

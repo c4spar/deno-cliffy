@@ -2,106 +2,106 @@
 import type { ImageOptions } from "./ansi_escapes.ts";
 
 /** Chainable ansi escape method declarations. */
-export interface Chain<T extends Chain<T>> {
+export interface Chain<TContext extends Chain<TContext>> {
   /** Add text. */
-  text: (text: string) => T;
+  text: (text: string) => TContext;
   toArray: () => Array<string>;
   /** Ring audio bell: `\u0007` */
-  bel: T;
+  bel: TContext;
   /** Get cursor position. */
-  cursorPosition: T;
+  cursorPosition: TContext;
   /**
    * Move cursor to x, y, counting from the top left corner.
    * @param x Position left.
    * @param y Position top.
    */
-  cursorTo: (x: number, y?: number) => T;
+  cursorTo: (x: number, y?: number) => TContext;
   /**
    * Move cursor by offset.
    * @param x Offset left.
    * @param y Offset top.
    */
-  cursorMove: (x: number, y: number) => T;
+  cursorMove: (x: number, y: number) => TContext;
   /**
    * Move cursor up by n lines.
    * @param count Number of lines.
    */
-  cursorUp: T & ((count: number) => T);
+  cursorUp: TContext & ((count: number) => TContext);
   /**
    * Move cursor down by n lines.
    * @param count Number of lines.
    */
-  cursorDown: T & ((count: number) => T);
+  cursorDown: TContext & ((count: number) => TContext);
   /**
    * Move cursor forward by n lines.
    * @param count Number of lines.
    */
-  cursorForward: T & ((count: number) => T);
+  cursorForward: TContext & ((count: number) => TContext);
   /**
    * Move cursor backward by n lines.
    * @param count Number of lines.
    */
-  cursorBackward: T & ((count: number) => T);
+  cursorBackward: TContext & ((count: number) => TContext);
   /**
    * Move cursor to the beginning of the line n lines down.
    * @param count Number of lines.
    */
-  cursorNextLine: T & ((count: number) => T);
+  cursorNextLine: TContext & ((count: number) => TContext);
   /**
    * Move cursor to the beginning of the line n lines up.
    * @param count Number of lines.
    */
-  cursorPrevLine: T & ((count: number) => T);
+  cursorPrevLine: TContext & ((count: number) => TContext);
   /** Move cursor to first column of current row. */
-  cursorLeft: T;
+  cursorLeft: TContext;
   /** Hide cursor. */
-  cursorHide: T;
+  cursorHide: TContext;
   /** Show cursor. */
-  cursorShow: T;
+  cursorShow: TContext;
   /** Save cursor. */
-  cursorSave: T;
+  cursorSave: TContext;
   /** Restore cursor. */
-  cursorRestore: T;
+  cursorRestore: TContext;
   /**
    * Scroll window up by n lines.
    * @param count Number of lines.
    */
-  scrollUp: T & ((count: number) => T);
+  scrollUp: TContext & ((count: number) => TContext);
   /**
    * Scroll window down by n lines.
    * @param count Number of lines.
    */
-  scrollDown: T & ((count: number) => T);
+  scrollDown: TContext & ((count: number) => TContext);
   /** Clear screen. */
-  eraseScreen: T;
+  eraseScreen: TContext;
   /**
    * Clear screen up by n lines.
    * @param count Number of lines.
    */
-  eraseUp: T & ((count: number) => T);
+  eraseUp: TContext & ((count: number) => TContext);
   /**
    * Clear screen down by n lines.
    * @param count Number of lines.
    */
-  eraseDown: T & ((count: number) => T);
+  eraseDown: TContext & ((count: number) => TContext);
   /** Clear current line. */
-  eraseLine: T;
+  eraseLine: TContext;
   /** Clear to line end. */
-  eraseLineEnd: T;
+  eraseLineEnd: TContext;
   /** Clear to line start. */
-  eraseLineStart: T;
+  eraseLineStart: TContext;
   /**
    * Clear screen and move cursor by n lines up and move cursor to first column.
    * @param count Number of lines.
    */
-  eraseLines: (count: number) => T;
+  eraseLines: (count: number) => TContext;
   /** Clear the terminal screen. (Viewport) */
-  clearScreen: T;
+  clearScreen: TContext;
   /**
    * Clear the whole terminal, including scrollback buffer.
    * (Not just the visible part of it).
    */
-  clearTerminal: T;
+  clearTerminal: TContext;
   /**
    * Create link.
    *
@@ -116,7 +116,7 @@ export interface Chain<T extends Chain<T>> {
    * );
    * ```
    */
-  link: (text: string, url: string) => T;
+  link: (text: string, url: string) => TContext;
   /**
    * Create image.
    *
@@ -133,5 +133,5 @@ export interface Chain<T extends Chain<T>> {
    * );
    * ```
    */
-  image: (buffer: string | ArrayBuffer, options?: ImageOptions) => T;
+  image: (buffer: string | ArrayBuffer, options?: ImageOptions) => TContext;
 }
