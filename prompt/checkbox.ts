@@ -1,6 +1,6 @@
 import type { KeyCode } from "../keycode/mod.ts";
 import { brightBlue, dim, green, red } from "./deps.ts";
-import { Figures, getFiguresByKeys } from "./figures.ts";
+import { Figures, getFiguresByKeys } from "./_figures.ts";
 import {
   GenericList,
   GenericListKeys,

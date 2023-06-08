@@ -15,7 +15,7 @@ import {
   stripColor,
   underline,
 } from "./deps.ts";
-import { Figures, getFiguresByKeys } from "./figures.ts";
+import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
 
 /** Generic input prompt options. */

@@ -6,7 +6,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
-import { Figures, getFiguresByKeys } from "./figures.ts";
+import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
 
 type UnsupportedInputOptions = "suggestions" | "list";
