@@ -9,13 +9,21 @@ export type BorderOptions = Partial<Border>;
 
 /** Table settings. */
 export interface TableSettings {
+  /** Table indentation. */
   indent: number;
+  /** Enable border on all cells. */
   border: boolean;
-  maxColWidth: number | Array<number>;
+  /** Set min column width. */
   minColWidth: number | Array<number>;
+  /** Set max column width. */
+  maxColWidth: number | Array<number>;
+  /** Set cell padding. */
   padding: number | Array<number>;
+  /** Set table characters. */
   chars: Border;
+  /** Set cell content alignment. */
   align?: Direction;
+  /** Set column options. */
   columns: Array<Column>;
 }
 
@@ -24,7 +32,23 @@ export type TableType<TRow extends RowType = RowType> =
   | Array<TRow>
   | Table<TRow>;
 
-/** Table representation. */
+/**
+ * Table representation.
+ *
+ * ```ts
+ * import { Row, Table } from "./mod.ts";
+ *
+ * new Table()
+ *   .header(new Row("Name", "Date", "City", "Country").border())
+ *   .body([
+ *     ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],
+ *     ["Jescie Wolfe", "Dec 4, 2020", "Alto Hospicio", "Japan"],
+ *     ["Allegra Cleveland", "Apr 16, 2020", "Avernas-le-Bauduin", "Samoa"],
+ *     ["Aretha Gamble", "Feb 22, 2021", "Honolulu", "Georgia"],
+ *   ])
+ *   .render();
+ * ```
+ */
 export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   protected static _chars: Border = { ...border };
   protected options: TableSettings = {
@@ -41,7 +65,8 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   /**
    * Create a new table. If rows is a table, all rows and options of the table
    * will be copied to the new table.
-   * @param rows
+   *
+   * @param rows An array of rows or a table instance.
    */
   public static from<TRow extends RowType>(rows: TableType<TRow>): Table<TRow> {
     const table = new this(...rows);
@@ -55,6 +80,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   /**
    * Create a new table from an array of json objects. An object represents a
    * row and each property a column.
+   *
    * @param rows Array of objects.
    */
   public static fromJson(rows: Array<DataRow>): Table {
@@ -63,6 +89,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set global default border characters.
+   *
    * @param chars Border options.
    */
   public static chars(chars: BorderOptions): typeof Table {
@@ -72,6 +99,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Write table or rows to stdout.
+   *
    * @param rows Table or rows.
    */
   public static render<TRow extends RowType>(rows: TableType<TRow>): void {
@@ -81,6 +109,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   /**
    * Read data from an array of json objects. An object represents a
    * row and each property a column.
+   *
    * @param rows Array of objects.
    */
   public fromJson(rows: Array<DataRow>): this {
@@ -89,6 +118,11 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return this;
   }
 
+  /**
+   * Set column options.
+   *
+   * @param columns An array of columns or column options.
+   */
   public columns(columns: Array<Column | ColumnOptions>): this {
     this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
@@ -96,6 +130,12 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return this;
   }
 
+  /**
+   * Set column options by index.
+   *
+   @param index   The column index.
+   @param column  Column or column options.
+   */
   public column(
     index: number,
     column: Column | ColumnOptions,
@@ -112,6 +152,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set table header.
+   *
    * @param header Header row or cells.
    */
   public header(header: RowType): this {
@@ -121,7 +162,8 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set table body.
-   * @param rows Table rows.
+   *
+   * @param rows Array of rows.
    */
   public body(rows: Array<TRow>): this {
     this.length = 0;
@@ -154,6 +196,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set max col with.
+   *
    * @param width     Max col width.
    * @param override  Override existing value.
    */
@@ -166,6 +209,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set min col width.
+   *
    * @param width     Min col width.
    * @param override  Override existing value.
    */
@@ -178,6 +222,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set table indentation.
+   *
    * @param width     Indent width.
    * @param override  Override existing value.
    */
@@ -190,6 +235,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set cell padding.
+   *
    * @param padding   Cell padding.
    * @param override  Override existing value.
    */
@@ -202,6 +248,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Enable/disable cell border.
+   *
    * @param enable    Enable/disable cell border.
    * @param override  Override existing value.
    */
@@ -214,6 +261,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Align table content.
+   *
    * @param direction Align direction.
    * @param override  Override existing value.
    */
@@ -226,6 +274,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
 
   /**
    * Set border characters.
+   *
    * @param chars Border options.
    */
   public chars(chars: BorderOptions): this {
@@ -243,7 +292,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return [...this];
   }
 
-  /** Get mac col widrth. */
+  /** Get max col width. */
   public getMaxColWidth(): number | Array<number> {
     return this.options.maxColWidth;
   }
@@ -295,10 +344,12 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return this.options.align ?? "left";
   }
 
+  /** Get columns. */
   public getColumns(): Array<Column> {
     return this.options.columns;
   }
 
+  /** Get column by column index. */
   public getColumn(index: number): Column {
     return this.options.columns[index] ??= new Column();
   }

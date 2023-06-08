@@ -1,6 +1,6 @@
 import { Cell, CellType, Direction } from "./cell.ts";
 
-/** Row type */
+/** Allowed row type. */
 export type RowType<
   T extends CellType | undefined = CellType | undefined,
 > =
@@ -19,6 +19,19 @@ interface RowOptions {
 
 /**
  * Row representation.
+ *
+ * Can be used to customize a single row.
+ *
+ * ```ts
+ * import { Row, Table } from "./mod.ts";
+ *
+ * new Table()
+ *   .body([
+ *     new Row("Foo", "Bar").align("right"),
+ *     ["Beep", "Boop"],
+ *   ])
+ *   .render();
+ * ```
  */
 export class Row<
   T extends CellType | undefined = CellType | undefined,
@@ -28,6 +41,7 @@ export class Row<
   /**
    * Create a new row. If cells is a row, all cells and options of the row will
    * be copied to the new row.
+   *
    * @param cells Cells or row.
    */
   public static from<T extends CellType | undefined>(
@@ -55,6 +69,7 @@ export class Row<
 
   /**
    * Enable/disable cell border.
+   *
    * @param enable    Enable/disable cell border.
    * @param override  Override existing value.
    */
@@ -67,6 +82,7 @@ export class Row<
 
   /**
    * Align row content.
+   *
    * @param direction Align direction.
    * @param override  Override existing value.
    */

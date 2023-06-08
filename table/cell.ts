@@ -1,19 +1,40 @@
-/** Cell type */
+/** Allowed cell value type. */
 export type CellValue = number | string;
 
+/** Allowed cell type. */
 export type CellType = CellValue | Cell;
 
+/** Cell alignment direction. */
 export type Direction = "left" | "right" | "center";
 
 /** Cell options. */
 interface CellOptions {
+  /** Enable/disable cell border. */
   border?: boolean;
+  /** Set coll span. */
   colSpan?: number;
+  /** Set row span. */
   rowSpan?: number;
+  /** Cell cell alignment direction. */
   align?: Direction;
 }
 
-/** Cell representation. */
+/**
+ * Cell representation.
+ *
+ * Can be used to customize a single cell.
+ *
+ * ```ts
+ * import { Cell, Table } from "./mod.ts";
+ *
+ * new Table()
+ *   .body([
+ *     ["Foo", new Cell("Bar").align("right")],
+ *     ["Beep", "Boop"],
+ *   ])
+ *   .render();
+ * ```
+ */
 export class Cell {
   protected options: CellOptions = {};
 
@@ -25,6 +46,7 @@ export class Cell {
   /**
    * Create a new cell. If value is a cell, the value and all options of the cell
    * will be copied to the new cell.
+   *
    * @param value Cell or cell value.
    */
   public static from(value: CellType): Cell {
@@ -40,6 +62,7 @@ export class Cell {
 
   /**
    * Cell constructor.
+   *
    * @param value Cell value.
    */
   public constructor(private value: CellValue) {}
@@ -56,6 +79,7 @@ export class Cell {
 
   /**
    * Set cell value.
+   *
    * @param value Cell or cell value.
    */
   public setValue(value: CellValue): this {
@@ -65,6 +89,7 @@ export class Cell {
 
   /**
    * Clone cell with all options.
+   *
    * @param value Cell or cell value.
    */
   public clone(value?: CellValue): Cell {
@@ -77,6 +102,7 @@ export class Cell {
 
   /**
    * Enable/disable cell border.
+   *
    * @param enable    Enable/disable cell border.
    * @param override  Override existing value.
    */
@@ -89,6 +115,7 @@ export class Cell {
 
   /**
    * Set col span.
+   *
    * @param span      Number of cols to span.
    * @param override  Override existing value.
    */
@@ -101,6 +128,7 @@ export class Cell {
 
   /**
    * Set row span.
+   *
    * @param span      Number of rows to span.
    * @param override  Override existing value.
    */
@@ -113,6 +141,7 @@ export class Cell {
 
   /**
    * Align cell content.
+   *
    * @param direction Align direction.
    * @param override  Override existing value.
    */
