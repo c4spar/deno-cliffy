@@ -1,6 +1,7 @@
 import { UnknownCommandError } from "../_errors.ts";
 import { Command } from "../command.ts";
 import { CommandType } from "../types/command.ts";
+import { checkVersion } from "../upgrade/_check_version.ts";
 
 /** Generates well formatted and colored help output for specified command. */
 export class HelpCommand
@@ -25,7 +26,7 @@ export class HelpCommand
             ...this.getAliases(),
           ]);
         }
-        await cmd.checkVersion();
+        await checkVersion(cmd);
         cmd.showHelp();
         if (this.shouldExit()) {
           Deno.exit(0);
