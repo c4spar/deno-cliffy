@@ -34,7 +34,7 @@ interface NumberSettings extends GenericSuggestionsSettings<number, string> {
   keys?: NumberKeys;
 }
 
-/** Number key options. */
+/** Number prompt keymap. */
 export interface NumberKeys extends GenericSuggestionsKeys {
   /** Increase value keymap. Default is `["up", "u", "+"]`. */
   increaseValue?: string[];

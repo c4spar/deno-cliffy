@@ -8,7 +8,7 @@ import {
 } from "./_generic_prompt.ts";
 
 /**
- * Prompt options used together with the `prompt()` method.
+ * Prompt options for the `prompt()` method.
  *
  * ```ts
  * import { PromptOptions } from "./prompt.ts";

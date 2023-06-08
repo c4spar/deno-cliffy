@@ -47,7 +47,7 @@ export type SelectOptionGroupSettings = GenericListOptionGroupSettings<
   SelectOptionSettings
 >;
 
-/** Select key options. */
+/** Select prompt keymap. */
 export type SelectKeys = GenericListKeys;
 
 /**

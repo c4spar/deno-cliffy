@@ -81,7 +81,7 @@ export interface CheckboxOptionGroupSettings
   icon: boolean;
 }
 
-/** Checkbox key options. */
+/** Checkbox prompt keymap. */
 export interface CheckboxKeys extends GenericListKeys {
   /** Check/uncheck option keymap. Default is `["space"]`. */
   check?: Array<string>;

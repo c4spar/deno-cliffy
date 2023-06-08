@@ -32,6 +32,7 @@ interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt keymap. */
 export type ConfirmKeys = GenericSuggestionsKeys;
 
 /**

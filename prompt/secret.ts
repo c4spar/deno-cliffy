@@ -33,7 +33,7 @@ interface SecretSettings extends GenericInputPromptSettings<string, string> {
   keys?: SecretKeys;
 }
 
-/** Secret key options. */
+/** Secret prompt keymap. */
 export type SecretKeys = GenericInputKeys;
 
 /**

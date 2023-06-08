@@ -24,7 +24,7 @@ interface ToggleSettings extends GenericPromptSettings<boolean, string> {
   inactive: string;
 }
 
-/** Toggle key options. */
+/** Toggle prompt keymap. */
 export interface ToggleKeys extends GenericPromptKeys {
   /** Activate keymap. Default is `["right", "y", "j", "s", "o"]`. */
   active?: string[];

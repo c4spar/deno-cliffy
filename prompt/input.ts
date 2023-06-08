@@ -25,6 +25,7 @@ interface InputSettings extends GenericSuggestionsSettings<string, string> {
   keys?: InputKeys;
 }
 
+/** Input prompt keymap. */
 export type InputKeys = GenericSuggestionsKeys;
 
 /**
