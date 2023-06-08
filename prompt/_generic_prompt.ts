@@ -11,7 +11,7 @@ import {
   stripColor,
   yellow,
 } from "./deps.ts";
-import { Figures } from "./figures.ts";
+import { Figures } from "./_figures.ts";
 
 /** Static generic prompt interface. */
 export interface StaticGenericPrompt<

@@ -12,7 +12,7 @@ import {
   isOptionGroup,
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
-import { getFiguresByKeys } from "./figures.ts";
+import { getFiguresByKeys } from "./_figures.ts";
 
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {

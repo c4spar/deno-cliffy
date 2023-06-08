@@ -1,2 +1,2 @@
-export * from "./key_code.ts";
-export * from "./key_codes.ts";
+export { type KeyCode, parse } from "./key_code.ts";
+export { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from "./key_codes.ts";
