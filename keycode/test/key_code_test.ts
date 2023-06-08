@@ -5,7 +5,7 @@ import {
   KeyMapCtrl,
   KeyMapShift,
   SpecialKeyMap,
-} from "../key_codes.ts";
+} from "../_key_codes.ts";
 
 const ESC = "\x1B";
 

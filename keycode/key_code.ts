@@ -1,4 +1,9 @@
-import { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from "./key_codes.ts";
+import {
+  KeyMap,
+  KeyMapCtrl,
+  KeyMapShift,
+  SpecialKeyMap,
+} from "./_key_codes.ts";
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 // https://github.com/nodejs/node/blob/v13.13.0/lib/internal/readline/utils.js
@@ -6,13 +11,21 @@ import { KeyMap, KeyMapCtrl, KeyMapShift, SpecialKeyMap } from "./key_codes.ts";
 const kUTF16SurrogateThreshold = 0x10000; // 2 ** 16
 const kEscape = "\x1b";
 
+/** KeyCode object. */
 export interface KeyCode {
+  /** Key name. */
   name?: string;
+  /** Key sequence. */
   sequence?: string;
+  /** Key code. */
   code?: string;
+  /** Indicates if the ctrl key is pressed. */
   ctrl?: boolean;
+  /** Indicates if the meta key is pressed. */
   meta?: boolean;
+  /** Indicates if the shift key is pressed. */
   shift?: boolean;
+  /** Key string value. */
   char?: string;
 }
 
