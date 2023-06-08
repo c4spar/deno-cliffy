@@ -5,11 +5,11 @@ import { Row } from "../../table/row.ts";
 import { Table } from "../../table/table.ts";
 
 new Table()
-  .header(Row.from(["Name", "Date", "City", "Country"]).border(true))
+  .header(Row.from(["Name", "Date", "City", "Country"]).border())
   .body([
     [
       "Baxter Herman",
-      new Cell("Oct 1, 2020").border(true),
+      new Cell("Oct 1, 2020").border(),
       "Row 1 Column 3",
       "Harderwijk",
       "Slovenia",

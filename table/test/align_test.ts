@@ -12,7 +12,7 @@ Deno.test("table - align - align table", () => {
         ["baz", "beep boop", "foo bar baz"],
         ["beep boop", "foo bar baz", "baz"],
       ])
-      .border(true)
+      .border()
       .align("center")
       .toString(),
     `
@@ -37,7 +37,7 @@ Deno.test("table - align - align row and cell", () => {
         new Row("baz", "beep boop", "foo bar baz").align("right"),
         ["beep boop", "foo bar baz", new Cell("baz").align("center")],
       ])
-      .border(true)
+      .border()
       .toString(),
     `
 ┌─────────────┬─────────────┬─────────────┐

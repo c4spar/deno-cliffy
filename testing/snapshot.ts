@@ -2,6 +2,7 @@ import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { quoteString } from "./_quote_string.ts";
 import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
 
+/** Snapshot test step options. */
 export interface SnapshotTestStep {
   /** Data written to the test process. */
   stdin?: Array<string> | string;
@@ -11,6 +12,7 @@ export interface SnapshotTestStep {
   canFail?: true;
 }
 
+/** Snapshot test options. */
 export interface SnapshotTestOptions extends SnapshotTestStep {
   /** Test name. */
   name: string;

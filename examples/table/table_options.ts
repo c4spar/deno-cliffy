@@ -13,5 +13,5 @@ new Table()
   .maxColWidth(10)
   .padding(1)
   .indent(2)
-  .border(true)
+  .border()
   .render();
