@@ -9,7 +9,6 @@ export {
   type GenericInput,
   type GenericInputKeys,
   type GenericInputPromptOptions,
-  type GenericInputPromptSettings,
 } from "./_generic_input.ts";
 export {
   type GenericList,
