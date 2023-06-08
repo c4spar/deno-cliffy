@@ -5,6 +5,8 @@ import { strLength } from "./_utils.ts";
  * given length. This function returns at least one word.
  *
  * ```ts
+ * import { consumeWords } from "./mod.ts";
+ *
  * const str = consumeWords(9, "This is an example."); // returns: "This is"
  * ```
  *
