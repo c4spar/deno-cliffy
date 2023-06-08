@@ -79,6 +79,7 @@ import type {
   TypeOrTypeHandler,
   VersionHandler,
 } from "./types.ts";
+import { checkVersion } from "./upgrade/_check_version.ts";
 
 /**
  * Chainable command factory class.
@@ -1880,7 +1881,7 @@ export class Command<
               `--${this._versionOption?.name}`,
             );
             if (long) {
-              await this.checkVersion();
+              await checkVersion(this);
               this.showLongVersion();
             } else {
               this.showVersion();
@@ -1905,7 +1906,7 @@ export class Command<
             const long = this.getRawArgs().includes(
               `--${this.getHelpOption()?.name}`,
             );
-            await this.checkVersion();
+            await checkVersion(this);
             this.showHelp({ long });
             this.exit();
           },
@@ -2389,26 +2390,6 @@ export class Command<
     if (this.shouldExit()) {
       Deno.exit(code);
     }
-  }
-
-  /** Check if new version is available and add hint to version. */
-  public async checkVersion(): Promise<void> {
-    const mainCommand = this.getMainCommand();
-    const upgradeCommand = mainCommand.getCommand("upgrade");
-
-    if (!isUpgradeCommand(upgradeCommand)) {
-      return;
-    }
-    const latestVersion = await upgradeCommand.getLatestVersion();
-    const currentVersion = mainCommand.getVersion();
-
-    if (currentVersion === latestVersion) {
-      return;
-    }
-    const versionHelpText =
-      `(New version available: ${latestVersion}. Run '${mainCommand.getName()} upgrade' to upgrade to the latest version!)`;
-
-    mainCommand.version(`${currentVersion}  ${bold(yellow(versionHelpText))}`);
   }
 
   /*****************************************************************************
@@ -3057,14 +3038,6 @@ function findFlag(flags: Array<string>): string {
     }
   }
   return flags[0];
-}
-
-function isUpgradeCommand(command: unknown): command is UpgradeCommandImpl {
-  return command instanceof Command && "getLatestVersion" in command;
-}
-
-interface UpgradeCommandImpl {
-  getLatestVersion(): Promise<string>;
 }
 
 interface DefaultOption {
