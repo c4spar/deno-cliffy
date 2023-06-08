@@ -99,7 +99,7 @@ export interface CheckboxKeys extends GenericListKeys {
  * });
  * ```
  *
- * You can also group options:
+ * Options can be also grouped:
  *
  * ```ts
  * import { Checkbox } from "./mod.ts";

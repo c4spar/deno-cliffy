@@ -62,7 +62,7 @@ export type SelectKeys = GenericListKeys;
  * });
  * ```
  *
- * You can also group options:
+ * Options can be also grouped:
  *
  * ```ts
  * import { Select } from "./mod.ts";
