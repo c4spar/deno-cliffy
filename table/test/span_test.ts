@@ -8,7 +8,7 @@ Deno.test("should allow undefined cell values", () => {
       ["foo", undefined, "bar"],
       ["beep", undefined, "boop"],
     ])
-      .border(true)
+      .border()
       .toString(),
     `
 ┌──────┬──┬──────┐
@@ -27,7 +27,7 @@ Deno.test("should override undefined cell values with col & row span", () => {
       [undefined, new Cell("beep").rowSpan(2), "boop"],
       ["biz", undefined, "baz"],
     ])
-      .border(true)
+      .border()
       .toString(),
     `
 ┌────────────┬──────┐
@@ -78,7 +78,7 @@ Deno.test("colspan + rowspan 1", () => {
       ],
       ["Row 6 Column 1"],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -119,7 +119,7 @@ Deno.test("colspan + rowspan 2", () => {
         Cell.from("Row 5 & 6 Column 2 & 3").rowSpan(2).colSpan(2),
       ],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -144,7 +144,7 @@ Deno.test("colspan + rowspan 3", () => {
         Cell.from("Row 5 & 6 Column 2 & 3").rowSpan(2).colSpan(2),
       ],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -166,7 +166,7 @@ Deno.test("colspan + rowspan 4", () => {
     Table.from([
       [Cell.from("Row 5 & 6 Column 2 & 3").rowSpan(2).colSpan(2)],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -195,7 +195,7 @@ Deno.test("colspan + rowspan 5", () => {
       ["Row 3 Column 1", "Row 3 Column 4"],
       ["Row 4 Column 1", "Row 4 Column 2", "Row 4 Column 3", "Row 4 Column 4"],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -224,7 +224,7 @@ Deno.test("colspan + rowspan 6", () => {
       ["Row 3 Column 1", "Row 3 Column 2", "Row 1 Column 3", "Row 1 Column 4"],
       ["Row 4 Column 1", "Row 4 Column 2", "Row 4 Column 3", "Row 4 Column 4"],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -260,7 +260,7 @@ Deno.test("colspan + rowspan 7", () => {
       ["Row 3 Column 1", "Row 3 Column 2"],
       ["Row 4 Column 1", "Row 4 Column 2"],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -295,7 +295,7 @@ Deno.test("colspan + rowspan 8", () => {
       ["Row 3 Column 2"],
       ["Row 4 Column 1", "Row 4 Column 2"],
     ])
-      .border(true)
+      .border()
       .toString(),
   );
 });
@@ -306,7 +306,7 @@ Deno.test("should allow an empty array as first row", () => {
       [],
       [new Cell("abc").colSpan(2)],
     ])
-      .border(true)
+      .border()
       .toString(),
     `
 ┌──┬──┐

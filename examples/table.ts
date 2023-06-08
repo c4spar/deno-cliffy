@@ -23,4 +23,4 @@ const table = new Table(
 
 table.push(["Row 6 / Column 1"]);
 
-table.border(true).render();
+table.border().render();

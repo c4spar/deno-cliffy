@@ -93,7 +93,7 @@ Deno.test("table getter", () => {
     .maxColWidth(10)
     .indent(2)
     .padding(4)
-    .border(true);
+    .border();
   assertEquals(table.getHeader(), header);
   assertEquals(table.getBody(), [
     ["cell1", "cell2", "cell3"],
@@ -162,7 +162,7 @@ Deno.test("simple border table", () => {
       ["cell1", "cell2", "cell3"],
       ["cell1", "cell2", "cell3"],
     ])
-      .border(true)
+      .border()
       .border(false, false)
       .toString(),
     `
@@ -269,7 +269,7 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -277,7 +277,7 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -285,32 +285,7 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
-        .toString(),
-    ], [
-      Table.from([
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-      ])
-        .padding(0)
-        .border(true)
-        .toString(),
-      Table.from([
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-      ])
-        .padding(0)
-        .border(true)
-        .toString(),
-      Table.from([
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-        ["cell1", "cell2", "cell3"],
-      ])
-        .padding(0)
-        .border(true)
+        .border()
         .toString(),
     ], [
       Table.from([
@@ -319,7 +294,7 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -327,7 +302,7 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -335,7 +310,32 @@ Deno.test("simple nested border table", () => {
         ["cell1", "cell2", "cell3"],
       ])
         .padding(0)
-        .border(true)
+        .border()
+        .toString(),
+    ], [
+      Table.from([
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+      ])
+        .padding(0)
+        .border()
+        .toString(),
+      Table.from([
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+      ])
+        .padding(0)
+        .border()
+        .toString(),
+      Table.from([
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+        ["cell1", "cell2", "cell3"],
+      ])
+        .padding(0)
+        .border()
         .toString(),
     ]])
       .padding(1)
@@ -441,7 +441,7 @@ Deno.test("multiline border table", () => {
     ])
       .padding(0)
       .maxColWidth(20)
-      .border(true)
+      .border()
       .toString(),
     `
 ┌───────────────┬─────────────────┬──────────────┐
@@ -596,7 +596,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -609,7 +609,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -618,7 +618,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
     ], [
       Table.from([
@@ -628,7 +628,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -637,7 +637,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -646,7 +646,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
     ], [
       Table.from([
@@ -656,7 +656,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -665,7 +665,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
       Table.from([
         ["cell1", "cell2", "cell3"],
@@ -674,7 +674,7 @@ Deno.test("nested multiline border table", () => {
       ])
         .padding(0)
         .maxColWidth(20)
-        .border(true)
+        .border()
         .toString(),
     ]])
       .padding(1)

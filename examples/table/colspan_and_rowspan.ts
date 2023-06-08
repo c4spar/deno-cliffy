@@ -19,5 +19,5 @@ Table.from([
   ["Row 5 Column 1", new Cell("Row 5 & 6 Column 2 & 3").rowSpan(2).colSpan(2)],
   ["Row 6 Column 1"],
 ])
-  .border(true)
+  .border()
   .render();

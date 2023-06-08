@@ -48,7 +48,7 @@ Deno.test("custom global table chars", () => {
         ["++", "++++ ++++++ ++", "+++ +"],
         ["++++ +++++", "++ ++++", "+++ +++++++"],
       ])
-      .border()
+      .border(true)
       .toString(),
     `
 caaaaaaaaaaaabaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaad
@@ -88,7 +88,7 @@ Deno.test("custom table chars", () => {
         rightMid: "n",
         midMid: "o",
       })
-      .border(true)
+      .border()
       .toString(),
     `
 caaaaaaaaaaaabaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaad

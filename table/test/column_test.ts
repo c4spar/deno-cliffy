@@ -38,7 +38,7 @@ await snapshotTest({
       }, {
         align: "right",
       }])
-      .border(true)
+      .border()
       .render();
   },
 });
@@ -55,7 +55,7 @@ await snapshotTest({
       }, {
         align: "right",
       }])
-      .border(true)
+      .border()
       .render();
   },
 });
@@ -76,7 +76,7 @@ await snapshotTest({
         padding: 5,
         align: "right",
       }])
-      .border(true)
+      .border()
       .render();
   },
 });
@@ -97,7 +97,7 @@ await snapshotTest({
     table.getColumn(2)?.align("right");
 
     table
-      .border(true)
+      .border()
       .render();
   },
 });

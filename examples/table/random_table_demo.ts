@@ -123,7 +123,7 @@ function randomizeRow(row: Array<CellType>) {
   const cells: Array<CellType> = row;
   const r1 = rnd();
   if (typeof cells[r1] === "string") {
-    cells[r1] = Cell.from(cells[r1]).border(true);
+    cells[r1] = Cell.from(cells[r1]).border();
   }
   return cells;
 }
