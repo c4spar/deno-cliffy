@@ -20,19 +20,29 @@ export interface GenericListOptions<TValue, TRawValue> extends
   options: Array<
     string | GenericListOption | GenericListOptionGroup<GenericListOption>
   >;
+  /** Keymap to assign key names to prompt actions. */
   keys?: GenericListKeys;
-  indent?: string;
+  /** Change list pointer. Default is `brightBlue("❯")`. */
   listPointer?: string;
-  searchIcon?: string;
+  /** Limit max displayed rows per page. */
   maxRows?: number;
+  /** Change search label. Default is `brightBlue("🔎")`. */
   searchLabel?: string;
+  /** Enable search. */
   search?: boolean;
+  /** Display prompt info. */
   info?: boolean;
+  /** Limit maximum amount of breadcrumb items. */
   maxBreadcrumbItems?: number;
+  /** Change breadcrumb separator. Default is ` › `. */
   breadcrumbSeparator?: string;
+  /** Change back pointer. Default is `❮`. */
   backPointer?: string;
+  /** Change group pointer. Default is `❯`. */
   groupPointer?: string;
+  /** Change group icon. Default is `📁`. */
   groupIcon?: string | boolean;
+  /** Change opened group icon. Default is `📂`. */
   groupOpenIcon?: string | boolean;
 }
 
@@ -45,7 +55,6 @@ export interface GenericListSettings<
 > extends GenericInputPromptSettings<TValue, TRawValue> {
   options: Array<TOption | TGroup>;
   keys: GenericListKeys;
-  indent: string;
   listPointer: string;
   maxRows: number;
   searchLabel: string;
@@ -61,15 +70,21 @@ export interface GenericListSettings<
 
 /** Generic list option options. */
 export interface GenericListOption {
+  /** The option value. */
   value: string;
+  /** The option label. */
   name?: string;
+  /** Disable option. Disabled options are displayed but cannot be selected. */
   disabled?: boolean;
 }
 
 /** Generic list option group options. */
 export interface GenericListOptionGroup<TOption extends GenericListOption> {
+  /** The option label. */
   name: string;
+  /** An array of child options. */
   options: Array<string | TOption | this>;
+  /** Disable option. Disabled options are displayed but cannot be selected. */
   disabled?: boolean;
 }
 
@@ -92,11 +107,17 @@ export interface GenericListOptionGroupSettings<
 
 /** GenericList key options. */
 export interface GenericListKeys extends GenericInputKeys {
-  previous?: string[];
+  /** Select next option keymap. Default is `["down", "d", "n", "2"]`. */
   next?: string[];
-  previousPage?: string[];
+  /** Select previous option keymap. Default is `["up", "u", "p", "8"]`. */
+  previous?: string[];
+  /** Select next page keymap. Default is `["pagedown", "right"]`. */
   nextPage?: string[];
+  /** Select previous page keymap. Default is `["pageup", "left"]`. */
+  previousPage?: string[];
+  /** Select next option keymap. Default is `["right", "enter", "return"]`. */
   open?: string[];
+  /** Select next option keymap. Default is `["left", "escape", "enter", "return"]`. */
   back?: string[];
 }
 
@@ -133,6 +154,7 @@ export abstract class GenericList<
 
   /**
    * Create list separator.
+   *
    * @param label Separator label.
    */
   public static separator(label = "------------"): GenericListOption {
@@ -170,10 +192,10 @@ export abstract class GenericList<
       maxRows: options.maxRows ?? 10,
       options: this.mapOptions(options, options.options),
       keys: {
-        previous: options.search ? ["up"] : ["up", "u", "p", "8"],
         next: options.search ? ["down"] : ["down", "d", "n", "2"],
-        previousPage: ["pageup", "left"],
+        previous: options.search ? ["up"] : ["up", "u", "p", "8"],
         nextPage: ["pagedown", "right"],
+        previousPage: ["pageup", "left"],
         open: ["right", "enter", "return"],
         back: ["left", "escape", "enter", "return"],
         ...(settings.keys ?? {}),

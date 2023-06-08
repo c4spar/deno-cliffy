@@ -10,11 +10,18 @@ import {
 /** Secret prompt options. */
 export interface SecretOptions
   extends GenericInputPromptOptions<string, string> {
-  label?: string;
-  hidden?: boolean;
-  minLength?: number;
-  maxLength?: number;
   keys?: SecretKeys;
+  /** Change prompt label. Default is `Secret`. */
+  label?: string;
+  /**
+   * If enabled, the input value is hidden, otherwise each character is replaced
+   * with a `*`.
+   */
+  hidden?: boolean;
+  /** Limit minimum allowed length of the secret. */
+  minLength?: number;
+  /** Limit maximum allowed length of the secret. */
+  maxLength?: number;
 }
 
 /** Secret prompt settings. */
@@ -26,20 +33,31 @@ interface SecretSettings extends GenericInputPromptSettings<string, string> {
   keys?: SecretKeys;
 }
 
-/** Secret key options. */
+/** Secret prompt keymap. */
 export type SecretKeys = GenericInputKeys;
 
-/** Secret prompt representation. */
+/**
+ * Secret prompt representation.
+ *
+ * ```ts
+ * import { Secret } from "./mod.ts";
+ *
+ * const password: string = await Secret.prompt("Enter your password");
+ * ```
+ */
 export class Secret extends GenericInput<string, string> {
   protected readonly settings: SecretSettings;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided message or options. */
   public static prompt(options: string | SecretOptions): Promise<string> {
     return new this(options).prompt();
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

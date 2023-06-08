@@ -17,9 +17,12 @@ type UnsupportedOptions =
 /** Confirm prompt options. */
 export interface ConfirmOptions
   extends Omit<GenericSuggestionsOptions<boolean, string>, UnsupportedOptions> {
-  active?: string;
-  inactive?: string;
+  /** Keymap to assign key names to prompt actions. */
   keys?: ConfirmKeys;
+  /** Change active label. Default is `Yes`. */
+  active?: string;
+  /** Change inactive label. Default is `No`. */
+  inactive?: string;
 }
 
 /** Confirm prompt settings. */
@@ -29,13 +32,22 @@ interface ConfirmSettings extends GenericSuggestionsSettings<boolean, string> {
   keys?: ConfirmKeys;
 }
 
+/** Confirm prompt keymap. */
 export type ConfirmKeys = GenericSuggestionsKeys;
 
-/** Confirm prompt representation. */
+/**
+ * Confirm prompt representation.
+ *
+ * ```ts
+ * import { Confirm } from "./mod.ts";
+ *
+ * const confirmed: boolean = await Confirm.prompt("Please confirm");
+ * ```
+ */
 export class Confirm extends GenericSuggestions<boolean, string> {
   protected readonly settings: ConfirmSettings;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided options. */
   public static prompt(
     options: string | ConfirmOptions,
   ): Promise<boolean> {
@@ -43,7 +55,10 @@ export class Confirm extends GenericSuggestions<boolean, string> {
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

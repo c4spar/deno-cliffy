@@ -10,6 +10,7 @@ import { brightBlue, dim, stripColor, underline } from "./deps.ts";
 /** Generic input prompt options. */
 export interface GenericInputPromptOptions<TValue, TRawValue>
   extends GenericPromptOptions<TValue, TRawValue> {
+  /** Keymap to assign key names to prompt actions. */
   keys?: GenericInputKeys;
 }
 
@@ -21,9 +22,13 @@ export interface GenericInputPromptSettings<TValue, TRawValue>
 
 /** Input keys options. */
 export interface GenericInputKeys extends GenericPromptKeys {
+  /** Cursor left keymap. Default is `["left"]`. */
   moveCursorLeft?: string[];
+  /** Cursor right keymap. Default is `["right"]`. */
   moveCursorRight?: string[];
+  /** Delete cursor right keymap. Default is `["backspace"]`. */
   deleteCharLeft?: string[];
+  /** Delete cursor right keymap. Default is `["delete"]`. */
   deleteCharRight?: string[];
 }
 

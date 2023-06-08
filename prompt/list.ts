@@ -10,12 +10,18 @@ import { dim, normalize, underline } from "./deps.ts";
 /** List prompt options. */
 export interface ListOptions
   extends GenericSuggestionsOptions<string[], string> {
-  separator?: string;
-  minLength?: number;
-  maxLength?: number;
-  minTags?: number;
-  maxTags?: number;
+  /** Keymap to assign key names to prompt actions. */
   keys?: ListKeys;
+  /** Change the list separator. Default is `,`. */
+  separator?: string;
+  /** Limit minimum allowed length of a tag. */
+  minLength?: number;
+  /** Limit maximum allowed length of a tag. */
+  maxLength?: number;
+  /** Limit minimum amount of entered tags. */
+  minTags?: number;
+  /** Limit maximum amount of entered tags. */
+  maxTags?: number;
 }
 
 /** List prompt settings. */
@@ -28,20 +34,31 @@ interface ListSettings extends GenericSuggestionsSettings<string[], string> {
   keys?: ListKeys;
 }
 
-/** List key options. */
+/** List prompt keymap. */
 export type ListKeys = GenericSuggestionsKeys;
 
-/** List prompt representation. */
+/**
+ * List prompt representation.
+ *
+ * ```ts
+ * import { List } from "./mod.ts";
+ *
+ * const confirmed: Array<string> = await List.prompt("Enter some keywords");
+ * ```
+ */
 export class List extends GenericSuggestions<string[], string> {
   protected readonly settings: ListSettings;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided options. */
   public static prompt(options: string | ListOptions): Promise<string[]> {
     return new this(options).prompt();
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

@@ -13,11 +13,16 @@ type UnsupportedOptions = "files";
 /** Number prompt options. */
 export interface NumberOptions
   extends Omit<GenericSuggestionsOptions<number, string>, UnsupportedOptions> {
-  min?: number;
-  max?: number;
-  float?: boolean;
-  round?: number;
+  /** Keymap to assign key names to prompt actions. */
   keys?: NumberKeys;
+  /** If set, the prompt value must be greater or equal than min. */
+  min?: number;
+  /** If set, the prompt value must be lower or equal than max. */
+  max?: number;
+  /** Enable floating point numbers. */
+  float?: boolean;
+  /** Round floating point numbers. */
+  round?: number;
 }
 
 /** Number prompt settings. */
@@ -29,23 +34,36 @@ interface NumberSettings extends GenericSuggestionsSettings<number, string> {
   keys?: NumberKeys;
 }
 
-/** Number key options. */
+/** Number prompt keymap. */
 export interface NumberKeys extends GenericSuggestionsKeys {
+  /** Increase value keymap. Default is `["up", "u", "+"]`. */
   increaseValue?: string[];
+  /** Decrease value keymap. Default is `["down", "d", "-"]`. */
   decreaseValue?: string[];
 }
 
-/** Number prompt representation. */
+/**
+ * Number prompt representation.
+ *
+ * ```ts
+ * import { Number } from "./mod.ts";
+ *
+ * const age: number = await Number.prompt("How old are you?");
+ * ```
+ */
 export class Number extends GenericSuggestions<number, string> {
   protected readonly settings: NumberSettings;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided message or options. */
   public static prompt(options: string | NumberOptions): Promise<number> {
     return new this(options).prompt();
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

@@ -20,28 +20,53 @@ export interface StaticGenericPrompt<
   TOptions extends GenericPromptOptions<TValue, TRawValue> =
     GenericPromptOptions<TValue, TRawValue>,
 > {
+  /**
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
+   * @param value The injected value.
+   */
   inject?(value: TValue): void;
 
+  /**
+   * Execute the prompt with the given options.
+   *
+   * @param options Prompt options.
+   */
   prompt(options: TOptions): Promise<TValue>;
 }
 
 /** Generic prompt options. */
 export interface GenericPromptOptions<TValue, TRawValue> {
+  /** The prompt message. */
   message: string;
+  /** The default value of the prompt. */
   default?: TValue;
+  /** Don't show the default value after the prompt message. */
   hideDefault?: boolean;
+  /** Validate prompt value. */
   validate?: (value: TRawValue) => ValidateResult;
+  /** Format the display value. */
   transform?: (value: TRawValue) => TValue | undefined;
+  /** Show a hint below the prompt. */
   hint?: string;
+  /** Change the prompt pointer. Default is `brightBlue("›")`. */
   pointer?: string;
+  /** Indent the prompt. */
   indent?: string;
+  /** Keymap to assign key names to prompt actions. */
   keys?: GenericPromptKeys;
+  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api?s=Deno.SetRawOptions). */
   cbreak?: boolean;
+  /** Change the prompt prefix. Default is: `yellow("? ")`. */
   prefix?: string;
+  /** Change the prompt input stream. */
   reader?: Deno.Reader & {
     readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
   };
+  /** Change the prompt output stream. */
   writer?: Deno.WriterSync;
 }
 
@@ -63,8 +88,9 @@ export interface GenericPromptSettings<TValue, TRawValue>
 /** Prompt validation return tape. */
 export type ValidateResult = string | boolean | Promise<string | boolean>;
 
-/** Input keys options. */
+/** Generic prompt keymap. */
 export interface GenericPromptKeys {
+  /** Submit keymap. Default is `["enter", "return"]`. */
   submit?: Array<string>;
 }
 
@@ -88,7 +114,10 @@ export abstract class GenericPrompt<
   #encoder = new TextEncoder();
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: unknown): void {
@@ -118,7 +147,7 @@ export abstract class GenericPrompt<
     };
   }
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt. */
   public async prompt(): Promise<TValue> {
     try {
       return await this.#execute();

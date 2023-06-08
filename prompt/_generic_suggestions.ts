@@ -21,14 +21,32 @@ import { distance } from "../_utils/distance.ts";
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<TValue, TRawValue>
   extends GenericInputPromptOptions<TValue, TRawValue> {
+  /** Keymap to assign key names to prompt actions. */
   keys?: GenericSuggestionsKeys;
+  /**
+   * Prompt id. If set, the prompt value is stored in local storage and used for
+   * auto suggestions the next time the prompt is used.
+   */
   id?: string;
+  /**
+   * An array of suggestions or a callback function that returns an array of
+   * suggestions.
+   */
   suggestions?: Array<string | number> | SuggestionHandler;
+  /** Callback function for auto-suggestion completion. */
   complete?: CompleteHandler;
+  /**
+   * Enable autosuggestions for files. Can be a boolean to enable all files or a
+   * regular expression to include only specific files.
+   */
   files?: boolean | RegExp;
+  /** Show auto suggestions as a list. */
   list?: boolean;
+  /** Display prompt info. */
   info?: boolean;
+  /** Change list pointer. Default is `brightBlue("❯")`. */
   listPointer?: string;
+  /** Limit max displayed rows per page. */
   maxRows?: number;
 }
 
@@ -48,17 +66,24 @@ export interface GenericSuggestionsSettings<TValue, TRawValue>
 
 /** Input keys options. */
 export interface GenericSuggestionsKeys extends GenericInputKeys {
+  /** Apply auto-suggestion keymap. Default is `["tab"]`. */
   complete?: string[];
+  /** Select next option keymap. Default is `["up"]`. */
   next?: string[];
+  /** Select previous option keymap. Default is `["down"]`. */
   previous?: string[];
+  /** Select next page keymap. Default is `["pageup"]`. */
   nextPage?: string[];
+  /** Select previous page keymap. Default is `["pagedown"]`. */
   previousPage?: string[];
 }
 
+/** Auto-suggestions handler. */
 export type SuggestionHandler = (
   input: string,
 ) => Array<string | number> | Promise<Array<string | number>>;
 
+/** Auto-suggestions complete handler. */
 export type CompleteHandler = (
   input: string,
   suggestion?: string,
