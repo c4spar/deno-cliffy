@@ -9,30 +9,43 @@ import {
 
 /** Generic prompt options. */
 export interface ToggleOptions extends GenericPromptOptions<boolean, string> {
-  active?: string;
-  inactive?: string;
+  /** Keymap to assign key names to prompt actions. */
   keys?: ToggleKeys;
+  /** Change active label. Default is `"Yes"`. */
+  active?: string;
+  /** Change inactive label. Default is `"No"`. */
+  inactive?: string;
 }
 
 /** Toggle prompt settings. */
 interface ToggleSettings extends GenericPromptSettings<boolean, string> {
+  keys: ToggleKeys;
   active: string;
   inactive: string;
-  keys: ToggleKeys;
 }
 
 /** Toggle key options. */
 export interface ToggleKeys extends GenericPromptKeys {
+  /** Activate keymap. Default is `["right", "y", "j", "s", "o"]`. */
   active?: string[];
+  /** Deactivate keymap. Default is `["left", "n"]`. */
   inactive?: string[];
 }
 
-/** Toggle prompt representation. */
+/**
+ * Toggle prompt representation.
+ *
+ * ```ts
+ * import { Toggle } from "./mod.ts";
+ *
+ * const password: boolean = await Toggle.prompt("Please confirm");
+ * ```
+ */
 export class Toggle extends GenericPrompt<boolean, string> {
   protected readonly settings: ToggleSettings;
   protected status: string;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt. */
   public static prompt(
     options: string | ToggleOptions,
   ): Promise<boolean> {

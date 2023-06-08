@@ -16,8 +16,10 @@ import { getFiguresByKeys } from "./_figures.ts";
 
 /** Select prompt options. */
 export interface SelectOptions extends GenericListOptions<string, string> {
-  options: Array<string | SelectOption | SelectOptionGroup>;
+  /** Keymap to assign key names to prompt actions. */
   keys?: SelectKeys;
+  /** An array of child options. */
+  options: Array<string | SelectOption | SelectOptionGroup>;
 }
 
 /** Select prompt settings. */
@@ -48,7 +50,35 @@ export type SelectOptionGroupSettings = GenericListOptionGroupSettings<
 /** Select key options. */
 export type SelectKeys = GenericListKeys;
 
-/** Select prompt representation. */
+/**
+ * Select prompt representation.
+ *
+ * ```ts
+ * import { Select } from "./mod.ts";
+ *
+ * const color: string = await Select.prompt({
+ *   message: "Pick a color",
+ *   options: ["red", "green", "blue"],
+ * });
+ * ```
+ *
+ * You can also group options:
+ *
+ * ```ts
+ * import { Select } from "./mod.ts";
+ *
+ * const value = await Select.prompt({
+ *   message: "Select a value",
+ *   options: [{
+ *     name: "Group 1",
+ *     options: ["foo", "bar", "baz"],
+ *   }, {
+ *     name: "Group 2",
+ *     options: ["beep", "boop"],
+ *   }],
+ * });
+ * ```
+ */
 export class Select extends GenericList<
   string,
   string,
@@ -60,13 +90,16 @@ export class Select extends GenericList<
   protected listIndex: number;
   protected listOffset: number;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided options. */
   public static prompt(options: SelectOptions): Promise<string> {
     return new this(options).prompt();
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

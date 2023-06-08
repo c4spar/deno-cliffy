@@ -10,9 +10,12 @@ import { normalize } from "./deps.ts";
 /** Input prompt options. */
 export interface InputOptions
   extends GenericSuggestionsOptions<string, string> {
-  minLength?: number;
-  maxLength?: number;
+  /** Keymap to assign key names to prompt actions. */
   keys?: InputKeys;
+  /** Set minimum allowed length of input value. */
+  minLength?: number;
+  /** Set maximum allowed length of input value. */
+  maxLength?: number;
 }
 
 /** Input prompt settings. */
@@ -24,17 +27,28 @@ interface InputSettings extends GenericSuggestionsSettings<string, string> {
 
 export type InputKeys = GenericSuggestionsKeys;
 
-/** Input prompt representation. */
+/**
+ * Input prompt representation.
+ *
+ * ```ts
+ * import { Input } from "./mod.ts";
+ *
+ * const confirmed: string = await Input.prompt("Enter your name");
+ * ```
+ */
 export class Input extends GenericSuggestions<string, string> {
   protected readonly settings: InputSettings;
 
-  /** Execute the prompt and show cursor on end. */
+  /** Execute the prompt with provided options. */
   public static prompt(options: string | InputOptions): Promise<string> {
     return new this(options).prompt();
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
    * @param value Input value.
    */
   public static inject(value: string): void {

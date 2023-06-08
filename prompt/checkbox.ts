@@ -18,14 +18,22 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 /** Checkbox prompt options. */
 export interface CheckboxOptions
   extends GenericListOptions<Array<string>, Array<string>> {
-  options: Array<string | CheckboxOption | CheckboxOptionGroup>;
-  confirmSubmit?: boolean;
-  check?: string;
-  uncheck?: string;
-  partialCheck?: string;
-  minOptions?: number;
-  maxOptions?: number;
+  /** Keymap to assign key names to prompt actions. */
   keys?: CheckboxKeys;
+  /** An array of child options. */
+  options: Array<string | CheckboxOption | CheckboxOptionGroup>;
+  /** If enabled, the user needs to press enter twice. Default is `true`. */
+  confirmSubmit?: boolean;
+  /** Change check icon. Default is `green(Figures.TICK)`. */
+  check?: string;
+  /** Change uncheck icon. Default is `red(Figures.CROSS)`. */
+  uncheck?: string;
+  /** Change partial check icon. Default is `green(Figures.RADIO_ON)`. */
+  partialCheck?: string;
+  /** The minimum allowed options to select. Default is `0`. */
+  minOptions?: number;
+  /** The maximum allowed options to select. Default is `Infinity`. */
+  maxOptions?: number;
 }
 
 /** Checkbox prompt settings. */
@@ -47,13 +55,16 @@ interface CheckboxSettings extends
 
 /** Checkbox option options. */
 export interface CheckboxOption extends GenericListOption {
+  /** Set checked status. */
   checked?: boolean;
+  /** Change option icon. */
   icon?: boolean;
 }
 
 /** Checkbox option group options. */
 export interface CheckboxOptionGroup
   extends GenericListOptionGroup<CheckboxOption> {
+  /** Change option icon. */
   icon?: boolean;
 }
 
@@ -72,10 +83,39 @@ export interface CheckboxOptionGroupSettings
 
 /** Checkbox key options. */
 export interface CheckboxKeys extends GenericListKeys {
+  /** Check/uncheck option keymap. Default is `["space"]`. */
   check?: Array<string>;
 }
 
-/** Checkbox prompt representation. */
+/**
+ * Checkbox prompt representation.
+ *
+ * ```ts
+ * import { Checkbox } from "./mod.ts";
+ *
+ * const colors: Array<string> = await Checkbox.prompt({
+ *   message: "Pick some colors",
+ *   options: ["red", "green", "blue"],
+ * });
+ * ```
+ *
+ * You can also group options:
+ *
+ * ```ts
+ * import { Checkbox } from "./mod.ts";
+ *
+ * const values = await Checkbox.prompt({
+ *   message: "Select some values",
+ *   options: [{
+ *     name: "Group 1",
+ *     options: ["foo", "bar", "baz"],
+ *   }, {
+ *     name: "Group 2",
+ *     options: ["beep", "boop"],
+ *   }],
+ * });
+ * ```
+ */
 export class Checkbox extends GenericList<
   Array<string>,
   Array<string>,
@@ -90,13 +130,18 @@ export class Checkbox extends GenericList<
   protected listOffset: number;
   private confirmSubmit = false;
 
-  /** Execute the prompt and show cursor on end. */
+  /**
+   * Execute the prompt with provided options.
+   *
+   * @param options Checkbox options.
+   */
   public static prompt(options: CheckboxOptions): Promise<Array<string>> {
     return new this(options).prompt();
   }
 
   /**
    * Create list separator.
+   *
    * @param label Separator label.
    */
   public static separator(label?: string): CheckboxOption {
@@ -107,8 +152,11 @@ export class Checkbox extends GenericList<
   }
 
   /**
-   * Inject prompt value. Can be used for unit tests or pre selections.
-   * @param value Array of input values.
+   * Inject prompt value. If called, the prompt doesn't prompt for an input and
+   * returns immediately the injected value. Can be used for unit tests or pre
+   * selections.
+   *
+   * @param value Input value.
    */
   public static inject(value: Array<string>): void {
     GenericPrompt.inject(value);
@@ -144,6 +192,7 @@ export class Checkbox extends GenericList<
 
   /**
    * Map string option values to options and set option defaults.
+   *
    * @param promptOptions Checkbox options.
    */
   protected mapOptions(
@@ -159,10 +208,6 @@ export class Checkbox extends GenericList<
     );
   }
 
-  /**
-   * Set list option defaults.
-   * @param option List option.
-   */
   protected mapOption(
     options: CheckboxOptions,
     option: CheckboxOption,
