@@ -1,18 +1,44 @@
 import { Direction } from "./cell.ts";
 
+/** Column options. */
 export interface ColumnOptions {
+  /** Enable/disable cell border. */
   border?: boolean;
+  /** Cell cell alignment direction. */
   align?: Direction;
+  /** Set min column width. */
   minWidth?: number;
+  /** Set max column width. */
   maxWidth?: number;
+  /** Set cell padding. */
   padding?: number;
 }
 
+/**
+ * Column representation.
+ *
+ * Can be used to customize a single column.
+ *
+ * ```ts
+ * import { Column, Table } from "./mod.ts";
+ *
+ * new Table()
+ *   .body([
+ *     ["Foo", "bar"],
+ *     ["Beep", "Boop"],
+ *   ])
+ *   .column(0, new Column().border())
+ *   .render();
+ * ```
+ */
 export class Column {
-  static from(options: ColumnOptions): Column {
-    const column = new Column();
-    column.opts = { ...options };
-    return column;
+  /**
+   * Create a new cell from column options or an existing column.
+   * @param options
+   */
+  static from(options: ColumnOptions | Column): Column {
+    const opts = options instanceof Column ? options.opts : options;
+    return new Column().options(opts);
   }
 
   protected opts: ColumnOptions = {};

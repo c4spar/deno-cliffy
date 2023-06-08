@@ -11,7 +11,7 @@ export type BorderOptions = Partial<Border>;
 export interface TableSettings {
   /** Table indentation. */
   indent: number;
-  /** Enable border on all cells. */
+  /** Enable/disable border on all cells. */
   border: boolean;
   /** Set min column width. */
   minColWidth: number | Array<number>;
