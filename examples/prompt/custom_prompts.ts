@@ -2,7 +2,7 @@
 
 import { BufReader } from "https://deno.land/std@0.170.0/io/buffer.ts";
 import { tty } from "../../ansi/tty.ts";
-import { Figures } from "../../prompt/figures.ts";
+import { Figures } from "../../prompt/_figures.ts";
 import { prompt } from "../../prompt/prompt.ts";
 import { Input } from "../../prompt/input.ts";
 
