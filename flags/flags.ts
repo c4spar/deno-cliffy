@@ -41,6 +41,7 @@ const DefaultTypes: Record<ArgumentType, TypeHandler> = {
 
 /**
  * Parse command line arguments.
+ *
  * @param argsOrCtx Command line arguments e.g: `Deno.args` or parse context.
  * @param opts      Parse options.
  *
