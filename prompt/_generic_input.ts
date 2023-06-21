@@ -26,7 +26,7 @@ export interface GenericInputKeys extends GenericPromptKeys {
   moveCursorLeft?: string[];
   /** Cursor right keymap. Default is `["right"]`. */
   moveCursorRight?: string[];
-  /** Delete cursor right keymap. Default is `["backspace"]`. */
+  /** Delete cursor left keymap. Default is `["backspace"]`. */
   deleteCharLeft?: string[];
   /** Delete cursor right keymap. Default is `["delete"]`. */
   deleteCharRight?: string[];
@@ -44,7 +44,7 @@ export abstract class GenericInput<
   protected inputValue = "";
   protected inputIndex = 0;
 
-  protected getDefaultSettings(
+  public getDefaultSettings(
     options: GenericInputPromptOptions<TValue, TRawValue>,
   ): GenericInputPromptSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);

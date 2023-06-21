@@ -1,0 +1,18 @@
+export const snapshot = {};
+
+snapshot[`[checkbox] should handle none primitive values 1`] = `
+stdout:
+"? Select an option
+❯ ✘ date 1
+  ✘ date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ date 1
+❯ ✘ date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  ✘ date 1
+❯ ✔ date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option › date 2
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;

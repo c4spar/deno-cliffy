@@ -78,7 +78,7 @@ export class Number extends GenericSuggestions<number, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  protected getDefaultSettings(options: NumberOptions): NumberSettings {
+  public getDefaultSettings(options: NumberOptions): NumberSettings {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,

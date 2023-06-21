@@ -73,7 +73,7 @@ export class List extends GenericSuggestions<string[], string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  protected getDefaultSettings(options: ListOptions): ListSettings {
+  public getDefaultSettings(options: ListOptions): ListSettings {
     return {
       ...super.getDefaultSettings(options),
       separator: options.separator ?? ",",

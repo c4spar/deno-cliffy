@@ -73,7 +73,7 @@ export class Confirm extends GenericSuggestions<boolean, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  protected getDefaultSettings(options: ConfirmOptions): ConfirmSettings {
+  public getDefaultSettings(options: ConfirmOptions): ConfirmSettings {
     return {
       ...super.getDefaultSettings(options),
       active: options.active || "Yes",

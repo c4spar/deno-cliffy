@@ -72,7 +72,7 @@ export class Secret extends GenericInput<string, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  protected getDefaultSettings(options: SecretOptions): SecretSettings {
+  public getDefaultSettings(options: SecretOptions): SecretSettings {
     return {
       ...super.getDefaultSettings(options),
       label: options.label ?? "Secret",

@@ -64,7 +64,7 @@ export class Input extends GenericSuggestions<string, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  protected getDefaultSettings(options: InputOptions): InputSettings {
+  public getDefaultSettings(options: InputOptions): InputSettings {
     return {
       ...super.getDefaultSettings(options),
       minLength: options.minLength ?? 0,

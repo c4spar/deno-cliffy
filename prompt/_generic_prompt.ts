@@ -14,12 +14,7 @@ import {
 import { Figures } from "./_figures.ts";
 
 /** Static generic prompt interface. */
-export interface StaticGenericPrompt<
-  TValue,
-  TRawValue,
-  TOptions extends GenericPromptOptions<TValue, TRawValue> =
-    GenericPromptOptions<TValue, TRawValue>,
-> {
+export interface StaticGenericPrompt<TValue, TOptions> {
   /**
    * Inject prompt value. If called, the prompt doesn't prompt for an input and
    * returns immediately the injected value. Can be used for unit tests or pre
@@ -37,6 +32,17 @@ export interface StaticGenericPrompt<
   prompt(options: TOptions): Promise<TValue>;
 }
 
+export type InferPromptOptions<TPrompt extends GenericPrompt<any, any>> =
+  Parameters<
+    TPrompt["getDefaultSettings"]
+  >[0];
+
+export type InferPromptValue<TPrompt extends GenericPrompt<any, any>> = Awaited<
+  ReturnType<
+    TPrompt["prompt"]
+  >
+>;
+
 /** Generic prompt options. */
 export interface GenericPromptOptions<TValue, TRawValue> {
   /** The prompt message. */
@@ -47,7 +53,7 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   hideDefault?: boolean;
   /** Validate prompt value. */
   validate?: (value: TRawValue) => ValidateResult;
-  /** Format the display value. */
+  /** Transform input value to output value. */
   transform?: (value: TRawValue) => TValue | undefined;
   /** Show a hint below the prompt. */
   hint?: string;
@@ -124,7 +130,7 @@ export abstract class GenericPrompt<
     GenericPrompt.injectedValue = value;
   }
 
-  protected getDefaultSettings(
+  public getDefaultSettings(
     options: GenericPromptOptions<TValue, TRawValue>,
   ): GenericPromptSettings<TValue, TRawValue> {
     return {

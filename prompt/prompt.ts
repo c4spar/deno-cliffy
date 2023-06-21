@@ -4,8 +4,12 @@ import { Tty, tty } from "../ansi/tty.ts";
 import {
   GenericPrompt,
   GenericPromptOptions,
+  InferPromptOptions,
+  InferPromptValue,
   StaticGenericPrompt,
 } from "./_generic_prompt.ts";
+import type { Select, SelectOptions } from "./select.ts";
+import type { Checkbox, CheckboxOptions } from "./checkbox.ts";
 
 /**
  * Prompt options for the `prompt()` method.
@@ -24,21 +28,40 @@ import {
  */
 export type PromptOptions<
   TName extends string,
-  TStaticPrompt extends StaticGenericPrompt<any, any>,
+  TPrompt extends GenericPrompt<any, any> | StaticGenericPrompt<any, any>,
   TResult extends
-    & PromptResult<TName, TStaticPrompt>
+    & PromptResult<TName, TPrompt>
     & Record<string, unknown> = PromptResult<
       TName,
-      TStaticPrompt
+      TPrompt
     >,
-> = Id<TResult & PromptResult<TName, TStaticPrompt>> extends infer Result ?
+> = Id<TResult & PromptResult<TName, TPrompt>> extends infer Result ?
     & {
       name: TName;
-      type: TStaticPrompt;
       before?: PromptMiddleware<Result>;
       after?: PromptMiddleware<Result>;
     }
-    & Parameters<TStaticPrompt["prompt"]>[0]
+    & (TPrompt extends GenericPrompt<any, any> ? (
+        & InferPromptOptions<TPrompt>
+        & {
+          type: StaticGenericPrompt<
+            InferPromptValue<TPrompt>,
+            InferPromptOptions<TPrompt>
+          >;
+        }
+      )
+      : TPrompt extends typeof Checkbox<infer Value> ? (
+          & CheckboxOptions<unknown extends Value ? string : Value>
+          & { type: TPrompt }
+        )
+      : TPrompt extends typeof Select<infer Value> ? (
+          & SelectOptions<unknown extends Value ? string : Value>
+          & { type: TPrompt }
+        )
+      : (
+        & Parameters<TPrompt["prompt"]>[0]
+        & { type: TPrompt }
+      ))
   : never;
 
 /**
@@ -141,10 +164,19 @@ export type Next<TName extends keyof any> = (
 /** Single prompt result. */
 type PromptResult<
   TName extends string,
-  TStaticPrompt extends StaticGenericPrompt<any, any> | void,
+  TPrompt extends
+    | GenericPrompt<any, any>
+    | StaticGenericPrompt<any, any>
+    | void,
 > = string extends TName ? {}
-  : TStaticPrompt extends StaticGenericPrompt<any, any> ? {
-      [Key in TName]?: Awaited<ReturnType<TStaticPrompt["prompt"]>>;
+  : TPrompt extends typeof Checkbox<infer U> ? {
+      [Key in TName]?: Array<unknown extends U ? string : U>;
+    }
+  : TPrompt extends typeof Select<infer U> ? {
+      [Key in TName]?: unknown extends U ? string : U;
+    }
+  : TPrompt extends GenericPrompt<any, any> | StaticGenericPrompt<any, any> ? {
+      [Key in TName]?: Awaited<ReturnType<TPrompt["prompt"]>>;
     }
   : {};
 
@@ -275,30 +307,30 @@ export function prompt<
   TOptions21 extends GenericPromptOptions<any, any>,
   TOptions22 extends GenericPromptOptions<any, any>,
   TOptions23 extends GenericPromptOptions<any, any>,
-  TStaticPrompt0 extends StaticGenericPrompt<any, any, TOptions0>,
-  TStaticPrompt1 extends StaticGenericPrompt<any, any, TOptions1>,
-  TStaticPrompt2 extends StaticGenericPrompt<any, any, TOptions2>,
-  TStaticPrompt3 extends StaticGenericPrompt<any, any, TOptions3>,
-  TStaticPrompt4 extends StaticGenericPrompt<any, any, TOptions4>,
-  TStaticPrompt5 extends StaticGenericPrompt<any, any, TOptions5>,
-  TStaticPrompt6 extends StaticGenericPrompt<any, any, TOptions6>,
-  TStaticPrompt7 extends StaticGenericPrompt<any, any, TOptions7>,
-  TStaticPrompt8 extends StaticGenericPrompt<any, any, TOptions8>,
-  TStaticPrompt9 extends StaticGenericPrompt<any, any, TOptions9>,
-  TStaticPrompt10 extends StaticGenericPrompt<any, any, TOptions10>,
-  TStaticPrompt11 extends StaticGenericPrompt<any, any, TOptions11>,
-  TStaticPrompt12 extends StaticGenericPrompt<any, any, TOptions12>,
-  TStaticPrompt13 extends StaticGenericPrompt<any, any, TOptions13>,
-  TStaticPrompt14 extends StaticGenericPrompt<any, any, TOptions14>,
-  TStaticPrompt15 extends StaticGenericPrompt<any, any, TOptions15>,
-  TStaticPrompt16 extends StaticGenericPrompt<any, any, TOptions16>,
-  TStaticPrompt17 extends StaticGenericPrompt<any, any, TOptions17>,
-  TStaticPrompt18 extends StaticGenericPrompt<any, any, TOptions18>,
-  TStaticPrompt19 extends StaticGenericPrompt<any, any, TOptions19>,
-  TStaticPrompt20 extends StaticGenericPrompt<any, any, TOptions20>,
-  TStaticPrompt21 extends StaticGenericPrompt<any, any, TOptions21>,
-  TStaticPrompt22 extends StaticGenericPrompt<any, any, TOptions22>,
-  TStaticPrompt23 extends StaticGenericPrompt<any, any, TOptions23>,
+  TStaticPrompt0 extends StaticGenericPrompt<any, TOptions0>,
+  TStaticPrompt1 extends StaticGenericPrompt<any, TOptions1>,
+  TStaticPrompt2 extends StaticGenericPrompt<any, TOptions2>,
+  TStaticPrompt3 extends StaticGenericPrompt<any, TOptions3>,
+  TStaticPrompt4 extends StaticGenericPrompt<any, TOptions4>,
+  TStaticPrompt5 extends StaticGenericPrompt<any, TOptions5>,
+  TStaticPrompt6 extends StaticGenericPrompt<any, TOptions6>,
+  TStaticPrompt7 extends StaticGenericPrompt<any, TOptions7>,
+  TStaticPrompt8 extends StaticGenericPrompt<any, TOptions8>,
+  TStaticPrompt9 extends StaticGenericPrompt<any, TOptions9>,
+  TStaticPrompt10 extends StaticGenericPrompt<any, TOptions10>,
+  TStaticPrompt11 extends StaticGenericPrompt<any, TOptions11>,
+  TStaticPrompt12 extends StaticGenericPrompt<any, TOptions12>,
+  TStaticPrompt13 extends StaticGenericPrompt<any, TOptions13>,
+  TStaticPrompt14 extends StaticGenericPrompt<any, TOptions14>,
+  TStaticPrompt15 extends StaticGenericPrompt<any, TOptions15>,
+  TStaticPrompt16 extends StaticGenericPrompt<any, TOptions16>,
+  TStaticPrompt17 extends StaticGenericPrompt<any, TOptions17>,
+  TStaticPrompt18 extends StaticGenericPrompt<any, TOptions18>,
+  TStaticPrompt19 extends StaticGenericPrompt<any, TOptions19>,
+  TStaticPrompt20 extends StaticGenericPrompt<any, TOptions20>,
+  TStaticPrompt21 extends StaticGenericPrompt<any, TOptions21>,
+  TStaticPrompt22 extends StaticGenericPrompt<any, TOptions22>,
+  TStaticPrompt23 extends StaticGenericPrompt<any, TOptions23>,
   TResult = Id<
     & PromptResult<TName0, TStaticPrompt0>
     & PromptResult<TName1, TStaticPrompt1>
@@ -452,7 +484,7 @@ export function prompt<
 ): Promise<TResult> {
   return new PromptList(
     prompts as Array<
-      PromptOptions<string, StaticGenericPrompt<unknown, unknown>>
+      PromptOptions<string, GenericPrompt<unknown, unknown>>
     >,
     options,
   ).run(options?.initial) as Promise<TResult>;
@@ -467,14 +499,14 @@ class PromptList {
 
   private get prompt(): PromptOptions<
     string,
-    StaticGenericPrompt<unknown, unknown>
+    GenericPrompt<unknown, unknown>
   > {
     return this.prompts[this.index];
   }
 
   public constructor(
     private prompts: Array<
-      PromptOptions<string, StaticGenericPrompt<unknown, unknown>>
+      PromptOptions<string, GenericPrompt<unknown, unknown>>
     >,
     private options?: GlobalPromptOptions<any>,
   ) {
