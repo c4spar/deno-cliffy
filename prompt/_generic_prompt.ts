@@ -32,11 +32,13 @@ export interface StaticGenericPrompt<TValue, TOptions> {
   prompt(options: TOptions): Promise<TValue>;
 }
 
+// deno-lint-ignore no-explicit-any
 export type InferPromptOptions<TPrompt extends GenericPrompt<any, any>> =
   Parameters<
     TPrompt["getDefaultSettings"]
   >[0];
 
+// deno-lint-ignore no-explicit-any
 export type InferPromptValue<TPrompt extends GenericPrompt<any, any>> = Awaited<
   ReturnType<
     TPrompt["prompt"]
