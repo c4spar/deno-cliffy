@@ -24,6 +24,7 @@ export interface CheckboxOptions<TValue>
   keys?: CheckboxKeys;
   /** An array of child options. */
   options: Array<
+    | Extract<TValue, string | number>
     | Extract<WidenType<TValue>, string | number>
     | CheckboxOption<TValue>
     | CheckboxOptionGroup<TValue>
@@ -203,6 +204,7 @@ export class Checkbox<TValue> extends GenericList<
   protected mapOptions(
     promptOptions: CheckboxOptions<TValue>,
     options: Array<
+      | Extract<TValue, string | number>
       | Extract<WidenType<TValue>, string | number>
       | CheckboxOption<TValue>
       | CheckboxOptionGroup<TValue>

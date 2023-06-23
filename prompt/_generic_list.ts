@@ -20,6 +20,7 @@ export interface GenericListOptions<TValue, TReturnValue, TRawValue>
       UnsupportedInputOptions
     > {
   options: Array<
+    | Extract<TValue, string | number>
     | Extract<WidenType<TValue>, string | number>
     | GenericListOption<TValue>
     | GenericListOptionGroup<TValue, GenericListOption<TValue>>
@@ -102,6 +103,7 @@ export interface GenericListOptionGroup<
   name: string;
   /** An array of child options. */
   options: Array<
+    | Extract<TValue, string | number>
     | Extract<WidenType<TValue>, string | number>
     | TOption
     | this
@@ -233,6 +235,7 @@ export abstract class GenericList<
   protected abstract mapOptions(
     promptOptions: GenericListOptions<TValue, TReturnValue, TRawValue>,
     options: Array<
+      | Extract<TValue, string | number>
       | Extract<WidenType<TValue>, string | number>
       | GenericListOption<TValue>
       | GenericListOptionGroup<TValue, GenericListOption<TValue>>

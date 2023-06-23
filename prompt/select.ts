@@ -22,6 +22,7 @@ export interface SelectOptions<TValue>
   keys?: SelectKeys;
   /** An array of child options. */
   options: Array<
+    | Extract<TValue, string | number>
     | Extract<WidenType<TValue>, string | number>
     | SelectOption<TValue>
     | SelectOptionGroup<TValue>
@@ -143,6 +144,7 @@ export class Select<TValue> extends GenericList<
   protected mapOptions(
     promptOptions: SelectOptions<TValue>,
     options: Array<
+      | Extract<TValue, string | number>
       | Extract<WidenType<TValue>, string | number>
       | SelectOption<TValue>
       | SelectOptionGroup<TValue>
