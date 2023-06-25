@@ -241,7 +241,7 @@ export abstract class GenericList<
   ): Array<TOption | TGroup>;
 
   protected mapOption(
-    options: GenericListOptions<TValue, TReturnValue, TRawValue>,
+    _options: GenericListOptions<TValue, TReturnValue, TRawValue>,
     option: GenericListOption<TValue> | GenericListSeparatorOption,
   ): GenericListOptionSettings<TValue> {
     if (isOption(option)) {
