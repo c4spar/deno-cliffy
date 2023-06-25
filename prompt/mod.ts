@@ -1,17 +1,14 @@
 export {
-  type GenericPrompt,
   type GenericPromptKeys,
   type GenericPromptOptions,
   type StaticGenericPrompt,
   type ValidateResult,
 } from "./_generic_prompt.ts";
 export {
-  type GenericInput,
   type GenericInputKeys,
   type GenericInputPromptOptions,
 } from "./_generic_input.ts";
 export {
-  type GenericList,
   type GenericListKeys,
   type GenericListOption,
   type GenericListOptionGroup,
