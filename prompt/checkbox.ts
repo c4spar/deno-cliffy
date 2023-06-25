@@ -438,9 +438,7 @@ export class Checkbox<TValue> extends GenericList<
    * @param value Output value.
    */
   protected format(value: Array<TValue>): string {
-    return value.map((val) =>
-      this.settings.format?.(val) ?? this.getOptionByValue(val)?.name ?? val
-    )
+    return value.map((val) => this.getOptionByValue(val)?.name ?? String(val))
       .join(", ");
   }
 }

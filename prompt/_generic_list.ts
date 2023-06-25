@@ -50,8 +50,6 @@ export interface GenericListOptions<TValue, TReturnValue, TRawValue>
   groupIcon?: string | boolean;
   /** Change opened group icon. Default is `📂`. */
   groupOpenIcon?: string | boolean;
-  /** Format the display value. */
-  format?: (value: TValue) => string;
 }
 
 /** Generic list prompt settings. */
@@ -75,7 +73,6 @@ export interface GenericListSettings<
   groupPointer: string;
   groupIcon: string | false;
   groupOpenIcon: string | false;
-  format?: (value: TValue) => string;
 }
 
 /** Generic list separator option options. */
@@ -251,7 +248,7 @@ export abstract class GenericList<
       return {
         value: option.value,
         name: typeof option.name === "undefined"
-          ? options.format?.(option.value) ?? String(option.value)
+          ? String(option.value)
           : option.name,
         disabled: "disabled" in option && option.disabled === true,
         indentLevel: 0,
