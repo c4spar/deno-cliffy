@@ -845,7 +845,11 @@ function flatMatchedOptions<
   return result;
 }
 
-/** @deprecated Use `Array<string | GenericListOption>` instead. */
+/**
+ * GenericList options type.
+ *
+ * @deprecated Use `Array<string | GenericListOption>` instead.
+ */
 export type GenericListValueOptions = Array<string | GenericListOption<string>>;
 /** @deprecated Use `Array<GenericListOptionSettings>` instead. */
 export type GenericListValueSettings = Array<GenericListOptionSettings<string>>;

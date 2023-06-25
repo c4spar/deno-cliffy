@@ -101,6 +101,8 @@ export interface CheckboxKeys extends GenericListKeys {
 /**
  * Checkbox prompt representation.
  *
+ * Simple prompt:
+ *
  * ```ts
  * import { Checkbox } from "./mod.ts";
  *
@@ -110,7 +112,42 @@ export interface CheckboxKeys extends GenericListKeys {
  * });
  * ```
  *
- * Options can be also grouped:
+ * Mixed option types:
+ *
+ * ```ts
+ * import { Checkbox } from "./mod.ts";
+ *
+ * const values: Array<string | number> = await Checkbox.prompt<string | number>({
+ *   message: "Pick some colors",
+ *   options: [1, 2, "3", "4"],
+ * });
+ * ```
+ *
+ * None primitive option types:
+ *
+ * ```ts
+ * import { Checkbox } from "./mod.ts";
+ *
+ * const dates: Array<Date> = await Checkbox.prompt({
+ *   message: "Pick some dates",
+ *   options: [
+ *     {
+ *       name: "Date 1",
+ *       value: new Date(100000),
+ *     },
+ *     {
+ *       name: "Date 2",
+ *       value: new Date(200000),
+ *     },
+ *     {
+ *       name: "Date 3",
+ *       value: new Date(300000),
+ *     },
+ *   ],
+ * });
+ * ```
+ *
+ * Grouped options:
  *
  * ```ts
  * import { Checkbox } from "./mod.ts";
