@@ -5,6 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
+import { WidenType } from "./_utils.ts";
 import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
@@ -12,13 +13,18 @@ import { distance } from "../_utils/distance.ts";
 type UnsupportedInputOptions = "suggestions" | "list";
 
 /** Generic list prompt options. */
-export interface GenericListOptions<TValue, TRawValue> extends
-  Omit<
-    GenericInputPromptOptions<TValue, TRawValue>,
-    UnsupportedInputOptions
-  > {
+export interface GenericListOptions<TValue, TReturnValue, TRawValue>
+  extends
+    Omit<
+      GenericInputPromptOptions<TReturnValue, TRawValue>,
+      UnsupportedInputOptions
+    > {
   options: Array<
-    string | GenericListOption | GenericListOptionGroup<GenericListOption>
+    | Extract<TValue, string | number>
+    | Extract<WidenType<TValue>, string | number>
+    | GenericListOption<TValue>
+    | GenericListOptionGroup<TValue, GenericListOption<TValue>>
+    | GenericListSeparatorOption
   >;
   /** Keymap to assign key names to prompt actions. */
   keys?: GenericListKeys;
@@ -49,10 +55,11 @@ export interface GenericListOptions<TValue, TRawValue> extends
 /** Generic list prompt settings. */
 export interface GenericListSettings<
   TValue,
+  TReturnValue,
   TRawValue,
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
-> extends GenericInputPromptSettings<TValue, TRawValue> {
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
+> extends GenericInputPromptSettings<TReturnValue, TRawValue> {
   options: Array<TOption | TGroup>;
   keys: GenericListKeys;
   listPointer: string;
@@ -68,10 +75,16 @@ export interface GenericListSettings<
   groupOpenIcon: string | false;
 }
 
+/** Generic list separator option options. */
+export interface GenericListSeparatorOption {
+  /** The separator label. */
+  name: string;
+}
+
 /** Generic list option options. */
-export interface GenericListOption {
+export interface GenericListOption<TValue> {
   /** The option value. */
-  value: string;
+  value: TValue;
   /** The option label. */
   name?: string;
   /** Disable option. Disabled options are displayed but cannot be selected. */
@@ -79,27 +92,37 @@ export interface GenericListOption {
 }
 
 /** Generic list option group options. */
-export interface GenericListOptionGroup<TOption extends GenericListOption> {
+export interface GenericListOptionGroup<
+  TValue,
+  TOption extends GenericListOption<TValue>,
+> {
   /** The option label. */
   name: string;
   /** An array of child options. */
-  options: Array<string | TOption | this>;
+  options: Array<
+    | Extract<TValue, string | number>
+    | Extract<WidenType<TValue>, string | number>
+    | TOption
+    | this
+    | GenericListSeparatorOption
+  >;
   /** Disable option. Disabled options are displayed but cannot be selected. */
   disabled?: boolean;
 }
 
 /** Generic list option settings. */
-export interface GenericListOptionSettings extends GenericListOption {
+export interface GenericListOptionSettings<TValue>
+  extends GenericListOption<TValue> {
   name: string;
-  value: string;
   disabled: boolean;
   indentLevel: number;
 }
 
 /** Generic list option group settings. */
 export interface GenericListOptionGroupSettings<
-  TOption extends GenericListOptionSettings,
-> extends GenericListOptionGroup<TOption> {
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+> extends GenericListOptionGroup<TValue, TOption> {
   disabled: boolean;
   indentLevel: number;
   options: Array<TOption | this>;
@@ -122,23 +145,26 @@ export interface GenericListKeys extends GenericInputKeys {
 }
 
 interface MatchedOption<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 > {
   option: TOption | TGroup;
   distance: number;
-  children: Array<MatchedOption<TOption, TGroup>>;
+  children: Array<MatchedOption<TValue, TOption, TGroup>>;
 }
 
 /** Generic list prompt representation. */
 export abstract class GenericList<
   TValue,
+  TReturnValue,
   TRawValue,
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
-> extends GenericInput<TValue, TRawValue> {
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
+> extends GenericInput<TReturnValue, TRawValue> {
   protected abstract readonly settings: GenericListSettings<
     TValue,
+    TReturnValue,
     TRawValue,
     TOption,
     TGroup
@@ -157,17 +183,17 @@ export abstract class GenericList<
    *
    * @param label Separator label.
    */
-  public static separator(label = "------------"): GenericListOption {
-    return { value: label, disabled: true };
+  public static separator(label = "------------"): GenericListSeparatorOption {
+    return { name: label };
   }
 
-  protected getDefaultSettings(
+  public getDefaultSettings(
     {
       groupIcon = true,
       groupOpenIcon = groupIcon,
       ...options
-    }: GenericListOptions<TValue, TRawValue>,
-  ): GenericListSettings<TValue, TRawValue, TOption, TGroup> {
+    }: GenericListOptions<TValue, TReturnValue, TRawValue>,
+  ): GenericListSettings<TValue, TReturnValue, TRawValue, TOption, TGroup> {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,
@@ -204,29 +230,44 @@ export abstract class GenericList<
   }
 
   protected abstract mapOptions(
-    promptOptions: GenericListOptions<TValue, TRawValue>,
+    promptOptions: GenericListOptions<TValue, TReturnValue, TRawValue>,
     options: Array<
-      string | GenericListOption | GenericListOptionGroup<GenericListOption>
+      | Extract<TValue, string | number>
+      | Extract<WidenType<TValue>, string | number>
+      | GenericListOption<TValue>
+      | GenericListOptionGroup<TValue, GenericListOption<TValue>>
+      | GenericListSeparatorOption
     >,
   ): Array<TOption | TGroup>;
 
   protected mapOption(
-    _options: GenericListOptions<TValue, TRawValue>,
-    option: GenericListOption,
-  ): GenericListOptionSettings {
-    return {
-      value: option.value,
-      name: typeof option.name === "undefined" ? option.value : option.name,
-      disabled: !!option.disabled,
-      indentLevel: 0,
-    };
+    _options: GenericListOptions<TValue, TReturnValue, TRawValue>,
+    option: GenericListOption<TValue> | GenericListSeparatorOption,
+  ): GenericListOptionSettings<TValue> {
+    if (isOption(option)) {
+      return {
+        value: option.value,
+        name: typeof option.name === "undefined"
+          ? String(option.value)
+          : option.name,
+        disabled: "disabled" in option && option.disabled === true,
+        indentLevel: 0,
+      };
+    } else {
+      return {
+        value: null as TValue,
+        name: option.name,
+        disabled: true,
+        indentLevel: 0,
+      };
+    }
   }
 
   protected mapOptionGroup(
-    options: GenericListOptions<TValue, TRawValue>,
-    option: GenericListOptionGroup<GenericListOption>,
+    options: GenericListOptions<TValue, TReturnValue, TRawValue>,
+    option: GenericListOptionGroup<TValue, GenericListOption<TValue>>,
     recursive = true,
-  ): GenericListOptionGroupSettings<GenericListOptionSettings> {
+  ): GenericListOptionGroupSettings<TValue, GenericListOptionSettings<TValue>> {
     return {
       name: option.name,
       disabled: !!option.disabled,
@@ -240,7 +281,7 @@ export abstract class GenericList<
     let options: Array<TOption | TGroup> = this.getCurrentOptions().slice();
 
     if (input.length) {
-      const matches = matchOptions<TOption, TGroup>(
+      const matches = matchOptions<TValue, TOption, TGroup>(
         input,
         this.getCurrentOptions(),
       );
@@ -436,7 +477,7 @@ export abstract class GenericList<
     option: TOption | TGroup,
     isSelected?: boolean,
   ): string {
-    let label: string = option.name;
+    let label = option.name;
 
     if (this.isBackButton(option)) {
       label = this.getBreadCrumb();
@@ -474,7 +515,7 @@ export abstract class GenericList<
     );
   }
 
-  protected getListIndex(value?: string) {
+  protected getListIndex(value?: TValue) {
     return Math.max(
       0,
       typeof value === "undefined"
@@ -501,7 +542,7 @@ export abstract class GenericList<
    * @param value Value of the option.
    */
   protected getOptionByValue(
-    value: string,
+    value: TValue,
   ): TOption | undefined {
     const option = this.options.find((option) =>
       isOption(option) && option.value === value
@@ -691,30 +732,42 @@ export abstract class GenericList<
 }
 
 export function isOption<
-  TOption extends GenericListOption,
+  TValue,
+  TOption extends GenericListOption<TValue>,
 >(
-  option: TOption | GenericListOptionGroup<GenericListOption> | undefined,
+  option:
+    | TOption
+    | GenericListOptionGroup<TValue, GenericListOption<TValue>>
+    | GenericListSeparatorOption
+    | undefined,
 ): option is TOption {
   return !!option && typeof option === "object" && "value" in option;
 }
 
 export function isOptionGroup<
-  TGroup extends GenericListOptionGroup<GenericListOption>,
+  TValue,
+  TGroup extends GenericListOptionGroup<TValue, GenericListOption<TValue>>,
 >(
-  option: TGroup | GenericListOption | string | undefined,
+  option:
+    | TGroup
+    | TValue
+    | GenericListOption<TValue>
+    | GenericListSeparatorOption
+    | undefined,
 ): option is TGroup {
-  return typeof option === "object" && "options" in option &&
-    option.options.length > 0;
+  return option !== null && typeof option === "object" && "options" in option &&
+    Array.isArray(option.options);
 }
 
 function matchOptions<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 >(
   searchInput: string,
   options: Array<TOption | TGroup>,
-): Array<MatchedOption<TOption, TGroup>> {
-  const matched: Array<MatchedOption<TOption, TGroup>> = [];
+): Array<MatchedOption<TValue, TOption, TGroup>> {
+  const matched: Array<MatchedOption<TValue, TOption, TGroup>> = [];
 
   for (const option of options) {
     if (isOptionGroup(option)) {
@@ -743,16 +796,17 @@ function matchOptions<
   return matched.sort(sortByDistance);
 
   function sortByDistance(
-    a: MatchedOption<TOption, TGroup>,
-    b: MatchedOption<TOption, TGroup>,
+    a: MatchedOption<TValue, TOption, TGroup>,
+    b: MatchedOption<TValue, TOption, TGroup>,
   ): number {
     return a.distance - b.distance;
   }
 }
 
 function matchOption<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 >(
   inputString: string,
   option: TOption | TGroup,
@@ -760,7 +814,7 @@ function matchOption<
   return matchInput(inputString, option.name) || (
     isOption(option) &&
     option.name !== option.value &&
-    matchInput(inputString, option.value)
+    matchInput(inputString, String(option.value))
   );
 }
 
@@ -771,10 +825,11 @@ function matchInput(inputString: string, value: string): boolean {
 }
 
 function flatMatchedOptions<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 >(
-  matches: Array<MatchedOption<TOption, TGroup>>,
+  matches: Array<MatchedOption<TValue, TOption, TGroup>>,
   indentLevel = 0,
   result: Array<TOption | TGroup> = [],
 ): Array<TOption | TGroup> {
@@ -788,6 +843,6 @@ function flatMatchedOptions<
 }
 
 /** @deprecated Use `Array<string | GenericListOption>` instead. */
-export type GenericListValueOptions = Array<string | GenericListOption>;
+export type GenericListValueOptions = Array<string | GenericListOption<string>>;
 /** @deprecated Use `Array<GenericListOptionSettings>` instead. */
-export type GenericListValueSettings = Array<GenericListOptionSettings>;
+export type GenericListValueSettings = Array<GenericListOptionSettings<string>>;

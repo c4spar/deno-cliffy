@@ -63,7 +63,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
       : "";
   }
 
-  protected getDefaultSettings(options: ToggleOptions): ToggleSettings {
+  public getDefaultSettings(options: ToggleOptions): ToggleSettings {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,

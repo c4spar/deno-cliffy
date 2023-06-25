@@ -1,10 +1,11 @@
 import { ansi } from "../../../ansi/ansi.ts";
-import { assertType, IsExact } from "../../../dev_deps.ts";
+import { assertEquals, assertType, IsExact } from "../../../dev_deps.ts";
 import { Checkbox, CheckboxOptions } from "../../checkbox.ts";
 import { Confirm } from "../../confirm.ts";
 import { Input } from "../../input.ts";
 import { Number } from "../../number.ts";
 import { prompt, PromptMiddleware, PromptOptions } from "../../prompt.ts";
+import { Select } from "../../select.ts";
 import { Toggle } from "../../toggle.ts";
 import { snapshotTest } from "../../../testing/snapshot.ts";
 
@@ -38,6 +39,9 @@ await snapshotTest({
         .cursorDown
         .text(" ")
         .text("\n")
+        // select
+        .cursorDown
+        .text("\n")
         .toArray(),
     },
   },
@@ -61,32 +65,45 @@ await snapshotTest({
       },
     };
 
-    const result = await prompt([{
-      name: "input",
-      type: Input,
-      message: "Enter some text",
-      default: "default value",
-    }, {
-      name: "number",
-      type: Number,
-      message: "Enter a number",
-    }, {
-      name: "confirm",
-      type: Confirm,
-      message: "Please confirm",
-    }, {
-      name: "toggle",
-      type: Toggle,
-      message: "Please toggle",
-      hint: "some hint",
-      default: false,
-    }, checkboxOptions], {
+    const result = await prompt([
+      {
+        name: "input",
+        type: Input,
+        message: "Enter some text",
+        default: "default value",
+      },
+      {
+        name: "number",
+        type: Number,
+        message: "Enter a number",
+      },
+      {
+        name: "confirm",
+        type: Confirm,
+        message: "Please confirm",
+      },
+      {
+        name: "toggle",
+        type: Toggle,
+        message: "Please toggle",
+        hint: "some hint",
+        default: false,
+      },
+      checkboxOptions,
+      {
+        name: "select",
+        type: Select<number>,
+        message: "Select a value",
+        options: [1, 2, 3],
+      },
+    ], {
       reader: Deno.stdin,
       writer: Deno.stderr,
     });
 
     assertType<
       IsExact<typeof result, {
+        select?: number | undefined;
         checkbox?: string[] | undefined;
         input?: string | undefined;
         number?: number | undefined;
@@ -94,6 +111,15 @@ await snapshotTest({
         toggle?: boolean | undefined;
       }>
     >(true);
+
+    assertEquals(result, {
+      input: "foo",
+      number: 43,
+      confirm: true,
+      toggle: true,
+      checkbox: ["bar", "baz"],
+      select: 2,
+    });
 
     assertType<
       IsExact<
@@ -107,7 +133,7 @@ await snapshotTest({
           after?: PromptMiddleware<
             { checkbox?: Array<string>; input?: string }
           >;
-        } & CheckboxOptions
+        } & CheckboxOptions<string>
       >
     >(true);
 

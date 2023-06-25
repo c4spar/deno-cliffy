@@ -109,7 +109,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   protected suggestions: Array<string | number> = [];
   #hasReadPermissions?: boolean;
 
-  protected getDefaultSettings(
+  public getDefaultSettings(
     options: GenericSuggestionsOptions<TValue, TRawValue>,
   ): GenericSuggestionsSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);

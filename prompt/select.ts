@@ -1,3 +1,4 @@
+import { WidenType } from "./_utils.ts";
 import { brightBlue, underline } from "./deps.ts";
 import {
   GenericList,
@@ -15,36 +16,47 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 import { getFiguresByKeys } from "./_figures.ts";
 
 /** Select prompt options. */
-export interface SelectOptions extends GenericListOptions<string, string> {
+export interface SelectOptions<TValue>
+  extends GenericListOptions<TValue, TValue, TValue> {
   /** Keymap to assign key names to prompt actions. */
   keys?: SelectKeys;
   /** An array of child options. */
-  options: Array<string | SelectOption | SelectOptionGroup>;
+  options: Array<
+    | Extract<TValue, string | number>
+    | Extract<WidenType<TValue>, string | number>
+    | SelectOption<TValue>
+    | SelectOptionGroup<TValue>
+  >;
 }
 
 /** Select prompt settings. */
-export interface SelectSettings extends
+export interface SelectSettings<TValue> extends
   GenericListSettings<
-    string,
-    string,
-    SelectOptionSettings,
-    SelectOptionGroupSettings
+    TValue,
+    TValue,
+    TValue,
+    SelectOptionSettings<TValue>,
+    SelectOptionGroupSettings<TValue>
   > {
   keys: SelectKeys;
 }
 
 /** Select option options. */
-export type SelectOption = GenericListOption;
+export type SelectOption<TValue> = GenericListOption<TValue>;
 
 /** Select option group options. */
-export type SelectOptionGroup = GenericListOptionGroup<GenericListOption>;
+export type SelectOptionGroup<TValue> = GenericListOptionGroup<
+  TValue,
+  GenericListOption<TValue>
+>;
 
 /** Select option settings. */
-export type SelectOptionSettings = GenericListOptionSettings;
+export type SelectOptionSettings<TValue> = GenericListOptionSettings<TValue>;
 
 /** Select option group settings. */
-export type SelectOptionGroupSettings = GenericListOptionGroupSettings<
-  SelectOptionSettings
+export type SelectOptionGroupSettings<TValue> = GenericListOptionGroupSettings<
+  TValue,
+  SelectOptionSettings<TValue>
 >;
 
 /** Select prompt keymap. */
@@ -79,20 +91,25 @@ export type SelectKeys = GenericListKeys;
  * });
  * ```
  */
-export class Select extends GenericList<
-  string,
-  string,
-  SelectOptionSettings,
-  SelectOptionGroupSettings
+export class Select<TValue> extends GenericList<
+  TValue,
+  TValue,
+  TValue,
+  SelectOptionSettings<TValue>,
+  SelectOptionGroupSettings<TValue>
 > {
-  protected readonly settings: SelectSettings;
-  protected options: Array<SelectOptionSettings | SelectOptionGroupSettings>;
+  protected readonly settings: SelectSettings<TValue>;
+  protected options: Array<
+    SelectOptionSettings<TValue> | SelectOptionGroupSettings<TValue>
+  >;
   protected listIndex: number;
   protected listOffset: number;
 
   /** Execute the prompt with provided options. */
-  public static prompt(options: SelectOptions): Promise<string> {
-    return new this(options).prompt();
+  public static prompt<TValue>(
+    options: SelectOptions<TValue>,
+  ): Promise<WidenType<TValue>> {
+    return new this(options).prompt() as Promise<WidenType<TValue>>;
   }
 
   /**
@@ -106,7 +123,7 @@ export class Select extends GenericList<
     GenericPrompt.inject(value);
   }
 
-  constructor(options: SelectOptions) {
+  constructor(options: SelectOptions<TValue>) {
     super();
     this.settings = this.getDefaultSettings(options);
     this.options = this.settings.options.slice();
@@ -114,26 +131,33 @@ export class Select extends GenericList<
     this.listOffset = this.getPageOffset(this.listIndex);
   }
 
-  protected getDefaultSettings(options: SelectOptions): SelectSettings {
+  public getDefaultSettings(
+    options: SelectOptions<TValue>,
+  ): SelectSettings<TValue> {
     return {
       ...super.getDefaultSettings(options),
       options: this.mapOptions(options, options.options),
     };
   }
 
-  /**
-   * Map string option values to options and set option defaults.
-   * @param promptOptions Select options.
-   */
+  /** Map string option values to options and set option defaults. */
   protected mapOptions(
-    promptOptions: SelectOptions,
-    options: Array<string | SelectOption | SelectOptionGroup>,
-  ): Array<SelectOptionSettings | SelectOptionGroupSettings> {
+    promptOptions: SelectOptions<TValue>,
+    options: Array<
+      | Extract<TValue, string | number>
+      | Extract<WidenType<TValue>, string | number>
+      | SelectOption<TValue>
+      | SelectOptionGroup<TValue>
+    >,
+  ): Array<SelectOptionSettings<TValue> | SelectOptionGroupSettings<TValue>> {
     return options.map((option) =>
-      isOptionGroup(option)
+      isSelectOptionGroup(option)
         ? this.mapOptionGroup(promptOptions, option)
-        : typeof option === "string"
-        ? this.mapOption(promptOptions, { value: option })
+        : typeof option === "string" || typeof option === "number"
+        ? this.mapOption(
+          promptOptions,
+          { value: option as TValue },
+        )
         : this.mapOption(promptOptions, option)
     );
   }
@@ -160,10 +184,10 @@ export class Select extends GenericList<
   }
 
   /** Get value of selected option. */
-  protected getValue(): string {
+  protected getValue(): TValue {
     const option = this.options[this.listIndex];
     assertIsOption(option);
-    return option?.value ?? this.settings.default;
+    return option.value;
   }
 
   /**
@@ -171,13 +195,10 @@ export class Select extends GenericList<
    * @param value User input value.
    * @return True on success, false or error message on error.
    */
-  protected validate(value: string): boolean | string {
-    return typeof value === "string" &&
-      value.length > 0 &&
-      this.options.findIndex((
-          option: SelectOptionSettings | SelectOptionGroupSettings,
-        ) => isOption(option) && option.value === value
-        ) !== -1;
+  protected validate(value: TValue): boolean | string {
+    return this.options.findIndex((
+      option: SelectOptionSettings<TValue> | SelectOptionGroupSettings<TValue>,
+    ) => isOption(option) && option.value === value) !== -1;
   }
 
   /**
@@ -185,27 +206,35 @@ export class Select extends GenericList<
    * @param value Input value.
    * @return Output value.
    */
-  protected transform(value: string): string {
-    return value.trim();
+  protected transform(value: TValue): TValue {
+    return value;
   }
 
   /**
    * Format output value.
    * @param value Output value.
    */
-  protected format(value: string): string {
-    return this.getOptionByValue(value)?.name ?? value;
+  protected format(value: TValue): string {
+    return this.getOptionByValue(value)?.name ?? String(value);
   }
 }
 
 function assertIsOption<
-  TOption extends GenericListOption,
+  TValue,
+  TOption extends GenericListOption<TValue>,
 >(
-  option: TOption | GenericListOptionGroup<GenericListOption>,
+  option: TOption | GenericListOptionGroup<TValue, GenericListOption<TValue>>,
 ): asserts option is TOption {
   if (!isOption(option)) {
     throw new Error("Expected an option but got an option group.");
   }
+}
+
+export function isSelectOptionGroup(
+  option: unknown,
+  // deno-lint-ignore no-explicit-any
+): option is SelectOptionGroup<any> {
+  return isOptionGroup(option);
 }
 
 /**
@@ -213,7 +242,7 @@ function assertIsOption<
  * @deprecated Use `Array<string | SelectOption | SelectOptionGroup>` instead.
  */
 export type SelectValueOptions = Array<
-  string | SelectOption | SelectOptionGroup
+  string | SelectOption<string> | SelectOptionGroup<string>
 >;
 
 /**
@@ -221,5 +250,5 @@ export type SelectValueOptions = Array<
  * @deprecated Use `Array<SelectOptionSettings | SelectOptionGroupSettings>` instead.
  */
 export type SelectValueSettings = Array<
-  SelectOptionSettings | SelectOptionGroupSettings
+  SelectOptionSettings<string> | SelectOptionGroupSettings<string>
 >;

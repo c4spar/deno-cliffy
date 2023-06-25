@@ -8,7 +8,8 @@ stdout:
   number: 43,
   confirm: true,
   toggle: true,
-  checkbox: [ "bar", "baz" ]
+  checkbox: [ "bar", "baz" ],
+  select: 2
 }
 '
 stderr:
@@ -54,5 +55,14 @@ stderr:
   ✔ Bar
 ❯ ✔ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option › Bar, Baz
+\\x1b[?25h\\x1b[?25h\\x1b[?25h? Select a value
+❯ 1
+  2
+  3\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select a value
+  1
+❯ 2
+  3\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select a value › 2
 \\x1b[?25h\\x1b[?25h\\x1b[?25h"
 `;

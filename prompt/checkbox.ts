@@ -1,4 +1,5 @@
 import type { KeyCode } from "../keycode/mod.ts";
+import { WidenType } from "./_utils.ts";
 import { brightBlue, dim, green, red } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 import {
@@ -9,6 +10,7 @@ import {
   GenericListOptionGroupSettings,
   GenericListOptions,
   GenericListOptionSettings,
+  GenericListSeparatorOption,
   GenericListSettings,
   isOption,
   isOptionGroup,
@@ -16,12 +18,18 @@ import {
 import { GenericPrompt } from "./_generic_prompt.ts";
 
 /** Checkbox prompt options. */
-export interface CheckboxOptions
-  extends GenericListOptions<Array<string>, Array<string>> {
+export interface CheckboxOptions<TValue>
+  extends GenericListOptions<TValue, Array<TValue>, Array<TValue>> {
   /** Keymap to assign key names to prompt actions. */
   keys?: CheckboxKeys;
   /** An array of child options. */
-  options: Array<string | CheckboxOption | CheckboxOptionGroup>;
+  options: Array<
+    | Extract<TValue, string | number>
+    | Extract<WidenType<TValue>, string | number>
+    | CheckboxOption<TValue>
+    | CheckboxOptionGroup<TValue>
+    | GenericListSeparatorOption
+  >;
   /** If enabled, the user needs to press enter twice. Default is `true`. */
   confirmSubmit?: boolean;
   /** Change check icon. Default is `green(Figures.TICK)`. */
@@ -37,12 +45,13 @@ export interface CheckboxOptions
 }
 
 /** Checkbox prompt settings. */
-interface CheckboxSettings extends
+interface CheckboxSettings<TValue> extends
   GenericListSettings<
-    Array<string>,
-    Array<string>,
-    CheckboxOptionSettings,
-    CheckboxOptionGroupSettings
+    TValue,
+    Array<TValue>,
+    Array<TValue>,
+    CheckboxOptionSettings<TValue>,
+    CheckboxOptionGroupSettings<TValue>
   > {
   confirmSubmit: boolean;
   check: string;
@@ -54,7 +63,7 @@ interface CheckboxSettings extends
 }
 
 /** Checkbox option options. */
-export interface CheckboxOption extends GenericListOption {
+export interface CheckboxOption<TValue> extends GenericListOption<TValue> {
   /** Set checked status. */
   checked?: boolean;
   /** Change option icon. */
@@ -62,21 +71,23 @@ export interface CheckboxOption extends GenericListOption {
 }
 
 /** Checkbox option group options. */
-export interface CheckboxOptionGroup
-  extends GenericListOptionGroup<CheckboxOption> {
+export interface CheckboxOptionGroup<TValue>
+  extends GenericListOptionGroup<TValue, CheckboxOption<TValue>> {
   /** Change option icon. */
   icon?: boolean;
 }
 
 /** Checkbox option settings. */
-export interface CheckboxOptionSettings extends GenericListOptionSettings {
+export interface CheckboxOptionSettings<TValue>
+  extends GenericListOptionSettings<TValue> {
   checked: boolean;
   icon: boolean;
 }
 
 /** Checkbox option group settings. */
-export interface CheckboxOptionGroupSettings
-  extends GenericListOptionGroupSettings<CheckboxOptionSettings> {
+export interface CheckboxOptionGroupSettings<TValue>
+  extends
+    GenericListOptionGroupSettings<TValue, CheckboxOptionSettings<TValue>> {
   readonly checked: boolean;
   icon: boolean;
 }
@@ -116,15 +127,16 @@ export interface CheckboxKeys extends GenericListKeys {
  * });
  * ```
  */
-export class Checkbox extends GenericList<
-  Array<string>,
-  Array<string>,
-  CheckboxOptionSettings,
-  CheckboxOptionGroupSettings
+export class Checkbox<TValue> extends GenericList<
+  TValue,
+  Array<TValue>,
+  Array<TValue>,
+  CheckboxOptionSettings<TValue>,
+  CheckboxOptionGroupSettings<TValue>
 > {
-  protected readonly settings: CheckboxSettings;
+  protected readonly settings: CheckboxSettings<TValue>;
   protected options: Array<
-    CheckboxOptionSettings | CheckboxOptionGroupSettings
+    CheckboxOptionSettings<TValue> | CheckboxOptionGroupSettings<TValue>
   >;
   protected listIndex: number;
   protected listOffset: number;
@@ -135,8 +147,10 @@ export class Checkbox extends GenericList<
    *
    * @param options Checkbox options.
    */
-  public static prompt(options: CheckboxOptions): Promise<Array<string>> {
-    return new this(options).prompt();
+  public static prompt<TValue>(
+    options: CheckboxOptions<TValue>,
+  ): Promise<Array<WidenType<TValue>>> {
+    return new this(options).prompt() as Promise<Array<WidenType<TValue>>>;
   }
 
   /**
@@ -144,12 +158,6 @@ export class Checkbox extends GenericList<
    *
    * @param label Separator label.
    */
-  public static separator(label?: string): CheckboxOption {
-    return {
-      ...super.separator(label),
-      icon: false,
-    };
-  }
 
   /**
    * Inject prompt value. If called, the prompt doesn't prompt for an input and
@@ -158,11 +166,11 @@ export class Checkbox extends GenericList<
    *
    * @param value Input value.
    */
-  public static inject(value: Array<string>): void {
+  public static inject<TValue>(value: Array<TValue>): void {
     GenericPrompt.inject(value);
   }
 
-  constructor(options: CheckboxOptions) {
+  constructor(options: CheckboxOptions<TValue>) {
     super();
     this.settings = this.getDefaultSettings(options);
     this.options = this.settings.options.slice();
@@ -170,7 +178,9 @@ export class Checkbox extends GenericList<
     this.listOffset = this.getPageOffset(this.listIndex);
   }
 
-  protected getDefaultSettings(options: CheckboxOptions): CheckboxSettings {
+  public getDefaultSettings(
+    options: CheckboxOptions<TValue>,
+  ): CheckboxSettings<TValue> {
     const settings = super.getDefaultSettings(options);
     return {
       confirmSubmit: true,
@@ -190,42 +200,57 @@ export class Checkbox extends GenericList<
     };
   }
 
-  /**
-   * Map string option values to options and set option defaults.
-   *
-   * @param promptOptions Checkbox options.
-   */
+  /** Map string option values to options and set option defaults. */
   protected mapOptions(
-    promptOptions: CheckboxOptions,
-    options: Array<string | CheckboxOption | CheckboxOptionGroup>,
-  ): Array<CheckboxOptionSettings | CheckboxOptionGroupSettings> {
+    promptOptions: CheckboxOptions<TValue>,
+    options: Array<
+      | Extract<TValue, string | number>
+      | Extract<WidenType<TValue>, string | number>
+      | CheckboxOption<TValue>
+      | CheckboxOptionGroup<TValue>
+      | GenericListSeparatorOption
+    >,
+  ): Array<
+    CheckboxOptionSettings<TValue> | CheckboxOptionGroupSettings<TValue>
+  > {
     return options.map((option) =>
-      isOptionGroup(option)
+      typeof option === "string" || typeof option === "number"
+        ? this.mapOption(
+          promptOptions,
+          { value: option as TValue },
+        )
+        : isCheckboxOptionGroup(option)
         ? this.mapOptionGroup(promptOptions, option)
-        : typeof option === "string"
-        ? this.mapOption(promptOptions, { value: option })
         : this.mapOption(promptOptions, option)
     );
   }
 
   protected mapOption(
-    options: CheckboxOptions,
-    option: CheckboxOption,
-  ): CheckboxOptionSettings {
-    return {
-      ...super.mapOption(options, option),
-      checked: typeof option.checked === "undefined" && options.default &&
-          options.default.indexOf(option.value) !== -1
-        ? true
-        : !!option.checked,
-      icon: typeof option.icon === "undefined" ? true : option.icon,
-    };
+    options: CheckboxOptions<TValue>,
+    option: CheckboxOption<TValue> | GenericListSeparatorOption,
+  ): CheckboxOptionSettings<TValue> {
+    if (isOption(option)) {
+      return {
+        ...super.mapOption(options, option),
+        checked: typeof option.checked === "undefined" && options.default &&
+            options.default.indexOf(option.value) !== -1
+          ? true
+          : !!option.checked,
+        icon: typeof option.icon === "undefined" ? true : option.icon,
+      };
+    } else {
+      return {
+        ...super.mapOption(options, option),
+        checked: false,
+        icon: false,
+      };
+    }
   }
 
   protected mapOptionGroup(
-    promptOptions: CheckboxOptions,
-    option: CheckboxOptionGroup,
-  ): CheckboxOptionGroupSettings {
+    promptOptions: CheckboxOptions<TValue>,
+    option: CheckboxOptionGroup<TValue>,
+  ): CheckboxOptionGroupSettings<TValue> {
     const options = this.mapOptions(promptOptions, option.options);
     return {
       ...super.mapOptionGroup(promptOptions, option, false),
@@ -245,13 +270,17 @@ export class Checkbox extends GenericList<
   }
 
   protected getListItemIcon(
-    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+    option:
+      | CheckboxOptionSettings<TValue>
+      | CheckboxOptionGroupSettings<TValue>,
   ): string {
     return this.getCheckboxIcon(option) + super.getListItemIcon(option);
   }
 
   private getCheckboxIcon(
-    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+    option:
+      | CheckboxOptionSettings<TValue>
+      | CheckboxOptionGroupSettings<TValue>,
   ): string {
     if (!option.icon) {
       return "";
@@ -266,8 +295,12 @@ export class Checkbox extends GenericList<
   }
 
   /** Get value of checked options. */
-  protected getValue(): Array<string> {
-    return flatOptions<CheckboxOptionSettings, CheckboxOptionGroupSettings>(
+  protected getValue(): Array<TValue> {
+    return flatOptions<
+      TValue,
+      CheckboxOptionSettings<TValue>,
+      CheckboxOptionGroupSettings<TValue>
+    >(
       this.settings.options,
     )
       .filter((option) => option.checked)
@@ -344,7 +377,9 @@ export class Checkbox extends GenericList<
   }
 
   private checkOption(
-    option: CheckboxOptionSettings | CheckboxOptionGroupSettings,
+    option:
+      | CheckboxOptionSettings<TValue>
+      | CheckboxOptionGroupSettings<TValue>,
     checked: boolean,
   ) {
     if (isOption(option)) {
@@ -361,18 +396,18 @@ export class Checkbox extends GenericList<
    * @param value User input value.
    * @return True on success, false or error message on error.
    */
-  protected validate(value: Array<string>): boolean | string {
+  protected validate(value: Array<TValue>): boolean | string {
     const options = flatOptions<
-      CheckboxOptionSettings,
-      CheckboxOptionGroupSettings
+      TValue,
+      CheckboxOptionSettings<TValue>,
+      CheckboxOptionGroupSettings<TValue>
     >(this.settings.options);
+
     const isValidValue = Array.isArray(value) &&
       value.every((val) =>
-        typeof val === "string" &&
-        val.length > 0 &&
-        options.findIndex((option: CheckboxOptionSettings) =>
-            option.value === val
-          ) !== -1
+        options.findIndex((option: CheckboxOptionSettings<TValue>) =>
+          option.value === val
+        ) !== -1
       );
 
     if (!isValidValue) {
@@ -394,30 +429,34 @@ export class Checkbox extends GenericList<
    * @param value Input value.
    * @return Output value.
    */
-  protected transform(value: Array<string>): Array<string> {
-    return value.map((val) => val.trim());
+  protected transform(value: Array<TValue>): Array<TValue> {
+    return value;
   }
 
   /**
    * Format output value.
    * @param value Output value.
    */
-  protected format(value: Array<string>): string {
-    return value.map((val) => this.getOptionByValue(val)?.name ?? val)
+  protected format(value: Array<TValue>): string {
+    return value.map((val) => this.getOptionByValue(val)?.name ?? String(val))
       .join(", ");
   }
 }
 
-function areSomeChecked(
-  options: Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>,
+function areSomeChecked<TValue>(
+  options: Array<
+    CheckboxOptionSettings<TValue> | CheckboxOptionGroupSettings<TValue>
+  >,
 ): boolean {
   return options.some((option) =>
     isOptionGroup(option) ? areSomeChecked(option.options) : option.checked
   );
 }
 
-function areAllChecked(
-  options: Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>,
+function areAllChecked<TValue>(
+  options: Array<
+    CheckboxOptionSettings<TValue> | CheckboxOptionGroupSettings<TValue>
+  >,
 ): boolean {
   return options.every((option) =>
     isOptionGroup(option) ? areAllChecked(option.options) : option.checked
@@ -425,8 +464,9 @@ function areAllChecked(
 }
 
 function flatOptions<
-  TOption extends GenericListOptionSettings,
-  TGroup extends GenericListOptionGroupSettings<TOption>,
+  TValue,
+  TOption extends GenericListOptionSettings<TValue>,
+  TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 >(
   options: Array<TOption | TGroup>,
 ): Array<TOption> {
@@ -450,16 +490,24 @@ function flatOptions<
     return opts;
   }
 }
+
+export function isCheckboxOptionGroup(
+  option: unknown,
+  // deno-lint-ignore no-explicit-any
+): option is CheckboxOptionGroup<any> {
+  return isOptionGroup(option);
+}
+
 /**
  * Checkbox options type.
  * @deprecated Use `Array<string | CheckboxOption>` instead.
  */
-export type CheckboxValueOptions = Array<string | CheckboxOption>;
+export type CheckboxValueOptions = Array<string | CheckboxOption<string>>;
 
 /**
  * Checkbox option settings type.
  * @deprecated Use `Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>` instead.
  */
 export type CheckboxValueSettings = Array<
-  CheckboxOptionSettings | CheckboxOptionGroupSettings
+  CheckboxOptionSettings<string> | CheckboxOptionGroupSettings<string>
 >;
