@@ -759,7 +759,7 @@ export function isOptionGroup<
     | undefined,
 ): option is TGroup {
   return option !== null && typeof option === "object" && "options" in option &&
-    option.options.length > 0;
+    Array.isArray(option.options);
 }
 
 function matchOptions<

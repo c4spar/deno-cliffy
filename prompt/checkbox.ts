@@ -217,7 +217,7 @@ export class Checkbox<TValue> extends GenericList<
       typeof option === "string" || typeof option === "number"
         ? this.mapOption(
           promptOptions,
-          { value: option } as CheckboxOption<TValue>,
+          { value: option as TValue },
         )
         : isCheckboxOptionGroup(option)
         ? this.mapOptionGroup(promptOptions, option)

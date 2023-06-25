@@ -156,7 +156,7 @@ export class Select<TValue> extends GenericList<
         : typeof option === "string" || typeof option === "number"
         ? this.mapOption(
           promptOptions,
-          { value: option } as SelectOption<TValue>,
+          { value: option as TValue },
         )
         : this.mapOption(promptOptions, option)
     );
