@@ -188,9 +188,7 @@ export abstract class GenericPrompt<
     }
 
     this.clear();
-    const successMessage: string | undefined = this.success(
-      this.#value,
-    );
+    const successMessage: string | undefined = this.success(this.#value);
 
     if (successMessage) {
       this.settings.writer.writeSync(
