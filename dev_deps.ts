@@ -27,6 +27,7 @@ export { dirname } from "https://deno.land/std@0.170.0/path/mod.ts";
 export { expandGlob } from "https://deno.land/std@0.170.0/fs/mod.ts";
 export type { WalkEntry } from "https://deno.land/std@0.170.0/fs/mod.ts";
 export { copy } from "https://deno.land/std@0.170.0/streams/conversion.ts";
+export { format } from "https://deno.land/std@0.170.0/datetime/format.ts";
 
 /* 3rd party */
 export { gt, lt } from "https://deno.land/x/semver@v1.4.1/mod.ts";

@@ -215,7 +215,8 @@ export class Select<TValue> extends GenericList<
    * @param value Output value.
    */
   protected format(value: TValue): string {
-    return this.getOptionByValue(value)?.name ?? String(value);
+    return this.settings.format?.(value) ??
+      this.getOptionByValue(value)?.name ?? String(value);
   }
 }
 

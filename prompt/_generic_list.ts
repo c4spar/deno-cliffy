@@ -50,6 +50,8 @@ export interface GenericListOptions<TValue, TReturnValue, TRawValue>
   groupIcon?: string | boolean;
   /** Change opened group icon. Default is `📂`. */
   groupOpenIcon?: string | boolean;
+  /** Format option value. */
+  format?: (value: TValue) => string;
 }
 
 /** Generic list prompt settings. */
@@ -73,6 +75,7 @@ export interface GenericListSettings<
   groupPointer: string;
   groupIcon: string | false;
   groupOpenIcon: string | false;
+  format?: (value: TValue) => string;
 }
 
 /** Generic list separator option options. */
@@ -241,14 +244,14 @@ export abstract class GenericList<
   ): Array<TOption | TGroup>;
 
   protected mapOption(
-    _options: GenericListOptions<TValue, TReturnValue, TRawValue>,
+    options: GenericListOptions<TValue, TReturnValue, TRawValue>,
     option: GenericListOption<TValue> | GenericListSeparatorOption,
   ): GenericListOptionSettings<TValue> {
     if (isOption(option)) {
       return {
         value: option.value,
         name: typeof option.name === "undefined"
-          ? String(option.value)
+          ? options.format?.(option.value) ?? String(option.value)
           : option.name,
         disabled: "disabled" in option && option.disabled === true,
         indentLevel: 0,

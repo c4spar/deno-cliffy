@@ -1,4 +1,5 @@
 import { ansi } from "../../../ansi/ansi.ts";
+import { format } from "../../../dev_deps.ts";
 import { Select } from "../../select.ts";
 import { snapshotTest } from "../../../testing/snapshot.ts";
 
@@ -40,6 +41,26 @@ await snapshotTest({
         { name: "Bar", value: "bar" },
         { name: "Baz", value: "baz" },
       ],
+    });
+  },
+});
+
+await snapshotTest({
+  name: "select prompt > should format option value",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .cursorDown
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Select.prompt({
+      message: "Message...",
+      options: [
+        { value: new Date(10000) },
+        { value: new Date(20000) },
+      ],
+      format: (date) => format(date, "dd-MM-yyyy"),
     });
   },
 });

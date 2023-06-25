@@ -1,4 +1,5 @@
 import { ansi } from "../../../ansi/ansi.ts";
+import { format } from "../../../dev_deps.ts";
 import { Checkbox } from "../../checkbox.ts";
 import { snapshotTest } from "../../../testing/snapshot.ts";
 
@@ -43,6 +44,27 @@ await snapshotTest({
         { name: "Bar", value: "bar" },
         { name: "Baz", value: "baz" },
       ],
+    });
+  },
+});
+
+await snapshotTest({
+  name: "checkbox prompt > should format option value",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .cursorDown
+    .text(" ")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Message...",
+      options: [
+        { value: new Date(10000) },
+        { value: new Date(20000) },
+      ],
+      format: (date) => format(date, "dd-MM-yyyy"),
     });
   },
 });
