@@ -65,6 +65,8 @@ export type SelectKeys = GenericListKeys;
 /**
  * Select prompt representation.
  *
+ * Simple prompt:
+ *
  * ```ts
  * import { Select } from "./mod.ts";
  *
@@ -74,7 +76,42 @@ export type SelectKeys = GenericListKeys;
  * });
  * ```
  *
- * Options can be also grouped:
+ * Mixed option types:
+ *
+ * ```ts
+ * import { Select } from "./mod.ts";
+ *
+ * const value: string | number = await Select.prompt<string | number>({
+ *   message: "Pick a color",
+ *   options: [1, 2, "3", "4"],
+ * });
+ * ```
+ *
+ * None primitive option types:
+ *
+ * ```ts
+ * import { Select } from "./mod.ts";
+ *
+ * const date: Date = await Select.prompt({
+ *   message: "Pick a date",
+ *   options: [
+ *     {
+ *       name: "Date 1",
+ *       value: new Date(100000),
+ *     },
+ *     {
+ *       name: "Date 2",
+ *       value: new Date(200000),
+ *     },
+ *     {
+ *       name: "Date 3",
+ *       value: new Date(300000),
+ *     },
+ *   ],
+ * });
+ * ```
+ *
+ * Grouped options:
  *
  * ```ts
  * import { Select } from "./mod.ts";
