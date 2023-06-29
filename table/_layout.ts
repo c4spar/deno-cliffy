@@ -326,8 +326,9 @@ export class TableLayout {
 
     // border mid row
     if (
-      (rowIndex === 0 && opts.hasHeaderBorder) ||
-      (rowIndex < opts.rows.length - 1 && opts.hasBodyBorder)
+      (opts.rows.length > 1) &&
+      ((rowIndex === 0 && opts.hasHeaderBorder) ||
+        (rowIndex < opts.rows.length - 1 && opts.hasBodyBorder))
     ) {
       result += this.renderBorderRow(row, nextRow, rowSpan, opts);
     }
