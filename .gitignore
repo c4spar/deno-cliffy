@@ -5,6 +5,7 @@
 .DS_Store
 .DS_Store?
 dist
+npm
 testing/__snapshots__/snapshot_test_fixture.ts.snap
 testing/__snapshots__/snapshot_test_fixture_2.ts.snap
 __snapshots_test__
