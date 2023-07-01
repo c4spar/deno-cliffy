@@ -6,8 +6,8 @@ things you may find helpful.
 ### Get in touch
 
 - ❓ Ask general support questions in
-  [discussions]([issues](https://github.com/c4spar/deno-cliffy/issues/new)) or
-  in the [chat](https://discord.gg/ghFYyP53jb).
+  [discussions](https://github.com/c4spar/deno-cliffy/discussions/categories/q-a?discussions_q=category%3AQ%26A+)
+  or in the [chat](https://discord.gg/ghFYyP53jb).
 - 👨‍💻 Use [issues](https://github.com/c4spar/deno-cliffy/issues/new) to report
   bugs, request new features and discuss your contributions.
 - 💬 Discuss topics in the [chat](https://discord.gg/V8XpuHdzz2).
