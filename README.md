@@ -5,7 +5,6 @@
 [![Build status](https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main)](https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml)
 [![Code coverage](https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg)](https://codecov.io/gh/c4spar/deno-cliffy)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
-[![nest.land](https://nest.land/badge.svg)](https://nest.land/package/cliffy)
 
 **Cliffy** is a _simple_ and _type-safe_ commandline framework for building
 complex commandline tools with [deno](https://deno.land).

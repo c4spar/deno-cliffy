@@ -29,9 +29,6 @@
   <a href="https://deno.land/x/cliffy">
     <img alt="Discord" src="https://img.shields.io/badge/Published on deno.land-blue?logo=deno&logoColor=959DA6&color=272727" />
   </a>
-  <a href="https://nest.land/package/cliffy">
-    <img src="https://nest.land/badge.svg" alt="nest.land badge">
-  </a>
 </p>
 
 The documentation has been moved to https://cliffy.io/docs/ansi.
