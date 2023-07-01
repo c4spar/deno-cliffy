@@ -1,4 +1,4 @@
-import { dim, italic } from "https://deno.land/std@0.170.0/fmt/colors.ts";
+import { dim, italic } from "../deps.ts";
 import { Command } from "../command.ts";
 import { BashCompletionsCommand } from "./bash.ts";
 import { CompleteCommand } from "./complete.ts";

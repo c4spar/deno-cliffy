@@ -11,7 +11,7 @@ import {
   strikethrough,
   underline,
   yellow,
-} from "https://deno.land/std@0.170.0/fmt/colors.ts";
+} from "https://deno.land/std@0.192.0/fmt/colors.ts";
 import { tty } from "../../ansi/tty.ts";
 import { Cell, CellType } from "../../table/cell.ts";
 import { Table } from "../../table/table.ts";
