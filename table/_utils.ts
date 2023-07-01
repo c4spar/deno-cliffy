@@ -6,7 +6,7 @@
  */
 import { Cell, CellType } from "./cell.ts";
 import { consumeWords } from "./consume_words.ts";
-import { stripColor } from "./deps.ts";
+import { stripColor, unicodeWidth } from "./deps.ts";
 
 /**
  * Get longest cell from given row index.
@@ -37,24 +37,5 @@ export function longest(
 }
 
 export const strLength = (str: string): number => {
-  str = stripColor(str);
-  let length = 0;
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i);
-    if (
-      // chinese characters: \u4e00 - \u9fa5
-      (charCode >= 19968 && charCode <= 40869) ||
-      // japanese characters \u3040 - \u30ff
-      (charCode >= 12352 && charCode <= 12543) ||
-      // full width characters \uff00 - \uffef
-      (charCode >= 65280 && charCode <= 65519) ||
-      // cjk symbol and punctuation characters \u3000 - \u303f
-      (charCode >= 12288 && charCode <= 12351)
-    ) {
-      length += 2;
-    } else {
-      length += 1;
-    }
-  }
-  return length;
+  return unicodeWidth(stripColor(str));
 };
