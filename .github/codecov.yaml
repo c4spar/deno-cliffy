@@ -32,6 +32,10 @@ flags:
     paths:
       - table/
     carryforward: true
+  testing:
+    paths:
+      - testing/
+    carryforward: true
 coverage:
   status:
     project: off
