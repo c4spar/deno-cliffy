@@ -4,18 +4,19 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  stable:
-    name: Deno Stable
+  test:
+    name: ${{ matrix.module }} ${{ matrix.os }} deno-${{ matrix.deno }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         deno: [v1.x]
+        module: [ansi, command, flags, keycode, keypress, prompt, table, testing]
     env:
       RUST_BACKTRACE: full
     steps:
-      - name: Setup repo
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup Deno
@@ -23,72 +24,12 @@ jobs:
         with:
           deno-version: ${{ matrix.deno }}
 
-      - name: Run ansi tests
-        run: deno task coverage:ansi
+      - name: Test ${{ matrix.module }}
+        run: deno task coverage:${{ matrix.module }}
 
-      - name: Upload ansi coverage
+      - name: Upload ${{ matrix.module }} coverage
         uses: codecov/codecov-action@v3
         with:
-          name: ansi-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/ansi/cov.lcov
-          flags: ansi
-
-      - name: Run command tests
-        run: deno task coverage:command
-
-      - name: Upload command coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: command-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/command/cov.lcov
-          flags: command
-
-      - name: Run flags tests
-        run: deno task coverage:flags
-
-      - name: Upload flags coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: flags-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/flags/cov.lcov
-          flags: flags
-
-      - name: Run keycode tests
-        run: deno task coverage:keycode
-
-      - name: Upload keycode coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: keycode-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/keycode/cov.lcov
-          flags: keycode
-
-      - name: Run keypress tests
-        run: deno task coverage:keypress
-
-      - name: Upload keypress coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: keypress-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/keypress/cov.lcov
-          flags: keypress
-
-      - name: Run prompt tests
-        run: deno task coverage:prompt
-
-      - name: Upload prompt coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: prompt-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/prompt/cov.lcov
-          flags: prompt
-
-      - name: Run table tests
-        run: deno task coverage:table
-
-      - name: Upload table coverage
-        uses: codecov/codecov-action@v3
-        with:
-          name: table-${{ matrix.os }}-${{ matrix.deno }}
-          files: dist/coverage/table/cov.lcov
-          flags: table
+          name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
+          files: dist/coverage/${{ matrix.module }}/cov.lcov
+          flags: ${{ matrix.module }}
