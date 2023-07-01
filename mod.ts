@@ -5,7 +5,7 @@ export {
   number,
   // Already exported by command module.
   // ValidationError,
-  type OptionType,
+  OptionType,
   parseFlags,
   string,
 } from "./flags/mod.ts";
