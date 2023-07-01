@@ -24,6 +24,6 @@ export {
   type IParseOptions,
   type ITypeHandler,
   type ITypeInfo,
-  type OptionType,
+  OptionType,
 } from "./deprecated.ts";
 export { ValidationError } from "./_errors.ts";
