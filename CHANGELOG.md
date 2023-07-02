@@ -1,3 +1,239 @@
+# [v1.0.0-rc.1](https://github.com/c4spar/deno-cliffy/compare/v0.25.7...v1.0.0-rc.1) (Jul 2, 2023)
+
+### BREAKING CHANGES
+
+- **ansi:** rename `.toBuffer()` method to `.bytes()` (#606)
+  ([853c2a6](https://github.com/c4spar/deno-cliffy/commit/853c2a6))
+- **ansi:** rename `stdin` and `stdout` options to `reader` and `writer` (#570)
+  ([8980c53](https://github.com/c4spar/deno-cliffy/commit/8980c53))
+- **flags:** remove `requiredValue` option and rename
+  `option.args[].optionalValue` to `option.args[].optional` (#496)
+  ([f381e56](https://github.com/c4spar/deno-cliffy/commit/f381e56))
+
+  before:
+
+  ```ts
+  parseFlags(Deno.args, {
+    flags: [{
+      name: "foo",
+      type: "boolean",
+      requiredValue: true,
+    }, {
+      name: "bar",
+      args: [{
+        type: "string",
+        optionalValue: true,
+      }],
+    }],
+  });
+  ```
+
+  after:
+
+  ```ts
+  parseFlags(Deno.args, {
+    flags: [{
+      name: "foo",
+      type: "boolean",
+      optionalValue: false,
+    }, {
+      name: "bar",
+      args: [{
+        type: "string",
+        optional: true,
+      }],
+    }],
+  });
+  ```
+
+- **prompt:** remove default indentation (#495)
+  ([16790ac](https://github.com/c4spar/deno-cliffy/commit/16790ac))
+
+  To restore the old behavior, you can use the indent option:
+
+  ```ts
+  await Input.prompt({
+    message: "What's your name?",
+    indent: " ",
+  });
+  ```
+
+### DEPRECATIONS
+
+- **prompt:** deprecate `SelectValueOptions` and `CheckboxValueOptions` types
+  (#526) ([20ba587](https://github.com/c4spar/deno-cliffy/commit/20ba587))
+
+  - `SelectValueOptions` -> Use `Array<string | SelectOption>` instead.
+  - `CheckboxValueOptions` -> Use `Array<string | CheckboxOption>` instead.
+- **table:** refactor table types (#559)
+  ([2b1ea19](https://github.com/c4spar/deno-cliffy/commit/2b1ea19))
+
+  - `IBorder` -> Use `Border` instead.
+  - `ICell` -> Use `CellType` instead.
+  - `IRow` -> Use `RowType` instead.
+  - `IDataRow` -> Use `DataRow` instead.
+  - `IBorderOptions` -> Use `BorderOptions` instead.
+  - `ITable` -> Use `TableType` instead.
+
+### Features
+
+- **ansi:** add `.toArray()` method to `ansi` module (#543)
+  ([ca2e7f6](https://github.com/c4spar/deno-cliffy/commit/ca2e7f6))
+- **command:** show required options in help usage (#598)
+  ([bd08f4b](https://github.com/c4spar/deno-cliffy/commit/bd08f4b))
+- **command:** add `--name` option to completion commands (#587)
+  ([f9368eb](https://github.com/c4spar/deno-cliffy/commit/f9368eb))
+- **command:** add `reader` & `writer` options to `prompt()` function (#574)
+  ([72536ea](https://github.com/c4spar/deno-cliffy/commit/72536ea))
+- **command:** support multiple option actions (#567)
+  ([4fb4f9a](https://github.com/c4spar/deno-cliffy/commit/4fb4f9a))
+- **command:** add `.globalAction()` method (#555)
+  ([b76524f](https://github.com/c4spar/deno-cliffy/commit/b76524f))
+- **prompt:** add format option to select and checkbox prompt (#626)
+  ([5b8bc2d](https://github.com/c4spar/deno-cliffy/commit/5b8bc2d))
+- **prompt:** allow any type as value for select and checkbox prompt (#625)
+  ([20b59ec](https://github.com/c4spar/deno-cliffy/commit/20b59ec))
+- **prompt:** add support for multi level options for select and checkbox prompt
+  (#445) ([880d472](https://github.com/c4spar/deno-cliffy/commit/880d472))
+- **prompt:** refactor and export un-exported `prompt()` types and update docs
+  (#578) ([9487d8d](https://github.com/c4spar/deno-cliffy/commit/9487d8d))
+- **prompt:** add `reader` and `writer` options (#569)
+  ([8923a6f](https://github.com/c4spar/deno-cliffy/commit/8923a6f))
+- **table:** implement `Column` class (#554)
+  ([738355a](https://github.com/c4spar/deno-cliffy/commit/738355a))
+- **table:** set default value for `.border()` method to `true` (#557)
+  ([a43d845](https://github.com/c4spar/deno-cliffy/commit/a43d845))
+- **testing:** add testing module (#581)
+  ([5db0f6e](https://github.com/c4spar/deno-cliffy/commit/5db0f6e),
+  [36c8dbe](https://github.com/c4spar/deno-cliffy/commit/36c8dbe),
+  [6a8ad25](https://github.com/c4spar/deno-cliffy/commit/6a8ad25),
+  [d20d31c](https://github.com/c4spar/deno-cliffy/commit/d20d31c))
+
+### Bug Fixes
+
+- **ansi:** use `opts.stdin.setRaw` instead of `Deno.stdin.setRaw` in`tty`
+  module and `getCursorPosition` method and fiy stdin option types (#564)
+  ([0bc4cca](https://github.com/c4spar/deno-cliffy/commit/0bc4cca))
+- **ansi:** color methods ignore an empty string argument (#558)
+  ([39eb048](https://github.com/c4spar/deno-cliffy/commit/39eb048))
+- **command:** use `Array<unknown>` for arguments in `.globalAction()` action
+  handler (#607)
+  ([de75995](https://github.com/c4spar/deno-cliffy/commit/de75995))
+- **command:** global parent action handlers are executed if noGlobals is
+  enabled (#603)
+  ([b7e34fa](https://github.com/c4spar/deno-cliffy/commit/b7e34fa))
+- **command:** enum type not always inferred correctly (#573)
+  ([31ba2ff](https://github.com/c4spar/deno-cliffy/commit/31ba2ff))
+- **command:** incorrect validation when parsing global options with default
+  values mixed with non-global options (#548)
+  ([ddd3e53](https://github.com/c4spar/deno-cliffy/commit/ddd3e53))
+- **command:** error handler not triggered with `.useRawArgs()` enabled (#549)
+  ([ecdb98e](https://github.com/c4spar/deno-cliffy/commit/ecdb98e))
+- **flags:** `OptionType` is exported as type (#636)
+  ([45890b9](https://github.com/c4spar/deno-cliffy/commit/45890b9))
+- **flags:** default value for no-value-flag cannot be overridden (#551)
+  ([456eb41](https://github.com/c4spar/deno-cliffy/commit/456eb41))
+- **table:** more accurate cell width for unicode chars (#632)
+  ([d29dce4](https://github.com/c4spar/deno-cliffy/commit/d29dce4))
+- **table:** apply column options only to table body (#608)
+  ([a7db939](https://github.com/c4spar/deno-cliffy/commit/a7db939))
+- **table:** fix hasBodyBorder method (#560)
+  ([36d3d5d](https://github.com/c4spar/deno-cliffy/commit/36d3d5d))
+- **table:** full width characters are not aligned correctly (#542)
+  ([9fea2ac](https://github.com/c4spar/deno-cliffy/commit/9fea2ac))
+- **table:** japanese characters are not aligned correctly (#541)
+  ([44e48ea](https://github.com/c4spar/deno-cliffy/commit/44e48ea))
+
+### Code Refactoring
+
+- remove main mod.ts (#638)
+  ([7de3ddc](https://github.com/c4spar/deno-cliffy/commit/7de3ddc))
+- **ansi:** use explicit exports in mod.ts (#610)
+  ([7e7063a](https://github.com/c4spar/deno-cliffy/commit/7e7063a))
+- **command:** move checkVersion method to separate file (#623)
+  ([a7a2d10](https://github.com/c4spar/deno-cliffy/commit/a7a2d10))
+- **command:** remove indentation from help output (#605)
+  ([e9ab46a](https://github.com/c4spar/deno-cliffy/commit/e9ab46a))
+- **command:** re-organize types (#602)
+  ([277fb27](https://github.com/c4spar/deno-cliffy/commit/277fb27))
+- **command:** use exit code `2` as default for validation errors (#601)
+  ([6394f89](https://github.com/c4spar/deno-cliffy/commit/6394f89))
+- **command:** improve error message for duplicate option names (#600)
+  ([1ef9e68](https://github.com/c4spar/deno-cliffy/commit/1ef9e68))
+- **command:** throw an error if the command name is missing when generating
+  shell completions (#599)
+  ([fa804b5](https://github.com/c4spar/deno-cliffy/commit/fa804b5))
+- **command:** switch to `Deno.Command` api (#596)
+  ([90d9565](https://github.com/c4spar/deno-cliffy/commit/90d9565))
+- **command:** set default value for ignore and only in snapshotTest method
+  (#588) ([7f0ec49](https://github.com/c4spar/deno-cliffy/commit/7f0ec49))
+- **flags:** use explicit exports in mod.ts (#609)
+  ([dd857d7](https://github.com/c4spar/deno-cliffy/commit/dd857d7))
+- **keycode:** use explicit exports in mod.ts (#611)
+  ([eb4d7a0](https://github.com/c4spar/deno-cliffy/commit/eb4d7a0))
+- **prompt:** remove GenericPrompt, GenericInput & GenericList exports (#627)
+  ([19a19f4](https://github.com/c4spar/deno-cliffy/commit/19a19f4))
+- **prompt:** remove unnecessary border arguments (#617)
+  ([ca6c705](https://github.com/c4spar/deno-cliffy/commit/ca6c705))
+- **prompt:** remove `GenericInputPromptSettings` export from mod.ts (#614)
+  ([ad8be98](https://github.com/c4spar/deno-cliffy/commit/ad8be98))
+- **prompt:** use explicit exports in mod.ts (#612)
+  ([f5dead8](https://github.com/c4spar/deno-cliffy/commit/f5dead8))
+- **prompt:** change default search icon to 🔎 (#577)
+  ([52830a8](https://github.com/c4spar/deno-cliffy/commit/52830a8))
+- **prompt:** remove windows encoding workaround (#566)
+  ([11e379f](https://github.com/c4spar/deno-cliffy/commit/11e379f))
+- **prompt:** change default label of secret prompt from `Password` to `Secret`
+  (#494) ([ed49579](https://github.com/c4spar/deno-cliffy/commit/ed49579))
+
+### Chore
+
+- fmt (#591) ([6950b5f](https://github.com/c4spar/deno-cliffy/commit/6950b5f))
+- remove all `--unstable` flags from tests and examples (#550)
+  ([b8bd612](https://github.com/c4spar/deno-cliffy/commit/b8bd612))
+- **ci:** refactor tests (#637)
+  ([0c950cf](https://github.com/c4spar/deno-cliffy/commit/0c950cf))
+- **ci:** adapt check examples step (#572)
+  ([95374cc](https://github.com/c4spar/deno-cliffy/commit/95374cc))
+- **ci:** enable doc tests (#556)
+  ([35f1329](https://github.com/c4spar/deno-cliffy/commit/35f1329))
+- **deno:** use top-level exclude option and fmt (#593)
+  ([184e2ee](https://github.com/c4spar/deno-cliffy/commit/184e2ee))
+- **license:** update copyright year
+  ([9918d43](https://github.com/c4spar/deno-cliffy/commit/9918d43))
+- **upgrade:** deno/std@0.192.0 (#639)
+  ([01e5fd8](https://github.com/c4spar/deno-cliffy/commit/01e5fd8))
+
+### Unit/Integration Tests
+
+- **prompt:** test also stderr in integration tests (#565)
+  ([6fa7ef5](https://github.com/c4spar/deno-cliffy/commit/6fa7ef5))
+- **prompt:** improve integration tests (#544)
+  ([986168f](https://github.com/c4spar/deno-cliffy/commit/986168f))
+
+### Documentation Updates
+
+- fix discussions link in `CONTRIBUTING.md` (#633)
+  ([d5d29d9](https://github.com/c4spar/deno-cliffy/commit/d5d29d9))
+- **ansi:** documentation improvements (#621)
+  ([2928a6f](https://github.com/c4spar/deno-cliffy/commit/2928a6f))
+- **ansi:** update examples (#571)
+  ([82af874](https://github.com/c4spar/deno-cliffy/commit/82af874))
+- **command:** documentation improvements (#622)
+  ([e8b7da5](https://github.com/c4spar/deno-cliffy/commit/e8b7da5))
+- **flags:** documentation improvements (#620)
+  ([46392b1](https://github.com/c4spar/deno-cliffy/commit/46392b1))
+- **keypress:** documentation improvements (#619)
+  ([385b483](https://github.com/c4spar/deno-cliffy/commit/385b483))
+- **keypress:** documentation improvements (#618)
+  ([2070858](https://github.com/c4spar/deno-cliffy/commit/2070858))
+- **prompt:** update select & checkbox docs (#628)
+  ([02949d6](https://github.com/c4spar/deno-cliffy/commit/02949d6))
+- **prompt:** documentation improvements (#616)
+  ([51dd46b](https://github.com/c4spar/deno-cliffy/commit/51dd46b))
+- **table:** documentation improvements (#615)
+  ([c67e441](https://github.com/c4spar/deno-cliffy/commit/c67e441))
+
 # [v0.25.7](https://github.com/c4spar/deno-cliffy/compare/v0.25.6...v0.25.7) (Jan 5, 2023)
 
 ### Bug Fixes
