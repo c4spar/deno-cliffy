@@ -58,3 +58,23 @@ stdout:
 stderr:
 ""
 `;
+
+snapshot[`checkbox prompt > should support separator option 1`] = `
+stdout:
+"? Message...
+❯ × 01-01-1970
+  +++++
+  × 01-01-1970\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Message...
+  × 01-01-1970
+  +++++
+❯ × 01-01-1970\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Message...
+  × 01-01-1970
+  +++++
+❯ √ 01-01-1970\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Message... » 01-01-1970
+\\x1b[?25h\\x1b[?25h"
+stderr:
+""
+`;
