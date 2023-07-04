@@ -10,9 +10,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        module: [ansi, command, flags, keycode, keypress, prompt, table, testing]
         os: [macOS-latest, windows-latest, ubuntu-latest]
         deno: [v1.x]
-        module: [ansi, command, flags, keycode, keypress, prompt, table, testing]
     env:
       RUST_BACKTRACE: full
     steps:

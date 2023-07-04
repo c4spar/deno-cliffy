@@ -4,6 +4,7 @@
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
     "test": "deno test --doc --allow-run=deno --allow-env --allow-read=./  --allow-write=./ --ignore=./CHANGELOG.md --parallel",
+    "check:examples": "deno check examples/**/*.ts",
     "snapshot": "deno task test -- --update",
     "coverage": "deno task test --coverage=./dist/coverage/all/result && deno coverage --lcov ./dist/coverage/all/result > ./dist/coverage/all/cov.lcov",
     "coverage:ansi": "deno task test ansi --coverage=./dist/coverage/ansi/result && deno coverage --lcov ./dist/coverage/ansi/result > ./dist/coverage/ansi/cov.lcov",
