@@ -68,3 +68,25 @@ await snapshotTest({
     });
   },
 });
+
+await snapshotTest({
+  name: "checkbox prompt > should support separator option",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .cursorDown
+    .text(" ")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Message...",
+      options: [
+        { value: new Date(10000) },
+        Checkbox.separator("+++++"),
+        { value: new Date(20000) },
+      ],
+      format: (date) => format(date, "dd-MM-yyyy"),
+    });
+  },
+});

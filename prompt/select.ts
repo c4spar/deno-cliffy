@@ -8,6 +8,7 @@ import {
   GenericListOptionGroupSettings,
   GenericListOptions,
   GenericListOptionSettings,
+  GenericListSeparatorOption,
   GenericListSettings,
   isOption,
   isOptionGroup,
@@ -26,6 +27,7 @@ export interface SelectOptions<TValue>
     | Extract<WidenType<TValue>, string | number>
     | SelectOption<TValue>
     | SelectOptionGroup<TValue>
+    | GenericListSeparatorOption
   >;
 }
 
@@ -185,6 +187,7 @@ export class Select<TValue> extends GenericList<
       | Extract<WidenType<TValue>, string | number>
       | SelectOption<TValue>
       | SelectOptionGroup<TValue>
+      | GenericListSeparatorOption
     >,
   ): Array<SelectOptionSettings<TValue> | SelectOptionGroupSettings<TValue>> {
     return options.map((option) =>
