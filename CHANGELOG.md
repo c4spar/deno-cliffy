@@ -1,3 +1,15 @@
+# [v1.0.0-rc.2](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.1...v1.0.0-rc.2) (Jul 4, 2023)
+
+### Bug Fixes
+
+- **prompt:** fix separator option for select prompt (#640)
+  ([937f58a](https://github.com/c4spar/deno-cliffy/commit/937f58a))
+
+### Chore
+
+- add check:examples task (#641)
+  ([4fd91b6](https://github.com/c4spar/deno-cliffy/commit/4fd91b6))
+
 # [v1.0.0-rc.1](https://github.com/c4spar/deno-cliffy/compare/v0.25.7...v1.0.0-rc.1) (Jul 2, 2023)
 
 ### BREAKING CHANGES
