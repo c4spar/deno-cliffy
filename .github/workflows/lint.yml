@@ -37,4 +37,4 @@ jobs:
         run: ./shellcheck --shell bash <(deno run -r ./examples/command/shell-completions.ts completions zsh)
 
       - name: Type-check examples
-        run: deno check examples/**/*.ts
+        run: deno task check:examples
