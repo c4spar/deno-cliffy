@@ -18,6 +18,7 @@ await snapshotTest({
         .cursorForward
         .text(" ")
         .text("\n")
+        .text("\n")
         .toArray(),
     },
   },
@@ -66,6 +67,7 @@ await snapshotTest({
         .cursorForward
         .cursorForward
         .text(" ")
+        .text("\n")
         .text("\n")
         .toArray(),
     },

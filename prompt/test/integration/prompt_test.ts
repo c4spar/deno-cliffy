@@ -39,6 +39,7 @@ await snapshotTest({
         .cursorDown
         .text(" ")
         .text("\n")
+        .text("\n")
         // select
         .cursorDown
         .text("\n")

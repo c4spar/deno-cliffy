@@ -12,6 +12,7 @@ await snapshotTest({
     .cursorDown
     .text(" ")
     .text("\n")
+    .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
@@ -33,6 +34,7 @@ await snapshotTest({
     .text("baz")
     .text("\n")
     .text(" ")
+    .text("\n")
     .text("\n")
     .toArray(),
   async fn() {
@@ -56,6 +58,7 @@ await snapshotTest({
     .cursorDown
     .text(" ")
     .text("\n")
+    .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
@@ -76,6 +79,7 @@ await snapshotTest({
   stdin: ansi
     .cursorDown
     .text(" ")
+    .text("\n")
     .text("\n")
     .toArray(),
   async fn() {
