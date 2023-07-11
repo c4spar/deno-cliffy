@@ -28,6 +28,10 @@ stdout:
 ? Select an option
   √ 📂 Foo » .. » Beep » Boop » Fiz
  ❯ √ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  √ 📂 Foo » .. » Beep » Boop » Fiz
+ ❯ √ Faz
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Faz
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -62,6 +66,10 @@ stdout:
 ? Select an option
   √ 📂 Foo # .. # Beep # Boop # Fiz
  ❯ √ Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  √ 📂 Foo # .. # Beep # Boop # Fiz
+ ❯ √ Faz
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Faz
 \\x1b[?25h\\x1b[?25h"
 stderr:

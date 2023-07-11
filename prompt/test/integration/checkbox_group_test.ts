@@ -13,6 +13,7 @@ await snapshotTest({
         .cursorDown
         .text(" ")
         .text("\n")
+        .text("\n")
         .toArray(),
     },
     "should select a child option": {
@@ -22,6 +23,7 @@ await snapshotTest({
         .cursorForward
         .cursorDown
         .text(" ")
+        .text("\n")
         .text("\n")
         .toArray(),
     },

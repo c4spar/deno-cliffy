@@ -12,6 +12,7 @@ await snapshotTest({
     .cursorDown
     .text(" ")
     .text("\n")
+    .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
@@ -33,6 +34,7 @@ await snapshotTest({
     .text("baz")
     .text("\n")
     .text(" ")
+    .text("\n")
     .text("\n")
     .toArray(),
   async fn() {
@@ -56,6 +58,7 @@ await snapshotTest({
     .cursorDown
     .text(" ")
     .text("\n")
+    .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
@@ -77,6 +80,7 @@ await snapshotTest({
     .cursorDown
     .text(" ")
     .text("\n")
+    .text("\n")
     .toArray(),
   async fn() {
     await Checkbox.prompt({
@@ -87,6 +91,29 @@ await snapshotTest({
         { value: new Date(20000) },
       ],
       format: (date) => format(date, "dd-MM-yyyy"),
+    });
+  },
+});
+
+await snapshotTest({
+  name: "checkbox prompt > should disable confirmSubmit",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .cursorDown
+    .cursorDown
+    .text(" ")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Select an option",
+      confirmSubmit: false,
+      options: [
+        { name: "Foo", value: "foo" },
+        { name: "Bar", value: "bar" },
+        { name: "Baz", value: "baz" },
+      ],
     });
   },
 });

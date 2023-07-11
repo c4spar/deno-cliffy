@@ -30,7 +30,7 @@ export interface CheckboxOptions<TValue>
     | CheckboxOptionGroup<TValue>
     | GenericListSeparatorOption
   >;
-  /** If enabled, the user needs to press enter twice. Default is `true`. */
+  /** If enabled, the user needs to press enter twice to submit. Default is `true`. */
   confirmSubmit?: boolean;
   /** Change check icon. Default is `green(Figures.TICK)`. */
   check?: string;
@@ -394,7 +394,6 @@ export class Checkbox<TValue> extends GenericList<
     if (
       !hasConfirmed &&
       this.settings.confirmSubmit &&
-      Deno.isatty(Deno.stdout.rid) &&
       !this.isSearchSelected()
     ) {
       this.confirmSubmit = true;
