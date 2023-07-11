@@ -18,6 +18,11 @@ stdout:
   × Foo
   × Bar
 ❯ √ Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  × Foo
+  × Bar
+❯ √ Baz
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[4A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » Baz
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -36,6 +41,9 @@ stdout:
 ❯ × Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
 ? Select an option 🔎 baz
 ❯ √ Baz\\x1b[1A\\x1b[26G\\x1b[G\\x1b[0J
+? Select an option 🔎 baz
+❯ √ Baz
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[2A\\x1b[26G\\x1b[G\\x1b[0J
 ? Select an option » Baz
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -53,6 +61,10 @@ stdout:
 ? Message...
   × 01-01-1970
 ❯ √ 01-01-1970\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Message...
+  × 01-01-1970
+❯ √ 01-01-1970
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Message... » 01-01-1970
 \\x1b[?25h\\x1b[?25h"
 stderr:
@@ -73,6 +85,11 @@ stdout:
   × 01-01-1970
   +++++
 ❯ √ 01-01-1970\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Message...
+  × 01-01-1970
+  +++++
+❯ √ 01-01-1970
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[4A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Message... » 01-01-1970
 \\x1b[?25h\\x1b[?25h"
 stderr:
