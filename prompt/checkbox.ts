@@ -367,12 +367,16 @@ export class Checkbox<TValue> extends GenericList<
 
   protected hint(): string | undefined {
     if (this.confirmSubmit) {
-      const info = this.selectedOption && this.isBackButton(this.selectedOption)
-        ? ` To leave the group use ${
+      const info = this.isBackButton(this.selectedOption)
+        ? ` To leave the current group press ${
           getFiguresByKeys(this.settings.keys.back ?? []).join(", ")
         }.`
-        : ` To open the selected group ${
+        : isOptionGroup(this.selectedOption)
+        ? ` To open the selected group press ${
           getFiguresByKeys(this.settings.keys.open ?? []).join(", ")
+        }.`
+        : ` To check or uncheck the selected option press ${
+          getFiguresByKeys(this.settings.keys.check ?? []).join(", ")
         }.`;
 
       return this.settings.indent +
