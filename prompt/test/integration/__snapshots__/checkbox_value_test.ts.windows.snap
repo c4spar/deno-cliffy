@@ -11,6 +11,10 @@ stdout:
 ? Select an option
   × date 1
 ❯ √ date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  × date 1
+❯ √ date 2
+Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option » date 2
 \\x1b[?25h\\x1b[?25h"
 stderr:
