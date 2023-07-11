@@ -94,3 +94,26 @@ await snapshotTest({
     });
   },
 });
+
+await snapshotTest({
+  name: "checkbox prompt > should disable confirmSubmit",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .cursorDown
+    .cursorDown
+    .text(" ")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Select an option",
+      confirmSubmit: false,
+      options: [
+        { name: "Foo", value: "foo" },
+        { name: "Bar", value: "bar" },
+        { name: "Baz", value: "baz" },
+      ],
+    });
+  },
+});
