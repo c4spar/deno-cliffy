@@ -648,7 +648,7 @@ export abstract class GenericList<
   }
 
   /** Select previous option. */
-  protected selectPrevious(): void {
+  protected selectPrevious(loop = true): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
@@ -665,7 +665,7 @@ export abstract class GenericList<
       this.getCurrentInputValue().length
     ) {
       this.listIndex = -1;
-    } else {
+    } else if (loop) {
       this.listIndex = this.options.length - 1;
       this.listOffset = this.options.length - this.getListHeight();
       if (this.selectedOption?.disabled) {
@@ -675,7 +675,7 @@ export abstract class GenericList<
   }
 
   /** Select next option. */
-  protected selectNext(): void {
+  protected selectNext(loop = true): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
@@ -692,7 +692,7 @@ export abstract class GenericList<
       this.getCurrentInputValue().length
     ) {
       this.listIndex = -1;
-    } else {
+    } else if (loop) {
       this.listIndex = this.listOffset = 0;
       if (this.selectedOption?.disabled) {
         this.selectNext();
@@ -713,6 +713,12 @@ export abstract class GenericList<
       } else {
         this.listIndex = 0;
       }
+      if (this.selectedOption?.disabled) {
+        this.selectPrevious(false);
+      }
+      if (this.selectedOption?.disabled) {
+        this.selectNext(false);
+      }
     }
   }
 
@@ -729,6 +735,12 @@ export abstract class GenericList<
         this.listOffset = offset;
       } else {
         this.listIndex = this.options.length - 1;
+      }
+      if (this.selectedOption?.disabled) {
+        this.selectNext(false);
+      }
+      if (this.selectedOption?.disabled) {
+        this.selectPrevious(false);
       }
     }
   }
