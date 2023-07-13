@@ -99,7 +99,7 @@ await snapshotTest({
     .toArray(),
   async fn() {
     await Select.prompt({
-      message: "Pick a color",
+      message: "Pick a value",
       options: [
         { name: "Value1", value: "value-1", disabled: true },
         { name: "Value2", value: "value-2" },
