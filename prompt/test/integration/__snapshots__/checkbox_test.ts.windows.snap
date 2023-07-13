@@ -122,7 +122,7 @@ stderr:
 
 snapshot[`checkbox prompt > should not select disabled option 1`] = `
 stdout:
-"? Pick a color
+"? Pick a value
   × Value1
 ❯ × Value2
   × Value3
@@ -133,7 +133,7 @@ stdout:
   × Value8
   × Value9
   × Value10\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value10
   × Value11
   × Value12
@@ -144,7 +144,7 @@ stdout:
   × Value17
   × Value18
   × Value19\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value1
   × Value2
 ❯ × Value3
@@ -155,7 +155,7 @@ stdout:
   × Value8
   × Value9
   × Value10\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value1
 ❯ × Value2
   × Value3
@@ -166,7 +166,7 @@ stdout:
   × Value8
   × Value9
   × Value10\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value1
 ❯ × Value2
   × Value3
@@ -177,7 +177,7 @@ stdout:
   × Value8
   × Value9
   × Value10\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value1
 ❯ √ Value2
   × Value3
@@ -188,7 +188,7 @@ stdout:
   × Value8
   × Value9
   × Value10\\x1b[10A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color
+? Pick a value
   × Value1
 ❯ √ Value2
   × Value3
@@ -200,7 +200,7 @@ stdout:
   × Value9
   × Value10
 Press ↵ again to submit. To check or uncheck the selected option press space.\\x1b[11A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Pick a color » Value2
+? Pick a value » Value2
 \\x1b[?25h\\x1b[?25h"
 stderr:
 ""
