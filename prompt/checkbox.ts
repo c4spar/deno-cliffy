@@ -96,6 +96,7 @@ export interface CheckboxOptionGroupSettings<TValue>
 export interface CheckboxKeys extends GenericListKeys {
   /** Check/uncheck option keymap. Default is `["space"]`. */
   check?: Array<string>;
+  checkAll?: Array<string>;
 }
 
 /**
@@ -230,6 +231,7 @@ export class Checkbox<TValue> extends GenericList<
       options: this.mapOptions(options, options.options),
       keys: {
         check: ["space"],
+        checkAll: ["a"],
         ...(settings.keys ?? {}),
         open: options.keys?.open ?? ["right"],
         back: options.keys?.back ?? ["left", "escape"],
@@ -360,6 +362,10 @@ export class Checkbox<TValue> extends GenericList<
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit(hasConfirmed);
         break;
+
+      case event.ctrl && this.isKey(this.settings.keys, "checkAll", event):
+        this.checkAllOption();
+        break;
       default:
         await super.handleEvent(event);
     }
@@ -428,6 +434,14 @@ export class Checkbox<TValue> extends GenericList<
       for (const childOption of option.options) {
         this.checkOption(childOption, checked);
       }
+    }
+  }
+
+  private checkAllOption() {
+    const checked = this.options.some((option) => option.checked);
+
+    for (const option of this.options) {
+      this.checkOption(option, !checked);
     }
   }
 
