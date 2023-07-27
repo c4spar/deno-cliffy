@@ -158,3 +158,24 @@ await snapshotTest({
     });
   },
 });
+
+await snapshotTest({
+  name: "checkbox prompt > should check all option",
+  meta: import.meta,
+  osSuffix: ["windows"],
+  stdin: ansi
+    .text("\x01")
+    .text("\n")
+    .text("\n")
+    .toArray(),
+  async fn() {
+    await Checkbox.prompt({
+      message: "Select option",
+      options: [
+        { name: "Foo", value: "foo" },
+        { name: "Bar", value: "bar" },
+        { name: "Baz", value: "baz" },
+      ],
+    });
+  },
+});
