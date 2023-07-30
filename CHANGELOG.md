@@ -1,3 +1,34 @@
+# [v1.0.0-rc.3](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.2...v1.0.0-rc.3) (Jul 30, 2023)
+
+### Features
+
+- add select all option to checkbox prompt (#649)
+  ([5f2c4f8](https://github.com/c4spar/deno-cliffy/commit/5f2c4f8))
+
+### Bug Fixes
+
+- **prompt:** disabled options can be selected with next page & previous page
+  keys (#646) ([6f3ba29](https://github.com/c4spar/deno-cliffy/commit/6f3ba29))
+- **prompt:** incorrect info message shown for checkbox prompt on submit (#643)
+  ([fd6831c](https://github.com/c4spar/deno-cliffy/commit/fd6831c))
+
+### Chore
+
+- disable deno lock (#651)
+  ([bd4ce72](https://github.com/c4spar/deno-cliffy/commit/bd4ce72))
+- **upgrade:** deno/std@0.196.0 (#650)
+  ([98ecc37](https://github.com/c4spar/deno-cliffy/commit/98ecc37))
+
+### Unit/Integration Tests
+
+- **prompt:** test confirmSubmit option from checkbox prompt (#644)
+  ([5d3bf0a](https://github.com/c4spar/deno-cliffy/commit/5d3bf0a))
+
+### Documentation Updates
+
+- remove unstable notice (#652)
+  ([99ca3cf](https://github.com/c4spar/deno-cliffy/commit/99ca3cf))
+
 # [v1.0.0-rc.2](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.1...v1.0.0-rc.2) (Jul 4, 2023)
 
 ### Bug Fixes
