@@ -9,8 +9,6 @@
 **Cliffy** is a _simple_ and _type-safe_ commandline framework for building
 complex commandline tools with [deno](https://deno.land).
 
-> ⚠️ This project is still under development. Expect breaking changes.
-
 ## Documentation
 
 The [documentation](https://cliffy.io/docs) is available on
