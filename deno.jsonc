@@ -1,4 +1,5 @@
 {
+  "lock": false,
   "exclude": ["dist"],
   "tasks": {
     "lint": "deno lint && deno fmt --check",
