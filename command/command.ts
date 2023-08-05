@@ -1766,15 +1766,15 @@ export class Command<
         await Promise.all(
           ctx.actions.map((action) => action.call(this, options, ...args)),
         );
-      }
 
-      if (ctx.standalone) {
-        return {
-          options,
-          args,
-          cmd: this,
-          literal: this.literalArgs,
-        };
+        if (ctx.standalone) {
+          return {
+            options,
+            args,
+            cmd: this,
+            literal: this.literalArgs,
+          };
+        }
       }
 
       return await this.execute(options, args);
