@@ -757,7 +757,7 @@ import {
         .type("color", colorType)
         .option("--foo [val:string]", "...")
         .option("--bar [val:string]", "...", { default: 4 })
-        .option("--baz <val:color>", "...", { default: "red" as const })
+        .option("--baz <val:color>", "...", { default: "red" })
         .option("--beep <val:string> [val:string]", "...", {
           default: new Date(),
           global: true,
@@ -771,11 +771,11 @@ import {
           assert<
             IsExact<typeof options, {
               foo?: string | true;
-              bar: string | number | true;
+              bar: string | true | 4;
               baz: "red" | "blue";
               beep: Date | [string, string?];
               boop: Date | [string, number?];
-              one: { two: string | number };
+              one: { two: string | 4 };
             }>
           >(true);
         });
@@ -809,7 +809,7 @@ import {
         .option("--one.foo <val:string>", "...", {
           default: 4,
           value: (value) => {
-            assert<IsExact<typeof value, number | string>>(true);
+            assert<IsExact<typeof value, string | 4>>(true);
             return new Date();
           },
         })
@@ -849,8 +849,8 @@ import {
               beep: Map<string, number>;
               boop: Array<Date>;
               foo?: string | true;
-              bar: string | number | true;
-              baz: string | number;
+              bar: string | true | 4;
+              baz: string | 4;
               one: { foo: Date; bar?: RegExp };
               three?: { four?: number };
               envVar: Date;
@@ -944,7 +944,7 @@ import {
               color: string | false;
               check: boolean;
               remote?: string | false;
-              defaultValue: number | false;
+              defaultValue: false | 5;
             }>
           >(true);
         });
