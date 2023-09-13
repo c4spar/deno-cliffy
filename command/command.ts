@@ -1237,7 +1237,7 @@ export class Command<
     TRequired extends OptionOptions["required"] = undefined,
     TCollect extends OptionOptions["collect"] = undefined,
     TConflicts extends OptionOptions["conflicts"] = undefined,
-    TDefaultValue = undefined,
+    const TDefaultValue = undefined,
     TMappedValue = undefined,
   >(
     flags: TFlags,
@@ -1304,7 +1304,7 @@ export class Command<
       TCommandOptions,
       Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
       undefined extends TConflicts ? TRequired : false,
-      TDefault
+      TDefaultValue
     >,
     TMappedGlobalOptions extends MapValue<
       TGlobalOptions,
@@ -1314,7 +1314,7 @@ export class Command<
     TRequired extends OptionOptions["required"] = undefined,
     TCollect extends OptionOptions["collect"] = undefined,
     TConflicts extends OptionOptions["conflicts"] = undefined,
-    TDefault = undefined,
+    const TDefaultValue = undefined,
     TMappedValue = undefined,
   >(
     flags: TFlags,
@@ -1335,7 +1335,7 @@ export class Command<
       >
         & {
           global: true;
-          default?: DefaultValue<TDefault>;
+          default?: DefaultValue<TDefaultValue>;
           required?: TRequired;
           collect?: TCollect;
           value?: OptionValueHandler<
