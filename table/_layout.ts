@@ -1,9 +1,9 @@
 import type { Column } from "./column.ts";
 import { Cell, CellType, Direction } from "./cell.ts";
-import { consumeWords } from "./consume_words.ts";
+import { consumeChars, consumeWords } from "./consume_words.ts";
 import { Row, RowType } from "./row.ts";
 import type { BorderOptions, Table, TableSettings } from "./table.ts";
-import { longest, strLength } from "./_utils.ts";
+import { getUnclosedAnsiRuns, longest, strLength } from "./_utils.ts";
 
 /** Layout render settings. */
 interface RenderSettings {
@@ -391,7 +391,7 @@ export class TableLayout {
 
     const { current, next } = this.renderCellValue(cell, maxLength);
 
-    row[colIndex].setValue(next.getValue());
+    row[colIndex].setValue(next);
 
     if (opts.hasBorder) {
       result += " ".repeat(opts.padding[colIndex]);
@@ -415,7 +415,7 @@ export class TableLayout {
   protected renderCellValue(
     cell: Cell,
     maxLength: number,
-  ): { current: string; next: Cell } {
+  ): { current: string; next: string } {
     const length: number = Math.min(
       maxLength,
       strLength(cell.toString()),
@@ -425,11 +425,20 @@ export class TableLayout {
     // break word if word is longer than max length
     const breakWord = strLength(words) > length;
     if (breakWord) {
-      words = words.slice(0, length);
+      words = consumeChars(length, words);
     }
 
     // get next content and remove leading space if breakWord is not true
+    // calculate from words.length _before_ any handling of unclosed ANSI codes
     const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
+
+    words = cell.unclosedAnsiRuns + words;
+
+    const { currentSuffix, nextPrefix } = getUnclosedAnsiRuns(words);
+
+    words += currentSuffix;
+    cell.unclosedAnsiRuns = nextPrefix;
+
     const fillLength = maxLength - strLength(words);
 
     // Align content
@@ -448,10 +457,7 @@ export class TableLayout {
       throw new Error("Unknown direction: " + align);
     }
 
-    return {
-      current,
-      next: cell.clone(next),
-    };
+    return { current, next };
   }
 
   /**

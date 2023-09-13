@@ -17,6 +17,11 @@ interface CellOptions {
   rowSpan?: number;
   /** Cell cell alignment direction. */
   align?: Direction;
+  /**
+   * Any unterminated ANSI formatting overflowed from previous lines of a
+   * multi-line cell.
+   */
+  unclosedAnsiRuns?: string;
 }
 
 /**
@@ -41,6 +46,17 @@ export class Cell {
   /** Get cell length. */
   public get length(): number {
     return this.toString().length;
+  }
+
+  /**
+   * Any unterminated ANSI formatting overflowed from previous lines of a
+   * multi-line cell.
+   */
+  public get unclosedAnsiRuns() {
+    return this.options.unclosedAnsiRuns ?? "";
+  }
+  public set unclosedAnsiRuns(val: string) {
+    this.options.unclosedAnsiRuns = val;
   }
 
   /**
