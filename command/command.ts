@@ -1375,7 +1375,7 @@ export class Command<
     TRequired extends OptionOptions["required"] = undefined,
     TCollect extends OptionOptions["collect"] = undefined,
     TConflicts extends OptionOptions["conflicts"] = undefined,
-    TDefaultValue = undefined,
+    const TDefaultValue = undefined,
     TMappedValue = undefined,
   >(
     flags: TFlags,
