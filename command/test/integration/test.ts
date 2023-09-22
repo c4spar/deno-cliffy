@@ -104,6 +104,7 @@ await snapshotTest({
           .reset(),
       )
       .command("bar")
+      .command("foo:bar")
       .option("-f, --file <path>", "...", { required: true })
       .command("validation-error")
       .action(() => {

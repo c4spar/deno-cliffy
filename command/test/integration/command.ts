@@ -51,6 +51,7 @@ const cmd = new Command()
       .reset(),
   )
   .command("bar")
+  .command("foo:bar")
   .option("-f, --file <path>", "...", { required: true })
   .command("validation-error")
   .action(() => {
