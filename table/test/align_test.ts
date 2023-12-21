@@ -56,11 +56,11 @@ Deno.test("table - align - default direction", () => {
   const cell = new Cell("foo");
   const row = new Row(cell);
   const table = new Table(row);
-  assertEquals(cell.getAlign(), "left");
-  assertEquals(row.getAlign(), "left");
-  assertEquals(table.getAlign(), "left");
-  assertEquals(table[0][0].getAlign(), "left");
-  assertEquals(table[0].getAlign(), "left");
+  assertEquals(cell.getAlign(), undefined);
+  assertEquals(row.getAlign(), undefined);
+  assertEquals(table.getAlign(), undefined);
+  assertEquals(table[0][0].getAlign(), undefined);
+  assertEquals(table[0].getAlign(), undefined);
 });
 
 Deno.test("table - align - override direction", () => {
@@ -78,9 +78,9 @@ Deno.test("table - align - inherit direction", () => {
   const cell = new Cell("foo");
   const row = new Row(cell);
   const table = new Table(row).align("right");
-  assertEquals(cell.getAlign(), "left");
-  assertEquals(row.getAlign(), "left");
+  assertEquals(cell.getAlign(), undefined);
+  assertEquals(row.getAlign(), undefined);
   assertEquals(table.getAlign(), "right");
-  assertEquals(table[0][0].getAlign(), "left");
-  assertEquals(table[0].getAlign(), "left");
+  assertEquals(table[0][0].getAlign(), undefined);
+  assertEquals(table[0].getAlign(), undefined);
 });

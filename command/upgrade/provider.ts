@@ -154,7 +154,7 @@ export abstract class Provider {
       );
 
       if (versions.length > this.maxListSize) {
-        const table = new Table().indent(indent);
+        const table = new Table<Array<string>>().indent(indent);
         const rowSize = Math.ceil(versions.length / maxCols);
         const colSize = Math.min(versions.length, maxCols);
         let versionIndex = 0;

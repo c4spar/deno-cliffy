@@ -1,36 +1,20 @@
 import { Border, border } from "./border.ts";
-import { Cell, Direction } from "./cell.ts";
+import {
+  Cell,
+  CellValue,
+  Direction,
+  GetCellValue,
+  ValueParser,
+} from "./cell.ts";
 import { Column, ColumnOptions } from "./column.ts";
 import { TableLayout } from "./_layout.ts";
-import { DataRow, Row, RowType } from "./row.ts";
-
-/** Border characters settings. */
-export type BorderOptions = Partial<Border>;
-
-/** Table settings. */
-export interface TableSettings {
-  /** Table indentation. */
-  indent: number;
-  /** Enable/disable border on all cells. */
-  border: boolean;
-  /** Set min column width. */
-  minColWidth: number | Array<number>;
-  /** Set max column width. */
-  maxColWidth: number | Array<number>;
-  /** Set cell padding. */
-  padding: number | Array<number>;
-  /** Set table characters. */
-  chars: Border;
-  /** Set cell content alignment. */
-  align?: Direction;
-  /** Set column options. */
-  columns: Array<Column>;
-}
-
-/** Table type. */
-export type TableType<TRow extends RowType = RowType> =
-  | Array<TRow>
-  | Table<TRow>;
+import {
+  GetRowInnerValue,
+  GetRowValue,
+  Row,
+  RowType,
+  UnwrapRow,
+} from "./row.ts";
 
 /**
  * Table representation.
@@ -49,18 +33,21 @@ export type TableType<TRow extends RowType = RowType> =
  *   .render();
  * ```
  */
-export class Table<TRow extends RowType = RowType> extends Array<TRow> {
+export class Table<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> extends Array<TRow> {
   protected static _chars: Border = { ...border };
-  protected options: TableSettings = {
+  protected options: TableSettings<TRow, THeaderRow> = {
     indent: 0,
     border: false,
     maxColWidth: Infinity,
     minColWidth: 0,
     padding: 1,
     chars: { ...Table._chars },
-    columns: [],
+    columns: [] as Array<unknown> as Columns<TRow, THeaderRow>,
   };
-  private headerRow?: Row;
+  private headerRow?: Row<GetRowValue<THeaderRow>>;
 
   /**
    * Create a new table. If rows is a table, all rows and options of the table
@@ -68,10 +55,15 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows An array of rows or a table instance.
    */
-  public static from<TRow extends RowType>(rows: TableType<TRow>): Table<TRow> {
-    const table = new this(...rows);
+  public static from<
+    TRow extends RowType<CellValue>,
+    THeaderRow extends RowType<CellValue>,
+  >(
+    rows: TableType<TRow, THeaderRow>,
+  ): Table<TRow, THeaderRow> {
+    const table = new this<TRow, THeaderRow>(...rows);
     if (rows instanceof Table) {
-      table.options = { ...(rows as Table).options };
+      table.options = { ...(rows as Table<TRow, THeaderRow>).options };
       table.headerRow = rows.headerRow ? Row.from(rows.headerRow) : undefined;
     }
     return table;
@@ -83,7 +75,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows Array of objects.
    */
-  public static fromJson(rows: Array<DataRow>): Table {
+  public static fromJson<TValue extends CellValue>(
+    rows: Array<Record<string, TValue>>,
+  ): Table<Array<TValue>, Array<string>> {
     return new this().fromJson(rows);
   }
 
@@ -102,7 +96,12 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows Table or rows.
    */
-  public static render<TRow extends RowType>(rows: TableType<TRow>): void {
+  public static render<
+    TRow extends RowType<CellValue>,
+    THeaderRow extends RowType<CellValue>,
+  >(
+    rows: Array<TRow> | Table<TRow, THeaderRow>,
+  ): void {
     Table.from(rows).render();
   }
 
@@ -112,21 +111,25 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows Array of objects.
    */
-  public fromJson(rows: Array<DataRow>): this {
-    this.header(Object.keys(rows[0]));
-    this.body(rows.map((row) => Object.values(row) as TRow));
-    return this;
+  public fromJson<TValue extends CellValue>(
+    rows: Array<Record<string, TValue>>,
+  ): Table<Array<TValue>, Array<string>> {
+    return (this as Table<unknown> as Table<Array<TValue>, Array<string>>)
+      .header(Object.keys(rows[0]))
+      .body(rows.map((row) => Object.values(row)));
   }
 
   /**
    * Set column options.
    *
-   * @param columns An array of columns or column options.
+   * @param columns Array of columns or column options.
    */
-  public columns(columns: Array<Column | ColumnOptions>): this {
+  public columns(
+    columns: ColumnsOptions<TRow, THeaderRow>,
+  ): this {
     this.options.columns = columns.map((column) =>
       column instanceof Column ? column : Column.from(column)
-    );
+    ) as Columns<TRow, THeaderRow>;
     return this;
   }
 
@@ -136,9 +139,11 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    @param index   The column index.
    @param column  Column or column options.
    */
-  public column(
-    index: number,
-    column: Column | ColumnOptions,
+  public column<TIndex extends number>(
+    index: TIndex,
+    column:
+      | Columns<TRow, THeaderRow>[TIndex]
+      | ColumnsOptions<TRow, THeaderRow>[TIndex],
   ): this {
     if (column instanceof Column) {
       this.options.columns[index] = column;
@@ -147,6 +152,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     } else {
       this.options.columns[index] = Column.from(column);
     }
+
     return this;
   }
 
@@ -155,9 +161,28 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param header Header row or cells.
    */
-  public header(header: RowType): this {
-    this.headerRow = header instanceof Row ? header : Row.from(header);
-    return this;
+  public header<const THeader extends THeaderRow>(
+    header: THeader,
+  ): Table<TRow, THeader> {
+    this.headerRow = header instanceof Row
+      ? header
+      : Row.from(header) as Row<GetRowValue<THeaderRow>>;
+    return this as Table<unknown> as Table<TRow, THeader>;
+  }
+
+  /**
+   * Add an array of rows.
+   * @param rows Table rows.
+   */
+  public rows<const TBodyRow extends TRow>(
+    rows: Array<TBodyRow>,
+  ): Table<TRow | TBodyRow, THeaderRow> {
+    const table = this as Table<RowType<CellValue>, THeaderRow> as Table<
+      TBodyRow,
+      THeaderRow
+    >;
+    table.push(...rows);
+    return table as Table<TRow | TBodyRow, THeaderRow>;
   }
 
   /**
@@ -165,19 +190,19 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows Array of rows.
    */
-  public body(rows: Array<TRow>): this {
+  public body<const TBodyRow extends TRow>(
+    rows: Array<TBodyRow>,
+  ): Table<TBodyRow, THeaderRow> {
     this.length = 0;
-    this.push(...rows);
-    return this;
+    return this.rows(rows) as Table<TBodyRow, THeaderRow>;
   }
 
   /** Clone table recursively with header and options. */
-  public clone(): Table {
-    const table = new Table(
-      ...this.map((row: TRow) =>
-        row instanceof Row ? row.clone() : Row.from(row).clone()
-      ),
+  public clone(): Table<TRow, THeaderRow> {
+    const rows = this.map((row) =>
+      row instanceof Row ? row.clone() : Row.from(row).clone()
     );
+    const table = Table.from(rows) as this;
     table.options = { ...this.options };
     table.headerRow = this.headerRow?.clone();
     return table;
@@ -282,8 +307,28 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
     return this;
   }
 
+  /**
+   * Register header value parser.
+   * @param fn  Value parser callback function.
+   */
+  public headerValue(
+    fn: ValueParser<GetRowInnerValue<THeaderRow>>,
+  ): this {
+    this.options.headerValue = fn;
+    return this;
+  }
+
+  /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public value(fn: ValueParser<GetRowInnerValue<TRow>>): this {
+    this.options.value = fn;
+    return this;
+  }
+
   /** Get table header. */
-  public getHeader(): Row | undefined {
+  public getHeader(): Row<GetRowValue<THeaderRow>> | undefined {
     return this.headerRow;
   }
 
@@ -313,14 +358,15 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   }
 
   /** Check if table has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Check if header row has border. */
   public hasHeaderBorder(): boolean {
     const hasBorder = this.headerRow?.hasBorder();
-    return hasBorder === true || (this.getBorder() && hasBorder !== false);
+    return hasBorder === true ||
+      (this.getBorder() === true && hasBorder !== false);
   }
 
   /** Check if table bordy has border. */
@@ -330,7 +376,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
       this.some((row) =>
         row instanceof Row
           ? row.hasBorder()
-          : row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
+          : Array.isArray(row)
+          ? row.some((cell) => cell instanceof Cell ? cell.getBorder() : false)
+          : false
       );
   }
 
@@ -340,23 +388,131 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   }
 
   /** Get table alignment. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  public getAlign(): Direction | undefined {
+    return this.options.align;
   }
 
   /** Get columns. */
-  public getColumns(): Array<Column> {
+  public getColumns(): Columns<TRow, THeaderRow> {
     return this.options.columns;
   }
 
-  /** Get column by column index. */
-  public getColumn(index: number): Column {
+  /** Get column by index. */
+  public getColumn<TIndex extends number>(
+    index: TIndex,
+  ): Columns<TRow, THeaderRow>[TIndex] {
     return this.options.columns[index] ??= new Column();
   }
+
+  /** Get header value parser. */
+  public getHeaderValueParser():
+    | ValueParser<GetRowInnerValue<THeaderRow>>
+    | undefined {
+    return this.options.headerValue;
+  }
+
+  /** Get value parser. */
+  public getCellValueParser():
+    | ValueParser<GetRowInnerValue<TRow>>
+    | undefined {
+    return this.options.value;
+  }
 }
+
+/** Table settings. */
+export interface TableSettings<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> {
+  /** Table indentation. */
+  indent: number;
+  /** Enable/disable border on all cells. */
+  border: boolean;
+  /** Set min column width. */
+  minColWidth: number | Array<number>;
+  /** Set max column width. */
+  maxColWidth: number | Array<number>;
+  /** Set cell padding. */
+  padding: number | Array<number>;
+  /** Set table characters. */
+  chars: Border;
+  /** Set cell content alignment. */
+  align?: Direction;
+  /** Set column options. */
+  columns: Columns<TRow, THeaderRow>;
+  /** Header value parser */
+  headerValue?: ValueParser<GetRowInnerValue<THeaderRow>>;
+  /** Cell value parser */
+  value?: ValueParser<GetRowInnerValue<TRow>>;
+}
+
+/** Table type. */
+export type TableType<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> =
+  | Array<TRow>
+  | Table<TRow, THeaderRow>;
+
+/** Border characters settings. */
+export type BorderOptions = Partial<Border>;
+
+type Columns<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> = GetRow<UnwrapRow<TRow>, UnwrapRow<THeaderRow>> extends infer Row
+  ? [] extends Row
+    ? Array<Column<GetRowInnerValue<TRow>, GetRowInnerValue<THeaderRow>>>
+    // deno-lint-ignore ban-types
+  : {} extends Row
+    ? Array<Column<GetRowInnerValue<TRow>, GetRowInnerValue<THeaderRow>>>
+  : {
+    [TIndex in keyof Row]?: Column<
+      GetCellValue<GetCell<TRow, TIndex>>,
+      GetCellValue<GetCell<THeaderRow, TIndex>>
+    >;
+  }
+  : never;
+
+type ColumnsOptions<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> = GetRow<UnwrapRow<TRow>, UnwrapRow<THeaderRow>> extends infer Row
+  ? [] extends Row
+    ? Array<ColumnOptions<GetRowInnerValue<TRow>, GetRowInnerValue<THeaderRow>>>
+    // deno-lint-ignore ban-types
+  : {} extends Row
+    ? Array<ColumnOptions<GetRowInnerValue<TRow>, GetRowInnerValue<THeaderRow>>>
+  : {
+    [TIndex in keyof Row]?: ColumnOptions<
+      GetCellValue<GetCell<TRow, TIndex>>,
+      GetCellValue<GetCell<THeaderRow, TIndex>>
+    >;
+  }
+  : never;
+
+type GetRow<
+  TRow,
+  THeaderRow,
+> = TRow extends ReadonlyArray<unknown>
+  ? THeaderRow extends ReadonlyArray<unknown> ? TRow | THeaderRow
+  : TRow
+  : THeaderRow extends ReadonlyArray<unknown> ? THeaderRow
+  : MakeArray<TRow> | MakeArray<THeaderRow>;
+
+type GetCell<TRow, TIndex> = TIndex extends keyof TRow ? TRow[TIndex]
+  : TRow extends ReadonlyArray<unknown> ? TRow[number]
+  : TRow;
+
+type MakeArray<T> = unknown extends T ? []
+  : T extends ReadonlyArray<unknown> ? T
+  : ReadonlyArray<T>;
 
 /** @deprecated Use `BorderOptions` instead. */
 export type IBorderOptions = BorderOptions;
 
 /** @deprecated Use `TableType` instead. */
-export type ITable = TableType;
+export type ITable<
+  TRow extends RowType<CellValue> = RowType<CellValue>,
+  THeaderRow extends RowType<CellValue> = TRow,
+> = TableType<TRow, THeaderRow>;
