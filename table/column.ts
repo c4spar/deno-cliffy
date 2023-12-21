@@ -19,14 +19,6 @@ export interface ColumnOptions<
   value?: ValueParser<TValue>;
 }
 
-export type FieldNames<TValue> = Extract<
-  keyof {
-    // deno-lint-ignore ban-types
-    [Key in keyof TValue as TValue[Key] extends Function ? never : Key]: Key;
-  },
-  string
->;
-
 /**
  * Column representation.
  *
