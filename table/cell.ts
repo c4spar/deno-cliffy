@@ -1,14 +1,28 @@
 /** Allowed cell value type. */
-export type CellValue = number | string;
+export type CellValue = unknown;
+// export type CellValue = number | string | Record<string, unknown> | undefined | null;
 
-/** Allowed cell type. */
-export type CellType = CellValue | Cell;
+/** Cell type. */
+export type CellType<TValue extends CellValue = CellValue> =
+  | Cell<TValue>
+  | TValue;
+
+export type GetCellValue<TCell extends CellType> = TCell extends infer TCell
+  ? TCell extends Cell<infer Value> ? Value
+  : TCell
+  : never;
 
 /** Cell alignment direction. */
 export type Direction = "left" | "right" | "center";
 
+export type ValueParserResult = string | number | undefined | null | void;
+
+export type ValueParser<TValue extends CellValue> = (
+  value: TValue,
+) => ValueParserResult;
+
 /** Cell options. */
-interface CellOptions {
+export interface CellOptions<TValue extends CellValue> {
   /** Enable/disable cell border. */
   border?: boolean;
   /** Set coll span. */
@@ -17,6 +31,8 @@ interface CellOptions {
   rowSpan?: number;
   /** Cell cell alignment direction. */
   align?: Direction;
+  // value?: ValueParser<TValue>;
+  value?(value: TValue): ValueParserResult;
   /**
    * Any unterminated ANSI formatting overflowed from previous lines of a
    * multi-line cell.
@@ -40,8 +56,9 @@ interface CellOptions {
  *   .render();
  * ```
  */
-export class Cell {
-  protected options: CellOptions = {};
+/** Cell representation. */
+export class Cell<TValue extends CellValue = CellValue> {
+  protected options: CellOptions<TValue> = {};
 
   /** Get cell length. */
   public get length(): number {
@@ -65,32 +82,35 @@ export class Cell {
    *
    * @param value Cell or cell value.
    */
-  public static from(value: CellType): Cell {
-    let cell: Cell;
+  public static from<TValue extends CellValue>(
+    value: CellType<TValue>,
+  ): Cell<TValue> {
     if (value instanceof Cell) {
-      cell = new this(value.getValue());
+      const cell = new this(value.getValue());
       cell.options = { ...value.options };
-    } else {
-      cell = new this(value);
+      return cell;
     }
-    return cell;
+
+    return new this(value);
   }
 
   /**
    * Cell constructor.
    *
-   * @param value Cell value.
+   * @param cellValue Cell value.
    */
-  public constructor(private value: CellValue) {}
+  public constructor(
+    private cellValue?: TValue | undefined | null,
+  ) {}
 
   /** Get cell string value. */
   public toString(): string {
-    return this.value.toString();
+    return this.cellValue?.toString() ?? "";
   }
 
   /** Get cell value. */
-  public getValue(): CellValue {
-    return this.value;
+  public getValue(): TValue | undefined | null {
+    return this.cellValue;
   }
 
   /**
@@ -98,8 +118,8 @@ export class Cell {
    *
    * @param value Cell or cell value.
    */
-  public setValue(value: CellValue): this {
-    this.value = value;
+  public setValue(value: TValue | undefined | null): this {
+    this.cellValue = value;
     return this;
   }
 
@@ -108,8 +128,12 @@ export class Cell {
    *
    * @param value Cell or cell value.
    */
-  public clone(value?: CellValue): Cell {
-    return Cell.from(value ?? this);
+  public clone<TCloneValue extends CellValue = TValue>(
+    value?: TCloneValue,
+  ): Cell<TCloneValue> {
+    const cell = new Cell(value ?? this.getValue() as TCloneValue);
+    cell.options = { ...this.options } as CellOptions<TCloneValue>;
+    return cell;
   }
 
   /**
@@ -201,12 +225,21 @@ export class Cell {
   }
 
   /**
+   * Register cell value parser.
+   * @param fn  Value parser callback function.
+   */
+  public value(fn: ValueParser<TValue>): this {
+    this.options.value = fn;
+    return this;
+  }
+
+  /**
    * Getter:
    */
 
   /** Check if cell has border. */
-  public getBorder(): boolean {
-    return this.options.border === true;
+  public getBorder(): boolean | undefined {
+    return this.options.border;
   }
 
   /** Get col span. */
@@ -223,9 +256,14 @@ export class Cell {
       : 1;
   }
 
-  /** Get row span. */
-  public getAlign(): Direction {
-    return this.options.align ?? "left";
+  /** Get cell alignment. */
+  public getAlign(): Direction | undefined {
+    return this.options.align;
+  }
+
+  /** Get value parser. */
+  public getValueParser(): ValueParser<TValue> | undefined {
+    return this.options.value;
   }
 }
 

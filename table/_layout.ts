@@ -1,7 +1,13 @@
+import {
+  Cell,
+  type CellType,
+  type CellValue,
+  type Direction,
+  type ValueParser,
+} from "./cell.ts";
 import type { Column } from "./column.ts";
-import { Cell, CellType, Direction } from "./cell.ts";
 import { consumeChars, consumeWords } from "./consume_words.ts";
-import { Row, RowType } from "./row.ts";
+import { GetRowInnerValue, Row, type RowType } from "./row.ts";
 import type { BorderOptions, Table, TableSettings } from "./table.ts";
 import { getUnclosedAnsiRuns, longest, strLength } from "./_utils.ts";
 
@@ -17,15 +23,18 @@ interface RenderSettings {
 }
 
 /** Table layout renderer. */
-export class TableLayout {
+export class TableLayout<
+  TRow extends RowType<CellValue>,
+  THeaderRow extends RowType<CellValue>,
+> {
   /**
    * Table layout constructor.
    * @param table   Table instance.
    * @param options Render options.
    */
   public constructor(
-    private table: Table,
-    private options: TableSettings,
+    private table: Table<TRow, THeaderRow>,
+    private options: TableSettings<TRow, THeaderRow>,
   ) {}
 
   /** Generate table string. */
@@ -53,7 +62,10 @@ export class TableLayout {
 
     const rows = this.#getRows();
 
-    const columns: number = Math.max(...rows.map((row) => row.length));
+    const columns: number = Math.max(
+      this.options.columns.length,
+      ...rows.map((row) => row.length),
+    );
     for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
       const row = rows[rowIndex];
       const length: number = row.length;
@@ -100,9 +112,11 @@ export class TableLayout {
   }
 
   #getRows(): Array<Row<Cell>> {
-    const header: Row | undefined = this.table.getHeader();
+    const header: Row<CellValue> | undefined = this.table
+      .getHeader();
     const rows = header ? [header, ...this.table] : this.table.slice();
     const hasSpan = rows.some((row) =>
+      Array.isArray(row) &&
       row.some((cell) =>
         cell instanceof Cell && (cell.getColSpan() > 1 || cell.getRowSpan() > 1)
       )
@@ -111,26 +125,37 @@ export class TableLayout {
     if (hasSpan) {
       return this.spanRows(rows);
     }
+    const isDataTable = this.isDataTable();
 
     return rows.map((row, rowIndex) => {
-      const newRow = this.createRow(row);
-      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+      const newRow = Row.from(row) as Row<Cell>;
+      const dataCell = isDataTable ? Cell.from(newRow[0]) : null;
+      const length = isDataTable ? this.options.columns.length : newRow.length;
+
+      for (let colIndex = 0; colIndex < length; colIndex++) {
         newRow[colIndex] = this.createCell(
-          row[colIndex],
+          newRow[colIndex] ?? dataCell,
           newRow,
           rowIndex,
           colIndex,
         );
       }
+
       return newRow;
     });
+  }
+
+  private isDataTable(): boolean {
+    const row = this.table[0];
+    return !!row && !(row instanceof Row || Array.isArray(row)) &&
+      typeof row === "object";
   }
 
   /**
    * Fills rows and cols by specified row/col span with a reference of the
    * original cell.
    */
-  protected spanRows(rows: Array<RowType>) {
+  protected spanRows(rows: Array<RowType<CellType>>) {
     const rowSpan: Array<number> = [];
     let colSpan = 1;
     let rowIndex = -1;
@@ -140,7 +165,7 @@ export class TableLayout {
       if (rowIndex === rows.length && rowSpan.every((span) => span === 1)) {
         break;
       }
-      const row = rows[rowIndex] = this.createRow(rows[rowIndex] || []);
+      const row = rows[rowIndex] = Row.from<unknown>(rows[rowIndex] || []);
       let colIndex = -1;
 
       while (true) {
@@ -166,10 +191,11 @@ export class TableLayout {
 
         if (rowSpan[colIndex] > 1) {
           rowSpan[colIndex]--;
-          rows[rowIndex].splice(
+          const prevRow = rows[rowIndex - 1] as Row<CellType>;
+          row.splice(
             colIndex,
             this.getDeleteCount(rows, rowIndex, colIndex),
-            rows[rowIndex - 1][colIndex],
+            prevRow[colIndex],
           );
 
           continue;
@@ -191,51 +217,70 @@ export class TableLayout {
   }
 
   protected getDeleteCount(
-    rows: Array<Array<unknown>>,
+    rows: Array<RowType<CellType>>,
     rowIndex: number,
     colIndex: number,
   ) {
-    return colIndex <= rows[rowIndex].length - 1 &&
-        typeof rows[rowIndex][colIndex] === "undefined"
+    const row: RowType<CellType> = rows[rowIndex];
+    return Array.isArray(row) && colIndex <= row.length - 1 &&
+        typeof row[colIndex] === "undefined"
       ? 1
       : 0;
   }
 
   /**
-   * Create a new row from existing row or cell array.
-   * @param row Original row.
-   */
-  protected createRow(row: RowType): Row<Cell> {
-    return Row.from(row)
-      .border(this.table.getBorder(), false)
-      .align(this.table.getAlign(), false) as Row<Cell>;
-  }
-
-  /**
    * Create a new cell from existing cell or cell value.
    *
-   * @param cell      Original cell.
+   * @param value      Original cell.
    * @param row       Parent row.
    * @param rowIndex  The row index of the cell.
    * @param colIndex  The column index of the cell.
    */
   protected createCell(
-    cell: CellType | null | undefined,
-    row: Row,
+    value: CellType,
+    row: Row<CellType>,
     rowIndex: number,
     colIndex: number,
   ): Cell {
-    const column: Column | undefined = this.options.columns.at(colIndex);
+    const column:
+      | Column<GetRowInnerValue<TRow>, GetRowInnerValue<THeaderRow>>
+      | undefined = this.options.columns
+        .at(colIndex);
     const isHeaderRow = this.isHeaderRow(rowIndex);
-    return Cell.from(cell ?? "")
-      .border(
-        (isHeaderRow ? null : column?.getBorder()) ?? row.getBorder(),
-        false,
-      )
-      .align(
-        (isHeaderRow ? null : column?.getAlign()) ?? row.getAlign(),
-        false,
+    const cell = Cell.from(value ?? "") as Cell;
+
+    if (typeof cell.getBorder() === "undefined") {
+      cell.border(
+        row.getBorder() ?? (isHeaderRow ? null : column?.getBorder()) ??
+          this.table.getBorder() ??
+          false,
       );
+    }
+
+    if (!cell.getAlign()) {
+      cell.align(
+        row.getAlign() ?? (isHeaderRow ? null : column?.getAlign()) ??
+          this.table.getAlign() ?? "left",
+      );
+    }
+
+    const cellValueParser =
+      (cell.getValueParser() ?? row.getCellValueParser() ??
+        (
+          isHeaderRow
+            ? column?.getHeaderValueParser()
+            : column?.getCellValueParser()
+        ) ??
+        (isHeaderRow
+          ? this.table.getHeaderValueParser()
+          : this.table.getCellValueParser())) as ValueParser<CellValue>;
+
+    if (cellValueParser) {
+      cell.value(cellValueParser);
+      cell.setValue(cellValueParser(cell.getValue()));
+    }
+
+    return cell;
   }
 
   private isHeaderRow(rowIndex: number) {
@@ -416,11 +461,12 @@ export class TableLayout {
     cell: Cell,
     maxLength: number,
   ): { current: string; next: string } {
+    const value = cell.toString();
     const length: number = Math.min(
       maxLength,
-      strLength(cell.toString()),
+      strLength(value),
     );
-    let words: string = consumeWords(length, cell.toString());
+    let words: string = consumeWords(length, value);
 
     // break word if word is longer than max length
     const breakWord = strLength(words) > length;
@@ -430,7 +476,7 @@ export class TableLayout {
 
     // get next content and remove leading space if breakWord is not true
     // calculate from words.length _before_ any handling of unclosed ANSI codes
-    const next = cell.toString().slice(words.length + (breakWord ? 0 : 1));
+    const next = value.slice(words.length + (breakWord ? 0 : 1));
 
     words = cell.unclosedAnsiRuns + words;
 
@@ -442,7 +488,7 @@ export class TableLayout {
     const fillLength = maxLength - strLength(words);
 
     // Align content
-    const align: Direction = cell.getAlign();
+    const align: Direction = cell.getAlign() ?? "left";
     let current: string;
     if (fillLength === 0) {
       current = words;
