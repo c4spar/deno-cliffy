@@ -265,15 +265,15 @@ export class TableLayout<
     }
 
     const cellValueParser =
-      (cell.getValueParser() ?? row.getCellValueParser() ??
+      (cell.getValueParser() ?? row.getValueParser() ??
         (
           isHeaderRow
             ? column?.getHeaderValueParser()
-            : column?.getCellValueParser()
+            : column?.getValueParser()
         ) ??
         (isHeaderRow
           ? this.table.getHeaderValueParser()
-          : this.table.getCellValueParser())) as ValueParser<CellValue>;
+          : this.table.getValueParser())) as ValueParser<CellValue>;
 
     if (cellValueParser) {
       cell.value(cellValueParser);
