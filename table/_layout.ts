@@ -264,16 +264,13 @@ export class TableLayout<
       );
     }
 
-    const cellValueParser =
-      (cell.getValueParser() ?? row.getCellValueParser() ??
-        (
-          isHeaderRow
-            ? column?.getHeaderValueParser()
-            : column?.getCellValueParser()
-        ) ??
-        (isHeaderRow
-          ? this.table.getHeaderValueParser()
-          : this.table.getCellValueParser())) as ValueParser<CellValue>;
+    const cellValueParser = (cell.getValueParser() ?? row.getValueParser() ??
+      (
+        isHeaderRow ? column?.getHeaderValueParser() : column?.getValueParser()
+      ) ??
+      (isHeaderRow
+        ? this.table.getHeaderValueParser()
+        : this.table.getValueParser())) as ValueParser<CellValue>;
 
     if (cellValueParser) {
       cell.value(cellValueParser);
