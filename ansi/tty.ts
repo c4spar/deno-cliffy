@@ -8,6 +8,7 @@ export interface TtyOptions {
   reader?: Deno.ReaderSync & {
     readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+    isTerminal(): boolean;
   };
 }
 

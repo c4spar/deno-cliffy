@@ -73,6 +73,7 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   reader?: Deno.Reader & {
     readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+    isTerminal(): boolean;
   };
   /** Change the prompt output stream. */
   writer?: Deno.WriterSync;
@@ -89,6 +90,7 @@ export interface GenericPromptSettings<TValue, TRawValue>
   reader: Deno.Reader & {
     readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+    isTerminal(): boolean;
   };
   writer: Deno.WriterSync;
 }
@@ -356,7 +358,7 @@ export abstract class GenericPrompt<
   /** Read user input from stdin. */
   #readChar = async (): Promise<Uint8Array> => {
     const buffer = new Uint8Array(8);
-    const isTty = Deno.isatty(this.settings.reader.rid);
+    const isTty = this.settings.reader.isTerminal();
 
     if (isTty) {
       this.settings.reader.setRaw(
