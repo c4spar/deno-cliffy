@@ -71,7 +71,6 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   prefix?: string;
   /** Change the prompt input stream. */
   reader?: Deno.Reader & {
-    readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };
@@ -88,7 +87,6 @@ export interface GenericPromptSettings<TValue, TRawValue>
   cbreak: boolean;
   tty: Tty;
   reader: Deno.Reader & {
-    readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };
