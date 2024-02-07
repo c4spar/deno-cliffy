@@ -6,8 +6,8 @@ import { Cursor, getCursorPosition } from "./cursor_position.ts";
 export interface TtyOptions {
   writer?: Deno.WriterSync;
   reader?: Deno.ReaderSync & {
-    readonly rid: number;
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
+    isTerminal(): boolean;
   };
 }
 
