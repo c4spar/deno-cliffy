@@ -800,9 +800,9 @@ export class Command<
   }
 
   /**
-   * Set command arguments:
+   * Set command arguments.
    *
-   *   <requiredArg:string> [optionalArg: number] [...restArgs:string]
+   * Syntax: `<requiredArg:string> [optionalArg: number] [...restArgs:string]`
    */
   public arguments<
     TArguments extends TypedArguments<
