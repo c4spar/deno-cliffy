@@ -67,7 +67,7 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   indent?: string;
   /** Keymap to assign key names to prompt actions. */
   keys?: GenericPromptKeys;
-  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.35.3?s=Deno.SetRawOptions). */
+  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.40.5?s=Deno.SetRawOptions). */
   cbreak?: boolean;
   /** Change the prompt prefix. Default is: `yellow("? ")`. */
   prefix?: string;

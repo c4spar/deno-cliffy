@@ -4,7 +4,7 @@ import { assertEquals } from "../../dev_deps.ts";
 Deno.test(`table - ansiRegexSource`, () => {
   const DIGITS = String.raw`\d+`;
   // All open and close ANSI codes taken from calls to `code(...)` in
-  // https://deno.land/std@0.215.0/fmt/colors.ts
+  // https://deno.land/std@0.216.0/fmt/colors.ts
   const ansiCodes = [
     { open: [0], close: 0 },
     { open: [1], close: 22 },
