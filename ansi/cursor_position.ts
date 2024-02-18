@@ -1,4 +1,5 @@
 import { cursorPosition } from "./ansi_escapes.ts";
+import type { ReaderSync, WriterSync } from "./deps.ts";
 
 /** Cursor position. */
 export interface Cursor {
@@ -8,8 +9,8 @@ export interface Cursor {
 
 /** Cursor position options. */
 export interface CursorPositionOptions {
-  writer?: Deno.WriterSync;
-  reader?: Deno.ReaderSync & {
+  writer?: WriterSync;
+  reader?: ReaderSync & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };

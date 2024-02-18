@@ -1,11 +1,12 @@
 import * as ansiEscapes from "./ansi_escapes.ts";
 import type { Chain } from "./chain.ts";
 import { Cursor, getCursorPosition } from "./cursor_position.ts";
+import type { ReaderSync, WriterSync } from "./deps.ts";
 
 /** Create new `Ansi` instance. */
 export interface TtyOptions {
-  writer?: Deno.WriterSync;
-  reader?: Deno.ReaderSync & {
+  writer?: WriterSync;
+  reader?: ReaderSync & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };

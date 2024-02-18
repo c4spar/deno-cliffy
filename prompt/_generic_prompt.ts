@@ -7,8 +7,10 @@ import {
   dim,
   green,
   italic,
+  type Reader,
   red,
   stripColor,
+  type WriterSync,
   yellow,
 } from "./deps.ts";
 import { Figures } from "./_figures.ts";
@@ -65,17 +67,17 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   indent?: string;
   /** Keymap to assign key names to prompt actions. */
   keys?: GenericPromptKeys;
-  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.35.3?s=Deno.SetRawOptions). */
+  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.40.5?s=Deno.SetRawOptions). */
   cbreak?: boolean;
   /** Change the prompt prefix. Default is: `yellow("? ")`. */
   prefix?: string;
   /** Change the prompt input stream. */
-  reader?: Deno.Reader & {
+  reader?: Reader & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };
   /** Change the prompt output stream. */
-  writer?: Deno.WriterSync;
+  writer?: WriterSync;
 }
 
 /** Generic prompt settings. */
@@ -86,11 +88,11 @@ export interface GenericPromptSettings<TValue, TRawValue>
   prefix: string;
   cbreak: boolean;
   tty: Tty;
-  reader: Deno.Reader & {
+  reader: Reader & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
     isTerminal(): boolean;
   };
-  writer: Deno.WriterSync;
+  writer: WriterSync;
 }
 
 /** Prompt validation return tape. */
