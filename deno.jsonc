@@ -2,14 +2,14 @@
 	"name": "@c4spar/cliffy",
 	"version": "1.0.0-rc.3",
 	"exports": {
-		"ansi": "./ansi/mod.ts",
-		"command": "./command/mod.ts",
-		"flags": "./flags/mod.ts",
-		"keycode": "./keycode/mod.ts",
-		"keypress": "./keypress/mod.ts",
-		"prompt": "./prompt/mod.ts",
-		"table": "./table/mod.ts",
-		"testing": "./testing/mod.ts"
+		"./ansi": "./ansi/mod.ts",
+		"./command": "./command/mod.ts",
+		"./flags": "./flags/mod.ts",
+		"./keycode": "./keycode/mod.ts",
+		"./keypress": "./keypress/mod.ts",
+		"./prompt": "./prompt/mod.ts",
+		"./table": "./table/mod.ts",
+		"./testing": "./testing/mod.ts"
 	},
 	"lock": false,
 	"exclude": ["dist"],
