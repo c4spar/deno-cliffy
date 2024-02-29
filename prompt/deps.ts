@@ -8,15 +8,15 @@ export {
   stripColor,
   underline,
   yellow,
-} from "https://deno.land/std@0.216.0/fmt/colors.ts";
+} from "@std/fmt/colors";
 export {
   dirname,
   join,
   normalize,
-} from "https://deno.land/std@0.216.0/path/mod.ts";
+} from "@std/path/mod";
 export type {
   Reader,
   ReaderSync,
   Writer,
   WriterSync,
-} from "https://deno.land/std@0.216.0/io/types.ts";
+} from "@std/io/types";

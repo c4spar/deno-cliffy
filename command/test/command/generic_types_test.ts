@@ -3,7 +3,7 @@ import {
   assert,
   IsAny,
   IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
+} from "conditional_type_checks";
 
 // Not required to execute this code, only type check.
 (() => {
