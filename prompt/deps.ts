@@ -13,7 +13,7 @@ export {
   dirname,
   join,
   normalize,
-} from "@std/path/mod";
+} from "@std/path";
 export type {
   Reader,
   ReaderSync,
