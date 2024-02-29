@@ -32,17 +32,17 @@
 		// "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.8.2/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
 	},
   "imports": {
-    "@std/assert": "jsr:@std/assert@0.216",
-    "@std/async": "jsr:@std/async@0.216",
-    "@std/console": "jsr:@std/console@0.216",
-    "@std/datetime": "jsr:@std/datetime@0.216",
-    "@std/encoding": "jsr:@std/encoding@0.216",
-    "@std/fmt": "jsr:@std/fmt@0.216",
-    "@std/fs": "jsr:@std/fs@0.216",
-    "@std/http": "jsr:@std/http@0.216",
-    "@std/io": "jsr:@std/io@0.216",
-    "@std/path": "jsr:@std/path@0.216",
-    "@std/testing": "jsr:@std/testing@0.216",
+    "@std/assert": "jsr:@std/assert@0.217",
+    "@std/async": "jsr:@std/async@0.217",
+    "@std/console": "jsr:@std/console@0.217",
+    "@std/datetime": "jsr:@std/datetime@0.217",
+    "@std/encoding": "jsr:@std/encoding@0.217",
+    "@std/fmt": "jsr:@std/fmt@0.217",
+    "@std/fs": "jsr:@std/fs@0.217",
+    "@std/http": "jsr:@std/http@0.217",
+    "@std/io": "jsr:@std/io@0.217",
+    "@std/path": "jsr:@std/path@0.217",
+    "@std/testing": "jsr:@std/testing@0.217",
     "conditional_type_checks": "npm:conditional-type-checks@1.0.6",
     "sinon": "npm:sinon@13.0.2"
   }
