@@ -3,7 +3,7 @@ import { encodeBase64 } from "./deps.ts";
 /** Escape sequence: `\x1B` */
 const ESC = "\x1B";
 /** Control sequence intro: `\x1B[` */
-const CSI = `${ESC}[`;
+const CSI: `\x1B[` = `${ESC}[`;
 /** Operating system command: `\x1B]` */
 const OSC = `${ESC}]`;
 /** Link separator */
@@ -12,7 +12,7 @@ const SEP = ";";
 /** Ring audio bell: `\u0007` */
 export const bel = "\u0007";
 /** Get cursor position. */
-export const cursorPosition = `${CSI}6n`;
+export const cursorPosition: `\x1B[6n` = `${CSI}6n`;
 
 /**
  * Move cursor to x, y, counting from the top left corner.
@@ -98,15 +98,15 @@ export function cursorPrevLine(count = 1): string {
 }
 
 /** Move cursor to first column of current row. */
-export const cursorLeft = `${CSI}G`;
+export const cursorLeft: `\x1B[G` = `${CSI}G`;
 /** Hide cursor. */
-export const cursorHide = `${CSI}?25l`;
+export const cursorHide: `\x1B[?25l` = `${CSI}?25l`;
 /** Show cursor. */
-export const cursorShow = `${CSI}?25h`;
+export const cursorShow: `\x1B[?25h` = `${CSI}?25h`;
 /** Save cursor. */
-export const cursorSave = `${ESC}7`;
+export const cursorSave: `\x1B7` = `${ESC}7`;
 /** Restore cursor. */
-export const cursorRestore = `${ESC}8`;
+export const cursorRestore: `\x1B8` = `${ESC}8`;
 
 /**
  * Scroll window up by n lines.
@@ -125,7 +125,7 @@ export function scrollDown(count = 1): string {
 }
 
 /** Clear screen. */
-export const eraseScreen = `${CSI}2J`;
+export const eraseScreen: `\x1B[2J` = `${CSI}2J`;
 
 /**
  * Clear screen up by n lines.
@@ -144,11 +144,11 @@ export function eraseDown(count = 1): string {
 }
 
 /** Clear current line. */
-export const eraseLine = `${CSI}2K`;
+export const eraseLine: `\x1B[2K` = `${CSI}2K`;
 /** Clear to line end. */
-export const eraseLineEnd = `${CSI}0K`;
+export const eraseLineEnd: `\x1B[0K` = `${CSI}0K`;
 /** Clear to line start. */
-export const eraseLineStart = `${CSI}1K`;
+export const eraseLineStart: `\x1B[1K` = `${CSI}1K`;
 
 /**
  * Clear screen and move cursor by n lines up and move cursor to first column.
@@ -170,7 +170,7 @@ export const clearScreen = "\u001Bc";
  * Clear the whole terminal, including scrollback buffer.
  * (Not just the visible part of it).
  */
-export const clearTerminal = Deno.build.os === "windows"
+export const clearTerminal: string = Deno.build.os === "windows"
   ? `${eraseScreen}${CSI}0f`
   // 1. Erases the screen (Only done in case `2` is not supported)
   // 2. Erases the whole screen including scrollback buffer

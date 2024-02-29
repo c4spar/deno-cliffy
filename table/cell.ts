@@ -68,7 +68,7 @@ export class Cell<TValue extends CellValue = CellValue> {
    * Any unterminated ANSI formatting overflowed from previous lines of a
    * multi-line cell.
    */
-  public get unclosedAnsiRuns() {
+  public get unclosedAnsiRuns(): string {
     return this.options.unclosedAnsiRuns ?? "";
   }
   public set unclosedAnsiRuns(val: string) {

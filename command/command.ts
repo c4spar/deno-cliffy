@@ -2294,7 +2294,7 @@ export class Command<
   }
 
   /** Check if command has arguments. */
-  public hasArguments() {
+  public hasArguments(): boolean {
     return !!this.argsDefinition;
   }
 
@@ -2317,7 +2317,7 @@ export class Command<
   }
 
   /** Get auto generated command usage. */
-  public getUsage() {
+  public getUsage(): string {
     return this._usage ??
       [this.getArgsDefinition(), this.getRequiredOptionsDefinition()]
         .join(" ")
@@ -2798,7 +2798,7 @@ export class Command<
   }
 
   /** Get completions. */
-  public getCompletions() {
+  public getCompletions(): Completion<any, any, any, any, any, any, any, any>[] {
     return this.getGlobalCompletions().concat(this.getBaseCompletions());
   }
 
