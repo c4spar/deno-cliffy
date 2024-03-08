@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { dim, italic } from "../deps.ts";
+import { dim, italic } from "@std/fmt/colors";
 import { FishCompletionsGenerator } from "./_fish_completions_generator.ts";
 
 /** Generates fish completions script. */

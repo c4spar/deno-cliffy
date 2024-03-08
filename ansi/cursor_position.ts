@@ -1,5 +1,5 @@
 import { cursorPosition } from "./ansi_escapes.ts";
-import type { ReaderSync, WriterSync } from "./deps.ts";
+import type { ReaderSync, WriterSync } from "@std/io/types";
 
 /** Cursor position. */
 export interface Cursor {

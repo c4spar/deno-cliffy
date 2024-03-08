@@ -2,7 +2,7 @@ import {
   assert,
   IsExact,
 } from "conditional_type_checks";
-import { assertEquals, assertRejects } from "../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";
 import { Confirm } from "../confirm.ts";

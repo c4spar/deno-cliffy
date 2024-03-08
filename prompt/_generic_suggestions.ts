@@ -9,12 +9,14 @@ import {
   bold,
   brightBlue,
   dim,
+  underline,
+  stripColor,
+} from "@std/fmt/colors";
+import {
   dirname,
   join,
   normalize,
-  stripColor,
-  underline,
-} from "./deps.ts";
+} from "@std/path"
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
 

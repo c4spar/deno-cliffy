@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import { ValidationError } from "../../_errors.ts";
 import { HelpCommand } from "../../help/help_command.ts";

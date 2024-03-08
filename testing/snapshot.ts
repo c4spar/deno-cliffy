@@ -1,6 +1,9 @@
 import { eraseDown } from "../ansi/ansi_escapes.ts";
 import { quoteString } from "./_quote_string.ts";
-import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
+import { basename } from "@std/path";
+import { red } from "@std/fmt/colors";
+import { assertSnapshot } from "@std/testing/snapshot";
+import { AssertionError } from "@std/assert/assertion_error";
 
 /** Snapshot test step options. */
 export interface SnapshotTestStep {

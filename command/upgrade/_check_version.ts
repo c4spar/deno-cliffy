@@ -1,4 +1,4 @@
-import { bold, yellow } from "../deps.ts";
+import { bold, yellow } from "@std/fmt/colors";
 import { Command } from "../command.ts";
 
 /** Check if new version is available and add hint to version. */

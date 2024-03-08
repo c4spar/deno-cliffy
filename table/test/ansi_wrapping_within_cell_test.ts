@@ -1,5 +1,5 @@
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 
 const tests: {
   description: string;

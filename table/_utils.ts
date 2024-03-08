@@ -6,7 +6,8 @@
  */
 import { Cell, CellType } from "./cell.ts";
 import { consumeWords } from "./consume_words.ts";
-import { stripColor, unicodeWidth } from "./deps.ts";
+import { stripColor } from "@std/fmt/colors";
+import { unicodeWidth } from "@std/console/unicode_width";
 
 /**
  * Get longest cell from given row index.

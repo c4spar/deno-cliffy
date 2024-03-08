@@ -1,5 +1,6 @@
 import { Table } from "../table.ts";
-import { assertSnapshot, assertType, IsExact } from "../../dev_deps.ts";
+import { assertType, IsExact } from "@std/testing/types";
+import { assertSnapshot } from "@std/testing/snapshot";
 import { Row } from "../row.ts";
 import { Cell } from "../cell.ts";
 

@@ -2,7 +2,7 @@ import {
   assert,
   IsExact,
 } from "conditional_type_checks";
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
 function cmd() {

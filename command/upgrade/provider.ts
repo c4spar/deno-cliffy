@@ -1,4 +1,4 @@
-import { bold, brightBlue, cyan, green, red, yellow } from "../deps.ts";
+import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "../../table/table.ts";
 

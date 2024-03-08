@@ -11,7 +11,7 @@ import {
   parseArgumentsDefinition,
   splitArguments,
 } from "./_utils.ts";
-import { bold, brightBlue, red } from "./deps.ts";
+import { bold, brightBlue, red } from "@std/fmt/colors";
 import {
   CommandExecutableNotFoundError,
   CommandNotFoundError,

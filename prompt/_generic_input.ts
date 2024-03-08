@@ -5,7 +5,7 @@ import {
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { brightBlue, dim, stripColor, underline } from "./deps.ts";
+import { brightBlue, dim, stripColor, underline } from "@std/fmt/colors";
 
 /** Generic input prompt options. */
 export interface GenericInputPromptOptions<TValue, TRawValue>

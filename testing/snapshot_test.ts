@@ -1,6 +1,7 @@
-import { assert, assertSnapshot } from "../dev_deps.ts";
+import { assert } from "@std/assert";
+import { assertSnapshot } from "@std/testing/snapshot";
 import { quoteString } from "./_quote_string.ts";
-import { dirname, fromFileUrl } from "./deps.ts";
+import { dirname, fromFileUrl } from "@std/path";
 
 Deno.test({
   name: "should run snapshot tests",

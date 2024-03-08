@@ -1,4 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 
 Deno.test("[flags] should parse required value with equals sign", () => {

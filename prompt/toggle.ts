@@ -1,5 +1,5 @@
 import type { KeyCode } from "../keycode/key_code.ts";
-import { dim, underline } from "./deps.ts";
+import { dim, underline } from "@std/fmt/colors";
 import {
   GenericPrompt,
   GenericPromptKeys,

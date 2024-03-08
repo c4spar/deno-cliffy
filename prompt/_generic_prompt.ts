@@ -7,12 +7,11 @@ import {
   dim,
   green,
   italic,
-  type Reader,
   red,
   stripColor,
-  type WriterSync,
-  yellow,
-} from "./deps.ts";
+  yellow
+} from "@std/fmt/colors";
+import { Reader, WriterSync } from "@std/io/types";
 import { Figures } from "./_figures.ts";
 
 /** Static generic prompt interface. */

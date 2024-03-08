@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertStrictEquals,
   assertThrows,
-} from "../../dev_deps.ts";
+} from "@std/assert";
 import { Row } from "../row.ts";
 
 Deno.test("simple table", () => {

@@ -6,7 +6,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
-import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
+import { bold, brightBlue, dim, stripColor, yellow } from "@std/fmt/colors";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
 

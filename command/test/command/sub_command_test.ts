@@ -2,7 +2,7 @@ import {
   assertEquals,
   assertRejects,
   assertThrows,
-} from "../../../dev_deps.ts";
+} from "@std/assert";
 import { Command } from "../../command.ts";
 
 const version = "1.0.0";

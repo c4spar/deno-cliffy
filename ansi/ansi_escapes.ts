@@ -1,4 +1,4 @@
-import { encodeBase64 } from "./deps.ts";
+import { encodeBase64 } from "@std/encoding/base64";
 
 /** Escape sequence: `\x1B` */
 const ESC = "\x1B";

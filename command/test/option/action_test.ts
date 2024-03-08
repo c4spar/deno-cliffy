@@ -1,11 +1,13 @@
 import {
   assert,
   assertEquals,
+} from "@std/assert";
+import {
   assertSpyCall,
   assertSpyCalls,
-  sinon,
   spy,
-} from "../../../dev_deps.ts";
+} from "@std/testing/mock";
+import sinon from "sinon";
 import { Command } from "../../command.ts";
 
 Deno.test("[command] should execute the action from an option", async () => {

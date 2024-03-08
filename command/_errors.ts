@@ -1,7 +1,7 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
 import { getFlag } from "../flags/_utils.ts";
-import { bold } from "./deps.ts";
+import { bold } from "@std/fmt/colors";
 import { EnvVar } from "./types.ts";
 
 export class CommandError extends Error {
