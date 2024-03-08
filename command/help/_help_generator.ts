@@ -13,7 +13,7 @@ import {
   red,
   setColorEnabled,
   yellow,
-} from "../deps.ts";
+} from "@std/fmt/colors";
 import { Type } from "../type.ts";
 import type { Argument, EnvVar, Example, Option } from "../types.ts";
 
