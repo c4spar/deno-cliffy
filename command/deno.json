@@ -1,0 +1,11 @@
+{
+  "name": "@cliffy/command",
+  "version": "1.0.0-rc.3",
+  "exports": {
+    ".": "./mod.ts",
+    "./completions": "./completions/mod.ts",
+    "./help": "./help/mod.ts",
+    "./upgrade": "./upgrade/mod.ts"
+  },
+  "lock": false
+}

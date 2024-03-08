@@ -1,0 +1,17 @@
+{
+  "name": "@cliffy/prompt",
+  "version": "1.0.0-rc.3",
+  "exports": {
+    ".": "./mod.ts",
+    "./checkbox": "./checkbox.ts",
+    "./confirm": "./confirm.ts",
+    "./input": "./input.ts",
+    "./list": "./list.ts",
+    "./number": "./number.ts",
+    "./prompt": "./prompt.ts",
+    "./secret": "./secret.ts",
+    "./select": "./select.ts",
+    "./toggle": "./toggle.ts"
+  },
+  "lock": false
+}

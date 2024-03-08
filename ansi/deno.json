@@ -1,0 +1,6 @@
+{
+  "name": "@cliffy/ansi",
+  "version": "1.0.0-rc.3",
+  "exports": "./mod.ts",
+  "lock": false
+}
