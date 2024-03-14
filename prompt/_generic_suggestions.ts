@@ -5,18 +5,8 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import {
-  bold,
-  brightBlue,
-  dim,
-  underline,
-  stripColor,
-} from "@std/fmt/colors";
-import {
-  dirname,
-  join,
-  normalize,
-} from "@std/path"
+import { bold, brightBlue, dim, stripColor, underline } from "@std/fmt/colors";
+import { dirname, join, normalize } from "@std/path";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 import { distance } from "../_utils/distance.ts";
 

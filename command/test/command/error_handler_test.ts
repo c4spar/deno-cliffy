@@ -1,12 +1,5 @@
-import {
-  assertEquals,
-  assertInstanceOf,
-  assertRejects,
-} from "@std/assert";
-import {
-  assertSpyCalls,
-  spy,
-} from "@std/testing/mock";
+import { assertEquals, assertInstanceOf, assertRejects } from "@std/assert";
+import { assertSpyCalls, spy } from "@std/testing/mock";
 import { Command, ErrorHandler, ValidationError } from "../../mod.ts";
 
 Deno.test("[command] should call error handler on error", async () => {

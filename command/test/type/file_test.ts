@@ -1,7 +1,4 @@
-import {
-  assert,
-  IsExact,
-} from "conditional_type_checks";
+import { assert, IsExact } from "conditional_type_checks";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 

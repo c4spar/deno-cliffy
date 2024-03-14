@@ -9,7 +9,7 @@ import {
   italic,
   red,
   stripColor,
-  yellow
+  yellow,
 } from "@std/fmt/colors";
 import { Reader, WriterSync } from "@std/io/types";
 import { Figures } from "./_figures.ts";

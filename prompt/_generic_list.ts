@@ -450,7 +450,10 @@ export abstract class GenericList<
     return this.settings.indent + " ".repeat(indentLevel);
   }
 
-  protected getListItemPointer(option: TOption | TGroup, isSelected?: boolean): string {
+  protected getListItemPointer(
+    option: TOption | TGroup,
+    isSelected?: boolean,
+  ): string {
     if (!isSelected) {
       return "  ";
     }

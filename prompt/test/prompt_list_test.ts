@@ -1,7 +1,4 @@
-import {
-  assert,
-  IsExact,
-} from "conditional_type_checks";
+import { assert, IsExact } from "conditional_type_checks";
 import { assertEquals, assertRejects } from "@std/assert";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";

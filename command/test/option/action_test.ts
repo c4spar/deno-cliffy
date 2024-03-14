@@ -1,12 +1,5 @@
-import {
-  assert,
-  assertEquals,
-} from "@std/assert";
-import {
-  assertSpyCall,
-  assertSpyCalls,
-  spy,
-} from "@std/testing/mock";
+import { assert, assertEquals } from "@std/assert";
+import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import sinon from "sinon";
 import { Command } from "../../command.ts";
 

@@ -2798,7 +2798,16 @@ export class Command<
   }
 
   /** Get completions. */
-  public getCompletions(): Completion<any, any, any, any, any, any, any, any>[] {
+  public getCompletions(): Completion<
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >[] {
     return this.getGlobalCompletions().concat(this.getBaseCompletions());
   }
 

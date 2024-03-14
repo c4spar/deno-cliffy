@@ -1,8 +1,4 @@
-import {
-  assertEquals,
-  assertRejects,
-  assertThrows,
-} from "@std/assert";
+import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { Command } from "../../command.ts";
 
 const version = "1.0.0";

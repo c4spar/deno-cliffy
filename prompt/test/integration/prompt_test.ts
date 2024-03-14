@@ -1,6 +1,6 @@
 import { ansi } from "../../../ansi/ansi.ts";
 import { assertEquals } from "@std/assert";
-import { IsExact, assertType } from "@std/testing/types";
+import { assertType, IsExact } from "@std/testing/types";
 import { Checkbox, CheckboxOptions } from "../../checkbox.ts";
 import { Confirm } from "../../confirm.ts";
 import { Input } from "../../input.ts";
