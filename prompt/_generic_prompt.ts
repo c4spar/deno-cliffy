@@ -1,6 +1,5 @@
-import type { Cursor } from "../ansi/cursor_position.ts";
-import { Tty, tty } from "../ansi/tty.ts";
-import { KeyCode, parse } from "../keycode/key_code.ts";
+import { Tty, tty, type Cursor } from "@cliffy/ansi";
+import { KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
   brightBlue,
