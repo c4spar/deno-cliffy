@@ -1,4 +1,4 @@
-import { Tty, tty, type Cursor } from "@cliffy/ansi";
+import { type Cursor, Tty, tty } from "@cliffy/ansi";
 import { KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
