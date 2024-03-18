@@ -1,5 +1,5 @@
+import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
-import { ValidationError } from "../../flags/_errors.ts";
 import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
 
