@@ -13,7 +13,6 @@ import {
 } from "./_utils.ts";
 import { bold, brightBlue, red } from "./deps.ts";
 import {
-  CommandExecutableNotFoundError,
   CommandNotFoundError,
   DefaultCommandNotFoundError,
   DuplicateCommandAliasError,
@@ -152,7 +151,6 @@ export class Command<
   private completions = new Map<string, Completion>();
   private cmd: Command<any> = this;
   private argsDefinition?: string;
-  private isExecutable = false;
   private throwOnError = false;
   private _allowEmpty = false;
   private _stopEarly = false;
@@ -790,12 +788,6 @@ export class Command<
   /** Make command globally available. */
   public global(): this {
     this.cmd.isGlobal = true;
-    return this;
-  }
-
-  /** Make command executable. */
-  public executable(): this {
-    this.cmd.isExecutable = true;
     return this;
   }
 
@@ -1718,10 +1710,7 @@ export class Command<
       this.registerDefaults();
       this.rawArgs = ctx.unknown.slice();
 
-      if (this.isExecutable) {
-        await this.executeExecutable(ctx.unknown);
-        return { options: {}, args: [], cmd: this, literal: [] };
-      } else if (this._useRawArgs) {
+      if (this._useRawArgs) {
         await this.parseEnvVars(ctx, this.envVars);
         return await this.execute(ctx.env, ctx.unknown);
       }
@@ -1964,32 +1953,6 @@ export class Command<
       await this._parent?.executeGlobalAction(options, args);
     }
     await this.globalActionHandler?.(options, ...args);
-  }
-
-  /**
-   * Execute external sub-command.
-   * @param args Raw command line arguments.
-   */
-  protected async executeExecutable(args: string[]) {
-    const command = this.getPath().replace(/\s+/g, "-");
-
-    await Deno.permissions.request({ name: "run", command });
-
-    try {
-      const cmd: Deno.Command = new Deno.Command(command, {
-        args,
-      });
-      const output: Deno.CommandOutput = await cmd.output();
-
-      if (!output.success) {
-        Deno.exit(output.code);
-      }
-    } catch (error) {
-      if (error instanceof Deno.errors.NotFound) {
-        throw new CommandExecutableNotFoundError(command);
-      }
-      throw error;
-    }
   }
 
   /** Parse raw command line arguments. */
