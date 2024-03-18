@@ -1,6 +1,10 @@
-import { getDefaultValue, getFlag } from "../../flags/_utils.ts";
 import { Table } from "@cliffy/table";
-import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
+import {
+  dedent,
+  getDescription,
+  getFlag,
+  parseArgumentsDefinition,
+} from "../_utils.ts";
 import type { Command } from "../command.ts";
 import {
   bold,
@@ -307,7 +311,10 @@ export class HelpGenerator {
     option.required && hints.push(yellow(`required`));
 
     if (typeof option.default !== "undefined") {
-      const defaultValue = getDefaultValue(option);
+      const defaultValue = typeof option.default === "function"
+        ? option.default()
+        : option.default;
+
       if (typeof defaultValue !== "undefined") {
         hints.push(
           bold(`Default: `) + inspect(defaultValue, this.options.colors),

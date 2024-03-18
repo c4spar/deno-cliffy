@@ -3,12 +3,12 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { underscoreToCamelCase } from "../flags/_utils.ts";
 import { parseFlags, type ParseFlagsContext } from "@cliffy/flags";
 import {
   getDescription,
   parseArgumentsDefinition,
   splitArguments,
+  underscoreToCamelCase,
 } from "./_utils.ts";
 import { bold, brightBlue, red } from "@std/fmt/colors";
 import {
