@@ -1,6 +1,6 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
-import { getFlag } from "../flags/_utils.ts";
+import { getFlag } from "./_utils.ts";
 import { bold } from "./deps.ts";
 import { EnvVar } from "./types.ts";
 
