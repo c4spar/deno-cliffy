@@ -3,13 +3,13 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
-import { underscoreToCamelCase } from "../flags/_utils.ts";
 import { parseFlags } from "../flags/flags.ts";
 import type { ParseFlagsContext } from "../flags/types.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
   splitArguments,
+  underscoreToCamelCase,
 } from "./_utils.ts";
 import { bold, brightBlue, red } from "./deps.ts";
 import {

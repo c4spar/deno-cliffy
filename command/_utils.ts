@@ -1,11 +1,32 @@
+import { closestString } from "https://deno.land/std@0.216.0/text/closest_string.ts";
 import {
   UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
 } from "../flags/_errors.ts";
-import { didYouMean } from "../flags/_utils.ts";
 import { OptionType } from "../flags/deprecated.ts";
 import type { Command } from "./command.ts";
 import type { Argument } from "./types.ts";
+
+export function getFlag(name: string) {
+  if (name.startsWith("-")) {
+    return name;
+  }
+  if (name.length > 1) {
+    return `--${name}`;
+  }
+  return `-${name}`;
+}
+
+export function didYouMean(
+  message: string,
+  type: string,
+  types: Array<string>,
+): string {
+  const match: string | undefined = types.length
+    ? closestString(type, types)
+    : undefined;
+  return match ? `${message} "${match}"?` : "";
+}
 
 export function didYouMeanCommand(
   command: string,
@@ -15,6 +36,7 @@ export function didYouMeanCommand(
   const commandNames = commands
     .map((command) => command.getName())
     .filter((command) => !excludes.includes(command));
+
   return didYouMean(" Did you mean command", command, commandNames);
 }
 
@@ -163,4 +185,15 @@ export function getDescription(
   return short
     ? description.trim().split("\n", 1)[0].trim()
     : dedent(description);
+}
+
+/** Convert underscore case string to camel case. */
+export function underscoreToCamelCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(
+      /_([a-z])/g,
+      (g) => g[1].toUpperCase(),
+    );
 }
