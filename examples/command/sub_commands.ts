@@ -25,10 +25,3 @@ await new Command()
       }),
   )
   .parse(Deno.args);
-
-// Command implemented using separate executable file (description is passed as second parameter to `.command()`)
-await new Command()
-  .command("start <service>", "Start named service.").executable()
-  .command("stop [service]", "Stop named service, or all if no name supplied.")
-  .executable()
-  .parse(Deno.args);
