@@ -6,9 +6,15 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
-import { bold, brightBlue, dim, stripColor, yellow } from "./deps.ts";
+import {
+  bold,
+  brightBlue,
+  dim,
+  levenshteinDistance,
+  stripColor,
+  yellow,
+} from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
-import { distance } from "../_utils/distance.ts";
 
 type UnsupportedInputOptions = "suggestions" | "list";
 
@@ -802,7 +808,7 @@ function matchOptions<
     if (matchOption(searchInput, option)) {
       matched.push({
         option,
-        distance: distance(option.name, searchInput),
+        distance: levenshteinDistance(option.name, searchInput),
         children: [],
       });
     }
