@@ -174,6 +174,7 @@ async function runPrompt(
       stderr: "piped",
       args: [
         "run",
+        "-c=deno.jsonc",
         ...options.denoArgs ?? ["--allow-env=SNAPSHOT_TEST_NAME"],
         options.meta.url,
         ...options.args ?? [],
