@@ -1,5 +1,5 @@
 import type { FlagOptions } from "./types.ts";
-import { distance } from "../_utils/distance.ts";
+import { closestString } from "@std/text/closest_string";
 
 /** Convert param case string to camel case. */
 export function paramCaseToCamelCase(str: string): string {
@@ -63,7 +63,7 @@ export function didYouMean(
   type: string,
   types: Array<string>,
 ): string {
-  const match: string | undefined = closest(type, types);
+  const match: string | undefined = closestString(type, types);
   return match ? `${message} "${match}"?` : "";
 }
 
@@ -121,19 +121,6 @@ function matchWildCardOption(
     }
   }
   return option;
-}
-
-function closest(str: string, arr: string[]): string | undefined {
-  let minDistance = Infinity;
-  let minIndex = 0;
-  for (let i = 0; i < arr.length; i++) {
-    const dist = distance(str, arr[i]);
-    if (dist < minDistance) {
-      minDistance = dist;
-      minIndex = i;
-    }
-  }
-  return arr[minIndex];
 }
 
 export function getDefaultValue(option: FlagOptions): unknown {

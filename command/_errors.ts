@@ -170,15 +170,6 @@ export class DefaultCommandNotFoundError extends CommandError {
   }
 }
 
-export class CommandExecutableNotFoundError extends CommandError {
-  constructor(name: string) {
-    super(
-      `Command executable not found: ${name}`,
-    );
-    Object.setPrototypeOf(this, CommandExecutableNotFoundError.prototype);
-  }
-}
-
 export class UnknownCompletionCommandError extends CommandError {
   constructor(name: string, commands: Array<Command>) {
     super(

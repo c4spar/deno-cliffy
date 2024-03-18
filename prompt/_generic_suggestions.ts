@@ -6,9 +6,9 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { bold, brightBlue, dim, stripColor, underline } from "@std/fmt/colors";
+import { levenshteinDistance } from "@std/text/levenshtein_distance";
 import { dirname, join, normalize } from "@std/path";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
-import { distance } from "../_utils/distance.ts";
 
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<TValue, TRawValue>
@@ -238,8 +238,8 @@ export abstract class GenericSuggestions<TValue, TRawValue>
           .startsWith(input.toLowerCase())
       )
       .sort((a: string | number, b: string | number) =>
-        distance((a || a).toString(), input) -
-        distance((b || b).toString(), input)
+        levenshteinDistance((a || a).toString(), input) -
+        levenshteinDistance((b || b).toString(), input)
       );
   }
 
