@@ -20,3 +20,4 @@ export type {
   Writer,
   WriterSync,
 } from "https://deno.land/std@0.216.0/io/types.ts";
+export { levenshteinDistance } from "https://deno.land/std@0.216.0/text/levenshtein_distance.ts";

@@ -11,12 +11,12 @@ import {
   dim,
   dirname,
   join,
+  levenshteinDistance,
   normalize,
   stripColor,
   underline,
 } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
-import { distance } from "../_utils/distance.ts";
 
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<TValue, TRawValue>
@@ -246,8 +246,8 @@ export abstract class GenericSuggestions<TValue, TRawValue>
           .startsWith(input.toLowerCase())
       )
       .sort((a: string | number, b: string | number) =>
-        distance((a || a).toString(), input) -
-        distance((b || b).toString(), input)
+        levenshteinDistance((a || a).toString(), input) -
+        levenshteinDistance((b || b).toString(), input)
       );
   }
 
