@@ -1,5 +1,5 @@
 import { getDefaultValue, getFlag } from "../../flags/_utils.ts";
-import { Table } from "../../table/table.ts";
+import { Table } from "@cliffy/table";
 import { dedent, getDescription, parseArgumentsDefinition } from "../_utils.ts";
 import type { Command } from "../command.ts";
 import {

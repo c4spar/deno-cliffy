@@ -1,4 +1,4 @@
-import type { KeyCode } from "../keycode/mod.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import { WidenType } from "./_utils.ts";
 import { brightBlue, dim, green, red } from "@std/fmt/colors";
 import { Figures, getFiguresByKeys } from "./_figures.ts";

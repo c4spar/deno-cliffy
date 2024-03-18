@@ -4,8 +4,7 @@ import {
   ValidationError as FlagsValidationError,
 } from "../flags/_errors.ts";
 import { underscoreToCamelCase } from "../flags/_utils.ts";
-import { parseFlags } from "../flags/flags.ts";
-import type { ParseFlagsContext } from "../flags/types.ts";
+import { parseFlags, type ParseFlagsContext } from "@cliffy/flags";
 import {
   getDescription,
   parseArgumentsDefinition,

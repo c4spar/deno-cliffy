@@ -1,4 +1,4 @@
-import type { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import { dim, underline } from "@std/fmt/colors";
 import {
   GenericPrompt,

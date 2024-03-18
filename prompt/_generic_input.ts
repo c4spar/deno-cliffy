@@ -1,4 +1,4 @@
-import type { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import {
   GenericPrompt,
   GenericPromptKeys,
