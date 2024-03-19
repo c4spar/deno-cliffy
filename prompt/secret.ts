@@ -1,5 +1,5 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
-import { underline } from "./deps.ts";
+import { underline } from "@std/fmt/colors";
 import {
   GenericInput,
   GenericInputKeys,

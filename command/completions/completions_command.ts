@@ -1,4 +1,4 @@
-import { dim, italic } from "../deps.ts";
+import { dim, italic } from "@std/fmt/colors";
 import { Command } from "../command.ts";
 import { BashCompletionsCommand } from "./bash.ts";
 import { CompleteCommand } from "./complete.ts";

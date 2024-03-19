@@ -1,4 +1,4 @@
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
 Deno.test("command - raw args - command with useRawArgs disabled", async () => {

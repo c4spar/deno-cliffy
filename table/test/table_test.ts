@@ -1,9 +1,5 @@
 import { Table } from "../table.ts";
-import {
-  assertEquals,
-  assertStrictEquals,
-  assertThrows,
-} from "../../dev_deps.ts";
+import { assertEquals, assertStrictEquals, assertThrows } from "@std/assert";
 import { Row } from "../row.ts";
 
 Deno.test("simple table", () => {

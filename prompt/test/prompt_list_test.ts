@@ -1,8 +1,5 @@
-import {
-  assert,
-  IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
-import { assertEquals, assertRejects } from "../../dev_deps.ts";
+import { assert, IsExact } from "conditional_type_checks";
+import { assertEquals, assertRejects } from "@std/assert";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";
 import { Confirm } from "../confirm.ts";

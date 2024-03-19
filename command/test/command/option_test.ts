@@ -1,6 +1,7 @@
 // deno-fmt-ignore-file
 
-import { assertEquals, assertThrows, bold } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "@std/assert";
+import { bold } from "@std/fmt/colors";
 import { Command } from "../../command.ts";
 import type { Option } from "../../types.ts";
 

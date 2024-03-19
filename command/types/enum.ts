@@ -1,6 +1,6 @@
 import { Type } from "../type.ts";
 import type { ArgumentValue } from "../types.ts";
-import { InvalidTypeError } from "../../flags/_errors.ts";
+import { InvalidTypeError } from "@cliffy/flags";
 
 /** Enum type. Allows only provided values. */
 export class EnumType<const TValue extends string | number | boolean>

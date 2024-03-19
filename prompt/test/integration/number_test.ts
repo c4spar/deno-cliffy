@@ -1,6 +1,6 @@
-import { ansi } from "../../../ansi/ansi.ts";
+import { ansi } from "@cliffy/ansi";
 import { Number } from "../../number.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "number prompt",

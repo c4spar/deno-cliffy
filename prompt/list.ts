@@ -5,7 +5,8 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { dim, normalize, underline } from "./deps.ts";
+import { dim, underline } from "@std/fmt/colors";
+import { normalize } from "@std/path";
 
 /** List prompt options. */
 export interface ListOptions

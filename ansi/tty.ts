@@ -1,7 +1,7 @@
 import * as ansiEscapes from "./ansi_escapes.ts";
 import type { Chain } from "./chain.ts";
 import { Cursor, getCursorPosition } from "./cursor_position.ts";
-import type { ReaderSync, WriterSync } from "./deps.ts";
+import { ReaderSync, WriterSync } from "@std/io/types";
 
 /** Create new `Ansi` instance. */
 export interface TtyOptions {

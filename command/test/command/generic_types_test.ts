@@ -1,9 +1,5 @@
 import { Command, EnumType } from "../../mod.ts";
-import {
-  assert,
-  IsAny,
-  IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
+import { assert, IsAny, IsExact } from "conditional_type_checks";
 
 // Not required to execute this code, only type check.
 (() => {

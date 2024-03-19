@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { dim } from "./deps.ts";
+import { dim } from "@std/fmt/colors";
 
 type UnsupportedOptions =
   | "files"

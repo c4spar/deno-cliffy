@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "@std/assert";
 import { ValidationError } from "../../_errors.ts";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";

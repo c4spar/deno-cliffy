@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "../../../dev_deps.ts";
+import { assertEquals, assertThrows } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 
 Deno.test("[flags] should not allow empty by default", () => {

@@ -1,5 +1,5 @@
 import { Secret } from "../../secret.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "secret prompt",

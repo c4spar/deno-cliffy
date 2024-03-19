@@ -1,4 +1,4 @@
-import { assert, assertRejects } from "../../../dev_deps.ts";
+import { assert, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
 const cmd = new Command()
