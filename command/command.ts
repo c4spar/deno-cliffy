@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
-import { UnknownTypeError } from "../flags/_errors.ts";
 import {
   parseFlags,
   type ParseFlagsContext,
+  UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "@cliffy/flags";
 import {
