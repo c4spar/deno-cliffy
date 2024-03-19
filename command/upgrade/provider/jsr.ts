@@ -3,7 +3,7 @@ import { Provider, Versions } from "../provider.ts";
 type Semver =
   | `${number}.${number}.${number}`
   | `${number}.${number}.${number}-${string}`;
-type PackageName = `@${string}/${string}`;
+type Package = `@${string}/${string}`;
 
 type JsrApiPackageMetadata = {
   scope: string;
@@ -14,25 +14,36 @@ type JsrApiPackageMetadata = {
   };
 };
 
-export interface JsrProviderOptions {
-  name?: PackageName;
-}
+export type JsrProviderOptions = {
+  package: Package;
+} | {
+  scope: string;
+  name?: string;
+};
 
 export class JsrProvider extends Provider {
   name = "jsr";
   private readonly repositoryUrl = "https://jsr.io/";
   private readonly packageName?: string;
+  private readonly packageScope: string;
 
-  constructor({ name }: JsrProviderOptions = {}) {
+  constructor(options: JsrProviderOptions) {
     super();
-    this.packageName = name;
+    this.packageScope = "package" in options
+      ? options.package.split("/")[0].slice(1)
+      : options.scope;
+    this.packageName = "package" in options
+      ? options.package.split("/")[1]
+      : options.name;
   }
 
   async getVersions(
-    name: PackageName,
+    name: string,
   ): Promise<Versions> {
     const response = await fetch(
-      `${this.repositoryUrl}/${this.packageName ?? name}/meta.json`,
+      `${this.repositoryUrl}/@${this.packageScope}/${
+        this.packageName ?? name
+      }/meta.json`,
     );
     if (!response.ok) {
       throw new Error(
@@ -48,12 +59,18 @@ export class JsrProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(name: PackageName): string {
-    return new URL(`${this.packageName ?? name}`, this.repositoryUrl).href;
+  getRepositoryUrl(name: string): string {
+    return new URL(
+      `@${this.packageScope}/${this.packageName ?? name}`,
+      this.repositoryUrl,
+    ).href;
   }
 
-  getRegistryUrl(name: PackageName, version: Semver): string {
-    return new URL(`${this.packageName ?? name}@${version}`, this.repositoryUrl)
+  getRegistryUrl(name: string, version: Semver): string {
+    return new URL(
+      `@${this.packageScope}/${this.packageName ?? name}@${version}`,
+      this.repositoryUrl,
+    )
       .href;
   }
 }
