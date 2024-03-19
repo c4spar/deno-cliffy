@@ -7,6 +7,7 @@ export {
   type GithubProviderOptions,
   type GithubVersions,
 } from "./provider/github.ts";
+export { JsrProvider, type JsrProviderOptions } from "./provider/jsr.ts";
 export {
   NestLandProvider,
   type NestLandProviderOptions,
