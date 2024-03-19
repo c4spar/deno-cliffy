@@ -1,4 +1,4 @@
-import { ansi } from "../../../ansi/ansi.ts";
+import { ansi } from "@cliffy/ansi";
 import { assertEquals } from "@std/assert";
 import { assertType, IsExact } from "@std/testing/types";
 import { Checkbox, CheckboxOptions } from "../../checkbox.ts";
@@ -8,7 +8,7 @@ import { Number } from "../../number.ts";
 import { prompt, PromptMiddleware, PromptOptions } from "../../prompt.ts";
 import { Select } from "../../select.ts";
 import { Toggle } from "../../toggle.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "prompt method",

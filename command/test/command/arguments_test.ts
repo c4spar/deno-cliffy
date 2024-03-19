@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
-import type { ArgumentValue } from "../../../flags/types.ts";
+import type { ArgumentValue } from "@cliffy/flags";
 import { ValidationError } from "../../_errors.ts";
 import { Command } from "../../command.ts";
 
