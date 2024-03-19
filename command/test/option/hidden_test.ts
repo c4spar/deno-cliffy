@@ -1,4 +1,5 @@
-import { assertEquals, stripColor } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
+import { stripColor } from "@std/fmt/colors";
 import { Command } from "../../command.ts";
 
 function command() {

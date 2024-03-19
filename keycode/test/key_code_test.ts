@@ -1,4 +1,4 @@
-import { assertEquals } from "../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { KeyCode, parse } from "../key_code.ts";
 import {
   KeyMap,

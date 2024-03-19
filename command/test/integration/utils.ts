@@ -1,4 +1,4 @@
-import { dirname } from "../../../dev_deps.ts";
+import { dirname } from "@std/path";
 
 export const baseDir = `${dirname(import.meta.url).replace("file://", "")}`;
 

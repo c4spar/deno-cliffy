@@ -1,5 +1,5 @@
 import { Command } from "../command.ts";
-import { dim, italic } from "../deps.ts";
+import { dim, italic } from "@std/fmt/colors";
 import { ZshCompletionsGenerator } from "./_zsh_completions_generator.ts";
 
 /** Generates zsh completions script. */

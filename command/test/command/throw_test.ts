@@ -1,4 +1,4 @@
-import { assertThrows } from "../../../dev_deps.ts";
+import { assertThrows } from "@std/assert";
 import { Command, ValidationError } from "../../mod.ts";
 
 Deno.test("[command] should throw error", () => {

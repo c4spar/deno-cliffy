@@ -1,5 +1,5 @@
-import { assertEquals, bold, red } from "../dev_deps.ts";
-import { underline } from "../prompt/deps.ts";
+import { assertEquals } from "@std/assert";
+import { bold, red, underline } from "@std/fmt/colors";
 import { colors } from "./colors.ts";
 
 Deno.test({

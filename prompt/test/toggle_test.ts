@@ -1,4 +1,5 @@
-import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { bold, red } from "@std/fmt/colors";
 import { Toggle } from "../toggle.ts";
 
 Deno.test("prompt toggle: yes", async () => {

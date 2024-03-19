@@ -1,4 +1,4 @@
-import { assertEquals } from "../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { tty } from "./tty.ts";
 
 Deno.test({

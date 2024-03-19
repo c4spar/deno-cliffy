@@ -1,6 +1,6 @@
 import { Type } from "../type.ts";
 import type { ArgumentValue } from "../types.ts";
-import { integer } from "../../flags/types/integer.ts";
+import { integer } from "@cliffy/flags";
 
 /** Integer type. */
 export class IntegerType extends Type<number> {

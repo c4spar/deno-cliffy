@@ -1,5 +1,5 @@
 import { ansiRegexSource } from "../_utils.ts";
-import { assertEquals } from "../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test(`table - ansiRegexSource`, () => {
   const DIGITS = String.raw`\d+`;
