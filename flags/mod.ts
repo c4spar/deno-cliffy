@@ -26,4 +26,10 @@ export {
   type ITypeInfo,
   OptionType,
 } from "./deprecated.ts";
-export { ValidationError } from "./_errors.ts";
+export {
+  InvalidTypeError,
+  UnexpectedArgumentAfterVariadicArgumentError,
+  UnexpectedRequiredArgumentError,
+  UnknownTypeError,
+  ValidationError,
+} from "./_errors.ts";
