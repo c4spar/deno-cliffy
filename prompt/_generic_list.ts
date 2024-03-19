@@ -7,8 +7,8 @@ import {
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
 import { bold, brightBlue, dim, stripColor, yellow } from "@std/fmt/colors";
+import { levenshteinDistance } from "@std/text/levenshtein_distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
-import { distance } from "../_utils/distance.ts";
 
 type UnsupportedInputOptions = "suggestions" | "list";
 
@@ -805,7 +805,7 @@ function matchOptions<
     if (matchOption(searchInput, option)) {
       matched.push({
         option,
-        distance: distance(option.name, searchInput),
+        distance: levenshteinDistance(option.name, searchInput),
         children: [],
       });
     }

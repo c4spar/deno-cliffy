@@ -51,6 +51,7 @@
     "@std/io": "jsr:@std/io@0.217",
     "@std/path": "jsr:@std/path@0.217",
     "@std/testing": "jsr:@std/testing@0.217",
+    "@std/text": "jsr:@std/text@0.217",
     "conditional_type_checks": "npm:conditional-type-checks@1.0.6",
     "sinon": "npm:sinon@13.0.2"
   }

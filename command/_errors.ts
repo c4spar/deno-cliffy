@@ -1,6 +1,6 @@
 import { didYouMeanCommand } from "./_utils.ts";
 import type { Command } from "./command.ts";
-import { getFlag } from "../flags/_utils.ts";
+import { getFlag } from "./_utils.ts";
 import { bold } from "@std/fmt/colors";
 import { EnvVar } from "./types.ts";
 
@@ -167,15 +167,6 @@ export class DefaultCommandNotFoundError extends CommandError {
       }`,
     );
     Object.setPrototypeOf(this, DefaultCommandNotFoundError.prototype);
-  }
-}
-
-export class CommandExecutableNotFoundError extends CommandError {
-  constructor(name: string) {
-    super(
-      `Command executable not found: ${name}`,
-    );
-    Object.setPrototypeOf(this, CommandExecutableNotFoundError.prototype);
   }
 }
 
