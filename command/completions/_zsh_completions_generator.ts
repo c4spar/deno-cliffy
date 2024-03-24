@@ -154,11 +154,12 @@ function _${replaceSpecialChars(path)}() {` +
     if (command.hasCommands(false)) {
       const actions: string = command
         .getCommands(false)
-        .map((command: Command) =>
-          `${command.getName()}) _${
-            replaceSpecialChars(path + " " + command.getName())
-          } ;;`
-        )
+        .map((command: Command) => {
+          const aliases = [command.getName(), ...command.getAliases()]
+            .join("|");
+          const action = replaceSpecialChars(path + " " + command.getName());
+          return `${aliases}) _${action} ;;`;
+        })
         .join("\n      ");
 
       return `\n
@@ -187,7 +188,6 @@ function _${replaceSpecialChars(path)}() {` +
 
     if (command.hasArguments() || command.hasCommands(false)) {
       argsCommand += ` \\\n    '${++argIndex}:command:_commands'`;
-
       const args: string[] = [];
 
       // first argument is completed together with commands.
