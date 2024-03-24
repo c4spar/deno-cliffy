@@ -140,7 +140,7 @@ function _${replaceSpecialChars(path)}() {` +
       }
     }
 
-    if (completions) {
+    if (command.hasArguments() || command.hasCommands(false)) {
       completions = `\n\n  function _commands() {${completions}\n  }`;
     }
 
@@ -185,23 +185,18 @@ function _${replaceSpecialChars(path)}() {` +
       argsCommand += ` \\\n    ${options.join(" \\\n    ")}`;
     }
 
-    if (
-      command.hasCommands(false) || (
-        command.getArguments()
-          .filter((arg) => command.getCompletion(arg.action)).length
-      )
-    ) {
-      argsCommand += ` \\\n    '${++argIndex}:command:_commands'`;
-    }
-
     if (command.hasArguments() || command.hasCommands(false)) {
+      argsCommand += ` \\\n    '${++argIndex}:command:_commands'`;
+
       const args: string[] = [];
 
       // first argument is completed together with commands.
       for (const arg of command.getArguments().slice(1)) {
         const type = command.getType(arg.type);
+
         if (type && type.handler instanceof FileType) {
           const fileCompletions = this.getFileCompletions(type);
+
           if (arg.variadic) {
             argIndex++;
             for (let i = 0; i < 5; i++) {
