@@ -543,7 +543,10 @@ export abstract class GenericList<
       return 0;
     }
     const height: number = this.getListHeight();
-    return Math.floor(index / height) * height;
+    return Math.min(
+      Math.floor(index / height) * height,
+      this.options.length - height,
+    );
   }
 
   /**
