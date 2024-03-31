@@ -15,5 +15,5 @@ export type {
   ReaderSync,
   Writer,
   WriterSync,
-} from "https://deno.land/std@0.216.0/io/types.ts";
-export { levenshteinDistance } from "https://deno.land/std@0.216.0/text/levenshtein_distance.ts";
+} from "jsr:@std/io@0.221.0/types";
+export { levenshteinDistance } from "jsr:@std/text@0.221.0/levenshtein-distance";

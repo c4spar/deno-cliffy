@@ -1,5 +1,2 @@
-export { encodeBase64 } from "https://deno.land/std@0.216.0/encoding/base64.ts";
-export type {
-  ReaderSync,
-  WriterSync,
-} from "https://deno.land/std@0.216.0/io/types.ts";
+export { encodeBase64 } from "jsr:@std/encoding@0.221.0/base64";
+export type { ReaderSync, WriterSync } from "jsr:@std/io@0.221.0/types";
