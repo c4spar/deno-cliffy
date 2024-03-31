@@ -32,5 +32,24 @@
     "dry-publish": "deno publish --allow-slow-types --dry-run",
     "publish": "deno publish --allow-slow-types"
     // "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.8.2/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
+  },
+  "publish": {
+    "include": [
+      "ansi",
+      "command",
+      "examples",
+      "flags",
+      "keycode",
+      "keypress",
+      "prompt",
+      "table",
+      "testing",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "deno.jsonc",
+      "LICENSE",
+      "logo.png",
+      "README.md"
+    ]
   }
 }
