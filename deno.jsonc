@@ -29,7 +29,9 @@
     "coverage:prompt": "deno task test prompt --coverage=./dist/coverage/prompt/result && deno coverage --lcov ./dist/coverage/prompt/result > ./dist/coverage/prompt/cov.lcov",
     "coverage:table": "deno task test table --coverage=./dist/coverage/table/result && deno coverage --lcov ./dist/coverage/table/result > ./dist/coverage/table/cov.lcov",
     "coverage:testing": "deno task test testing --coverage=./dist/coverage/testing/result && deno coverage --lcov ./dist/coverage/testing/result > ./dist/coverage/testing/cov.lcov",
-    "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.5/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md"
+    "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.5/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md",
+    "dry-publish": "deno publish --dry-run",
+    "publish": "deno publish"
     // "update": "deno run --allow-read=./ --allow-write=./ https://deno.land/x/udd@0.8.2/main.ts" globs are a bit weird in tasks: https://github.com/denoland/deno/discussions/15625
   }
 }
