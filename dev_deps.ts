@@ -18,11 +18,7 @@ export {
   assertType,
   type IsExact,
 } from "https://deno.land/std@0.216.0/testing/types.ts";
-export {
-  bold,
-  red,
-  stripColor,
-} from "https://deno.land/std@0.216.0/fmt/colors.ts";
+export { bold, red, stripColor } from "jsr:@std/fmt@0.221.0/colors";
 export { dirname } from "https://deno.land/std@0.216.0/path/dirname.ts";
 export { expandGlob } from "https://deno.land/std@0.216.0/fs/expand_glob.ts";
 export type { WalkEntry } from "https://deno.land/std@0.216.0/fs/walk.ts";

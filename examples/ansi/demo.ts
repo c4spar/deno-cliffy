@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import * as stdColors from "https://deno.land/std@0.216.0/fmt/colors.ts";
+import * as stdColors from "jsr:@std/fmt@0.221.0/colors";
 import * as ansiEscapes from "../../ansi/ansi_escapes.ts";
 
 const ansiEscapeNames1: Array<keyof typeof ansiEscapes> = [

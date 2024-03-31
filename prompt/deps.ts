@@ -8,7 +8,7 @@ export {
   stripColor,
   underline,
   yellow,
-} from "https://deno.land/std@0.216.0/fmt/colors.ts";
+} from "jsr:@std/fmt@0.221.0/colors";
 export {
   dirname,
   join,
