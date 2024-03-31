@@ -1,5 +1,5 @@
 {
-  "name": "@codemonument/cliffy",
+  "name": "@cliffy-io/cliffy",
   "version": "1.0.0-rc.3",
   "exports": {
     "./ansi": "./ansi/mod.ts",
