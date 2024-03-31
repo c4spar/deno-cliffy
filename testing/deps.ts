@@ -1,8 +1,4 @@
-export { AssertionError } from "https://deno.land/std@0.216.0/assert/assertion_error.ts";
-export { assertSnapshot } from "https://deno.land/std@0.216.0/testing/snapshot.ts";
-export { red } from "https://deno.land/std@0.216.0/fmt/colors.ts";
-export {
-  basename,
-  dirname,
-  fromFileUrl,
-} from "https://deno.land/std@0.216.0/path/mod.ts";
+export { AssertionError } from "jsr:@std/assert@0.221.0";
+export { assertSnapshot } from "jsr:@std/testing@0.221.0/snapshot";
+export { red } from "jsr:@std/fmt@0.221.0/colors";
+export { basename, dirname, fromFileUrl } from "jsr:@std/path@0.221.0";
