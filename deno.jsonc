@@ -4,7 +4,6 @@
   "exports": {
     "./ansi": "./ansi/mod.ts",
     "./command": "./command/mod.ts",
-    "./examples": "./examples/mod.ts",
     "./flags": "./flags/mod.ts",
     "./keycode": "./keycode/mod.ts",
     "./keypress": "./keypress/mod.ts",
