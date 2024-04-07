@@ -6,7 +6,7 @@
  */
 import { Cell, CellType } from "./cell.ts";
 import { consumeWords } from "./consume_words.ts";
-import { stripColor, unicodeWidth } from "./deps.ts";
+import { stripAnsiCode, unicodeWidth } from "./deps.ts";
 
 /**
  * Get longest cell from given row index.
@@ -37,7 +37,7 @@ export function longest(
 }
 
 export const strLength = (str: string): number => {
-  return unicodeWidth(stripColor(str));
+  return unicodeWidth(stripAnsiCode(str));
 };
 
 /** Regex `source` to match any relevant ANSI code. */

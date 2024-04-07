@@ -13,7 +13,7 @@ import {
   join,
   levenshteinDistance,
   normalize,
-  stripColor,
+  stripAnsiCode,
   underline,
 } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
@@ -241,7 +241,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
     return suggestions
       .filter((value: string | number) =>
-        stripColor(value.toString())
+        stripAnsiCode(value.toString())
           .toLowerCase()
           .startsWith(input.toLowerCase())
       )

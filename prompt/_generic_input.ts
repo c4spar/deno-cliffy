@@ -5,7 +5,7 @@ import {
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { brightBlue, dim, stripColor, underline } from "./deps.ts";
+import { brightBlue, dim, stripAnsiCode, underline } from "./deps.ts";
 
 /** Generic input prompt options. */
 export interface GenericInputPromptOptions<TValue, TRawValue>
@@ -66,7 +66,7 @@ export abstract class GenericInput<
 
   protected message(): string {
     const message: string = super.message() + " " + this.settings.pointer + " ";
-    this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+    this.cursor.x = stripAnsiCode(message).length + this.inputIndex + 1;
     return message + this.input();
   }
 
