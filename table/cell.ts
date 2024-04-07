@@ -1,28 +1,14 @@
 /** Allowed cell value type. */
-export type CellValue = unknown;
-// export type CellValue = number | string | Record<string, unknown> | undefined | null;
+export type CellValue = number | string;
 
-/** Cell type. */
-export type CellType<TValue extends CellValue = CellValue> =
-  | Cell<TValue>
-  | TValue;
-
-export type GetCellValue<TCell extends CellType> = TCell extends infer TCell
-  ? TCell extends Cell<infer Value> ? Value
-  : TCell
-  : never;
+/** Allowed cell type. */
+export type CellType = CellValue | Cell;
 
 /** Cell alignment direction. */
 export type Direction = "left" | "right" | "center";
 
-export type ValueParserResult = string | number | undefined | null | void;
-
-export type ValueParser<TValue extends CellValue> = (
-  value: TValue,
-) => ValueParserResult;
-
 /** Cell options. */
-export interface CellOptions<TValue extends CellValue> {
+interface CellOptions {
   /** Enable/disable cell border. */
   border?: boolean;
   /** Set coll span. */
@@ -31,8 +17,6 @@ export interface CellOptions<TValue extends CellValue> {
   rowSpan?: number;
   /** Cell cell alignment direction. */
   align?: Direction;
-  // value?: ValueParser<TValue>;
-  value?(value: TValue): ValueParserResult;
   /**
    * Any unterminated ANSI formatting overflowed from previous lines of a
    * multi-line cell.
@@ -56,9 +40,8 @@ export interface CellOptions<TValue extends CellValue> {
  *   .render();
  * ```
  */
-/** Cell representation. */
-export class Cell<TValue extends CellValue = CellValue> {
-  protected options: CellOptions<TValue> = {};
+export class Cell {
+  protected options: CellOptions = {};
 
   /** Get cell length. */
   public get length(): number {
@@ -82,35 +65,32 @@ export class Cell<TValue extends CellValue = CellValue> {
    *
    * @param value Cell or cell value.
    */
-  public static from<TValue extends CellValue>(
-    value: CellType<TValue>,
-  ): Cell<TValue> {
+  public static from(value: CellType): Cell {
+    let cell: Cell;
     if (value instanceof Cell) {
-      const cell = new this(value.getValue());
+      cell = new this(value.getValue());
       cell.options = { ...value.options };
-      return cell;
+    } else {
+      cell = new this(value);
     }
-
-    return new this(value);
+    return cell;
   }
 
   /**
    * Cell constructor.
    *
-   * @param cellValue Cell value.
+   * @param value Cell value.
    */
-  public constructor(
-    private cellValue?: TValue | undefined | null,
-  ) {}
+  public constructor(private value: CellValue) {}
 
   /** Get cell string value. */
   public toString(): string {
-    return this.cellValue?.toString() ?? "";
+    return this.value.toString();
   }
 
   /** Get cell value. */
-  public getValue(): TValue | undefined | null {
-    return this.cellValue;
+  public getValue(): CellValue {
+    return this.value;
   }
 
   /**
@@ -118,8 +98,8 @@ export class Cell<TValue extends CellValue = CellValue> {
    *
    * @param value Cell or cell value.
    */
-  public setValue(value: TValue | undefined | null): this {
-    this.cellValue = value;
+  public setValue(value: CellValue): this {
+    this.value = value;
     return this;
   }
 
@@ -128,12 +108,8 @@ export class Cell<TValue extends CellValue = CellValue> {
    *
    * @param value Cell or cell value.
    */
-  public clone<TCloneValue extends CellValue = TValue>(
-    value?: TCloneValue,
-  ): Cell<TCloneValue> {
-    const cell = new Cell(value ?? this.getValue() as TCloneValue);
-    cell.options = { ...this.options } as CellOptions<TCloneValue>;
-    return cell;
+  public clone(value?: CellValue): Cell {
+    return Cell.from(value ?? this);
   }
 
   /**
@@ -225,21 +201,12 @@ export class Cell<TValue extends CellValue = CellValue> {
   }
 
   /**
-   * Register cell value parser.
-   * @param fn  Value parser callback function.
-   */
-  public value(fn: ValueParser<TValue>): this {
-    this.options.value = fn;
-    return this;
-  }
-
-  /**
    * Getter:
    */
 
   /** Check if cell has border. */
-  public getBorder(): boolean | undefined {
-    return this.options.border;
+  public getBorder(): boolean {
+    return this.options.border === true;
   }
 
   /** Get col span. */
@@ -256,14 +223,9 @@ export class Cell<TValue extends CellValue = CellValue> {
       : 1;
   }
 
-  /** Get cell alignment. */
-  public getAlign(): Direction | undefined {
-    return this.options.align;
-  }
-
-  /** Get value parser. */
-  public getValueParser(): ValueParser<TValue> | undefined {
-    return this.options.value;
+  /** Get row span. */
+  public getAlign(): Direction {
+    return this.options.align ?? "left";
   }
 }
 

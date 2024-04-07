@@ -1,10 +1,7 @@
-import { CellValue, Direction, ValueParser } from "./cell.ts";
+import { Direction } from "./cell.ts";
 
 /** Column options. */
-export interface ColumnOptions<
-  TValue extends CellValue,
-  THeaderValue extends CellValue = TValue,
-> {
+export interface ColumnOptions {
   /** Enable/disable cell border. */
   border?: boolean;
   /** Cell cell alignment direction. */
@@ -15,8 +12,6 @@ export interface ColumnOptions<
   maxWidth?: number;
   /** Set cell padding. */
   padding?: number;
-  headerValue?: ValueParser<THeaderValue>;
-  value?: ValueParser<TValue>;
 }
 
 /**
@@ -28,108 +23,59 @@ export interface ColumnOptions<
  * import { Column, Table } from "./mod.ts";
  *
  * new Table()
- *   .header(["One", "Two"])
  *   .body([
  *     ["Foo", "bar"],
  *     ["Beep", "Boop"],
  *   ])
- *   .column(0, new Column({
- *     border: true,
- *   }))
+ *   .column(0, new Column().border())
  *   .render();
  * ```
  */
-export class Column<
-  TValue extends CellValue,
-  THeaderValue extends CellValue = TValue,
-> {
+export class Column {
   /**
-   * Create a new column from column options or an existing column.
+   * Create a new cell from column options or an existing column.
    * @param options
    */
-  static from<
-    TValue extends CellValue,
-    THeaderValue extends CellValue,
-  >(
-    options: ColumnOptions<TValue, THeaderValue> | Column<TValue, THeaderValue>,
-  ): Column<TValue, THeaderValue> {
+  static from(options: ColumnOptions | Column): Column {
     const opts = options instanceof Column ? options.opts : options;
-    return new Column<TValue, THeaderValue>().options(opts);
+    return new Column().options(opts);
   }
 
-  constructor(
-    protected opts: ColumnOptions<TValue, THeaderValue> = {},
-  ) {}
+  protected opts: ColumnOptions = {};
 
-  /**
-   * Set column options.
-   * @param options Column options.
-   */
-  options(options: ColumnOptions<TValue, THeaderValue>): this {
+  /** Set column options. */
+  options(options: ColumnOptions): this {
     Object.assign(this.opts, options);
     return this;
   }
 
-  /**
-   * Set min column width.
-   * @param width Min column width.
-   */
+  /** Set min column width. */
   minWidth(width: number): this {
     this.opts.minWidth = width;
     return this;
   }
 
-  /**
-   * Set max column width.
-   * @param width Max column width.
-   */
+  /** Set max column width. */
   maxWidth(width: number): this {
     this.opts.maxWidth = width;
     return this;
   }
 
-  /**
-   * Set column border.
-   * @param border
-   */
+  /** Set column border. */
   border(border = true): this {
     this.opts.border = border;
     return this;
   }
 
-  /**
-   * Set column left and right padding.
-   * @param padding Padding.
-   */
+  /** Set column padding. */
   padding(padding: number): this {
     this.opts.padding = padding;
     return this;
   }
 
-  /**
-   * Set column alignment.
-   * @param direction Column alignment.
-   */
+  /** Set column alignment. */
   align(direction: Direction): this {
     this.opts.align = direction;
-    return this;
-  }
-
-  /**
-   * Register header value parser.
-   * @param fn  Value parser callback function.
-   */
-  headerValue(fn: ValueParser<THeaderValue>): this {
-    this.opts.headerValue = fn;
-    return this;
-  }
-
-  /**
-   * Register cell value parser.
-   * @param fn  Value parser callback function.
-   */
-  value(fn: ValueParser<TValue>): this {
-    this.opts.value = fn;
     return this;
   }
 
@@ -156,15 +102,5 @@ export class Column<
   /** Get column alignment. */
   getAlign(): Direction | undefined {
     return this.opts.align;
-  }
-
-  /** Get header value parser. */
-  getHeaderValueParser(): ValueParser<THeaderValue> | undefined {
-    return this.opts.headerValue;
-  }
-
-  /** Get value parser. */
-  getCellValueParser(): ValueParser<TValue> | undefined {
-    return this.opts.value;
   }
 }
