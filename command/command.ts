@@ -6,6 +6,7 @@ import {
 import { parseFlags } from "../flags/flags.ts";
 import type { ParseFlagsContext } from "../flags/types.ts";
 import {
+  exit,
   getDescription,
   parseArgumentsDefinition,
   splitArguments,
@@ -1668,7 +1669,7 @@ export class Command<
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
    */
   public parse(
-    args: string[] = Deno.args,
+    args: string[] = getArgv(),
   ): Promise<
     TParentCommand extends Command<any> ? CommandResult<
         Record<string, unknown>,
@@ -2048,13 +2049,13 @@ export class Command<
     names: readonly string[],
   ): Promise<{ name: string; value: string } | undefined> {
     for (const name of names) {
-      const status = await Deno.permissions.query({
+      const status = await (globalThis).Deno?.permissions.query({
         name: "env",
         variable: name,
       });
 
-      if (status.state === "granted") {
-        const value = Deno.env.get(name);
+      if (!status || status.state === "granted") {
+        const value = getEnv(name);
 
         if (value) {
           return { name, value };
@@ -2186,7 +2187,7 @@ export class Command<
 
     console.error(red(`  ${bold("error")}: ${error.message}\n`));
 
-    Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
+    exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
   /*****************************************************************************
@@ -2351,7 +2352,7 @@ export class Command<
 
   private exit(code = 0) {
     if (this.shouldExit()) {
-      Deno.exit(code);
+      exit(code);
     }
   }
 
@@ -3018,4 +3019,12 @@ interface ParseOptionsOptions {
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
   dotted?: boolean;
+}
+
+function getArgv(): Array<string> {
+  return "Deno" in globalThis ? (globalThis as any).Deno.args : "process" in globalThis ? (globalThis as any).process.argv.slice(2) : [];
+}
+
+function getEnv(name: string): string | undefined {
+  return "Deno" in globalThis ? (globalThis as any).Deno.env.get(name) : "process" in globalThis ? (globalThis as any).process.env[name] : undefined;
 }

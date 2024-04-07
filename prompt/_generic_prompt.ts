@@ -317,7 +317,7 @@ export abstract class GenericPrompt<
       case event.name === "c" && event.ctrl:
         this.clear();
         this.settings.tty.cursorShow();
-        Deno.exit(130);
+        exit(130);
         return;
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
@@ -452,5 +452,16 @@ function getColumns(): number | null {
     return Deno.consoleSize().columns ?? null;
   } catch (_error) {
     return null;
+  }
+}
+
+function exit(code: number): never {
+  const exit: (code: number) => never = (globalThis as any).Deno?.exit ??
+    (globalThis as any).process?.exit;
+
+  if (exit) {
+    exit(code);
+  } else {
+    throw new Error("unsupported runtime");
   }
 }

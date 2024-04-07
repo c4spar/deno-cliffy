@@ -2,6 +2,7 @@ import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
 import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
+import { exit } from "../_utils.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
@@ -50,7 +51,7 @@ export class UpgradeCommand extends Command {
               this.getMainCommand().getName(),
               this.getVersion(),
             );
-            Deno.exit(0);
+            exit(0);
           },
         },
       )
