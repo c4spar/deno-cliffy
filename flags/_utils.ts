@@ -1,5 +1,5 @@
 import type { FlagOptions } from "./types.ts";
-import { closestString } from "@std/text/closest_string";
+import { closestString } from "@std/text/closest-string";
 
 /** Convert param case string to camel case. */
 export function paramCaseToCamelCase(str: string): string {

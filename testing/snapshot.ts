@@ -3,7 +3,7 @@ import { quoteString } from "./_quote_string.ts";
 import { basename } from "@std/path";
 import { red } from "@std/fmt/colors";
 import { assertSnapshot } from "@std/testing/snapshot";
-import { AssertionError } from "@std/assert/assertion_error";
+import { AssertionError } from "@std/assert/assertion-error";
 
 /** Snapshot test step options. */
 export interface SnapshotTestStep {

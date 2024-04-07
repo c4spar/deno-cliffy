@@ -12,7 +12,7 @@ import {
   stripAnsiCode,
   underline,
 } from "@std/fmt/colors";
-import { levenshteinDistance } from "@std/text/levenshtein_distance";
+import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { dirname, join, normalize } from "@std/path";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 

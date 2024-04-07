@@ -7,7 +7,7 @@ import {
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
 import { bold, brightBlue, dim, stripAnsiCode, yellow } from "@std/fmt/colors";
-import { levenshteinDistance } from "@std/text/levenshtein_distance";
+import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 
 type UnsupportedInputOptions = "suggestions" | "list";
