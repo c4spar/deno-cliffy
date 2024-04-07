@@ -1,46 +1,20 @@
-import {
-  Cell,
-  CellType,
-  CellValue,
-  Direction,
-  GetCellValue,
-  ValueParser,
-} from "./cell.ts";
+import { Cell, CellType, Direction } from "./cell.ts";
 
-/** Row type. */
-export type RowType<TCell extends CellType> =
-  | Row<TCell>
-  | ReadonlyArray<TCell>
-  | TCell;
+/** Allowed row type. */
+export type RowType<
+  T extends CellType | undefined = CellType | undefined,
+> =
+  | Array<T>
+  | Row<T>;
 
-export type GetRowInnerValue<TRow extends RowType<CellType>> = TRow extends
-  infer TRow
-  ? TRow extends ReadonlyArray<infer Value extends CellType>
-    ? GetCellValue<Value>
-  : TRow
-  : never;
-
-export type GetRowValue<TRow extends RowType<CellType>> = TRow extends
-  infer TRow ? TRow extends ReadonlyArray<infer Value extends CellType> ? Value
-  : TRow
-  : never;
-
-export type UnwrapRow<TRow extends RowType<CellType>> = TRow extends infer TRow
-  ? TRow extends Row<infer Value extends CellType> ? Value
-  : TRow
-  : never;
-
-/** @deprecated Use `Record<string, TValue>` instead. */
-export type DataRow<TValue extends CellValue> = Record<string, TValue>;
+/** Json row. */
+export type DataRow = Record<string, string | number>;
 
 /** Row options. */
-export interface RowOptions<
-  TValue extends CellValue,
-> {
+interface RowOptions {
   indent?: number;
   border?: boolean;
   align?: Direction;
-  value?: ValueParser<TValue>;
 }
 
 /**
@@ -60,38 +34,31 @@ export interface RowOptions<
  * ```
  */
 export class Row<
-  TCell extends CellType,
-> extends Array<TCell> {
-  protected options: RowOptions<GetCellValue<TCell>> = {};
+  T extends CellType | undefined = CellType | undefined,
+> extends Array<T> {
+  protected options: RowOptions = {};
 
   /**
    * Create a new row. If cells is a row, all cells and options of the row will
    * be copied to the new row.
    *
-   * @param value Cells or row.
+   * @param cells Cells or row.
    */
-  public static from<
-    TCell extends CellType,
-  >(
-    value: RowType<TCell>,
-  ): Row<TCell> {
-    if (Array.isArray(value)) {
-      const row = new this<TCell>(...value);
-      if (value instanceof Row) {
-        row.options = { ...(value as Row<TCell>).options };
-      }
-      return row;
+  public static from<T extends CellType | undefined>(
+    cells: RowType<T>,
+  ): Row<T> {
+    const row = new this(...cells);
+    if (cells instanceof Row) {
+      row.options = { ...(cells as Row).options };
     }
-
-    return new this(value as TCell);
+    return row;
   }
 
   /** Clone row recursively with all options. */
-  public clone(): this {
-    const cells = this.map((cell) =>
-      cell instanceof Cell ? cell.clone() : cell
+  public clone(): Row {
+    const row = new Row(
+      ...this.map((cell: T) => cell instanceof Cell ? cell.clone() : cell),
     );
-    const row = Row.from(cells) as this;
     row.options = { ...this.options };
     return row;
   }
@@ -127,21 +94,12 @@ export class Row<
   }
 
   /**
-   * Register cell value parser.
-   * @param fn  Value parser callback function.
-   */
-  public value(fn: ValueParser<GetCellValue<TCell>>): this {
-    this.options.value = fn;
-    return this;
-  }
-
-  /**
    * Getter:
    */
 
   /** Check if row has border. */
-  public getBorder(): boolean | undefined {
-    return this.options.border;
+  public getBorder(): boolean {
+    return this.options.border === true;
   }
 
   /** Check if row or any child cell has border. */
@@ -151,18 +109,13 @@ export class Row<
   }
 
   /** Get row alignment. */
-  public getAlign(): Direction | undefined {
-    return this.options.align;
-  }
-
-  /** Get value parser. */
-  public getValueParser(): ValueParser<GetCellValue<TCell>> | undefined {
-    return this.options.value;
+  public getAlign(): Direction {
+    return this.options.align ?? "left";
   }
 }
 
 /** @deprecated Use `RowType` instead. */
-export type IRow<TValue extends CellValue> = RowType<TValue>;
+export type IRow = RowType;
 
-/** @deprecated Use `Record<string, TValue>` instead. */
-export type IDataRow<TValue extends CellValue> = DataRow<TValue>;
+/** @deprecated Use `DataRow` instead. */
+export type IDataRow = DataRow;

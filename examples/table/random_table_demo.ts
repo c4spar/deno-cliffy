@@ -27,13 +27,13 @@ Deno.addSignalListener("SIGINT", () => {
 loop();
 
 function loop() {
-  const table = createTable();
+  const table: Table = createTable();
   tty.eraseScreen.cursorTo(0, 0);
   table.render();
   setTimeout(loop, 1000);
 }
 
-function createTable() {
+function createTable(): Table {
   return new Table()
     .header(
       ["ID", "First Name", "Last Name", "Email", "Gender", "IP-Address"].map(

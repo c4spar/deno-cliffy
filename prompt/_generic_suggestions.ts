@@ -5,7 +5,7 @@ import {
   GenericInputPromptOptions,
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { bold, brightBlue, dim, stripColor, underline } from "@std/fmt/colors";
+import { bold, brightBlue, dim, stripAnsiCode, underline } from "@std/fmt/colors";
 import { levenshteinDistance } from "@std/text/levenshtein_distance";
 import { dirname, join, normalize } from "@std/path";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
@@ -233,7 +233,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
     return suggestions
       .filter((value: string | number) =>
-        stripColor(value.toString())
+        stripAnsiCode(value.toString())
           .toLowerCase()
           .startsWith(input.toLowerCase())
       )

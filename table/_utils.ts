@@ -6,7 +6,7 @@
  */
 import { Cell, CellType } from "./cell.ts";
 import { consumeWords } from "./consume_words.ts";
-import { stripColor } from "@std/fmt/colors";
+import { stripAnsiCode } from "@std/fmt/colors";
 import { unicodeWidth } from "@std/console/unicode_width";
 
 /**
@@ -38,7 +38,7 @@ export function longest(
 }
 
 export const strLength = (str: string): number => {
-  return unicodeWidth(stripColor(str));
+  return unicodeWidth(stripAnsiCode(str));
 };
 
 /** Regex `source` to match any relevant ANSI code. */

@@ -1,7 +1,9 @@
 // deno-fmt-ignore-file
 
 import { assertEquals } from "@std/assert";
+import { snapshotTest } from "../../../testing/snapshot.ts";
 import { Command } from "../../command.ts";
+import { CompletionsCommand } from "../../completions/completions_command.ts";
 import type { Completion } from "../../types.ts";
 
 function command() {
@@ -14,7 +16,7 @@ function command() {
       new Command()
         .complete("bar", () => ["bar1", "bar2"])
         .command("baz")
-        .complete("baz", () => ["baz1", "baz2"])
+        .complete("baz", () => ["baz1", "baz2"]),
     );
 }
 
@@ -92,4 +94,60 @@ Deno.test("command - completion - get global completion", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalCompletion("global")?.name, "global");
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalCompletion("baz")?.name, undefined);
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalCompletion("unknown")?.name, undefined);
+});
+
+await snapshotTest({
+  name: "should handle file type completions in options",
+  meta: import.meta,
+  steps: {
+    zsh: { args: ["completions", "zsh"] },
+  },
+  async fn(): Promise<void> {
+    await new Command()
+      .version("1.0.0")
+      .name("completions-test")
+      // first option argument
+      .command("foo")
+      .option("-f, --file1 <path:file>", "...", { required: true })
+      // second option argument
+      .command("bar")
+      .option("-f, --file2 <name:string> <path:file>", "...", { required: true })
+      // rest option argument
+      .command("beep")
+      .option("-f, --file3 <...path:file>", "...", { required: true })
+      // second rest option argument
+      .command("boop")
+      .option("-f, --file4 <name:string> <...path:file>", "...", { required: true })
+      // completion command
+      .command("completions", new CompletionsCommand())
+      .parse();
+  },
+});
+
+await snapshotTest({
+  name: "should generate file type completions in arguments",
+  meta: import.meta,
+  steps: {
+    zsh: { args: ["completions", "zsh"] },
+  },
+  async fn(): Promise<void> {
+    await new Command()
+      .version("1.0.0")
+      .name("completions-test")
+      // first argument
+      .command("foo")
+      .arguments("<path:file>")
+      // second argument
+      .command("bar")
+      .arguments("<name:string> <path:file>")
+      // rest argument
+      .command("beep")
+      .arguments("<...path:file>")
+      // second rest argument
+      .command("boop")
+      .arguments("<name:string> <...path:file>")
+      // completion command
+      .command("completions", new CompletionsCommand())
+      .parse();
+  },
 });

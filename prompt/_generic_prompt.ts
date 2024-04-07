@@ -7,7 +7,7 @@ import {
   green,
   italic,
   red,
-  stripColor,
+  stripAnsiCode,
   yellow,
 } from "@std/fmt/colors";
 import { Reader, WriterSync } from "@std/io/types";
@@ -65,7 +65,7 @@ export interface GenericPromptOptions<TValue, TRawValue> {
   indent?: string;
   /** Keymap to assign key names to prompt actions. */
   keys?: GenericPromptKeys;
-  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.40.5?s=Deno.SetRawOptions). */
+  /** Enable cbreak mode. For more information see [Deno.SetRawOptions](https://deno.land/api@v1.42.1?s=Deno.SetRawOptions). */
   cbreak?: boolean;
   /** Change the prompt prefix. Default is: `yellow("? ")`. */
   prefix?: string;
@@ -217,7 +217,7 @@ export abstract class GenericPrompt<
     const columns = getColumns();
     const linesCount: number = columns
       ? lines.reduce((prev, next) => {
-        const length = stripColor(next).length;
+        const length = stripAnsiCode(next).length;
         return prev + (length > columns ? Math.ceil(length / columns) : 1);
       }, 0)
       : content.split("\n").length;

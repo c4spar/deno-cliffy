@@ -6,7 +6,7 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
-import { bold, brightBlue, dim, stripColor, yellow } from "@std/fmt/colors";
+import { bold, brightBlue, dim, stripAnsiCode, yellow } from "@std/fmt/colors";
 import { levenshteinDistance } from "@std/text/levenshtein_distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 
@@ -358,7 +358,7 @@ export abstract class GenericList<
     if (this.settings.search) {
       const input = this.isSearchSelected() ? this.input() : dim(this.input());
       message += " " + this.settings.searchLabel + " ";
-      this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+      this.cursor.x = stripAnsiCode(message).length + this.inputIndex + 1;
       message += input;
     }
 
@@ -540,7 +540,10 @@ export abstract class GenericList<
       return 0;
     }
     const height: number = this.getListHeight();
-    return Math.floor(index / height) * height;
+    return Math.min(
+      Math.floor(index / height) * height,
+      this.options.length - height,
+    );
   }
 
   /**
@@ -837,7 +840,7 @@ function matchOption<
 }
 
 function matchInput(inputString: string, value: string): boolean {
-  return stripColor(value)
+  return stripAnsiCode(value)
     .toLowerCase()
     .includes(inputString);
 }

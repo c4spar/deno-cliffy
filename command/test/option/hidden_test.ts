@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { stripColor } from "@std/fmt/colors";
+import { stripAnsiCode } from "@std/fmt/colors";
 import { Command } from "../../command.ts";
 
 function command() {
@@ -41,6 +41,6 @@ Options:
   -h, --help     - Show this help.                            
   -V, --version  - Show the version number for this program.  
 `,
-    stripColor(output),
+    stripAnsiCode(output),
   );
 });
