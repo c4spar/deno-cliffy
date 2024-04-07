@@ -1,3 +1,77 @@
+# [v1.0.0-rc.4](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.3...v1.0.0-rc.4) (Apr 7, 2024)
+
+### BREAKING CHANGES
+
+- **ansi,prompt:** remove use of `Deno.isatty()` and `rid` (#672)
+  ([bcc7552](https://github.com/c4spar/deno-cliffy/commit/bcc7552))
+
+  This commit removes the `rid` property from the `reader` option and replaces
+  the `isTty` method with the `isTerminal` method.
+
+- **command:** remove support for executable sub-commands (#682)
+  ([89475a8](https://github.com/c4spar/deno-cliffy/commit/89475a8))
+
+### Features
+
+- Publish to jsr (#679)
+
+  This is the first release on [jsr.io](https://jsr.io/@cliffy) and is used for
+  initial testing. Cliffy is still published to
+  [deno.land](https://deno.land/x/cliffy/), but as soon as jsr.io becomes
+  stable, cliffy will probably only be published on jsr.io and no longer on
+  deno.land.
+
+- **flags:** export `InvalidTypeError` (#686)
+  ([e9a400a](https://github.com/c4spar/deno-cliffy/commit/e9a400a))
+
+### Bug Fixes
+
+- **command:** file type completion not working for first argument in zsh
+  completions (#688)
+  ([a5cd35e](https://github.com/c4spar/deno-cliffy/commit/a5cd35e))
+- **command:** zsh completion for command aliases not working (#688)
+  ([2351c77](https://github.com/c4spar/deno-cliffy/commit/2351c77))
+- **command:** arg with no completions followed by args with completions breaks
+  zsh completion (#688)
+  ([53551ac](https://github.com/c4spar/deno-cliffy/commit/53551ac))
+- **command:** use ValidationError from command module instead of flags module
+  in upgrade command (#684)
+  ([a568c39](https://github.com/c4spar/deno-cliffy/commit/a568c39))
+- **command:** infer option default value as const (#660)
+  ([c91ddb6](https://github.com/c4spar/deno-cliffy/commit/c91ddb6))
+- **command:** command action not triggered for standalone options without
+  action handler (#654)
+  ([4e63862](https://github.com/c4spar/deno-cliffy/commit/4e63862))
+- **command:** escape colons in subCommand name for zsh completions (#661)
+  ([aa1311f](https://github.com/c4spar/deno-cliffy/commit/aa1311f))
+- **prompt:** fix initial page offset for checkbox and select prompt (#689)
+  ([da56395](https://github.com/c4spar/deno-cliffy/commit/da56395))
+- **table:** Wrap ANSI codes for multiline cells (#657)
+  ([5118a1c](https://github.com/c4spar/deno-cliffy/commit/5118a1c))
+
+### Code Refactoring
+
+- **command,flags:** move some utils functions (#683)
+  ([6319a78](https://github.com/c4spar/deno-cliffy/commit/6319a78))
+- **flags,prompt:** remove distance method and use std/text (#681)
+  ([181e055](https://github.com/c4spar/deno-cliffy/commit/181e055))
+
+### Chore
+
+- **deps:** upgrade to std@0.221.0 (#691)
+  ([140f250](https://github.com/c4spar/deno-cliffy/commit/140f250),
+  [d337862](https://github.com/c4spar/deno-cliffy/commit/d337862))
+
+### Unit/Integration Tests
+
+- **command:** add file type completion test for zsh (#688)
+  ([fba0969](https://github.com/c4spar/deno-cliffy/commit/fba0969))
+
+### Documentation Updates
+
+- **command:** fix markdown formatting for arguments (#677) (#678)
+  ([6e67dca](https://github.com/c4spar/deno-cliffy/commit/6e67dca))
+
 # [v1.0.0-rc.3](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.2...v1.0.0-rc.3) (Jul 30, 2023)
 
 ### Features
