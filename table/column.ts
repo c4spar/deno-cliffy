@@ -164,7 +164,7 @@ export class Column<
   }
 
   /** Get value parser. */
-  getValueParser(): ValueParser<TValue> | undefined {
+  getCellValueParser(): ValueParser<TValue> | undefined {
     return this.opts.value;
   }
 }

@@ -412,7 +412,7 @@ export class Table<
   }
 
   /** Get value parser. */
-  public getValueParser():
+  public getCellValueParser():
     | ValueParser<GetRowInnerValue<TRow>>
     | undefined {
     return this.options.value;

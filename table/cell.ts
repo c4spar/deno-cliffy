@@ -31,7 +31,8 @@ export interface CellOptions<TValue extends CellValue> {
   rowSpan?: number;
   /** Cell cell alignment direction. */
   align?: Direction;
-  value?: ValueParser<TValue>;
+  // value?: ValueParser<TValue>;
+  value?(value: TValue): ValueParserResult;
   /**
    * Any unterminated ANSI formatting overflowed from previous lines of a
    * multi-line cell.

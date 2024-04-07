@@ -156,7 +156,7 @@ export class Row<
   }
 
   /** Get value parser. */
-  public getValueParser(): ValueParser<GetCellValue<TCell>> | undefined {
+  public getCellValueParser(): ValueParser<GetCellValue<TCell>> | undefined {
     return this.options.value;
   }
 }
