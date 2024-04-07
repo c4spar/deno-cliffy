@@ -11,7 +11,7 @@ import {
   brightBlue,
   dim,
   levenshteinDistance,
-  stripColor,
+  stripAnsiCode,
   yellow,
 } from "./deps.ts";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
@@ -364,7 +364,7 @@ export abstract class GenericList<
     if (this.settings.search) {
       const input = this.isSearchSelected() ? this.input() : dim(this.input());
       message += " " + this.settings.searchLabel + " ";
-      this.cursor.x = stripColor(message).length + this.inputIndex + 1;
+      this.cursor.x = stripAnsiCode(message).length + this.inputIndex + 1;
       message += input;
     }
 
@@ -843,7 +843,7 @@ function matchOption<
 }
 
 function matchInput(inputString: string, value: string): boolean {
-  return stripColor(value)
+  return stripAnsiCode(value)
     .toLowerCase()
     .includes(inputString);
 }

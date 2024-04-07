@@ -1,4 +1,4 @@
-import { assertEquals, stripColor } from "../../../dev_deps.ts";
+import { assertEquals, stripAnsiCode } from "../../../dev_deps.ts";
 import { CompletionsCommand } from "../../completions/completions_command.ts";
 import { HelpCommand } from "../../help/help_command.ts";
 import { Command } from "../../command.ts";
@@ -35,7 +35,7 @@ Deno.test("hidden command help", () => {
   const output: string = cmd.getHelp();
 
   assertEquals(
-    stripColor(output),
+    stripAnsiCode(output),
     `
 Usage:   COMMAND
 Version: 1.0.0  
