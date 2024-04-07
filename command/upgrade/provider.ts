@@ -84,7 +84,12 @@ export abstract class Provider {
       const { latest } = await this.getVersions(name);
       to = latest;
     }
-    const registry: string = new URL(main, this.getRegistryUrl(name, to)).href;
+
+    const registryUrl = this.getRegistryUrl(name, to)
+    const registry: string =
+      registryUrl.startsWith('jsr:') ?
+      `${registryUrl}/${name}` :
+      new URL(main, registryUrl).href;
 
     const cmdArgs = ["install"];
 

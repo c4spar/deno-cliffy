@@ -67,10 +67,6 @@ export class JsrProvider extends Provider {
   }
 
   getRegistryUrl(name: string, version: Semver): string {
-    return new URL(
-      `@${this.packageScope}/${this.packageName ?? name}@${version}`,
-      this.repositoryUrl,
-    )
-      .href;
+    return `jsr:@${this.packageScope}/${this.packageName ?? name}@${version}`
   }
 }
