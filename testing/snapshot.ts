@@ -218,7 +218,7 @@ async function runPrompt(
         await new Promise((resolve) =>
           setTimeout(
             resolve,
-            options.timeout ?? Deno.build.os === "windows" ? 1500 : 700,
+            options.timeout ?? Deno.build.os === "windows" ? 2000 : 700,
           )
         );
       }
