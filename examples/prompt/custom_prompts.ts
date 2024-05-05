@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { BufReader } from "@std/io/buf_reader";
+import { BufReader } from "@std/io/buf-reader";
 import { tty } from "../../ansi/tty.ts";
 import { Figures } from "../../prompt/_figures.ts";
 import { prompt } from "../../prompt/prompt.ts";
