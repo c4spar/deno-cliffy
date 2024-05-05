@@ -39,7 +39,7 @@ for (const name of methodNames) {
  * Chainable colors module.
  *
  * ```ts
- * import { colors } from "./mod.ts";
+ * import { colors } from "./colors.ts";
  *
  * console.log(colors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
@@ -47,7 +47,7 @@ for (const name of methodNames) {
  * If invoked as method, a new Ansi instance will be returned.
  *
  * ```ts
- * import { Colors, colors } from "./mod.ts";
+ * import { Colors, colors } from "./colors.ts";
  *
  * const myColors: Colors = colors();
  * console.log(myColors.blue.bgRed.bold('Welcome to Deno.Land!'));

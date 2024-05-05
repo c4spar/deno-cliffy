@@ -1,4 +1,4 @@
-import { eraseDown } from "@cliffy/ansi";
+import { eraseDown } from "@cliffy/ansi/ansi-escapes";
 import { quoteString } from "./_quote_string.ts";
 import { basename } from "@std/path";
 import { red } from "@std/fmt/colors";

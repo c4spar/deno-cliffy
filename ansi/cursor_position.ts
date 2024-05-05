@@ -25,7 +25,7 @@ const decoder = new TextDecoder();
  * @param options  Options.
  *
  * ```ts
- * import { Cursor, getCursorPosition } from "./mod.ts";
+ * import { Cursor, getCursorPosition } from "./cursor_position.ts";
  *
  * const cursor: Cursor = getCursorPosition();
  * console.log(cursor); // { x: 0, y: 14}
