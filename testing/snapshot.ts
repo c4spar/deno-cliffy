@@ -141,7 +141,7 @@ function registerTest(options: SnapshotTestOptions) {
     ctx: Deno.TestContext,
     step?: SnapshotTestStep,
   ) {
-    const { stdout, stderr } = await runPrompt(options, step);
+    const { stdout, stderr } = await executeTest(options, step);
 
     const serializer = options.serializer ?? quoteString;
     const output = `stdout:\n${serializer(stdout)}\nstderr:\n${
@@ -161,7 +161,7 @@ function registerTest(options: SnapshotTestOptions) {
   }
 }
 
-async function runPrompt(
+async function executeTest(
   options: SnapshotTestOptions,
   step?: SnapshotTestStep,
 ): Promise<{ stdout: string; stderr: string }> {
@@ -183,7 +183,7 @@ async function runPrompt(
         variable: "CLIFFY_SNAPSHOT_CONFIG",
       });
       if (state === "granted" && Deno.env.has("CLIFFY_SNAPSHOT_CONFIG")) {
-        denoArgs.push("-c=deno.jsonc");
+        denoArgs.push(`--config=${Deno.env.get("CLIFFY_SNAPSHOT_CONFIG")}`);
       }
     }
 
@@ -218,7 +218,7 @@ async function runPrompt(
         await new Promise((resolve) =>
           setTimeout(
             resolve,
-            options.timeout ?? Deno.build.os === "windows" ? 2000 : 700,
+            options.timeout ?? Deno.build.os === "windows" ? 800 : 300,
           )
         );
       }

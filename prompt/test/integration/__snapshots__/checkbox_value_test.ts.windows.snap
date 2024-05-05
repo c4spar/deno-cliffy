@@ -7,9 +7,6 @@ stdout:
   × date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × date 1
-❯ × date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
-? Select an option
-  × date 1
 ❯ √ date 2\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × date 1
