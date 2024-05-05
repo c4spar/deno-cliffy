@@ -19,12 +19,18 @@ Deno.test({
       "--allow-run=deno",
       `--allow-read=${testDir}`,
       `--allow-write=${testDir}`,
+      `--allow-env=CLIFFY_SNAPSHOT_CONFIG`,
       "testing/snapshot_test_fixture.ts",
       "--",
       "--update",
     ];
 
-    const cmd = new Deno.Command("deno", { args });
+    const cmd = new Deno.Command("deno", {
+      args,
+      env: {
+        CLIFFY_SNAPSHOT_CONFIG: Deno.env.get("CLIFFY_SNAPSHOT_CONFIG"),
+      },
+    });
 
     const { success, stdout, stderr } = await cmd.output();
 

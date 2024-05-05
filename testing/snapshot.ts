@@ -21,8 +21,10 @@ export interface SnapshotTestOptions extends SnapshotTestStep {
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
   meta: ImportMeta;
+
   /** Test function. */
   fn(): void | Promise<void>;
+
   /**
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
@@ -168,13 +170,30 @@ async function runPrompt(
   let stderr: string | undefined;
 
   try {
+    let denoArgs: Array<string>;
+
+    if (options.denoArgs) {
+      denoArgs = options.denoArgs;
+    } else {
+      denoArgs = ["--allow-env=SNAPSHOT_TEST_NAME"];
+
+      // workaround for https://github.com/denoland/deno/issues/22020
+      const { state } = await Deno.permissions.query({
+        name: "env",
+        variable: "CLIFFY_SNAPSHOT_CONFIG",
+      });
+      if (state === "granted" && Deno.env.has("CLIFFY_SNAPSHOT_CONFIG")) {
+        denoArgs.push("-c=deno.jsonc");
+      }
+    }
+
     const cmd = new Deno.Command("deno", {
       stdin: "piped",
       stdout: "piped",
       stderr: "piped",
       args: [
         "run",
-        ...options.denoArgs ?? ["--allow-env=SNAPSHOT_TEST_NAME"],
+        ...denoArgs,
         options.meta.url,
         ...options.args ?? [],
         ...step?.args ?? [],
