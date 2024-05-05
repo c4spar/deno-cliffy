@@ -1,18 +1,17 @@
-import type { Cursor } from "../ansi/cursor_position.ts";
-import { Tty, tty } from "../ansi/tty.ts";
-import { KeyCode, parse } from "../keycode/key_code.ts";
+import { Tty, tty } from "@cliffy/ansi/tty";
+import { type Cursor } from "@cliffy/ansi/cursor-position";
+import { KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
   brightBlue,
   dim,
   green,
   italic,
-  type Reader,
   red,
   stripAnsiCode,
-  type WriterSync,
   yellow,
-} from "./deps.ts";
+} from "@std/fmt/colors";
+import { Reader, WriterSync } from "@std/io/types";
 import { Figures } from "./_figures.ts";
 
 /** Static generic prompt interface. */

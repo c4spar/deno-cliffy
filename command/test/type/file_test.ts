@@ -1,8 +1,5 @@
-import {
-  assert,
-  IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
-import { assertEquals } from "../../../dev_deps.ts";
+import { assert, IsExact } from "conditional_type_checks";
+import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
 function cmd() {

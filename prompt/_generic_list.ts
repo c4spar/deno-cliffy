@@ -1,4 +1,4 @@
-import type { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import {
   GenericInput,
   GenericInputKeys,
@@ -6,14 +6,8 @@ import {
   GenericInputPromptSettings,
 } from "./_generic_input.ts";
 import { WidenType } from "./_utils.ts";
-import {
-  bold,
-  brightBlue,
-  dim,
-  levenshteinDistance,
-  stripAnsiCode,
-  yellow,
-} from "./deps.ts";
+import { bold, brightBlue, dim, stripAnsiCode, yellow } from "@std/fmt/colors";
+import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 
 type UnsupportedInputOptions = "suggestions" | "list";
@@ -183,7 +177,7 @@ export abstract class GenericList<
   protected abstract listOffset: number;
   protected parentOptions: Array<TGroup> = [];
 
-  protected get selectedOption() {
+  protected get selectedOption(): TOption | TGroup | undefined {
     return this.options.at(this.listIndex);
   }
 
@@ -446,7 +440,7 @@ export abstract class GenericList<
     return line;
   }
 
-  protected getListItemIndent(option: TOption | TGroup) {
+  protected getListItemIndent(option: TOption | TGroup): string {
     const indentLevel = this.isSearching()
       ? option.indentLevel
       : this.hasParent() && !this.isBackButton(option)
@@ -456,7 +450,10 @@ export abstract class GenericList<
     return this.settings.indent + " ".repeat(indentLevel);
   }
 
-  protected getListItemPointer(option: TOption | TGroup, isSelected?: boolean) {
+  protected getListItemPointer(
+    option: TOption | TGroup,
+    isSelected?: boolean,
+  ): string {
     if (!isSelected) {
       return "  ";
     }
@@ -504,7 +501,7 @@ export abstract class GenericList<
     return label;
   }
 
-  protected getBreadCrumb() {
+  protected getBreadCrumb(): string {
     if (!this.parentOptions.length || !this.settings.maxBreadcrumbItems) {
       return "";
     }
@@ -524,7 +521,7 @@ export abstract class GenericList<
     );
   }
 
-  protected getListIndex(value?: TValue) {
+  protected getListIndex(value?: TValue): number {
     return Math.max(
       0,
       typeof value === "undefined"
@@ -538,7 +535,7 @@ export abstract class GenericList<
     );
   }
 
-  protected getPageOffset(index: number) {
+  protected getPageOffset(index: number): number {
     if (index === 0) {
       return 0;
     }

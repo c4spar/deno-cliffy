@@ -1,5 +1,5 @@
 import { List } from "../../list.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "list prompt",

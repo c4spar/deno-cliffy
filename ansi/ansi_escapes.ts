@@ -1,9 +1,9 @@
-import { encodeBase64 } from "./deps.ts";
+import { encodeBase64 } from "@std/encoding/base64";
 
 /** Escape sequence: `\x1B` */
 const ESC = "\x1B";
 /** Control sequence intro: `\x1B[` */
-const CSI = `${ESC}[`;
+const CSI: string = `${ESC}[`;
 /** Operating system command: `\x1B]` */
 const OSC = `${ESC}]`;
 /** Link separator */
@@ -12,7 +12,7 @@ const SEP = ";";
 /** Ring audio bell: `\u0007` */
 export const bel = "\u0007";
 /** Get cursor position. */
-export const cursorPosition = `${CSI}6n`;
+export const cursorPosition: string = `${CSI}6n`;
 
 /**
  * Move cursor to x, y, counting from the top left corner.
@@ -98,15 +98,15 @@ export function cursorPrevLine(count = 1): string {
 }
 
 /** Move cursor to first column of current row. */
-export const cursorLeft = `${CSI}G`;
+export const cursorLeft: string = `${CSI}G`;
 /** Hide cursor. */
-export const cursorHide = `${CSI}?25l`;
+export const cursorHide: string = `${CSI}?25l`;
 /** Show cursor. */
-export const cursorShow = `${CSI}?25h`;
+export const cursorShow: string = `${CSI}?25h`;
 /** Save cursor. */
-export const cursorSave = `${ESC}7`;
+export const cursorSave: string = `${ESC}7`;
 /** Restore cursor. */
-export const cursorRestore = `${ESC}8`;
+export const cursorRestore: string = `${ESC}8`;
 
 /**
  * Scroll window up by n lines.
@@ -125,7 +125,7 @@ export function scrollDown(count = 1): string {
 }
 
 /** Clear screen. */
-export const eraseScreen = `${CSI}2J`;
+export const eraseScreen: string = `${CSI}2J`;
 
 /**
  * Clear screen up by n lines.
@@ -144,11 +144,11 @@ export function eraseDown(count = 1): string {
 }
 
 /** Clear current line. */
-export const eraseLine = `${CSI}2K`;
+export const eraseLine: string = `${CSI}2K`;
 /** Clear to line end. */
-export const eraseLineEnd = `${CSI}0K`;
+export const eraseLineEnd: string = `${CSI}0K`;
 /** Clear to line start. */
-export const eraseLineStart = `${CSI}1K`;
+export const eraseLineStart: string = `${CSI}1K`;
 
 /**
  * Clear screen and move cursor by n lines up and move cursor to first column.
@@ -170,7 +170,7 @@ export const clearScreen = "\u001Bc";
  * Clear the whole terminal, including scrollback buffer.
  * (Not just the visible part of it).
  */
-export const clearTerminal = Deno.build.os === "windows"
+export const clearTerminal: string = Deno.build.os === "windows"
   ? `${eraseScreen}${CSI}0f`
   // 1. Erases the screen (Only done in case `2` is not supported)
   // 2. Erases the whole screen including scrollback buffer
@@ -185,7 +185,7 @@ export const clearTerminal = Deno.build.os === "windows"
  * @param url Link url.
  *
  * ```ts
- * import { link } from "./mod.ts";
+ * import { link } from "@cliffy/ansi/ansi-escapes";
  *
  * console.log(
  *   link("Click me.", "https://deno.land"),
@@ -223,7 +223,7 @@ export interface ImageOptions {
  * @param options Image options.
  *
  * ```ts
- * import { image } from "./mod.ts";
+ * import { image } from "@cliffy/ansi/ansi-escapes";
  *
  * const response = await fetch("https://deno.land/images/hashrock_simple.png");
  * const imageBuffer: ArrayBuffer = await response.arrayBuffer();

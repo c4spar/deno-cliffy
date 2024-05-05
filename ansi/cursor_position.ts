@@ -1,5 +1,5 @@
 import { cursorPosition } from "./ansi_escapes.ts";
-import type { ReaderSync, WriterSync } from "./deps.ts";
+import type { ReaderSync, WriterSync } from "@std/io/types";
 
 /** Cursor position. */
 export interface Cursor {
@@ -25,7 +25,7 @@ const decoder = new TextDecoder();
  * @param options  Options.
  *
  * ```ts
- * import { Cursor, getCursorPosition } from "./mod.ts";
+ * import { Cursor, getCursorPosition } from "@cliffy/ansi/cursor-position";
  *
  * const cursor: Cursor = getCursorPosition();
  * console.log(cursor); // { x: 0, y: 14}

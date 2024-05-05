@@ -1,7 +1,7 @@
-import { ansi } from "../../../ansi/ansi.ts";
-import { format } from "../../../dev_deps.ts";
+import { ansi } from "@cliffy/ansi";
+import { format } from "@std/datetime/format";
 import { Select } from "../../select.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "select prompt > should select an option",

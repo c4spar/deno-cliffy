@@ -1,11 +1,6 @@
-import {
-  assertEquals,
-  assertSpyCall,
-  assertSpyCalls,
-  assertType,
-  IsExact,
-  spy,
-} from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
+import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
+import { assertType, IsExact } from "@std/testing/types";
 import { Command } from "../../command.ts";
 
 interface IStats {

@@ -1,4 +1,4 @@
-import { boolean } from "../../flags/types/boolean.ts";
+import { boolean } from "@cliffy/flags";
 import type { ArgumentValue } from "../types.ts";
 import { Type } from "../type.ts";
 

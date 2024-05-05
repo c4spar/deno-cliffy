@@ -109,7 +109,7 @@ export interface Chain<TContext extends Chain<TContext>> {
    * @param url Link url.
    *
    * ```ts
-   * import { ansi } from "./mod.ts";
+   * import { ansi } from "@cliffy/ansi";
    *
    * console.log(
    *   ansi.link("Click me.", "https://deno.land"),
@@ -124,7 +124,7 @@ export interface Chain<TContext extends Chain<TContext>> {
    * @param options Image options.
    *
    * ```ts
-   * import { ansi } from "./mod.ts";
+   * import { ansi } from "@cliffy/ansi";
    *
    * const response = await fetch("https://deno.land/images/hashrock_simple.png");
    * const imageBuffer: ArrayBuffer = await response.arrayBuffer();

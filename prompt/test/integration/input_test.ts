@@ -1,5 +1,5 @@
 import { Input } from "../../input.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "input prompt",

@@ -1,4 +1,4 @@
-import { string } from "../../flags/types/string.ts";
+import { string } from "@cliffy/flags";
 import { Type } from "../type.ts";
 import type { ArgumentValue } from "../types.ts";
 
