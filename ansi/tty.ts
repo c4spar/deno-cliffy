@@ -39,7 +39,7 @@ export type Tty = TtyFactory & TtyChain;
  * If invoked as method, a new Tty instance will be returned.
  *
  * ```ts
- * import { tty } from "./tty.ts";
+ * import { tty } from "@cliffy/ansi/tty";
  *
  * tty.cursorTo(0, 0).eraseScreen();
  * ```

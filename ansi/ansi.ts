@@ -32,7 +32,7 @@ export type Ansi = AnsiFactory & AnsiChain;
  * If invoked as method, a new Ansi instance will be returned.
  *
  * ```ts
- * import { ansi } from "./ansi.ts";
+ * import { ansi } from "@cliffy/ansi";
  *
  * await Deno.stdout.write(
  *   new TextEncoder().encode(
@@ -44,7 +44,7 @@ export type Ansi = AnsiFactory & AnsiChain;
  * Or shorter:
  *
  * ```ts
- * import { ansi } from "./ansi.ts";
+ * import { ansi } from "@cliffy/ansi";
  *
  * await Deno.stdout.write(
  *   ansi.cursorTo(0, 0).eraseScreen.bytes(),

@@ -185,7 +185,7 @@ export const clearTerminal: string = Deno.build.os === "windows"
  * @param url Link url.
  *
  * ```ts
- * import { link } from "./ansi_escapes.ts";
+ * import { link } from "@cliffy/ansi/ansi-escapes";
  *
  * console.log(
  *   link("Click me.", "https://deno.land"),
@@ -223,7 +223,7 @@ export interface ImageOptions {
  * @param options Image options.
  *
  * ```ts
- * import { image } from "./ansi_escapes.ts";
+ * import { image } from "@cliffy/ansi/ansi-escapes";
  *
  * const response = await fetch("https://deno.land/images/hashrock_simple.png");
  * const imageBuffer: ArrayBuffer = await response.arrayBuffer();

@@ -21,10 +21,8 @@ export interface SnapshotTestOptions extends SnapshotTestStep {
   name: string;
   /** Import meta. Required to determine the import url of the test file. */
   meta: ImportMeta;
-
   /** Test function. */
   fn(): void | Promise<void>;
-
   /**
    * Object of test steps. Key is the test name and the value is an array of
    * input sequences/characters.
