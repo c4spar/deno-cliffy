@@ -216,7 +216,10 @@ async function runPrompt(
         await writer.write(encoder.encode(data));
         // Ensure all inputs are processed and rendered separately.
         await new Promise((resolve) =>
-          setTimeout(resolve, options.timeout ?? 800)
+          setTimeout(
+            resolve,
+            options.timeout ?? Deno.build.os === "windows" ? 1000 : 700,
+          )
         );
       }
     }
