@@ -1,6 +1,7 @@
 name: Publish
 
 on:
+  pull_request:
   push:
     branches: [main]
   release:
@@ -25,7 +26,7 @@ jobs:
         uses: denoland/setup-deno@v1
 
       - name: Publish (dry run)
-        if: github.event_name == 'push'
+        if: github.event_name != 'release'
         run: deno publish --dry-run
 
       - name: Publish
