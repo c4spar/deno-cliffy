@@ -12,7 +12,7 @@ export interface UpgradeOptions {
   from?: string;
   to: string;
   args?: Array<string>;
-  main?: string;
+  main: string;
   importMap?: string;
 }
 
@@ -77,7 +77,7 @@ export abstract class Provider {
   }
 
   async upgrade(
-    { name, from, to, importMap, main = `${name}.ts`, args = [] }:
+    { name, from, to, importMap, main, args = [] }:
       UpgradeOptions,
   ): Promise<void> {
     if (to === "latest") {
