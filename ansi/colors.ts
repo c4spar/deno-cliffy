@@ -1,4 +1,4 @@
-import * as stdColors from "https://deno.land/std@0.221.0/fmt/colors.ts";
+import * as stdColors from "@std/fmt/colors";
 
 type ExcludedColorMethods = "setColorEnabled" | "getColorEnabled";
 type PropertyNames = keyof typeof stdColors;
@@ -39,7 +39,7 @@ for (const name of methodNames) {
  * Chainable colors module.
  *
  * ```ts
- * import { colors } from "./mod.ts";
+ * import { colors } from "@cliffy/ansi/colors";
  *
  * console.log(colors.blue.bgRed.bold('Welcome to Deno.Land!'));
  * ```
@@ -47,7 +47,7 @@ for (const name of methodNames) {
  * If invoked as method, a new Ansi instance will be returned.
  *
  * ```ts
- * import { Colors, colors } from "./mod.ts";
+ * import { Colors, colors } from "@cliffy/ansi/colors";
  *
  * const myColors: Colors = colors();
  * console.log(myColors.blue.bgRed.bold('Welcome to Deno.Land!'));

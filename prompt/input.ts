@@ -5,7 +5,7 @@ import {
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { normalize } from "./deps.ts";
+import { normalize } from "@std/path";
 
 /** Input prompt options. */
 export interface InputOptions

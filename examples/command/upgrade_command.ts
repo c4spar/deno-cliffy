@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run --allow-net --allow-run --allow-read --no-check
 
-import { Command, CompletionsCommand } from "../../command/mod.ts";
+import { CompletionsCommand } from "../../command/completions/mod.ts";
+import { Command } from "../../command/mod.ts";
 import {
   DenoLandProvider,
   NestLandProvider,

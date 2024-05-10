@@ -1,4 +1,5 @@
-import { assertEquals, stripAnsiCode } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
+import { stripAnsiCode } from "@std/fmt/colors";
 import { CompletionsCommand } from "../../completions/completions_command.ts";
 import { HelpCommand } from "../../help/help_command.ts";
 import { Command } from "../../command.ts";

@@ -1,6 +1,6 @@
 import { Cell } from "../cell.ts";
 import { Table } from "../table.ts";
-import { assertEquals } from "../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test("should allow undefined cell values", () => {
   assertEquals(

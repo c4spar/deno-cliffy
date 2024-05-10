@@ -1,5 +1,5 @@
-import { ansi } from "../../../ansi/ansi.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { ansi } from "@cliffy/ansi";
+import { snapshotTest } from "@cliffy/testing";
 import { Select } from "../../select.ts";
 
 await snapshotTest({
