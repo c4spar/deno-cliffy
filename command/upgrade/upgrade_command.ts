@@ -38,14 +38,14 @@ export class UpgradeCommand extends Command {
         {
           default: this.getProvider().name,
           hidden: this.providers.length < 2,
-          value: (registry?: string) => this.getProvider(registry),
+          value: (registry) => this.getProvider(registry),
         },
       )
       .option(
         "-l, --list-versions",
         "Show available versions.",
         {
-          action: async ({ registry }: { registry: Provider }) => {
+          action: async ({ registry }) => {
             await registry.listVersions(
               this.getMainCommand().getName(),
               this.getVersion(),
@@ -55,7 +55,7 @@ export class UpgradeCommand extends Command {
         },
       )
       .option(
-        "--version <version:string>",
+        "--version <version:string:version>",
         "The version to upgrade to.",
         { default: "latest" },
       )
@@ -70,18 +70,14 @@ export class UpgradeCommand extends Command {
 
         if (
           force || !currentVersion ||
-          await (registry as Provider).isOutdated(
-            name,
-            currentVersion,
-            targetVersion as string,
-          )
+          await registry.isOutdated(name, currentVersion, targetVersion)
         ) {
-          await (registry as Provider).upgrade({
+          await registry.upgrade({
             name,
             main,
             importMap,
             from: currentVersion,
-            to: targetVersion as string,
+            to: targetVersion,
             args,
           });
         }

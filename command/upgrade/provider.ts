@@ -12,7 +12,7 @@ export interface UpgradeOptions {
   from?: string;
   to: string;
   args?: Array<string>;
-  main: string;
+  main?: string;
   importMap?: string;
 }
 
@@ -86,8 +86,8 @@ export abstract class Provider {
 
     const registryUrl = this.getRegistryUrl(name, to);
     const registry: string = registryUrl.startsWith("jsr:")
-      ? `${registryUrl}/${name}`
-      : new URL(main, registryUrl).href;
+      ? registryUrl
+      : new URL(main || `${name}.ts`, registryUrl).href;
 
     const cmdArgs = ["install"];
 
