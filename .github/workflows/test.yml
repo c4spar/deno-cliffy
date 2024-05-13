@@ -15,6 +15,7 @@ jobs:
         deno: [v1.x]
     env:
       RUST_BACKTRACE: full
+      CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
         uses: actions/checkout@v3
