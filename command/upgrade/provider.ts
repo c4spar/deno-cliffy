@@ -77,14 +77,17 @@ export abstract class Provider {
   }
 
   async upgrade(
-    { name, from, to, importMap, main = `${name}.ts`, args = [] }:
-      UpgradeOptions,
+    { name, from, to, importMap, main, args = [] }: UpgradeOptions,
   ): Promise<void> {
     if (to === "latest") {
       const { latest } = await this.getVersions(name);
       to = latest;
     }
-    const registry: string = new URL(main, this.getRegistryUrl(name, to)).href;
+
+    const registryUrl = this.getRegistryUrl(name, to);
+    const registry: string = registryUrl.startsWith("jsr:")
+      ? registryUrl
+      : new URL(main || `${name}.ts`, registryUrl).href;
 
     const cmdArgs = ["install"];
 
