@@ -10,7 +10,8 @@ import { assert, IsAny, IsExact } from "conditional_type_checks";
       new Command<any>()
         .action((options, ...args) => {
           assert<IsAny<typeof options>>(true);
-          assert<IsAny<typeof args>>(true);
+          // deno-lint-ignore no-explicit-any
+          assert<IsExact<typeof args, Array<any>>>(true);
         });
     },
   });
@@ -26,7 +27,8 @@ import { assert, IsAny, IsExact } from "conditional_type_checks";
         .env("FOO_BAR <val:number>", "")
         .action((options, ...args) => {
           assert<IsAny<typeof options>>(true);
-          assert<IsAny<typeof args>>(true);
+          // deno-lint-ignore no-explicit-any
+          assert<IsExact<typeof args, Array<any>>>(true);
         });
     },
   });

@@ -25,12 +25,14 @@ Deno.test({
       "--update",
     ];
 
-    const cmd = new Deno.Command("deno", {
-      args,
-      env: {
-        CLIFFY_SNAPSHOT_CONFIG: Deno.env.get("CLIFFY_SNAPSHOT_CONFIG"),
-      },
-    });
+    const env: Record<string, string> = {};
+
+    const snapshotConfig = Deno.env.get("CLIFFY_SNAPSHOT_CONFIG");
+    if (snapshotConfig) {
+      env.CLIFFY_SNAPSHOT_CONFIG = snapshotConfig;
+    }
+
+    const cmd = new Deno.Command("deno", { args, env });
 
     const { success, stdout, stderr } = await cmd.output();
 
