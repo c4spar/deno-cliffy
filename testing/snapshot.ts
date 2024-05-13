@@ -216,7 +216,7 @@ async function executeTest(
         await new Promise((resolve) =>
           setTimeout(
             resolve,
-            options.timeout ?? Deno.build.os === "windows" ? 1200 : 300,
+            options.timeout ?? Deno.build.os === "windows" ? 1500 : 300,
           )
         );
       }
