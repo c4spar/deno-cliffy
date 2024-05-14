@@ -2,12 +2,10 @@
 
 import { CompletionsCommand } from "../../command/completions/mod.ts";
 import { Command } from "../../command/mod.ts";
-import {
-  DenoLandProvider,
-  NestLandProvider,
-  UpgradeCommand,
-} from "../../command/upgrade/mod.ts";
+import { UpgradeCommand } from "../../command/upgrade/mod.ts";
+import { DenoLandProvider } from "../../command/upgrade/provider/deno_land.ts";
 import { GithubProvider } from "../../command/upgrade/provider/github.ts";
+import { NestLandProvider } from "../../command/upgrade/provider/nest_land.ts";
 
 await new Command()
   .name("codeview")
