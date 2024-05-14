@@ -4,8 +4,16 @@
   "exports": {
     ".": "./mod.ts",
     "./completions": "./completions/mod.ts",
+    "./completions/bash": "./completions/bash.ts",
+    "./completions/fish": "./completions/fish.ts",
+    "./completions/zsh": "./completions/zsh.ts",
     "./help": "./help/mod.ts",
-    "./upgrade": "./upgrade/mod.ts"
+    "./upgrade": "./upgrade/mod.ts",
+    "./upgrade/provider/deno-land": "./upgrade/provider/deno_land.ts",
+    "./upgrade/provider/github": "./upgrade/provider/github.ts",
+    "./upgrade/provider/jsr": "./upgrade/provider/jsr.ts",
+    "./upgrade/provider/nest-land": "./upgrade/provider/nest_land.ts",
+    "./upgrade/provider/npm": "./upgrade/provider/npm.ts"
   },
   "lock": false
 }
