@@ -85,9 +85,10 @@ export abstract class Provider {
     }
 
     const registryUrl = this.getRegistryUrl(name, to);
-    const registry: string = registryUrl.startsWith("jsr:")
-      ? registryUrl
-      : new URL(main || `${name}.ts`, registryUrl).href;
+    const registry: string =
+      registryUrl.startsWith("jsr:") || registryUrl.startsWith("npm:")
+        ? registryUrl
+        : new URL(main || `${name}.ts`, registryUrl).href;
 
     const cmdArgs = ["install"];
 
