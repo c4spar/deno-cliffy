@@ -2,7 +2,8 @@ export const snapshot = {};
 
 snapshot[`should handle file type completions in options > zsh 1`] = `
 stdout:
-\`#!/usr/bin/env zsh
+\`#compdef completions-test
+
 # zsh completion support for completions-test v1.0.0
 
 autoload -U is-at-least
@@ -31,8 +32,7 @@ function __completions_test_complete {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test] )) ||
-function _completions_test() {
+_completions_test() {
   local state
 
   function _commands() {
@@ -70,8 +70,7 @@ function _completions_test() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo] )) ||
-function _completions_test_foo() {
+(( \$+functions[_completions_test_foo] )) || _completions_test_foo() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -79,8 +78,7 @@ function _completions_test_foo() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_bar] )) ||
-function _completions_test_bar() {
+(( \$+functions[_completions_test_bar] )) || _completions_test_bar() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -92,8 +90,7 @@ function _completions_test_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_beep] )) ||
-function _completions_test_beep() {
+(( \$+functions[_completions_test_beep] )) || _completions_test_beep() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -101,8 +98,7 @@ function _completions_test_beep() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_boop] )) ||
-function _completions_test_boop() {
+(( \$+functions[_completions_test_boop] )) || _completions_test_boop() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -114,8 +110,7 @@ function _completions_test_boop() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions] )) ||
-function _completions_test_completions() {
+(( \$+functions[_completions_test_completions] )) || _completions_test_completions() {
 
   function _commands() {
     local -a commands
@@ -147,8 +142,7 @@ function _completions_test_completions() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_bash] )) ||
-function _completions_test_completions_bash() {
+(( \$+functions[_completions_test_completions_bash] )) || _completions_test_completions_bash() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -160,8 +154,7 @@ function _completions_test_completions_bash() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_fish] )) ||
-function _completions_test_completions_fish() {
+(( \$+functions[_completions_test_completions_fish] )) || _completions_test_completions_fish() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -173,8 +166,7 @@ function _completions_test_completions_fish() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_zsh] )) ||
-function _completions_test_completions_zsh() {
+(( \$+functions[_completions_test_completions_zsh] )) || _completions_test_completions_zsh() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -185,9 +177,12 @@ function _completions_test_completions_zsh() {
   esac
 }
 
-# _completions_test "\${@}"
-
-compdef _completions_test completions-test
+# shellcheck disable=SC2154
+if [ "\${funcstack[1]}" = "_completions-test" ]; then
+  _completions_test "\${@}"
+else
+  compdef _completions_test completions-test;
+fi
 \`
 stderr:
 ""
@@ -195,7 +190,8 @@ stderr:
 
 snapshot[`should generate file type completions in arguments > zsh 1`] = `
 stdout:
-\`#!/usr/bin/env zsh
+\`#compdef completions-test
+
 # zsh completion support for completions-test v1.0.0
 
 autoload -U is-at-least
@@ -224,8 +220,7 @@ function __completions_test_complete {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test] )) ||
-function _completions_test() {
+_completions_test() {
   local state
 
   function _commands() {
@@ -263,8 +258,7 @@ function _completions_test() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo] )) ||
-function _completions_test_foo() {
+(( \$+functions[_completions_test_foo] )) || _completions_test_foo() {
 
   function _commands() {
     _files
@@ -276,8 +270,7 @@ function _completions_test_foo() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_bar] )) ||
-function _completions_test_bar() {
+(( \$+functions[_completions_test_bar] )) || _completions_test_bar() {
 
   function _commands() {
   }
@@ -289,8 +282,7 @@ function _completions_test_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_beep] )) ||
-function _completions_test_beep() {
+(( \$+functions[_completions_test_beep] )) || _completions_test_beep() {
 
   function _commands() {
     _files
@@ -302,8 +294,7 @@ function _completions_test_beep() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_boop] )) ||
-function _completions_test_boop() {
+(( \$+functions[_completions_test_boop] )) || _completions_test_boop() {
 
   function _commands() {
   }
@@ -319,8 +310,7 @@ function _completions_test_boop() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions] )) ||
-function _completions_test_completions() {
+(( \$+functions[_completions_test_completions] )) || _completions_test_completions() {
 
   function _commands() {
     local -a commands
@@ -352,8 +342,7 @@ function _completions_test_completions() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_bash] )) ||
-function _completions_test_completions_bash() {
+(( \$+functions[_completions_test_completions_bash] )) || _completions_test_completions_bash() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -365,8 +354,7 @@ function _completions_test_completions_bash() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_fish] )) ||
-function _completions_test_completions_fish() {
+(( \$+functions[_completions_test_completions_fish] )) || _completions_test_completions_fish() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -378,8 +366,7 @@ function _completions_test_completions_fish() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_zsh] )) ||
-function _completions_test_completions_zsh() {
+(( \$+functions[_completions_test_completions_zsh] )) || _completions_test_completions_zsh() {
 
   _arguments -w -s -S -C \\\\
     '(- *)'{-h,--help}'[Show this help.]' \\\\
@@ -390,9 +377,12 @@ function _completions_test_completions_zsh() {
   esac
 }
 
-# _completions_test "\${@}"
-
-compdef _completions_test completions-test
+# shellcheck disable=SC2154
+if [ "\${funcstack[1]}" = "_completions-test" ]; then
+  _completions_test "\${@}"
+else
+  compdef _completions_test completions-test;
+fi
 \`
 stderr:
 ""
