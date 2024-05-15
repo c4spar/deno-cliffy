@@ -1,25 +1,28 @@
 import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
-import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
+import type { Provider, Versions } from "./provider.ts";
+import type { RuntimeUpgradeOptions } from "./runtime.ts";
+import { type RuntimeOptionsMap, upgrade } from "./upgrade.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
-  TProviders extends TProvider | Array<TProvider> =
-    | TProvider
-    | Array<TProvider>,
-> {
-  provider: TProviders;
+> extends RuntimeUpgradeOptions {
+  provider: TProvider | Array<TProvider>;
   main?: string;
-  importMap?: string;
-  args?: Array<string>;
+  runtime?: RuntimeOptionsMap;
 }
 
+/**
+ * The `UpgradeCommand` adds an upgrade functionality to the cli to be able to
+ * seamlessly upgrade the cli to the latest or a specific version from any
+ * supported registry.
+ */
 export class UpgradeCommand extends Command {
   private readonly providers: ReadonlyArray<Provider>;
 
   constructor(
-    { provider, main, args, importMap }: UpgradeCommandOptions,
+    { provider, ...options }: UpgradeCommandOptions,
   ) {
     super();
     this.providers = Array.isArray(provider) ? provider : [provider];
@@ -45,13 +48,12 @@ export class UpgradeCommand extends Command {
         "-l, --list-versions",
         "Show available versions.",
         {
-          action: async ({ registry }) => {
-            await registry.listVersions(
+          standalone: true,
+          action: ({ registry }) =>
+            registry.listVersions(
               this.getMainCommand().getName(),
               this.getVersion(),
-            );
-            Deno.exit(0);
-          },
+            ),
         },
       )
       .option(
@@ -64,23 +66,18 @@ export class UpgradeCommand extends Command {
         "Replace current installation even if not out-of-date.",
       )
       .complete("version", () => this.getAllVersions())
-      .action(async ({ registry, version: targetVersion, force }) => {
+      .action(async ({ registry: provider, version, force }) => {
         const name: string = this.getMainCommand().getName();
         const currentVersion: string | undefined = this.getVersion();
 
-        if (
-          force || !currentVersion ||
-          await registry.isOutdated(name, currentVersion, targetVersion)
-        ) {
-          await registry.upgrade({
-            name,
-            main,
-            importMap,
-            from: currentVersion,
-            to: targetVersion,
-            args,
-          });
-        }
+        await upgrade({
+          name,
+          version,
+          currentVersion,
+          force,
+          provider,
+          ...options,
+        });
       });
   }
 

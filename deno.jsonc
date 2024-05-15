@@ -40,6 +40,7 @@
     "@cliffy/testing": "jsr:@cliffy/testing@1.0.0-rc.4",
     "@std/assert": "jsr:@std/assert@0.225",
     "@std/async": "jsr:@std/async@0.224",
+    "@std/cli": "jsr:@std/cli@0.224",
     "@std/console": "jsr:@std/console@0.224",
     "@std/datetime": "jsr:@std/datetime@0.224",
     "@std/encoding": "jsr:@std/encoding@0.224",

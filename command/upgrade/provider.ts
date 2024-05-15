@@ -7,25 +7,34 @@ export interface Versions {
   versions: Array<string>;
 }
 
-export interface UpgradeOptions {
-  name: string;
-  from?: string;
-  to: string;
-  args?: Array<string>;
+export interface ProviderOptions {
   main?: string;
-  importMap?: string;
 }
 
 export abstract class Provider {
   abstract readonly name: string;
+  protected readonly main?: string;
   protected readonly maxListSize: number = 25;
   private maxCols = 8;
+
+  protected constructor({ main }: ProviderOptions = {}) {
+    this.main = main;
+  }
 
   abstract getVersions(name: string): Promise<Versions>;
 
   abstract getRepositoryUrl(name: string): string;
 
   abstract getRegistryUrl(name: string, version: string): string;
+
+  getSpecifier(name: string, version: string, defaultMain?: string): string {
+    return `${this.getRegistryUrl(name, version)}${this.getMain(defaultMain)}`;
+  }
+
+  private getMain(defaultMain?: string) {
+    const main = this.main ?? defaultMain;
+    return main ? `/${main}` : "";
+  }
 
   async isOutdated(
     name: string,
@@ -74,63 +83,6 @@ export abstract class Provider {
     }
 
     return true;
-  }
-
-  async upgrade(
-    { name, from, to, importMap, main, args = [] }: UpgradeOptions,
-  ): Promise<void> {
-    if (to === "latest") {
-      const { latest } = await this.getVersions(name);
-      to = latest;
-    }
-
-    const registryUrl = this.getRegistryUrl(name, to);
-    const registry: string =
-      registryUrl.startsWith("jsr:") || registryUrl.startsWith("npm:")
-        ? registryUrl
-        : new URL(main || `${name}.ts`, registryUrl).href;
-
-    const cmdArgs = ["install"];
-
-    if (importMap) {
-      const importJson: string =
-        new URL(importMap, this.getRegistryUrl(name, to)).href;
-
-      cmdArgs.push("--import-map", importJson);
-    }
-
-    if (args.length) {
-      cmdArgs.push(...args, "--force", "--name", name, registry);
-    } else {
-      cmdArgs.push(
-        "--no-check",
-        "--quiet",
-        "--force",
-        "--name",
-        name,
-        registry,
-      );
-    }
-
-    const cmd = new Deno.Command(Deno.execPath(), {
-      args: cmdArgs,
-      stdout: "piped",
-      stderr: "piped",
-    });
-    const { success, stderr } = await cmd.output();
-
-    if (!success) {
-      await Deno.stderr.write(stderr);
-      throw new Error(
-        `Failed to upgrade ${name} from ${from} to version ${to}!`,
-      );
-    }
-
-    console.info(
-      `Successfully upgraded ${name} from ${from} to version ${to}! (${
-        this.getRegistryUrl(name, to)
-      })`,
-    );
   }
 
   public async listVersions(

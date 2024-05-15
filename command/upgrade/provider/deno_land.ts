@@ -1,6 +1,6 @@
-import { Provider, Versions } from "../provider.ts";
+import { Provider, ProviderOptions, Versions } from "../provider.ts";
 
-export interface DenoLandProviderOptions {
+export interface DenoLandProviderOptions extends ProviderOptions {
   name?: string;
 }
 
@@ -10,8 +10,8 @@ export class DenoLandProvider extends Provider {
   private readonly registryUrl = "https://deno.land/x/";
   private readonly moduleName?: string;
 
-  constructor({ name }: DenoLandProviderOptions = {}) {
-    super();
+  constructor({ name, main = `${name}.ts` }: DenoLandProviderOptions = {}) {
+    super({ main });
     this.moduleName = name;
   }
 
@@ -35,7 +35,7 @@ export class DenoLandProvider extends Provider {
   }
 
   getRegistryUrl(name: string, version: string): string {
-    return new URL(`${this.moduleName ?? name}@${version}/`, this.registryUrl)
+    return new URL(`${this.moduleName ?? name}@${version}`, this.registryUrl)
       .href;
   }
 }

@@ -1,8 +1,9 @@
-import { Provider, Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 
 type Semver =
   | `${number}.${number}.${number}`
   | `${number}.${number}.${number}-${string}`;
+
 type Package = `@${string}/${string}`;
 
 type JsrApiPackageMetadata = {
@@ -14,12 +15,14 @@ type JsrApiPackageMetadata = {
   };
 };
 
-export type JsrProviderOptions = {
-  package: Package;
-} | {
-  scope: string;
-  name?: string;
-};
+export type JsrProviderOptions =
+  & ProviderOptions
+  & ({
+    package: Package;
+  } | {
+    scope: string;
+    name?: string;
+  });
 
 export class JsrProvider extends Provider {
   name = "jsr";
@@ -27,8 +30,8 @@ export class JsrProvider extends Provider {
   private readonly packageName?: string;
   private readonly packageScope: string;
 
-  constructor(options: JsrProviderOptions) {
-    super();
+  constructor({ main, ...options }: JsrProviderOptions) {
+    super({ main });
     this.packageScope = "package" in options
       ? options.package.split("/")[0].slice(1)
       : options.scope;

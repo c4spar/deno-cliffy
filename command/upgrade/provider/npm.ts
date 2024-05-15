@@ -1,11 +1,13 @@
-import { Provider, type Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 
-export type NpmProviderOptions = {
-  package: string;
-} | {
-  scope: string;
-  name?: string;
-};
+export type NpmProviderOptions =
+  & ProviderOptions
+  & ({
+    package: string;
+  } | {
+    scope: string;
+    name?: string;
+  });
 
 export class NpmProvider extends Provider {
   name = "npm";
@@ -13,8 +15,8 @@ export class NpmProvider extends Provider {
   private readonly packageName?: string;
   private readonly packageScope: string;
 
-  constructor(options: NpmProviderOptions) {
-    super();
+  constructor({ main, ...options }: NpmProviderOptions) {
+    super({ main });
     this.packageScope = "package" in options
       ? options.package.split("/")[0].slice(1)
       : options.scope;
