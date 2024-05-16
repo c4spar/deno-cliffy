@@ -1,6 +1,9 @@
+import { Spinner } from "@std/cli/spinner";
+import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
+import { createLogger } from "./logger.ts";
 import type { Provider, Versions } from "./provider.ts";
 import type { RuntimeUpgradeOptions } from "./runtime.ts";
 import { type RuntimeOptionsMap, upgrade } from "./upgrade.ts";
@@ -9,7 +12,6 @@ export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
 > extends RuntimeUpgradeOptions {
   provider: TProvider | Array<TProvider>;
-  main?: string;
   runtime?: RuntimeOptionsMap;
 }
 
@@ -65,19 +67,39 @@ export class UpgradeCommand extends Command {
         "-f, --force",
         "Replace current installation even if not out-of-date.",
       )
+      .option(
+        "-v, --verbose",
+        "Log verbose output.",
+      )
       .complete("version", () => this.getAllVersions())
-      .action(async ({ registry: provider, version, force }) => {
+      .action(async ({ registry: provider, version, force, verbose }) => {
         const name: string = this.getMainCommand().getName();
         const currentVersion: string | undefined = this.getVersion();
 
-        await upgrade({
-          name,
-          version,
-          currentVersion,
-          force,
-          provider,
-          ...options,
+        const spinner = new Spinner({
+          message: brightBlue(
+            `Upgrading ${bold(name)} from version ${
+              bold(currentVersion ?? "")
+            } to ${bold(version)}...`,
+          ),
         });
+        const logger = createLogger({ spinner, verbose });
+        spinner.start();
+
+        try {
+          await upgrade({
+            name,
+            version,
+            currentVersion,
+            force,
+            provider,
+            verbose,
+            logger,
+            ...options,
+          });
+        } finally {
+          spinner.stop();
+        }
       });
   }
 

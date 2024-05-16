@@ -1,4 +1,6 @@
+import { dim } from "@std/fmt/colors";
 import { Runtime, type UpgradePackageOptions } from "../runtime.ts";
+import type { Logger } from "../logger.ts";
 
 /** Deno specific upgrade options. */
 export interface DenoUpgradeOptions {
@@ -13,35 +15,41 @@ export type DenoUpgradePackageOptions =
 /** Deno runtime upgrade handler. */
 export class DenoRuntime extends Runtime {
   upgrade(
-    { provider, name, main, version, importMap, args = [] }:
+    { provider, name, main, version, importMap, verbose, logger, args = [] }:
       DenoUpgradePackageOptions,
   ): Promise<string | null> {
     const specifier: string = provider.getSpecifier(name, version, main);
 
-    const cmdArgs = ["install", "--global"];
+    const cmdArgs = ["install", `--name=${name}`, "--global", "--force"];
 
-    if (importMap) {
-      const importJson: string = new URL(importMap, specifier).href;
-      cmdArgs.push("--import-map", importJson);
+    if (!verbose) {
+      cmdArgs.push("--quiet");
     }
 
     if (args.length) {
-      cmdArgs.push(...args, "--force", "--name", name, specifier);
-    } else {
-      cmdArgs.push(
-        "--no-check",
-        "--quiet",
-        "--force",
-        "--name",
-        name,
-        specifier,
-      );
+      cmdArgs.push(...args);
     }
 
-    return this.execute(cmdArgs);
+    if (importMap) {
+      const importJson: string = new URL(importMap, specifier).href;
+      cmdArgs.push(`--import-map=${importJson}`);
+    }
+
+    cmdArgs.push(specifier);
+
+    return this.execute(cmdArgs, logger);
   }
 
-  protected async execute(cmdArgs: string[]): Promise<string | null> {
+  protected async execute(
+    cmdArgs: string[],
+    logger?: Logger,
+  ): Promise<string | null> {
+    logger?.log(
+      dim("$ %s %s"),
+      Deno.execPath(),
+      cmdArgs.join(" "),
+    );
+
     const cmd = new Deno.Command(Deno.execPath(), {
       args: cmdArgs,
       stdout: "piped",
