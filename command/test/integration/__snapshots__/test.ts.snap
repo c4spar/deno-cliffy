@@ -919,7 +919,8 @@ stderr:
 
 snapshot[`command integration > should generate zsh completions 1`] = `
 stdout:
-\`#!/usr/bin/env zsh
+\`#compdef completions-test
+
 # zsh completion support for completions-test v1.0.0
 
 autoload -U is-at-least
@@ -948,8 +949,7 @@ function __completions_test_complete {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test] )) ||
-function _completions_test() {
+_completions_test() {
   local state
 
   function _commands() {
@@ -1001,8 +1001,7 @@ function _completions_test() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo] )) ||
-function _completions_test_foo() {
+(( \$+functions[_completions_test_foo] )) || _completions_test_foo() {
 
   function _commands() {
     local -a commands
@@ -1035,8 +1034,7 @@ function _completions_test_foo() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo_help] )) ||
-function _completions_test_foo_help() {
+(( \$+functions[_completions_test_foo_help] )) || _completions_test_foo_help() {
 
   function _commands() {
     __completions_test_complete command command foo help
@@ -1048,8 +1046,7 @@ function _completions_test_foo_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo_bar] )) ||
-function _completions_test_foo_bar() {
+(( \$+functions[_completions_test_foo_bar] )) || _completions_test_foo_bar() {
 
   function _commands() {
     local -a commands
@@ -1080,8 +1077,7 @@ function _completions_test_foo_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo_bar_help] )) ||
-function _completions_test_foo_bar_help() {
+(( \$+functions[_completions_test_foo_bar_help] )) || _completions_test_foo_bar_help() {
 
   function _commands() {
     __completions_test_complete command command foo bar help
@@ -1093,8 +1089,7 @@ function _completions_test_foo_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_bar] )) ||
-function _completions_test_bar() {
+(( \$+functions[_completions_test_bar] )) || _completions_test_bar() {
 
   function _commands() {
     local -a commands
@@ -1124,8 +1119,7 @@ function _completions_test_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_bar_help] )) ||
-function _completions_test_bar_help() {
+(( \$+functions[_completions_test_bar_help] )) || _completions_test_bar_help() {
 
   function _commands() {
     __completions_test_complete command command bar help
@@ -1137,8 +1131,7 @@ function _completions_test_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo_bar] )) ||
-function _completions_test_foo_bar() {
+(( \$+functions[_completions_test_foo_bar] )) || _completions_test_foo_bar() {
 
   function _commands() {
     local -a commands
@@ -1170,8 +1163,7 @@ function _completions_test_foo_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_foo_bar_help] )) ||
-function _completions_test_foo_bar_help() {
+(( \$+functions[_completions_test_foo_bar_help] )) || _completions_test_foo_bar_help() {
 
   function _commands() {
     __completions_test_complete command command foo:bar help
@@ -1183,8 +1175,7 @@ function _completions_test_foo_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_validation_error] )) ||
-function _completions_test_validation_error() {
+(( \$+functions[_completions_test_validation_error] )) || _completions_test_validation_error() {
 
   function _commands() {
     local -a commands
@@ -1214,8 +1205,7 @@ function _completions_test_validation_error() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_validation_error_help] )) ||
-function _completions_test_validation_error_help() {
+(( \$+functions[_completions_test_validation_error_help] )) || _completions_test_validation_error_help() {
 
   function _commands() {
     __completions_test_complete command command validation-error help
@@ -1227,8 +1217,7 @@ function _completions_test_validation_error_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_help] )) ||
-function _completions_test_help() {
+(( \$+functions[_completions_test_help] )) || _completions_test_help() {
 
   function _commands() {
     __completions_test_complete command command help
@@ -1240,8 +1229,7 @@ function _completions_test_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions] )) ||
-function _completions_test_completions() {
+(( \$+functions[_completions_test_completions] )) || _completions_test_completions() {
 
   function _commands() {
     local -a commands
@@ -1275,8 +1263,7 @@ function _completions_test_completions() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_help] )) ||
-function _completions_test_completions_help() {
+(( \$+functions[_completions_test_completions_help] )) || _completions_test_completions_help() {
 
   function _commands() {
     __completions_test_complete command command completions help
@@ -1288,8 +1275,7 @@ function _completions_test_completions_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_bash] )) ||
-function _completions_test_completions_bash() {
+(( \$+functions[_completions_test_completions_bash] )) || _completions_test_completions_bash() {
 
   function _commands() {
     local -a commands
@@ -1319,8 +1305,7 @@ function _completions_test_completions_bash() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_bash_help] )) ||
-function _completions_test_completions_bash_help() {
+(( \$+functions[_completions_test_completions_bash_help] )) || _completions_test_completions_bash_help() {
 
   function _commands() {
     __completions_test_complete command command completions bash help
@@ -1332,8 +1317,7 @@ function _completions_test_completions_bash_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_fish] )) ||
-function _completions_test_completions_fish() {
+(( \$+functions[_completions_test_completions_fish] )) || _completions_test_completions_fish() {
 
   function _commands() {
     local -a commands
@@ -1363,8 +1347,7 @@ function _completions_test_completions_fish() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_fish_help] )) ||
-function _completions_test_completions_fish_help() {
+(( \$+functions[_completions_test_completions_fish_help] )) || _completions_test_completions_fish_help() {
 
   function _commands() {
     __completions_test_complete command command completions fish help
@@ -1376,8 +1359,7 @@ function _completions_test_completions_fish_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_zsh] )) ||
-function _completions_test_completions_zsh() {
+(( \$+functions[_completions_test_completions_zsh] )) || _completions_test_completions_zsh() {
 
   function _commands() {
     local -a commands
@@ -1407,8 +1389,7 @@ function _completions_test_completions_zsh() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_completions_test_completions_zsh_help] )) ||
-function _completions_test_completions_zsh_help() {
+(( \$+functions[_completions_test_completions_zsh_help] )) || _completions_test_completions_zsh_help() {
 
   function _commands() {
     __completions_test_complete command command completions zsh help
@@ -1419,9 +1400,12 @@ function _completions_test_completions_zsh_help() {
     '1:command:_commands'
 }
 
-# _completions_test "\${@}"
-
-compdef _completions_test completions-test
+# shellcheck disable=SC2154
+if [ "\${funcstack[1]}" = "_completions-test" ]; then
+  _completions_test "\${@}"
+else
+  compdef _completions_test completions-test;
+fi
 \`
 stderr:
 ""
@@ -1429,7 +1413,8 @@ stderr:
 
 snapshot[`command integration > should override name in zsh completions 1`] = `
 stdout:
-\`#!/usr/bin/env zsh
+\`#compdef foo-command
+
 # zsh completion support for foo-command v1.0.0
 
 autoload -U is-at-least
@@ -1458,8 +1443,7 @@ function __foo_command_complete {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command] )) ||
-function _foo_command() {
+_foo_command() {
   local state
 
   function _commands() {
@@ -1511,8 +1495,7 @@ function _foo_command() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo] )) ||
-function _foo_command_foo() {
+(( \$+functions[_foo_command_foo] )) || _foo_command_foo() {
 
   function _commands() {
     local -a commands
@@ -1545,8 +1528,7 @@ function _foo_command_foo() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo_help] )) ||
-function _foo_command_foo_help() {
+(( \$+functions[_foo_command_foo_help] )) || _foo_command_foo_help() {
 
   function _commands() {
     __foo_command_complete command command foo help
@@ -1558,8 +1540,7 @@ function _foo_command_foo_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo_bar] )) ||
-function _foo_command_foo_bar() {
+(( \$+functions[_foo_command_foo_bar] )) || _foo_command_foo_bar() {
 
   function _commands() {
     local -a commands
@@ -1590,8 +1571,7 @@ function _foo_command_foo_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo_bar_help] )) ||
-function _foo_command_foo_bar_help() {
+(( \$+functions[_foo_command_foo_bar_help] )) || _foo_command_foo_bar_help() {
 
   function _commands() {
     __foo_command_complete command command foo bar help
@@ -1603,8 +1583,7 @@ function _foo_command_foo_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_bar] )) ||
-function _foo_command_bar() {
+(( \$+functions[_foo_command_bar] )) || _foo_command_bar() {
 
   function _commands() {
     local -a commands
@@ -1634,8 +1613,7 @@ function _foo_command_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_bar_help] )) ||
-function _foo_command_bar_help() {
+(( \$+functions[_foo_command_bar_help] )) || _foo_command_bar_help() {
 
   function _commands() {
     __foo_command_complete command command bar help
@@ -1647,8 +1625,7 @@ function _foo_command_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo_bar] )) ||
-function _foo_command_foo_bar() {
+(( \$+functions[_foo_command_foo_bar] )) || _foo_command_foo_bar() {
 
   function _commands() {
     local -a commands
@@ -1680,8 +1657,7 @@ function _foo_command_foo_bar() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_foo_bar_help] )) ||
-function _foo_command_foo_bar_help() {
+(( \$+functions[_foo_command_foo_bar_help] )) || _foo_command_foo_bar_help() {
 
   function _commands() {
     __foo_command_complete command command foo:bar help
@@ -1693,8 +1669,7 @@ function _foo_command_foo_bar_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_validation_error] )) ||
-function _foo_command_validation_error() {
+(( \$+functions[_foo_command_validation_error] )) || _foo_command_validation_error() {
 
   function _commands() {
     local -a commands
@@ -1724,8 +1699,7 @@ function _foo_command_validation_error() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_validation_error_help] )) ||
-function _foo_command_validation_error_help() {
+(( \$+functions[_foo_command_validation_error_help] )) || _foo_command_validation_error_help() {
 
   function _commands() {
     __foo_command_complete command command validation-error help
@@ -1737,8 +1711,7 @@ function _foo_command_validation_error_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_help] )) ||
-function _foo_command_help() {
+(( \$+functions[_foo_command_help] )) || _foo_command_help() {
 
   function _commands() {
     __foo_command_complete command command help
@@ -1750,8 +1723,7 @@ function _foo_command_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions] )) ||
-function _foo_command_completions() {
+(( \$+functions[_foo_command_completions] )) || _foo_command_completions() {
 
   function _commands() {
     local -a commands
@@ -1785,8 +1757,7 @@ function _foo_command_completions() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_help] )) ||
-function _foo_command_completions_help() {
+(( \$+functions[_foo_command_completions_help] )) || _foo_command_completions_help() {
 
   function _commands() {
     __foo_command_complete command command completions help
@@ -1798,8 +1769,7 @@ function _foo_command_completions_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_bash] )) ||
-function _foo_command_completions_bash() {
+(( \$+functions[_foo_command_completions_bash] )) || _foo_command_completions_bash() {
 
   function _commands() {
     local -a commands
@@ -1829,8 +1799,7 @@ function _foo_command_completions_bash() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_bash_help] )) ||
-function _foo_command_completions_bash_help() {
+(( \$+functions[_foo_command_completions_bash_help] )) || _foo_command_completions_bash_help() {
 
   function _commands() {
     __foo_command_complete command command completions bash help
@@ -1842,8 +1811,7 @@ function _foo_command_completions_bash_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_fish] )) ||
-function _foo_command_completions_fish() {
+(( \$+functions[_foo_command_completions_fish] )) || _foo_command_completions_fish() {
 
   function _commands() {
     local -a commands
@@ -1873,8 +1841,7 @@ function _foo_command_completions_fish() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_fish_help] )) ||
-function _foo_command_completions_fish_help() {
+(( \$+functions[_foo_command_completions_fish_help] )) || _foo_command_completions_fish_help() {
 
   function _commands() {
     __foo_command_complete command command completions fish help
@@ -1886,8 +1853,7 @@ function _foo_command_completions_fish_help() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_zsh] )) ||
-function _foo_command_completions_zsh() {
+(( \$+functions[_foo_command_completions_zsh] )) || _foo_command_completions_zsh() {
 
   function _commands() {
     local -a commands
@@ -1917,8 +1883,7 @@ function _foo_command_completions_zsh() {
 }
 
 # shellcheck disable=SC2154
-(( \$+functions[_foo_command_completions_zsh_help] )) ||
-function _foo_command_completions_zsh_help() {
+(( \$+functions[_foo_command_completions_zsh_help] )) || _foo_command_completions_zsh_help() {
 
   function _commands() {
     __foo_command_complete command command completions zsh help
@@ -1929,9 +1894,12 @@ function _foo_command_completions_zsh_help() {
     '1:command:_commands'
 }
 
-# _foo_command "\${@}"
-
-compdef _foo_command foo-command
+# shellcheck disable=SC2154
+if [ "\${funcstack[1]}" = "_foo-command" ]; then
+  _foo_command "\${@}"
+else
+  compdef _foo_command foo-command;
+fi
 \`
 stderr:
 ""
