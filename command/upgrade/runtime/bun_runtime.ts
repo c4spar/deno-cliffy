@@ -18,12 +18,11 @@ export class BunRuntime extends NodeRuntime {
       : [process.execPath, ...cmdArgs];
 
     logger?.log(
-      dim("$ %s %s"),
-      Deno.execPath(),
+      dim("$ %s"),
       cmdArgs.join(" "),
     );
 
-    const proc = Bun.spawn(cmdArgs, { stdout: "piped", stderr: "piped" });
+    const proc = Bun.spawn(cmdArgs, { stdout: "pipe", stderr: "pipe" });
     await proc.exited;
 
     if (proc.exitCode) {

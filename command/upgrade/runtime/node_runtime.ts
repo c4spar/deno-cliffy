@@ -44,7 +44,6 @@ export class NodeRuntime implements Runtime {
 
     logger?.log(
       dim("$ %s %s %s"),
-      Deno.execPath(),
       bin,
       args.join(" "),
     );
