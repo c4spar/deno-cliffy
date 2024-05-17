@@ -30,8 +30,11 @@ export class DenoLandProvider extends Provider {
     return await response.json();
   }
 
-  getRepositoryUrl(name: string): string {
-    return new URL(`${this.moduleName ?? name}/`, this.repositoryUrl).href;
+  getRepositoryUrl(name: string, version?: string): string {
+    return new URL(
+      `${this.moduleName ?? name}${version ? `@${version}` : ""}`,
+      this.repositoryUrl,
+    ).href;
   }
 
   getRegistryUrl(name: string, version: string): string {

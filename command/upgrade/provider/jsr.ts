@@ -62,9 +62,11 @@ export class JsrProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(name: string): string {
+  getRepositoryUrl(name: string, version?: Semver): string {
     return new URL(
-      `@${this.packageScope}/${this.packageName ?? name}`,
+      `@${this.packageScope}/${this.packageName ?? name}${
+        version ? `@${version}` : ""
+      }`,
       this.repositoryUrl,
     ).href;
   }

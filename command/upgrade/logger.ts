@@ -27,11 +27,7 @@ export function createLogger({ spinner, verbose }: LoggerOptions): Logger {
     log: (...args: Array<unknown>): void => {
       verbose && write("log", ...args);
     },
-    info: (...args: Array<unknown>): void => {
-      write("info", ...args);
-    },
-    error: (...args: Array<unknown>): void => {
-      write("error", ...args);
-    },
+    info: (...args: Array<unknown>): void => write("info", ...args),
+    error: (...args: Array<unknown>): void => write("error", ...args),
   };
 }

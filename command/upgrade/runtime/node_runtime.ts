@@ -13,7 +13,7 @@ export class NodeRuntime implements Runtime {
       logger,
       args = [],
     }: UpgradePackageOptions,
-  ): Promise<string | null> {
+  ): Promise<void> {
     const specifier = provider.getSpecifier(name, version, main)
       .replace(/^(npm|jsr):/, "");
     const isJsr = provider.name === "jsr";
@@ -37,7 +37,7 @@ export class NodeRuntime implements Runtime {
     cmdArgs: string[],
     isJsr: boolean,
     logger?: Logger,
-  ): Promise<string | null> {
+  ): Promise<void> {
     const { spawn } = await import("node:child_process");
 
     const [bin, args] = isJsr ? ["npx", ["jsr", ...cmdArgs]] : ["npm", cmdArgs];
@@ -59,9 +59,7 @@ export class NodeRuntime implements Runtime {
     );
 
     if (exitCode) {
-      return stderr.join("\n");
+      throw new Error(stderr.join("\n").trim());
     }
-
-    return null;
   }
 }

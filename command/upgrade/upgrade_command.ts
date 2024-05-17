@@ -97,6 +97,12 @@ export class UpgradeCommand extends Command {
             logger,
             ...options,
           });
+        } catch (error: unknown) {
+          logger.error(
+            !verbose && error instanceof Error ? error.message : error,
+          );
+          spinner.stop();
+          Deno.exit(1);
         } finally {
           spinner.stop();
         }

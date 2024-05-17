@@ -7,7 +7,7 @@ export class BunRuntime extends NodeRuntime {
     cmdArgs: string[],
     isJsr: boolean,
     logger?: Logger,
-  ): Promise<string | null> {
+  ): Promise<void> {
     // deno-lint-ignore no-explicit-any
     const Bun = (globalThis as any).Bun;
     // deno-lint-ignore no-explicit-any
@@ -27,9 +27,8 @@ export class BunRuntime extends NodeRuntime {
     await proc.exited;
 
     if (proc.exitCode) {
-      return await new Response(proc.stderr).text();
+      const stderr = await new Response(proc.stderr).text();
+      throw new Error(stderr.trim());
     }
-
-    return null;
   }
 }

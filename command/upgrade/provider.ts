@@ -23,7 +23,7 @@ export abstract class Provider {
 
   abstract getVersions(name: string): Promise<Versions>;
 
-  abstract getRepositoryUrl(name: string): string;
+  abstract getRepositoryUrl(name: string, version?: string): string;
 
   abstract getRegistryUrl(name: string, version: string): string;
 
@@ -31,7 +31,7 @@ export abstract class Provider {
     return `${this.getRegistryUrl(name, version)}${this.getMain(defaultMain)}`;
   }
 
-  private getMain(defaultMain?: string) {
+  private getMain(defaultMain?: string): string {
     const main = this.main ?? defaultMain;
     return main ? `/${main}` : "";
   }

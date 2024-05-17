@@ -14,10 +14,10 @@ export type DenoUpgradePackageOptions =
 
 /** Deno runtime upgrade handler. */
 export class DenoRuntime extends Runtime {
-  upgrade(
+  async upgrade(
     { provider, name, main, version, importMap, verbose, logger, args = [] }:
       DenoUpgradePackageOptions,
-  ): Promise<string | null> {
+  ): Promise<void> {
     const specifier: string = provider.getSpecifier(name, version, main);
 
     const cmdArgs = ["install", `--name=${name}`, "--global", "--force"];
@@ -37,13 +37,13 @@ export class DenoRuntime extends Runtime {
 
     cmdArgs.push(specifier);
 
-    return this.execute(cmdArgs, logger);
+    await this.execute(cmdArgs, logger);
   }
 
   protected async execute(
     cmdArgs: string[],
     logger?: Logger,
-  ): Promise<string | null> {
+  ): Promise<void> {
     logger?.log(
       dim("$ %s %s"),
       Deno.execPath(),
@@ -58,9 +58,7 @@ export class DenoRuntime extends Runtime {
     const { success, stderr } = await cmd.output();
 
     if (!success) {
-      return new TextDecoder().decode(stderr);
+      throw new Error(new TextDecoder().decode(stderr).trim());
     }
-
-    return null;
   }
 }

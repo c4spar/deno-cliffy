@@ -11,7 +11,8 @@ export type NpmProviderOptions =
 
 export class NpmProvider extends Provider {
   name = "npm";
-  private readonly repositoryUrl = "https://registry.npmjs.org/";
+  private readonly repositoryUrl = "https://npmjs.org/";
+  private readonly apiUrl = "https://registry.npmjs.org/";
   private readonly packageName?: string;
   private readonly packageScope: string;
 
@@ -29,7 +30,7 @@ export class NpmProvider extends Provider {
     name: string,
   ): Promise<Versions> {
     const response = await fetch(
-      `${this.repositoryUrl}/@${this.packageScope}/${this.packageName ?? name}`,
+      `${this.apiUrl}/@${this.packageScope}/${this.packageName ?? name}`,
     );
     if (!response.ok) {
       throw new Error(
@@ -46,9 +47,11 @@ export class NpmProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(name: string): string {
+  getRepositoryUrl(name: string, version?: string): string {
     return new URL(
-      `@${this.packageScope}/${this.packageName ?? name}`,
+      `package/@${this.packageScope}/${this.packageName ?? name}${
+        version ? `/v/${version}` : ""
+      }`,
       this.repositoryUrl,
     ).href;
   }

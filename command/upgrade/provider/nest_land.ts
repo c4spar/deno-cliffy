@@ -42,11 +42,11 @@ export class NestLandProvider extends Provider {
   }
 
   getRepositoryUrl(name: string): string {
-    return new URL(`${this.moduleName ?? name}/`, this.repositoryUrl).href;
+    return new URL(`${this.moduleName ?? name}`, this.repositoryUrl).href;
   }
 
   getRegistryUrl(name: string, version: string): string {
-    return new URL(`${this.moduleName ?? name}@${version}/`, this.registryUrl)
+    return new URL(`${this.moduleName ?? name}@${version}`, this.registryUrl)
       .href;
   }
 }

@@ -62,8 +62,11 @@ export class GithubProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(_name: string): string {
-    return new URL(`${this.repositoryName}/`, this.repositoryUrl).href;
+  getRepositoryUrl(_name: string, version?: string): string {
+    return new URL(
+      `${this.repositoryName}${version ? `/releases/tag/${version}` : ""}`,
+      this.repositoryUrl,
+    ).href;
   }
 
   getRegistryUrl(_name: string, version: string): string {

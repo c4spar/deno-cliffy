@@ -57,27 +57,26 @@ export async function upgrade(
     const { runtimeName, runtime } = await getRuntime();
     logger?.log(dim("Detected runtime: %s"), runtimeName);
 
-    const errorMessage: string | null = await runtime.upgrade({
-      args,
-      ...(runtimeOptions?.[runtimeName] ?? {}),
-      name,
-      version,
-      main,
-      provider,
-      logger,
-      verbose,
-    });
-
-    if (errorMessage) {
+    try {
+      await runtime.upgrade({
+        args,
+        ...(runtimeOptions?.[runtimeName] ?? {}),
+        name,
+        version,
+        main,
+        provider,
+        logger,
+        verbose,
+      });
+    } catch (error: unknown) {
       logger?.error(
         red(
           `Failed to upgrade ${bold(name)} ${
             currentVersion ? `from version ${bold(currentVersion)} ` : ""
-          }to ${bold(version)}:`,
+          }to ${bold(version)}.`,
         ),
       );
-      logger?.error(errorMessage);
-      Deno.exit(1);
+      throw error;
     }
 
     logger?.info(
@@ -86,7 +85,7 @@ export async function upgrade(
           bold(currentVersion ?? "")
         } to ${bold(version)}!`,
       ),
-      dim(`(${provider.getRegistryUrl(name, version)})`),
+      dim(`(${provider.getRepositoryUrl(name, version)})`),
     );
   }
 }

@@ -18,5 +18,5 @@ export interface UpgradePackageOptions extends RuntimeUpgradeOptions {
 
 /** Runtime handler. */
 export abstract class Runtime {
-  abstract upgrade(_options: UpgradePackageOptions): Promise<string | null>;
+  abstract upgrade(_options: UpgradePackageOptions): Promise<void>;
 }
