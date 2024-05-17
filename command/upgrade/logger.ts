@@ -9,18 +9,18 @@ export interface Logger {
 }
 
 export interface LoggerOptions {
-  spinner: Spinner;
+  spinner?: Spinner;
   verbose?: boolean;
 }
 
-export function createLogger({ spinner, verbose }: LoggerOptions): Logger {
+export function createLogger({ spinner, verbose }: LoggerOptions = {}): Logger {
   function write(
     type: "log" | "info" | "error",
     ...args: Array<unknown>
   ): void {
-    spinner && spinner.stop();
+    spinner?.stop();
     console[type](...args);
-    spinner && spinner.start();
+    spinner?.start();
   }
 
   return {
