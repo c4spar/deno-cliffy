@@ -5,11 +5,18 @@ import {
   resetFetch,
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
+import {
+  mockCommand,
+  mockGlobalCommand,
+  resetCommand,
+  resetGlobalCommand,
+} from "@c4spar/mock-command";
 import { DenoLandProvider } from "./deno_land.ts";
-import { Versions } from "../provider.ts";
+import type { Versions } from "../provider.ts";
 
 Deno.test("DenoLandProvider", async (ctx) => {
   mockGlobalFetch();
+  mockGlobalCommand();
 
   const provider = new DenoLandProvider();
 
@@ -78,5 +85,42 @@ Deno.test("DenoLandProvider", async (ctx) => {
     },
   });
 
+  await ctx.step({
+    name: "should upgrade to latest version",
+    async fn() {
+      mockFetch("https://cdn.deno.land/foo/meta/versions.json", {
+        body: JSON.stringify({
+          latest: "1.0.1",
+          versions: ["1.0.1", "1.0.0"],
+        }),
+      });
+
+      mockCommand({
+        command: Deno.execPath(),
+        args: [
+          "install",
+          "--no-check",
+          "--quiet",
+          "--force",
+          "--name",
+          "foo",
+          "https://deno.land/x/foo@1.0.1/foo.ts",
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
+
+      await provider.upgrade({
+        name: "foo",
+        from: "1.0.1",
+        to: "latest",
+      });
+
+      resetFetch();
+      resetCommand();
+    },
+  });
+
   resetGlobalFetch();
+  resetGlobalCommand();
 });

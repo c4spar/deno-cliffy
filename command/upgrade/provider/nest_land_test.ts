@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import {
   mockFetch,
   mockGlobalFetch,
@@ -6,9 +6,16 @@ import {
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
 import { NestLandProvider } from "./nest_land.ts";
+import {
+  mockCommand,
+  mockGlobalCommand,
+  resetCommand,
+  resetGlobalCommand,
+} from "@c4spar/mock-command";
 
 Deno.test("NestLandProvider", async (ctx) => {
   mockGlobalFetch();
+  mockGlobalCommand();
 
   const provider = new NestLandProvider();
 
@@ -55,32 +62,43 @@ Deno.test("NestLandProvider", async (ctx) => {
   });
 
   await ctx.step({
-    name: "should check if version is outdated",
+    name: "should upgrade to latest version",
     async fn() {
-      const mock = {
+      mockFetch("https://nest.land/api/package-client", {
         body: JSON.stringify({
           body: {
             latestVersion: "1.0.1",
             packageUploadNames: ["foo@1.0.0", "foo@1.0.1"],
           },
         }),
-      };
+      });
 
-      mockFetch("https://nest.land/api/package-client", mock);
-      const isOutdated = await provider.isOutdated("foo", "1.0.0", "latest");
-      assert(isOutdated);
+      mockCommand({
+        command: Deno.execPath(),
+        args: [
+          "install",
+          "--no-check",
+          "--quiet",
+          "--force",
+          "--name",
+          "foo",
+          "https://x.nest.land/foo@1.0.1/foo.ts",
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
 
-      mockFetch("https://nest.land/api/package-client", mock);
-      const isNotOutdated = !await provider.isOutdated(
-        "foo",
-        "1.0.1",
-        "latest",
-      );
-      assert(isNotOutdated);
+      await provider.upgrade({
+        name: "foo",
+        from: "1.0.1",
+        to: "latest",
+      });
 
       resetFetch();
+      resetCommand();
     },
   });
 
   resetGlobalFetch();
+  resetGlobalCommand();
 });

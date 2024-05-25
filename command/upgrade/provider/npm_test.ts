@@ -5,10 +5,17 @@ import {
   resetFetch,
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
+import {
+  mockCommand,
+  mockGlobalCommand,
+  resetCommand,
+  resetGlobalCommand,
+} from "@c4spar/mock-command";
 import { NpmProvider } from "./npm.ts";
 
 Deno.test("NpmProvider", async (ctx) => {
   mockGlobalFetch();
+  mockGlobalCommand();
 
   const provider = new NpmProvider({
     scope: "example",
@@ -90,5 +97,47 @@ Deno.test("NpmProvider", async (ctx) => {
     },
   });
 
+  await ctx.step({
+    name: "should upgrade to latest version",
+    async fn() {
+      mockFetch("https://registry.npmjs.org/@example/foo", {
+        body: JSON.stringify({
+          "dist-tags": {
+            latest: "1.0.1",
+          },
+          versions: {
+            "1.0.0": null,
+            "1.0.1": null,
+          },
+        }),
+      });
+
+      mockCommand({
+        command: Deno.execPath(),
+        args: [
+          "install",
+          "--no-check",
+          "--quiet",
+          "--force",
+          "--name",
+          "foo",
+          "npm:@example/foo@1.0.1",
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
+
+      await provider.upgrade({
+        name: "foo",
+        from: "1.0.1",
+        to: "latest",
+      });
+
+      resetFetch();
+      resetCommand();
+    },
+  });
+
   resetGlobalFetch();
+  resetGlobalCommand();
 });

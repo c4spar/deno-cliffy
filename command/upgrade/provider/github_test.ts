@@ -6,9 +6,16 @@ import {
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
 import { GithubProvider } from "./github.ts";
+import {
+  mockCommand,
+  mockGlobalCommand,
+  resetCommand,
+  resetGlobalCommand,
+} from "@c4spar/mock-command";
 
 Deno.test("GithubProvider", async (ctx) => {
   mockGlobalFetch();
+  mockGlobalCommand();
 
   const provider = new GithubProvider({ repository: "repo/user" });
 
@@ -117,5 +124,49 @@ Deno.test("GithubProvider", async (ctx) => {
     },
   });
 
+  await ctx.step({
+    name: "should upgrade to latest version",
+    async fn() {
+      mockFetch("https://api.github.com/repos/repo/user/git/refs/tags", {
+        body: JSON.stringify([
+          { ref: "1.0.0" },
+          { ref: "1.0.1" },
+        ]),
+      });
+
+      mockFetch("https://api.github.com/repos/repo/user/branches", {
+        body: JSON.stringify([
+          { name: "branch-1", protected: true },
+          { name: "branch-2", protected: false },
+        ]),
+      });
+
+      mockCommand({
+        command: Deno.execPath(),
+        args: [
+          "install",
+          "--no-check",
+          "--quiet",
+          "--force",
+          "--name",
+          "foo",
+          "https://raw.githubusercontent.com/repo/user/1.0.1/foo.ts",
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
+
+      await provider.upgrade({
+        name: "foo",
+        from: "1.0.0",
+        to: "latest",
+      });
+
+      resetFetch();
+      resetCommand();
+    },
+  });
+
   resetGlobalFetch();
+  resetGlobalCommand();
 });

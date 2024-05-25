@@ -6,9 +6,16 @@ import {
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
 import { JsrProvider } from "./jsr.ts";
+import {
+  mockCommand,
+  mockGlobalCommand,
+  resetCommand,
+  resetGlobalCommand,
+} from "@c4spar/mock-command";
 
 Deno.test("JsrProvider", async (ctx) => {
   mockGlobalFetch();
+  mockGlobalCommand();
 
   const provider = new JsrProvider({
     scope: "example",
@@ -37,7 +44,7 @@ Deno.test("JsrProvider", async (ctx) => {
   await ctx.step({
     name: "should return versions",
     async fn() {
-      mockFetch("https://jsr.io//@example/foo/meta.json", {
+      mockFetch("https://jsr.io/@example/foo/meta.json", {
         body: JSON.stringify({
           latest: "1.0.1",
           versions: {
@@ -70,11 +77,11 @@ Deno.test("JsrProvider", async (ctx) => {
         }),
       };
 
-      mockFetch("https://jsr.io//@example/foo/meta.json", mock);
+      mockFetch("https://jsr.io/@example/foo/meta.json", mock);
       const isOutdated = await provider.isOutdated("foo", "1.0.0", "latest");
       assert(isOutdated);
 
-      mockFetch("https://jsr.io//@example/foo/meta.json", mock);
+      mockFetch("https://jsr.io/@example/foo/meta.json", mock);
       const isNotOutdated = !await provider.isOutdated(
         "foo",
         "1.0.1",
@@ -86,5 +93,45 @@ Deno.test("JsrProvider", async (ctx) => {
     },
   });
 
+  await ctx.step({
+    name: "should upgrade to latest version",
+    async fn() {
+      mockFetch("https://jsr.io/@example/foo/meta.json", {
+        body: JSON.stringify({
+          latest: "1.0.1",
+          versions: {
+            "1.0.1": null,
+            "1.0.0": null,
+          },
+        }),
+      });
+
+      mockCommand({
+        command: Deno.execPath(),
+        args: [
+          "install",
+          "--no-check",
+          "--quiet",
+          "--force",
+          "--name",
+          "foo",
+          "jsr:@example/foo@1.0.1",
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
+
+      await provider.upgrade({
+        name: "foo",
+        from: "1.0.1",
+        to: "latest",
+      });
+
+      resetFetch();
+      resetCommand();
+    },
+  });
+
   resetGlobalFetch();
+  resetGlobalCommand();
 });

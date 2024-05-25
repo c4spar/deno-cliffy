@@ -40,11 +40,7 @@ export class JsrProvider extends Provider {
   async getVersions(
     name: string,
   ): Promise<Versions> {
-    const response = await fetch(
-      `${this.repositoryUrl}/@${this.packageScope}/${
-        this.packageName ?? name
-      }/meta.json`,
-    );
+    const response = await fetch(`${this.getRepositoryUrl(name)}/meta.json`);
     if (!response.ok) {
       throw new Error(
         "couldn't fetch the latest version - try again after sometime",
