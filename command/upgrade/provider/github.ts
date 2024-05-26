@@ -61,11 +61,11 @@ export class GithubProvider extends Provider {
   }
 
   getRepositoryUrl(_name: string): string {
-    return new URL(`${this.repositoryName}/`, this.repositoryUrl).href;
+    return new URL(this.repositoryName, this.repositoryUrl).href;
   }
 
   getRegistryUrl(_name: string, version: string): string {
-    return new URL(`${this.repositoryName}/${version}/`, this.registryUrl).href;
+    return new URL(`${this.repositoryName}/${version}`, this.registryUrl).href;
   }
 
   async listVersions(name: string, currentVersion?: string): Promise<void> {

@@ -88,13 +88,12 @@ export abstract class Provider {
     const registry: string =
       registryUrl.startsWith("jsr:") || registryUrl.startsWith("npm:")
         ? registryUrl
-        : new URL(main || `${name}.ts`, registryUrl).href;
+        : new URL(main || `${name}.ts`, registryUrl + "/").href;
 
     const cmdArgs = ["install"];
 
     if (importMap) {
-      const importJson: string =
-        new URL(importMap, this.getRegistryUrl(name, to)).href;
+      const importJson: string = new URL(importMap, registryUrl + "/").href;
 
       cmdArgs.push("--import-map", importJson);
     }
