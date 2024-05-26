@@ -32,11 +32,14 @@ export class NestLandProvider extends Provider {
     const { body: { latestVersion, packageUploadNames } } = await response
       .json();
 
+    const stripPackageName = (version: string): string => {
+      return version.replace(new RegExp(`^${this.moduleName ?? name}@`), "");
+    };
+
     return {
-      latest: latestVersion,
-      versions: packageUploadNames.map(
-        (version: string) =>
-          version.replace(new RegExp(`^${this.moduleName ?? name}@`), ""),
+      latest: stripPackageName(latestVersion),
+      versions: packageUploadNames.map((version: string) =>
+        stripPackageName(version)
       ).reverse(),
     };
   }
