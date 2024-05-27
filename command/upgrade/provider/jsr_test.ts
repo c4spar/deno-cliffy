@@ -5,6 +5,7 @@ import {
   resetFetch,
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
+import { upgrade } from "../upgrade.ts";
 import { JsrProvider } from "./jsr.ts";
 import {
   mockCommand,
@@ -96,7 +97,7 @@ Deno.test("JsrProvider", async (ctx) => {
   await ctx.step({
     name: "should upgrade to latest version",
     async fn() {
-      mockFetch("https://jsr.io/@example/foo/meta.json", {
+      const versionsResponse = {
         body: JSON.stringify({
           latest: "1.0.1",
           versions: {
@@ -104,27 +105,29 @@ Deno.test("JsrProvider", async (ctx) => {
             "1.0.0": null,
           },
         }),
-      });
+      };
+      mockFetch("https://jsr.io/@example/foo/meta.json", versionsResponse);
+      mockFetch("https://jsr.io/@example/foo/meta.json", versionsResponse);
 
       mockCommand({
         command: Deno.execPath(),
         args: [
           "install",
-          "--no-check",
-          "--quiet",
+          "--name=foo",
+          "--global",
           "--force",
-          "--name",
-          "foo",
+          "--quiet",
           "jsr:@example/foo@1.0.1",
         ],
         stdout: "piped",
         stderr: "piped",
       });
 
-      await provider.upgrade({
+      await upgrade({
         name: "foo",
-        from: "1.0.1",
-        to: "latest",
+        currentVersion: "1.0.0",
+        version: "latest",
+        provider,
       });
 
       resetFetch();

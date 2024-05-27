@@ -5,6 +5,7 @@ import {
   resetFetch,
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
+import { upgrade } from "../upgrade.ts";
 import { GithubProvider } from "./github.ts";
 import {
   mockCommand,
@@ -127,39 +128,55 @@ Deno.test("GithubProvider", async (ctx) => {
   await ctx.step({
     name: "should upgrade to latest version",
     async fn() {
-      mockFetch("https://api.github.com/repos/repo/user/git/refs/tags", {
+      const tagsResponse = {
         body: JSON.stringify([
           { ref: "1.0.0" },
           { ref: "1.0.1" },
         ]),
-      });
+      };
+      mockFetch(
+        "https://api.github.com/repos/repo/user/git/refs/tags",
+        tagsResponse,
+      );
+      mockFetch(
+        "https://api.github.com/repos/repo/user/git/refs/tags",
+        tagsResponse,
+      );
 
-      mockFetch("https://api.github.com/repos/repo/user/branches", {
+      const branchesResponse = {
         body: JSON.stringify([
           { name: "branch-1", protected: true },
           { name: "branch-2", protected: false },
         ]),
-      });
+      };
+      mockFetch(
+        "https://api.github.com/repos/repo/user/branches",
+        branchesResponse,
+      );
+      mockFetch(
+        "https://api.github.com/repos/repo/user/branches",
+        branchesResponse,
+      );
 
       mockCommand({
         command: Deno.execPath(),
         args: [
           "install",
-          "--no-check",
-          "--quiet",
+          "--name=foo",
+          "--global",
           "--force",
-          "--name",
-          "foo",
-          "https://raw.githubusercontent.com/repo/user/1.0.1/foo.ts",
+          "--quiet",
+          "https://raw.githubusercontent.com/repo/user/1.0.1",
         ],
         stdout: "piped",
         stderr: "piped",
       });
 
-      await provider.upgrade({
+      await upgrade({
         name: "foo",
-        from: "1.0.0",
-        to: "latest",
+        currentVersion: "1.0.0",
+        version: "latest",
+        provider,
       });
 
       resetFetch();

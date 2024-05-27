@@ -50,12 +50,13 @@ export class UpgradeCommand extends Command {
         "-l, --list-versions",
         "Show available versions.",
         {
-          standalone: true,
-          action: ({ registry }) =>
-            registry.listVersions(
+          action: async ({ registry }) => {
+            await registry.listVersions(
               this.getMainCommand().getName(),
               this.getVersion(),
-            ),
+            );
+            Deno.exit(0);
+          },
         },
       )
       .option(

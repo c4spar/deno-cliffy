@@ -1,6 +1,6 @@
-import { Provider, type Versions } from "../provider.ts";
+import { Provider, ProviderOptions, type Versions } from "../provider.ts";
 
-export interface NestLandProviderOptions {
+export interface NestLandProviderOptions extends ProviderOptions {
   name?: string;
 }
 
@@ -10,8 +10,8 @@ export class NestLandProvider extends Provider {
   private readonly registryUrl = "https://x.nest.land/";
   private readonly moduleName?: string;
 
-  constructor({ name }: NestLandProviderOptions = {}) {
-    super();
+  constructor({ name, main }: NestLandProviderOptions = {}) {
+    super({ main });
     this.moduleName = name;
   }
 
@@ -44,8 +44,11 @@ export class NestLandProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(name: string): string {
-    return new URL(`${this.moduleName ?? name}`, this.repositoryUrl).href;
+  getRepositoryUrl(name: string, version?: string): string {
+    return new URL(
+      `${this.moduleName ?? name}${version ? `@${version}` : ""}`,
+      this.repositoryUrl,
+    ).href;
   }
 
   getRegistryUrl(name: string, version: string): string {

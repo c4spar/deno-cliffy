@@ -11,6 +11,7 @@ import {
   resetCommand,
   resetGlobalCommand,
 } from "@c4spar/mock-command";
+import { upgrade } from "../upgrade.ts";
 import { NpmProvider } from "./npm.ts";
 
 Deno.test("NpmProvider", async (ctx) => {
@@ -36,7 +37,7 @@ Deno.test("NpmProvider", async (ctx) => {
     fn() {
       assertEquals(
         provider.getRepositoryUrl("foo"),
-        "https://registry.npmjs.org/@example/foo",
+        "https://npmjs.org/package/@example/foo",
       );
     },
   });
@@ -100,7 +101,7 @@ Deno.test("NpmProvider", async (ctx) => {
   await ctx.step({
     name: "should upgrade to latest version",
     async fn() {
-      mockFetch("https://registry.npmjs.org/@example/foo", {
+      const versionResponse = {
         body: JSON.stringify({
           "dist-tags": {
             latest: "1.0.1",
@@ -110,27 +111,29 @@ Deno.test("NpmProvider", async (ctx) => {
             "1.0.1": null,
           },
         }),
-      });
+      };
+      mockFetch("https://registry.npmjs.org/@example/foo", versionResponse);
+      mockFetch("https://registry.npmjs.org/@example/foo", versionResponse);
 
       mockCommand({
         command: Deno.execPath(),
         args: [
           "install",
-          "--no-check",
-          "--quiet",
+          "--name=foo",
+          "--global",
           "--force",
-          "--name",
-          "foo",
+          "--quiet",
           "npm:@example/foo@1.0.1",
         ],
         stdout: "piped",
         stderr: "piped",
       });
 
-      await provider.upgrade({
+      await upgrade({
         name: "foo",
-        from: "1.0.1",
-        to: "latest",
+        currentVersion: "1.0.0",
+        version: "latest",
+        provider,
       });
 
       resetFetch();

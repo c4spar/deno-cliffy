@@ -1,4 +1,4 @@
-import { Provider, ProviderOptions, Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 
 export interface DenoLandProviderOptions extends ProviderOptions {
   name?: string;
@@ -10,7 +10,7 @@ export class DenoLandProvider extends Provider {
   private readonly registryUrl = "https://deno.land/x/";
   private readonly moduleName?: string;
 
-  constructor({ name, main = `${name}.ts` }: DenoLandProviderOptions = {}) {
+  constructor({ name, main }: DenoLandProviderOptions = {}) {
     super({ main });
     this.moduleName = name;
   }

@@ -13,12 +13,15 @@ import {
 } from "@c4spar/mock-command";
 import { DenoLandProvider } from "./deno_land.ts";
 import type { Versions } from "../provider.ts";
+import { upgrade } from "../upgrade.ts";
 
 Deno.test("DenoLandProvider", async (ctx) => {
   mockGlobalFetch();
   mockGlobalCommand();
 
-  const provider = new DenoLandProvider();
+  const provider = new DenoLandProvider({
+    main: "foo.ts",
+  });
 
   await ctx.step({
     name: "should return registry url",
@@ -88,32 +91,40 @@ Deno.test("DenoLandProvider", async (ctx) => {
   await ctx.step({
     name: "should upgrade to latest version",
     async fn() {
-      mockFetch("https://cdn.deno.land/foo/meta/versions.json", {
+      const versionsResponse = {
         body: JSON.stringify({
           latest: "1.0.1",
           versions: ["1.0.1", "1.0.0"],
         }),
-      });
+      };
+      mockFetch(
+        "https://cdn.deno.land/foo/meta/versions.json",
+        versionsResponse,
+      );
+      mockFetch(
+        "https://cdn.deno.land/foo/meta/versions.json",
+        versionsResponse,
+      );
 
       mockCommand({
         command: Deno.execPath(),
         args: [
           "install",
-          "--no-check",
-          "--quiet",
+          "--name=foo",
+          "--global",
           "--force",
-          "--name",
-          "foo",
+          "--quiet",
           "https://deno.land/x/foo@1.0.1/foo.ts",
         ],
         stdout: "piped",
         stderr: "piped",
       });
 
-      await provider.upgrade({
+      await upgrade({
         name: "foo",
-        from: "1.0.1",
-        to: "latest",
+        currentVersion: "1.0.0",
+        version: "latest",
+        provider,
       });
 
       resetFetch();
