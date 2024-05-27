@@ -30,8 +30,8 @@ export class JsrProvider extends Provider {
   private readonly packageName?: string;
   private readonly packageScope: string;
 
-  constructor({ main, ...options }: JsrProviderOptions) {
-    super({ main });
+  constructor({ main, logger, ...options }: JsrProviderOptions) {
+    super({ main, logger });
     this.packageScope = "package" in options
       ? options.package.split("/")[0].slice(1)
       : options.scope;

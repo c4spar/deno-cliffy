@@ -16,8 +16,8 @@ export class NpmProvider extends Provider {
   private readonly packageName?: string;
   private readonly packageScope: string;
 
-  constructor({ main, ...options }: NpmProviderOptions) {
-    super({ main });
+  constructor({ main, logger, ...options }: NpmProviderOptions) {
+    super({ main, logger });
     this.packageScope = "package" in options
       ? options.package.split("/")[0].slice(1)
       : options.scope;

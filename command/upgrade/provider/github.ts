@@ -22,9 +22,9 @@ export class GithubProvider extends Provider {
   private readonly githubToken?: string;
 
   constructor(
-    { repository, branches = true, token, main }: GithubProviderOptions,
+    { repository, branches = true, token, main, logger }: GithubProviderOptions,
   ) {
-    super({ main });
+    super({ main, logger });
     this.repositoryName = repository;
     this.listBranches = branches;
     this.githubToken = token;

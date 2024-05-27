@@ -10,8 +10,8 @@ export class NestLandProvider extends Provider {
   private readonly registryUrl = "https://x.nest.land/";
   private readonly moduleName?: string;
 
-  constructor({ name, main }: NestLandProviderOptions = {}) {
-    super({ main });
+  constructor({ name, main, logger }: NestLandProviderOptions = {}) {
+    super({ main, logger });
     this.moduleName = name;
   }
 

@@ -1,6 +1,7 @@
 import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "@cliffy/table";
+import type { Logger } from "./logger.ts";
 
 export interface Versions {
   latest: string;
@@ -9,16 +10,19 @@ export interface Versions {
 
 export interface ProviderOptions {
   main?: string;
+  logger?: Logger;
 }
 
 export abstract class Provider {
   abstract readonly name: string;
   protected readonly main?: string;
   protected readonly maxListSize: number = 25;
+  protected logger: Logger;
   private maxCols = 8;
 
-  protected constructor({ main }: ProviderOptions = {}) {
+  protected constructor({ main, logger = console }: ProviderOptions = {}) {
     this.main = main;
+    this.logger = logger;
   }
 
   abstract getVersions(name: string): Promise<Versions>;
@@ -34,6 +38,10 @@ export abstract class Provider {
   private getMain(defaultMain?: string): string {
     const main = this.main ?? defaultMain;
     return main ? `/${main}` : "";
+  }
+
+  public setLogger(logger: Logger): void {
+    this.logger = logger;
   }
 
   async isOutdated(
@@ -66,7 +74,7 @@ export abstract class Provider {
 
     // Check if requested version is already the latest available version.
     if (latest && latest === currentVersion && latest === targetVersion) {
-      console.warn(
+      this.logger.warn(
         yellow(
           `You're already using the latest available version ${currentVersion} of ${name}.`,
         ),
@@ -76,7 +84,7 @@ export abstract class Provider {
 
     // Check if requested version is already installed.
     if (targetVersion && currentVersion === targetVersion) {
-      console.warn(
+      this.logger.warn(
         yellow(`You're already using version ${currentVersion} of ${name}.`),
       );
       return false;

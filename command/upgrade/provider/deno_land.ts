@@ -10,8 +10,8 @@ export class DenoLandProvider extends Provider {
   private readonly registryUrl = "https://deno.land/x/";
   private readonly moduleName?: string;
 
-  constructor({ name, main }: DenoLandProviderOptions = {}) {
-    super({ main });
+  constructor({ name, main, logger }: DenoLandProviderOptions = {}) {
+    super({ main, logger });
     this.moduleName = name;
   }
 

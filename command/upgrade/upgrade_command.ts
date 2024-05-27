@@ -28,9 +28,11 @@ export class UpgradeCommand extends Command {
   ) {
     super();
     this.providers = Array.isArray(provider) ? provider : [provider];
+
     if (!this.providers.length) {
       throw new Error(`No upgrade provider defined!`);
     }
+
     this
       .description(() =>
         `Upgrade ${this.getMainCommand().getName()} executable to latest or given version.`
@@ -86,6 +88,7 @@ export class UpgradeCommand extends Command {
         });
         const logger = createLogger({ spinner, verbose });
         spinner.start();
+        provider.setLogger(logger);
 
         try {
           await upgrade({
