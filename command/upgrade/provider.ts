@@ -35,15 +35,6 @@ export abstract class Provider {
     return `${this.getRegistryUrl(name, version)}${this.getMain(defaultMain)}`;
   }
 
-  private getMain(defaultMain?: string): string {
-    const main = this.main ?? defaultMain;
-    return main ? `/${main}` : "";
-  }
-
-  public setLogger(logger: Logger): void {
-    this.logger = logger;
-  }
-
   async isOutdated(
     name: string,
     currentVersion: string,
@@ -137,5 +128,14 @@ export abstract class Provider {
         );
       }
     }
+  }
+
+  setLogger(logger: Logger): void {
+    this.logger = logger;
+  }
+
+  private getMain(defaultMain?: string): string {
+    const main = this.main ?? defaultMain;
+    return main ? `/${main}` : "";
   }
 }
