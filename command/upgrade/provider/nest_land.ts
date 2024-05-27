@@ -1,4 +1,4 @@
-import { Provider, ProviderOptions, type Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 
 export interface NestLandProviderOptions extends ProviderOptions {
   name?: string;
