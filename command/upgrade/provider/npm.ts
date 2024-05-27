@@ -30,7 +30,10 @@ export class NpmProvider extends Provider {
     name: string,
   ): Promise<Versions> {
     const response = await fetch(
-      `${this.apiUrl}/@${this.packageScope}/${this.packageName ?? name}`,
+      new URL(
+        `@${this.packageScope}/${this.packageName ?? name}`,
+        this.apiUrl,
+      ),
     );
     if (!response.ok) {
       throw new Error(
