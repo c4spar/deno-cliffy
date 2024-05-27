@@ -2,6 +2,7 @@ import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "@cliffy/table";
 import type { Logger } from "./logger.ts";
+import type { UpgradeOptions } from "./upgrade.ts";
 
 export interface Versions {
   latest: string;
@@ -12,6 +13,11 @@ export interface ProviderOptions {
   main?: string;
   logger?: Logger;
 }
+
+export type ProviderUpgradeOptions = Omit<
+  UpgradeOptions,
+  "provider" | "runtime"
+>;
 
 export abstract class Provider {
   abstract readonly name: string;
@@ -30,6 +36,8 @@ export abstract class Provider {
   abstract getRepositoryUrl(name: string, version?: string): string;
 
   abstract getRegistryUrl(name: string, version: string): string;
+
+  upgrade?(options: ProviderUpgradeOptions): Promise<void>;
 
   getSpecifier(name: string, version: string, defaultMain?: string): string {
     return `${this.getRegistryUrl(name, version)}${this.getMain(defaultMain)}`;

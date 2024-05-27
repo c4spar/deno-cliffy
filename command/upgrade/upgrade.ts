@@ -54,20 +54,32 @@ export async function upgrade(
     } else {
       logger?.log(dim("Upgrading %s to version %s"), name, version);
     }
-    const { runtimeName, runtime } = await getRuntime();
-    logger?.log(dim("Detected runtime: %s"), runtimeName);
 
     try {
-      await runtime.upgrade({
-        args,
-        ...(runtimeOptions?.[runtimeName] ?? {}),
-        name,
-        version,
-        main,
-        provider,
-        logger,
-        verbose,
-      });
+      if (provider.upgrade) {
+        await provider.upgrade({
+          args,
+          name,
+          version,
+          main,
+          logger,
+          verbose,
+        });
+      } else {
+        const { runtimeName, runtime } = await getRuntime();
+        logger?.log(dim("Detected runtime: %s"), runtimeName);
+
+        await runtime.upgrade({
+          args,
+          ...(runtimeOptions?.[runtimeName] ?? {}),
+          name,
+          version,
+          main,
+          provider,
+          logger,
+          verbose,
+        });
+      }
     } catch (error: unknown) {
       logger?.error(
         red(
