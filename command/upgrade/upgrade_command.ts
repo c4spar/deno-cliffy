@@ -5,12 +5,12 @@ import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
 import type { Provider, Versions } from "./provider.ts";
-import type { RuntimeUpgradeOptions } from "./runtime.ts";
+import type { RuntimeOptions } from "./runtime.ts";
 import { type RuntimeOptionsMap, upgrade } from "./upgrade.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
-> extends RuntimeUpgradeOptions {
+> extends RuntimeOptions {
   provider: TProvider | Array<TProvider>;
   runtime?: RuntimeOptionsMap;
 }
@@ -93,8 +93,8 @@ export class UpgradeCommand extends Command {
         try {
           await upgrade({
             name,
-            version,
-            currentVersion,
+            to: version,
+            from: currentVersion,
             force,
             provider,
             verbose,

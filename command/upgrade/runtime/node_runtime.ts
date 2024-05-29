@@ -1,6 +1,6 @@
 import { dim } from "@std/fmt/colors";
 import type { Logger } from "../logger.ts";
-import type { Runtime, UpgradePackageOptions } from "../runtime.ts";
+import type { Runtime, RuntimeUpgradeOptions } from "../runtime.ts";
 
 export class NodeRuntime implements Runtime {
   upgrade(
@@ -8,13 +8,13 @@ export class NodeRuntime implements Runtime {
       provider,
       name,
       main,
-      version,
+      to,
       verbose,
       logger,
       args = [],
-    }: UpgradePackageOptions,
+    }: RuntimeUpgradeOptions,
   ): Promise<void> {
-    const specifier = provider.getSpecifier(name, version, main)
+    const specifier = provider.getSpecifier(name, to, main)
       .replace(/^(npm|jsr):/, "");
     const isJsr = provider.name === "jsr";
 

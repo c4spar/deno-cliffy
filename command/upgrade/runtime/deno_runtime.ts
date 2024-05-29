@@ -1,24 +1,24 @@
 import { dim } from "@std/fmt/colors";
-import { Runtime, type UpgradePackageOptions } from "../runtime.ts";
+import { Runtime, type RuntimeUpgradeOptions } from "../runtime.ts";
 import type { Logger } from "../logger.ts";
 
 /** Deno specific upgrade options. */
-export interface DenoUpgradeOptions {
+export interface DenoRuntimeOptions {
   importMap?: string;
 }
 
 /** Deno specific package upgrade options. */
-export type DenoUpgradePackageOptions =
-  & UpgradePackageOptions
-  & DenoUpgradeOptions;
+export type DenoRuntimeUpgradeOptions =
+  & RuntimeUpgradeOptions
+  & DenoRuntimeOptions;
 
 /** Deno runtime upgrade handler. */
 export class DenoRuntime extends Runtime {
   async upgrade(
-    { provider, name, main, version, importMap, verbose, logger, args = [] }:
-      DenoUpgradePackageOptions,
+    { provider, name, main, to, importMap, verbose, logger, args = [] }:
+      DenoRuntimeUpgradeOptions,
   ): Promise<void> {
-    const specifier: string = provider.getSpecifier(name, version, main);
+    const specifier: string = provider.getSpecifier(name, to, main);
 
     const cmdArgs = ["install", `--name=${name}`, "--global", "--force"];
 

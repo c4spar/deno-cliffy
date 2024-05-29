@@ -131,8 +131,8 @@ Deno.test("NpmProvider", async (ctx) => {
 
       await upgrade({
         name: "foo",
-        currentVersion: "1.0.0",
-        version: "latest",
+        from: "1.0.0",
+        to: "latest",
         provider,
       });
 
