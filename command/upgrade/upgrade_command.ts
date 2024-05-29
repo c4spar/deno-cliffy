@@ -5,8 +5,11 @@ import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
 import type { Provider, Versions } from "./provider.ts";
-import type { RuntimeOptions } from "./runtime.ts";
-import { type RuntimeOptionsMap, upgrade } from "./upgrade.ts";
+import {
+  type RuntimeOptions,
+  type RuntimeOptionsMap,
+  upgrade,
+} from "./upgrade.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
@@ -74,43 +77,56 @@ export class UpgradeCommand extends Command {
         "-v, --verbose",
         "Log verbose output.",
       )
+      .option("--no-spinner", "Disable spinner.")
       .complete("version", () => this.getAllVersions())
-      .action(async ({ registry: provider, version, force, verbose }) => {
-        const name: string = this.getMainCommand().getName();
-        const currentVersion: string | undefined = this.getVersion();
-
-        const spinner = new Spinner({
-          message: brightBlue(
-            `Upgrading ${bold(name)} from version ${
-              bold(currentVersion ?? "")
-            } to ${bold(version)}...`,
-          ),
-        });
-        const logger = createLogger({ spinner, verbose });
-        spinner.start();
-        provider.setLogger(logger);
-
-        try {
-          await upgrade({
-            name,
-            to: version,
-            from: currentVersion,
+      .action(
+        async (
+          {
+            registry: provider,
+            version,
             force,
-            provider,
             verbose,
-            logger,
-            ...options,
-          });
-        } catch (error: unknown) {
-          logger.error(
-            !verbose && error instanceof Error ? error.message : error,
-          );
-          spinner.stop();
-          Deno.exit(1);
-        } finally {
-          spinner.stop();
-        }
-      });
+            spinner: spinnerEnabled,
+          },
+        ) => {
+          const name: string = this.getMainCommand().getName();
+          const currentVersion: string | undefined = this.getVersion();
+
+          const spinner = spinnerEnabled
+            ? new Spinner({
+              message: brightBlue(
+                `Upgrading ${bold(name)} from version ${
+                  bold(currentVersion ?? "")
+                } to ${bold(version)}...`,
+              ),
+            })
+            : undefined;
+          const logger = createLogger({ spinner, verbose });
+          spinner?.start();
+          provider.setLogger(logger);
+
+          try {
+            await upgrade({
+              name,
+              to: version,
+              from: currentVersion,
+              force,
+              provider,
+              verbose,
+              logger,
+              ...options,
+            });
+          } catch (error: unknown) {
+            logger.error(
+              !verbose && error instanceof Error ? error.message : error,
+            );
+            spinner?.stop();
+            Deno.exit(1);
+          } finally {
+            spinner?.stop();
+          }
+        },
+      );
   }
 
   public async getAllVersions(): Promise<Array<string>> {

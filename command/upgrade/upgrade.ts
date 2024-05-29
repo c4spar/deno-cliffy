@@ -1,7 +1,13 @@
-import { bold, dim, green, red } from "@std/fmt/colors";
+import { bold, brightBlue, dim, red } from "@std/fmt/colors";
 import { getRuntime } from "./get_runtime.ts";
-import type { RuntimeOptions, RuntimeUpgradeOptions } from "./runtime.ts";
+import type { RuntimeUpgradeOptions } from "./runtime.ts";
 import type { DenoRuntimeOptions } from "./runtime/deno_runtime.ts";
+
+/** Shared runtime options. */
+export interface RuntimeOptions {
+  args?: Array<string>;
+  main?: string;
+}
 
 /** Runtime options map for supported runtimes. */
 export interface RuntimeOptionsMap {
@@ -13,8 +19,6 @@ export interface RuntimeOptionsMap {
 /** Options for upgrading a package from any supported runtime. */
 export interface UpgradeOptions extends RuntimeUpgradeOptions {
   runtime?: RuntimeOptionsMap;
-  from?: string;
-  force?: boolean;
 }
 
 /**
@@ -23,74 +27,66 @@ export interface UpgradeOptions extends RuntimeUpgradeOptions {
  */
 export async function upgrade(
   {
-    name,
-    main,
-    args,
     runtime: runtimeOptions,
     provider,
-    to,
-    from,
-    force,
-    logger,
-    verbose,
+    ...options
   }: UpgradeOptions,
 ): Promise<void> {
   if (
-    force ||
-    !from ||
-    await provider.isOutdated(name, from, to)
+    options.force ||
+    !options.from ||
+    await provider.isOutdated(options.name, options.from, options.to)
   ) {
-    if (to === "latest") {
-      logger?.log(dim("Upgrading %s to the %s version"), name, to);
-      const { latest } = await provider.getVersions(name);
-      to = latest;
+    if (options.to === "latest") {
+      options.logger?.log(
+        dim("Upgrading %s to the %s version"),
+        options.name,
+        options.to,
+      );
+      const { latest } = await provider.getVersions(options.name);
+      options.to = latest;
     } else {
-      logger?.log(dim("Upgrading %s to version %s"), name, to);
+      options.logger?.log(
+        dim("Upgrading %s to version %s"),
+        options.name,
+        options.to,
+      );
     }
+    options.logger?.log(dim("Upgrading %s:"), options.name);
+    options.logger?.log(dim("  - current version: %s"), options.from);
+    options.logger?.log(dim("  - target version: %s"), options.to);
 
     try {
       if (provider.upgrade) {
-        await provider.upgrade({
-          args,
-          name,
-          to,
-          main,
-          logger,
-          verbose,
-        });
+        await provider.upgrade(options);
       } else {
         const { runtimeName, runtime } = await getRuntime();
-        logger?.log(dim("Detected runtime: %s"), runtimeName);
+        options.logger?.log(dim("  - runtime: %s"), runtimeName);
 
         await runtime.upgrade({
-          args,
+          ...options,
           ...(runtimeOptions?.[runtimeName] ?? {}),
-          name,
-          to,
-          main,
           provider,
-          logger,
-          verbose,
         });
       }
     } catch (error: unknown) {
-      logger?.error(
+      options.logger?.error(
         red(
-          `Failed to upgrade ${bold(name)} ${
-            from ? `from version ${bold(from)} ` : ""
-          }to ${bold(to)}.`,
+          `Failed to upgrade ${bold(options.name)} ${
+            options.from ? `from version ${bold(options.from)} ` : ""
+          }to ${bold(options.to)}.`,
         ),
       );
       throw error;
     }
 
-    logger?.info(
-      green(
-        `Successfully upgraded ${bold(name)} from version ${
-          bold(from ?? "")
-        } to ${bold(to)}!`,
+    options.logger?.info(
+      brightBlue(
+        `Successfully upgraded ${bold(options.name)} from version ${
+          bold(options.from ?? "")
+        } to ${bold(options.to)}!`,
       ),
-      dim(`(${provider.getRepositoryUrl(name, to)})`),
+      dim(`(${provider.getRepositoryUrl(options.name, options.to)})`),
     );
   }
 }

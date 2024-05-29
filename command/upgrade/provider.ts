@@ -2,7 +2,6 @@ import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "@cliffy/table";
 import type { Logger } from "./logger.ts";
-import type { UpgradeOptions } from "./upgrade.ts";
 
 export interface Versions {
   latest: string;
@@ -14,10 +13,15 @@ export interface ProviderOptions {
   logger?: Logger;
 }
 
-export type ProviderUpgradeOptions = Omit<
-  UpgradeOptions,
-  "provider" | "runtime"
->;
+export interface ProviderUpgradeOptions {
+  name: string;
+  to: string;
+  main?: string;
+  args?: Array<string>;
+  from?: string;
+  force?: boolean;
+  verbose?: boolean;
+}
 
 export abstract class Provider {
   abstract readonly name: string;

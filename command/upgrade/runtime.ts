@@ -1,18 +1,9 @@
 import type { Logger } from "./logger.ts";
-import type { Provider } from "./provider.ts";
-
-/** Runtime specific options. */
-export interface RuntimeOptions {
-  args?: Array<string>;
-  main?: string;
-}
+import type { Provider, ProviderUpgradeOptions } from "./provider.ts";
 
 /** Options for upgrading a package for a specific runtime. */
-export interface RuntimeUpgradeOptions extends RuntimeOptions {
-  name: string;
-  to: string;
+export interface RuntimeUpgradeOptions extends ProviderUpgradeOptions {
   provider: Provider;
-  verbose?: boolean;
   logger?: Logger;
 }
 
