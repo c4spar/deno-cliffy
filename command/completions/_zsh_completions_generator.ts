@@ -35,7 +35,8 @@ export class ZshCompletionsGenerator {
       ? ` v${this.cmd.getVersion()}`
       : "";
 
-    return `#!/usr/bin/env zsh
+    return `#compdef ${this.name}
+
 # zsh completion support for ${path}${version}
 
 autoload -U is-at-least
@@ -65,9 +66,12 @@ function __${replaceSpecialChars(this.name)}_complete {
 
 ${this.generateCompletions(this.name, this.cmd).trim()}
 
-# _${replaceSpecialChars(path)} "\${@}"
-
-compdef _${replaceSpecialChars(path)} ${path}`;
+# shellcheck disable=SC2154
+if [ "\${funcstack[1]}" = "_${this.name}" ]; then
+  _${replaceSpecialChars(this.name)} "\${@}"
+else
+  compdef _${replaceSpecialChars(path)} ${path};
+fi`;
   }
 
   /** Generates zsh completions method for given command and child commands. */
@@ -86,8 +90,11 @@ compdef _${replaceSpecialChars(path)} ${path}`;
     path = (path ? path + " " : "") + name;
 
     return `# shellcheck disable=SC2154
-(( $+functions[_${replaceSpecialChars(path)}] )) ||
-function _${replaceSpecialChars(path)}() {` +
+` +
+      (command.getParent()
+        ? `(( $+functions[_${replaceSpecialChars(path)}] )) || `
+        : "") +
+      `_${replaceSpecialChars(path)}() {` +
       (!command.getParent()
         ? `
   local state`

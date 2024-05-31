@@ -176,12 +176,11 @@ async function executeTest(
       denoArgs = ["--allow-env=SNAPSHOT_TEST_NAME"];
 
       // workaround for https://github.com/denoland/deno/issues/22020
-      const { state } = await Deno.permissions.query({
-        name: "env",
-        variable: "CLIFFY_SNAPSHOT_CONFIG",
-      });
-      if (state === "granted" && Deno.env.has("CLIFFY_SNAPSHOT_CONFIG")) {
-        denoArgs.push(`--config=${Deno.env.get("CLIFFY_SNAPSHOT_CONFIG")}`);
+      const snapshotConfigPath = await getEnvIfGranted(
+        "CLIFFY_SNAPSHOT_CONFIG",
+      );
+      if (snapshotConfigPath) {
+        denoArgs.push(`--config=${snapshotConfigPath}`);
       }
     }
 
@@ -210,15 +209,15 @@ async function executeTest(
     ];
 
     if (stdin.length) {
+      const delay = Number(
+        await getEnvIfGranted("CLIFFY_SNAPSHOT_DELAY") ||
+          (options.timeout ?? Deno.build.os === "windows" ? 1200 : 300),
+      );
+
       for (const data of stdin) {
         await writer.write(encoder.encode(data));
-        // Ensure all inputs are processed and rendered separately.
-        await new Promise((resolve) =>
-          setTimeout(
-            resolve,
-            options.timeout ?? Deno.build.os === "windows" ? 1200 : 300,
-          )
-        );
+        // Workaround to ensure all inputs are processed and rendered separately.
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -230,7 +229,7 @@ async function executeTest(
     await child.stdin.close();
   } catch (error: unknown) {
     const assertionError = new AssertionError(
-      `Prompt snapshot test failed: ${options.meta.url}.\n${red(stderr ?? "")}`,
+      `Snapshot test failed: ${options.meta.url}.\n${red(stderr ?? "")}`,
     );
     assertionError.cause = error;
     throw assertionError;
@@ -238,7 +237,7 @@ async function executeTest(
 
   if (!output.success && !options.canFail && !step?.canFail) {
     throw new AssertionError(
-      `Prompt snapshot test failed: ${options.meta.url}.` +
+      `Snapshot test failed: ${options.meta.url}.` +
         `Test command failed with a none zero exit code: ${output.code}.\n${
           red(stderr ?? "")
         }`,
@@ -261,4 +260,15 @@ async function runTest(options: SnapshotTestOptions) {
   if (testName === options.name) {
     await options.fn();
   }
+}
+
+async function getEnvIfGranted(name: string): Promise<string | undefined> {
+  const { state } = await Deno.permissions.query({
+    name: "env",
+    variable: name,
+  });
+
+  return state === "granted" && Deno.env.has(name)
+    ? Deno.env.get(name)
+    : undefined;
 }

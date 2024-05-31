@@ -32,21 +32,24 @@ export class NestLandProvider extends Provider {
     const { body: { latestVersion, packageUploadNames } } = await response
       .json();
 
+    const stripPackageName = (version: string): string => {
+      return version.replace(new RegExp(`^${this.moduleName ?? name}@`), "");
+    };
+
     return {
-      latest: latestVersion,
-      versions: packageUploadNames.map(
-        (version: string) =>
-          version.replace(new RegExp(`^${this.moduleName ?? name}@`), ""),
+      latest: stripPackageName(latestVersion),
+      versions: packageUploadNames.map((version: string) =>
+        stripPackageName(version)
       ).reverse(),
     };
   }
 
   getRepositoryUrl(name: string): string {
-    return new URL(`${this.moduleName ?? name}/`, this.repositoryUrl).href;
+    return new URL(`${this.moduleName ?? name}`, this.repositoryUrl).href;
   }
 
   getRegistryUrl(name: string, version: string): string {
-    return new URL(`${this.moduleName ?? name}@${version}/`, this.registryUrl)
+    return new URL(`${this.moduleName ?? name}@${version}`, this.registryUrl)
       .href;
   }
 }
