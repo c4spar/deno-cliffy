@@ -71,13 +71,23 @@ export class Editor extends GenericSuggestions<string, string> {
   }
 
   public getDefaultSettings(options: EditorOptions): EditorSettings {
+    const editor = `${brightBlack("(")}${brightBlue("EDITOR")}${brightBlack(")")}`
+    const bOpen = brightBlack("[")
+    const bClose = brightBlack("]")
+    const yLink = (path: string) => yellow(link(path, resolve(path)))
+
+    const hasSourceFile = 'sourceFile' in options && options.sourceFile !== undefined
+
+    const pointer = hasSourceFile ?
+      `${editor} ${bOpen}${yLink(options.sourceFile!)}${bClose}` :
+      editor
+
     return {
       ...super.getDefaultSettings(options),
-      pointer: options.pointer ??
-        `${brightBlack("EOF: (")}${brightBlue(options.endDelimiter ?? ".")}${
-          brightBlack(")")
-        }`,
-      endDelimiter: options.endDelimiter ?? ".",
+      pointer: options.pointer ?? pointer,
+      sourceFile: hasSourceFile ? options.sourceFile! : Deno.makeTempFileSync({ suffix: options.fileExtension }),
+      suggestedEditor: options.suggestedEditor ?? '',
+      editorMode: 'terminal',
       minLength: options.minLength ?? 0,
       maxLength: options.maxLength ?? Infinity,
     };
