@@ -1,12 +1,12 @@
-import { brightBlack, brightBlue } from "jsr:@std/fmt@0.224/colors";
+import { brightBlack, brightBlue, yellow } from "jsr:@std/fmt@0.224/colors";
 import { GenericPrompt } from "./_generic_prompt.ts";
 import {
   GenericSuggestions,
-  GenericSuggestionsKeys,
   GenericSuggestionsOptions,
   GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
-import { normalize } from "@std/path";
+import { normalize, resolve } from "@std/path";
+import { link } from "../ansi/ansi_escapes.ts";
 
 /** Editor prompt options. */
 export interface EditorOptions
