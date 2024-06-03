@@ -28,6 +28,7 @@ export interface EditorOptions
 /** Editor prompt settings. */
 interface EditorSettings extends GenericSuggestionsSettings<string, string> {
   sourceFile: string;
+  fileExtension: string;
   editorMode: 'terminal' | 'visual';
   suggestedEditor: string;
   minLength: number;
@@ -88,7 +89,8 @@ export class Editor extends GenericSuggestions<string, string> {
     return {
       ...super.getDefaultSettings(options),
       pointer: options.pointer ?? pointer,
-      sourceFile: hasSourceFile ? options.sourceFile! : Deno.makeTempFileSync({ suffix: options.fileExtension }),
+      sourceFile: options.sourceFile ?? '',
+      fileExtension: options.fileExtension ?? '',
       suggestedEditor: options.suggestedEditor ?? '',
       editorMode: 'terminal',
       minLength: options.minLength ?? 0,
