@@ -108,8 +108,8 @@ export class Editor extends GenericSuggestions<string, string> {
       // try $EDITOR then $VISUAL global vars, else git user defined editor, else vim, else vscode, else notepad
       ? '"$($EDITOR ?? $VISUAL ?? $($(git config core.editor) 2> $null) ?? $($(vim -h) 2>&1> $null && echo "vim") ?? $($(code -h) 2>&1> $null && echo "code") ?? $(echo "notepad"))"'
       //sh
-      // try $EDITOR then $VISUAL global vars, else git user defined editor, else os terminal defined editor is available, else vi
-      : '"${EDITOR:-${VISUAL:-$(git config core.editor 2> /dev/null || (sensible-editor --version &> /dev/null && echo "sensible-editor") || echo "vi")}}"';
+  async #queryEditor(shQuery: string, pwshQuery: string): Promise<string> {
+    const queryEditor = Deno.build.os === "windows" ? pwshQuery : shQuery;
 
     const { stdout, stderr, success } = await new Deno.Command(this.#osShell, {
       args: [...this.#osShellArgs, `echo ${queryEditor}`],
@@ -120,7 +120,7 @@ export class Editor extends GenericSuggestions<string, string> {
     if (success) {
       return decoder.decode(stdout).trim();
     } else {
-      throw new Error("unable to determine user default terminal editor", {
+      throw new Error("unable to determine user default editor", {
         cause: new Error(decoder.decode(stderr).trim()),
       });
     }
