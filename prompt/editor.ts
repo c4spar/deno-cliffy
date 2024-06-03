@@ -78,9 +78,12 @@ export class Editor extends GenericSuggestions<string, string> {
 
     const hasSourceFile = 'sourceFile' in options && options.sourceFile !== undefined
 
-    const pointer = hasSourceFile ?
-      `${editor} ${bOpen}${yLink(options.sourceFile!)}${bClose}` :
-      editor
+    const pointer = 
+      hasSourceFile ?
+        `${editor} ${bOpen}${yLink(options.sourceFile!)}${bClose}` :
+      options.fileExtension ?
+        `${editor} ${bOpen}${brightBlack("ext: ")}${yellow(options.fileExtension)}${bClose}` :
+        editor
 
     return {
       ...super.getDefaultSettings(options),
