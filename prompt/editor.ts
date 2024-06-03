@@ -13,10 +13,12 @@ export interface EditorOptions
   extends GenericSuggestionsOptions<string, string> {
   /** Edit an existing file. */
   sourceFile?: string;
-  /** Prefer editor mode. */
-  preferMode?: 'terminal' | 'visual';
   /** Temp file extension. */
   fileExtension?: string;
+  /** Prefer editor mode. */
+  editorMode?: 'terminal' | 'visual';
+  /** Suggest editor to use in priority. */
+  suggestedEditor?: string;
   /** Set minimum allowed length of editor value. */
   minLength?: number;
   /** Set maximum allowed length of editor value. */
@@ -26,8 +28,8 @@ export interface EditorOptions
 /** Editor prompt settings. */
 interface EditorSettings extends GenericSuggestionsSettings<string, string> {
   sourceFile: string;
-  preferMode: 'editor' | 'visual';
-  fileExtension: string;
+  editorMode: 'terminal' | 'visual';
+  suggestedEditor: string;
   minLength: number;
   maxLength: number;
 }
