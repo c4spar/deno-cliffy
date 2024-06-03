@@ -16,7 +16,7 @@ export interface EditorOptions
   /** Temp file extension. */
   fileExtension?: string;
   /** Prefer editor mode. */
-  editorMode?: 'terminal' | 'visual';
+  editorMode?: "terminal" | "visual";
   /** Suggest editor to use in priority. */
   suggestedEditor?: string;
   /** Set minimum allowed length of editor value. */
@@ -29,7 +29,7 @@ export interface EditorOptions
 interface EditorSettings extends GenericSuggestionsSettings<string, string> {
   sourceFile: string;
   fileExtension: string;
-  editorMode: 'terminal' | 'visual';
+  editorMode: "terminal" | "visual";
   suggestedEditor: string;
   minLength: number;
   maxLength: number;
@@ -72,27 +72,31 @@ export class Editor extends GenericSuggestions<string, string> {
   }
 
   public getDefaultSettings(options: EditorOptions): EditorSettings {
-    const editor = `${brightBlack("(")}${brightBlue("EDITOR")}${brightBlack(")")}`
-    const bOpen = brightBlack("[")
-    const bClose = brightBlack("]")
-    const yLink = (path: string) => yellow(link(path, resolve(path)))
+    const editor = `${brightBlack("(")}${brightBlue("EDITOR")}${
+      brightBlack(")")
+    }`;
+    const bOpen = brightBlack("[");
+    const bClose = brightBlack("]");
+    const yLink = (path: string) => yellow(link(path, resolve(path)));
 
-    const hasSourceFile = 'sourceFile' in options && options.sourceFile !== undefined
+    const hasSourceFile = "sourceFile" in options &&
+      options.sourceFile !== undefined;
 
-    const pointer = 
-      hasSourceFile ?
-        `${editor} ${bOpen}${yLink(options.sourceFile!)}${bClose}` :
-      options.fileExtension ?
-        `${editor} ${bOpen}${brightBlack("ext: ")}${yellow(options.fileExtension)}${bClose}` :
-        editor
+    const pointer = hasSourceFile
+      ? `${editor} ${bOpen}${yLink(options.sourceFile!)}${bClose}`
+      : options.fileExtension
+      ? `${editor} ${bOpen}${brightBlack("ext: ")}${
+        yellow(options.fileExtension)
+      }${bClose}`
+      : editor;
 
     return {
       ...super.getDefaultSettings(options),
       pointer: options.pointer ?? pointer,
-      sourceFile: options.sourceFile ?? '',
-      fileExtension: options.fileExtension ?? '',
-      suggestedEditor: options.suggestedEditor ?? '',
-      editorMode: 'terminal',
+      sourceFile: options.sourceFile ?? "",
+      fileExtension: options.fileExtension ?? "",
+      suggestedEditor: options.suggestedEditor ?? "",
+      editorMode: "terminal",
       minLength: options.minLength ?? 0,
       maxLength: options.maxLength ?? Infinity,
     };
@@ -106,23 +110,25 @@ export class Editor extends GenericSuggestions<string, string> {
     return Deno.build.os === "windows" ? ["-nop", "-c"] : ["-c"];
   }
 
-  
   #getDefaultVisualEditor(): Promise<string> {
     const sh = {
-      custom: `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
-      xdgText: '(gtk-launch $(xdg-mime query default text/plain) --version &> /dev/null && echo "gtk-launch $(xdg-mime query default text/plain)")',
+      custom:
+        `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
+      xdgText:
+        '(gtk-launch $(xdg-mime query default text/plain) --version &> /dev/null && echo "gtk-launch $(xdg-mime query default text/plain)")',
       gedit: '(gedit --version &> /dev/null && echo "gedit")',
-      gvim: 'echo "gvim"'
-    }
+      gvim: 'echo "gvim"',
+    };
 
     const pwsh = {
-      custom: `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
+      custom:
+        `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
       code: '$($(code -h) 2>&1> $null && echo "code")',
       sublime: '$($(subl -h) 2>&1> $null && echo "subl")',
       gvim: '$($(gvim -h) 2>&1> $null && echo "gvim")',
       notepadPLusPlus: '$($(notepad++ --help) 2>&1> $null && echo "notepad++")',
-      notepad: '$(echo "notepad")'
-    }
+      notepad: '$(echo "notepad")',
+    };
 
     return this.#queryEditor(
       //sh
@@ -130,24 +136,27 @@ export class Editor extends GenericSuggestions<string, string> {
       `"\${VISUAL:-$(${sh.custom} || ${sh.xdgText} || ${sh.gedit} || ${sh.gvim})}"`,
       //pwsh
       // try $VISUAL global var then custom if provided, else sublime text, else notepad++, else gvim, else notepad
-      `"$($VISUAL ?? $(${pwsh.custom} ?? ${pwsh.code} ?? ${pwsh.sublime} ?? ${pwsh.notepadPLusPlus} ?? ${pwsh.gvim} ?? ${pwsh.notepad})"`
-    )
+      `"$($VISUAL ?? $(${pwsh.custom} ?? ${pwsh.code} ?? ${pwsh.sublime} ?? ${pwsh.notepadPLusPlus} ?? ${pwsh.gvim} ?? ${pwsh.notepad})"`,
+    );
   }
   #getDefaultTerminalEditor(): Promise<string> {
     const sh = {
-      custom: `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
+      custom:
+        `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
       git: "git config core.editor 2> /dev/null",
-      sensible: '(sensible-editor --version &> /dev/null && echo "sensible-editor")',
+      sensible:
+        '(sensible-editor --version &> /dev/null && echo "sensible-editor")',
       vi: '(vi --version &> /dev/null && echo "vi")',
-      nano: 'echo "nano"'
-    }
+      nano: 'echo "nano"',
+    };
 
     const pwsh = {
-      custom: `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
+      custom:
+        `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
       git: "$(git config core.editor) 2> $null)",
       vim: '$($(vim -h) 2>&1> $null && echo "vim")',
-      notepad: '$(echo "notepad")'
-    }
+      notepad: '$(echo "notepad")',
+    };
 
     return this.#queryEditor(
       //sh
@@ -155,10 +164,10 @@ export class Editor extends GenericSuggestions<string, string> {
       `"\${EDITOR:-$(${sh.custom} || ${sh.git} || ${sh.sensible} || ${sh.vi} || ${sh.nano})}"`,
       //pwsh
       // try $EDITOR global var then custom if provided, else git user defined editor, else vim, default notepad (required fallback despite terminal mode).
-      `"$($EDITOR ?? $(${pwsh.custom} ?? ${pwsh.git} ?? ${pwsh.vim} ?? ${pwsh.notepad})"`
-    )
+      `"$($EDITOR ?? $(${pwsh.custom} ?? ${pwsh.git} ?? ${pwsh.vim} ?? ${pwsh.notepad})"`,
+    );
   }
-  
+
   async #queryEditor(shQuery: string, pwshQuery: string): Promise<string> {
     const queryEditor = Deno.build.os === "windows" ? pwshQuery : shQuery;
 
@@ -183,9 +192,12 @@ export class Editor extends GenericSuggestions<string, string> {
     //Show default prompt
     await super.prompt();
 
-    const filePath = this.settings.sourceFile ?? await Deno.makeTempFile({ suffix: `.${this.settings.fileExtension}` });
+    const filePath = this.settings.sourceFile ??
+      await Deno.makeTempFile({ suffix: `.${this.settings.fileExtension}` });
 
-    const editor = this.settings.editorMode === 'visual' ? await this.#getDefaultVisualEditor() : await this.#getDefaultTerminalEditor();
+    const editor = this.settings.editorMode === "visual"
+      ? await this.#getDefaultVisualEditor()
+      : await this.#getDefaultTerminalEditor();
 
     //open editor
     const { success } = await new Deno.Command(this.#osShell, {
