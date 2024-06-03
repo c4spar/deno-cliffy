@@ -11,8 +11,12 @@ import { normalize } from "@std/path";
 /** Editor prompt options. */
 export interface EditorOptions
   extends GenericSuggestionsOptions<string, string> {
-  /** Prompt end delimiter. */
-  endDelimiter?: string;
+  /** Edit an existing file. */
+  sourceFile?: string;
+  /** Prefer editor mode. */
+  preferMode?: 'terminal' | 'visual';
+  /** Temp file extension. */
+  fileExtension?: string;
   /** Set minimum allowed length of editor value. */
   minLength?: number;
   /** Set maximum allowed length of editor value. */
@@ -21,9 +25,11 @@ export interface EditorOptions
 
 /** Editor prompt settings. */
 interface EditorSettings extends GenericSuggestionsSettings<string, string> {
+  sourceFile: string;
+  preferMode: 'editor' | 'visual';
+  fileExtension: string;
   minLength: number;
   maxLength: number;
-  endDelimiter: string;
 }
 
 /**
@@ -32,7 +38,7 @@ interface EditorSettings extends GenericSuggestionsSettings<string, string> {
  * ```ts
  * import { Editor } from "./mod.ts";
  *
- * const confirmed: string = await Editor.prompt("Enter your name");
+ * const noteContent: string = await Editor.prompt("Edit a note");
  * ```
  */
 export class Editor extends GenericSuggestions<string, string> {
