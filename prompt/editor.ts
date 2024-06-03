@@ -183,13 +183,13 @@ export class Editor extends GenericSuggestions<string, string> {
     //Show default prompt
     await super.prompt();
 
-    const tmpFilePath = await Deno.makeTempFile();
+    const filePath = this.settings.sourceFile ?? await Deno.makeTempFile({ suffix: `.${this.settings.fileExtension}` });
 
-    const editor = await this.#getDefaultEditor();
+    const editor = this.settings.editorMode === 'visual' ? await this.#getDefaultVisualEditor() : await this.#getDefaultTerminalEditor();
 
     //open editor
     const { success } = await new Deno.Command(this.#osShell, {
-      args: [...this.#osShellArgs, `${editor} ${tmpFilePath}`],
+      args: [...this.#osShellArgs, `${editor} ${filePath}`],
       stdout: "inherit",
       stderr: "inherit",
       stdin: "inherit",
@@ -201,8 +201,10 @@ export class Editor extends GenericSuggestions<string, string> {
       );
     }
 
-    const content = await Deno.readTextFile(tmpFilePath);
-    await Deno.remove(tmpFilePath);
+    const content = await Deno.readTextFile(filePath);
+    if (!this.settings.sourceFile) {
+      await Deno.remove(filePath);
+    }
 
     return content;
   }
