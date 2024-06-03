@@ -101,13 +101,59 @@ export class Editor extends GenericSuggestions<string, string> {
     return Deno.build.os === "windows" ? ["-nop", "-c"] : ["-c"];
   }
 
-  async #getDefaultEditor(): Promise<string> {
-    //? Maybe refactor these lines to an helper function
-    const queryEditor = Deno.build.os === "windows"
-      //pwsh
-      // try $EDITOR then $VISUAL global vars, else git user defined editor, else vim, else vscode, else notepad
-      ? '"$($EDITOR ?? $VISUAL ?? $($(git config core.editor) 2> $null) ?? $($(vim -h) 2>&1> $null && echo "vim") ?? $($(code -h) 2>&1> $null && echo "code") ?? $(echo "notepad"))"'
+  
+  #getDefaultVisualEditor(): Promise<string> {
+    const sh = {
+      custom: `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
+      xdgText: '(gtk-launch $(xdg-mime query default text/plain) --version &> /dev/null && echo "gtk-launch $(xdg-mime query default text/plain)")',
+      gedit: '(gedit --version &> /dev/null && echo "gedit")',
+      gvim: 'echo "gvim"'
+    }
+
+    const pwsh = {
+      custom: `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
+      code: '$($(code -h) 2>&1> $null && echo "code")',
+      sublime: '$($(subl -h) 2>&1> $null && echo "subl")',
+      gvim: '$($(gvim -h) 2>&1> $null && echo "gvim")',
+      notepadPLusPlus: '$($(notepad++ --help) 2>&1> $null && echo "notepad++")',
+      notepad: '$(echo "notepad")'
+    }
+
+    return this.#queryEditor(
       //sh
+      // try $VISUAL global var then custom if provided, else xdg-open (force text), else gedit, else gvim
+      `"\${VISUAL:-$(${sh.custom} || ${sh.xdgText} || ${sh.gedit} || ${sh.gvim})}"`,
+      //pwsh
+      // try $VISUAL global var then custom if provided, else sublime text, else notepad++, else gvim, else notepad
+      `"$($VISUAL ?? $(${pwsh.custom} ?? ${pwsh.code} ?? ${pwsh.sublime} ?? ${pwsh.notepadPLusPlus} ?? ${pwsh.gvim} ?? ${pwsh.notepad})"`
+    )
+  }
+  #getDefaultTerminalEditor(): Promise<string> {
+    const sh = {
+      custom: `(which "${this.settings.suggestedEditor}" &> /dev/null && echo "${this.settings.suggestedEditor}")`,
+      git: "git config core.editor 2> /dev/null",
+      sensible: '(sensible-editor --version &> /dev/null && echo "sensible-editor")',
+      vi: '(vi --version &> /dev/null && echo "vi")',
+      nano: 'echo "nano"'
+    }
+
+    const pwsh = {
+      custom: `$($(Get-Command "${this.settings.suggestedEditor}") 2>&1> $null && echo "${this.settings.suggestedEditor}")`,
+      git: "$(git config core.editor) 2> $null)",
+      vim: '$($(vim -h) 2>&1> $null && echo "vim")',
+      notepad: '$(echo "notepad")'
+    }
+
+    return this.#queryEditor(
+      //sh
+      // try $EDITOR global var then custom if provided, else git user defined editor, else os terminal defined editor if available, else vi, else nano.
+      `"\${EDITOR:-$(${sh.custom} || ${sh.git} || ${sh.sensible} || ${sh.vi} || ${sh.nano})}"`,
+      //pwsh
+      // try $EDITOR global var then custom if provided, else git user defined editor, else vim, default notepad (required fallback despite terminal mode).
+      `"$($EDITOR ?? $(${pwsh.custom} ?? ${pwsh.git} ?? ${pwsh.vim} ?? ${pwsh.notepad})"`
+    )
+  }
+  
   async #queryEditor(shQuery: string, pwshQuery: string): Promise<string> {
     const queryEditor = Deno.build.os === "windows" ? pwshQuery : shQuery;
 
