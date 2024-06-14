@@ -21,6 +21,8 @@ export abstract class Provider {
   protected readonly maxListSize: number = 25;
   private maxCols = 8;
 
+  abstract hasRequiredPermissions(): Promise<boolean>;
+
   abstract getVersions(name: string): Promise<Versions>;
 
   abstract getRepositoryUrl(name: string): string;
