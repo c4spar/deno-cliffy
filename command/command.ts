@@ -79,6 +79,7 @@ import type {
   VersionHandler,
 } from "./types.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
+import { CommandOptions } from "./mod.ts";
 
 /**
  * Chainable command factory class.
@@ -1666,9 +1667,11 @@ export class Command<
    * Parse command line arguments and execute matched command.
    *
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
+   * @param options Additional options to consider when parsing.
    */
   public parse(
     args: string[] = Deno.args,
+    options?: { execute?: boolean },
   ): Promise<
     TParentCommand extends Command<any> ? CommandResult<
         Record<string, unknown>,
@@ -1700,6 +1703,7 @@ export class Command<
       stopOnUnknown: false,
       defaults: {},
       actions: [],
+      execute: options?.execute ?? true,
     };
     return this.parseCommand(ctx) as any;
   }
@@ -1712,7 +1716,14 @@ export class Command<
 
       if (this._useRawArgs) {
         await this.parseEnvVars(ctx, this.envVars);
-        return await this.execute(ctx.env, ctx.unknown);
+
+        if (ctx.execute) {
+          return await this.execute(ctx.env, ctx.unknown);
+        } else {
+          // TODO: Resolve typing for options
+          const options = { ...ctx.env, ...ctx.flags };
+          return { cmd: this, options: options, literal: this.literalArgs };
+        }
       }
 
       let preParseGlobals = false;
@@ -1750,6 +1761,9 @@ export class Command<
       const args = this.parseArguments(ctx, options);
       this.literalArgs = ctx.literal;
 
+      //
+      // TODO: How can we defer executing this when ctx.execute is false?
+      //
       // Execute option action.
       if (ctx.actions.length) {
         await Promise.all(
@@ -1766,9 +1780,17 @@ export class Command<
         }
       }
 
-      return await this.execute(options, args);
+      if (ctx.execute) {
+        return await this.execute(options, args);
+      } else {
+        return { options, args, cmd: this, literal: this.literalArgs };
+      }
     } catch (error: unknown) {
-      this.handleError(error);
+      if (ctx.execute) {
+        this.handleError(error);
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -1913,7 +1935,7 @@ export class Command<
    * @param options A map of options.
    * @param args Command arguments.
    */
-  private async execute(
+  public async execute(
     options: Record<string, unknown>,
     args: Array<unknown>,
   ): Promise<CommandResult> {
@@ -3021,6 +3043,7 @@ interface DefaultOption {
 interface ParseContext extends ParseFlagsContext<Record<string, unknown>> {
   actions: Array<ActionHandler>;
   env: Record<string, unknown>;
+  execute: boolean;
 }
 
 interface ParseOptionsOptions {
