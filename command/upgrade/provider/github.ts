@@ -1,7 +1,7 @@
-import { Provider, Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 import { bold, brightBlue } from "@std/fmt/colors";
 
-export interface GithubProviderOptions {
+export interface GithubProviderOptions extends ProviderOptions {
   repository: string;
   branches?: boolean;
   token?: string;
@@ -21,8 +21,10 @@ export class GithubProvider extends Provider {
   private readonly listBranches?: boolean;
   private readonly githubToken?: string;
 
-  constructor({ repository, branches = true, token }: GithubProviderOptions) {
-    super();
+  constructor(
+    { repository, branches = true, token, main, logger }: GithubProviderOptions,
+  ) {
+    super({ main, logger });
     this.repositoryName = repository;
     this.listBranches = branches;
     this.githubToken = token;
@@ -60,8 +62,11 @@ export class GithubProvider extends Provider {
     };
   }
 
-  getRepositoryUrl(_name: string): string {
-    return new URL(this.repositoryName, this.repositoryUrl).href;
+  getRepositoryUrl(_name: string, version?: string): string {
+    return new URL(
+      `${this.repositoryName}${version ? `/releases/tag/${version}` : ""}`,
+      this.repositoryUrl,
+    ).href;
   }
 
   getRegistryUrl(_name: string, version: string): string {

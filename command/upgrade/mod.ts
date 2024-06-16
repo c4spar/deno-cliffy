@@ -1,4 +1,4 @@
-export { Provider, type UpgradeOptions, type Versions } from "./provider.ts";
+export { Provider, type Versions } from "./provider.ts";
 export {
   UpgradeCommand,
   type UpgradeCommandOptions,

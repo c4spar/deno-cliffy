@@ -1,31 +1,71 @@
+import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
-import type { Provider, Versions } from "./provider.ts";
 import { EnumType } from "../types/enum.ts";
+import { createLogger } from "./logger.ts";
+import type { Provider, Versions } from "./provider.ts";
+import { Spinner } from "./spinner.ts";
+import {
+  type RuntimeOptions,
+  type RuntimeOptionsMap,
+  upgrade,
+} from "./upgrade.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,
-  TProviders extends TProvider | Array<TProvider> =
-    | TProvider
-    | Array<TProvider>,
-> {
-  provider: TProviders;
-  main?: string;
-  importMap?: string;
-  args?: Array<string>;
+> extends RuntimeOptions {
+  provider: TProvider | Array<TProvider>;
+  runtime?: RuntimeOptionsMap;
 }
 
+/**
+ * The `UpgradeCommand` adds an upgrade functionality to the cli to be able to
+ * seamlessly upgrade the cli to the latest or a specific version from a
+ * provided registry with any supported runtime.
+ * Currently supported runtimes are: `deno`, `node` and `bun`.
+ *
+ * @example Upgrade command example.
+ *
+ * ```
+ * import { Command } from "@cliffy/command";
+ * import { UpgradeCommand } from "@cliffy/command/upgrade";
+ * import { DenoLandProvider } from "@cliffy/command/upgrade/provider/deno-land";
+ * import { GithubProvider } from "@cliffy/command/upgrade/provider/github";
+ * import { JsrProvider } from "@cliffy/command/upgrade/provider/jsr";
+ * import { NestLandProvider } from "@cliffy/command/upgrade/provider/nest-land";
+ * import { NpmProvider } from "@cliffy/command/upgrade/provider/npm";
+ *
+ * await new Command()
+ *   .name("my-cli")
+ *   .version("0.2.1")
+ *   .command(
+ *     "upgrade",
+ *     new UpgradeCommand({
+ *       provider: [
+ *         new JsrProvider({ scope: "examples" }),
+ *         new NpmProvider({ scope: "examples" }),
+ *         new DenoLandProvider(),
+ *         new NestLandProvider(),
+ *         new GithubProvider({ repository: "examples/my-cli" }),
+ *       ],
+ *     }),
+ *   )
+ *   .parse();
+ * ```
+ */
 export class UpgradeCommand extends Command {
   private readonly providers: ReadonlyArray<Provider>;
 
   constructor(
-    { provider, main, args, importMap }: UpgradeCommandOptions,
+    { provider, ...options }: UpgradeCommandOptions,
   ) {
     super();
     this.providers = Array.isArray(provider) ? provider : [provider];
+
     if (!this.providers.length) {
       throw new Error(`No upgrade provider defined!`);
     }
+
     this
       .description(() =>
         `Upgrade ${this.getMainCommand().getName()} executable to latest or given version.`
@@ -63,25 +103,60 @@ export class UpgradeCommand extends Command {
         "-f, --force",
         "Replace current installation even if not out-of-date.",
       )
+      .option(
+        "-v, --verbose",
+        "Log verbose output.",
+      )
+      .option("--no-spinner", "Disable spinner.")
       .complete("version", () => this.getAllVersions())
-      .action(async ({ registry, version: targetVersion, force }) => {
-        const name: string = this.getMainCommand().getName();
-        const currentVersion: string | undefined = this.getVersion();
+      .action(
+        async (
+          {
+            registry: provider,
+            version,
+            force,
+            verbose,
+            spinner: spinnerEnabled,
+          },
+        ) => {
+          const name: string = this.getMainCommand().getName();
+          const currentVersion: string | undefined = this.getVersion();
 
-        if (
-          force || !currentVersion ||
-          await registry.isOutdated(name, currentVersion, targetVersion)
-        ) {
-          await registry.upgrade({
-            name,
-            main,
-            importMap,
-            from: currentVersion,
-            to: targetVersion,
-            args,
-          });
-        }
-      });
+          const spinner = spinnerEnabled
+            ? new Spinner({
+              message: brightBlue(
+                `Upgrading ${bold(name)} from version ${
+                  bold(currentVersion ?? "")
+                } to ${bold(version)}...`,
+              ),
+            })
+            : undefined;
+          const logger = createLogger({ spinner, verbose });
+          spinner?.start();
+          provider.setLogger(logger);
+
+          try {
+            await upgrade({
+              name,
+              to: version,
+              from: currentVersion,
+              force,
+              provider,
+              verbose,
+              logger,
+              ...options,
+            });
+          } catch (error: unknown) {
+            logger.error(
+              !verbose && error instanceof Error ? error.message : error,
+            );
+            spinner?.stop();
+            Deno.exit(1);
+          } finally {
+            spinner?.stop();
+          }
+        },
+      );
   }
 
   public async getAllVersions(): Promise<Array<string>> {

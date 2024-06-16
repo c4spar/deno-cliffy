@@ -1,10 +1,11 @@
-import { assertEquals } from "@std/assert";
+import { assert, assertEquals } from "@std/assert";
 import {
   mockFetch,
   mockGlobalFetch,
   resetFetch,
   resetGlobalFetch,
 } from "@c4spar/mock-fetch";
+import { upgrade } from "../upgrade.ts";
 import { NestLandProvider } from "./nest_land.ts";
 import {
   mockCommand,
@@ -17,7 +18,9 @@ Deno.test("NestLandProvider", async (ctx) => {
   mockGlobalFetch();
   mockGlobalCommand();
 
-  const provider = new NestLandProvider();
+  const provider = new NestLandProvider({
+    main: "foo.ts",
+  });
 
   await ctx.step({
     name: "should return registry url",
@@ -45,7 +48,7 @@ Deno.test("NestLandProvider", async (ctx) => {
       mockFetch("https://nest.land/api/package-client", {
         body: JSON.stringify({
           body: {
-            latestVersion: "1.0.1",
+            latestVersion: "foo@1.0.1",
             packageUploadNames: ["foo@1.0.0", "foo@1.0.1"],
           },
         }),
@@ -62,36 +65,66 @@ Deno.test("NestLandProvider", async (ctx) => {
   });
 
   await ctx.step({
+    name: "should check if version is outdated",
+    async fn() {
+      const mock = {
+        body: JSON.stringify({
+          body: {
+            latestVersion: "foo@1.0.1",
+            packageUploadNames: ["foo@1.0.0", "foo@1.0.1"],
+          },
+        }),
+      };
+
+      mockFetch("https://nest.land/api/package-client", mock);
+      const isOutdated = await provider.isOutdated("foo", "1.0.0", "latest");
+      assert(isOutdated);
+
+      mockFetch("https://nest.land/api/package-client", mock);
+      const isNotOutdated = !await provider.isOutdated(
+        "foo",
+        "1.0.1",
+        "latest",
+      );
+      assert(isNotOutdated);
+
+      resetFetch();
+    },
+  });
+
+  await ctx.step({
     name: "should upgrade to latest version",
     async fn() {
-      mockFetch("https://nest.land/api/package-client", {
+      const versionsResponse = {
         body: JSON.stringify({
           body: {
             latestVersion: "1.0.1",
             packageUploadNames: ["foo@1.0.0", "foo@1.0.1"],
           },
         }),
-      });
+      };
+      mockFetch("https://nest.land/api/package-client", versionsResponse);
+      mockFetch("https://nest.land/api/package-client", versionsResponse);
 
       mockCommand({
         command: Deno.execPath(),
         args: [
           "install",
-          "--no-check",
-          "--quiet",
+          "--name=foo",
+          "--global",
           "--force",
-          "--name",
-          "foo",
+          "--quiet",
           "https://x.nest.land/foo@1.0.1/foo.ts",
         ],
         stdout: "piped",
         stderr: "piped",
       });
 
-      await provider.upgrade({
+      await upgrade({
         name: "foo",
-        from: "1.0.1",
+        from: "1.0.0",
         to: "latest",
+        provider,
       });
 
       resetFetch();

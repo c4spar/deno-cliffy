@@ -9,7 +9,7 @@ import { NestLandProvider } from "../../command/upgrade/provider/nest_land.ts";
 
 await new Command()
   .name("codeview")
-  .version("0.2.2")
+  .version("0.2.1")
   .command(
     "upgrade",
     new UpgradeCommand({
