@@ -9,6 +9,7 @@ on:
 
 env:
   DENO_UNSTABLE_WORKSPACES: true
+  DENO_FUTURE: 1
 
 jobs:
   publish:

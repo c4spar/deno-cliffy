@@ -15,6 +15,7 @@ jobs:
         deno: [v1.x]
     env:
       RUST_BACKTRACE: full
+      DENO_FUTURE: 1
       CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
