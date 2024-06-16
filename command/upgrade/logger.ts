@@ -1,4 +1,4 @@
-import type { Spinner } from "@std/cli/spinner";
+import type { Spinner } from "./spinner.ts";
 
 export interface Logger {
   log(...data: Array<unknown>): void;
