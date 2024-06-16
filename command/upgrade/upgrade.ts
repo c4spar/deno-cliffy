@@ -16,7 +16,11 @@ export interface RuntimeOptionsMap {
   bun?: RuntimeOptions;
 }
 
-/** Options for upgrading a package from any supported runtime. */
+/**
+ * Options for upgrading a package from a provided registry with any supported
+ * runtimes.
+ * Currently supported runtimes are: `deno`, `node` and `bun`.
+ */
 export interface UpgradeOptions extends RuntimeUpgradeOptions {
   runtime?: RuntimeOptionsMap;
 }

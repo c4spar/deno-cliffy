@@ -8,11 +8,13 @@ export interface Versions {
   versions: Array<string>;
 }
 
+/** Shared provider options. */
 export interface ProviderOptions {
   main?: string;
   logger?: Logger;
 }
 
+/** Provider upgrade options. */
 export interface ProviderUpgradeOptions {
   name: string;
   to: string;
@@ -23,6 +25,30 @@ export interface ProviderUpgradeOptions {
   verbose?: boolean;
 }
 
+/**
+ * Upgrade provider.
+ *
+ * The upgrade provider is an api wrapper for a javascript registry which is
+ * used by the upgrade command to upgrade the cli to a specific version.
+ *
+ * @example Upgrade provider example.
+ *
+ * ```
+ * import { Command } from "@cliffy/command";
+ * import { UpgradeCommand } from "@cliffy/command/upgrade";
+ * import { DenoLandProvider } from "@cliffy/command/upgrade/provider/deno-land";
+ * import { GithubProvider } from "@cliffy/command/upgrade/provider/github";
+ * import { JsrProvider } from "@cliffy/command/upgrade/provider/jsr";
+ * import { NestLandProvider } from "@cliffy/command/upgrade/provider/nest-land";
+ * import { NpmProvider } from "@cliffy/command/upgrade/provider/npm";
+ *
+ * const upgradeCommand = new UpgradeCommand({
+ *   provider: [
+ *     new JsrProvider({ package: "@examples/package" }),
+ *   ],
+ * });
+ * ```
+ */
 export abstract class Provider {
   abstract readonly name: string;
   protected readonly main?: string;
