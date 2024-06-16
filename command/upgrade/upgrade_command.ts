@@ -1,10 +1,10 @@
-import { Spinner } from "@std/cli/spinner";
 import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
 import type { Provider, Versions } from "./provider.ts";
+import { Spinner } from "./spinner.ts";
 import {
   type RuntimeOptions,
   type RuntimeOptionsMap,
