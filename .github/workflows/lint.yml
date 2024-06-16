@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RUST_BACKTRACE: full
+      DENO_FUTURE: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
