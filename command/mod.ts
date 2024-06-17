@@ -41,7 +41,4 @@ export { NumberType } from "./types/number.ts";
 export { StringType } from "./types/string.ts";
 export { Type } from "./type.ts";
 export { ValidationError, type ValidationErrorOptions } from "./_errors.ts";
-export * from "./help/mod.ts";
-export * from "./upgrade/mod.ts";
-export * from "./completions/mod.ts";
 export * from "./deprecated.ts";

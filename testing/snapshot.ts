@@ -1,6 +1,9 @@
-import { eraseDown } from "../ansi/ansi_escapes.ts";
+import { eraseDown } from "@cliffy/ansi/ansi-escapes";
 import { quoteString } from "./_quote_string.ts";
-import { AssertionError, assertSnapshot, basename, red } from "./deps.ts";
+import { basename } from "@std/path";
+import { red } from "@std/fmt/colors";
+import { assertSnapshot } from "@std/testing/snapshot";
+import { AssertionError } from "@std/assert/assertion-error";
 
 /** Snapshot test step options. */
 export interface SnapshotTestStep {
@@ -80,7 +83,7 @@ const encoder = new TextEncoder();
  *
  * ```ts
  * import { snapshotTest } from "./snapshot.ts";
- * import { Input } from "../prompt/input.ts";
+ * import { Input } from "@cliffy/prompt/input";
  *
  * await snapshotTest({
  *   name: "test name",
@@ -136,7 +139,7 @@ function registerTest(options: SnapshotTestOptions) {
     ctx: Deno.TestContext,
     step?: SnapshotTestStep,
   ) {
-    const { stdout, stderr } = await runPrompt(options, step);
+    const { stdout, stderr } = await executeTest(options, step);
 
     const serializer = options.serializer ?? quoteString;
     const output = `stdout:\n${serializer(stdout)}\nstderr:\n${
@@ -156,7 +159,7 @@ function registerTest(options: SnapshotTestOptions) {
   }
 }
 
-async function runPrompt(
+async function executeTest(
   options: SnapshotTestOptions,
   step?: SnapshotTestStep,
 ): Promise<{ stdout: string; stderr: string }> {
@@ -165,13 +168,29 @@ async function runPrompt(
   let stderr: string | undefined;
 
   try {
+    let denoArgs: Array<string>;
+
+    if (options.denoArgs) {
+      denoArgs = options.denoArgs;
+    } else {
+      denoArgs = ["--allow-env=SNAPSHOT_TEST_NAME"];
+
+      // workaround for https://github.com/denoland/deno/issues/22020
+      const snapshotConfigPath = await getEnvIfGranted(
+        "CLIFFY_SNAPSHOT_CONFIG",
+      );
+      if (snapshotConfigPath) {
+        denoArgs.push(`--config=${snapshotConfigPath}`);
+      }
+    }
+
     const cmd = new Deno.Command("deno", {
       stdin: "piped",
       stdout: "piped",
       stderr: "piped",
       args: [
         "run",
-        ...options.denoArgs ?? ["--allow-env=SNAPSHOT_TEST_NAME"],
+        ...denoArgs,
         options.meta.url,
         ...options.args ?? [],
         ...step?.args ?? [],
@@ -190,12 +209,15 @@ async function runPrompt(
     ];
 
     if (stdin.length) {
+      const delay = Number(
+        await getEnvIfGranted("CLIFFY_SNAPSHOT_DELAY") ||
+          (options.timeout ?? Deno.build.os === "windows" ? 1200 : 300),
+      );
+
       for (const data of stdin) {
         await writer.write(encoder.encode(data));
-        // Ensure all inputs are processed and rendered separately.
-        await new Promise((resolve) =>
-          setTimeout(resolve, options.timeout ?? 700)
-        );
+        // Workaround to ensure all inputs are processed and rendered separately.
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -207,7 +229,7 @@ async function runPrompt(
     await child.stdin.close();
   } catch (error: unknown) {
     const assertionError = new AssertionError(
-      `Prompt snapshot test failed: ${options.meta.url}.\n${red(stderr ?? "")}`,
+      `Snapshot test failed: ${options.meta.url}.\n${red(stderr ?? "")}`,
     );
     assertionError.cause = error;
     throw assertionError;
@@ -215,7 +237,7 @@ async function runPrompt(
 
   if (!output.success && !options.canFail && !step?.canFail) {
     throw new AssertionError(
-      `Prompt snapshot test failed: ${options.meta.url}.` +
+      `Snapshot test failed: ${options.meta.url}.` +
         `Test command failed with a none zero exit code: ${output.code}.\n${
           red(stderr ?? "")
         }`,
@@ -238,4 +260,15 @@ async function runTest(options: SnapshotTestOptions) {
   if (testName === options.name) {
     await options.fn();
   }
+}
+
+async function getEnvIfGranted(name: string): Promise<string | undefined> {
+  const { state } = await Deno.permissions.query({
+    name: "env",
+    variable: name,
+  });
+
+  return state === "granted" && Deno.env.has(name)
+    ? Deno.env.get(name)
+    : undefined;
 }

@@ -1,4 +1,4 @@
-import { Table } from "../../table/table.ts";
+import { Table } from "@cliffy/table";
 import {
   dedent,
   getDescription,
@@ -17,7 +17,7 @@ import {
   red,
   setColorEnabled,
   yellow,
-} from "../deps.ts";
+} from "@std/fmt/colors";
 import { Type } from "../type.ts";
 import type { Argument, EnvVar, Example, Option } from "../types.ts";
 
@@ -358,7 +358,7 @@ export class HelpGenerator {
 }
 
 function capitalize(string: string): string {
-  return string?.charAt(0).toUpperCase() + string.slice(1) ?? "";
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function inspect(value: unknown, colors: boolean): string {

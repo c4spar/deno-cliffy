@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any ban-types
 
-import { Tty, tty } from "../ansi/tty.ts";
+import { Tty, tty } from "@cliffy/ansi/tty";
 import {
   GenericPrompt,
   GenericPromptOptions,

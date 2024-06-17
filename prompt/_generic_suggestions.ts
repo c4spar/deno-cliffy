@@ -1,4 +1,4 @@
-import type { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import {
   GenericInput,
   GenericInputKeys,
@@ -9,13 +9,11 @@ import {
   bold,
   brightBlue,
   dim,
-  dirname,
-  join,
-  levenshteinDistance,
-  normalize,
   stripAnsiCode,
   underline,
-} from "./deps.ts";
+} from "@std/fmt/colors";
+import { levenshteinDistance } from "@std/text/levenshtein-distance";
+import { dirname, join, normalize } from "@std/path";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
 
 /** Generic input prompt options. */

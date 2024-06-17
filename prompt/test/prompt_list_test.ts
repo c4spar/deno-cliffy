@@ -1,8 +1,5 @@
-import {
-  assert,
-  IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
-import { assertEquals, assertRejects } from "../../dev_deps.ts";
+import { assertType, type IsExact } from "@std/testing/types";
+import { assertEquals, assertRejects } from "@std/assert";
 import { inject, prompt } from "../prompt.ts";
 import { Checkbox } from "../checkbox.ts";
 import { Confirm } from "../confirm.ts";
@@ -45,7 +42,7 @@ Deno.test("prompt - prompt list", async () => {
     message: "Please confirm?",
     type: Confirm,
     after: async (result, next) => {
-      assert<
+      assertType<
         IsExact<typeof result, {
           animals?: Array<string>;
           name?: string;
@@ -60,7 +57,7 @@ Deno.test("prompt - prompt list", async () => {
     },
   }, {
     before: async (result, next) => {
-      assert<
+      assertType<
         IsExact<typeof result, {
           animals?: Array<string>;
           name?: string;
@@ -78,7 +75,7 @@ Deno.test("prompt - prompt list", async () => {
     type: Number,
   }, {
     before: (result, next) => {
-      assert<
+      assertType<
         IsExact<typeof result, {
           animals?: Array<string>;
           name?: string;
@@ -87,7 +84,7 @@ Deno.test("prompt - prompt list", async () => {
           unknown?: number;
         }>
       >(true);
-      assert<
+      assertType<
         IsExact<
           typeof next,
           (
@@ -111,7 +108,7 @@ Deno.test("prompt - prompt list", async () => {
     type: Number,
   }]);
 
-  assert<
+  assertType<
     IsExact<typeof result, {
       animals?: Array<string>;
       name?: string;
@@ -137,8 +134,8 @@ Deno.test("prompt - prompt list - before next callback", async () => {
         message: `Enter your name`,
         type: Input,
         before: async (result, next) => {
-          assert<IsExact<typeof result, { name?: string }>>(true);
-          assert<
+          assertType<IsExact<typeof result, { name?: string }>>(true);
+          assertType<
             IsExact<
               typeof next,
               (next?: "name" | number | true | null) => Promise<void>

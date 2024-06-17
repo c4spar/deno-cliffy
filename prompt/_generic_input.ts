@@ -1,11 +1,11 @@
-import type { KeyCode } from "../keycode/key_code.ts";
+import type { KeyCode } from "@cliffy/keycode";
 import {
   GenericPrompt,
   GenericPromptKeys,
   GenericPromptOptions,
   GenericPromptSettings,
 } from "./_generic_prompt.ts";
-import { brightBlue, dim, stripAnsiCode, underline } from "./deps.ts";
+import { brightBlue, dim, stripAnsiCode, underline } from "@std/fmt/colors";
 
 /** Generic input prompt options. */
 export interface GenericInputPromptOptions<TValue, TRawValue>

@@ -1,0 +1,11 @@
+{
+  "name": "@cliffy/ansi",
+  "version": "1.0.0-rc.4",
+  "exports": {
+    ".": "./ansi.ts",
+    "./ansi-escapes": "./ansi_escapes.ts",
+    "./colors": "./colors.ts",
+    "./cursor-position": "./cursor_position.ts",
+    "./tty": "./tty.ts"
+  }
+}

@@ -15,6 +15,8 @@ jobs:
         deno: [v1.x]
     env:
       RUST_BACKTRACE: full
+      DENO_FUTURE: 1
+      CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,8 +30,9 @@ jobs:
         run: deno task coverage:${{ matrix.module }}
 
       - name: Upload ${{ matrix.module }} coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
           files: dist/coverage/${{ matrix.module }}/cov.lcov
           flags: ${{ matrix.module }}
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,9 +1,9 @@
-import { closestString } from "https://deno.land/std@0.221.0/text/closest_string.ts";
+import { closestString } from "@std/text/closest-string";
 import {
+  OptionType,
   UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
-} from "../flags/_errors.ts";
-import { OptionType } from "../flags/deprecated.ts";
+} from "@cliffy/flags";
 import type { Command } from "./command.ts";
 import type { Argument } from "./types.ts";
 

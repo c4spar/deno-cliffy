@@ -1,5 +1,5 @@
 import { Toggle } from "../../toggle.ts";
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { snapshotTest } from "@cliffy/testing";
 
 await snapshotTest({
   name: "toggle prompt",

@@ -1,9 +1,5 @@
-import {
-  assertEquals,
-  assertRejects,
-  assertSpyCalls,
-  spy,
-} from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { assertSpyCalls, spy } from "@std/testing/mock";
 import { Command } from "../../command.ts";
 
 Deno.test("[command] should execute standalone option action", async () => {

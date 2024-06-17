@@ -1,6 +1,6 @@
-import { Provider, Versions } from "../provider.ts";
+import { Provider, type ProviderOptions, type Versions } from "../provider.ts";
 
-export interface NestLandProviderOptions {
+export interface NestLandProviderOptions extends ProviderOptions {
   name?: string;
 }
 
@@ -10,8 +10,8 @@ export class NestLandProvider extends Provider {
   private readonly registryUrl = "https://x.nest.land/";
   private readonly moduleName?: string;
 
-  constructor({ name }: NestLandProviderOptions = {}) {
-    super();
+  constructor({ name, main, logger }: NestLandProviderOptions = {}) {
+    super({ main, logger });
     this.moduleName = name;
   }
 
@@ -32,21 +32,27 @@ export class NestLandProvider extends Provider {
     const { body: { latestVersion, packageUploadNames } } = await response
       .json();
 
+    const stripPackageName = (version: string): string => {
+      return version.replace(new RegExp(`^${this.moduleName ?? name}@`), "");
+    };
+
     return {
-      latest: latestVersion,
-      versions: packageUploadNames.map(
-        (version: string) =>
-          version.replace(new RegExp(`^${this.moduleName ?? name}@`), ""),
+      latest: stripPackageName(latestVersion),
+      versions: packageUploadNames.map((version: string) =>
+        stripPackageName(version)
       ).reverse(),
     };
   }
 
-  getRepositoryUrl(name: string): string {
-    return new URL(`${this.moduleName ?? name}/`, this.repositoryUrl).href;
+  getRepositoryUrl(name: string, version?: string): string {
+    return new URL(
+      `${this.moduleName ?? name}${version ? `@${version}` : ""}`,
+      this.repositoryUrl,
+    ).href;
   }
 
   getRegistryUrl(name: string, version: string): string {
-    return new URL(`${this.moduleName ?? name}@${version}/`, this.registryUrl)
+    return new URL(`${this.moduleName ?? name}@${version}`, this.registryUrl)
       .href;
   }
 }

@@ -10,9 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno_version: [ canary ]
+        deno_version: [canary]
     env:
       RUST_BACKTRACE: full
+      DENO_FUTURE: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3

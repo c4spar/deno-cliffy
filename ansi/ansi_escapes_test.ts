@@ -14,7 +14,7 @@ import {
   scrollDown,
   scrollUp,
 } from "./ansi_escapes.ts";
-import { assertEquals } from "../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 
 Deno.test({
   name: "ansi - ansi escapes - cursorTo x",

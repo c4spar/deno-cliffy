@@ -1,11 +1,7 @@
 import { snapshotTest } from "../../../testing/snapshot.ts";
-import {
-  Command,
-  CompletionsCommand,
-  EnumType,
-  HelpCommand,
-  ValidationError,
-} from "../../mod.ts";
+import { CompletionsCommand } from "../../completions/mod.ts";
+import { HelpCommand } from "../../help/mod.ts";
+import { Command, EnumType, ValidationError } from "../../mod.ts";
 
 await snapshotTest({
   name: "command integration",

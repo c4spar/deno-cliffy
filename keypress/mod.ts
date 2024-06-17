@@ -1,4 +1,4 @@
-import { KeyCode, parse } from "../keycode/mod.ts";
+import { KeyCode, parse } from "@cliffy/keycode";
 
 type KeyPressEventType = "keydown";
 

@@ -1,6 +1,6 @@
 // deno-fmt-ignore-file
 
-import { assertEquals } from "../../../dev_deps.ts";
+import { assertEquals } from "@std/assert";
 import { snapshotTest } from "../../../testing/snapshot.ts";
 import { Command } from "../../command.ts";
 import { CompletionsCommand } from "../../completions/completions_command.ts";

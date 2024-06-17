@@ -1,31 +1,77 @@
-import { bold, brightBlue, cyan, green, red, yellow } from "../deps.ts";
+import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
-import { Table } from "../../table/table.ts";
+import { Table } from "@cliffy/table";
+import type { Logger } from "./logger.ts";
 
 export interface Versions {
   latest: string;
   versions: Array<string>;
 }
 
-export interface UpgradeOptions {
-  name: string;
-  from?: string;
-  to: string;
-  args?: Array<string>;
+/** Shared provider options. */
+export interface ProviderOptions {
   main?: string;
-  importMap?: string;
+  logger?: Logger;
 }
 
+/** Provider upgrade options. */
+export interface ProviderUpgradeOptions {
+  name: string;
+  to: string;
+  main?: string;
+  args?: Array<string>;
+  from?: string;
+  force?: boolean;
+  verbose?: boolean;
+}
+
+/**
+ * Upgrade provider.
+ *
+ * The upgrade provider is an api wrapper for a javascript registry which is
+ * used by the upgrade command to upgrade the cli to a specific version.
+ *
+ * @example Upgrade provider example.
+ *
+ * ```
+ * import { Command } from "@cliffy/command";
+ * import { UpgradeCommand } from "@cliffy/command/upgrade";
+ * import { DenoLandProvider } from "@cliffy/command/upgrade/provider/deno-land";
+ * import { GithubProvider } from "@cliffy/command/upgrade/provider/github";
+ * import { JsrProvider } from "@cliffy/command/upgrade/provider/jsr";
+ * import { NestLandProvider } from "@cliffy/command/upgrade/provider/nest-land";
+ * import { NpmProvider } from "@cliffy/command/upgrade/provider/npm";
+ *
+ * const upgradeCommand = new UpgradeCommand({
+ *   provider: [
+ *     new JsrProvider({ package: "@examples/package" }),
+ *   ],
+ * });
+ * ```
+ */
 export abstract class Provider {
   abstract readonly name: string;
+  protected readonly main?: string;
   protected readonly maxListSize: number = 25;
+  protected logger: Logger;
   private maxCols = 8;
+
+  protected constructor({ main, logger = console }: ProviderOptions = {}) {
+    this.main = main;
+    this.logger = logger;
+  }
 
   abstract getVersions(name: string): Promise<Versions>;
 
-  abstract getRepositoryUrl(name: string): string;
+  abstract getRepositoryUrl(name: string, version?: string): string;
 
   abstract getRegistryUrl(name: string, version: string): string;
+
+  upgrade?(options: ProviderUpgradeOptions): Promise<void>;
+
+  getSpecifier(name: string, version: string, defaultMain?: string): string {
+    return `${this.getRegistryUrl(name, version)}${this.getMain(defaultMain)}`;
+  }
 
   async isOutdated(
     name: string,
@@ -57,7 +103,7 @@ export abstract class Provider {
 
     // Check if requested version is already the latest available version.
     if (latest && latest === currentVersion && latest === targetVersion) {
-      console.warn(
+      this.logger.warn(
         yellow(
           `You're already using the latest available version ${currentVersion} of ${name}.`,
         ),
@@ -67,66 +113,13 @@ export abstract class Provider {
 
     // Check if requested version is already installed.
     if (targetVersion && currentVersion === targetVersion) {
-      console.warn(
+      this.logger.warn(
         yellow(`You're already using version ${currentVersion} of ${name}.`),
       );
       return false;
     }
 
     return true;
-  }
-
-  async upgrade(
-    { name, from, to, importMap, main = `${name}.ts`, args = [] }:
-      UpgradeOptions,
-  ): Promise<void> {
-    if (to === "latest") {
-      const { latest } = await this.getVersions(name);
-      to = latest;
-    }
-    const registry: string = new URL(main, this.getRegistryUrl(name, to)).href;
-
-    const cmdArgs = ["install"];
-
-    if (importMap) {
-      const importJson: string =
-        new URL(importMap, this.getRegistryUrl(name, to)).href;
-
-      cmdArgs.push("--import-map", importJson);
-    }
-
-    if (args.length) {
-      cmdArgs.push(...args, "--force", "--name", name, registry);
-    } else {
-      cmdArgs.push(
-        "--no-check",
-        "--quiet",
-        "--force",
-        "--name",
-        name,
-        registry,
-      );
-    }
-
-    const cmd = new Deno.Command(Deno.execPath(), {
-      args: cmdArgs,
-      stdout: "piped",
-      stderr: "piped",
-    });
-    const { success, stderr } = await cmd.output();
-
-    if (!success) {
-      await Deno.stderr.write(stderr);
-      throw new Error(
-        `Failed to upgrade ${name} from ${from} to version ${to}!`,
-      );
-    }
-
-    console.info(
-      `Successfully upgraded ${name} from ${from} to version ${to}! (${
-        this.getRegistryUrl(name, to)
-      })`,
-    );
   }
 
   public async listVersions(
@@ -173,5 +166,14 @@ export abstract class Provider {
         );
       }
     }
+  }
+
+  setLogger(logger: Logger): void {
+    this.logger = logger;
+  }
+
+  private getMain(defaultMain?: string): string {
+    const main = this.main ?? defaultMain;
+    return main ? `/${main}` : "";
   }
 }

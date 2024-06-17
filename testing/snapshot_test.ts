@@ -1,6 +1,7 @@
-import { assert, assertSnapshot } from "../dev_deps.ts";
+import { assert } from "@std/assert";
+import { assertSnapshot } from "@std/testing/snapshot";
 import { quoteString } from "./_quote_string.ts";
-import { dirname, fromFileUrl } from "./deps.ts";
+import { dirname, fromFileUrl } from "@std/path";
 
 Deno.test({
   name: "should run snapshot tests",
@@ -18,12 +19,20 @@ Deno.test({
       "--allow-run=deno",
       `--allow-read=${testDir}`,
       `--allow-write=${testDir}`,
+      `--allow-env=CLIFFY_SNAPSHOT_CONFIG`,
       "testing/snapshot_test_fixture.ts",
       "--",
       "--update",
     ];
 
-    const cmd = new Deno.Command("deno", { args });
+    const env: Record<string, string> = {};
+
+    const snapshotConfig = Deno.env.get("CLIFFY_SNAPSHOT_CONFIG");
+    if (snapshotConfig) {
+      env.CLIFFY_SNAPSHOT_CONFIG = snapshotConfig;
+    }
+
+    const cmd = new Deno.Command("deno", { args, env });
 
     const { success, stdout, stderr } = await cmd.output();
 

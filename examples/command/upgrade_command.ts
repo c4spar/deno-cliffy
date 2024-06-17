@@ -1,16 +1,15 @@
 #!/usr/bin/env -S deno run --allow-net --allow-run --allow-read --no-check
 
-import { Command, CompletionsCommand } from "../../command/mod.ts";
-import {
-  DenoLandProvider,
-  NestLandProvider,
-  UpgradeCommand,
-} from "../../command/upgrade/mod.ts";
+import { CompletionsCommand } from "../../command/completions/mod.ts";
+import { Command } from "../../command/mod.ts";
+import { UpgradeCommand } from "../../command/upgrade/mod.ts";
+import { DenoLandProvider } from "../../command/upgrade/provider/deno_land.ts";
 import { GithubProvider } from "../../command/upgrade/provider/github.ts";
+import { NestLandProvider } from "../../command/upgrade/provider/nest_land.ts";
 
 await new Command()
   .name("codeview")
-  .version("0.2.2")
+  .version("0.2.1")
   .command(
     "upgrade",
     new UpgradeCommand({

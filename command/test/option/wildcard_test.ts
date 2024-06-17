@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "../../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
 function cmd() {

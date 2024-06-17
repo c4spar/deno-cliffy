@@ -1,4 +1,5 @@
-import { assertEquals, assertRejects, bold, red } from "../../dev_deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { bold, red } from "@std/fmt/colors";
 import { Checkbox } from "../checkbox.ts";
 
 Deno.test("prompt checkbox: valid value", async () => {

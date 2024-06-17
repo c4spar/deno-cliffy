@@ -1,27 +1,25 @@
 import { Command, EnumType } from "../../mod.ts";
-import {
-  assert,
-  IsAny,
-  IsExact,
-} from "https://deno.land/x/conditional_type_checks@1.0.6/mod.ts";
+import { assertType, type IsAny, type IsExact } from "@std/testing/types";
 
 // Not required to execute this code, only type check.
 (() => {
   Deno.test({
-    name: "[command] - generic types - options and args should be of type any",
+    name:
+      "[command] - generic types - options and args should be of type any bay default",
     fn() {
       // deno-lint-ignore no-explicit-any
       new Command<any>()
         .action((options, ...args) => {
-          assert<IsAny<typeof options>>(true);
-          assert<IsAny<typeof args>>(true);
+          assertType<IsAny<typeof options>>(true);
+          // deno-lint-ignore no-explicit-any
+          assertType<IsExact<typeof args, Array<any>>>(true);
         });
     },
   });
 
   Deno.test({
     name:
-      "[command] - generic types - options and args should be of type any 2",
+      "[command] - generic types - options and args should be of type any with options and arguments",
     fn() {
       // deno-lint-ignore no-explicit-any
       new Command<any>()
@@ -29,8 +27,9 @@ import {
         .arguments("<val:string> [val:string]")
         .env("FOO_BAR <val:number>", "")
         .action((options, ...args) => {
-          assert<IsAny<typeof options>>(true);
-          assert<IsAny<typeof args>>(true);
+          assertType<IsAny<typeof options>>(true);
+          // deno-lint-ignore no-explicit-any
+          assertType<IsExact<typeof args, Array<any>>>(true);
         });
     },
   });
@@ -40,18 +39,18 @@ import {
     fn() {
       new Command()
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, []>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, []>>(true);
         })
         .command("foo", new Command())
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, []>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, []>>(true);
         })
         .command("bar", new Command<void>())
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, []>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, []>>(true);
         });
     },
   });
@@ -61,8 +60,8 @@ import {
     fn() {
       new Command<void, void, void, []>()
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, []>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, []>>(true);
         });
     },
   });
@@ -73,8 +72,8 @@ import {
     fn() {
       new Command<void, void, void, [number]>()
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, [number]>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, [number]>>(true);
         });
     },
   });
@@ -91,8 +90,8 @@ import {
         { bar?: true }
       >()
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [bar?: number]>>(true);
-          assert<
+          assertType<IsExact<typeof args, [bar?: number]>>(true);
+          assertType<
             IsExact<typeof options, {
               bar?: true;
               foo?: boolean;
@@ -129,8 +128,8 @@ import {
         .option("-a, --age <age:number>", "description ...", { required: true })
         .option("-e, --email <email:string>", "description ...")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [string, string?, number?]>>(true);
-          assert<
+          assertType<IsExact<typeof args, [string, string?, number?]>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               debugLevel: "debug" | "info" | "warn" | "error";
@@ -151,8 +150,8 @@ import {
         .option("--main", "")
         .globalOption("--debug", "", {
           action: (options, ...args) => {
-            assert<IsExact<typeof args, []>>(true);
-            assert<
+            assertType<IsExact<typeof args, []>>(true);
+            assertType<
               IsExact<typeof options, {
                 debug?: true;
                 // logLevel?: true;
@@ -164,8 +163,8 @@ import {
         .option("--log-level", "", {
           global: true,
           action: (options, ...args) => {
-            assert<IsExact<typeof args, []>>(true);
-            assert<
+            assertType<IsExact<typeof args, []>>(true);
+            assertType<
               IsExact<typeof options, {
                 debug?: true;
                 logLevel?: true;
@@ -175,8 +174,8 @@ import {
           },
         })
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -189,8 +188,8 @@ import {
         .globalOption("--foo-global", "")
         .option("--foo", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -204,8 +203,8 @@ import {
         .globalOption("--bar-global", "")
         .option("--bar", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -224,8 +223,8 @@ import {
         .globalOption("--foo-global", "")
         .option("--foo", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -239,8 +238,8 @@ import {
         .globalOption("--foo-foo-global", "")
         .option("--foo-foo", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -258,8 +257,8 @@ import {
         .versionOption("--versionx", "", {
           global: true,
           action(options, ...args) {
-            assert<IsExact<typeof args, []>>(true);
-            assert<
+            assertType<IsExact<typeof args, []>>(true);
+            assertType<
               IsExact<typeof options, {
                 debug?: true;
                 logLevel?: true;
@@ -270,8 +269,8 @@ import {
           },
         })
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -288,8 +287,8 @@ import {
         .globalOption("--log-level", "")
         .option("--main", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [string, number?]>>(true);
-          assert<
+          assertType<IsExact<typeof args, [string, number?]>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -299,8 +298,8 @@ import {
         })
         .command("foo", foo)
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -311,8 +310,8 @@ import {
         })
         .command("bar", bar)
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               debug?: true;
               logLevel?: true;
@@ -344,8 +343,8 @@ import {
       const cmd = new Command()
         .globalOption("--main", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               main?: true;
             }>
@@ -353,8 +352,8 @@ import {
         })
         .command("1", new Command())
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               main?: true;
             }>
@@ -362,8 +361,8 @@ import {
         })
         .command("2", foo)
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               main?: true;
               foo?: true;
@@ -372,8 +371,8 @@ import {
         })
         .command("3", new Command())
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               main?: true;
             }>
@@ -491,8 +490,8 @@ import {
         .globalOption("--main", "...")
         .command("foo", new Foo())
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [string]>>(true);
-          assert<
+          assertType<IsExact<typeof args, [string]>>(true);
+          assertType<
             IsExact<typeof options, {
               main?: true;
               foo?: true;
@@ -528,8 +527,8 @@ import {
         .option("-f", "")
         .arguments("<arg1:color> [arg2:string]")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, ["red" | "blue", string?]>>(true);
-          assert<
+          assertType<IsExact<typeof args, ["red" | "blue", string?]>>(true);
+          assertType<
             IsExact<typeof options, {
               color?: true | "red" | "blue";
               num?: number | true;
@@ -549,8 +548,8 @@ import {
       new Command()
         .arguments("<...args:number>")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [number, ...Array<number>]>>(true);
-          assert<
+          assertType<IsExact<typeof args, [number, ...Array<number>]>>(true);
+          assertType<
             IsExact<typeof options, void>
           >(true);
         });
@@ -573,7 +572,7 @@ import {
           "<arg1> <arg2:string> <arg3:number> <arg4:boolean> [arg5] [arg6:string] [arg7:number] [arg8:boolean] [arg9:color] [...rest:lang[]]",
         )
         .action((options, ...args) => {
-          assert<
+          assertType<
             IsExact<typeof args, [
               string,
               string,
@@ -587,7 +586,7 @@ import {
               ...Array<Array<Lang>>,
             ]>
           >(true);
-          assert<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof options, void>>(true);
         });
     },
   });
@@ -602,7 +601,7 @@ import {
         .globalType("lang", langType)
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
-          assert<
+          assertType<
             IsExact<typeof args, [
               string,
               ("red" | "blue")?,
@@ -610,7 +609,7 @@ import {
             ]>
           >(true);
 
-          assert<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof options, void>>(true);
         });
     },
   });
@@ -621,8 +620,8 @@ import {
       new Command()
         .command("foo <val:number>")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [number]>>(true);
-          assert<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, [number]>>(true);
+          assertType<IsExact<typeof options, void>>(true);
         });
     },
   });
@@ -634,8 +633,8 @@ import {
       new Command()
         .command("foo <...val>")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, [string, ...Array<string>]>>(true);
-          assert<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, [string, ...Array<string>]>>(true);
+          assertType<IsExact<typeof options, void>>(true);
         });
     },
   });
@@ -650,7 +649,7 @@ import {
         .globalType("lang", langType)
         .command("foo <arg1:string> [arg2:color] [...rest:lang[]]")
         .action((options, ...args) => {
-          assert<
+          assertType<
             IsExact<typeof args, [
               string,
               ("red" | "blue")?,
@@ -658,7 +657,7 @@ import {
             ]>
           >(true);
 
-          assert<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof options, void>>(true);
         });
     },
   });
@@ -676,8 +675,8 @@ import {
         .env("FOO_BAR_BAZ=<val:number>", "", { required: true })
         .globalEnv("GLOBAL_FOO_BAR <val:lang>", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               globalFooBar?: "js" | "rust";
               fooBar?: "red" | "blue";
@@ -687,8 +686,8 @@ import {
         })
         .command("foo")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               globalFooBar?: "js" | "rust";
             }>
@@ -703,8 +702,8 @@ import {
       new Command()
         .env("FOO_BAR_BAZ=<val:string>", "", { prefix: "FOO_" })
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               barBaz?: string;
             }>
@@ -720,8 +719,8 @@ import {
         .option("--foo-bar <val:string> <val:boolean> [val:number]", "")
         .option("--foo-bar-baz=<val:string> [val:number]", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               fooBar?: [string, boolean, number?];
               fooBarBaz?: [string, number?];
@@ -738,8 +737,8 @@ import {
         .option("--foo-bar=<val:string>", "")
         .option("--foo-bar-baz=<val:string> [val:number]", "")
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               fooBar?: string;
               fooBarBaz?: [string, number?];
@@ -767,8 +766,8 @@ import {
         })
         .option("--one.two <val:string>", "...", { default: 4 })
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               foo?: string | true;
               bar: string | true | 4;
@@ -793,7 +792,7 @@ import {
           default: new Date(),
           global: true,
           value: (value) => {
-            assert<IsExact<typeof value, Date | [string, string?]>>(true);
+            assertType<IsExact<typeof value, Date | [string, string?]>>(true);
             return new Map<string, number>();
           },
         })
@@ -802,49 +801,49 @@ import {
           required: true,
           collect: true,
           value(value, val: Array<Date> = []) {
-            assert<IsExact<typeof value, RegExp | [string, string?]>>(true);
+            assertType<IsExact<typeof value, RegExp | [string, string?]>>(true);
             return [...val, new Date()];
           },
         })
         .option("--one.foo <val:string>", "...", {
           default: 4,
           value: (value) => {
-            assert<IsExact<typeof value, string | 4>>(true);
+            assertType<IsExact<typeof value, string | 4>>(true);
             return new Date();
           },
         })
         .option("--one.bar <val:string>", "...", {
           value: (value) => {
-            assert<IsExact<typeof value, string>>(true);
+            assertType<IsExact<typeof value, string>>(true);
             return /.*/;
           },
         })
         .option("--three.four <val:string>", "...", {
           value: (value) => {
-            assert<IsExact<typeof value, string>>(true);
+            assertType<IsExact<typeof value, string>>(true);
             return 2;
           },
         })
         .env("ENV_VAR=<val:number>", "...", {
           required: true,
           value(value) {
-            assert<IsExact<typeof value, number>>(true);
+            assertType<IsExact<typeof value, number>>(true);
             return new Date();
           },
         })
         .option("--env-var-2 <val:string>", "...", (value) => {
-          assert<IsExact<typeof value, string>>(true);
+          assertType<IsExact<typeof value, string>>(true);
           return new Date();
         })
         .env("ENV_VAR_2=<val:string>", "...", {
           value(value) {
-            assert<IsExact<typeof value, string>>(true);
+            assertType<IsExact<typeof value, string>>(true);
             return new Date();
           },
         })
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               beep: Map<string, number>;
               boop: Array<Date>;
@@ -881,8 +880,8 @@ import {
           // deno-lint-ignore no-inferrable-types
           value: (val: number, prev: number = 1) => val + prev,
           action(options, ...args) {
-            assert<IsExact<typeof args, []>>(true);
-            assert<
+            assertType<IsExact<typeof args, []>>(true);
+            assertType<
               IsExact<typeof options, {
                 beep?: Array<string>;
                 boop?: Array<number>;
@@ -900,8 +899,8 @@ import {
             // deno-lint-ignore no-inferrable-types
             value: (_: number | true, previus: number = 0) => ++previus,
             action(options, ...args) {
-              assert<IsExact<typeof args, []>>(true);
-              assert<
+              assertType<IsExact<typeof args, []>>(true);
+              assertType<
                 IsExact<typeof options, {
                   beep?: Array<string>;
                   boop?: Array<number>;
@@ -914,8 +913,8 @@ import {
           },
         )
         .action((options, ...args) => {
-          assert<IsExact<typeof args, []>>(true);
-          assert<
+          assertType<IsExact<typeof args, []>>(true);
+          assertType<
             IsExact<typeof options, {
               beep?: Array<string>;
               boop?: Array<number>;
@@ -939,7 +938,7 @@ import {
         .option("--no-remote", "No remote.")
         .option("--no-default-value", "No remote.", { default: 5 })
         .action((options) => {
-          assert<
+          assertType<
             IsExact<typeof options, {
               color: string | false;
               check: boolean;
@@ -964,8 +963,8 @@ import {
         .arguments("<foo:string> [bar:number]")
         .parse(["abc"]);
 
-      assert<IsExact<typeof args, [string, number?]>>(true);
-      assert<
+      assertType<IsExact<typeof args, [string, number?]>>(true);
+      assertType<
         IsExact<
           typeof cmd,
           Command<
@@ -989,8 +988,8 @@ import {
           >
         >
       >(true);
-      assert<IsExact<typeof literal, Array<string>>>(true);
-      assert<
+      assertType<IsExact<typeof literal, Array<string>>>(true);
+      assertType<
         IsExact<typeof options, {
           foo?: true;
           bar?: number;
@@ -1013,8 +1012,8 @@ import {
         .command("foo", "...")
         .parse(Deno.args);
 
-      assert<IsExact<typeof args, Array<unknown>>>(true);
-      assert<
+      assertType<IsExact<typeof args, Array<unknown>>>(true);
+      assertType<
         IsExact<
           typeof cmd,
           Command<
@@ -1029,8 +1028,8 @@ import {
           >
         >
       >(true);
-      assert<IsExact<typeof literal, Array<string>>>(true);
-      assert<IsExact<typeof options, Record<string, unknown>>>(true);
+      assertType<IsExact<typeof literal, Array<string>>>(true);
+      assertType<IsExact<typeof options, Record<string, unknown>>>(true);
     },
   });
 
@@ -1042,8 +1041,8 @@ import {
         .arguments("<val:string> [val:string]")
         .useRawArgs()
         .action((options, ...args) => {
-          assert<IsExact<typeof options, void>>(true);
-          assert<IsExact<typeof args, Array<string>>>(true);
+          assertType<IsExact<typeof options, void>>(true);
+          assertType<IsExact<typeof args, Array<string>>>(true);
         });
     },
   });
