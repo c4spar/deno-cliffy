@@ -35,9 +35,23 @@ export class CompleteCommand extends Command<
           await completion?.complete(completeCommand, parent) ?? [];
 
         if (result?.length) {
-          Deno.stdout.writeSync(new TextEncoder().encode(result.join("\n")));
+          writeSync(new TextEncoder().encode(result.join("\n")));
         }
       })
       .reset();
+  }
+}
+
+function writeSync(data: Uint8Array): void {
+  if ("Deno" in globalThis) {
+    // deno-lint-ignore no-explicit-any
+    (globalThis as any).Deno.stdout.writeSync(data);
+  } else if ("process" in globalThis) {
+    // deno-lint-ignore no-explicit-any
+    (globalThis as any).process.stdout.write(
+      (globalThis as any).Buffer.from(data),
+    );
+  } else {
+    throw new Error("unsupported runtime");
   }
 }

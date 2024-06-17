@@ -362,11 +362,15 @@ function capitalize(string: string): string {
 }
 
 function inspect(value: unknown, colors: boolean): string {
-  return Deno.inspect(
-    value,
-    // deno < 1.4.3 doesn't support the colors property.
-    { depth: 1, colors, trailingComma: false } as Deno.InspectOptions,
-  );
+  // deno-lint-ignore no-explicit-any
+  const { Deno } = globalThis as any;
+
+  return Deno
+    ? Deno.inspect(
+      value,
+      { depth: 1, colors, trailingComma: false },
+    )
+    : JSON.stringify(value, null, 2);
 }
 
 /**

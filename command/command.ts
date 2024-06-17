@@ -1113,7 +1113,7 @@ export class Command<
   }
 
   /**
-   * Throw validation errors instead of calling `Deno.exit()` to handle
+   * Throw validation errors instead of calling `exit()` to handle
    * validation errors manually.
    *
    * A validation error is thrown when the command is wrongly used by the user.
@@ -1165,7 +1165,7 @@ export class Command<
   }
 
   /**
-   * Same as `.throwErrors()` but also prevents calling `Deno.exit` after
+   * Same as `.throwErrors()` but also prevents calling `exit()` after
    * printing help or version with the --help and --version option.
    */
   public noExit(): this {
@@ -2049,7 +2049,7 @@ export class Command<
     names: readonly string[],
   ): Promise<{ name: string; value: string } | undefined> {
     for (const name of names) {
-      const status = await (globalThis).Deno?.permissions.query({
+      const status = await (globalThis as any).Deno?.permissions.query({
         name: "env",
         variable: name,
       });
@@ -2169,7 +2169,7 @@ export class Command<
 
   /**
    * Handle error. If `throwErrors` is enabled the error will be thrown,
-   * otherwise a formatted error message will be printed and `Deno.exit(1)`
+   * otherwise a formatted error message will be printed and `exit(1)`
    * will be called. This will also trigger registered error handlers.
    *
    * @param error The error to handle.
@@ -3031,9 +3031,17 @@ interface ParseOptionsOptions {
 }
 
 function getArgv(): Array<string> {
-  return "Deno" in globalThis ? (globalThis as any).Deno.args : "process" in globalThis ? (globalThis as any).process.argv.slice(2) : [];
+  return "Deno" in globalThis
+    ? (globalThis as any).Deno.args
+    : "process" in globalThis
+    ? (globalThis as any).process.argv.slice(2)
+    : [];
 }
 
 function getEnv(name: string): string | undefined {
-  return "Deno" in globalThis ? (globalThis as any).Deno.env.get(name) : "process" in globalThis ? (globalThis as any).process.env[name] : undefined;
+  return "Deno" in globalThis
+    ? (globalThis as any).Deno.env.get(name)
+    : "process" in globalThis
+    ? (globalThis as any).process.env[name]
+    : undefined;
 }
