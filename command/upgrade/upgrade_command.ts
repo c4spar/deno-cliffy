@@ -1,5 +1,6 @@
 import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
+import { exit } from "../_runtime/exit.ts";
 import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
@@ -10,7 +11,6 @@ import {
   type RuntimeOptionsMap,
   upgrade,
 } from "./upgrade.ts";
-import { exit } from "../_utils.ts";
 
 export interface UpgradeCommandOptions<
   TProvider extends Provider = Provider,

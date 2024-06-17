@@ -1,5 +1,5 @@
-import { Tty, tty } from "@cliffy/ansi/tty";
 import { type Cursor } from "@cliffy/ansi/cursor-position";
+import { Tty, tty } from "@cliffy/ansi/tty";
 import { KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
@@ -13,6 +13,7 @@ import {
 } from "@std/fmt/colors";
 import { Reader, WriterSync } from "@std/io/types";
 import { Figures } from "./_figures.ts";
+import { exit } from "./_runtime/exit.ts";
 
 /** Static generic prompt interface. */
 export interface StaticGenericPrompt<TValue, TOptions> {
@@ -451,16 +452,5 @@ function getColumns(): number | null {
     return Deno.consoleSize().columns ?? null;
   } catch (_error) {
     return null;
-  }
-}
-
-function exit(code: number): never {
-  const exit: (code: number) => never = (globalThis as any).Deno?.exit ??
-    (globalThis as any).process?.exit;
-
-  if (exit) {
-    exit(code);
-  } else {
-    throw new Error("unsupported runtime");
   }
 }

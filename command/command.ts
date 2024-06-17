@@ -5,14 +5,17 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "@cliffy/flags";
-import {
-  exit,
-  getDescription,
-  parseArgumentsDefinition,
-  splitArguments,
-  underscoreToCamelCase,
-} from "./_utils.ts";
 import { bold, brightBlue, red } from "@std/fmt/colors";
+import {
+  MapTypes,
+  MapValue,
+  MergeOptions,
+  TypedArguments,
+  TypedCommandArguments,
+  TypedEnv,
+  TypedOption,
+  TypedType,
+} from "./_argument_types.ts";
 import {
   CommandNotFoundError,
   DefaultCommandNotFoundError,
@@ -35,24 +38,18 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
+import { exit } from "./_runtime/exit.ts";
+import { getArgv } from "./_runtime/get-argv.ts";
+import { getEnv } from "./_runtime/get-env.ts";
 import { Merge, OneOf, ValueOf } from "./_type_utils.ts";
-import { BooleanType } from "./types/boolean.ts";
-import { FileType } from "./types/file.ts";
-import { IntegerType } from "./types/integer.ts";
-import { NumberType } from "./types/number.ts";
-import { StringType } from "./types/string.ts";
-import { Type } from "./type.ts";
-import { HelpGenerator, type HelpOptions } from "./help/_help_generator.ts";
 import {
-  MapTypes,
-  MapValue,
-  MergeOptions,
-  TypedArguments,
-  TypedCommandArguments,
-  TypedEnv,
-  TypedOption,
-  TypedType,
-} from "./_argument_types.ts";
+  getDescription,
+  parseArgumentsDefinition,
+  splitArguments,
+  underscoreToCamelCase,
+} from "./_utils.ts";
+import { HelpGenerator, type HelpOptions } from "./help/_help_generator.ts";
+import { Type } from "./type.ts";
 import type {
   ActionHandler,
   Argument,
@@ -79,6 +76,11 @@ import type {
   TypeOrTypeHandler,
   VersionHandler,
 } from "./types.ts";
+import { BooleanType } from "./types/boolean.ts";
+import { FileType } from "./types/file.ts";
+import { IntegerType } from "./types/integer.ts";
+import { NumberType } from "./types/number.ts";
+import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
 /**
@@ -3028,20 +3030,4 @@ interface ParseOptionsOptions {
   stopEarly?: boolean;
   stopOnUnknown?: boolean;
   dotted?: boolean;
-}
-
-function getArgv(): Array<string> {
-  return "Deno" in globalThis
-    ? (globalThis as any).Deno.args
-    : "process" in globalThis
-    ? (globalThis as any).process.argv.slice(2)
-    : [];
-}
-
-function getEnv(name: string): string | undefined {
-  return "Deno" in globalThis
-    ? (globalThis as any).Deno.env.get(name)
-    : "process" in globalThis
-    ? (globalThis as any).process.env[name]
-    : undefined;
 }

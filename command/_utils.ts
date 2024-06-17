@@ -1,9 +1,9 @@
-import { closestString } from "@std/text/closest-string";
 import {
   OptionType,
   UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
 } from "@cliffy/flags";
+import { closestString } from "@std/text/closest-string";
 import type { Command } from "./command.ts";
 import type { Argument } from "./types.ts";
 
@@ -196,15 +196,4 @@ export function underscoreToCamelCase(str: string): string {
       /_([a-z])/g,
       (g) => g[1].toUpperCase(),
     );
-}
-
-export function exit(code: number): never {
-  const exit: (code: number) => never = (globalThis as any).Deno?.exit ??
-    (globalThis as any).process?.exit;
-
-  if (exit) {
-    exit(code);
-  } else {
-    throw new Error("unsupported runtime");
-  }
 }

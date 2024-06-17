@@ -1,5 +1,6 @@
-import { Command } from "../command.ts";
 import { UnknownCompletionCommandError } from "../_errors.ts";
+import { writeSync } from "../_runtime/write_sync.ts";
+import { Command } from "../command.ts";
 import type { Completion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
@@ -39,19 +40,5 @@ export class CompleteCommand extends Command<
         }
       })
       .reset();
-  }
-}
-
-function writeSync(data: Uint8Array): void {
-  if ("Deno" in globalThis) {
-    // deno-lint-ignore no-explicit-any
-    (globalThis as any).Deno.stdout.writeSync(data);
-  } else if ("process" in globalThis) {
-    // deno-lint-ignore no-explicit-any
-    (globalThis as any).process.stdout.write(
-      (globalThis as any).Buffer.from(data),
-    );
-  } else {
-    throw new Error("unsupported runtime");
   }
 }

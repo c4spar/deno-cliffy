@@ -1,12 +1,5 @@
 import { Table } from "@cliffy/table";
 import {
-  dedent,
-  getDescription,
-  getFlag,
-  parseArgumentsDefinition,
-} from "../_utils.ts";
-import type { Command } from "../command.ts";
-import {
   bold,
   brightBlue,
   brightMagenta,
@@ -18,6 +11,14 @@ import {
   setColorEnabled,
   yellow,
 } from "@std/fmt/colors";
+import { inspect } from "../_runtime/inspect.ts";
+import {
+  dedent,
+  getDescription,
+  getFlag,
+  parseArgumentsDefinition,
+} from "../_utils.ts";
+import type { Command } from "../command.ts";
 import { Type } from "../type.ts";
 import type { Argument, EnvVar, Example, Option } from "../types.ts";
 
@@ -359,18 +360,6 @@ export class HelpGenerator {
 
 function capitalize(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function inspect(value: unknown, colors: boolean): string {
-  // deno-lint-ignore no-explicit-any
-  const { Deno } = globalThis as any;
-
-  return Deno
-    ? Deno.inspect(
-      value,
-      { depth: 1, colors, trailingComma: false },
-    )
-    : JSON.stringify(value, null, 2);
 }
 
 /**

@@ -1,5 +1,5 @@
 import { UnknownCommandError } from "../_errors.ts";
-import { exit } from "../_utils.ts";
+import { exit } from "../_runtime/exit.ts";
 import { Command } from "../command.ts";
 import { CommandType } from "../types/command.ts";
 import { checkVersion } from "../upgrade/_check_version.ts";
