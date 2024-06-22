@@ -1,4 +1,5 @@
 import { UnknownCommandError } from "../_errors.ts";
+import { exit } from "../_runtime/exit.ts";
 import { Command } from "../command.ts";
 import { CommandType } from "../types/command.ts";
 import { checkVersion } from "../upgrade/_check_version.ts";
@@ -29,7 +30,7 @@ export class HelpCommand
         await checkVersion(cmd);
         cmd.showHelp();
         if (this.shouldExit()) {
-          Deno.exit(0);
+          exit(0);
         }
       });
   }

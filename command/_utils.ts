@@ -1,9 +1,9 @@
-import { closestString } from "@std/text/closest-string";
 import {
   OptionType,
   UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
 } from "@cliffy/flags";
+import { closestString } from "@std/text/closest-string";
 import type { Command } from "./command.ts";
 import type { Argument } from "./types.ts";
 
