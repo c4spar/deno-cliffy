@@ -1,9 +1,6 @@
 export function getArgv(): Array<string> {
-  return "Deno" in globalThis
-    // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).Deno.args
-    : "process" in globalThis
-    // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).process.argv.slice(2)
-    : [];
+  // deno-lint-ignore no-explicit-any
+  const { Deno, process } = globalThis as any;
+
+  return Deno?.args ?? process?.argv.slice(2) ?? [];
 }

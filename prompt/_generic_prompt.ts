@@ -1,5 +1,5 @@
-import { type Cursor } from "@cliffy/ansi/cursor-position";
 import { Tty, tty } from "@cliffy/ansi/tty";
+import { type Cursor } from "@cliffy/ansi/cursor-position";
 import { KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
@@ -13,7 +13,6 @@ import {
 } from "@std/fmt/colors";
 import { Reader, WriterSync } from "@std/io/types";
 import { Figures } from "./_figures.ts";
-import { exit } from "./_runtime/exit.ts";
 
 /** Static generic prompt interface. */
 export interface StaticGenericPrompt<TValue, TOptions> {
@@ -317,7 +316,7 @@ export abstract class GenericPrompt<
       case event.name === "c" && event.ctrl:
         this.clear();
         this.settings.tty.cursorShow();
-        exit(130);
+        Deno.exit(130);
         return;
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
