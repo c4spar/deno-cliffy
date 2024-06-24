@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
+import { assertType, IsExact } from "@std/testing/types";
 import { Select } from "../select.ts";
 
 Deno.test("prompt select: value", async () => {
@@ -10,6 +11,23 @@ Deno.test("prompt select: value", async () => {
     options: [{ value: "value1" }, { value: "value2" }, "value3"],
   });
   assertEquals(result, "value2");
+});
+
+Deno.test("prompt select: object value", async () => {
+  Select.inject({ id: 1, name: "foo" });
+
+  const books = [
+    { id: 1, name: "foo" },
+    { id: 2, name: "bar" },
+  ];
+
+  const result = await Select.prompt({
+    message: "please select a book",
+    options: books.map((x) => ({ name: x.name, value: x })),
+  });
+
+  assertEquals(result, { id: 1, name: "foo" });
+  assertType<IsExact<typeof result, { id: number; name: string }>>(true);
 });
 
 Deno.test("prompt select: empty value", async () => {

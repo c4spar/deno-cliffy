@@ -15,6 +15,7 @@ import {
 } from "./_generic_list.ts";
 import { GenericPrompt } from "./_generic_prompt.ts";
 import { getFiguresByKeys } from "./_figures.ts";
+import { equal } from "@std/assert/equal";
 
 /** Select prompt options. */
 export interface SelectOptions<TValue>
@@ -23,7 +24,7 @@ export interface SelectOptions<TValue>
   keys?: SelectKeys;
   /** An array of child options. */
   options: Array<
-    | Extract<TValue, string | number>
+    // | Extract<TValue, string | number>
     | Extract<WidenType<TValue>, string | number>
     | SelectOption<TValue>
     | SelectOptionGroup<TValue>
@@ -158,7 +159,7 @@ export class Select<TValue> extends GenericList<
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static inject<TValue>(value: TValue): void {
     GenericPrompt.inject(value);
   }
 
@@ -238,7 +239,7 @@ export class Select<TValue> extends GenericList<
   protected validate(value: TValue): boolean | string {
     return this.options.findIndex((
       option: SelectOptionSettings<TValue> | SelectOptionGroupSettings<TValue>,
-    ) => isOption(option) && option.value === value) !== -1;
+    ) => isOption(option) && equal(option.value, value)) !== -1;
   }
 
   /**
