@@ -5,13 +5,17 @@ import {
   UnknownTypeError,
   ValidationError as FlagsValidationError,
 } from "@cliffy/flags";
-import {
-  getDescription,
-  parseArgumentsDefinition,
-  splitArguments,
-  underscoreToCamelCase,
-} from "./_utils.ts";
 import { bold, brightBlue, red } from "@std/fmt/colors";
+import {
+  MapTypes,
+  MapValue,
+  MergeOptions,
+  TypedArguments,
+  TypedCommandArguments,
+  TypedEnv,
+  TypedOption,
+  TypedType,
+} from "./_argument_types.ts";
 import {
   CommandNotFoundError,
   DefaultCommandNotFoundError,
@@ -34,24 +38,18 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
+import { exit } from "./_runtime/exit.ts";
+import { getArgv } from "./_runtime/get-argv.ts";
+import { getEnv } from "./_runtime/get-env.ts";
 import { Merge, OneOf, ValueOf } from "./_type_utils.ts";
-import { BooleanType } from "./types/boolean.ts";
-import { FileType } from "./types/file.ts";
-import { IntegerType } from "./types/integer.ts";
-import { NumberType } from "./types/number.ts";
-import { StringType } from "./types/string.ts";
-import { Type } from "./type.ts";
-import { HelpGenerator, type HelpOptions } from "./help/_help_generator.ts";
 import {
-  MapTypes,
-  MapValue,
-  MergeOptions,
-  TypedArguments,
-  TypedCommandArguments,
-  TypedEnv,
-  TypedOption,
-  TypedType,
-} from "./_argument_types.ts";
+  getDescription,
+  parseArgumentsDefinition,
+  splitArguments,
+  underscoreToCamelCase,
+} from "./_utils.ts";
+import { HelpGenerator, type HelpOptions } from "./help/_help_generator.ts";
+import { Type } from "./type.ts";
 import type {
   ActionHandler,
   Argument,
@@ -78,6 +76,11 @@ import type {
   TypeOrTypeHandler,
   VersionHandler,
 } from "./types.ts";
+import { BooleanType } from "./types/boolean.ts";
+import { FileType } from "./types/file.ts";
+import { IntegerType } from "./types/integer.ts";
+import { NumberType } from "./types/number.ts";
+import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
 /**
@@ -1112,7 +1115,7 @@ export class Command<
   }
 
   /**
-   * Throw validation errors instead of calling `Deno.exit()` to handle
+   * Throw validation errors instead of calling `exit()` to handle
    * validation errors manually.
    *
    * A validation error is thrown when the command is wrongly used by the user.
@@ -1164,7 +1167,7 @@ export class Command<
   }
 
   /**
-   * Same as `.throwErrors()` but also prevents calling `Deno.exit` after
+   * Same as `.throwErrors()` but also prevents calling `exit()` after
    * printing help or version with the --help and --version option.
    */
   public noExit(): this {
@@ -1668,7 +1671,7 @@ export class Command<
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
    */
   public parse(
-    args: string[] = Deno.args,
+    args: string[] = getArgv(),
   ): Promise<
     TParentCommand extends Command<any> ? CommandResult<
         Record<string, unknown>,
@@ -2048,13 +2051,13 @@ export class Command<
     names: readonly string[],
   ): Promise<{ name: string; value: string } | undefined> {
     for (const name of names) {
-      const status = await Deno.permissions.query({
+      const status = await (globalThis as any).Deno?.permissions.query({
         name: "env",
         variable: name,
       });
 
-      if (status.state === "granted") {
-        const value = Deno.env.get(name);
+      if (!status || status.state === "granted") {
+        const value = getEnv(name);
 
         if (value) {
           return { name, value };
@@ -2168,7 +2171,7 @@ export class Command<
 
   /**
    * Handle error. If `throwErrors` is enabled the error will be thrown,
-   * otherwise a formatted error message will be printed and `Deno.exit(1)`
+   * otherwise a formatted error message will be printed and `exit(1)`
    * will be called. This will also trigger registered error handlers.
    *
    * @param error The error to handle.
@@ -2186,7 +2189,7 @@ export class Command<
 
     console.error(red(`  ${bold("error")}: ${error.message}\n`));
 
-    Deno.exit(error instanceof ValidationError ? error.exitCode : 1);
+    exit(error instanceof ValidationError ? error.exitCode : 1);
   }
 
   /*****************************************************************************
@@ -2351,7 +2354,7 @@ export class Command<
 
   private exit(code = 0) {
     if (this.shouldExit()) {
-      Deno.exit(code);
+      exit(code);
     }
   }
 

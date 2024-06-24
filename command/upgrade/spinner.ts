@@ -1,20 +1,14 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+import { getNoColor } from "../_runtime/no_color.ts";
+import { writeSync } from "../_runtime/write_sync.ts";
+
 const encoder = new TextEncoder();
 
 const LINE_CLEAR = encoder.encode("\r\u001b[K"); // From cli/prompt_secret.ts
 const COLOR_RESET = "\u001b[0m";
 const DEFAULT_INTERVAL = 75;
 const DEFAULT_SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-
-const { Deno, process, Buffer } = globalThis as {
-  // deno-lint-ignore no-explicit-any
-  Deno?: Record<string, any>;
-  // deno-lint-ignore no-explicit-any
-  process?: Record<string, any>;
-  // deno-lint-ignore no-explicit-any
-  Buffer?: Record<string, any>;
-};
 
 /**
  * This is a hack to allow us to use the same type for both the color name and
@@ -76,16 +70,6 @@ export interface SpinnerOptions {
    * This can be changed while the spinner is active.
    */
   color?: Color;
-}
-
-function writeSync(writeData: Uint8Array): void {
-  if (Deno) {
-    return Deno.stdout.writeSync(writeData);
-  } else if (process && Buffer) {
-    process.stdout.write(Buffer.from(writeData));
-  } else {
-    throw new Error("unsupported runtime");
-  }
 }
 
 /**
@@ -213,13 +197,14 @@ export class Spinner {
    * ```
    */
   start() {
-    if (this.#active || Deno?.stdout.writable.locked) {
+    // deno-lint-ignore no-explicit-any
+    if (this.#active || (globalThis as any).Deno?.stdout.writable.locked) {
       return;
     }
 
     this.#active = true;
     let i = 0;
-    const noColor = Deno?.noColor ?? process?.env.NO_COLOR;
+    const noColor = getNoColor();
 
     // Updates the spinner after the given interval.
     const updateFrame = () => {

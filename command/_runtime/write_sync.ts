@@ -1,0 +1,13 @@
+export function writeSync(data: Uint8Array): number {
+  // deno-lint-ignore no-explicit-any
+  const { Deno, process } = globalThis as any;
+
+  if (Deno) {
+    return Deno.stdout.writeSync(data);
+  } else if (process) {
+    process.stdout.write(data);
+    return data.byteLength;
+  } else {
+    throw new Error("unsupported runtime");
+  }
+}

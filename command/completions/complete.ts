@@ -1,5 +1,6 @@
-import { Command } from "../command.ts";
 import { UnknownCompletionCommandError } from "../_errors.ts";
+import { writeSync } from "../_runtime/write_sync.ts";
+import { Command } from "../command.ts";
 import type { Completion } from "../types.ts";
 
 /** Execute auto completion method of command and action. */
@@ -35,7 +36,7 @@ export class CompleteCommand extends Command<
           await completion?.complete(completeCommand, parent) ?? [];
 
         if (result?.length) {
-          Deno.stdout.writeSync(new TextEncoder().encode(result.join("\n")));
+          writeSync(new TextEncoder().encode(result.join("\n")));
         }
       })
       .reset();

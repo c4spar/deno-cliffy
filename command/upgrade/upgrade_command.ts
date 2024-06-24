@@ -1,5 +1,6 @@
 import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
+import { exit } from "../_runtime/exit.ts";
 import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
@@ -90,7 +91,7 @@ export class UpgradeCommand extends Command {
               this.getMainCommand().getName(),
               this.getVersion(),
             );
-            Deno.exit(0);
+            exit(0);
           },
         },
       )
@@ -151,7 +152,7 @@ export class UpgradeCommand extends Command {
               !verbose && error instanceof Error ? error.message : error,
             );
             spinner?.stop();
-            Deno.exit(1);
+            exit(1);
           } finally {
             spinner?.stop();
           }
