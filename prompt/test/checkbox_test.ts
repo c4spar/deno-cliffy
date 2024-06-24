@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
+import { assertType, IsExact } from "@std/testing/types";
 import { Checkbox } from "../checkbox.ts";
 
 Deno.test("prompt checkbox: valid value", async () => {
@@ -17,7 +18,25 @@ Deno.test("prompt checkbox: empty value", async () => {
     message: "message",
     options: [{ value: "value1" }, { value: "value2" }, "value3"],
   });
+
   assertEquals(result, []);
+});
+
+Deno.test("prompt checkbox: object value", async () => {
+  Checkbox.inject([{ id: 1, name: "foo" }]);
+
+  const books = [
+    { id: 1, name: "foo" },
+    { id: 2, name: "bar" },
+  ];
+
+  const result = await Checkbox.prompt({
+    message: "please select a book",
+    options: books.map((x) => ({ name: x.name, value: x })),
+  });
+
+  assertEquals(result, [{ id: 1, name: "foo" }]);
+  assertType<IsExact<typeof result, Array<{ id: number; name: string }>>>(true);
 });
 
 Deno.test("prompt checkbox: invalid value", async () => {
