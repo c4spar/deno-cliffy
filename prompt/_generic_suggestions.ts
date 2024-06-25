@@ -105,6 +105,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   protected suggestionsIndex = -1;
   protected suggestionsOffset = 0;
   protected suggestions: Array<string | number> = [];
+  #envPermissions: Record<string, boolean> = {};
   #hasReadPermissions?: boolean;
 
   public getDefaultSettings(
@@ -168,6 +169,9 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       const status = await Deno.permissions.request({ name: "read" });
       // disable path completion if read permissions are denied.
       this.#hasReadPermissions = status.state === "granted";
+    }
+    if (this.#isFileModeEnabled()) {
+      await this.#expandInputValue(this.inputValue);
     }
     await this.match();
     return super.render();
@@ -411,7 +415,12 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   }
 
   async #completeValue() {
-    this.inputValue = await this.complete();
+    const inputValue = await this.complete();
+    this.setInputValue(inputValue);
+  }
+
+  private setInputValue(inputValue: string): void {
+    this.inputValue = inputValue;
     this.inputIndex = this.inputValue.length;
     this.suggestionsIndex = 0;
     this.suggestionsOffset = 0;
@@ -496,6 +505,44 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       }
     }
   }
+
+  async #expandInputValue(path: string): Promise<void> {
+    if (!path.startsWith("~")) {
+      return;
+    }
+    const envVar = getHomeDirEnvVar();
+    const hasEnvPermissions = await this.#hasEnvPermissions(envVar);
+
+    if (!hasEnvPermissions) {
+      return;
+    }
+    const homeDir = getHomeDir();
+
+    if (homeDir) {
+      path = path.replace("~", homeDir);
+      this.setInputValue(path);
+    }
+  }
+
+  async #hasEnvPermissions(variable: string): Promise<boolean> {
+    if (this.#envPermissions[variable]) {
+      return this.#envPermissions[variable];
+    }
+    const desc: Deno.PermissionDescriptor = {
+      name: "env",
+      variable,
+    };
+    const currentStatus = await Deno.permissions.query(desc);
+    this.#envPermissions[variable] = currentStatus.state === "granted";
+
+    if (!this.#envPermissions[variable]) {
+      this.clear();
+      const newStatus = await Deno.permissions.request(desc);
+      this.#envPermissions[variable] = newStatus.state === "granted";
+    }
+
+    return this.#envPermissions[variable];
+  }
 }
 
 function uniqueSuggestions(
@@ -536,4 +583,12 @@ async function listDir(
   return fileNames.sort(function (a, b) {
     return a.toLowerCase().localeCompare(b.toLowerCase());
   });
+}
+
+function getHomeDirEnvVar() {
+  return Deno.build.os === "windows" ? "USERPROFILE" : "HOME";
+}
+
+function getHomeDir(): string | undefined {
+  return Deno.env.get(getHomeDirEnvVar());
 }
