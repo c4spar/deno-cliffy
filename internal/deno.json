@@ -1,6 +1,6 @@
 {
   "name": "@cliffy/internal",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "exports": {
     "./runtime/exit": "./runtime/exit.ts",
     "./runtime/get-args": "./runtime/get_args.ts",

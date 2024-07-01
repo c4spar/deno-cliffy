@@ -1,3 +1,62 @@
+# [v1.0.0-rc.5](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.4...v1.0.0-rc.5) (Jul 1, 2024)
+
+### Features
+
+- add built-in `jsr` upgrade provider (rework) ( #692)
+  ([b976d26](https://github.com/c4spar/deno-cliffy/commit/b976d26))
+- publish to jsr.io ( #679)
+  ([ff14148](https://github.com/c4spar/deno-cliffy/commit/ff14148))
+- **ansi,keypress,prompt:** add support for node.js ( #720)
+  ([1e1c2e6](https://github.com/c4spar/deno-cliffy/commit/1e1c2e6))
+- **command:** add support for nodejs ( #693)
+  ([f81e895](https://github.com/c4spar/deno-cliffy/commit/f81e895))
+- **command:** add support for node and bun to upgrade command ( #705)
+  ([7011ada](https://github.com/c4spar/deno-cliffy/commit/7011ada))
+- **command:** support zsh fpath completion ( #703)
+  ([f770de2](https://github.com/c4spar/deno-cliffy/commit/f770de2))
+- **command:** add npm upgrade provider ( #701)
+  ([45dbe30](https://github.com/c4spar/deno-cliffy/commit/45dbe30))
+
+### Bug Fixes
+
+- **prompt:** expand input value if file suggestions are enabled ( #719)
+  ([e377f04](https://github.com/c4spar/deno-cliffy/commit/e377f04))
+- **prompt:** fix validation and return type of object option values for
+  checkbox and seleect prompt ( #718)
+  ([3e92792](https://github.com/c4spar/deno-cliffy/commit/3e92792))
+
+### Code Refactoring
+
+- **command:** add exports for completions and upgrade provider ( #700)
+  ([6d08b9a](https://github.com/c4spar/deno-cliffy/commit/6d08b9a))
+
+### Chore
+
+- replace conditional_type_checks with @std/testing/types ( #699)
+  ([2bc19f7](https://github.com/c4spar/deno-cliffy/commit/2bc19f7))
+- **ci:** enable `DENO_FUTURE` on ci ( #715)
+  ([318e2af](https://github.com/c4spar/deno-cliffy/commit/318e2af))
+- **ci:** upgrade codecov-action to v4 ( #708)
+  ([7a932da](https://github.com/c4spar/deno-cliffy/commit/7a932da))
+- **deps:** upgrade @std to latest version ( #721)
+  ([a6d2bc9](https://github.com/c4spar/deno-cliffy/commit/a6d2bc9))
+- **deps:** upgrade @std to latest version ( #714)
+  ([c74892b](https://github.com/c4spar/deno-cliffy/commit/c74892b))
+- **lint:** remove unused null coalescing operator ( #713)
+  ([da5d7b2](https://github.com/c4spar/deno-cliffy/commit/da5d7b2))
+
+### Unit/Integration Tests
+
+- **command:** add provider tests ( #706)
+  ([10d9254](https://github.com/c4spar/deno-cliffy/commit/10d9254))
+- **command,prompt:** fix tests ( #697)
+  ([fe9726d](https://github.com/c4spar/deno-cliffy/commit/fe9726d))
+
+### deps
+
+- **upgrade:** upgrade @std/* to latest version ( #704)
+  ([4e62e39](https://github.com/c4spar/deno-cliffy/commit/4e62e39))
+
 # [v1.0.0-rc.4](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.3...v1.0.0-rc.4) (Apr 7, 2024)
 
 ### BREAKING CHANGES
