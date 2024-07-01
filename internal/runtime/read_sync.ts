@@ -3,7 +3,12 @@ const { Deno, process, Buffer } = globalThis as any;
 const { readSync: readSyncNode } = process
   ? await import("node:fs")
   : { readSync: null };
-
+/**
+ * Read from stdin.
+ *
+ * @internal
+ * @param data Uint8Array to store the data.
+ */
 export function readSync(data: Uint8Array): number {
   if (Deno) {
     return Deno.stdout.readSync(data);

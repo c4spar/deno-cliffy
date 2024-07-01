@@ -1,3 +1,9 @@
+/**
+ * Get environment variable.
+ *
+ * @internal
+ * @param name The name of the environment variable.
+ */
 export function getEnv(name: string): string | undefined {
   // deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;

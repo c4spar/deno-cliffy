@@ -1,3 +1,9 @@
+/**
+ * Get directory list.
+ *
+ * @internal
+ * @param path Path to the directory.
+ */
 export async function readDir(path: string): Promise<Array<{ name: string }>> {
   // deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;

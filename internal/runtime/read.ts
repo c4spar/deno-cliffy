@@ -1,3 +1,9 @@
+/**
+ * Read from stdin.
+ *
+ * @internal
+ * @param data Uint8Array to store the data.
+ */
 export function read(data: Uint8Array): Promise<number | null> {
   // deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;

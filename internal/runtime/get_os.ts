@@ -1,3 +1,8 @@
+/**
+ * Get operating system name.
+ *
+ * @internal
+ */
 export function getOs():
   | "darwin"
   | "linux"

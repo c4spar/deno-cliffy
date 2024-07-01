@@ -1,3 +1,8 @@
+/**
+ * Returns the width of the console window.
+ *
+ * @internal
+ */
 export function getColumns(): number | null {
   try {
     // deno-lint-ignore no-explicit-any

@@ -1,3 +1,8 @@
+/**
+ * Inspect values.
+ *
+ * @internal
+ */
 export function inspect(value: unknown, colors: boolean): string {
   // deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;

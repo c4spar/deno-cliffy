@@ -1,3 +1,8 @@
+/**
+ * Checks if current process is a tty.
+ *
+ * @internal
+ */
 export function isTerminal(): boolean {
   // deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;

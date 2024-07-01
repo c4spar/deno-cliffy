@@ -1,3 +1,8 @@
+/**
+ * Checks if colors are enabled.
+ *
+ * @internal
+ */
 export function getNoColor(): boolean {
   // deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;

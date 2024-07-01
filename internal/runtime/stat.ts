@@ -1,3 +1,9 @@
+/**
+ * Get file info.
+ *
+ * @internal
+ * @param input Path to the file.
+ */
 export async function stat(input: string): Promise<{ isDirectory: boolean }> {
   // deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;

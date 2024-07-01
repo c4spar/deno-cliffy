@@ -1,5 +1,11 @@
 import { stat } from "./stat.ts";
 
+/**
+ * Check if given path is a directory.
+ *
+ * @internal
+ * @param path The file path.
+ */
 export async function isDirectory(path: string): Promise<boolean> {
   try {
     const { isDirectory } = await stat(path);
