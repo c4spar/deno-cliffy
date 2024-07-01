@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run --allow-net=localhost:8080,deno.land
 
 import { Command } from "../command/mod.ts";
-import { serve } from "@std/http/server";
 
 await new Command()
   .name("reverse-proxy")
@@ -14,9 +13,12 @@ await new Command()
     default: "localhost",
   })
   .arguments("[domain]")
-  .action(async ({ port, host }, domain = "deno.land") => {
+  .action(({ port, host }, domain = "deno.land") => {
     console.log(`Listening on http://${host}:${port}`);
-    await serve((req: Request) => {
+    Deno.serve({
+      hostname: host,
+      port,
+    }, (req: Request) => {
       const url = new URL(req.url);
       url.protocol = "https:";
       url.hostname = domain;
@@ -28,6 +30,6 @@ await new Command()
         method: req.method,
         body: req.body,
       });
-    }, { hostname: host, port });
+    });
   })
   .parse();
