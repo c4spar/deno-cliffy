@@ -1,4 +1,5 @@
 import { encodeBase64 } from "@std/encoding/base64";
+import { getOs } from "@cliffy/internal/runtime/get-os";
 
 /** Escape sequence: `\x1B` */
 const ESC = "\x1B";
@@ -170,7 +171,7 @@ export const clearScreen = "\u001Bc";
  * Clear the whole terminal, including scrollback buffer.
  * (Not just the visible part of it).
  */
-export const clearTerminal: string = Deno.build.os === "windows"
+export const clearTerminal: string = getOs() === "windows"
   ? `${eraseScreen}${CSI}0f`
   // 1. Erases the screen (Only done in case `2` is not supported)
   // 2. Erases the whole screen including scrollback buffer

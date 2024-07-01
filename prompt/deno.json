@@ -12,6 +12,5 @@
     "./secret": "./secret.ts",
     "./select": "./select.ts",
     "./toggle": "./toggle.ts"
-  },
-  "lock": false
+  }
 }

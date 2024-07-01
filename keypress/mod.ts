@@ -1,4 +1,6 @@
 import { KeyCode, parse } from "@cliffy/keycode";
+import { setRaw } from "@cliffy/internal/runtime/set-raw";
+import { read } from "@cliffy/internal/runtime/read";
 
 type KeyPressEventType = "keydown";
 
@@ -195,9 +197,8 @@ export class Keypress extends EventTarget
 
   #read = async (): Promise<void> => {
     const buffer = new Uint8Array(8);
-    // Deno.stdin.setRaw(true, { cbreak: true });
-    Deno.stdin.setRaw(true);
-    const nread: number | null = await Deno.stdin.read(buffer).catch(
+    setRaw(true);
+    const nread: number | null = await read(buffer).catch(
       (error) => {
         if (!this.#disposed) {
           this.dispose(error);
@@ -205,7 +206,7 @@ export class Keypress extends EventTarget
         return null;
       },
     );
-    Deno.stdin.setRaw(false);
+    setRaw(false);
 
     if (this.#disposed) {
       return;

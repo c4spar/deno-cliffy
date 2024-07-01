@@ -1,14 +1,16 @@
+import { readSync } from "@cliffy/internal/runtime/read-sync";
+import { setRaw } from "@cliffy/internal/runtime/set-raw";
+import { writeSync } from "@cliffy/internal/runtime/write-sync";
 import * as ansiEscapes from "./ansi_escapes.ts";
 import type { Chain } from "./chain.ts";
-import { Cursor, getCursorPosition } from "./cursor_position.ts";
-import { ReaderSync, WriterSync } from "@std/io/types";
+import { type Cursor, getCursorPosition } from "./cursor_position.ts";
+import type { ReaderSync, WriterSync } from "@std/io/types";
 
 /** Create new `Ansi` instance. */
 export interface TtyOptions {
   writer?: WriterSync;
   reader?: ReaderSync & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
-    isTerminal(): boolean;
   };
 }
 
@@ -51,8 +53,8 @@ const encoder = new TextEncoder();
 function factory(options?: TtyOptions): Tty {
   let result = "";
   let stack: Array<[Property, Args]> = [];
-  const writer = options?.writer ?? Deno.stdout;
-  const reader = options?.reader ?? Deno.stdin;
+  const writer = options?.writer ?? { writeSync };
+  const reader = options?.reader ?? { readSync, setRaw };
 
   const tty: Tty = function (
     this: TtyChain | undefined,

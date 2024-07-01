@@ -1,3 +1,5 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+
 const main = {
   ARROW_UP: "↑",
   ARROW_DOWN: "↓",
@@ -40,7 +42,7 @@ const win = {
 };
 
 /** Prompt icons. */
-export const Figures = Deno.build.os === "windows" ? win : main;
+export const Figures = getOs() === "windows" ? win : main;
 
 const keyMap: Record<string, keyof typeof Figures> = {
   up: "ARROW_UP",

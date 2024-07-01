@@ -38,9 +38,9 @@ import {
   UnknownCommandError,
   ValidationError,
 } from "./_errors.ts";
-import { exit } from "./_runtime/exit.ts";
-import { getArgv } from "./_runtime/get-argv.ts";
-import { getEnv } from "./_runtime/get-env.ts";
+import { exit } from "@cliffy/internal/runtime/exit";
+import { getArgs } from "@cliffy/internal/runtime/get-args";
+import { getEnv } from "@cliffy/internal/runtime/get-env";
 import { Merge, OneOf, ValueOf } from "./_type_utils.ts";
 import {
   getDescription,
@@ -1671,7 +1671,7 @@ export class Command<
    * @param args Command line args to parse. Ex: `cmd.parse( Deno.args )`
    */
   public parse(
-    args: string[] = getArgv(),
+    args: string[] = getArgs(),
   ): Promise<
     TParentCommand extends Command<any> ? CommandResult<
         Record<string, unknown>,

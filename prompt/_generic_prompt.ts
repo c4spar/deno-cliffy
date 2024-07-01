@@ -1,6 +1,6 @@
-import { Tty, tty } from "@cliffy/ansi/tty";
-import { type Cursor } from "@cliffy/ansi/cursor-position";
-import { KeyCode, parse } from "@cliffy/keycode";
+import type { Cursor } from "@cliffy/ansi/cursor-position";
+import { type Tty, tty } from "@cliffy/ansi/tty";
+import { type KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
   brightBlue,
@@ -11,8 +11,15 @@ import {
   stripAnsiCode,
   yellow,
 } from "@std/fmt/colors";
-import { Reader, WriterSync } from "@std/io/types";
+import type { Reader, WriterSync } from "@std/io/types";
+import { readSync } from "@cliffy/internal/runtime/read-sync";
+import { writeSync } from "@cliffy/internal/runtime/write-sync";
 import { Figures } from "./_figures.ts";
+import { exit } from "@cliffy/internal/runtime/exit";
+import { getColumns } from "@cliffy/internal/runtime/get-columns";
+import { isTerminal } from "@cliffy/internal/runtime/is-terminal";
+import { read } from "@cliffy/internal/runtime/read";
+import { setRaw } from "@cliffy/internal/runtime/set-raw";
 
 /** Static generic prompt interface. */
 export interface StaticGenericPrompt<TValue, TOptions> {
@@ -140,12 +147,12 @@ export abstract class GenericPrompt<
       ...options,
       tty: tty({
         // Stdin is only used by getCursorPosition which we don't need.
-        reader: Deno.stdin,
-        writer: options.writer ?? Deno.stdout,
+        reader: { readSync, setRaw },
+        writer: options.writer ?? { writeSync },
       }),
       cbreak: options.cbreak ?? false,
-      reader: options.reader ?? Deno.stdin,
-      writer: options.writer ?? Deno.stdout,
+      reader: options.reader ?? { read, setRaw, isTerminal },
+      writer: options.writer ?? { writeSync },
       pointer: options.pointer ?? brightBlue(Figures.POINTER_SMALL),
       prefix: options.prefix ?? yellow("? "),
       indent: options.indent ?? "",
@@ -316,7 +323,7 @@ export abstract class GenericPrompt<
       case event.name === "c" && event.ctrl:
         this.clear();
         this.settings.tty.cursorShow();
-        Deno.exit(130);
+        exit(130);
         return;
       case this.isKey(this.settings.keys, "submit", event):
         await this.submit();
@@ -442,14 +449,5 @@ export abstract class GenericPrompt<
       (typeof event.sequence !== "undefined" &&
         keyNames.indexOf(event.sequence) !== -1)
     );
-  }
-}
-
-function getColumns(): number | null {
-  try {
-    // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
-    return Deno.consoleSize().columns ?? null;
-  } catch (_error) {
-    return null;
   }
 }

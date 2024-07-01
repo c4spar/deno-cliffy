@@ -11,7 +11,7 @@ import {
   setColorEnabled,
   yellow,
 } from "@std/fmt/colors";
-import { inspect } from "../_runtime/inspect.ts";
+import { inspect } from "@cliffy/internal/runtime/inspect";
 import {
   dedent,
   getDescription,
