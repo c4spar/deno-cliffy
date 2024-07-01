@@ -17,6 +17,5 @@
     "./runtime/set-raw": "./runtime/set_raw.ts",
     "./runtime/stat": "./runtime/stat.ts",
     "./runtime/write-sync": "./runtime/write_sync.ts"
-  },
-  "lock": false
+  }
 }
