@@ -1,5 +1,5 @@
 import { UnknownCompletionCommandError } from "../_errors.ts";
-import { writeSync } from "../_runtime/write_sync.ts";
+import { writeSync } from "@cliffy/internal/runtime/write-sync";
 import { Command } from "../command.ts";
 import type { Completion } from "../types.ts";
 

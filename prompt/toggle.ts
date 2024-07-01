@@ -2,9 +2,9 @@ import type { KeyCode } from "@cliffy/keycode";
 import { dim, underline } from "@std/fmt/colors";
 import {
   GenericPrompt,
-  GenericPromptKeys,
-  GenericPromptOptions,
-  GenericPromptSettings,
+  type GenericPromptKeys,
+  type GenericPromptOptions,
+  type GenericPromptSettings,
 } from "./_generic_prompt.ts";
 
 /** Generic prompt options. */

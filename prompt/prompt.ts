@@ -1,15 +1,16 @@
 // deno-lint-ignore-file no-explicit-any ban-types
 
-import { Tty, tty } from "@cliffy/ansi/tty";
+import { type Tty, tty } from "@cliffy/ansi/tty";
 import {
   GenericPrompt,
-  GenericPromptOptions,
-  InferPromptOptions,
-  InferPromptValue,
-  StaticGenericPrompt,
+  type GenericPromptOptions,
+  type InferPromptOptions,
+  type InferPromptValue,
+  type StaticGenericPrompt,
 } from "./_generic_prompt.ts";
 import type { Select, SelectOptions } from "./select.ts";
 import type { Checkbox, CheckboxOptions } from "./checkbox.ts";
+import { writeSync } from "@cliffy/internal/runtime/write-sync";
 
 /**
  * Prompt options for the `prompt()` method.
@@ -512,7 +513,7 @@ class PromptList {
   ) {
     this.names = this.prompts.map((prompt) => prompt.name);
     this.tty = tty({
-      writer: options?.writer ?? Deno.stdout,
+      writer: options?.writer ?? { writeSync },
     });
   }
 

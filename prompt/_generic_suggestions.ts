@@ -1,20 +1,24 @@
 import type { KeyCode } from "@cliffy/keycode";
 import {
-  GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
-} from "./_generic_input.ts";
-import {
   bold,
   brightBlue,
   dim,
   stripAnsiCode,
   underline,
 } from "@std/fmt/colors";
-import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { dirname, join, normalize } from "@std/path";
+import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
+import {
+  GenericInput,
+  type GenericInputKeys,
+  type GenericInputPromptOptions,
+  type GenericInputPromptSettings,
+} from "./_generic_input.ts";
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { isDirectory } from "@cliffy/internal/runtime/is-directory";
+import { readDir } from "@cliffy/internal/runtime/read-dir";
+import { stat } from "@cliffy/internal/runtime/stat";
 
 /** Generic input prompt options. */
 export interface GenericSuggestionsOptions<TValue, TRawValue>
@@ -93,7 +97,7 @@ interface LocalStorage {
   setItem(key: string, value: string): void;
 }
 
-const sep = Deno.build.os === "windows" ? "\\" : "/";
+const sep = getOs() === "windows" ? "\\" : "/";
 
 /** Generic input prompt representation. */
 export abstract class GenericSuggestions<TValue, TRawValue>
@@ -166,9 +170,12 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
   protected async render(): Promise<void> {
     if (this.settings.files && this.#hasReadPermissions === undefined) {
-      const status = await Deno.permissions.request({ name: "read" });
+      // deno-lint-ignore no-explicit-any
+      const status = await (globalThis as any).Deno?.permissions.request({
+        name: "read",
+      });
       // disable path completion if read permissions are denied.
-      this.#hasReadPermissions = status.state === "granted";
+      this.#hasReadPermissions = !status || status.state === "granted";
     }
     if (this.#isFileModeEnabled()) {
       await this.#expandInputValue(this.inputValue);
@@ -222,7 +229,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       return [];
     }
 
-    const path = await Deno.stat(input)
+    const path = await stat(input)
       .then((file) => file.isDirectory ? input : dirname(input))
       .catch(() => dirname(input));
 
@@ -554,19 +561,13 @@ function uniqueSuggestions(
     self.indexOf(value) === index;
 }
 
-function isDirectory(path: string): Promise<boolean> {
-  return Deno.stat(path)
-    .then((file) => file.isDirectory)
-    .catch(() => false);
-}
-
 async function listDir(
   path: string,
   mode?: boolean | RegExp,
 ): Promise<Array<string>> {
   const fileNames: string[] = [];
 
-  for await (const file of Deno.readDir(path || ".")) {
+  for (const file of await readDir(path)) {
     if (
       mode === true && (file.name.startsWith(".") || file.name.endsWith("~"))
     ) {

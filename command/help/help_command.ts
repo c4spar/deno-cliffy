@@ -1,5 +1,5 @@
 import { UnknownCommandError } from "../_errors.ts";
-import { exit } from "../_runtime/exit.ts";
+import { exit } from "@cliffy/internal/runtime/exit";
 import { Command } from "../command.ts";
 import { CommandType } from "../types/command.ts";
 import { checkVersion } from "../upgrade/_check_version.ts";

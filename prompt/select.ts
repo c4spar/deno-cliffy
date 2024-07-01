@@ -2,14 +2,14 @@ import { WidenType } from "./_utils.ts";
 import { brightBlue, underline } from "@std/fmt/colors";
 import {
   GenericList,
-  GenericListKeys,
-  GenericListOption,
-  GenericListOptionGroup,
-  GenericListOptionGroupSettings,
-  GenericListOptions,
-  GenericListOptionSettings,
-  GenericListSeparatorOption,
-  GenericListSettings,
+  type GenericListKeys,
+  type GenericListOption,
+  type GenericListOptionGroup,
+  type GenericListOptionGroupSettings,
+  type GenericListOptions,
+  type GenericListOptionSettings,
+  type GenericListSeparatorOption,
+  type GenericListSettings,
   isOption,
   isOptionGroup,
 } from "./_generic_list.ts";

@@ -1,0 +1,22 @@
+{
+  "name": "@cliffy/internal",
+  "version": "1.0.0-rc.4",
+  "exports": {
+    "./runtime/exit": "./runtime/exit.ts",
+    "./runtime/get-args": "./runtime/get_args.ts",
+    "./runtime/get-columns": "./runtime/get_columns.ts",
+    "./runtime/get-env": "./runtime/get_env.ts",
+    "./runtime/get-os": "./runtime/get_os.ts",
+    "./runtime/inspect": "./runtime/inspect.ts",
+    "./runtime/is-directory": "./runtime/is_directory.ts",
+    "./runtime/is-terminal": "./runtime/is_terminal.ts",
+    "./runtime/no-color": "./runtime/no_color.ts",
+    "./runtime/read": "./runtime/read.ts",
+    "./runtime/read-dir": "./runtime/read_dir.ts",
+    "./runtime/read-sync": "./runtime/read_sync.ts",
+    "./runtime/set-raw": "./runtime/set_raw.ts",
+    "./runtime/stat": "./runtime/stat.ts",
+    "./runtime/write-sync": "./runtime/write_sync.ts"
+  },
+  "lock": false
+}

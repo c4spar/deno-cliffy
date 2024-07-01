@@ -2,9 +2,9 @@ import { GenericPrompt } from "./_generic_prompt.ts";
 import { underline } from "@std/fmt/colors";
 import {
   GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
+  type GenericInputKeys,
+  type GenericInputPromptOptions,
+  type GenericInputPromptSettings,
 } from "./_generic_input.ts";
 
 /** Secret prompt options. */

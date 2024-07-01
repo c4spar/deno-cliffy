@@ -1,3 +1,6 @@
+import { readSync } from "@cliffy/internal/runtime/read-sync";
+import { setRaw } from "@cliffy/internal/runtime/set-raw";
+import { writeSync } from "@cliffy/internal/runtime/write-sync";
 import { cursorPosition } from "./ansi_escapes.ts";
 import type { ReaderSync, WriterSync } from "@std/io/types";
 
@@ -12,7 +15,6 @@ export interface CursorPositionOptions {
   writer?: WriterSync;
   reader?: ReaderSync & {
     setRaw(mode: boolean, options?: Deno.SetRawOptions): void;
-    isTerminal(): boolean;
   };
 }
 
@@ -33,8 +35,8 @@ const decoder = new TextDecoder();
  */
 export function getCursorPosition(
   {
-    reader = Deno.stdin,
-    writer = Deno.stdout,
+    reader = { readSync, setRaw },
+    writer = { writeSync },
   }: CursorPositionOptions = {},
 ): Cursor {
   const data = new Uint8Array(8);
