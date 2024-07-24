@@ -304,7 +304,7 @@ let keyPress: Keypress;
  *
  * console.log("Press ctrl+c to exit.");
  *
- * for await (const event: KeyPressEvent of keypress()) {
+ * for await (const event of keypress()) {
  *   console.log(event);
  *
  *   if (event.ctrlKey && event.key === "c") {

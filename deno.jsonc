@@ -1,5 +1,5 @@
 {
-  "workspaces": [
+  "workspace": [
     "ansi",
     "command",
     "flags",

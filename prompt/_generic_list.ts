@@ -792,7 +792,10 @@ function matchOptions<
 
   for (const option of options) {
     if (isOptionGroup(option)) {
-      const children = matchOptions(searchInput, option.options)
+      const children = matchOptions<TValue, TOption, TGroup>(
+        searchInput,
+        option.options,
+      )
         .sort(sortByDistance);
 
       if (children.length) {
