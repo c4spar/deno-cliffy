@@ -1,4 +1,4 @@
-import { Direction } from "./cell.ts";
+import type { Direction } from "./cell.ts";
 
 /** Column options. */
 export interface ColumnOptions {

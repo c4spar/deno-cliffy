@@ -7,7 +7,7 @@ import {
   OptionNotCombinableError,
   UnknownOptionError,
 } from "./_errors.ts";
-import { ParseFlagsContext, ParseFlagsOptions } from "./types.ts";
+import type { ParseFlagsContext, ParseFlagsOptions } from "./types.ts";
 import type { ArgumentOptions, FlagOptions } from "./types.ts";
 
 /**

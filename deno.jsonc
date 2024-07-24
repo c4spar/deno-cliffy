@@ -1,5 +1,5 @@
 {
-  "workspaces": [
+  "workspace": [
     "ansi",
     "command",
     "flags",
@@ -15,7 +15,7 @@
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
-    "test": "CLIFFY_SNAPSHOT_CONFIG=deno.jsonc deno test --doc --allow-run=deno --allow-env --allow-read  --allow-write=./ --ignore=./CHANGELOG.md --parallel",
+    "test": "deno test --doc --allow-run=deno --allow-env --allow-read  --allow-write=./ --ignore=./CHANGELOG.md --parallel",
     "check:examples": "deno check examples/**/*.ts",
     "snapshot": "deno task test -- --update",
     "coverage": "deno task test --coverage=./dist/coverage/all/result && deno coverage --lcov ./dist/coverage/all/result > ./dist/coverage/all/cov.lcov",

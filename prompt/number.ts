@@ -2,9 +2,9 @@ import type { KeyCode } from "@cliffy/keycode";
 import { GenericPrompt } from "./_generic_prompt.ts";
 import {
   GenericSuggestions,
-  GenericSuggestionsKeys,
-  GenericSuggestionsOptions,
-  GenericSuggestionsSettings,
+  type GenericSuggestionsKeys,
+  type GenericSuggestionsOptions,
+  type GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
 import { parseNumber } from "./_utils.ts";
 

@@ -1,11 +1,15 @@
 import { ansi } from "@cliffy/ansi";
 import { assertEquals } from "@std/assert";
-import { assertType, IsExact } from "@std/testing/types";
-import { Checkbox, CheckboxOptions } from "../../checkbox.ts";
+import { assertType, type IsExact } from "@std/testing/types";
+import { Checkbox, type CheckboxOptions } from "../../checkbox.ts";
 import { Confirm } from "../../confirm.ts";
 import { Input } from "../../input.ts";
 import { Number } from "../../number.ts";
-import { prompt, PromptMiddleware, PromptOptions } from "../../prompt.ts";
+import {
+  prompt,
+  type PromptMiddleware,
+  type PromptOptions,
+} from "../../prompt.ts";
 import { Select } from "../../select.ts";
 import { Toggle } from "../../toggle.ts";
 import { snapshotTest } from "@cliffy/testing";

@@ -7,7 +7,7 @@ const event: KeyPressEvent = await keypress();
 console.log("Key pressed: %s", event.key);
 
 /** AsyncIterator */
-for await (const event: KeyPressEvent of keypress()) {
+for await (const event of keypress()) {
   console.log("Key pressed: %s", event.key);
   if (event.ctrlKey && event.key === "c") {
     console.log("exit");

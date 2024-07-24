@@ -1,9 +1,9 @@
 import { GenericPrompt } from "./_generic_prompt.ts";
 import {
   GenericSuggestions,
-  GenericSuggestionsKeys,
-  GenericSuggestionsOptions,
-  GenericSuggestionsSettings,
+  type GenericSuggestionsKeys,
+  type GenericSuggestionsOptions,
+  type GenericSuggestionsSettings,
 } from "./_generic_suggestions.ts";
 import { dim, underline } from "@std/fmt/colors";
 import { normalize } from "@std/path";

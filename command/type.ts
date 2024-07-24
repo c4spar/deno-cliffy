@@ -1,5 +1,5 @@
 import type { Command } from "./command.ts";
-import { TypeOrTypeHandler } from "./types.ts";
+import type { TypeOrTypeHandler } from "./types.ts";
 import type {
   ArgumentValue,
   CompleteHandlerResult,

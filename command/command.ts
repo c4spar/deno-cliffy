@@ -6,7 +6,7 @@ import {
   ValidationError as FlagsValidationError,
 } from "@cliffy/flags";
 import { bold, brightBlue, red } from "@std/fmt/colors";
-import {
+import type {
   MapTypes,
   MapValue,
   MergeOptions,
@@ -41,7 +41,7 @@ import {
 import { exit } from "@cliffy/internal/runtime/exit";
 import { getArgs } from "@cliffy/internal/runtime/get-args";
 import { getEnv } from "@cliffy/internal/runtime/get-env";
-import { Merge, OneOf, ValueOf } from "./_type_utils.ts";
+import type { Merge, OneOf, ValueOf } from "./_type_utils.ts";
 import {
   getDescription,
   parseArgumentsDefinition,

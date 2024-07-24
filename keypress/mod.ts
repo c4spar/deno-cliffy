@@ -1,4 +1,4 @@
-import { KeyCode, parse } from "@cliffy/keycode";
+import { type KeyCode, parse } from "@cliffy/keycode";
 import { setRaw } from "@cliffy/internal/runtime/set-raw";
 import { read } from "@cliffy/internal/runtime/read";
 
@@ -304,7 +304,7 @@ let keyPress: Keypress;
  *
  * console.log("Press ctrl+c to exit.");
  *
- * for await (const event: KeyPressEvent of keypress()) {
+ * for await (const event of keypress()) {
  *   console.log(event);
  *
  *   if (event.ctrlKey && event.key === "c") {
