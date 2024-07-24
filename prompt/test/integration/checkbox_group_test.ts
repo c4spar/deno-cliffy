@@ -21,6 +21,7 @@ await snapshotTest({
         .cursorDown
         .cursorDown
         .cursorForward
+        .cursorForward
         .cursorDown
         .text(" ")
         .text("\n")

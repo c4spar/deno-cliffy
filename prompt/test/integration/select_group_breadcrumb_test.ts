@@ -16,6 +16,12 @@ await snapshotTest({
         .text("\n")
         .text("\n")
         .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
         .toArray(),
     },
   },
@@ -56,6 +62,12 @@ await snapshotTest({
   steps: {
     "should render breadcrumb": {
       stdin: ansi
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
+        .text("\n")
         .text("\n")
         .text("\n")
         .text("\n")

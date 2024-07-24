@@ -335,7 +335,7 @@ export abstract class GenericList<
   protected submitGroupOption(selectedOption: TGroup) {
     this.parentOptions.push(selectedOption);
     this.match();
-    this.listIndex = 1;
+    this.listIndex = 0;
   }
 
   protected isBackButton(option: TOption | TGroup | undefined): boolean {
@@ -584,10 +584,13 @@ export abstract class GenericList<
     if (
       this.isKey(this.settings.keys, "open", event) &&
       isOptionGroup(this.selectedOption) &&
-      !this.isBackButton(this.selectedOption) &&
       !this.isSearchSelected()
     ) {
-      this.submitGroupOption(this.selectedOption);
+      if (this.isBackButton(this.selectedOption)) {
+        this.selectNext();
+      } else {
+        this.submitGroupOption(this.selectedOption);
+      }
     } else if (
       this.isKey(this.settings.keys, "back", event) &&
       (this.isBackButton(this.selectedOption) || event.name === "escape") &&
