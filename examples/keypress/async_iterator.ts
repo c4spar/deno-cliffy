@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
-import { keypress, KeyPressEvent } from "../../keypress/mod.ts";
+import { keypress } from "../../keypress/mod.ts";
 
-for await (const event: KeyPressEvent of keypress()) {
+for await (const event of keypress()) {
   console.log(
     "type: %s, key: %s, ctrl: %s, meta: %s, shift: %s, alt: %s, repeat: %s",
     event.type,
