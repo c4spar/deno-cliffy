@@ -174,14 +174,6 @@ async function executeTest(
       denoArgs = options.denoArgs;
     } else {
       denoArgs = ["--allow-env=SNAPSHOT_TEST_NAME"];
-
-      // workaround for https://github.com/denoland/deno/issues/22020
-      const snapshotConfigPath = await getEnvIfGranted(
-        "CLIFFY_SNAPSHOT_CONFIG",
-      );
-      if (snapshotConfigPath) {
-        denoArgs.push(`--config=${snapshotConfigPath}`);
-      }
     }
 
     const cmd = new Deno.Command("deno", {
