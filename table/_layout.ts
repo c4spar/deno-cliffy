@@ -1,7 +1,7 @@
 import type { Column } from "./column.ts";
-import { Cell, CellType, Direction } from "./cell.ts";
+import { Cell, type CellType, type Direction } from "./cell.ts";
 import { consumeChars, consumeWords } from "./consume_words.ts";
-import { Row, RowType } from "./row.ts";
+import { Row, type RowType } from "./row.ts";
 import type { BorderOptions, Table, TableSettings } from "./table.ts";
 import { getUnclosedAnsiRuns, longest, strLength } from "./_utils.ts";
 

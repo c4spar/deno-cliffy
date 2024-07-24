@@ -1,4 +1,4 @@
-import { Cell, CellType, Direction } from "./cell.ts";
+import { Cell, type CellType, type Direction } from "./cell.ts";
 
 /** Allowed row type. */
 export type RowType<

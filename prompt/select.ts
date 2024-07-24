@@ -1,4 +1,4 @@
-import { WidenType } from "./_utils.ts";
+import type { WidenType } from "./_utils.ts";
 import { brightBlue, underline } from "@std/fmt/colors";
 import {
   GenericList,

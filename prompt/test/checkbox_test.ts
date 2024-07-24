@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
-import { assertType, IsExact } from "@std/testing/types";
+import { assertType, type IsExact } from "@std/testing/types";
 import { Checkbox } from "../checkbox.ts";
 
 Deno.test("prompt checkbox: valid value", async () => {

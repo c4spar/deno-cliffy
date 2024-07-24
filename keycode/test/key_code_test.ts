@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { KeyCode, parse } from "../key_code.ts";
+import { type KeyCode, parse } from "../key_code.ts";
 import {
   KeyMap,
   KeyMapCtrl,

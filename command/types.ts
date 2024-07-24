@@ -8,7 +8,7 @@ import type {
   TypeHandler,
   ValueHandler,
 } from "@cliffy/flags";
-import { MapTypes } from "./_argument_types.ts";
+import type { MapTypes } from "./_argument_types.ts";
 import type { ValidationError } from "./_errors.ts";
 import type { Command } from "./command.ts";
 import type { HelpOptions } from "./help/_help_generator.ts";

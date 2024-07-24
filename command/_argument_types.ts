@@ -1,19 +1,19 @@
 // deno-lint-ignore-file no-explicit-any
-import { Spread } from "./_spread.ts";
-import {
+import type { Spread } from "./_spread.ts";
+import type {
   CamelCase,
   Merge,
   MergeRecursive,
   TrimLeft,
   TrimRight,
 } from "./_type_utils.ts";
-import { Type } from "./type.ts";
-import { TypeOrTypeHandler } from "./types.ts";
-import { BooleanType } from "./types/boolean.ts";
-import { FileType } from "./types/file.ts";
-import { IntegerType } from "./types/integer.ts";
-import { NumberType } from "./types/number.ts";
-import { StringType } from "./types/string.ts";
+import type { Type } from "./type.ts";
+import type { TypeOrTypeHandler } from "./types.ts";
+import type { BooleanType } from "./types/boolean.ts";
+import type { FileType } from "./types/file.ts";
+import type { IntegerType } from "./types/integer.ts";
+import type { NumberType } from "./types/number.ts";
+import type { StringType } from "./types/string.ts";
 
 type DefaultTypes = {
   number: NumberType;

@@ -1,4 +1,4 @@
-import { KeyCode, parse } from "@cliffy/keycode";
+import { type KeyCode, parse } from "@cliffy/keycode";
 import { setRaw } from "@cliffy/internal/runtime/set-raw";
 import { read } from "@cliffy/internal/runtime/read";
 

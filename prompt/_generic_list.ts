@@ -1,11 +1,11 @@
 import type { KeyCode } from "@cliffy/keycode";
 import {
   GenericInput,
-  GenericInputKeys,
-  GenericInputPromptOptions,
-  GenericInputPromptSettings,
+  type GenericInputKeys,
+  type GenericInputPromptOptions,
+  type GenericInputPromptSettings,
 } from "./_generic_input.ts";
-import { WidenType } from "./_utils.ts";
+import type { WidenType } from "./_utils.ts";
 import { bold, brightBlue, dim, stripAnsiCode, yellow } from "@std/fmt/colors";
 import { levenshteinDistance } from "@std/text/levenshtein-distance";
 import { Figures, getFiguresByKeys } from "./_figures.ts";
