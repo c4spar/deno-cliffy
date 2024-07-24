@@ -13,7 +13,7 @@ export async function checkVersion(cmd: Command<any>): Promise<void> {
   const latestVersion = await upgradeCommand.getLatestVersion();
   const currentVersion = mainCommand.getVersion();
 
-  if (currentVersion === latestVersion) {
+  if (!currentVersion || currentVersion === latestVersion) {
     return;
   }
   const versionHelpText =
