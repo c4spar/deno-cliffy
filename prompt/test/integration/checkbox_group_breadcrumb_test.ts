@@ -16,6 +16,13 @@ await snapshotTest({
         .cursorForward
         .cursorForward
         .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
         .text(" ")
         .text("\n")
         .text("\n")
@@ -59,6 +66,13 @@ await snapshotTest({
   steps: {
     "should render breadcrumb": {
       stdin: ansi
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
+        .cursorForward
         .cursorForward
         .cursorForward
         .cursorForward

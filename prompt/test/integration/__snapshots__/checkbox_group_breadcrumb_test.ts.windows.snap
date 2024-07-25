@@ -5,20 +5,41 @@ stdout:
 "? Select an option
 ❯ × 📁 Foo\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo
+   × 📁 Bar\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo
  ❯ × 📁 Bar\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo » Bar
+   × 📁 Baz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo » Bar
  ❯ × 📁 Baz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo » Bar » Baz
+   × 📁 Beep\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo » Bar » Baz
  ❯ × 📁 Beep\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo » Bar » Baz » Beep
+   × 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo » Bar » Baz » Beep
  ❯ × 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo » .. » Baz » Beep » Boop
+   × 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo » .. » Baz » Beep » Boop
  ❯ × 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo » .. » Beep » Boop » Fiz
+   × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  × 📂 Foo » .. » Beep » Boop » Fiz
+ ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo » .. » Beep » Boop » Fiz
  ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
@@ -43,20 +64,41 @@ stdout:
 "? Select an option
 ❯ × 📁 Foo\\x1b[1A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo
+   × 📁 Bar\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo
  ❯ × 📁 Bar\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo # Bar
+   × 📁 Baz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo # Bar
  ❯ × 📁 Baz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo # Bar # Baz
+   × 📁 Beep\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo # Bar # Baz
  ❯ × 📁 Beep\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo # Bar # Baz # Beep
+   × 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo # Bar # Baz # Beep
  ❯ × 📁 Boop\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ × 📂 Foo # .. # Baz # Beep # Boop
+   × 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   × 📂 Foo # .. # Baz # Beep # Boop
  ❯ × 📁 Fiz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+❮ × 📂 Foo # .. # Beep # Boop # Fiz
+   × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
+  × 📂 Foo # .. # Beep # Boop # Fiz
+ ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
   × 📂 Foo # .. # Beep # Boop # Fiz
  ❯ × Faz\\x1b[2A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J

@@ -13,6 +13,7 @@ await snapshotTest({
         .cursorDown
         .text("\n")
         .text("\n")
+        .text("\n")
         .toArray(),
     },
   },

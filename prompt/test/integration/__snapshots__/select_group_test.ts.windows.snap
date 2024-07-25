@@ -15,6 +15,10 @@ stdout:
   Bar
 ❯ 📁 Baz\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
 ? Select an option
+❮ 📂 Baz
+   Beep
+   Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
+? Select an option
   📂 Baz
  ❯ Beep
    Boop\\x1b[3A\\x1b[0G\\x1b[?25l\\x1b[G\\x1b[0J
