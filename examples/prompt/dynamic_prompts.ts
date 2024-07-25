@@ -1,9 +1,9 @@
 #!/usr/bin/env -S deno run
 
-import { prompt } from "../../prompt/prompt.ts";
-import { Checkbox } from "../../prompt/checkbox.ts";
-import { Confirm } from "../../prompt/confirm.ts";
-import { Number } from "../../prompt/number.ts";
+import { prompt } from "@cliffy/prompt";
+import { Checkbox } from "@cliffy/prompt/checkbox";
+import { Confirm } from "@cliffy/prompt/confirm";
+import { Number } from "@cliffy/prompt/number";
 
 const result = await prompt([{
   name: "animals",

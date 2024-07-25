@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { keypress } from "../../keypress/mod.ts";
+import { keypress } from "@cliffy/keypress";
 
 for await (const event of keypress()) {
   console.log(

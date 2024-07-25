@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command, StringType } from "../../command/mod.ts";
+import { Command, StringType } from "@cliffy/command";
 
 class EmailType extends StringType {
   complete(): string[] {

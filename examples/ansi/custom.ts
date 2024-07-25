@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-net=deno.land
 
 import { rgb24 } from "@std/fmt/colors";
-import { tty } from "../../ansi/tty.ts";
+import { tty } from "@cliffy/ansi/tty";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();

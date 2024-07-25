@@ -1,4 +1,4 @@
-import { Command } from "../../command/command.ts";
+import { Command } from "@cliffy/command";
 
 const cmd = new Command()
   .option("-p, --pizza-type <type>", "Flavour of pizza.")

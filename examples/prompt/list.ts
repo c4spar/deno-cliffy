@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { List } from "../../prompt/list.ts";
+import { List } from "@cliffy/prompt/list";
 
 const keywords: string[] = await List.prompt("Enter some keywords");
 

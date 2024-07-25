@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { List } from "../../prompt/list.ts";
+import { List } from "@cliffy/prompt/list";
 import { colors } from "./data/colors.ts";
 
 const colorNames: Array<string> = Object.keys(colors);

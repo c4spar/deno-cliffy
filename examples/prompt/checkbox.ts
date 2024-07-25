@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Checkbox } from "../../prompt/checkbox.ts";
+import { Checkbox } from "@cliffy/prompt/checkbox";
 
 const title: Array<string> = await Checkbox.prompt({
   message: "Pick some books",

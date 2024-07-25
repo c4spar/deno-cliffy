@@ -1,10 +1,10 @@
 #!/usr/bin/env -S deno run
 
-import { prompt, PromptOptions } from "../../prompt/prompt.ts";
-import { Input } from "../../prompt/input.ts";
-import { Number } from "../../prompt/number.ts";
-import { Confirm } from "../../prompt/confirm.ts";
-import { Checkbox } from "../../prompt/checkbox.ts";
+import { prompt, PromptOptions } from "@cliffy/prompt";
+import { Input } from "@cliffy/prompt/input";
+import { Number } from "@cliffy/prompt/number";
+import { Confirm } from "@cliffy/prompt/confirm";
+import { Checkbox } from "@cliffy/prompt/checkbox";
 
 const animalsPrompt: PromptOptions<
   "animals",

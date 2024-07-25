@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Secret } from "../../prompt/secret.ts";
+import { Secret } from "@cliffy/prompt/secret";
 
 const password: string = await Secret.prompt({
   message: "Enter your password",

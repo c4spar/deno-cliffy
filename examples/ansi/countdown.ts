@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-net=deno.land
 
-import { colors } from "../../ansi/colors.ts";
-import { tty } from "../../ansi/tty.ts";
+import { colors } from "@cliffy/ansi/colors";
+import { tty } from "@cliffy/ansi/tty";
 
 for await (const i of [3, 2, 1]) {
   console.log(i);

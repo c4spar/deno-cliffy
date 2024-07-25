@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run -A
 
-import { Command } from "../../command/command.ts";
+import { Command } from "@cliffy/command";
 
 await new Command()
   .env(

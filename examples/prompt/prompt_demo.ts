@@ -1,15 +1,15 @@
 #!/usr/bin/env -S deno run
 
+import { prompt } from "@cliffy/prompt";
+import { Checkbox } from "@cliffy/prompt/checkbox";
+import { Input } from "@cliffy/prompt/input";
+import { List } from "@cliffy/prompt/list";
+import { Number } from "@cliffy/prompt/number";
+import { Secret } from "@cliffy/prompt/secret";
+import { Select } from "@cliffy/prompt/select";
+import { Toggle } from "@cliffy/prompt/toggle";
+import { tty } from "@cliffy/ansi/tty";
 import { rgb24 } from "@std/fmt/colors";
-import { tty } from "../../ansi/tty.ts";
-import { prompt } from "../../prompt/prompt.ts";
-import { Checkbox } from "../../prompt/checkbox.ts";
-import { Input } from "../../prompt/input.ts";
-import { List } from "../../prompt/list.ts";
-import { Number } from "../../prompt/number.ts";
-import { Secret } from "../../prompt/secret.ts";
-import { Select } from "../../prompt/select.ts";
-import { Toggle } from "../../prompt/toggle.ts";
 import { colors } from "./data/colors.ts";
 import { firstNames } from "./data/first_names.ts";
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell } from "../../table/cell.ts";
-import { Row } from "../../table/row.ts";
-import { Table } from "../../table/table.ts";
+import { Cell, Row, Table } from "@cliffy/table";
 
 new Table()
   .header(Row.from(["Name", "Date", "City", "Country"]).border())

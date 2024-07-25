@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command, EnumType } from "../../command/mod.ts";
+import { Command, EnumType } from "@cliffy/command";
 
 await new Command()
   .globalType("color", new EnumType(["red", "blue", "yellow"]))
