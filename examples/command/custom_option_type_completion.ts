@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
+import { Command } from "@cliffy/command";
 
 await new Command()
   .option("-e, --email <value:string:email>", "Your email address.")

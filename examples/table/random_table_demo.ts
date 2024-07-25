@@ -1,5 +1,7 @@
 #!/usr/bin/env -S deno run
 
+import { Cell, CellType, Table } from "@cliffy/table";
+import { tty } from "@cliffy/ansi/tty";
 import {
   blue,
   bold,
@@ -12,9 +14,6 @@ import {
   underline,
   yellow,
 } from "@std/fmt/colors";
-import { tty } from "../../ansi/tty.ts";
-import { Cell, CellType } from "../../table/cell.ts";
-import { Table } from "../../table/table.ts";
 
 tty.cursorHide();
 

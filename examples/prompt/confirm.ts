@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Confirm } from "../../prompt/confirm.ts";
+import { Confirm } from "@cliffy/prompt/confirm";
 
 const confirmed: boolean = await Confirm.prompt("Can you confirm?");
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags, ValidationError } from "../../flags/mod.ts";
+import { parseFlags, ValidationError } from "@cliffy/flags";
 
 try {
   const flags = parseFlags(Deno.args, {

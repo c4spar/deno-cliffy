@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/mod.ts";
+import { Command } from "@cliffy/command";
 
 await new Command()
   .command("rmdir <dirs...:string>", "Remove directories.")

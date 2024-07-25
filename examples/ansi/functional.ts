@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { cursorTo, eraseDown, image, link } from "../../ansi/ansi_escapes.ts";
+import { cursorTo, eraseDown, image, link } from "@cliffy/ansi/ansi-escapes";
 
 const response = await fetch("https://deno.land/images/hashrock_simple.png");
 const imageBuffer: ArrayBuffer = await response.arrayBuffer();

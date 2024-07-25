@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
+import { Command } from "@cliffy/command";
 
 const { options } = await new Command()
   .option("-u, --audio-codec <type:string>", "description ...")

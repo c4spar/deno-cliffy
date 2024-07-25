@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell, Table } from "../table/mod.ts";
+import { Cell, Table } from "@cliffy/table";
 
 const table = new Table(
   [

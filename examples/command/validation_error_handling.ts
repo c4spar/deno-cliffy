@@ -1,4 +1,4 @@
-import { Command, ValidationError } from "../../command/mod.ts";
+import { Command, ValidationError } from "@cliffy/command";
 
 const cmd = new Command()
   .throwErrors() // <-- throw also validation errors.

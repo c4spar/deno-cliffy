@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { ArgumentValue, Command } from "../../command/mod.ts";
+import { ArgumentValue, Command } from "@cliffy/command";
 
 const colors = ["red", "blue", "yellow"];
 

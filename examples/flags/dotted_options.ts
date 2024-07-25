@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { parseFlags } from "../../flags/flags.ts";
+import { parseFlags } from "@cliffy/flags";
 
 const result = parseFlags(Deno.args, {
   allowEmpty: true,

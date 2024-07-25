@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
-import { EnumType } from "../../command/types/enum.ts";
+import { Command, EnumType } from "@cliffy/command";
 
 enum Animal {
   Dog = "dog",

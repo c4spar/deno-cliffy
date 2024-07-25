@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { colors } from "../../ansi/colors.ts";
+import { colors } from "@cliffy/ansi/colors";
 
 // Define theme colors.
 const error = colors.bold.red;

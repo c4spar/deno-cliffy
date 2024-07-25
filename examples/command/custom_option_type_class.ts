@@ -1,11 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import {
-  ArgumentValue,
-  Command,
-  Type,
-  ValidationError,
-} from "../../command/mod.ts";
+import { ArgumentValue, Command, Type, ValidationError } from "@cliffy/command";
 
 class ColorType extends Type<string> {
   private readonly colors = ["red", "blue", "yellow"];

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
+import { Command } from "@cliffy/command";
 import { red } from "@std/fmt/colors";
-import { Command } from "../../command/command.ts";
 
 await new Command()
   .name("examples")

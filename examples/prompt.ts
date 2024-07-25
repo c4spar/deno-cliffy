@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Confirm, Input, Number, Secret } from "../prompt/mod.ts";
+import { Confirm, Input, Number, Secret } from "@cliffy/prompt";
 
 let hostname: string, port: number, password: string;
 

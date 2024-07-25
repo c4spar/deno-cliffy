@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { tty } from "../../ansi/tty.ts";
-import { Toggle } from "../../prompt/toggle.ts";
+import { tty } from "@cliffy/ansi/tty";
+import { Toggle } from "@cliffy/prompt/toggle";
 
 Deno.addSignalListener("SIGINT", () => {
   tty.cursorLeft.eraseDown.cursorShow();

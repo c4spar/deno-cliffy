@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "../../command/command.ts";
+import { Command } from "@cliffy/command";
 
 // Sub-command implemented using action handler (description is supplied separately to `.command()`)
 await new Command()

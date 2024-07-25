@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell } from "../../table/cell.ts";
-import { Table } from "../../table/table.ts";
+import { Cell, Table } from "@cliffy/table";
 
 Table.from([
   [
