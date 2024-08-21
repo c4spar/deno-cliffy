@@ -36,8 +36,11 @@ jobs:
         with:
           bun-version: canary
 
+      - name: Enable corepack
+        run: command -v corepack >/dev/null 2>&1 && corepack enable
+
+      - name: Install deps
+        run: deno task setup:${{ matrix.runtime }}
+
       - name: Run tests
-        run:
-          - command -v corepack >/dev/null 2>&1 && corepack enable
-          - deno task setup:${{ matrix.runtime }}
-          - deno task test:${{ matrix.runtime }}
+        run: deno task test:${{ matrix.runtime }}

@@ -37,13 +37,16 @@ jobs:
         with:
           bun-version-file: ".bun-version"
 
-      - name: Test ${{ matrix.runtime }}
-        run:
-          - command -v corepack >/dev/null 2>&1 && corepack enable
-          - deno task setup:${{ matrix.runtime }}
-          - deno task coverage:${{ matrix.runtime }}
+      - name: Setup corepack
+        run: command -v corepack >/dev/null 2>&1 && corepack enable
 
-      - name: Upload ${{ matrix.runtime }} coverage
+      - name: Install deps
+        run: deno task setup:${{ matrix.runtime }}
+
+      - name: Run tests
+        run: deno task test:${{ matrix.runtime }}
+
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           name: ${{ matrix.runtime }}-${{ matrix.os }}
