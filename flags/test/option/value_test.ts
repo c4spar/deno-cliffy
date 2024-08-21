@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -38,7 +39,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - option - value - collect boolean", () => {
+test("flags - option - value - collect boolean", () => {
   const { flags, unknown, literal } = parseFlags(["-bbb"], options);
 
   assertEquals(flags, { boolean: [true, true, true], default: "bar" });
@@ -46,7 +47,7 @@ Deno.test("flags - option - value - collect boolean", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - value - function validator with no value", () => {
+test("flags - option - value - function validator with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "-d"], options);
 
   assertEquals(flags, { function: true, default: "bar" });
@@ -54,7 +55,7 @@ Deno.test("flags - option - value - function validator with no value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - value - function validator with valid value", () => {
+test("flags - option - value - function validator with valid value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "foo", "-d"], options);
 
   assertEquals(flags, { function: ["foo"], default: "bar" });
@@ -62,7 +63,7 @@ Deno.test("flags - option - value - function validator with valid value", () => 
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - value - function validator with collected values", () => {
+test("flags - option - value - function validator with collected values", () => {
   const { flags, unknown, literal } = parseFlags([
     "-f",
     "foo",
@@ -78,7 +79,7 @@ Deno.test("flags - option - value - function validator with collected values", (
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - value - function validator with invalid value", () => {
+test("flags - option - value - function validator with invalid value", () => {
   assertThrows(
     () => parseFlags(["-f", "fo", "-d"], options),
     Error,
@@ -86,7 +87,7 @@ Deno.test("flags - option - value - function validator with invalid value", () =
   );
 });
 
-Deno.test("flags - option - value - function validator with incremental value", () => {
+test("flags - option - value - function validator with incremental value", () => {
   const { flags } = parseFlags(["-iii"], options);
   assertEquals(flags, { incremental: 3, default: "bar" });
 });

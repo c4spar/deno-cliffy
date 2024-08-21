@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -23,7 +24,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags optionRequire noArguments", () => {
+test("flags optionRequire noArguments", () => {
   const { flags, unknown, literal } = parseFlags([], options);
 
   assertEquals(flags, {});
@@ -31,7 +32,7 @@ Deno.test("flags optionRequire noArguments", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionRequire videoAudioImageType", () => {
+test("flags optionRequire videoAudioImageType", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-v", "value", "-a", "value", "--image-type", "value"],
     options,
@@ -45,7 +46,7 @@ Deno.test("flags optionRequire videoAudioImageType", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionRequire videoType", () => {
+test("flags optionRequire videoType", () => {
   assertThrows(
     () => parseFlags(["-v", "value"], options),
     Error,
@@ -53,7 +54,7 @@ Deno.test("flags optionRequire videoType", () => {
   );
 });
 
-Deno.test("flags optionRequire audioType", () => {
+test("flags optionRequire audioType", () => {
   assertThrows(
     () => parseFlags(["-a", "value"], options),
     Error,
@@ -61,7 +62,7 @@ Deno.test("flags optionRequire audioType", () => {
   );
 });
 
-Deno.test("flags optionRequire imageType", () => {
+test("flags optionRequire imageType", () => {
   assertThrows(
     () => parseFlags(["-i", "value"], options),
     Error,
@@ -69,7 +70,7 @@ Deno.test("flags optionRequire imageType", () => {
   );
 });
 
-Deno.test("flags optionRequire videoAudio", () => {
+test("flags optionRequire videoAudio", () => {
   assertThrows(
     () => parseFlags(["-v", "value", "-a", "value"], options),
     Error,
@@ -77,7 +78,7 @@ Deno.test("flags optionRequire videoAudio", () => {
   );
 });
 
-Deno.test("flags optionRequire audioVideo", () => {
+test("flags optionRequire audioVideo", () => {
   assertThrows(
     () => parseFlags(["-a", "value", "-v", "value"], options),
     Error,
@@ -85,7 +86,7 @@ Deno.test("flags optionRequire audioVideo", () => {
   );
 });
 
-Deno.test("flags optionRequire imageVideo", () => {
+test("flags optionRequire imageVideo", () => {
   assertThrows(
     () => parseFlags(["-i", "value", "-v", "value"], options),
     Error,

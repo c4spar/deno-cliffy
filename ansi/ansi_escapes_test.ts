@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import {
   cursorBackward,
   cursorDown,
@@ -16,7 +17,7 @@ import {
 } from "./ansi_escapes.ts";
 import { assertEquals } from "@std/assert";
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorTo x",
   fn() {
     assertEquals(
@@ -26,7 +27,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorTo x y",
   fn() {
     assertEquals(
@@ -36,7 +37,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorMove right down",
   fn() {
     assertEquals(
@@ -46,7 +47,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorMove left up",
   fn() {
     assertEquals(
@@ -56,7 +57,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorUp",
   fn() {
     assertEquals(
@@ -66,7 +67,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorDown",
   fn() {
     assertEquals(
@@ -76,7 +77,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorForward",
   fn() {
     assertEquals(
@@ -86,7 +87,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorBackward",
   fn() {
     assertEquals(
@@ -96,7 +97,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorNextLine",
   fn() {
     assertEquals(
@@ -106,7 +107,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - cursorPrevLine",
   fn() {
     assertEquals(
@@ -116,7 +117,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - scrollUp",
   fn() {
     assertEquals(
@@ -126,7 +127,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - scrollDown",
   fn() {
     assertEquals(
@@ -136,7 +137,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - eraseUp",
   fn() {
     assertEquals(
@@ -146,7 +147,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - eraseUp",
   fn() {
     assertEquals(
@@ -156,7 +157,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - link",
   fn() {
     assertEquals(
@@ -166,7 +167,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - image",
   fn() {
     assertEquals(
@@ -180,7 +181,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - ansi escapes - image preserveAspectRatio",
   fn() {
     assertEquals(

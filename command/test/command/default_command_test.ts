@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command - raw args - command with usRawArgs disabled", async () => {
+test("command - raw args - command with usRawArgs disabled", async () => {
   let action = 0;
   const { options, args, literal } = await new Command()
     .throwErrors()

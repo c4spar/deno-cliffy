@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -12,29 +13,33 @@ function command() {
     );
 }
 
-Deno.test("command depends option with default value: should accept no arguments", async () => {
+test("command depends option with default value: should accept no arguments", async () => {
   const { options, args } = await command().parse([]);
 
   assertEquals(options, { flag2: "example" });
   assertEquals(args, []);
 });
 
-Deno.test("command depends option with default value: should accept -h", async () => {
-  const { options, args } = await command().noExit().parse(["-h"]);
+test({
+  name: "command depends option with default value: should accept -h",
+  ignore: ["node"],
+  fn: async () => {
+    const { options, args } = await command().noExit().parse(["-h"]);
 
-  // @TODO: add help & version option types to command.
-  assertEquals(options, { flag2: "example", help: true } as unknown);
-  assertEquals(args, []);
+    // @TODO: add help & version option types to command.
+    assertEquals(options, { flag2: "example", help: true } as unknown);
+    assertEquals(args, []);
+  },
 });
 
-Deno.test("command depends option with default value: should accept --flag1", async () => {
+test("command depends option with default value: should accept --flag1", async () => {
   const { options, args } = await command().parse(["--flag1"]);
 
   assertEquals(options, { flag1: true, flag2: "example" });
   assertEquals(args, []);
 });
 
-Deno.test("command depends option with default value: should accept --flag1 --flag2 test", async () => {
+test("command depends option with default value: should accept --flag1 --flag2 test", async () => {
   const { options, args } = await command().parse(
     ["--flag1", "--flag2", "test"],
   );
@@ -43,7 +48,7 @@ Deno.test("command depends option with default value: should accept --flag1 --fl
   assertEquals(args, []);
 });
 
-Deno.test("command depends option with default value: should not accept --flag2 test", async () => {
+test("command depends option with default value: should not accept --flag2 test", async () => {
   await assertRejects(
     async () => {
       await command().parse(["--flag2", "test"]);

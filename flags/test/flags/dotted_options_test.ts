@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { ValidationError } from "../../_errors.ts";
 import { OptionType } from "../../deprecated.ts";
@@ -18,7 +19,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("[flags] should parse dotted short options", () => {
+test("[flags] should parse dotted short options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-b.a", "300", "-b.v", "900"],
     options,
@@ -29,7 +30,7 @@ Deno.test("[flags] should parse dotted short options", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse dotted long options", () => {
+test("[flags] should parse dotted long options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--bitrate.audio", "300", "--bitrate.video", "900"],
     options,
@@ -40,7 +41,7 @@ Deno.test("[flags] should parse dotted long options", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse dotted alias options", () => {
+test("[flags] should parse dotted alias options", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--audio-bitrate", "300", "--video-bitrate", "900"],
     options,
@@ -51,7 +52,7 @@ Deno.test("[flags] should parse dotted alias options", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should not parse dotted options with dotted options disabled", () => {
+test("[flags] should not parse dotted options with dotted options disabled", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-b.a", "300", "-b.v", "900"],
     { ...options, dotted: false },
@@ -62,7 +63,7 @@ Deno.test("[flags] should not parse dotted options with dotted options disabled"
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should throw error for missing depending options with dotted option", () => {
+test("[flags] should throw error for missing depending options with dotted option", () => {
   assertThrows(
     () => parseFlags(["--bitrate.audio", "300"], options),
     ValidationError,
@@ -70,7 +71,7 @@ Deno.test("[flags] should throw error for missing depending options with dotted 
   );
 });
 
-Deno.test("[flags] should throw error for missing depending options with dotted alias option", () => {
+test("[flags] should throw error for missing depending options with dotted alias option", () => {
   assertThrows(
     () => parseFlags(["--audio-bitrate", "300"], options),
     ValidationError,
@@ -78,7 +79,7 @@ Deno.test("[flags] should throw error for missing depending options with dotted 
   );
 });
 
-Deno.test("[flags] should throw an error for dotted option with invalid value", () => {
+test("[flags] should throw an error for dotted option with invalid value", () => {
   assertThrows(
     () =>
       parseFlags(

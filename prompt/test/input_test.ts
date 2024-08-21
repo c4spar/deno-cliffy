@@ -1,15 +1,17 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { Input } from "../input.ts";
 
-Deno.test("prompt input: value", async () => {
+test("prompt input: value", async () => {
   console.log();
   Input.inject("hallo");
   const result: string | undefined = await Input.prompt("message");
   assertEquals(result, "hallo");
 });
 
-Deno.test("prompt input: validate option", async () => {
+test("prompt input: validate option", async () => {
   console.log();
   Input.inject("foo");
   const result: string | undefined = await Input.prompt({
@@ -19,7 +21,7 @@ Deno.test("prompt input: validate option", async () => {
   assertEquals(result, "foo");
 });
 
-Deno.test("prompt input: default value", async () => {
+test("prompt input: default value", async () => {
   console.log();
   Input.inject("");
   const result: string | undefined = await Input.prompt({
@@ -30,7 +32,7 @@ Deno.test("prompt input: default value", async () => {
   assertEquals(result, "default");
 });
 
-Deno.test("prompt input: empty value", async () => {
+test("prompt input: empty value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -43,13 +45,13 @@ Deno.test("prompt input: empty value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
+        getOs() === "windows" ? bold("× ") : bold("✘ ")
       }Value must be longer than 8 but has a length of 0.`,
     ),
   );
 });
 
-Deno.test("prompt input: invalid value", async () => {
+test("prompt input: invalid value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -61,12 +63,12 @@ Deno.test("prompt input: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt input: null value", async () => {
+test("prompt input: null value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -76,7 +78,7 @@ Deno.test("prompt input: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

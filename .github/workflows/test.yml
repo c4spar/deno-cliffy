@@ -5,34 +5,48 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.module }} ${{ matrix.os }} deno-${{ matrix.deno }}
+    name: ${{ matrix.runtime }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        module: [ansi, command, flags, keycode, keypress, prompt, table, testing]
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno: [v1.x]
+        runtime: [deno, node, bun]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
       CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno }}
+          deno-version-file: ".deno-version"
 
-      - name: Test ${{ matrix.module }}
-        run: deno task coverage:${{ matrix.module }}
+      - name: Setup Node
+        if: ${{ matrix.runtime == 'node' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+        run: corepack enable
 
-      - name: Upload ${{ matrix.module }} coverage
+      - name: Setup Bun
+        if: ${{ matrix.runtime == 'bun' }}
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+
+      - name: Test ${{ matrix.runtime }}
+        run:
+          - deno task setup:${{ matrix.runtime }}
+          - deno task coverage:${{ matrix.runtime }}
+
+      - name: Upload ${{ matrix.runtime }} coverage
         uses: codecov/codecov-action@v4
         with:
-          name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
+          name: ${{ matrix.runtime }}-${{ matrix.os }}
           files: dist/coverage/${{ matrix.module }}/cov.lcov
-          flags: ${{ matrix.module }}
+          flags: ${{ matrix.runtime }}
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -9,7 +10,7 @@ function cmd() {
     });
 }
 
-Deno.test("[flags] should not allow empty by default", async () => {
+test("[flags] should not allow empty by default", async () => {
   await assertRejects(
     () => cmd().parse([]),
     Error,
@@ -17,7 +18,7 @@ Deno.test("[flags] should not allow empty by default", async () => {
   );
 });
 
-Deno.test("[flags] should not allow empty if disabled", async () => {
+test("[flags] should not allow empty if disabled", async () => {
   await assertRejects(
     () => cmd().allowEmpty(false).parse([]),
     Error,
@@ -25,7 +26,7 @@ Deno.test("[flags] should not allow empty if disabled", async () => {
   );
 });
 
-Deno.test("[flags] should allow empty if enabled", async () => {
+test("[flags] should allow empty if enabled", async () => {
   const { options, args } = await cmd()
     .allowEmpty()
     .parse([]);
@@ -34,7 +35,7 @@ Deno.test("[flags] should allow empty if enabled", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("[flags] should allow empty if enabled with true", async () => {
+test("[flags] should allow empty if enabled with true", async () => {
   const { options, args } = await cmd()
     .allowEmpty(true)
     .parse([]);

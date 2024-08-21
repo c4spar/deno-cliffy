@@ -1,15 +1,17 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { Secret } from "../secret.ts";
 
-Deno.test("prompt secret: value", async () => {
+test("prompt secret: value", async () => {
   console.log();
   Secret.inject("hallo");
   const result: string | undefined = await Secret.prompt("message");
   assertEquals(result, "hallo");
 });
 
-Deno.test("prompt secret: validate option", async () => {
+test("prompt secret: validate option", async () => {
   console.log();
   Secret.inject("a".repeat(9));
   const result: string | undefined = await Secret.prompt({
@@ -19,7 +21,7 @@ Deno.test("prompt secret: validate option", async () => {
   assertEquals(result, "a".repeat(9));
 });
 
-Deno.test("prompt secret: empty value", async () => {
+test("prompt secret: empty value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -32,13 +34,13 @@ Deno.test("prompt secret: empty value", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
+        getOs() === "windows" ? bold("× ") : bold("✘ ")
       }Secret must be longer than 8 but has a length of 0.`,
     ),
   );
 });
 
-Deno.test("prompt secret: invalid value", async () => {
+test("prompt secret: invalid value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -50,12 +52,12 @@ Deno.test("prompt secret: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt secret: null value", async () => {
+test("prompt secret: null value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -65,7 +67,7 @@ Deno.test("prompt secret: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

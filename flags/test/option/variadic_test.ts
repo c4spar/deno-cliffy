@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -47,7 +48,7 @@ const options: ParseFlagsOptions = {
 
 // Optional:
 
-Deno.test("flags optionVariadic optional", () => {
+test("flags optionVariadic optional", () => {
   const { flags, unknown, literal } = parseFlags(["-o"], options);
 
   assertEquals(flags, { optional: true });
@@ -57,7 +58,7 @@ Deno.test("flags optionVariadic optional", () => {
 
 // Boolean:
 
-Deno.test("flags optionVariadic boolean", () => {
+test("flags optionVariadic boolean", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-b", "1", "0", "true", "false"],
     options,
@@ -68,7 +69,7 @@ Deno.test("flags optionVariadic boolean", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionVariadic booleanInvalidValue", () => {
+test("flags optionVariadic booleanInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-b", "1", "0", "true", "false", "2"], options),
     Error,
@@ -78,7 +79,7 @@ Deno.test("flags optionVariadic booleanInvalidValue", () => {
 
 // String:
 
-Deno.test("flags optionVariadic string", () => {
+test("flags optionVariadic string", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-s", "1", "0", "true", "false"],
     options,
@@ -91,7 +92,7 @@ Deno.test("flags optionVariadic string", () => {
 
 // Number:
 
-Deno.test("flags optionVariadic number", () => {
+test("flags optionVariadic number", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-n", "1", "0", "654", "1.2"],
     options,
@@ -102,7 +103,7 @@ Deno.test("flags optionVariadic number", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionVariadic numberInvalidValue", () => {
+test("flags optionVariadic numberInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-n", "1", "0", "654", "abc", "1,2"], options),
     Error,
@@ -112,7 +113,7 @@ Deno.test("flags optionVariadic numberInvalidValue", () => {
 
 // Exact:
 
-Deno.test("flags optionVariadic arg1 + arg2", () => {
+test("flags optionVariadic arg1 + arg2", () => {
   const { flags, unknown, literal } = parseFlags(["-e", "1", "abc"], options);
 
   assertEquals(flags, { variadicOption: [1, "abc"] });
@@ -120,7 +121,7 @@ Deno.test("flags optionVariadic arg1 + arg2", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionVariadic arg1 + arg2 + arg3", () => {
+test("flags optionVariadic arg1 + arg2 + arg3", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-e", "1", "abc", "def", "1", "true"],
     options,
@@ -131,7 +132,7 @@ Deno.test("flags optionVariadic arg1 + arg2 + arg3", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionVariadic exactInvalidValue", () => {
+test("flags optionVariadic exactInvalidValue", () => {
   assertThrows(
     () => parseFlags(["-e", "abc", "def", "ghi", "1"], options),
     Error,
@@ -139,7 +140,7 @@ Deno.test("flags optionVariadic exactInvalidValue", () => {
   );
 });
 
-Deno.test("flags optionVariadic exactMissingValue", () => {
+test("flags optionVariadic exactMissingValue", () => {
   assertThrows(
     () => parseFlags(["-e", "1"], options),
     Error,
@@ -147,7 +148,7 @@ Deno.test("flags optionVariadic exactMissingValue", () => {
   );
 });
 
-Deno.test("flags optionVariadic exactLastOptional", () => {
+test("flags optionVariadic exactLastOptional", () => {
   const { flags, unknown, literal } = parseFlags(["-e", "1", "abc"], options);
 
   assertEquals(flags, { variadicOption: [1, "abc"] });
@@ -155,7 +156,7 @@ Deno.test("flags optionVariadic exactLastOptional", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionVariadic exactLastOptionalVariadic", () => {
+test("flags optionVariadic exactLastOptionalVariadic", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-e", "1", "abc", "def", "1", "0", "true", "false"],
     options,

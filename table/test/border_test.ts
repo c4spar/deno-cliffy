@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { border } from "../border.ts";
 import { Table } from "../table.ts";
 import { assertEquals } from "@std/assert";
 
-Deno.test("default table chars", () => {
+test("default table chars", () => {
   assertEquals(
     Table
       .from([
@@ -23,7 +24,7 @@ Deno.test("default table chars", () => {
   );
 });
 
-Deno.test("custom global table chars", () => {
+test("custom global table chars", () => {
   assertEquals(
     Table
       .chars({
@@ -63,7 +64,7 @@ geeeeeeeeeeeefeeeeeeeeeeeeeeeefeeeeeeeeeeeeeeeeeeeh`.slice(1),
   Table.chars(border);
 });
 
-Deno.test("custom table chars", () => {
+test("custom table chars", () => {
   assertEquals(
     Table
       .from([

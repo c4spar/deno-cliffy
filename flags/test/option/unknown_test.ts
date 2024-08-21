@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
@@ -9,7 +10,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("unknown flags", () => {
+test("unknown flags", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "foo", "-", "--", "bar"],
     options,

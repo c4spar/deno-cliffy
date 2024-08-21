@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -36,25 +37,25 @@ function cmd() {
     });
 }
 
-Deno.test("command - option - value - collect boolean", async () => {
+test("command - option - value - collect boolean", async () => {
   const { options } = await cmd().parse(["-bbb"]);
 
   assertEquals(options, { boolean: [true, true, true], default: "bar" });
 });
 
-Deno.test("command - option - value - function validator with no value", async () => {
+test("command - option - value - function validator with no value", async () => {
   const { options } = await cmd().parse(["-f", "-d"]);
 
   assertEquals(options, { function: true, default: "bar" });
 });
 
-Deno.test("command - option - value - function validator with valid value", async () => {
+test("command - option - value - function validator with valid value", async () => {
   const { options } = await cmd().parse(["-f", "foo", "-d"]);
 
   assertEquals(options, { function: ["foo"], default: "bar" });
 });
 
-Deno.test("command - option - value - function validator with collected values", async () => {
+test("command - option - value - function validator with collected values", async () => {
   const { options } = await cmd().parse([
     "-f",
     "foo",
@@ -68,7 +69,7 @@ Deno.test("command - option - value - function validator with collected values",
   assertEquals(options, { function: ["foo", "bar", "baz"], default: "bar" });
 });
 
-Deno.test("command - option - value - function validator with invalid value", async () => {
+test("command - option - value - function validator with invalid value", async () => {
   await assertRejects(
     () => cmd().parse(["-f", "fo", "-d"]),
     Error,
@@ -76,7 +77,7 @@ Deno.test("command - option - value - function validator with invalid value", as
   );
 });
 
-Deno.test("command - option - value - function validator with incremental value", async () => {
+test("command - option - value - function validator with incremental value", async () => {
   const { options } = await cmd().parse(["-iii"]);
 
   assertEquals(options, { incremental: 3, default: "bar" });

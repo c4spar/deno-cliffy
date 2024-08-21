@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -23,84 +24,84 @@ const cmd3 = new Command()
   .option("-a, --color <color>", "description ...")
   .action(() => {});
 
-Deno.test("command - type - boolean - with no value", async () => {
+test("command - type - boolean - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - long flag with no value", async () => {
+test("command - type - boolean - long flag with no value", async () => {
   const { options, args } = await cmd.parse(["--flag"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - with true value", async () => {
+test("command - type - boolean - with true value", async () => {
   const { options, args } = await cmd.parse(["-f", "true"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - long flag with true value", async () => {
+test("command - type - boolean - long flag with true value", async () => {
   const { options, args } = await cmd.parse(["--flag", "true"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - with false value", async () => {
+test("command - type - boolean - with false value", async () => {
   const { options, args } = await cmd.parse(["-f", "false"]);
 
   assertEquals(options, { flag: false });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - long flag with false value and argument", async () => {
+test("command - type - boolean - long flag with false value and argument", async () => {
   const { options, args } = await cmd.parse(["--flag", "false", "unknown"]);
 
   assertEquals(options, { flag: false });
   assertEquals(args, ["unknown"]);
 });
 
-Deno.test("command - type - boolean - with 1 value", async () => {
+test("command - type - boolean - with 1 value", async () => {
   const { options, args } = await cmd.parse(["-f", "1"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - long flag with 1 value", async () => {
+test("command - type - boolean - long flag with 1 value", async () => {
   const { options, args } = await cmd.parse(["--flag", "1"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - with 0 value", async () => {
+test("command - type - boolean - with 0 value", async () => {
   const { options, args } = await cmd.parse(["-f", "0"]);
 
   assertEquals(options, { flag: false });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - long flag with 0 value and argument", async () => {
+test("command - type - boolean - long flag with 0 value and argument", async () => {
   const { options, args } = await cmd.parse(["--flag", "0", "unknown"]);
 
   assertEquals(options, { flag: false });
   assertEquals(args, ["unknown"]);
 });
 
-Deno.test("command - type - boolean - negatable option with argument", async () => {
+test("command - type - boolean - negatable option with argument", async () => {
   const { options, args } = await cmd.parse(["--no-flag", "unknown"]);
 
   assertEquals(options, { flag: false });
   assertEquals(args, ["unknown"]);
 });
 
-Deno.test("command - type - boolean - with invalid value", async () => {
+test("command - type - boolean - with invalid value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "unknown"]);
@@ -110,7 +111,7 @@ Deno.test("command - type - boolean - with invalid value", async () => {
   );
 });
 
-Deno.test("command - type - boolean - no arguments allowed", async () => {
+test("command - type - boolean - no arguments allowed", async () => {
   await assertRejects(
     async () => {
       await cmd2.parse(["-f", "true", "unknown"]);
@@ -120,14 +121,14 @@ Deno.test("command - type - boolean - no arguments allowed", async () => {
   );
 });
 
-Deno.test("command - type - boolean - negatable option last", async () => {
+test("command - type - boolean - negatable option last", async () => {
   const { options, args } = await cmd3.parse(["--color", "red", "--no-check"]);
 
   assertEquals(options, { color: "red", check: false });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - boolean - negatable option first", async () => {
+test("command - type - boolean - negatable option first", async () => {
   const { options, args } = await cmd3.parse(["--no-check", "--color", "red"]);
 
   assertEquals(options, { color: "red", check: false });

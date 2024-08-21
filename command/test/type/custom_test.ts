@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import type { ArgumentValue, TypeHandler } from "../../types.ts";
@@ -30,28 +31,28 @@ const cmd = new Command()
   .description("...")
   .action(() => {});
 
-Deno.test("command - type - custom - with valid value", async () => {
+test("command - type - custom - with valid value", async () => {
   const { options, args } = await cmd.parse(["-e", "my@email.com"]);
 
   assertEquals(options, { email: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - custom - long flag with valid value", async () => {
+test("command - type - custom - long flag with valid value", async () => {
   const { options, args } = await cmd.parse(["-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - custom - child command with valid value", async () => {
+test("command - type - custom - child command with valid value", async () => {
   const { options, args } = await cmd.parse(["init", "-E", "my@email.com"]);
 
   assertEquals(options, { email2: "my@email.com" });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - custom - with unknown type", async () => {
+test("command - type - custom - with unknown type", async () => {
   await assertRejects(
     () => cmd.parse(["init", "-e", "my@email.com"]),
     Error,
@@ -59,7 +60,7 @@ Deno.test("command - type - custom - with unknown type", async () => {
   );
 });
 
-Deno.test("command - type - custom - with invalid value", async () => {
+test("command - type - custom - with invalid value", async () => {
   await assertRejects(
     () => cmd.parse(["-E", "my @email.com"]),
     Error,
@@ -67,7 +68,7 @@ Deno.test("command - type - custom - with invalid value", async () => {
   );
 });
 
-Deno.test("command - type - custom - with invalid value on child command", async () => {
+test("command - type - custom - with invalid value on child command", async () => {
   await assertRejects(
     () => cmd.parse(["init", "-E", "my @email.com"]),
     Error,
@@ -88,7 +89,7 @@ class CustomType<TType extends string> extends Type<TType> {
   }
 }
 
-Deno.test("command - type - custom - generic custom type", async () => {
+test("command - type - custom - generic custom type", async () => {
   const cmd = new Command()
     .throwErrors()
     .type("format", new CustomType(["foo", "bar"]))

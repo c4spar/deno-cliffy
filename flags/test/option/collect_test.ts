@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -31,7 +32,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - option - collect - short flag can only occur once", () => {
+test("flags - option - collect - short flag can only occur once", () => {
   assertThrows(
     () => parseFlags(["-f", "-f"], options),
     Error,
@@ -39,7 +40,7 @@ Deno.test("flags - option - collect - short flag can only occur once", () => {
   );
 });
 
-Deno.test("flags - option - collect - long flag can only occur once", () => {
+test("flags - option - collect - long flag can only occur once", () => {
   assertThrows(
     () => parseFlags(["-f", "--flag"], options),
     Error,
@@ -47,7 +48,7 @@ Deno.test("flags - option - collect - long flag can only occur once", () => {
   );
 });
 
-Deno.test("flags - option - collect - long and short flag can not occur together", () => {
+test("flags - option - collect - long and short flag can not occur together", () => {
   assertThrows(
     () => parseFlags(["-f", "true", "--flag", "false"], options),
     Error,
@@ -55,7 +56,7 @@ Deno.test("flags - option - collect - long and short flag can not occur together
   );
 });
 
-Deno.test("flags - option - collect - flag and negatable flag can not occur together", () => {
+test("flags - option - collect - flag and negatable flag can not occur together", () => {
   assertThrows(
     () => parseFlags(["-f", "--no-flag"], options),
     Error,
@@ -63,7 +64,7 @@ Deno.test("flags - option - collect - flag and negatable flag can not occur toge
   );
 });
 
-Deno.test("flags - option - collect - collect boolean value", () => {
+test("flags - option - collect - collect boolean value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-b", "1", "--boolean", "0"],
     options,
@@ -74,7 +75,7 @@ Deno.test("flags - option - collect - collect boolean value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - collect - collect string value", () => {
+test("flags - option - collect - collect string value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-s", "1", "--string", "0"],
     options,
@@ -85,7 +86,7 @@ Deno.test("flags - option - collect - collect string value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - collect - collect number value", () => {
+test("flags - option - collect - collect number value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-n", "1", "--number", "0"],
     options,
@@ -96,7 +97,7 @@ Deno.test("flags - option - collect - collect number value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - collect - collect values by default", () => {
+test("flags - option - collect - collect values by default", () => {
   const { flags, unknown, literal } = parseFlags([
     "--foo",
     "1",

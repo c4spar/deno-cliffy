@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -12,7 +13,7 @@ function command() {
     .option("--no-remote", "No remote.");
 }
 
-Deno.test("negatable options with no arguments", async () => {
+test("negatable options with no arguments", async () => {
   const { options, args, literal } = await command().parse([]);
 
   assertEquals(options, {
@@ -23,7 +24,7 @@ Deno.test("negatable options with no arguments", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("negatable options with arguments", async () => {
+test("negatable options with arguments", async () => {
   const { options, args, literal } = await command().parse(
     ["--color", "blue", "--remote", "foo"],
   );
@@ -37,7 +38,7 @@ Deno.test("negatable options with arguments", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("negatable flag --no-remote should not depend on --color", async () => {
+test("negatable flag --no-remote should not depend on --color", async () => {
   const { options, args, literal } = await command().parse(["--no-remote"]);
 
   assertEquals(options, {
@@ -49,7 +50,7 @@ Deno.test("negatable flag --no-remote should not depend on --color", async () =>
   assertEquals(literal, []);
 });
 
-Deno.test("negatable flags should negate value", async () => {
+test("negatable flags should negate value", async () => {
   const { options, args, literal } = await command().parse(
     ["--no-check", "--no-color", "--no-remote"],
   );
@@ -63,7 +64,7 @@ Deno.test("negatable flags should negate value", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("negatable options should not be combinable with positive options", async () => {
+test("negatable options should not be combinable with positive options", async () => {
   await assertRejects(
     async () => {
       await command().parse(["--color", "--no-color", "--no-check"]);

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -7,21 +8,21 @@ const cmd = new Command()
   .option("-F, --flag2 <value:integer>", "description ...")
   .action(() => {});
 
-Deno.test("command - type - integer - with no value", async () => {
+test("command - type - integer - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - integer - with valid value", async () => {
+test("command - type - integer - with valid value", async () => {
   const { options, args } = await cmd.parse(["--flag", "123"]);
 
   assertEquals(options, { flag: 123 });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - integer - with argument", async () => {
+test("command - type - integer - with argument", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "123", "unknown"]);
@@ -31,7 +32,7 @@ Deno.test("command - type - integer - with argument", async () => {
   );
 });
 
-Deno.test("command - type - integer - with missing value", async () => {
+test("command - type - integer - with missing value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-F"]);
@@ -41,7 +42,7 @@ Deno.test("command - type - integer - with missing value", async () => {
   );
 });
 
-Deno.test("command - type - integer - with invalid string value", async () => {
+test("command - type - integer - with invalid string value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "abc"]);
@@ -51,7 +52,7 @@ Deno.test("command - type - integer - with invalid string value", async () => {
   );
 });
 
-Deno.test("command - type - integer - with invalid float value", async () => {
+test("command - type - integer - with invalid float value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "1.23"]);

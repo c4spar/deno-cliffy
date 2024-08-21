@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -34,7 +35,7 @@ const requiredNumberValueOptions: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - type - string - with no value", () => {
+test("flags - type - string - with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], optionalValueOptions);
 
   assertEquals(flags, { flag: true });
@@ -42,7 +43,7 @@ Deno.test("flags - type - string - with no value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with valid value", () => {
+test("flags - type - string - with valid value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "value"],
     optionalValueOptions,
@@ -53,7 +54,7 @@ Deno.test("flags - type - string - with valid value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with special chars", () => {
+test("flags - type - string - with special chars", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", '!"§$%&/()=?*+#=\\/@*-+,<😎>,.;:_-abc123€√', "unknown"],
     optionalValueOptions,
@@ -64,7 +65,7 @@ Deno.test("flags - type - string - with special chars", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with missing value", () => {
+test("flags - type - string - with missing value", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredStringValueOptions),
     Error,
@@ -72,7 +73,7 @@ Deno.test("flags - type - string - with missing value", () => {
   );
 });
 
-Deno.test("flags - type - string - value starting with '-'", () => {
+test("flags - type - string - value starting with '-'", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-a", "unknown"],
     requiredStringValueOptions,
@@ -83,7 +84,7 @@ Deno.test("flags - type - string - value starting with '-'", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with negative numeric value", () => {
+test("flags - type - string - with negative numeric value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-1", "unknown"],
     requiredNumberValueOptions,
@@ -94,7 +95,7 @@ Deno.test("flags - type - string - with negative numeric value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with negative numeric value 2", () => {
+test("flags - type - string - with negative numeric value 2", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-123", "unknown"],
     requiredNumberValueOptions,
@@ -105,7 +106,7 @@ Deno.test("flags - type - string - with negative numeric value 2", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with negative decimal value", () => {
+test("flags - type - string - with negative decimal value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-12.2", "unknown"],
     requiredNumberValueOptions,
@@ -116,7 +117,7 @@ Deno.test("flags - type - string - with negative decimal value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with negative numeric string value", () => {
+test("flags - type - string - with negative numeric string value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-1", "unknown"],
     requiredStringValueOptions,
@@ -127,7 +128,7 @@ Deno.test("flags - type - string - with negative numeric string value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - value starting with hyphen", () => {
+test("flags - type - string - value starting with hyphen", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-foo", "unknown"],
     requiredStringValueOptions,
@@ -138,7 +139,7 @@ Deno.test("flags - type - string - value starting with hyphen", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with long flag as value", () => {
+test("flags - type - string - with long flag as value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "--foo", "unknown"],
     requiredStringValueOptions,
@@ -149,7 +150,7 @@ Deno.test("flags - type - string - with long flag as value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with long flag and value as value", () => {
+test("flags - type - string - with long flag and value as value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "--foo=bar", "unknown"],
     requiredStringValueOptions,
@@ -160,7 +161,7 @@ Deno.test("flags - type - string - with long flag and value as value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with short flag and value as value", () => {
+test("flags - type - string - with short flag and value as value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-a=b", "unknown"],
     requiredStringValueOptions,
@@ -171,7 +172,7 @@ Deno.test("flags - type - string - with short flag and value as value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - string - with only hyphens as value", () => {
+test("flags - type - string - with only hyphens as value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "-------------", "unknown"],
     requiredStringValueOptions,

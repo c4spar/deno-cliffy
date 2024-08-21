@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Table } from "../table.ts";
 import { assertEquals } from "@std/assert";
 
@@ -84,7 +85,7 @@ for (const { description, content, width, expect } of tests) {
   // console.log(`expect\n${expect}`);
   // console.log(JSON.stringify({ actual, expect }, null, '\t'));
 
-  Deno.test(`table - ${description}`, () => {
+  test(`table - ${description}`, () => {
     assertEquals(actual, expect);
   });
 }

@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Table } from "../table.ts";
 import { assertEquals } from "@std/assert";
 
-Deno.test("table - special chars - chinese characters", () => {
+test("table - special chars - chinese characters", () => {
   assertEquals(
     Table.from([
       ["名字为 豆贝 尔维了", "cell2", "cell3"],
@@ -17,7 +18,7 @@ cell1              豆 贝 cell3`.slice(1),
   );
 });
 
-Deno.test("table - special chars - japanese characters", () => {
+test("table - special chars - japanese characters", () => {
   assertEquals(
     Table.from([
       ["私は ふわっち クン", "cell2", "cell3"],
@@ -33,7 +34,7 @@ cell1              ふわ ふわ cell3   `.slice(1),
   );
 });
 
-Deno.test("table - special chars - full width & cjk sybmol characters", () => {
+test("table - special chars - full width & cjk sybmol characters", () => {
   assertEquals(
     Table.from([
       ["！、￥", "cell2", "cell3"],
@@ -49,7 +50,7 @@ cell1  〜 〜 cell3`.slice(1),
   );
 });
 
-Deno.test("table - special chars - Korean", () => {
+test("table - special chars - Korean", () => {
   assertEquals(
     Table.from([["한"]])
       .border(true)
@@ -61,7 +62,7 @@ Deno.test("table - special chars - Korean", () => {
   );
 });
 
-Deno.test("table - emoji (within BMP)", () => {
+test("table - emoji (within BMP)", () => {
   assertEquals(
     Table.from([["✅"]])
       .border(true)
@@ -73,7 +74,7 @@ Deno.test("table - emoji (within BMP)", () => {
   );
 });
 
-Deno.test("table - emoji (outside BMP)", () => {
+test("table - emoji (outside BMP)", () => {
   assertEquals(
     Table.from([["💩"]])
       .border(true)
@@ -85,7 +86,7 @@ Deno.test("table - emoji (outside BMP)", () => {
   );
 });
 
-Deno.test("table - zero-width non-joiner", () => {
+test("table - zero-width non-joiner", () => {
   assertEquals(
     Table.from([["a\u200cb"]])
       .border(true)
@@ -97,7 +98,7 @@ Deno.test("table - zero-width non-joiner", () => {
   );
 });
 
-Deno.test("table - single-width char (outside BMP)", () => {
+test("table - single-width char (outside BMP)", () => {
   assertEquals(
     Table.from([["𐌰𐌱"]])
       .border(true)

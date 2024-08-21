@@ -1,6 +1,8 @@
 import { eraseDown } from "@cliffy/ansi/ansi-escapes";
+import { getRuntimeName } from "@cliffy/internal/runtime/runtime-name";
+import { test } from "@cliffy/internal/testing/test";
+
 import { quoteString } from "./_quote_string.ts";
-import { basename } from "@std/path";
 import { red } from "@std/fmt/colors";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { AssertionError } from "@std/assert/assertion-error";
@@ -114,26 +116,34 @@ export async function snapshotTest(
 }
 
 function registerTest(options: SnapshotTestOptions) {
-  const fileName = basename(options.meta.url);
+  const fileName = options.meta.url.split("/").at(-1) ?? "";
 
-  Deno.test({
-    name: options.name,
-    ignore: options.ignore ?? false,
-    only: options.only ?? false,
-    async fn(ctx) {
-      const steps = Object.entries(options.steps ?? {});
-      if (steps.length) {
-        for (const [name, step] of steps) {
-          await ctx.step({
-            name,
-            fn: (ctx) => fn(ctx, step),
-          });
+  if (["node", "bun"].includes(getRuntimeName())) {
+    test({
+      name: options.name,
+      ignore: true,
+      fn() {},
+    });
+  } else {
+    Deno.test({
+      name: options.name,
+      ignore: options.ignore ?? false,
+      only: options.only ?? false,
+      async fn(ctx) {
+        const steps = Object.entries(options.steps ?? {});
+        if (steps.length) {
+          for (const [name, step] of steps) {
+            await ctx.step({
+              name,
+              fn: (ctx) => fn(ctx, step),
+            });
+          }
+        } else {
+          await fn(ctx);
         }
-      } else {
-        await fn(ctx);
-      }
-    },
-  });
+      },
+    });
+  }
 
   async function fn(
     ctx: Deno.TestContext,
