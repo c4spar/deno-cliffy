@@ -30,7 +30,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
-        run: corepack enable
 
       - name: Setup Bun
         if: ${{ matrix.runtime == 'bun' }}
@@ -40,6 +39,7 @@ jobs:
 
       - name: Test ${{ matrix.runtime }}
         run:
+          - command -v corepack >/dev/null 2>&1 && corepack enable
           - deno task setup:${{ matrix.runtime }}
           - deno task coverage:${{ matrix.runtime }}
 

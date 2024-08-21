@@ -38,5 +38,6 @@ jobs:
 
       - name: Run tests
         run:
+          - command -v corepack >/dev/null 2>&1 && corepack enable
           - deno task setup:${{ matrix.runtime }}
           - deno task test:${{ matrix.runtime }}
