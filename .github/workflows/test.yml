@@ -38,7 +38,8 @@ jobs:
           bun-version-file: ".bun-version"
 
       - name: Setup corepack
-        run: command -v corepack >/dev/null 2>&1 && corepack enable
+        if: ${{ matrix.runtime == 'node' }}
+        run: corepack enable
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}
