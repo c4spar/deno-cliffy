@@ -16,7 +16,7 @@
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
     "test:deno": "deno test --doc --allow-run=deno --allow-env --allow-read  --allow-write=./ --ignore=./CHANGELOG.md --parallel",
-    "run": "deno run ./tasks/run_script.ts",
+    "run": "deno run -A ./tasks/run_script.ts",
     "test:node": "deno task run test:node",
     "test:bun": "bun test",
     "coverage:deno": "deno task test:deno --coverage=./dist/coverage/result $COVERAGE_FILES && deno coverage --lcov ./dist/coverage/result > ./dist/coverage/cov.lcov",
