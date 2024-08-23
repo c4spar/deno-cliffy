@@ -41,7 +41,9 @@ jobs:
         if: ${{ matrix.runtime == 'node' }}
         run: |
           corepack enable
-          corepack prepare
+          corepack prepare pnpm --activate
+          corepack --version
+          pnpm --version
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}
