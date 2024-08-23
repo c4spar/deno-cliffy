@@ -28,7 +28,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: nightly
-        run: corepack enable
 
       - name: Setup Bun
         if: ${{ matrix.runtime == 'bun' }}
@@ -38,7 +37,9 @@ jobs:
 
       - name: Setup corepack
         if: ${{ matrix.runtime == 'node' }}
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack prepare
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}
