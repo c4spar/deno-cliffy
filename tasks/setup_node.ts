@@ -50,6 +50,8 @@ for (const [specifier, version] of Object.entries(denoConfig.imports)) {
     : version;
 }
 
+console.log("PNPM_HOME:", Deno.env.get("PNPM_HOME"));
+
 await Deno.writeTextFile(
   "./package.json",
   JSON.stringify({

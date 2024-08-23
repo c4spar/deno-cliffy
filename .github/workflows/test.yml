@@ -44,6 +44,8 @@ jobs:
           corepack prepare pnpm --activate
           corepack --version
           pnpm --version
+          which pnpm
+          echo $PNPM_HOME
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}
