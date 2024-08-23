@@ -46,6 +46,7 @@ jobs:
           pnpm --version
           which pnpm
           echo $PNPM_HOME
+          echo $PATH
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}

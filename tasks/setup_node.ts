@@ -50,6 +50,7 @@ for (const [specifier, version] of Object.entries(denoConfig.imports)) {
     : version;
 }
 
+console.log("PATH:", Deno.env.get("PATH"));
 console.log("PNPM_HOME:", Deno.env.get("PNPM_HOME"));
 
 await Deno.writeTextFile(
