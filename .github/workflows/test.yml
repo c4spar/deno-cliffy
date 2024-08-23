@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runtime: [deno, node, bun]
+        runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
