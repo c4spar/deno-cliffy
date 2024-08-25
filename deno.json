@@ -31,8 +31,8 @@
     "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.5/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md"
   },
   "scripts": {
-    "test:node": "pnpm tsx --test !(testing|node_modules)/**/*test.ts",
-    "coverage:node": "mkdir -p dist/coverage && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/cov.lcov !(testing|node_modules)/**/**/**/*test.ts"
+    "test:node": "pnpm tsx --test '!(testing|node_modules)/**/*test.ts'",
+    "coverage:node": "mkdir -p dist/coverage && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
   },
   "imports": {
     "@c4spar/mock-command": "jsr:@c4spar/mock-command@^1.0.1",
