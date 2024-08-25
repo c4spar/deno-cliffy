@@ -17,10 +17,10 @@
     "fmt": "deno fmt",
     "test:deno": "deno test --doc --allow-run=deno --allow-env --allow-read  --allow-write=./ --ignore=./CHANGELOG.md --parallel",
     "run": "deno run -A ./tasks/run_script.ts",
-    "test:node": "deno task run test:node",
+    "test:node": "pnpm tsx --test '!(testing|node_modules)/**/*test.ts'",
     "test:bun": "bun test",
     "coverage:deno": "deno task test:deno --coverage=./dist/coverage/deno/result $COVERAGE_FILES && deno coverage --lcov ./dist/coverage/deno/result > ./dist/coverage/deno/cov.lcov",
-    "coverage:node": "deno task run coverage:node",
+    "coverage:node": "mkdir -p dist/coverage/node && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/node/cov.lcov '!(testing|node_modules)/**/*test.ts'",
     "coverage:bun": "deno task test:bun --coverage --coverage-reporter=lcov --coverage-dir=./dist/coverage",
     "snapshot": "deno task test -- --update",
     "check:examples": "deno check examples/**/*.ts",
@@ -29,10 +29,6 @@
     "setup:bun": "deno run -A ./tasks/setup_node.ts --bun",
     "clean": "rm -rf dist node_modules .npmrc bun.lockb package.json pnpm-lock.yaml tsconfig.json",
     "update": "deno run --allow-read=./ --allow-net --allow-write=./ https://deno.land/x/deno_outdated@0.2.5/cli.ts --ignore README.md CHANGELOG.md CONTRIBUTING.md"
-  },
-  "scripts": {
-    "test:node": "pnpm tsx --test '!(testing|node_modules)/**/*test.ts'",
-    "coverage:node": "mkdir -p dist/coverage/node && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/node/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
   },
   "imports": {
     "@c4spar/mock-command": "jsr:@c4spar/mock-command@^1.0.1",
