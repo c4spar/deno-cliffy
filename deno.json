@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test:node": "pnpm tsx --test '!(testing|node_modules)/**/*test.ts'",
-    "coverage:node": "mkdir -p dist/coverage && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/node/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
+    "coverage:node": "mkdir -p dist/coverage/node && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/node/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
   },
   "imports": {
     "@c4spar/mock-command": "jsr:@c4spar/mock-command@^1.0.1",
