@@ -52,6 +52,7 @@ jobs:
         run: bun install
 
       - name: Run tests
+        shell: bash
         run: deno task test:${{ matrix.runtime }}
 
       - name: Upload coverage
