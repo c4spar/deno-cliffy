@@ -19,7 +19,7 @@
     "run": "deno run -A ./tasks/run_script.ts",
     "test:node": "deno task run test:node",
     "test:bun": "bun test",
-    "coverage:deno": "deno task test:deno --coverage=./dist/coverage/result $COVERAGE_FILES && deno coverage --lcov ./dist/coverage/result > ./dist/coverage/cov.lcov",
+    "coverage:deno": "deno task test:deno --coverage=./dist/coverage/deno/result $COVERAGE_FILES && deno coverage --lcov ./dist/coverage/deno/result > ./dist/coverage/deno/cov.lcov",
     "coverage:node": "deno task run coverage:node",
     "coverage:bun": "deno task test:bun --coverage --coverage-reporter=lcov --coverage-dir=./dist/coverage",
     "snapshot": "deno task test -- --update",
@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test:node": "pnpm tsx --test '!(testing|node_modules)/**/*test.ts'",
-    "coverage:node": "mkdir -p dist/coverage && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
+    "coverage:node": "mkdir -p dist/coverage && pnpm tsx --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./dist/coverage/node/cov.lcov '!(testing|node_modules)/**/**/**/*test.ts'"
   },
   "imports": {
     "@c4spar/mock-command": "jsr:@c4spar/mock-command@^1.0.1",
