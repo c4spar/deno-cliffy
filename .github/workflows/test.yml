@@ -37,16 +37,9 @@ jobs:
         with:
           bun-version-file: ".bun-version"
 
-      - name: Setup corepack
+      - name: Setup pnpm
         if: ${{ matrix.runtime == 'node' }}
-        run: |
-          corepack enable
-          corepack prepare pnpm --activate
-          corepack --version
-          pnpm --version
-          which pnpm
-          echo $PNPM_HOME
-          echo $PATH
+        uses: pnpm/action-setup@v4
 
       - name: Install deps
         run: deno task setup:${{ matrix.runtime }}
