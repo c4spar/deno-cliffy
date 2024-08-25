@@ -71,14 +71,16 @@ await new Deno.Command("deno", {
   args: ["fmt", "tsconfig.json", "package.json"],
 }).spawn().output();
 
-if (Deno.args.includes("--bun")) {
-  await new Deno.Command("bun", {
-    args: ["install"],
-  }).spawn().output();
-} else {
-  await new Deno.Command("pnpm", {
-    args: ["install"],
-  }).spawn().output();
+if (!Deno.args.includes("--no-install")) {
+  if (Deno.args.includes("--bun")) {
+    await new Deno.Command("bun", {
+      args: ["install"],
+    }).spawn().output();
+  } else {
+    await new Deno.Command("pnpm", {
+      args: ["install"],
+    }).spawn().output();
+  }
 }
 
 async function getProjects(): Promise<Array<string>> {

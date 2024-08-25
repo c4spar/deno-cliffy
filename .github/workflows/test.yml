@@ -20,6 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create package.json
+        if: ${{ matrix.runtime == 'node' || matrix.runtime == 'bun' }}
+        run: deno task setup:${{ matrix.runtime }} --no-install
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
@@ -40,9 +44,12 @@ jobs:
       - name: Setup pnpm
         if: ${{ matrix.runtime == 'node' }}
         uses: pnpm/action-setup@v4
+        with:
+          run_install: true
 
-      - name: Install deps
-        run: deno task setup:${{ matrix.runtime }}
+      - name: Install bun deps
+        if: ${{ matrix.runtime == 'bun' }}
+        run: bun install
 
       - name: Run tests
         run: deno task test:${{ matrix.runtime }}
