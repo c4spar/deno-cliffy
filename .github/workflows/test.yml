@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: deno task test:${{ matrix.runtime }}
+        run: deno task coverage:${{ matrix.runtime }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
