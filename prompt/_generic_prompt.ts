@@ -363,7 +363,7 @@ export abstract class GenericPrompt<
 
   /** Read user input from stdin. */
   #readChar = async (): Promise<Uint8Array> => {
-    const buffer = new Uint8Array(8);
+    const buffer = new Uint8Array(4096);
     const isTty = this.settings.reader.isTerminal();
 
     if (isTty) {
