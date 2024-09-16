@@ -1,5 +1,5 @@
 {
-  "name": "@cliffy/flags",
+  "name": "@windmill-labs/cliffy-flags",
   "version": "1.0.0-rc.5",
   "exports": "./mod.ts"
 }

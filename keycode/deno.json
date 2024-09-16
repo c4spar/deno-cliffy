@@ -1,5 +1,5 @@
 {
-  "name": "@cliffy/keycode",
+  "name": "@windmill-labs/cliffy-keycode",
   "version": "1.0.0-rc.5",
   "exports": "./mod.ts"
 }

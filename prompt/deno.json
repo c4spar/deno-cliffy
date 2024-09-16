@@ -1,5 +1,5 @@
 {
-  "name": "@cliffy/prompt",
+  "name": "@windmill-labs/cliffy-prompt",
   "version": "1.0.0-rc.5",
   "exports": {
     ".": "./mod.ts",

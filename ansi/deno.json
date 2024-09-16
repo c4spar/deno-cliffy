@@ -1,5 +1,5 @@
 {
-  "name": "@cliffy/ansi",
+  "name": "@windmill-labs/cliffy-ansi",
   "version": "1.0.0-rc.5",
   "exports": {
     ".": "./ansi.ts",

@@ -1,5 +1,5 @@
 {
-  "name": "@cliffy/internal",
+  "name": "@windmill-labs/cliffy-internal",
   "version": "1.0.0-rc.5",
   "exports": {
     "./runtime/exit": "./runtime/exit.ts",

@@ -7,9 +7,9 @@
  */
 export function setRaw(
   mode: boolean,
-  { cbreak }: { cbreak?: boolean } = {},
+  { cbreak }: { cbreak?: boolean } = {}
 ): void {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;
 
   if (Deno) {
