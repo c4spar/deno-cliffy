@@ -15,22 +15,22 @@ jobs:
         include:
           - runtime: deno
             os: macOS-latest
-            deno_version: v1.x
+            runtime_version: v1.x
           - runtime: deno
             os: windows-latest
-            deno_version: v1.x
+            runtime_version: v1.x
           - runtime: deno
             os: ubuntu-latest
-            deno_version: v1.x
+            runtime_version: v1.x
           - runtime: deno
             os: macOS-latest
-            deno_version: rc
+            runtime_version: rc
           - runtime: deno
             os: windows-latest
-            deno_version: rc
+            runtime_version: rc
           - runtime: deno
             os: ubuntu-latest
-            deno_version: rc
+            runtime_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
