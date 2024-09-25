@@ -1,4 +1,4 @@
-import type { Spinner } from "./spinner.ts";
+// import type { Spinner } from "./spinner.ts";
 
 export interface Logger {
   log(...data: Array<unknown>): void;
@@ -8,18 +8,18 @@ export interface Logger {
 }
 
 export interface LoggerOptions {
-  spinner?: Spinner;
+  // spinner?: Spinner;
   verbose?: boolean;
 }
 
-export function createLogger({ spinner, verbose }: LoggerOptions = {}): Logger {
+export function createLogger({ verbose }: LoggerOptions = {}): Logger {
   function write(
     type: "log" | "info" | "warn" | "error",
     ...args: Array<unknown>
   ): void {
-    spinner?.stop();
+    // spinner?.stop();
     console[type](...args);
-    spinner?.start();
+    // spinner?.start();
   }
 
   return {

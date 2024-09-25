@@ -10,7 +10,7 @@ export class BooleanType extends Type<boolean> {
   }
 
   /** Complete boolean type. */
-  public complete(): string[] {
+  public override complete(): string[] {
     return ["true", "false"];
   }
 }

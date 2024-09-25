@@ -11,6 +11,11 @@ jobs:
       matrix:
         runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
+        include:
+          - runtime: deno
+            deno_version: canary
+          - runtime: deno
+            deno_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -21,7 +26,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: canary
+          deno-version: ${{ matrix.deno_version }}
 
       - name: Setup Node
         if: ${{ matrix.runtime == 'node' }}

@@ -5,13 +5,14 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.runtime }} ${{ matrix.os }}
+    name: ${{ matrix.runtime }} ${{ matrix.os }} deno-${{ matrix.deno }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
+        deno: [v1.x, rc]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -23,7 +24,8 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version-file: ".deno-version"
+          deno-version: ${{ matrix.deno }}
+          # deno-version-file: ".deno-version"
 
       - name: Create package.json
         if: ${{ matrix.runtime == 'node' || matrix.runtime == 'bun' }}
@@ -44,14 +46,22 @@ jobs:
       - name: Setup pnpm
         if: ${{ matrix.runtime == 'node' }}
         uses: pnpm/action-setup@v4
-        with:
-          run_install: true
 
-      - name: Install bun deps
-        if: ${{ matrix.runtime == 'bun' }}
-        run: bun install
+      - name: Install deps
+        run: deno task setup:${{ matrix.runtime }}
 
       - name: Run tests
+        if: matrix.runtime == 'deno' && matrix.deno_version == 'v1.x'
+        shell: bash
+        run: deno task coverage:deno-v1
+
+      - name: Run tests
+        if: matrix.runtime == 'deno' && matrix.deno_version == 'rc'
+        shell: bash
+        run: deno task coverage:deno-v2
+
+      - name: Run tests
+        if: matrix.runtime != 'deno'
         shell: bash
         run: deno task coverage:${{ matrix.runtime }}
 

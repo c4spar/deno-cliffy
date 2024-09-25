@@ -3,7 +3,7 @@
 import { Command, StringType } from "@cliffy/command";
 
 class EmailType extends StringType {
-  complete(): string[] {
+  override complete(): string[] {
     return ["aaa@example.com", "bbb@example.com", "ccc@example.com"];
   }
 }

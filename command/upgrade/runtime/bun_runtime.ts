@@ -3,7 +3,7 @@ import type { Logger } from "../logger.ts";
 import { NodeRuntime } from "./node_runtime.ts";
 
 export class BunRuntime extends NodeRuntime {
-  protected async execute(
+  protected override async execute(
     cmdArgs: string[],
     isJsr: boolean,
     logger?: Logger,

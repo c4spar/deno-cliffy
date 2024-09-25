@@ -102,7 +102,7 @@ const sep = getOs() === "windows" ? "\\" : "/";
 /** Generic input prompt representation. */
 export abstract class GenericSuggestions<TValue, TRawValue>
   extends GenericInput<TValue, TRawValue> {
-  protected abstract readonly settings: GenericSuggestionsSettings<
+  protected abstract override readonly settings: GenericSuggestionsSettings<
     TValue,
     TRawValue
   >;
@@ -112,7 +112,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   #envPermissions: Record<string, boolean> = {};
   #hasReadPermissions?: boolean;
 
-  public getDefaultSettings(
+  public override getDefaultSettings(
     options: GenericSuggestionsOptions<TValue, TRawValue>,
   ): GenericSuggestionsSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);
@@ -168,7 +168,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
     }
   }
 
-  protected async render(): Promise<void> {
+  protected override async render(): Promise<void> {
     if (this.settings.files && this.#hasReadPermissions === undefined) {
       // deno-lint-ignore no-explicit-any
       const status = await (globalThis as any).Deno?.permissions.request({
@@ -199,7 +199,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
     );
   }
 
-  protected input(): string {
+  protected override input(): string {
     return super.input() + dim(this.getSuggestion());
   }
 
@@ -260,7 +260,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       );
   }
 
-  protected body(): string | Promise<string> {
+  protected override body(): string | Promise<string> {
     return this.getList() + this.getInfo();
   }
 
@@ -365,7 +365,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "next", event):
         if (this.settings.list) {
@@ -411,7 +411,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
   }
 
   /** Delete char right. */
-  protected deleteCharRight(): void {
+  protected override deleteCharRight(): void {
     if (this.inputIndex < this.inputValue.length) {
       super.deleteCharRight();
       if (!this.getCurrentInputValue().length) {

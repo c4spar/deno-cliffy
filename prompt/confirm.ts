@@ -61,7 +61,7 @@ export class Confirm extends GenericSuggestions<boolean, string> {
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static override inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
@@ -73,7 +73,7 @@ export class Confirm extends GenericSuggestions<boolean, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  public getDefaultSettings(options: ConfirmOptions): ConfirmSettings {
+  public override getDefaultSettings(options: ConfirmOptions): ConfirmSettings {
     return {
       ...super.getDefaultSettings(options),
       active: options.active || "Yes",
@@ -89,7 +89,7 @@ export class Confirm extends GenericSuggestions<boolean, string> {
     };
   }
 
-  protected defaults(): string {
+  protected override defaults(): string {
     let defaultMessage = "";
 
     if (this.settings.default === true) {
@@ -106,7 +106,7 @@ export class Confirm extends GenericSuggestions<boolean, string> {
     return defaultMessage ? dim(` (${defaultMessage})`) : "";
   }
 
-  protected success(value: boolean): string | undefined {
+  protected override success(value: boolean): string | undefined {
     this.saveSuggestions(this.format(value));
     return super.success(value);
   }

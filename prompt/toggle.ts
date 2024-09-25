@@ -63,7 +63,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
       : "";
   }
 
-  public getDefaultSettings(options: ToggleOptions): ToggleSettings {
+  public override getDefaultSettings(options: ToggleOptions): ToggleSettings {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,
@@ -77,7 +77,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
     };
   }
 
-  protected message(): string {
+  protected override message(): string {
     let message = super.message() + " " + this.settings.pointer + " ";
 
     if (this.status === this.settings.active) {
@@ -94,7 +94,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
   }
 
   /** Read user input from stdin, handle events and validate user input. */
-  protected read(): Promise<boolean> {
+  protected override read(): Promise<boolean> {
     this.settings.tty.cursorHide();
     return super.read();
   }
@@ -103,7 +103,7 @@ export class Toggle extends GenericPrompt<boolean, string> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case event.sequence === this.settings.inactive[0].toLowerCase():
       case this.isKey(this.settings.keys, "inactive", event):

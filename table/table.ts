@@ -68,7 +68,9 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
    *
    * @param rows An array of rows or a table instance.
    */
-  public static from<TRow extends RowType>(rows: TableType<TRow>): Table<TRow> {
+  public static override from<TRow extends RowType>(
+    rows: TableType<TRow>,
+  ): Table<TRow> {
     const table = new this(...rows);
     if (rows instanceof Table) {
       table.options = { ...(rows as Table).options };
@@ -184,7 +186,7 @@ export class Table<TRow extends RowType = RowType> extends Array<TRow> {
   }
 
   /** Generate table string. */
-  public toString(): string {
+  public override toString(): string {
     return new TableLayout(this, this.options).toString();
   }
 

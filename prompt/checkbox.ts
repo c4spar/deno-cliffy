@@ -205,7 +205,7 @@ export class Checkbox<TValue> extends GenericList<
    *
    * @param value Input value.
    */
-  public static inject<TValue>(value: Array<TValue>): void {
+  public static override inject<TValue>(value: Array<TValue>): void {
     GenericPrompt.inject(value);
   }
 
@@ -217,7 +217,7 @@ export class Checkbox<TValue> extends GenericList<
     this.listOffset = this.getPageOffset(this.listIndex);
   }
 
-  public getDefaultSettings(
+  public override getDefaultSettings(
     options: CheckboxOptions<TValue>,
   ): CheckboxSettings<TValue> {
     const settings = super.getDefaultSettings(options);
@@ -265,7 +265,7 @@ export class Checkbox<TValue> extends GenericList<
     );
   }
 
-  protected mapOption(
+  protected override mapOption(
     options: CheckboxOptions<TValue>,
     option: CheckboxOption<TValue> | GenericListSeparatorOption,
   ): CheckboxOptionSettings<TValue> {
@@ -287,7 +287,7 @@ export class Checkbox<TValue> extends GenericList<
     }
   }
 
-  protected mapOptionGroup(
+  protected override mapOptionGroup(
     promptOptions: CheckboxOptions<TValue>,
     option: CheckboxOptionGroup<TValue>,
   ): CheckboxOptionGroupSettings<TValue> {
@@ -302,14 +302,14 @@ export class Checkbox<TValue> extends GenericList<
     };
   }
 
-  protected match(): void {
+  protected override match(): void {
     super.match();
     if (this.isSearching()) {
       this.selectSearch();
     }
   }
 
-  protected getListItemIcon(
+  protected override getListItemIcon(
     option:
       | CheckboxOptionSettings<TValue>
       | CheckboxOptionGroupSettings<TValue>,
@@ -351,7 +351,7 @@ export class Checkbox<TValue> extends GenericList<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     const hasConfirmed: boolean = this.confirmSubmit;
     this.confirmSubmit = false;
 
@@ -372,7 +372,7 @@ export class Checkbox<TValue> extends GenericList<
     }
   }
 
-  protected hint(): string | undefined {
+  protected override hint(): string | undefined {
     if (this.confirmSubmit) {
       const info = this.isBackButton(this.selectedOption)
         ? ` To leave the current group press ${
@@ -397,7 +397,7 @@ export class Checkbox<TValue> extends GenericList<
     return super.hint();
   }
 
-  protected async submit(hasConfirmed?: boolean): Promise<void> {
+  protected override async submit(hasConfirmed?: boolean): Promise<void> {
     if (
       !hasConfirmed &&
       this.settings.confirmSubmit &&
