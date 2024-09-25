@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { ansiRegexSource } from "../_utils.ts";
 import { assertEquals } from "@std/assert";
 
-Deno.test(`table - ansiRegexSource`, () => {
+test(`table - ansiRegexSource`, () => {
   const DIGITS = String.raw`\d+`;
   // All open and close ANSI codes taken from calls to `code(...)` in
   // https://deno.land/std@0.221.0/fmt/colors.ts

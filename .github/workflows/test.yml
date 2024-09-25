@@ -5,34 +5,61 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.module }} ${{ matrix.os }} deno-${{ matrix.deno }}
+    name: ${{ matrix.runtime }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        module: [ansi, command, flags, keycode, keypress, prompt, table, testing]
+        runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno: [v1.x]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
       CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno }}
+          deno-version-file: ".deno-version"
 
-      - name: Test ${{ matrix.module }}
-        run: deno task coverage:${{ matrix.module }}
+      - name: Create package.json
+        if: ${{ matrix.runtime == 'node' || matrix.runtime == 'bun' }}
+        run: deno task setup:${{ matrix.runtime }} --no-install
 
-      - name: Upload ${{ matrix.module }} coverage
+      - name: Setup Node
+        if: ${{ matrix.runtime == 'node' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+
+      - name: Setup Bun
+        if: ${{ matrix.runtime == 'bun' }}
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+
+      - name: Setup pnpm
+        if: ${{ matrix.runtime == 'node' }}
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      - name: Install bun deps
+        if: ${{ matrix.runtime == 'bun' }}
+        run: bun install
+
+      - name: Run tests
+        shell: bash
+        run: deno task coverage:${{ matrix.runtime }}
+
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          name: ${{ matrix.module }}-${{ matrix.os }}-${{ matrix.deno }}
+          fail_ci_if_error: true
+          name: ${{ matrix.runtime }}-${{ matrix.os }}
           files: dist/coverage/${{ matrix.module }}/cov.lcov
-          flags: ${{ matrix.module }}
+          flags: ${{ matrix.runtime }}
           token: ${{ secrets.CODECOV_TOKEN }}

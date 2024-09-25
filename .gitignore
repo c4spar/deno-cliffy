@@ -8,3 +8,11 @@ dist
 testing/__snapshots__/snapshot_test_fixture.ts.snap
 testing/__snapshots__/snapshot_test_fixture_2.ts.snap
 __snapshots_test__
+
+# Node files
+node_modules
+.npmrc
+bun.lockb
+package.json
+pnpm-lock.yaml
+tsconfig.json

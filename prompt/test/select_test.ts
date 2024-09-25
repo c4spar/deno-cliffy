@@ -1,9 +1,11 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { assertType, type IsExact } from "@std/testing/types";
 import { Select } from "../select.ts";
 
-Deno.test("prompt select: value", async () => {
+test("prompt select: value", async () => {
   console.log();
   Select.inject("value2");
   const result: string | undefined = await Select.prompt({
@@ -13,7 +15,7 @@ Deno.test("prompt select: value", async () => {
   assertEquals(result, "value2");
 });
 
-Deno.test("prompt select: object value", async () => {
+test("prompt select: object value", async () => {
   Select.inject({ id: 1, name: "foo" });
 
   const books = [
@@ -30,7 +32,7 @@ Deno.test("prompt select: object value", async () => {
   assertType<IsExact<typeof result, { id: number; name: string }>>(true);
 });
 
-Deno.test("prompt select: empty value", async () => {
+test("prompt select: empty value", async () => {
   await assertRejects(
     async () => {
       Select.inject("");
@@ -41,12 +43,12 @@ Deno.test("prompt select: empty value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt select: invalid value", async () => {
+test("prompt select: invalid value", async () => {
   await assertRejects(
     async () => {
       Select.inject("value4");
@@ -57,12 +59,12 @@ Deno.test("prompt select: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt select: null value", async () => {
+test("prompt select: null value", async () => {
   await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
@@ -74,7 +76,7 @@ Deno.test("prompt select: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

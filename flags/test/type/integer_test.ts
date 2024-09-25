@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -24,7 +25,7 @@ const requiredValueOptions: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - type - integer - with no value", () => {
+test("flags - type - integer - with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], optionalValueOptions);
 
   assertEquals(flags, { flag: true });
@@ -32,7 +33,7 @@ Deno.test("flags - type - integer - with no value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - integer - with valid value", () => {
+test("flags - type - integer - with valid value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "123"],
     optionalValueOptions,
@@ -43,7 +44,7 @@ Deno.test("flags - type - integer - with valid value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - integer - with argument", () => {
+test("flags - type - integer - with argument", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-f", "456", "unknown"],
     optionalValueOptions,
@@ -54,7 +55,7 @@ Deno.test("flags - type - integer - with argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - integer - with missing value", () => {
+test("flags - type - integer - with missing value", () => {
   assertThrows(
     () => parseFlags(["-f"], requiredValueOptions),
     Error,
@@ -62,7 +63,7 @@ Deno.test("flags - type - integer - with missing value", () => {
   );
 });
 
-Deno.test("flags - type - integer - with invalid string value", () => {
+test("flags - type - integer - with invalid string value", () => {
   assertThrows(
     () => parseFlags(["-f", "abc"], requiredValueOptions),
     Error,
@@ -70,7 +71,7 @@ Deno.test("flags - type - integer - with invalid string value", () => {
   );
 });
 
-Deno.test("flags - type - integer - with invalid float value", () => {
+test("flags - type - integer - with invalid float value", () => {
   assertThrows(
     () => parseFlags(["-f", "1.23"], requiredValueOptions),
     Error,

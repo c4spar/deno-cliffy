@@ -1,36 +1,38 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { Confirm } from "../confirm.ts";
 
-Deno.test("prompt confirm: y", async () => {
+test("prompt confirm: y", async () => {
   console.log();
   Confirm.inject("y");
   const result: boolean | undefined = await Confirm.prompt("message");
   assertEquals(result, true);
 });
 
-Deno.test("prompt confirm: yes", async () => {
+test("prompt confirm: yes", async () => {
   console.log();
   Confirm.inject("Yes");
   const result: boolean | undefined = await Confirm.prompt("message");
   assertEquals(result, true);
 });
 
-Deno.test("prompt confirm: n", async () => {
+test("prompt confirm: n", async () => {
   console.log();
   Confirm.inject("n");
   const result: boolean | undefined = await Confirm.prompt("message");
   assertEquals(result, false);
 });
 
-Deno.test("prompt confirm: no", async () => {
+test("prompt confirm: no", async () => {
   console.log();
   Confirm.inject("No");
   const result: boolean | undefined = await Confirm.prompt("message");
   assertEquals(result, false);
 });
 
-Deno.test("prompt confirm: empty value", async () => {
+test("prompt confirm: empty value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -39,12 +41,12 @@ Deno.test("prompt confirm: empty value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt confirm: invalid value", async () => {
+test("prompt confirm: invalid value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -53,12 +55,12 @@ Deno.test("prompt confirm: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt confirm: null value", async () => {
+test("prompt confirm: null value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -68,7 +70,7 @@ Deno.test("prompt confirm: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

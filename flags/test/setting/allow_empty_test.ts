@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 
-Deno.test("[flags] should not allow empty by default", () => {
+test("[flags] should not allow empty by default", () => {
   assertThrows(
     () =>
       parseFlags([], {
@@ -15,7 +16,7 @@ Deno.test("[flags] should not allow empty by default", () => {
   );
 });
 
-Deno.test("[flags] should not allow empty if disabled", () => {
+test("[flags] should not allow empty if disabled", () => {
   assertThrows(
     () =>
       parseFlags([], {
@@ -30,7 +31,7 @@ Deno.test("[flags] should not allow empty if disabled", () => {
   );
 });
 
-Deno.test("[flags] should allow empty if enabled", () => {
+test("[flags] should allow empty if enabled", () => {
   const { flags, unknown } = parseFlags([], {
     allowEmpty: true,
     flags: [{

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
@@ -15,7 +16,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("negatable flags with no arguments", () => {
+test("negatable flags with no arguments", () => {
   const { flags, unknown, literal } = parseFlags([], options);
 
   assertEquals(flags, {
@@ -25,7 +26,7 @@ Deno.test("negatable flags with no arguments", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("negatable flags", () => {
+test("negatable flags", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--no-color", "--no-check"],
     options,
@@ -39,7 +40,7 @@ Deno.test("negatable flags", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("Option with name with negatable flags", () => {
+test("Option with name with negatable flags", () => {
   assertThrows(
     () => parseFlags(["--color", "--no-color", "--no-check"], options),
     Error,
@@ -47,7 +48,7 @@ Deno.test("Option with name with negatable flags", () => {
   );
 });
 
-Deno.test("unknown negatable flag", () => {
+test("unknown negatable flag", () => {
   assertThrows(
     () => parseFlags(["--no-remote"], options),
     Error,

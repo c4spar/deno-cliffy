@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -45,7 +46,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("[flags] should set default args with empty arguments", () => {
+test("[flags] should set default args with empty arguments", () => {
   const { flags, unknown, literal } = parseFlags([], options);
 
   assertEquals(flags, {
@@ -61,7 +62,7 @@ Deno.test("[flags] should set default args with empty arguments", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should override default values", () => {
+test("[flags] should override default values", () => {
   const { flags, unknown, literal } = parseFlags(
     [
       "-b",
@@ -95,7 +96,7 @@ Deno.test("[flags] should override default values", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should override default value with optional value", () => {
+test("[flags] should override default value with optional value", () => {
   const { flags, unknown, literal } = parseFlags(["-b"], options);
 
   assertEquals(flags, {
@@ -111,7 +112,7 @@ Deno.test("[flags] should override default value with optional value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should ignore defaults", () => {
+test("[flags] should ignore defaults", () => {
   const { flags, unknown, literal } = parseFlags([], {
     ...options,
     ignoreDefaults: {
@@ -131,7 +132,7 @@ Deno.test("[flags] should ignore defaults", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse from context", () => {
+test("[flags] should parse from context", () => {
   const { flags, unknown, literal } = parseFlags({
     flags: { bar: true },
     unknown: ["--foo"],
@@ -154,7 +155,7 @@ Deno.test("[flags] should parse from context", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should ignore missing required options which are already parsed", () => {
+test("[flags] should ignore missing required options which are already parsed", () => {
   const { flags, unknown, literal } = parseFlags({
     flags: {
       required: true,

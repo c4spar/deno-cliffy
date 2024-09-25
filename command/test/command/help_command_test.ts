@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { CompletionsCommand } from "../../completions/completions_command.ts";
 import { HelpCommand } from "../../help/help_command.ts";
@@ -69,7 +70,7 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
   return cmd;
 }
 
-Deno.test({
+test({
   name: "command: help command with line break",
   fn() {
     const output: string = command(true, true).getHelp();
@@ -112,7 +113,7 @@ Environment variables:
   },
 });
 
-Deno.test({
+test({
   name: "command: help command with line break but without default options",
   fn() {
     const output: string = command(false, true).getHelp();

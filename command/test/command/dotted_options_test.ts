@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -21,7 +22,7 @@ function cmd() {
     .action(() => {});
 }
 
-Deno.test("command: dotted short options", async () => {
+test("command: dotted short options", async () => {
   const { options, args, literal } = await cmd().parse(
     ["-b.a", "300", "-b.v", "900"],
   );
@@ -31,7 +32,7 @@ Deno.test("command: dotted short options", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("command: dotted long options", async () => {
+test("command: dotted long options", async () => {
   const { options, args, literal } = await cmd().parse(
     ["--bitrate.audio", "300", "--bitrate.video", "900"],
   );
@@ -41,7 +42,7 @@ Deno.test("command: dotted long options", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("command: dotted aliases", async () => {
+test("command: dotted aliases", async () => {
   const { options, args, literal } = await cmd().parse(
     ["--audio-bitrate", "300", "--video-bitrate", "900"],
   );
@@ -51,7 +52,7 @@ Deno.test("command: dotted aliases", async () => {
   assertEquals(literal, []);
 });
 
-Deno.test("command: dotted aliases", async () => {
+test("command: dotted aliases", async () => {
   await assertRejects(
     () => cmd().parse(["--audio-bitrate", "300"]),
     Error,
@@ -59,7 +60,7 @@ Deno.test("command: dotted aliases", async () => {
   );
 });
 
-Deno.test("command: dotted option with invalid value", async () => {
+test("command: dotted option with invalid value", async () => {
   await assertRejects(
     () => cmd().parse(["--bitrate.audio", "300", "--bitrate.video", "900k"]),
     Error,

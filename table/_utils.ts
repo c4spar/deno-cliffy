@@ -7,7 +7,8 @@
 import { Cell, type CellType } from "./cell.ts";
 import { consumeWords } from "./consume_words.ts";
 import { stripAnsiCode } from "@std/fmt/colors";
-import { unicodeWidth } from "@std/cli/unicode-width";
+import { unicodeWidth } from "./unicode_width.ts";
+// import { unicodeWidth } from "@std/cli/unicode-width";
 
 /**
  * Get longest cell from given row index.

@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { bold, red, underline } from "@std/fmt/colors";
 import { colors } from "./colors.ts";
 
-Deno.test({
+test({
   name: "ansi - colors - chainable colors",
   fn() {
     assertEquals(
@@ -12,7 +13,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - colors - chainable colors theme",
   fn() {
     const theme = colors.red.underline;
@@ -27,7 +28,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - colors - chainable colors custom instance",
   fn() {
     const myColors = colors();
@@ -43,7 +44,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - colors - empty string argument",
   fn() {
     assertEquals(

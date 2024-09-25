@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -19,7 +20,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags optionStandalone flag", () => {
+test("flags optionStandalone flag", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], options);
 
   assertEquals(flags, { flag: true, fooBar: 3 });
@@ -27,7 +28,7 @@ Deno.test("flags optionStandalone flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionStandalone flagCombine", () => {
+test("flags optionStandalone flagCombine", () => {
   assertThrows(
     () => parseFlags(["-f", "-a"], options),
     Error,
@@ -35,7 +36,7 @@ Deno.test("flags optionStandalone flagCombine", () => {
   );
 });
 
-Deno.test("flags optionStandalone flagCombineLong", () => {
+test("flags optionStandalone flagCombineLong", () => {
   assertThrows(
     () => parseFlags(["--flag", "--all"], options),
     Error,

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -14,7 +15,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags optionAliases f", () => {
+test("flags optionAliases f", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], options);
 
   assertEquals(flags, { flag: true });
@@ -22,7 +23,7 @@ Deno.test("flags optionAliases f", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionAliases fl", () => {
+test("flags optionAliases fl", () => {
   const { flags, unknown, literal } = parseFlags(["--fl"], options);
 
   assertEquals(flags, { flag: true });
@@ -30,7 +31,7 @@ Deno.test("flags optionAliases fl", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionAliases flag", () => {
+test("flags optionAliases flag", () => {
   const { flags, unknown, literal } = parseFlags(["--flag"], options);
 
   assertEquals(flags, { flag: true });
@@ -38,7 +39,7 @@ Deno.test("flags optionAliases flag", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionAliases flags", () => {
+test("flags optionAliases flags", () => {
   const { flags, unknown, literal } = parseFlags(["--flags"], options);
 
   assertEquals(flags, { flag: true });
@@ -46,7 +47,7 @@ Deno.test("flags optionAliases flags", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionAliases InvalidValue f", () => {
+test("flags optionAliases InvalidValue f", () => {
   assertThrows(
     () => parseFlags(["-f", "value"], options),
     Error,
@@ -54,7 +55,7 @@ Deno.test("flags optionAliases InvalidValue f", () => {
   );
 });
 
-Deno.test("flags optionAliases InvalidValue fl", () => {
+test("flags optionAliases InvalidValue fl", () => {
   assertThrows(
     () => parseFlags(["--fl", "value"], options),
     Error,
@@ -62,7 +63,7 @@ Deno.test("flags optionAliases InvalidValue fl", () => {
   );
 });
 
-Deno.test("flags optionAliases InvalidValue flag", () => {
+test("flags optionAliases InvalidValue flag", () => {
   assertThrows(
     () => parseFlags(["--flag", "value"], options),
     Error,
@@ -70,7 +71,7 @@ Deno.test("flags optionAliases InvalidValue flag", () => {
   );
 });
 
-Deno.test("flags optionAliases InvalidValue flags", () => {
+test("flags optionAliases InvalidValue flags", () => {
   assertThrows(
     () => parseFlags(["--flags", "value"], options),
     Error,

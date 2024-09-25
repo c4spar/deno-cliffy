@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assert, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -7,12 +8,12 @@ const cmd = new Command()
   .option("--no-flag", "description ...")
   .action(() => {});
 
-Deno.test("should not throw an error if single flag is used", async () => {
+test("should not throw an error if single flag is used", async () => {
   const parsedArgs = await cmd.parse(["-f", "true"]);
   assert(parsedArgs.options.flag === true);
 });
 
-Deno.test("command optionDuplicate flag", async () => {
+test("command optionDuplicate flag", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "-f", "true"]);
@@ -22,7 +23,7 @@ Deno.test("command optionDuplicate flag", async () => {
   );
 });
 
-Deno.test("command optionDuplicate flagLong", async () => {
+test("command optionDuplicate flagLong", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "--flag"]);
@@ -32,7 +33,7 @@ Deno.test("command optionDuplicate flagLong", async () => {
   );
 });
 
-Deno.test("command optionDuplicate flagTrueLongFalse", async () => {
+test("command optionDuplicate flagTrueLongFalse", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--flag", "false"]);
@@ -42,7 +43,7 @@ Deno.test("command optionDuplicate flagTrueLongFalse", async () => {
   );
 });
 
-Deno.test("command optionDuplicate flagTrueNoFlag", async () => {
+test("command optionDuplicate flagTrueNoFlag", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--no-flag"]);
@@ -52,7 +53,7 @@ Deno.test("command optionDuplicate flagTrueNoFlag", async () => {
   );
 });
 
-Deno.test("command optionDuplicate flagTrueNoFlagTrue", async () => {
+test("command optionDuplicate flagTrueNoFlagTrue", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "true", "--no-flag", "true"]);

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import { ValidationError } from "../../_errors.ts";
@@ -29,21 +30,21 @@ const cmd = () =>
         ),
     );
 
-Deno.test("[command] should execute global command", async () => {
+test("[command] should execute global command", async () => {
   const { options, args } = await cmd().parse(["global", "halo"]);
 
   assertEquals(options, {});
   assertEquals(args, ["halo"]);
 });
 
-Deno.test("[command] should execute global command on sub command", async () => {
+test("[command] should execute global command on sub command", async () => {
   const { options, args } = await cmd().parse(["command1", "global", "halo"]);
 
   assertEquals(options, {});
   assertEquals(args, ["halo"]);
 });
 
-Deno.test("[command] should execute global command on nested sub command", async () => {
+test("[command] should execute global command on nested sub command", async () => {
   const { options, args } = await cmd().parse(
     ["command1", "command2", "global", "halo"],
   );
@@ -52,19 +53,27 @@ Deno.test("[command] should execute global command on nested sub command", async
   assertEquals(args, ["halo"]);
 });
 
-Deno.test("[command] should disable global commands with noGlobals", async () => {
-  await assertRejects(
-    () =>
-      cmd().parse(
-        ["command1", "command3", "global", "halo"],
-      ),
-    ValidationError,
-    'Unknown command "global". Did you mean command "help"?',
-  );
+test({
+  name: "[command] should disable global commands with noGlobals",
+  ignore: ["node"],
+  fn: async () => {
+    await assertRejects(
+      () =>
+        cmd().parse(
+          ["command1", "command3", "global", "halo"],
+        ),
+      ValidationError,
+      'Unknown command "global". Did you mean command "help"?',
+    );
+  },
 });
 
-Deno.test("[command] should not disable global help command with noGlobals", async () => {
-  await cmd().parse(
-    ["command1", "command3", "help"],
-  );
+test({
+  name: "[command] should not disable global help command with noGlobals",
+  ignore: ["node"],
+  fn: async () => {
+    await cmd().parse(
+      ["command1", "command3", "help"],
+    );
+  },
 });

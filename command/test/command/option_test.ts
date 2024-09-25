@@ -1,5 +1,6 @@
 // deno-fmt-ignore-file
 
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { bold } from "@std/fmt/colors";
 import { Command } from "../../command.ts";
@@ -24,7 +25,7 @@ function command() {
     );
 }
 
-Deno.test("command - option - option properties", () => {
+test("command - option - option properties", () => {
   const option: Option = new Command()
     .throwErrors()
     .option("-F, --foo-bar <baz:boolean> [baz:string]", "test ...", {
@@ -74,7 +75,7 @@ Deno.test("command - option - option properties", () => {
   }]);
 });
 
-Deno.test("command - option - has options", () => {
+test("command - option - has options", () => {
   const cmd = command();
   assertEquals(cmd.hasOptions(), true);
   assertEquals(cmd.hasOptions(true), true);
@@ -82,7 +83,7 @@ Deno.test("command - option - has options", () => {
   assertEquals(new Command().hasOptions(true), false);
 });
 
-Deno.test("command - option - get options", () => {
+test("command - option - get options", () => {
   const cmd = command();
   assertEquals(cmd.getOptions().length, 2);
   assertEquals(cmd.getOptions(true).length, 4);
@@ -96,7 +97,7 @@ Deno.test("command - option - get options", () => {
   assertEquals(!!cmd.getOptions(true).find((opt) => opt.name === "foo-hidden"), true);
 });
 
-Deno.test("command - option - get base options", () => {
+test("command - option - get base options", () => {
   const cmd = command();
   assertEquals(cmd.getBaseOptions().length, 2);
   assertEquals(cmd.getBaseOptions(true).length, 4);
@@ -110,7 +111,7 @@ Deno.test("command - option - get base options", () => {
   assertEquals(!!cmd.getBaseOptions(true).find((opt) => opt.name === "foo-hidden"), true);
 });
 
-Deno.test("command - option - get global options", () => {
+test("command - option - get global options", () => {
   const cmd = command();
   assertEquals(cmd.getCommand("bar")?.getGlobalOptions().length, 1);
   assertEquals(cmd.getCommand("bar")?.getGlobalOptions(true).length, 2);
@@ -124,7 +125,7 @@ Deno.test("command - option - get global options", () => {
   assertEquals(!!cmd.getCommand("bar")?.getGlobalOptions(true).find((opt) => opt.name === "foo-hidden"), false);
 });
 
-Deno.test("command - option - has option", () => {
+test("command - option - has option", () => {
   const cmd = command();
   assertEquals(cmd.hasOption("global"), true);
   assertEquals(cmd.hasOption("global-hidden"), false);
@@ -149,7 +150,7 @@ Deno.test("command - option - has option", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.hasOption("unknown"), false);
 });
 
-Deno.test("command - option - get option", () => {
+test("command - option - get option", () => {
   const cmd = command();
   assertEquals(cmd.getOption("global")?.name, "global");
   assertEquals(cmd.getOption("global-hidden")?.name, undefined);
@@ -174,7 +175,7 @@ Deno.test("command - option - get option", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getOption("unknown")?.name, undefined);
 });
 
-Deno.test("command - option - get base option", () => {
+test("command - option - get base option", () => {
   const cmd = command();
   assertEquals(cmd.getBaseOption("global")?.name, "global");
   assertEquals(cmd.getBaseOption("global-hidden")?.name, undefined);
@@ -199,7 +200,7 @@ Deno.test("command - option - get base option", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getBaseOption("unknown")?.name, undefined);
 });
 
-Deno.test("command - option - get global option", () => {
+test("command - option - get global option", () => {
   const cmd = command();
   assertEquals(cmd.getGlobalOption("global")?.name, undefined);
   assertEquals(cmd.getGlobalOption("global-hidden")?.name, undefined);
@@ -224,7 +225,7 @@ Deno.test("command - option - get global option", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getGlobalOption("unknown")?.name, undefined);
 });
 
-Deno.test("command - option - remove option", () => {
+test("command - option - remove option", () => {
   const cmd = command();
   assertEquals(cmd.getOption("foo")?.name, "foo");
   assertEquals(cmd.removeOption("foo")?.name, "foo");
@@ -232,7 +233,7 @@ Deno.test("command - option - remove option", () => {
   assertEquals(cmd.removeOption("foo"), undefined);
 });
 
-Deno.test("command - option - duplicate option", () => {
+test("command - option - duplicate option", () => {
   assertThrows(
     () => {
       new Command()
@@ -250,7 +251,7 @@ Deno.test("command - option - duplicate option", () => {
   );
 });
 
-Deno.test("command - option - override existing option", async () => {
+test("command - option - override existing option", async () => {
   const { options } = await new Command()
     .option("-f, --foo", "...")
     .option("-x, --foo, --foo-override", "...", { override: true })
@@ -258,14 +259,14 @@ Deno.test("command - option - override existing option", async () => {
   assertEquals(options, { foo: true });
 });
 
-Deno.test("command - option - option value handler", async () => {
+test("command - option - option value handler", async () => {
   const { options } = await new Command()
     .option("-f, --foo <value:string>", "...", (value) => ({ value }))
     .parse(["--foo", "bar"]);
   assertEquals(options, { foo: { value: "bar" } });
 });
 
-Deno.test("command - option - global option value handler", async () => {
+test("command - option - global option value handler", async () => {
   const { options } = await new Command()
     .globalOption("-f, --foo <value:string>", "...", (value) => ({ value }))
     .command("foo")

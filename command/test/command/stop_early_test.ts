@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command stopEarly disable", async () => {
+test("command stopEarly disable", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .option("-f, --flag [value:boolean]", "description ...")
@@ -26,7 +27,7 @@ Deno.test("command stopEarly disable", async () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("command stopEarly enabled", async () => {
+test("command stopEarly enabled", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .stopEarly()
@@ -56,7 +57,7 @@ Deno.test("command stopEarly enabled", async () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("command stopEarly unknown option", async () => {
+test("command stopEarly unknown option", async () => {
   const cmd = new Command()
     .throwErrors()
     .stopEarly()

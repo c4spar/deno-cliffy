@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { assertSpyCalls, spy } from "@std/testing/mock";
 import { Command } from "../../command.ts";
 
-Deno.test("[command] should execute standalone option action", async () => {
+test("[command] should execute standalone option action", async () => {
   const actionSpy = spy();
   const optionActionSpy = spy();
 
@@ -21,7 +22,7 @@ Deno.test("[command] should execute standalone option action", async () => {
   assertEquals(options, { standalone: true });
 });
 
-Deno.test("[command] should execute main action with standalone option", async () => {
+test("[command] should execute main action with standalone option", async () => {
   const actionSpy = spy();
 
   const cmd = new Command()
@@ -37,7 +38,7 @@ Deno.test("[command] should execute main action with standalone option", async (
   assertEquals(options, { standalone: true });
 });
 
-Deno.test("[command] should throw an error if standalone option is combined with other options", async () => {
+test("[command] should throw an error if standalone option is combined with other options", async () => {
   const actionSpy = spy();
 
   const cmd = new Command()

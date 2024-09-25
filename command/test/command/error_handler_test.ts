@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertInstanceOf, assertRejects } from "@std/assert";
 import { assertSpyCalls, spy } from "@std/testing/mock";
 import { Command, type ErrorHandler, ValidationError } from "../../mod.ts";
 
-Deno.test("[command] should call error handler on error", async () => {
+test("[command] should call error handler on error", async () => {
   let error: unknown;
   const errorHandler = (): ErrorHandler => (error, cmd) => {
     assertInstanceOf(error, ValidationError);
@@ -40,7 +41,7 @@ Deno.test("[command] should call error handler on error", async () => {
   assertEquals(error.cmd.getName(), "child");
 });
 
-Deno.test("[command] should call child error handler on child error", async () => {
+test("[command] should call child error handler on child error", async () => {
   let error: unknown;
   const errorHandler = (): ErrorHandler => (error, cmd) => {
     assertInstanceOf(error, ValidationError);
@@ -78,7 +79,7 @@ Deno.test("[command] should call child error handler on child error", async () =
   assertEquals(error.cmd.getName(), "child2");
 });
 
-Deno.test("[command] should handle error with useRawArgs enabled", async () => {
+test("[command] should handle error with useRawArgs enabled", async () => {
   const errorHandlerSpy = spy();
 
   await assertRejects(
@@ -103,7 +104,7 @@ Deno.test("[command] should handle error with useRawArgs enabled", async () => {
   assertSpyCalls(errorHandlerSpy, 1);
 });
 
-Deno.test("[command] should handle error on sub command with useRawArgs enabled", async () => {
+test("[command] should handle error on sub command with useRawArgs enabled", async () => {
   const errorHandlerSpy = spy();
 
   await assertRejects(

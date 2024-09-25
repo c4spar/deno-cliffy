@@ -1,4 +1,5 @@
-import { snapshotTest } from "../../../testing/snapshot.ts";
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { snapshotTest } from "@cliffy/testing";
 import { CompletionsCommand } from "../../completions/mod.ts";
 import { HelpCommand } from "../../help/mod.ts";
 import { Command, EnumType, ValidationError } from "../../mod.ts";
@@ -6,7 +7,7 @@ import { Command, EnumType, ValidationError } from "../../mod.ts";
 await snapshotTest({
   name: "command integration",
   meta: import.meta,
-  ignore: Deno.build.os === "windows",
+  ignore: getOs() === "windows",
   colors: true,
   steps: {
     "should complete boolean arg": {
