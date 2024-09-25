@@ -5,14 +5,14 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.runtime }} ${{ matrix.os }} deno-${{ matrix.deno }}
+    name: ${{ matrix.runtime }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno: [v1.x, rc]
+        deno_version: [v1.x, rc]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno }}
+          deno-version: ${{ matrix.deno_version }}
           # deno-version-file: ".deno-version"
 
       - name: Create package.json
