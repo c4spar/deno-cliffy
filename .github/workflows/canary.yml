@@ -13,8 +13,22 @@ jobs:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         include:
           - runtime: deno
+            os: macOS-latest
             deno_version: canary
           - runtime: deno
+            os: windows-latest
+            deno_version: canary
+          - runtime: deno
+            os: ubuntu-latest
+            deno_version: canary
+          - runtime: deno
+            os: macOS-latest
+            deno_version: rc
+          - runtime: deno
+            os: windows-latest
+            deno_version: rc
+          - runtime: deno
+            os: ubuntu-latest
             deno_version: rc
     env:
       RUST_BACKTRACE: full
