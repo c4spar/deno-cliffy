@@ -12,7 +12,11 @@ jobs:
       matrix:
         runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno_version: [v1.x, rc]
+        include:
+          - runtime: deno
+            deno_version: v1.x
+          - runtime: deno
+            deno_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
