@@ -5,7 +5,7 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.runtime }} ${{ matrix.os }}
+    name: ${{ matrix.runtime }} ${{ matrix.os }} ${{ matrix.runtime_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -14,9 +14,9 @@ jobs:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         include:
           - runtime: deno
-            deno_version: v1.x
+            runtime_version: v1.x
           - runtime: deno
-            deno_version: rc
+            runtime_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno_version }}
+          deno-version: ${{ matrix.runtime_version }}
           # deno-version-file: ".deno-version"
 
       - name: Create package.json
@@ -55,12 +55,12 @@ jobs:
         run: deno task setup:${{ matrix.runtime }}
 
       - name: Run tests
-        if: matrix.runtime == 'deno' && matrix.deno_version == 'v1.x'
+        if: matrix.runtime == 'deno' && matrix.runtime_version == 'v1.x'
         shell: bash
         run: deno task coverage:deno-v1
 
       - name: Run tests
-        if: matrix.runtime == 'deno' && matrix.deno_version == 'rc'
+        if: matrix.runtime == 'deno' && matrix.runtime_version == 'rc'
         shell: bash
         run: deno task coverage:deno-v2
 
