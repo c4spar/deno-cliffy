@@ -108,7 +108,7 @@ export class UpgradeCommand extends Command {
         "-v, --verbose",
         "Log verbose output.",
       )
-      .option("--no-spinner", "Disable spinner.", { hidden: true })
+      .option("--no-spinner", "Disable spinner.")
       .complete("version", () => this.getAllVersions())
       .action(
         async (
