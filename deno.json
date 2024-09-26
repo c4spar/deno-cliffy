@@ -15,6 +15,7 @@
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
+    "test": "deno task test:deno",
     "test:deno": "deno task test:deno-v2",
     "test:deno-v1": "deno task test:deno-v2 --doc --ignore=./CHANGELOG.md",
     "test:deno-v2": "deno test --allow-run=deno --allow-env --allow-read  --allow-write=./ --parallel",
