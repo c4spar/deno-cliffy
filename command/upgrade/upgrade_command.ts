@@ -1,11 +1,11 @@
-// import { bold, brightBlue } from "@std/fmt/colors";
+import { bold, brightBlue } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { exit } from "@cliffy/internal/runtime/exit";
 import { Command } from "../command.ts";
 import { EnumType } from "../types/enum.ts";
 import { createLogger } from "./logger.ts";
 import type { Provider, Versions } from "./provider.ts";
-// import { Spinner } from "./spinner.ts";
+import { Spinner } from "./spinner.ts";
 import {
   type RuntimeOptions,
   type RuntimeOptionsMap,
@@ -117,23 +117,23 @@ export class UpgradeCommand extends Command {
             version,
             force,
             verbose,
-            spinner: _spinnerEnabled,
+            spinner: spinnerEnabled,
           },
         ) => {
           const name: string = this.getMainCommand().getName();
           const currentVersion: string | undefined = this.getVersion();
 
-          // const spinner = spinnerEnabled
-          //   ? new Spinner({
-          //     message: brightBlue(
-          //       `Upgrading ${bold(name)} from version ${
-          //         bold(currentVersion ?? "")
-          //       } to ${bold(version)}...`,
-          //     ),
-          //   })
-          //   : undefined;
-          const logger = createLogger({ verbose });
-          // spinner?.start();
+          const spinner = spinnerEnabled
+            ? new Spinner({
+              message: brightBlue(
+                `Upgrading ${bold(name)} from version ${
+                  bold(currentVersion ?? "")
+                } to ${bold(version)}...`,
+              ),
+            })
+            : undefined;
+          const logger = createLogger({ spinner, verbose });
+          spinner?.start();
           provider.setLogger(logger);
 
           try {
@@ -151,10 +151,10 @@ export class UpgradeCommand extends Command {
             logger.error(
               !verbose && error instanceof Error ? error.message : error,
             );
-            // spinner?.stop();
+            spinner?.stop();
             exit(1);
           } finally {
-            // spinner?.stop();
+            spinner?.stop();
           }
         },
       );
