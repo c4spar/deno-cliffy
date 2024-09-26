@@ -4,32 +4,20 @@ on:
     - cron: 0 3 * * *
 jobs:
   canary:
-    name: Canary ${{ matrix.runtime }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        runtime: [deno, node]
+        runtime:
+          - name: deno
+            version: canary
+          - name: deno
+            version: rc
+          - name: node
+            version: nightly
+          # - name: bun
+          #   version: canary
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        include:
-          - runtime: deno
-            os: macOS-latest
-            deno_version: canary
-          - runtime: deno
-            os: windows-latest
-            deno_version: canary
-          - runtime: deno
-            os: ubuntu-latest
-            deno_version: canary
-          - runtime: deno
-            os: macOS-latest
-            deno_version: rc
-          - runtime: deno
-            os: windows-latest
-            deno_version: rc
-          - runtime: deno
-            os: ubuntu-latest
-            deno_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -40,30 +28,29 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno_version }}
+          deno-version: ${{ matrix.runtime.version }}
+
+      - name: Create package.json
+        if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
+        run: deno task setup:${{ matrix.runtime.name }} --no-install
 
       - name: Setup Node
-        if: ${{ matrix.runtime == 'node' }}
+        if: matrix.runtime.name == 'node'
         uses: actions/setup-node@v4
         with:
-          node-version: nightly
+          node-version: ${{ matrix.runtime.version }}
 
       - name: Setup Bun
-        if: ${{ matrix.runtime == 'bun' }}
+        if: matrix.runtime.name == 'bun'
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: canary
+          bun-version: ${{ matrix.runtime.version }}
 
-      - name: Setup corepack
-        if: ${{ matrix.runtime == 'node' }}
-        run: |
-          corepack enable
-          corepack prepare pnpm --activate
-          corepack --version
-          pnpm --version
-
-      - name: Install deps
-        run: deno task setup:${{ matrix.runtime }}
+      - name: Setup pnpm
+        if: ${{ matrix.runtime.name == 'node' }}
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
 
       - name: Run tests
-        run: deno task test:${{ matrix.runtime }}
+        run: deno task test:${{ matrix.runtime.name }}

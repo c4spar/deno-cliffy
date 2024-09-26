@@ -15,6 +15,7 @@ jobs:
           - name: deno
             version: rc
           - name: node
+          # - name: bun
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
