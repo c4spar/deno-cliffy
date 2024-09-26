@@ -62,7 +62,7 @@ export class List extends GenericSuggestions<string[], string> {
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static override inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
@@ -74,7 +74,7 @@ export class List extends GenericSuggestions<string[], string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  public getDefaultSettings(options: ListOptions): ListSettings {
+  public override getDefaultSettings(options: ListOptions): ListSettings {
     return {
       ...super.getDefaultSettings(options),
       separator: options.separator ?? ",",
@@ -85,7 +85,7 @@ export class List extends GenericSuggestions<string[], string> {
     };
   }
 
-  protected input(): string {
+  protected override input(): string {
     const oldInput: string = this.inputValue;
     const tags: string[] = this.getTags(oldInput);
     const separator: string = this.settings.separator + " ";
@@ -117,7 +117,7 @@ export class List extends GenericSuggestions<string[], string> {
     );
   }
 
-  protected success(value: string[]): string | undefined {
+  protected override success(value: string[]): string | undefined {
     this.saveSuggestions(...value);
     return super.success(value);
   }
@@ -136,12 +136,12 @@ export class List extends GenericSuggestions<string[], string> {
       .join(this.settings.separator + " ");
   }
 
-  protected getCurrentInputValue(): string {
+  protected override getCurrentInputValue(): string {
     return this.getTags().pop() ?? "";
   }
 
   /** Add char. */
-  protected addChar(char: string): void {
+  protected override addChar(char: string): void {
     switch (char) {
       case this.settings.separator:
         if (
@@ -159,14 +159,14 @@ export class List extends GenericSuggestions<string[], string> {
   }
 
   /** Delete char left. */
-  protected deleteChar(): void {
+  protected override deleteChar(): void {
     if (this.inputValue[this.inputIndex - 1] === " ") {
       super.deleteChar();
     }
     super.deleteChar();
   }
 
-  protected async complete(): Promise<string> {
+  protected override async complete(): Promise<string> {
     const tags = this.getTags().slice(0, -1);
     tags.push(await super.complete());
     return tags.join(this.settings.separator + " ");

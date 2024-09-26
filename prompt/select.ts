@@ -159,7 +159,7 @@ export class Select<TValue> extends GenericList<
    *
    * @param value Input value.
    */
-  public static inject<TValue>(value: TValue): void {
+  public static override inject<TValue>(value: TValue): void {
     GenericPrompt.inject(value);
   }
 
@@ -171,7 +171,7 @@ export class Select<TValue> extends GenericList<
     this.listOffset = this.getPageOffset(this.listIndex);
   }
 
-  public getDefaultSettings(
+  public override getDefaultSettings(
     options: SelectOptions<TValue>,
   ): SelectSettings<TValue> {
     return {
@@ -203,11 +203,11 @@ export class Select<TValue> extends GenericList<
     );
   }
 
-  protected input(): string {
+  protected override input(): string {
     return underline(brightBlue(this.inputValue));
   }
 
-  protected async submit(): Promise<void> {
+  protected override async submit(): Promise<void> {
     if (
       this.isBackButton(this.selectedOption) ||
       isOptionGroup(this.selectedOption)

@@ -5,12 +5,17 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.runtime }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        runtime: [deno, node]
+        runtime:
+          - name: deno
+            version: v1.x
+          - name: deno
+            version: rc
+          - name: node
+          # - name: bun
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
@@ -23,43 +28,51 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version-file: ".deno-version"
+          deno-version: ${{ matrix.runtime.version }}
+          # deno-version-file: ".deno-version"
 
       - name: Create package.json
-        if: ${{ matrix.runtime == 'node' || matrix.runtime == 'bun' }}
-        run: deno task setup:${{ matrix.runtime }} --no-install
+        if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
+        run: deno task setup:${{ matrix.runtime.name }} --no-install
 
       - name: Setup Node
-        if: ${{ matrix.runtime == 'node' }}
+        if: ${{ matrix.runtime.name == 'node' }}
         uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
 
       - name: Setup Bun
-        if: ${{ matrix.runtime == 'bun' }}
+        if: ${{ matrix.runtime.name == 'bun' }}
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: ".bun-version"
 
       - name: Setup pnpm
-        if: ${{ matrix.runtime == 'node' }}
+        if: ${{ matrix.runtime.name == 'node' }}
         uses: pnpm/action-setup@v4
         with:
           run_install: true
 
-      - name: Install bun deps
-        if: ${{ matrix.runtime == 'bun' }}
-        run: bun install
+      - name: Run tests
+        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'v1.x'
+        shell: bash
+        run: deno task coverage:deno-v1
 
       - name: Run tests
+        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'rc'
         shell: bash
-        run: deno task coverage:${{ matrix.runtime }}
+        run: deno task coverage:deno-v2
+
+      - name: Run tests
+        if: matrix.runtime != 'deno'
+        shell: bash
+        run: deno task coverage:${{ matrix.runtime.name }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
-          name: ${{ matrix.runtime }}-${{ matrix.os }}
-          files: dist/coverage/${{ matrix.module }}/cov.lcov
-          flags: ${{ matrix.runtime }}
+          name: ${{ matrix.runtime.name }}-${{ matrix.os }}
+          files: dist/coverage/${{ matrix.runtime.name }}/cov.lcov
+          flags: ${{ matrix.runtime.name }}
           token: ${{ secrets.CODECOV_TOKEN }}
