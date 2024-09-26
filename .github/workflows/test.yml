@@ -5,31 +5,38 @@ on:
   pull_request:
 jobs:
   test:
-    name: ${{ matrix.runtime }} ${{ matrix.os }} ${{ matrix.runtime_version }}
+    name: ${{ matrix.os }} ${{ matrix.runtime }} ${{ matrix.runtime_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         runtime: [deno, node]
         os: [macOS-latest, windows-latest, ubuntu-latest]
+        runtime_version: [v1.x, rc]
         include:
-          - runtime: deno
-            os: macOS-latest
+          - os: macos-latest
+            runtime: node
+          - os: windows-latest
+            runtime: node
+          - os: ubuntu-latest
+            runtime: node
+          - os: macos-latest
+            runtime: deno
             runtime_version: v1.x
-          - runtime: deno
-            os: windows-latest
-            runtime_version: v1.x
-          - runtime: deno
-            os: ubuntu-latest
-            runtime_version: v1.x
-          - runtime: deno
-            os: macOS-latest
+          - os: macos-latest
+            runtime: deno
             runtime_version: rc
-          - runtime: deno
-            os: windows-latest
+          - os: windows-latest
+            runtime: deno
+            runtime_version: v1.x
+          - os: windows-latest
+            runtime: deno
             runtime_version: rc
-          - runtime: deno
-            os: ubuntu-latest
+          - os: ubuntu-latest
+            runtime: deno
+            runtime_version: v1.x
+          - os: ubuntu-latest
+            runtime: deno
             runtime_version: rc
     env:
       RUST_BACKTRACE: full
