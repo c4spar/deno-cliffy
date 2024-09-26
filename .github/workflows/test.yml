@@ -49,9 +49,8 @@ jobs:
       - name: Setup pnpm
         if: ${{ matrix.runtime.name == 'node' }}
         uses: pnpm/action-setup@v4
-
-      - name: Install deps
-        run: deno task setup:${{ matrix.runtime.name }}
+        with:
+          run_install: true
 
       - name: Run tests
         if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'v1.x'
