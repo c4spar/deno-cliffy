@@ -9,33 +9,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runtime: [deno, node]
+        runtime:
+          - name: deno
+            version: v1.x
+          - name: deno
+            version: rc
+          - name: node
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        include:
-          - os: macos-latest
-            runtime: node
-          - os: windows-latest
-            runtime: node
-          - os: ubuntu-latest
-            runtime: node
-          - os: macos-latest
-            runtime: deno
-            runtime_version: v1.x
-          - os: macos-latest
-            runtime: deno
-            runtime_version: rc
-          - os: windows-latest
-            runtime: deno
-            runtime_version: v1.x
-          - os: windows-latest
-            runtime: deno
-            runtime_version: rc
-          - os: ubuntu-latest
-            runtime: deno
-            runtime_version: v1.x
-          - os: ubuntu-latest
-            runtime: deno
-            runtime_version: rc
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -47,52 +27,52 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.runtime_version }}
+          deno-version: ${{ matrix.runtime.version }}
           # deno-version-file: ".deno-version"
 
       - name: Create package.json
-        if: ${{ matrix.runtime == 'node' || matrix.runtime == 'bun' }}
-        run: deno task setup:${{ matrix.runtime }} --no-install
+        if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
+        run: deno task setup:${{ matrix.runtime.name }} --no-install
 
       - name: Setup Node
-        if: ${{ matrix.runtime == 'node' }}
+        if: ${{ matrix.runtime.name == 'node' }}
         uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
 
       - name: Setup Bun
-        if: ${{ matrix.runtime == 'bun' }}
+        if: ${{ matrix.runtime.name == 'bun' }}
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: ".bun-version"
 
       - name: Setup pnpm
-        if: ${{ matrix.runtime == 'node' }}
+        if: ${{ matrix.runtime.name == 'node' }}
         uses: pnpm/action-setup@v4
 
       - name: Install deps
-        run: deno task setup:${{ matrix.runtime }}
+        run: deno task setup:${{ matrix.runtime.name }}
 
       - name: Run tests
-        if: matrix.runtime == 'deno' && matrix.runtime_version == 'v1.x'
+        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'v1.x'
         shell: bash
         run: deno task coverage:deno-v1
 
       - name: Run tests
-        if: matrix.runtime == 'deno' && matrix.runtime_version == 'rc'
+        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'rc'
         shell: bash
         run: deno task coverage:deno-v2
 
       - name: Run tests
         if: matrix.runtime != 'deno'
         shell: bash
-        run: deno task coverage:${{ matrix.runtime }}
+        run: deno task coverage:${{ matrix.runtime.name }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
-          name: ${{ matrix.runtime }}-${{ matrix.os }}
+          name: ${{ matrix.runtime.name }}-${{ matrix.os }}
           files: dist/coverage/${{ matrix.module }}/cov.lcov
-          flags: ${{ matrix.runtime }}
+          flags: ${{ matrix.runtime.name }}
           token: ${{ secrets.CODECOV_TOKEN }}
