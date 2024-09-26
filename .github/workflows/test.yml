@@ -72,6 +72,6 @@ jobs:
         with:
           fail_ci_if_error: true
           name: ${{ matrix.runtime.name }}-${{ matrix.os }}
-          files: dist/coverage/${{ matrix.module }}/cov.lcov
+          files: dist/coverage/${{ matrix.runtime.name }}/cov.lcov
           flags: ${{ matrix.runtime.name }}
           token: ${{ secrets.CODECOV_TOKEN }}
