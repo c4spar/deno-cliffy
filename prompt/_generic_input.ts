@@ -37,6 +37,7 @@ export abstract class GenericInput<
   TValue,
   TRawValue,
 > extends GenericPrompt<TValue, TRawValue> {
+  // @ts-ignore ignore jsr publish error
   protected abstract override readonly settings: GenericInputPromptSettings<
     TValue,
     TRawValue

@@ -165,6 +165,7 @@ export abstract class GenericList<
   TOption extends GenericListOptionSettings<TValue>,
   TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 > extends GenericInput<TReturnValue, TRawValue> {
+  // @ts-ignore ignore jsr publish error
   protected abstract override readonly settings: GenericListSettings<
     TValue,
     TReturnValue,

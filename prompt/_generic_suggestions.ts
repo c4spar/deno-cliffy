@@ -102,6 +102,7 @@ const sep = getOs() === "windows" ? "\\" : "/";
 /** Generic input prompt representation. */
 export abstract class GenericSuggestions<TValue, TRawValue>
   extends GenericInput<TValue, TRawValue> {
+  // @ts-ignore ignore jsr publish error
   protected abstract override readonly settings: GenericSuggestionsSettings<
     TValue,
     TRawValue
