@@ -11,7 +11,7 @@ const { readSync: readSyncNode } = process
  */
 export function readSync(data: Uint8Array): number {
   if (Deno) {
-    return Deno.stdout.readSync(data);
+    return Deno.stdin.readSync(data);
   } else if (readSyncNode) {
     const buffer = Buffer.alloc(data.byteLength);
     const bytesRead = readSyncNode(
