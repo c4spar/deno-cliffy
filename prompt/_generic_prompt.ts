@@ -1,5 +1,6 @@
 import type { Cursor } from "@cliffy/ansi/cursor-position";
 import { type Tty, tty } from "@cliffy/ansi/tty";
+import { getRuntimeName } from "@cliffy/internal/runtime/runtime-name";
 import { type KeyCode, parse } from "@cliffy/keycode";
 import {
   bold,
@@ -363,7 +364,7 @@ export abstract class GenericPrompt<
 
   /** Read user input from stdin. */
   #readChar = async (): Promise<Uint8Array> => {
-    const buffer = new Uint8Array(4096);
+    const buffer = new Uint8Array(getRuntimeName() === "deno" ? 8 : 4096);
     const isTty = this.settings.reader.isTerminal();
 
     if (isTty) {
