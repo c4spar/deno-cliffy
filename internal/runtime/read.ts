@@ -17,7 +17,7 @@ export function read(data: Uint8Array): Promise<number | null> {
           const buffer = process.stdin.read();
 
           if (buffer === null) {
-            return null;
+            return resolve(null);
           }
 
           for (let i = 0; i < buffer.length; i++) {
