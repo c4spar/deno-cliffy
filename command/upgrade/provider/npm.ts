@@ -16,7 +16,7 @@ export class NpmProvider extends Provider {
   private readonly packageName?: string;
   private readonly packageScope?: string;
 
-  constructor({ main, logger, ...options }: NpmProviderOptions) {
+  constructor({ main, logger, ...options }: NpmProviderOptions = {}) {
     super({ main, logger });
     if ("package" in options) {
       if (options.package.startsWith("@")) {
