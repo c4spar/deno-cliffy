@@ -5,7 +5,7 @@ export type NpmProviderOptions =
   & ({
     package: string;
   } | {
-    scope: string;
+    scope?: string;
     name?: string;
   });
 
@@ -14,23 +14,28 @@ export class NpmProvider extends Provider {
   private readonly repositoryUrl = "https://npmjs.org/";
   private readonly apiUrl = "https://registry.npmjs.org/";
   private readonly packageName?: string;
-  private readonly packageScope: string;
+  private readonly packageScope?: string;
 
   constructor({ main, logger, ...options }: NpmProviderOptions) {
     super({ main, logger });
-    this.packageScope = "package" in options
-      ? options.package.split("/")[0].slice(1)
-      : options.scope;
-    this.packageName = "package" in options
-      ? options.package.split("/")[1]
-      : options.name;
+    if ("package" in options) {
+      if (options.package.startsWith("@")) {
+        this.packageScope = options.package.split("/")[0].slice(1);
+        this.packageName = options.package.split("/")[1];
+      } else {
+        this.packageName = options.package;
+      }
+    } else {
+      this.packageScope = options.scope;
+      this.packageName = options.name;
+    }
   }
 
   async getVersions(
     name: string,
   ): Promise<Versions> {
     const response = await fetch(
-      new URL(`@${this.packageScope}/${this.packageName ?? name}`, this.apiUrl),
+      new URL(this.#getPackageName(name), this.apiUrl),
     );
     if (!response.ok) {
       throw new Error(
@@ -49,15 +54,19 @@ export class NpmProvider extends Provider {
 
   getRepositoryUrl(name: string, version?: string): string {
     return new URL(
-      `package/@${this.packageScope}/${this.packageName ?? name}${
-        version ? `/v/${version}` : ""
-      }`,
+      `package/${this.#getPackageName(name)}${version ? `/v/${version}` : ""}`,
       this.repositoryUrl,
     ).href;
   }
 
   getRegistryUrl(name: string, version: string): string {
-    return `npm:@${this.packageScope}/${this.packageName ?? name}@${version}`;
+    return `npm:${this.#getPackageName(name)}@${version}`;
+  }
+
+  #getPackageName(name: string): string {
+    return `${this.packageScope ? `@${this.packageScope}/` : ""}${
+      this.packageName ?? name
+    }`;
   }
 }
 

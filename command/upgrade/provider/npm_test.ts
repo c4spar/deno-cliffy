@@ -37,6 +37,34 @@ test({
     });
 
     await ctx.step({
+      name: "should return registry url with package option",
+      fn() {
+        const provider = new NpmProvider({
+          package: "example",
+        });
+
+        assertEquals(
+          provider.getRegistryUrl("foo", "1.0.0"),
+          "npm:example@1.0.0",
+        );
+      },
+    });
+
+    await ctx.step({
+      name: "should return registry url with packageName option",
+      fn() {
+        const provider = new NpmProvider({
+          package: "example",
+        });
+
+        assertEquals(
+          provider.getRegistryUrl("foo", "1.0.0"),
+          "npm:example@1.0.0",
+        );
+      },
+    });
+
+    await ctx.step({
       name: "should return repository url",
       fn() {
         assertEquals(
