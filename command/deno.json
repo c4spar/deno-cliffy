@@ -1,6 +1,6 @@
 {
   "name": "@cliffy/command",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.7",
   "exports": {
     ".": "./mod.ts",
     "./completions": "./completions/mod.ts",

@@ -1,3 +1,8 @@
+# [v1.0.0-rc.7](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.6...v1.0.0-rc.7) (Sep 28, 2024)
+
+No changes, i only forgot that deno needs an annoying version number in
+deno.json.
+
 # [v1.0.0-rc.6](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.5...v1.0.0-rc.6) (Sep 28, 2024)
 
 ### Features
