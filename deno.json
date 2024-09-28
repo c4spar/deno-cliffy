@@ -15,7 +15,10 @@
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
+    "node": "pnpm tsx",
+    "bun": "bun run",
     "test": "deno task test:deno",
+    "test:all": "deno task clean && deno task test:deno && deno task setup:node && deno task test:node && deno task clean",
     "test:deno": "deno task test:deno-v2",
     "test:deno-v1": "deno task test:deno-v2 --doc --ignore=./CHANGELOG.md",
     "test:deno-v2": "deno test --allow-run=deno --allow-env --allow-read  --allow-write=./ --parallel",
