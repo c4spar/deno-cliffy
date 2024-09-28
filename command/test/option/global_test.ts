@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import type { ArgumentValue } from "../../types.ts";
@@ -47,14 +48,14 @@ const cmd = () =>
         .reset(),
     );
 
-Deno.test("[command] should parse global options", async () => {
+test("[command] should parse global options", async () => {
   const { options, args } = await cmd().parse(["-g", "halo", "-G", "halo"]);
 
   assertEquals(options, { global: "HALO", global2: "halo" });
   assertEquals(args, []);
 });
 
-Deno.test("[command] should parse global options on sub command", async () => {
+test("[command] should parse global options on sub command", async () => {
   const { options, args } = await cmd().parse([
     "cmd1",
     "-g",
@@ -69,7 +70,7 @@ Deno.test("[command] should parse global options on sub command", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("[command] should parse global options on nested sub command", async () => {
+test("[command] should parse global options on nested sub command", async () => {
   const { options, args } = await cmd().parse(
     ["cmd1", "cmd2", "-g", "foo", "-G", "bar", "-o", "baz"],
   );
@@ -78,7 +79,7 @@ Deno.test("[command] should parse global options on nested sub command", async (
   assertEquals(args, []);
 });
 
-Deno.test("[command] should parse global options before sub commands", async () => {
+test("[command] should parse global options before sub commands", async () => {
   const { options, args } = await cmd().parse(
     ["-g", "foo", "cmd1", "-G", "bar", "cmd2", "-o", "baz"],
   );
@@ -87,7 +88,7 @@ Deno.test("[command] should parse global options before sub commands", async () 
   assertEquals(args, []);
 });
 
-Deno.test("[command] should collect global options before sub commands", async () => {
+test("[command] should collect global options before sub commands", async () => {
   const { options, args } = await new Command()
     .noExit()
     .globalOption("--collect <value>", "...", { collect: true })
@@ -109,7 +110,7 @@ Deno.test("[command] should collect global options before sub commands", async (
   assertEquals(args, []);
 });
 
-Deno.test("[command] should parse global options before and after normal option", async () => {
+test("[command] should parse global options before and after normal option", async () => {
   const { options, args } = await new Command()
     .noExit()
     .globalOption("--global", "...", { collect: true })
@@ -123,7 +124,7 @@ Deno.test("[command] should parse global options before and after normal option"
   assertEquals(args, []);
 });
 
-Deno.test("[command] should disable global options with noGlobals", async () => {
+test("[command] should disable global options with noGlobals", async () => {
   await assertRejects(
     () =>
       cmd().parse(
@@ -134,16 +135,24 @@ Deno.test("[command] should disable global options with noGlobals", async () => 
   );
 });
 
-Deno.test("[command] should not disable global -h option with noGlobals", async () => {
-  await cmd().parse(
-    ["cmd1", "cmd3", "-h"],
-  );
+test({
+  name: "[command] should not disable global -h option with noGlobals",
+  ignore: ["node"],
+  fn: async () => {
+    await cmd().parse(
+      ["cmd1", "cmd3", "-h"],
+    );
+  },
 });
 
-Deno.test("[command] should not disable global --help option with noGlobals", async () => {
-  await cmd().parse(
-    ["cmd1", "cmd3", "--help"],
-  );
+test({
+  name: "[command] should not disable global --help option with noGlobals",
+  ignore: ["node"],
+  fn: async () => {
+    await cmd().parse(
+      ["cmd1", "cmd3", "--help"],
+    );
+  },
 });
 
 const cmdWithDefaults = () =>
@@ -181,7 +190,7 @@ const cmdWithDefaults = () =>
         ),
     );
 
-Deno.test("[command] should parse options when used interchangeable and global options have defaults", async () => {
+test("[command] should parse options when used interchangeable and global options have defaults", async () => {
   const { options, args } = await cmdWithDefaults().parse([
     "cmd1",
     "cmd2",

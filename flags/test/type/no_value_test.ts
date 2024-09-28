@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
@@ -9,7 +10,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - type - no value - short flag without argument", () => {
+test("flags - type - no value - short flag without argument", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], options);
 
   assertEquals(flags, { flag: true });
@@ -17,7 +18,7 @@ Deno.test("flags - type - no value - short flag without argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - no value - long flag without argument", () => {
+test("flags - type - no value - long flag without argument", () => {
   const { flags, unknown, literal } = parseFlags(["--flag"], options);
 
   assertEquals(flags, { flag: true });
@@ -25,7 +26,7 @@ Deno.test("flags - type - no value - long flag without argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - no value - short flag with argument", () => {
+test("flags - type - no value - short flag with argument", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "true"], options);
 
   assertEquals(flags, { flag: true });
@@ -33,7 +34,7 @@ Deno.test("flags - type - no value - short flag with argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - no value - long flag with argument", () => {
+test("flags - type - no value - long flag with argument", () => {
   const { flags, unknown, literal } = parseFlags(["--flag", "true"], options);
 
   assertEquals(flags, { flag: true });
@@ -41,7 +42,7 @@ Deno.test("flags - type - no value - long flag with argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - no value - should throw if a no value flag has a value", () => {
+test("flags - type - no value - should throw if a no value flag has a value", () => {
   assertThrows(
     () => parseFlags(["-f=123"], options),
     Error,
@@ -49,7 +50,7 @@ Deno.test("flags - type - no value - should throw if a no value flag has a value
   );
 });
 
-Deno.test("flags - type - no value - should not throw unexpected error value with no options", () => {
+test("flags - type - no value - should not throw unexpected error value with no options", () => {
   const result = parseFlags(["-f=123"]);
   assertEquals(result, {
     unknown: [],

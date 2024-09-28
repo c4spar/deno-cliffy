@@ -25,7 +25,7 @@ import type {
  *     return value;
  *   }
  *
- *   public complete(): string[] {
+ *   public override complete(): string[] {
  *     return ["red", "blue"];
  *   }
  * }

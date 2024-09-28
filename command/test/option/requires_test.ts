@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -20,7 +21,7 @@ const cmd = new Command()
   )
   .action(() => {});
 
-Deno.test("command optionRequire videoAudioImageType", async () => {
+test("command optionRequire videoAudioImageType", async () => {
   const { options, args } = await cmd.parse(
     ["-v", "value", "-a", "value", "--image-type", "value"],
   );
@@ -32,7 +33,7 @@ Deno.test("command optionRequire videoAudioImageType", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command optionRequire videoType", async () => {
+test("command optionRequire videoType", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-v", "value"]);
@@ -42,7 +43,7 @@ Deno.test("command optionRequire videoType", async () => {
   );
 });
 
-Deno.test("command optionRequire audioType", async () => {
+test("command optionRequire audioType", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-a", "value"]);
@@ -52,7 +53,7 @@ Deno.test("command optionRequire audioType", async () => {
   );
 });
 
-Deno.test("command optionRequire imageType", async () => {
+test("command optionRequire imageType", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-i", "value"]);
@@ -62,7 +63,7 @@ Deno.test("command optionRequire imageType", async () => {
   );
 });
 
-Deno.test("command optionRequire videoAudio", async () => {
+test("command optionRequire videoAudio", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);
@@ -72,7 +73,7 @@ Deno.test("command optionRequire videoAudio", async () => {
   );
 });
 
-Deno.test("command optionRequire audioVideo", async () => {
+test("command optionRequire audioVideo", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-a", "value", "-v", "value"]);
@@ -82,7 +83,7 @@ Deno.test("command optionRequire audioVideo", async () => {
   );
 });
 
-Deno.test("command optionRequire imageVideo", async () => {
+test("command optionRequire imageVideo", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-i", "value", "-v", "value"]);

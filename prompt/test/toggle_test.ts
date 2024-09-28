@@ -1,22 +1,24 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { Toggle } from "../toggle.ts";
 
-Deno.test("prompt toggle: yes", async () => {
+test("prompt toggle: yes", async () => {
   console.log();
   Toggle.inject("Yes");
   const result: boolean | undefined = await Toggle.prompt("message");
   assertEquals(result, true);
 });
 
-Deno.test("prompt toggle: no", async () => {
+test("prompt toggle: no", async () => {
   console.log();
   Toggle.inject("No");
   const result: boolean | undefined = await Toggle.prompt("message");
   assertEquals(result, false);
 });
 
-Deno.test("prompt toggle: empty value", async () => {
+test("prompt toggle: empty value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -25,12 +27,12 @@ Deno.test("prompt toggle: empty value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt toggle: invalid value", async () => {
+test("prompt toggle: invalid value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -39,12 +41,12 @@ Deno.test("prompt toggle: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt toggle: null value", async () => {
+test("prompt toggle: null value", async () => {
   console.log();
   await assertRejects(
     async () => {
@@ -54,7 +56,7 @@ Deno.test("prompt toggle: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

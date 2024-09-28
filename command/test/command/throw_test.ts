@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertThrows } from "@std/assert";
 import { Command, ValidationError } from "../../mod.ts";
 
-Deno.test("[command] should throw error", () => {
+test("[command] should throw error", () => {
   assertThrows(
     () =>
       new Command()
@@ -12,7 +13,7 @@ Deno.test("[command] should throw error", () => {
   );
 });
 
-Deno.test("[command] should throw validation error", () => {
+test("[command] should throw validation error", () => {
   assertThrows(
     () =>
       new Command()

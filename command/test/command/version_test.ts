@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command - version - version string", () => {
+test("command - version - version string", () => {
   const cmd = new Command()
     .throwErrors()
     .version("version: xxx")
@@ -13,7 +14,7 @@ Deno.test("command - version - version string", () => {
   assertEquals(cmd.getCommand("bar")?.getVersion(), "version: xxx");
 });
 
-Deno.test("command - version - version handler", () => {
+test("command - version - version handler", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -28,7 +29,7 @@ Deno.test("command - version - version handler", () => {
   assertEquals(cmd.getCommand("bar")?.getVersion(), "version: bar");
 });
 
-Deno.test("command - version - override version", () => {
+test("command - version - override version", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -46,7 +47,7 @@ Deno.test("command - version - override version", () => {
   assertEquals(cmd.getCommand("bar")?.getVersion(), "bar version");
 });
 
-Deno.test("command - version - version option", async () => {
+test("command - version - version option", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()
@@ -67,7 +68,7 @@ Deno.test("command - version - version option", async () => {
   );
 });
 
-Deno.test("command - version - global version option", async () => {
+test("command - version - global version option", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()

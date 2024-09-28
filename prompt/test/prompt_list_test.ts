@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertType, type IsExact } from "@std/testing/types";
 import { assertEquals, assertRejects } from "@std/assert";
 import { inject, prompt } from "../prompt.ts";
@@ -6,7 +7,7 @@ import { Confirm } from "../confirm.ts";
 import { Number } from "../number.ts";
 import { Input } from "../input.ts";
 
-Deno.test("prompt - prompt list", async () => {
+test("prompt - prompt list", async () => {
   let beforeCalled = 0;
   let afterCalled = 0;
   const expectedResult = {
@@ -122,7 +123,7 @@ Deno.test("prompt - prompt list", async () => {
   assertEquals(afterCalled, 1);
 });
 
-Deno.test("prompt - prompt list - before next callback", async () => {
+test("prompt - prompt list - before next callback", async () => {
   await assertRejects(
     async () => {
       inject({
@@ -151,7 +152,7 @@ Deno.test("prompt - prompt list - before next callback", async () => {
   );
 });
 
-Deno.test("prompt - prompt list - after next callback", async () => {
+test("prompt - prompt list - after next callback", async () => {
   await assertRejects(
     async () => {
       inject({

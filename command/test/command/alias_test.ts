@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command - alias - command with alias 1", async () => {
+test("command - alias - command with alias 1", async () => {
   const cmd = new Command()
     .throwErrors()
     .command("foo, bar")
@@ -14,7 +15,7 @@ Deno.test("command - alias - command with alias 1", async () => {
   assertEquals(barOptions, { baz: true });
 });
 
-Deno.test("command - alias - command with alias 2", async () => {
+test("command - alias - command with alias 2", async () => {
   const cmd = new Command()
     .throwErrors()
     .command("foo")
@@ -28,7 +29,7 @@ Deno.test("command - alias - command with alias 2", async () => {
   assertEquals(barOptions, { baz: true });
 });
 
-Deno.test("command - alias - duplicate command alias name 1", async () => {
+test("command - alias - duplicate command alias name 1", async () => {
   await assertRejects(
     async () => {
       await new Command()
@@ -41,7 +42,7 @@ Deno.test("command - alias - duplicate command alias name 1", async () => {
   );
 });
 
-Deno.test("command - alias - duplicate command alias name 2", async () => {
+test("command - alias - duplicate command alias name 2", async () => {
   await assertRejects(
     async () => {
       await new Command()

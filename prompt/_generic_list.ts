@@ -165,7 +165,8 @@ export abstract class GenericList<
   TOption extends GenericListOptionSettings<TValue>,
   TGroup extends GenericListOptionGroupSettings<TValue, TOption>,
 > extends GenericInput<TReturnValue, TRawValue> {
-  protected abstract readonly settings: GenericListSettings<
+  // @ts-ignore ignore jsr publish error
+  protected abstract override readonly settings: GenericListSettings<
     TValue,
     TReturnValue,
     TRawValue,
@@ -190,7 +191,7 @@ export abstract class GenericList<
     return { name: label };
   }
 
-  public getDefaultSettings(
+  public override getDefaultSettings(
     {
       groupIcon = true,
       groupOpenIcon = groupIcon,
@@ -350,7 +351,7 @@ export abstract class GenericList<
     return this.getCurrentInputValue() !== "";
   }
 
-  protected message(): string {
+  protected override message(): string {
     let message = `${this.settings.indent}${this.settings.prefix}` +
       bold(this.settings.message) +
       this.defaults();
@@ -366,7 +367,7 @@ export abstract class GenericList<
   }
 
   /** Render options. */
-  protected body(): string | Promise<string> {
+  protected override body(): string | Promise<string> {
     return this.getList() + this.getInfo();
   }
 
@@ -561,7 +562,7 @@ export abstract class GenericList<
   }
 
   /** Read user input. */
-  protected read(): Promise<boolean> {
+  protected override read(): Promise<boolean> {
     if (!this.settings.search) {
       this.settings.tty.cursorHide();
     }
@@ -580,7 +581,7 @@ export abstract class GenericList<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     if (
       this.isKey(this.settings.keys, "open", event) &&
       isOptionGroup(this.selectedOption) &&
@@ -616,7 +617,7 @@ export abstract class GenericList<
     }
   }
 
-  protected async submit(): Promise<void> {
+  protected override async submit(): Promise<void> {
     if (this.isSearchSelected()) {
       this.selectNext();
       return;
@@ -624,32 +625,32 @@ export abstract class GenericList<
     await super.submit();
   }
 
-  protected moveCursorLeft(): void {
+  protected override moveCursorLeft(): void {
     if (this.settings.search) {
       super.moveCursorLeft();
     }
   }
 
-  protected moveCursorRight(): void {
+  protected override moveCursorRight(): void {
     if (this.settings.search) {
       super.moveCursorRight();
     }
   }
 
-  protected deleteChar(): void {
+  protected override deleteChar(): void {
     if (this.settings.search) {
       super.deleteChar();
     }
   }
 
-  protected deleteCharRight(): void {
+  protected override deleteCharRight(): void {
     if (this.settings.search) {
       super.deleteCharRight();
       this.match();
     }
   }
 
-  protected addChar(char: string): void {
+  protected override addChar(char: string): void {
     if (this.settings.search) {
       super.addChar(char);
       this.match();

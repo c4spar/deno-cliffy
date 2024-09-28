@@ -1,9 +1,10 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assert, assertEquals } from "@std/assert";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import sinon from "sinon";
 import { Command } from "../../command.ts";
 
-Deno.test("[command] should execute the action from an option", async () => {
+test("[command] should execute the action from an option", async () => {
   const optionSpy = sinon.spy();
 
   const cmd = new Command()
@@ -19,7 +20,7 @@ Deno.test("[command] should execute the action from an option", async () => {
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute the action from an child command option", async () => {
+test("[command] should execute the action from an child command option", async () => {
   const optionSpy = sinon.spy();
 
   const subCmd = new Command()
@@ -38,7 +39,7 @@ Deno.test("[command] should execute the action from an child command option", as
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute the action from an option with dashed option name", async () => {
+test("[command] should execute the action from an option with dashed option name", async () => {
   const optionSpy = sinon.spy();
 
   const cmd = new Command()
@@ -54,7 +55,7 @@ Deno.test("[command] should execute the action from an option with dashed option
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute the action from an option with dashed option name and a value", async () => {
+test("[command] should execute the action from an option with dashed option name and a value", async () => {
   const optionSpy = sinon.spy();
 
   const cmd = new Command()
@@ -72,7 +73,7 @@ Deno.test("[command] should execute the action from an option with dashed option
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute the action from an option and the command action", async () => {
+test("[command] should execute the action from an option and the command action", async () => {
   const commandSpy = sinon.spy();
   const optionSpy = sinon.spy();
 
@@ -95,7 +96,7 @@ Deno.test("[command] should execute the action from an option and the command ac
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should not execute the command action when executing an option action", async () => {
+test("[command] should not execute the command action when executing an option action", async () => {
   const commandSpy = sinon.spy();
   const optionSpy = sinon.spy();
 
@@ -118,7 +119,7 @@ Deno.test("[command] should not execute the command action when executing an opt
   assertEquals(optionSpy.firstCall.args, [options, ...args]);
 });
 
-Deno.test("[command] should execute multiple option actions", async () => {
+test("[command] should execute multiple option actions", async () => {
   const commandSpy = spy();
   const fooOptionSpy = spy();
   const barOptionSpy = spy();

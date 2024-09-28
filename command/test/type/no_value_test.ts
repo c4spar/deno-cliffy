@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import { HelpCommand } from "../../help/help_command.ts";
@@ -8,19 +9,19 @@ const cmd = new Command()
   .action(() => {})
   .command("help", new HelpCommand());
 
-Deno.test("command - type - no value - short flag without argument", async () => {
+test("command - type - no value - short flag without argument", async () => {
   const { options, args } = await cmd.parse(["-f"]);
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - no value - long flag without argument", async () => {
+test("command - type - no value - long flag without argument", async () => {
   const { options, args } = await cmd.parse(["--flag"]);
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - no value - short flag with argument", async () => {
+test("command - type - no value - short flag with argument", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "true"]);
@@ -30,7 +31,7 @@ Deno.test("command - type - no value - short flag with argument", async () => {
   );
 });
 
-Deno.test("command - type - no value - long flag with argument", async () => {
+test("command - type - no value - long flag with argument", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["--flag", "true"]);

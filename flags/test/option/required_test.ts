@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -18,7 +19,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags - option - required - required option", () => {
+test("flags - option - required - required option", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--required", "foo"],
     options,
@@ -29,7 +30,7 @@ Deno.test("flags - option - required - required option", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - required - missing required option", () => {
+test("flags - option - required - missing required option", () => {
   assertThrows(
     () => parseFlags([], options),
     Error,
@@ -37,7 +38,7 @@ Deno.test("flags - option - required - missing required option", () => {
   );
 });
 
-Deno.test("flags - option - required - required option value", () => {
+test("flags - option - required - required option value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--required", "foo", "--required-value", "bar"],
     options,
@@ -52,7 +53,7 @@ Deno.test("flags - option - required - required option value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - required - missing required option value", () => {
+test("flags - option - required - missing required option value", () => {
   assertThrows(
     () => parseFlags(["--required", "foo", "--required-value"], options),
     Error,
@@ -60,7 +61,7 @@ Deno.test("flags - option - required - missing required option value", () => {
   );
 });
 
-Deno.test("flags - option - required - required option value with default value", () => {
+test("flags - option - required - required option value with default value", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--required", "foo", "--required-default", "baz"],
     options,
@@ -71,7 +72,7 @@ Deno.test("flags - option - required - required option value with default value"
   assertEquals(literal, []);
 });
 
-Deno.test("flags - option - required - missing required option value with default value", () => {
+test("flags - option - required - missing required option value with default value", () => {
   assertThrows(
     () => parseFlags(["--required", "foo", "--required-default"], options),
     Error,

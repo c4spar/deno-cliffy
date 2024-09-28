@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -36,7 +37,7 @@ function command(states: States = {}) {
     );
 }
 
-Deno.test("command - sub command - sub-command with arguments", async () => {
+test("command - sub command - sub-command with arguments", async () => {
   const stats: States = {};
   // deno-lint-ignore no-explicit-any
   const cmd: Command<any> = command(stats);
@@ -52,7 +53,7 @@ Deno.test("command - sub command - sub-command with arguments", async () => {
   assertEquals(stats.action3, undefined);
 });
 
-Deno.test("command - sub command - sub-command2 with arguments", async () => {
+test("command - sub command - sub-command2 with arguments", async () => {
   const stats: States = {};
   // deno-lint-ignore no-explicit-any
   const cmd: Command<any> = command(stats);
@@ -68,7 +69,7 @@ Deno.test("command - sub command - sub-command2 with arguments", async () => {
   assertEquals(stats.action3, undefined);
 });
 
-Deno.test("command - sub command - nested child command with arguments", async () => {
+test("command - sub command - nested child command with arguments", async () => {
   const stats: States = {};
   // deno-lint-ignore no-explicit-any
   const cmd: Command<any> = command(stats);
@@ -84,7 +85,7 @@ Deno.test("command - sub command - nested child command with arguments", async (
   assertEquals(stats.action3, true);
 });
 
-Deno.test("[command] sub command - sub-command with missing argument", async () => {
+test("[command] sub command - sub-command with missing argument", async () => {
   await assertRejects(
     async () => {
       await command().parse(["sub-command", "input-path", "-f"]);
@@ -94,7 +95,7 @@ Deno.test("[command] sub command - sub-command with missing argument", async () 
   );
 });
 
-Deno.test("[command] sub command - sub-command with missing flag", async () => {
+test("[command] sub command - sub-command with missing flag", async () => {
   await assertRejects(
     async () => {
       await command().parse(["sub-command", "input-path"]);
@@ -104,7 +105,7 @@ Deno.test("[command] sub command - sub-command with missing flag", async () => {
   );
 });
 
-Deno.test("[command] sub command - sub-command 2 with missing argument", async () => {
+test("[command] sub command - sub-command 2 with missing argument", async () => {
   await assertRejects(
     async () => {
       await command().parse(["sub-command2", "input-path"]);
@@ -114,7 +115,7 @@ Deno.test("[command] sub command - sub-command 2 with missing argument", async (
   );
 });
 
-Deno.test("[command] sub command - nested sub-command with missing argument", async () => {
+test("[command] sub command - nested sub-command with missing argument", async () => {
   await assertRejects(
     async () => {
       await command().parse(["sub-command2", "sub-command3", "input-path"]);
@@ -124,7 +125,7 @@ Deno.test("[command] sub command - nested sub-command with missing argument", as
   );
 });
 
-Deno.test("[command] sub command - command with empty name", async () => {
+test("[command] sub command - command with empty name", async () => {
   await assertRejects(
     async () => {
       await new Command()
@@ -136,14 +137,14 @@ Deno.test("[command] sub command - command with empty name", async () => {
   );
 });
 
-Deno.test("[command] sub command - override child command", async () => {
+test("[command] sub command - override child command", async () => {
   await new Command()
     .command("foo")
     .command("foo", "...", true)
     .parse(["foo"]);
 });
 
-Deno.test("[command] sub command - duplicate command name", async () => {
+test("[command] sub command - duplicate command name", async () => {
   await assertRejects(
     async () => {
       await new Command()
@@ -156,7 +157,7 @@ Deno.test("[command] sub command - duplicate command name", async () => {
   );
 });
 
-Deno.test("[command] sub command - select sub-command", async () => {
+test("[command] sub command - select sub-command", async () => {
   const cmd = new Command()
     .command("foo")
     .command("bar");

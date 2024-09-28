@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command: option -> default", async () => {
+test("command: option -> default", async () => {
   const { options, args } = await new Command()
     .throwErrors()
     .option("--flag1", "flag 1")
@@ -12,7 +13,7 @@ Deno.test("command: option -> default", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command: option -> default", async () => {
+test("command: option -> default", async () => {
   const { options, args } = await new Command()
     .throwErrors()
     .option("--flag1", "flag 1")
@@ -23,7 +24,7 @@ Deno.test("command: option -> default", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command: option -> default", async () => {
+test("command: option -> default", async () => {
   const { options, args } = await new Command()
     .throwErrors()
     .option("--flag1", "flag 1")
@@ -34,7 +35,7 @@ Deno.test("command: option -> default", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command: option -> default", async () => {
+test("command: option -> default", async () => {
   const { options, args } = await new Command()
     .throwErrors()
     .option("--flag1", "flag 1")

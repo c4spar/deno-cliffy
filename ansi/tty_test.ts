@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { tty } from "./tty.ts";
 
-Deno.test({
+test({
   name: "ansi - tty - chainable tty",
   fn() {
     assertEquals(
@@ -11,7 +12,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - tty - chainable tty custom instance",
   fn() {
     assertEquals(
@@ -21,13 +22,16 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - empty ansi chain",
+  ignore: ["node", "bun"],
   fn() {
     assertEquals(
       typeof tty({
-        writer: Deno.stdout,
-        reader: Deno.stdin,
+        // deno-lint-ignore no-explicit-any
+        writer: (globalThis as any).Deno.stdout,
+        // deno-lint-ignore no-explicit-any
+        reader: (globalThis as any).Deno.stdin,
       })() === "function",
       true,
     );

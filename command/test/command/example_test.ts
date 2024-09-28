@@ -1,5 +1,6 @@
 // deno-fmt-ignore-file
 
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 import type { Example } from "../../types.ts";
@@ -11,7 +12,7 @@ function command() {
     .command("bar");
 }
 
-Deno.test("command - example - example properties", () => {
+test("command - example - example properties", () => {
   const cmd = new Command()
     .throwErrors()
     .example("foo", "foo ...");
@@ -20,19 +21,19 @@ Deno.test("command - example - example properties", () => {
   assertEquals(example.description, "foo ...");
 });
 
-Deno.test("command - example - has examples", () => {
+test("command - example - has examples", () => {
   const cmd = command();
   assertEquals(cmd.hasExamples(), true);
   assertEquals(new Command().hasExamples(), false);
 });
 
-Deno.test("command - example - get examples", () => {
+test("command - example - get examples", () => {
   const cmd = command();
   assertEquals(cmd.getExamples().length, 1);
   assertEquals(!!cmd.getExamples().find((opt) => opt.name === "foo"), true);
 });
 
-Deno.test("command - example - has example", () => {
+test("command - example - has example", () => {
   const cmd = command();
   assertEquals(cmd.hasExample("foo"), true);
   assertEquals(cmd.hasExample("unknown"), false);
@@ -40,7 +41,7 @@ Deno.test("command - example - has example", () => {
   assertEquals(cmd.getCommand("bar")?.hasExample("unknown"), false);
 });
 
-Deno.test("command - example - get example", () => {
+test("command - example - get example", () => {
   const cmd = command();
   assertEquals(cmd.getExample("foo")?.name, "foo");
   assertEquals(cmd.getExample("unknown")?.name, undefined);

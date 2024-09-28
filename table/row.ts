@@ -44,7 +44,7 @@ export class Row<
    *
    * @param cells Cells or row.
    */
-  public static from<T extends CellType | undefined>(
+  public static override from<T extends CellType | undefined>(
     cells: RowType<T>,
   ): Row<T> {
     const row = new this(...cells);

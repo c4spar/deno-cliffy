@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 
-Deno.test("[flags] should stop on unknown option with stopOnUnknown enabled", () => {
+test("[flags] should stop on unknown option with stopOnUnknown enabled", () => {
   const { flags, unknown, literal } = parseFlags([
     "-f",
     "true",

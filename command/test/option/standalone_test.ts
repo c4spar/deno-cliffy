@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -7,14 +8,14 @@ const cmd = new Command()
   .option("-a, --all [value:boolean]", "description ...")
   .action(() => {});
 
-Deno.test("command optionStandalone flag", async () => {
+test("command optionStandalone flag", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command optionStandalone flagCombine", async () => {
+test("command optionStandalone flagCombine", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "-a"]);
@@ -24,7 +25,7 @@ Deno.test("command optionStandalone flagCombine", async () => {
   );
 });
 
-Deno.test("command optionStandalone flagCombineLong", async () => {
+test("command optionStandalone flagCombineLong", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["--flag", "--all"]);

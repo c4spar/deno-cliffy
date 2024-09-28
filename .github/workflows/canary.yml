@@ -4,24 +4,53 @@ on:
     - cron: 0 3 * * *
 jobs:
   canary:
-    name: Deno Canary
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        runtime:
+          - name: deno
+            version: canary
+          - name: deno
+            version: rc
+          - name: node
+            version: nightly
+          # - name: bun
+          #   version: canary
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        deno_version: [canary]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno_version }}
+          deno-version: ${{ matrix.runtime.version }}
+
+      - name: Create package.json
+        if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
+        run: deno task setup:${{ matrix.runtime.name }} --no-install
+
+      - name: Setup Node
+        if: matrix.runtime.name == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.runtime.version }}
+
+      - name: Setup Bun
+        if: matrix.runtime.name == 'bun'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ matrix.runtime.version }}
+
+      - name: Setup pnpm
+        if: ${{ matrix.runtime.name == 'node' }}
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: true
 
       - name: Run tests
-        run: deno task test
+        run: deno task test:${{ matrix.runtime.name }}

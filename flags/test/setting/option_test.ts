@@ -1,9 +1,10 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { FlagOptions } from "../../types.ts";
 
-Deno.test("flags option callback", () => {
+test("flags option callback", () => {
   const options: Array<{ option: FlagOptions; value: unknown }> = [];
   parseFlags([
     "--foo",

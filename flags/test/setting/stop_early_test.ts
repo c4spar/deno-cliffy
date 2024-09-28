@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 
-Deno.test("flags stopEarly disable", () => {
+test("flags stopEarly disable", () => {
   const { flags, unknown, literal } = parseFlags([
     "-f",
     "true",
@@ -38,7 +39,7 @@ Deno.test("flags stopEarly disable", () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("flags stopEarly enabled", () => {
+test("flags stopEarly enabled", () => {
   const { flags, unknown, literal } = parseFlags([
     "-f",
     "true",
@@ -78,7 +79,7 @@ Deno.test("flags stopEarly enabled", () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("flags stopEarly unknown option", () => {
+test("flags stopEarly unknown option", () => {
   assertThrows(
     () =>
       parseFlags([

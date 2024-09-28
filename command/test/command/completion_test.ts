@@ -1,5 +1,6 @@
 // deno-fmt-ignore-file
 
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { snapshotTest } from "../../../testing/snapshot.ts";
 import { Command } from "../../command.ts";
@@ -20,7 +21,7 @@ function command() {
     );
 }
 
-Deno.test("command - completion - completion properties", () => {
+test("command - completion - completion properties", () => {
   const cmd = new Command()
     .throwErrors()
     .complete("foo", () => ["foo1", "foo2"])
@@ -36,28 +37,28 @@ Deno.test("command - completion - completion properties", () => {
   assertEquals(barCompletion.global, true);
 });
 
-Deno.test("command - completion - get completions", () => {
+test("command - completion - get completions", () => {
   const cmd = command();
   assertEquals(cmd.getCompletions().length, 2);
   assertEquals(!!cmd.getCompletions().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getCompletions().find((opt) => opt.name === "foo"), true);
 });
 
-Deno.test("command - completion - get base completions", () => {
+test("command - completion - get base completions", () => {
   const cmd = command();
   assertEquals(cmd.getBaseCompletions().length, 2);
   assertEquals(!!cmd.getBaseCompletions().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getBaseCompletions().find((opt) => opt.name === "foo"), true);
 });
 
-Deno.test("command - completion - get global completions", () => {
+test("command - completion - get global completions", () => {
   const cmd = command();
   assertEquals(cmd.getCommand("bar")?.getGlobalCompletions().length, 1);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalCompletions().find((opt) => opt.name === "global"), true);
   assertEquals(!!cmd.getCommand("bar")?.getGlobalCompletions().find((opt) => opt.name === "foo"), false);
 });
 
-Deno.test("command - completion - get completion", () => {
+test("command - completion - get completion", () => {
   const cmd = command();
   assertEquals(cmd.getCompletion("global")?.name, "global");
   assertEquals(cmd.getCompletion("foo")?.name, "foo");
@@ -70,7 +71,7 @@ Deno.test("command - completion - get completion", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getCompletion("unknown")?.name, undefined);
 });
 
-Deno.test("command - completion - get base completion", () => {
+test("command - completion - get base completion", () => {
   const cmd = command();
   assertEquals(cmd.getBaseCompletion("global")?.name, "global");
   assertEquals(cmd.getBaseCompletion("foo")?.name, "foo");
@@ -83,7 +84,7 @@ Deno.test("command - completion - get base completion", () => {
   assertEquals(cmd.getCommand("bar")?.getCommand("baz")?.getBaseCompletion("unknown")?.name, undefined);
 });
 
-Deno.test("command - completion - get global completion", () => {
+test("command - completion - get global completion", () => {
   const cmd = command();
   assertEquals(cmd.getGlobalCompletion("global")?.name, undefined);
   assertEquals(cmd.getGlobalCompletion("foo")?.name, undefined);

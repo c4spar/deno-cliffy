@@ -52,7 +52,7 @@ export class Input extends GenericSuggestions<string, string> {
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static override inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
@@ -64,7 +64,7 @@ export class Input extends GenericSuggestions<string, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  public getDefaultSettings(options: InputOptions): InputSettings {
+  public override getDefaultSettings(options: InputOptions): InputSettings {
     return {
       ...super.getDefaultSettings(options),
       minLength: options.minLength ?? 0,
@@ -72,7 +72,7 @@ export class Input extends GenericSuggestions<string, string> {
     };
   }
 
-  protected success(value: string): string | undefined {
+  protected override success(value: string): string | undefined {
     this.saveSuggestions(value);
     return super.success(value);
   }

@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -25,7 +26,7 @@ const cmd = new Command()
   })
   .action(() => {});
 
-Deno.test("command optionConflicts noArguments", async () => {
+test("command optionConflicts noArguments", async () => {
   await assertRejects(
     async () => {
       await cmd.parse([]);
@@ -35,14 +36,14 @@ Deno.test("command optionConflicts noArguments", async () => {
   );
 });
 
-Deno.test("command optionConflicts type", async () => {
+test("command optionConflicts type", async () => {
   const { options, args } = await cmd.parse(["-t", "value"]);
 
   assertEquals(options, { type: "value" });
   assertEquals(args, []);
 });
 
-Deno.test("command optionConflicts videoAudioImageType", async () => {
+test("command optionConflicts videoAudioImageType", async () => {
   const { options, args } = await cmd.parse(
     ["-v", "value", "-a", "value", "--image-type", "value"],
   );
@@ -54,7 +55,7 @@ Deno.test("command optionConflicts videoAudioImageType", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command optionConflicts videoAudioImageType", async () => {
+test("command optionConflicts videoAudioImageType", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-v", "value", "-a", "value"]);

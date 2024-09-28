@@ -293,7 +293,7 @@ export class HelpGenerator {
     }
     return this.label("Examples") +
       Table.from(examples.map((example: Example) => [
-        dim(bold(`${capitalize(example.name)}:`)),
+        dim(bold(example.name)),
         dedent(example.description),
       ]))
         .padding(1)
@@ -356,10 +356,6 @@ export class HelpGenerator {
   private label(label: string) {
     return "\n" + bold(`${label}:`) + "\n\n";
   }
-}
-
-function capitalize(string: string): string {
-  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 /**

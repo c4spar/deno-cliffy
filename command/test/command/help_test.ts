@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("[command] help - help string", () => {
+test("[command] help - help string", () => {
   const cmd = new Command()
     .throwErrors()
     .help("help: xxx")
@@ -13,7 +14,7 @@ Deno.test("[command] help - help string", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "help: xxx");
 });
 
-Deno.test("[command] help - help handler", () => {
+test("[command] help - help handler", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -29,7 +30,7 @@ Deno.test("[command] help - help handler", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "help: bar");
 });
 
-Deno.test("[command] help - override help handler", () => {
+test("[command] help - override help handler", () => {
   const cmd = new Command()
     .throwErrors()
     .name("main")
@@ -47,7 +48,7 @@ Deno.test("[command] help - override help handler", () => {
   assertEquals(cmd.getCommand("bar")?.getHelp(), "bar help");
 });
 
-Deno.test("[command] help - help option", async () => {
+test("[command] help - help option", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()
@@ -69,7 +70,7 @@ Deno.test("[command] help - help option", async () => {
   assertEquals(called, 4);
 });
 
-Deno.test("[command] help - help option action", async () => {
+test("[command] help - help option action", async () => {
   let called = 0;
   const cmd = new Command()
     .throwErrors()
@@ -93,39 +94,46 @@ Deno.test("[command] help - help option action", async () => {
   assertEquals(called, 4);
 });
 
-Deno.test("[command] help - should set usage", () => {
-  const cmd = new Command()
-    .throwErrors()
-    .help({ colors: false })
-    .usage("foo bar")
-    .arguments("<foo> [bar]");
+test({
+  name: "[command] help - should set usage",
+  ignore: ["node"],
+  fn: () => {
+    const cmd = new Command()
+      .throwErrors()
+      .help({ colors: false })
+      .usage("foo bar")
+      .arguments("<foo> [bar]");
 
-  assertEquals(
-    `
+    assertEquals(
+      `
 Usage: COMMAND foo bar
 
 Options:
 
   -h, --help  - Show this help.  
 `,
-    cmd.getHelp(),
-  );
+      cmd.getHelp(),
+    );
+  },
 });
 
-Deno.test("[command] help - should group options", () => {
-  const cmd = new Command()
-    .throwErrors()
-    .help({ colors: false })
-    .option("--foo", "Foo option.")
-    .group("Other options")
-    .option("--bar", "Bar option.")
-    .option("--baz", "Baz option.")
-    .group("Other options 2")
-    .option("--beep", "Beep option.")
-    .option("--boop", "Boop option.");
+test({
+  name: "[command] help - should group options",
+  ignore: ["node"],
+  fn: () => {
+    const cmd = new Command()
+      .throwErrors()
+      .help({ colors: false })
+      .option("--foo", "Foo option.")
+      .group("Other options")
+      .option("--bar", "Bar option.")
+      .option("--baz", "Baz option.")
+      .group("Other options 2")
+      .option("--beep", "Beep option.")
+      .option("--boop", "Boop option.");
 
-  assertEquals(
-    `
+    assertEquals(
+      `
 Usage: COMMAND
 
 Options:
@@ -143,21 +151,26 @@ Other options 2:
   --beep  - Beep option.  
   --boop  - Boop option.  
 `,
-    cmd.getHelp(),
-  );
+      cmd.getHelp(),
+    );
+  },
 });
 
-Deno.test("[command] help - should ignore required options for help option", async () => {
-  const ctx = await new Command()
-    .noExit()
-    .name("bug-with-help-and-required-options")
-    .version("0.1.0")
-    .description("Help does not work if you have required option(s).")
-    .command("bar")
-    .description("Help doesn't work, because -f is required.")
-    .option("-f, --file <file:string>", "file path", { required: true })
-    .action((options) => console.log(options))
-    .parse(["bar", "--help"]);
+test({
+  name: "[command] help - should ignore required options for help option",
+  ignore: ["node"],
+  fn: async () => {
+    const ctx = await new Command()
+      .noExit()
+      .name("bug-with-help-and-required-options")
+      .version("0.1.0")
+      .description("Help does not work if you have required option(s).")
+      .command("bar")
+      .description("Help doesn't work, because -f is required.")
+      .option("-f, --file <file:string>", "file path", { required: true })
+      // .action((options) => console.log(options))
+      .parse(["bar", "--help"]);
 
-  assertEquals(ctx.options, { help: true });
+    assertEquals(ctx.options, { help: true });
+  },
 });

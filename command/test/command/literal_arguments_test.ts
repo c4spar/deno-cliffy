@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command literal arguments", async () => {
+test("command literal arguments", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .option("-f, --flag [val:string]", "...")

@@ -1,9 +1,11 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { assertType, type IsExact } from "@std/testing/types";
 import { Checkbox } from "../checkbox.ts";
 
-Deno.test("prompt checkbox: valid value", async () => {
+test("prompt checkbox: valid value", async () => {
   Checkbox.inject(["value1", "value3"]);
   const result: string[] | undefined = await Checkbox.prompt({
     message: "message",
@@ -12,7 +14,7 @@ Deno.test("prompt checkbox: valid value", async () => {
   assertEquals(result, ["value1", "value3"]);
 });
 
-Deno.test("prompt checkbox: empty value", async () => {
+test("prompt checkbox: empty value", async () => {
   Checkbox.inject([]);
   const result: string[] | undefined = await Checkbox.prompt({
     message: "message",
@@ -22,7 +24,7 @@ Deno.test("prompt checkbox: empty value", async () => {
   assertEquals(result, []);
 });
 
-Deno.test("prompt checkbox: object value", async () => {
+test("prompt checkbox: object value", async () => {
   Checkbox.inject([{ id: 1, name: "foo" }]);
 
   const books = [
@@ -39,7 +41,7 @@ Deno.test("prompt checkbox: object value", async () => {
   assertType<IsExact<typeof result, Array<{ id: number; name: string }>>>(true);
 });
 
-Deno.test("prompt checkbox: invalid value", async () => {
+test("prompt checkbox: invalid value", async () => {
   await assertRejects(
     async () => {
       Checkbox.inject(["value3", "value4"]);
@@ -50,12 +52,12 @@ Deno.test("prompt checkbox: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt checkbox: null value", async () => {
+test("prompt checkbox: null value", async () => {
   await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
@@ -67,12 +69,12 @@ Deno.test("prompt checkbox: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt checkbox: min options", async () => {
+test("prompt checkbox: min options", async () => {
   await assertRejects(
     async () => {
       Checkbox.inject(["value1", "value2"]);
@@ -85,13 +87,13 @@ Deno.test("prompt checkbox: min options", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
+        getOs() === "windows" ? bold("× ") : bold("✘ ")
       }The minimum number of options is 3 but got 2.`,
     ),
   );
 });
 
-Deno.test("prompt checkbox: max options", async () => {
+test("prompt checkbox: max options", async () => {
   await assertRejects(
     async () => {
       Checkbox.inject(["value1", "value2"]);
@@ -104,7 +106,7 @@ Deno.test("prompt checkbox: max options", async () => {
     Error,
     red(
       `${
-        Deno.build.os === "windows" ? bold("× ") : bold("✘ ")
+        getOs() === "windows" ? bold("× ") : bold("✘ ")
       }The maximum number of options is 1 but got 2.`,
     ),
   );
