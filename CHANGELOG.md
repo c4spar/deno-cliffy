@@ -1,3 +1,51 @@
+# [v1.0.0-rc.6](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.5...v1.0.0-rc.6) (Sep 28, 2024)
+
+### Features
+
+* add support for deno v2 (
+  #745) ([64fff28](https://github.com/c4spar/deno-cliffy/commit/64fff28))
+* **command:** add support for disabling spinner in upgrade command (
+  #749) ([62fa792](https://github.com/c4spar/deno-cliffy/commit/62fa792))
+* **command:** add support for npm package without scope to npm provider (
+  #748) ([f882fa0](https://github.com/c4spar/deno-cliffy/commit/f882fa0))
+
+### Bug Fixes
+
+* **command:** directly print example text w/o capitalization (
+  #741) ([b0f1942](https://github.com/c4spar/deno-cliffy/commit/b0f1942))
+* **command:** new version info is displayed if no stable version is available (
+  #726) ([3295c7a](https://github.com/c4spar/deno-cliffy/commit/3295c7a))
+* **internal:** resolve null instead of returning null (
+  #752) ([779cf08](https://github.com/c4spar/deno-cliffy/commit/779cf08))
+* **internal:** fix readSync method (
+  #747) ([2d8aa19](https://github.com/c4spar/deno-cliffy/commit/2d8aa19))
+* **prompt:** increase buffer size of input prompts for nodejs to allow paste of
+  more than 8 chars (
+  #739) ([dd9aab0](https://github.com/c4spar/deno-cliffy/commit/dd9aab0))
+
+### Code Refactoring
+
+* **command:** remove unused files (
+  #751) ([ced45fc](https://github.com/c4spar/deno-cliffy/commit/ced45fc))
+* **prompt:** set list index to 0 instead of 1 when selecting a group option (
+  #727) ([09c8c7a](https://github.com/c4spar/deno-cliffy/commit/09c8c7a))
+
+### Chore
+
+* setup tests for node (
+  #729) ([a036cac](https://github.com/c4spar/deno-cliffy/commit/a036cac))
+* use workspace property and fix some type and lint errors (
+  #725) ([e9dae18](https://github.com/c4spar/deno-cliffy/commit/e9dae18))
+* **deno:** add test:all, node and bun task (
+  #750) ([1bee870](https://github.com/c4spar/deno-cliffy/commit/1bee870))
+* **deps:** upgrade @std to latest version (
+  #746) ([2a32a37](https://github.com/c4spar/deno-cliffy/commit/2a32a37))
+
+### Documentation Updates
+
+* **examples:** use workspace specifier for imports (
+  #728) ([33b01f8](https://github.com/c4spar/deno-cliffy/commit/33b01f8))
+
 # [v1.0.0-rc.5](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.4...v1.0.0-rc.5) (Jul 1, 2024)
 
 ### Features
