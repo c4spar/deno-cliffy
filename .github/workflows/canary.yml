@@ -10,13 +10,15 @@ jobs:
       matrix:
         runtime:
           - name: deno
-            version: canary
+            deno-version: canary
           - name: deno
-            version: rc
+            deno-version: rc
           - name: node
-            version: nightly
+            deno-version: canary
+            node-version: nightly
           # - name: bun
-          #   version: canary
+          #   deno-version: canary
+          #   bun-version: canary
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
@@ -28,7 +30,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.runtime.version }}
+          deno-version: ${{ matrix.runtime.deno-version }}
 
       - name: Create package.json
         if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
@@ -38,13 +40,13 @@ jobs:
         if: matrix.runtime.name == 'node'
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.runtime.version }}
+          node-version: ${{ matrix.runtime.node-version }}
 
       - name: Setup Bun
         if: matrix.runtime.name == 'bun'
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: ${{ matrix.runtime.version }}
+          bun-version: ${{ matrix.runtime.bun-version }}
 
       - name: Setup pnpm
         if: ${{ matrix.runtime.name == 'node' }}
