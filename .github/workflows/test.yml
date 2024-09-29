@@ -11,9 +11,9 @@ jobs:
       matrix:
         runtime:
           - name: deno
-            version: v1.x
+            deno-version: v1.x
           - name: deno
-            version: rc
+            deno-version: rc
           - name: node
           # - name: bun
         os: [macOS-latest, windows-latest, ubuntu-latest]
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.runtime.version }}
+          deno-version: ${{ matrix.runtime.deno-version }}
           # deno-version-file: ".deno-version"
 
       - name: Create package.json
@@ -54,12 +54,12 @@ jobs:
           run_install: true
 
       - name: Run tests
-        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'v1.x'
+        if: matrix.runtime.name == 'deno' && matrix.runtime.deno-version == 'v1.x'
         shell: bash
         run: deno task coverage:deno-v1
 
       - name: Run tests
-        if: matrix.runtime.name == 'deno' && matrix.runtime.version == 'rc'
+        if: matrix.runtime.name == 'deno' && matrix.runtime.deno-version == 'rc'
         shell: bash
         run: deno task coverage:deno-v2
 
