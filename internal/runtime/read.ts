@@ -4,14 +4,22 @@
  * @internal
  * @param data Uint8Array to store the data.
  */
-export function read(data: Uint8Array): Promise<number | null> {
+export async function read(data: Uint8Array): Promise<number | null> {
   // deno-lint-ignore no-explicit-any
-  const { Deno, process } = globalThis as any;
+  const { Deno, Bun, process } = globalThis as any;
 
   if (Deno) {
-    return Deno.stdin.read(data);
+    return await Deno.stdin.read(data);
+  } else if (Bun) {
+    const reader = Bun.stdin.stream().getReader();
+    const { value: buffer } = await reader.read();
+    await reader.cancel();
+    for (let i = 0; i < buffer.length; i++) {
+      data[i] = buffer[i];
+    }
+    return buffer.length;
   } else if (process) {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       process.stdin.once("readable", () => {
         try {
           const buffer = process.stdin.read();
