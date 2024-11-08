@@ -13,7 +13,7 @@ jobs:
           - name: deno
             deno-version: v1.x
           - name: deno
-            deno-version: rc
+            deno-version: v2.x
           - name: node
           # - name: bun
         os: [macOS-latest, windows-latest, ubuntu-latest]

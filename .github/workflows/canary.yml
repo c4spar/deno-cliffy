@@ -11,11 +11,9 @@ jobs:
         runtime:
           - name: deno
             deno-version: canary
-          - name: deno
-            deno-version: rc
           - name: node
             deno-version: canary
-            node-version: nightly
+            node-version: canary
           # - name: bun
           #   deno-version: canary
           #   bun-version: canary
