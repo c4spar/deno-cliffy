@@ -14,9 +14,8 @@ jobs:
             deno-version: canary
           - name: node
             deno-version: canary
-            node-version: canary
+            node-version: latest
           # - name: bun
-          #   deno-version: canary
           #   bun-version: canary
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
@@ -40,6 +39,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.runtime.node-version }}
+          check-latest: true
 
       - name: Setup Bun
         if: matrix.runtime.name == 'bun'
