@@ -15,6 +15,7 @@ jobs:
             deno-version: canary
             node-version: latest
           # - name: bun
+          #   deno-version: canary
           #   bun-version: canary
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
