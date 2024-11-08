@@ -1,6 +1,5 @@
 name: Canary
 on:
-  pull_request:
   schedule:
     - cron: 0 3 * * *
 jobs:
