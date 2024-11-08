@@ -136,7 +136,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
     // Keep support for deno < 1.10.
     if (this.settings.id && "localStorage" in window) {
       try {
-        // deno-lint-ignore no-explicit-any
+        // dnt-shim-ignore deno-lint-ignore no-explicit-any
         return (window as any).localStorage;
       } catch (_) {
         // Ignore error if --location is not set.
@@ -171,7 +171,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
   protected override async render(): Promise<void> {
     if (this.settings.files && this.#hasReadPermissions === undefined) {
-      // deno-lint-ignore no-explicit-any
+      // dnt-shim-ignore dnt-shim-ignore deno-lint-ignore no-explicit-any
       const status = await (globalThis as any).Deno?.permissions.request({
         name: "read",
       });

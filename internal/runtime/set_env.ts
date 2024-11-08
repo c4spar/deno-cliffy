@@ -6,7 +6,7 @@
  * @param value The value of the environment variable.
  */
 export function setEnv(name: string, value: string): void {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

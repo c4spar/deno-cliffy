@@ -5,7 +5,7 @@
  * @param input Path to the file.
  */
 export async function stat(input: string): Promise<{ isDirectory: boolean }> {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;
 
   if (Deno) {

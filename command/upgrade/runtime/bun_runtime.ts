@@ -8,9 +8,9 @@ export class BunRuntime extends NodeRuntime {
     isJsr: boolean,
     logger?: Logger,
   ): Promise<void> {
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore deno-lint-ignore no-explicit-any
     const Bun = (globalThis as any).Bun;
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore deno-lint-ignore no-explicit-any
     const process = (globalThis as any).process;
 
     cmdArgs = isJsr

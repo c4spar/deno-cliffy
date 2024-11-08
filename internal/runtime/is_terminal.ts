@@ -4,7 +4,7 @@
  * @internal
  */
 export function isTerminal(): boolean {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

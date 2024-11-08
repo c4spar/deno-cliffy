@@ -5,7 +5,7 @@
  * @param path Path to the directory.
  */
 export async function readDir(path: string): Promise<Array<{ name: string }>> {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno } = globalThis as any;
   path ||= ".";
 

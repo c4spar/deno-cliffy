@@ -5,7 +5,7 @@
  * @param data Uint8Array to store the data.
  */
 export async function read(data: Uint8Array): Promise<number | null> {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore deno-lint-ignore no-explicit-any
   const { Deno, Bun, process } = globalThis as any;
 
   if (Deno) {

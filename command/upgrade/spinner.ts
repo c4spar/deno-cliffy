@@ -197,7 +197,7 @@ export class Spinner {
    * ```
    */
   start() {
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore deno-lint-ignore no-explicit-any
     if (this.#active || (globalThis as any).Deno?.stdout.writable.locked) {
       return;
     }

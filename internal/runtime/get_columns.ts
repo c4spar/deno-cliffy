@@ -5,7 +5,7 @@
  */
 export function getColumns(): number | null {
   try {
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore deno-lint-ignore no-explicit-any
     const { Deno, process } = globalThis as any;
 
     // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)
