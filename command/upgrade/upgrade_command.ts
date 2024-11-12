@@ -17,6 +17,7 @@ export interface UpgradeCommandOptions<
 > extends RuntimeOptions {
   provider: TProvider | Array<TProvider>;
   runtime?: RuntimeOptionsMap;
+  spinner?: boolean;
 }
 
 /**
@@ -58,7 +59,8 @@ export class UpgradeCommand extends Command {
   private readonly providers: ReadonlyArray<Provider>;
 
   constructor(
-    { provider, ...options }: UpgradeCommandOptions,
+    { provider, spinner: withSpinner = true, ...options }:
+      UpgradeCommandOptions,
   ) {
     super();
     this.providers = Array.isArray(provider) ? provider : [provider];
@@ -108,7 +110,9 @@ export class UpgradeCommand extends Command {
         "-v, --verbose",
         "Log verbose output.",
       )
-      .option("--no-spinner", "Disable spinner.")
+      .option("--no-spinner", "Disable spinner.", {
+        hidden: !withSpinner,
+      })
       .complete("version", () => this.getAllVersions())
       .action(
         async (
@@ -123,7 +127,7 @@ export class UpgradeCommand extends Command {
           const name: string = this.getMainCommand().getName();
           const currentVersion: string | undefined = this.getVersion();
 
-          const spinner = spinnerEnabled
+          const spinner = withSpinner && spinnerEnabled
             ? new Spinner({
               message: brightBlue(
                 `Upgrading ${bold(name)} from version ${

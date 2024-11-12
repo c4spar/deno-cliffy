@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -15,7 +16,7 @@ const cmd = new Command()
 
 // Optional:
 
-Deno.test("command optionVariadic optional", async () => {
+test("command optionVariadic optional", async () => {
   const { options, args } = await cmd.parse(["-o"]);
 
   assertEquals(options, { optional: true });
@@ -24,14 +25,14 @@ Deno.test("command optionVariadic optional", async () => {
 
 // Boolean:
 
-Deno.test("command optionVariadic boolean", async () => {
+test("command optionVariadic boolean", async () => {
   const { options, args } = await cmd.parse(["-b", "1", "0", "true", "false"]);
 
   assertEquals(options, { boolean: [true, false, true, false] });
   assertEquals(args, []);
 });
 
-Deno.test("command optionVariadic booleanInvalidValue", async () => {
+test("command optionVariadic booleanInvalidValue", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-b", "1", "0", "true", "false", "2"]);
@@ -43,7 +44,7 @@ Deno.test("command optionVariadic booleanInvalidValue", async () => {
 
 // String:
 
-Deno.test("command optionVariadic string", async () => {
+test("command optionVariadic string", async () => {
   const { options, args } = await cmd.parse(["-s", "1", "0", "true", "false"]);
 
   assertEquals(options, { string: ["1", "0", "true", "false"] });
@@ -52,14 +53,14 @@ Deno.test("command optionVariadic string", async () => {
 
 // Number:
 
-Deno.test("command optionVariadic number", async () => {
+test("command optionVariadic number", async () => {
   const { options, args } = await cmd.parse(["-n", "1", "0", "654", "1.2"]);
 
   assertEquals(options, { number: [1, 0, 654, 1.2] });
   assertEquals(args, []);
 });
 
-Deno.test("command optionVariadic numberInvalidValue", async () => {
+test("command optionVariadic numberInvalidValue", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-n", "1", "0", "654", "abc", "1,2"]);
@@ -71,14 +72,14 @@ Deno.test("command optionVariadic numberInvalidValue", async () => {
 
 // Exact:
 
-Deno.test("command optionVariadic exact", async () => {
+test("command optionVariadic exact", async () => {
   const { options, args } = await cmd.parse(["-v", "1", "abc", "1"]);
 
   assertEquals(options, { variadicOption: [1, "abc", true] });
   assertEquals(args, []);
 });
 
-Deno.test("command optionVariadic exactInvalidValue", async () => {
+test("command optionVariadic exactInvalidValue", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-v", "abc", "abc", "1"]);
@@ -88,7 +89,7 @@ Deno.test("command optionVariadic exactInvalidValue", async () => {
   );
 });
 
-Deno.test("command optionVariadic exactMissingValue", async () => {
+test("command optionVariadic exactMissingValue", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-v", "1"]);
@@ -98,14 +99,14 @@ Deno.test("command optionVariadic exactMissingValue", async () => {
   );
 });
 
-Deno.test("command optionVariadic exactLastOptional", async () => {
+test("command optionVariadic exactLastOptional", async () => {
   const { options, args } = await cmd.parse(["-v", "1", "abc"]);
 
   assertEquals(options, { variadicOption: [1, "abc"] });
   assertEquals(args, []);
 });
 
-Deno.test("command optionVariadic exactLastOptionalVariadic", async () => {
+test("command optionVariadic exactLastOptionalVariadic", async () => {
   const { options, args } = await cmd.parse(
     ["-v", "1", "abc", "1", "0", "true", "false"],
   );

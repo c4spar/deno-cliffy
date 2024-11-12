@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -35,7 +36,7 @@ const options: ParseFlagsOptions = {
   }],
 };
 
-Deno.test("flags optionConflicts noArguments", () => {
+test("flags optionConflicts noArguments", () => {
   assertThrows(
     () => parseFlags([], options),
     Error,
@@ -43,7 +44,7 @@ Deno.test("flags optionConflicts noArguments", () => {
   );
 });
 
-Deno.test("flags optionConflicts type", () => {
+test("flags optionConflicts type", () => {
   const { flags, unknown, literal } = parseFlags(["-t", "value"], options);
 
   assertEquals(flags, { type: "value" });
@@ -51,7 +52,7 @@ Deno.test("flags optionConflicts type", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionConflicts videoAudioImageType", () => {
+test("flags optionConflicts videoAudioImageType", () => {
   const { flags, unknown, literal } = parseFlags(
     ["-v", "value", "-a", "value", "--image-type", "value"],
     options,
@@ -65,7 +66,7 @@ Deno.test("flags optionConflicts videoAudioImageType", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags optionConflicts videoTypeDependsOnImageType", () => {
+test("flags optionConflicts videoTypeDependsOnImageType", () => {
   assertThrows(
     () => parseFlags(["-v", "value", "-a", "value"], options),
     Error,

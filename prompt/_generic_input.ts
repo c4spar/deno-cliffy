@@ -37,14 +37,15 @@ export abstract class GenericInput<
   TValue,
   TRawValue,
 > extends GenericPrompt<TValue, TRawValue> {
-  protected abstract readonly settings: GenericInputPromptSettings<
+  // @ts-ignore ignore jsr publish error
+  protected abstract override readonly settings: GenericInputPromptSettings<
     TValue,
     TRawValue
   >;
   protected inputValue = "";
   protected inputIndex = 0;
 
-  public getDefaultSettings(
+  public override getDefaultSettings(
     options: GenericInputPromptOptions<TValue, TRawValue>,
   ): GenericInputPromptSettings<TValue, TRawValue> {
     const settings = super.getDefaultSettings(options);
@@ -64,7 +65,7 @@ export abstract class GenericInput<
     return this.inputValue;
   }
 
-  protected message(): string {
+  protected override message(): string {
     const message: string = super.message() + " " + this.settings.pointer + " ";
     this.cursor.x = stripAnsiCode(message).length + this.inputIndex + 1;
     return message + this.input();
@@ -94,7 +95,7 @@ export abstract class GenericInput<
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.isKey(this.settings.keys, "moveCursorLeft", event):
         this.moveCursorLeft();

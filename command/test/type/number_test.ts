@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -8,21 +9,21 @@ const cmd = new Command()
   .option("--no-flag", "description ...")
   .action(() => {});
 
-Deno.test("command - type - number - with no value", async () => {
+test("command - type - number - with no value", async () => {
   const { options, args } = await cmd.parse(["-f"]);
 
   assertEquals(options, { flag: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - number - with valid value", async () => {
+test("command - type - number - with valid value", async () => {
   const { options, args } = await cmd.parse(["--flag", "123"]);
 
   assertEquals(options, { flag: 123 });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - number - with argument", async () => {
+test("command - type - number - with argument", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "123", "unknown"]);
@@ -32,7 +33,7 @@ Deno.test("command - type - number - with argument", async () => {
   );
 });
 
-Deno.test("command - type - number - with missing value", async () => {
+test("command - type - number - with missing value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-F"]);
@@ -42,7 +43,7 @@ Deno.test("command - type - number - with missing value", async () => {
   );
 });
 
-Deno.test("command - type - number - with invalid string value", async () => {
+test("command - type - number - with invalid string value", async () => {
   await assertRejects(
     async () => {
       await cmd.parse(["-f", "abc"]);

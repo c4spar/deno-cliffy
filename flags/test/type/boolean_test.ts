@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
 import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
@@ -16,7 +17,7 @@ const options = {
   }],
 };
 
-Deno.test("flags - type - boolean - with no value", () => {
+test("flags - type - boolean - with no value", () => {
   const { flags, unknown, literal } = parseFlags(["-f"], options);
 
   assertEquals(flags, { flag: true });
@@ -24,7 +25,7 @@ Deno.test("flags - type - boolean - with no value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - long flag with no value", () => {
+test("flags - type - boolean - long flag with no value", () => {
   const { flags, unknown, literal } = parseFlags(["--flag"], options);
 
   assertEquals(flags, { flag: true });
@@ -32,7 +33,7 @@ Deno.test("flags - type - boolean - long flag with no value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - with true value", () => {
+test("flags - type - boolean - with true value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "true"], options);
 
   assertEquals(flags, { flag: true });
@@ -40,7 +41,7 @@ Deno.test("flags - type - boolean - with true value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - long flag with true value", () => {
+test("flags - type - boolean - long flag with true value", () => {
   const { flags, unknown, literal } = parseFlags(["--flag", "true"], options);
 
   assertEquals(flags, { flag: true });
@@ -48,7 +49,7 @@ Deno.test("flags - type - boolean - long flag with true value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - with false value", () => {
+test("flags - type - boolean - with false value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "false"], options);
 
   assertEquals(flags, { flag: false });
@@ -56,7 +57,7 @@ Deno.test("flags - type - boolean - with false value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - long flag with false value and argument", () => {
+test("flags - type - boolean - long flag with false value and argument", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "false", "unknown"],
     options,
@@ -67,7 +68,7 @@ Deno.test("flags - type - boolean - long flag with false value and argument", ()
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - with 1 value", () => {
+test("flags - type - boolean - with 1 value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "1"], options);
 
   assertEquals(flags, { flag: true });
@@ -75,7 +76,7 @@ Deno.test("flags - type - boolean - with 1 value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - long flag with 1 value", () => {
+test("flags - type - boolean - long flag with 1 value", () => {
   const { flags, unknown, literal } = parseFlags(["--flag", "1"], options);
 
   assertEquals(flags, { flag: true });
@@ -83,7 +84,7 @@ Deno.test("flags - type - boolean - long flag with 1 value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - with 0 value", () => {
+test("flags - type - boolean - with 0 value", () => {
   const { flags, unknown, literal } = parseFlags(["-f", "0"], options);
 
   assertEquals(flags, { flag: false });
@@ -91,7 +92,7 @@ Deno.test("flags - type - boolean - with 0 value", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - long flag with 0 value and argument", () => {
+test("flags - type - boolean - long flag with 0 value and argument", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--flag", "0", "unknown"],
     options,
@@ -102,7 +103,7 @@ Deno.test("flags - type - boolean - long flag with 0 value and argument", () => 
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - negatable option with argument", () => {
+test("flags - type - boolean - negatable option with argument", () => {
   const { flags, unknown, literal } = parseFlags(
     ["--no-flag", "unknown"],
     options,
@@ -113,7 +114,7 @@ Deno.test("flags - type - boolean - negatable option with argument", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("flags - type - boolean - no value option with default value", () => {
+test("flags - type - boolean - no value option with default value", () => {
   const parseOptions = {
     flags: [{
       name: "foo",
@@ -128,7 +129,7 @@ Deno.test("flags - type - boolean - no value option with default value", () => {
   assertEquals(result2.flags, { foo: true });
 });
 
-Deno.test("flags - type - boolean - with invalid value", () => {
+test("flags - type - boolean - with invalid value", () => {
   assertThrows(
     () => parseFlags(["-f", "unknown"], options),
     Error,

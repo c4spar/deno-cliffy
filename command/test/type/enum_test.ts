@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { Command } from "../../command.ts";
 import { EnumType } from "../../types/enum.ts";
@@ -17,42 +18,42 @@ const cmd = () =>
     .option("--enum-color [value:enum-color]", "description ...")
     .reset();
 
-Deno.test("command - type - enum - with no value", async () => {
+test("command - type - enum - with no value", async () => {
   const { options, args } = await cmd().parse(["--array-color"]);
 
   assertEquals(options, { arrayColor: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with array and string value", async () => {
+test("command - type - enum - with array and string value", async () => {
   const { options, args } = await cmd().parse(["--array-color", "red"]);
 
   assertEquals(options, { arrayColor: "red" });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with array and number value", async () => {
+test("command - type - enum - with array and number value", async () => {
   const { options, args } = await cmd().parse(["--array-color", "1"]);
 
   assertEquals(options, { arrayColor: 1 });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with array and boolean value", async () => {
+test("command - type - enum - with array and boolean value", async () => {
   const { options, args } = await cmd().parse(["--array-color", "true"]);
 
   assertEquals(options, { arrayColor: true });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with enum", async () => {
+test("command - type - enum - with enum", async () => {
   const { options, args } = await cmd().parse(["--enum-color", "red"]);
 
   assertEquals(options, { enumColor: Color.Red });
   assertEquals(args, []);
 });
 
-Deno.test("command - type - enum - with array value", async () => {
+test("command - type - enum - with array value", async () => {
   await assertRejects(
     async () => {
       await cmd().parse(["--array-color", "green"]);
@@ -62,7 +63,7 @@ Deno.test("command - type - enum - with array value", async () => {
   );
 });
 
-Deno.test("command - type - enum - with enum value", async () => {
+test("command - type - enum - with enum value", async () => {
   await assertRejects(
     async () => {
       await cmd().parse(["--enum-color", "green"]);

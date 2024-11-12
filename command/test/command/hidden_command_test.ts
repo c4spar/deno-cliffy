@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { stripAnsiCode } from "@std/fmt/colors";
 import { CompletionsCommand } from "../../completions/completions_command.ts";
@@ -19,7 +20,7 @@ function command() {
     .hidden();
 }
 
-Deno.test("hidden command", async () => {
+test("hidden command", async () => {
   // deno-lint-ignore no-explicit-any
   const cmd: Command<any> = command();
   const { options, args } = await cmd.parse(
@@ -31,7 +32,7 @@ Deno.test("hidden command", async () => {
   assertEquals(args[1], "output-path");
 });
 
-Deno.test("hidden command help", () => {
+test("hidden command help", () => {
   const cmd = command();
   const output: string = cmd.getHelp();
 

@@ -60,7 +60,7 @@ export class Secret extends GenericInput<string, string> {
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static override inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
@@ -72,7 +72,7 @@ export class Secret extends GenericInput<string, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  public getDefaultSettings(options: SecretOptions): SecretSettings {
+  public override getDefaultSettings(options: SecretOptions): SecretSettings {
     return {
       ...super.getDefaultSettings(options),
       label: options.label ?? "Secret",
@@ -82,14 +82,14 @@ export class Secret extends GenericInput<string, string> {
     };
   }
 
-  protected input(): string {
+  protected override input(): string {
     return underline(
       this.settings.hidden ? "" : "*".repeat(this.inputValue.length),
     );
   }
 
   /** Read user input. */
-  protected read(): Promise<boolean> {
+  protected override read(): Promise<boolean> {
     if (this.settings.hidden) {
       this.settings.tty.cursorHide();
     }

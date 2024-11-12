@@ -1,7 +1,8 @@
 {
   "name": "@cliffy/internal",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.7",
   "exports": {
+    "./runtime/delete-env": "./runtime/delete_env.ts",
     "./runtime/exit": "./runtime/exit.ts",
     "./runtime/get-args": "./runtime/get_args.ts",
     "./runtime/get-columns": "./runtime/get_columns.ts",
@@ -14,8 +15,11 @@
     "./runtime/read": "./runtime/read.ts",
     "./runtime/read-dir": "./runtime/read_dir.ts",
     "./runtime/read-sync": "./runtime/read_sync.ts",
+    "./runtime/runtime-name": "./runtime/runtime_name.ts",
+    "./runtime/set-env": "./runtime/set_env.ts",
     "./runtime/set-raw": "./runtime/set_raw.ts",
     "./runtime/stat": "./runtime/stat.ts",
-    "./runtime/write-sync": "./runtime/write_sync.ts"
+    "./runtime/write-sync": "./runtime/write_sync.ts",
+    "./testing/test": "./testing/test/mod.ts"
   }
 }

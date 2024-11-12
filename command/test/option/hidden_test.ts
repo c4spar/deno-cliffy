@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { stripAnsiCode } from "@std/fmt/colors";
 import { Command } from "../../command.ts";
@@ -15,7 +16,7 @@ function command() {
     .hidden();
 }
 
-Deno.test("hidden option", async () => {
+test("hidden option", async () => {
   const cmd = command();
   const { options, args } = await cmd.parse(["--hidden", "test"]);
 
@@ -23,7 +24,7 @@ Deno.test("hidden option", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("hidden option help", () => {
+test("hidden option help", () => {
   const cmd = command();
   const output: string = cmd.getHelp();
 

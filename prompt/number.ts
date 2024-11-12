@@ -66,7 +66,7 @@ export class Number extends GenericSuggestions<number, string> {
    *
    * @param value Input value.
    */
-  public static inject(value: string): void {
+  public static override inject(value: string): void {
     GenericPrompt.inject(value);
   }
 
@@ -78,7 +78,7 @@ export class Number extends GenericSuggestions<number, string> {
     this.settings = this.getDefaultSettings(options);
   }
 
-  public getDefaultSettings(options: NumberOptions): NumberSettings {
+  public override getDefaultSettings(options: NumberOptions): NumberSettings {
     const settings = super.getDefaultSettings(options);
     return {
       ...settings,
@@ -95,7 +95,7 @@ export class Number extends GenericSuggestions<number, string> {
     };
   }
 
-  protected success(value: number): string | undefined {
+  protected override success(value: number): string | undefined {
     this.saveSuggestions(value);
     return super.success(value);
   }
@@ -104,7 +104,7 @@ export class Number extends GenericSuggestions<number, string> {
    * Handle user input event.
    * @param event Key event.
    */
-  protected async handleEvent(event: KeyCode): Promise<void> {
+  protected override async handleEvent(event: KeyCode): Promise<void> {
     switch (true) {
       case this.settings.suggestions &&
         this.isKey(this.settings.keys, "next", event):
@@ -199,7 +199,7 @@ export class Number extends GenericSuggestions<number, string> {
    * Add char to input.
    * @param char Char.
    */
-  protected addChar(char: string): void {
+  protected override addChar(char: string): void {
     if (isNumeric(char)) {
       super.addChar(char);
     } else if (

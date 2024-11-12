@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -12,14 +13,14 @@ const cmd = new Command()
     { separator: " " },
   );
 
-Deno.test("command: list option", async () => {
+test("command: list option", async () => {
   const { options, args } = await cmd.parse(["-l", "1,2,3"]);
 
   assertEquals(options, { list: [1, 2, 3] });
   assertEquals(args, []);
 });
 
-Deno.test("command: list option separator", async () => {
+test("command: list option separator", async () => {
   const { options, args } = await cmd.parse(["-o", "1 2 3"]);
 
   assertEquals(options, { otherList: ["1", "2", "3"] });

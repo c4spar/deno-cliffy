@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { ansi } from "./ansi.ts";
 
-Deno.test({
+test({
   name: "ansi - chainable ansi escapes",
   fn() {
     assertEquals(
@@ -11,7 +12,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - toArray",
   fn() {
     assertEquals(
@@ -21,7 +22,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - chainable ansi escape custom instance",
   fn() {
     const myAnsi = ansi();
@@ -39,7 +40,7 @@ Deno.test({
   },
 });
 
-Deno.test({
+test({
   name: "ansi - empty ansi chain",
   fn() {
     assertEquals(ansi().toString(), "");

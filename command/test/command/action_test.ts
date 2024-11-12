@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import { assertType, type IsExact } from "@std/testing/types";
@@ -18,7 +19,7 @@ function createStats(): IStats {
   };
 }
 
-Deno.test("flags allowEmpty enabled", async () => {
+test("flags allowEmpty enabled", async () => {
   const stats: IStats = createStats();
 
   const cmd = new Command()
@@ -40,7 +41,7 @@ Deno.test("flags allowEmpty enabled", async () => {
   assertEquals(stats.args, args);
 });
 
-Deno.test("flags allowEmpty enabled", async () => {
+test("flags allowEmpty enabled", async () => {
   const stats: IStats = createStats();
   // deno-lint-ignore no-explicit-any
   let subCmd: Command<any>;
@@ -68,7 +69,7 @@ Deno.test("flags allowEmpty enabled", async () => {
   assertEquals(stats.args, args);
 });
 
-Deno.test("[flags] should call global action handler", async () => {
+test("[flags] should call global action handler", async () => {
   const mainGlobalSpy = spy();
   const mainSpy = spy();
   const fooGlobalSpy = spy();
@@ -177,7 +178,7 @@ Deno.test("[flags] should call global action handler", async () => {
   assertSpyCall(barSpy, 0, { args });
 });
 
-Deno.test("[flags] should call global and base action handler", async () => {
+test("[flags] should call global and base action handler", async () => {
   const globalSpy = spy();
   const baseSpy = spy();
 
@@ -198,7 +199,7 @@ Deno.test("[flags] should call global and base action handler", async () => {
   assertSpyCall(baseSpy, 0, { args });
 });
 
-Deno.test("[flags] should not call global action handler with noGlobals", async () => {
+test("[flags] should not call global action handler with noGlobals", async () => {
   const globalSpy = spy();
   const baseSpy = spy();
   const fooGlobalSpy = spy();

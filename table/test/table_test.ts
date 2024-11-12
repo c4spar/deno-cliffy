@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Table } from "../table.ts";
 import { assertEquals, assertStrictEquals, assertThrows } from "@std/assert";
 import { Row } from "../row.ts";
 
-Deno.test("simple table", () => {
+test("simple table", () => {
   assertEquals(
     Table.from([
       ["cell1", "cell2", "cell3"],
@@ -18,7 +19,7 @@ cell1 cell2 cell3`.slice(1),
   );
 });
 
-Deno.test("simple table from table", () => {
+test("simple table from table", () => {
   assertEquals(
     Table.from(
       new Table()
@@ -39,7 +40,7 @@ cell1 cell2 cell3`.slice(1),
   );
 });
 
-Deno.test("simple table from json", () => {
+test("simple table from json", () => {
   assertEquals(
     Table.fromJson([{
       firstName: "foo",
@@ -64,7 +65,7 @@ foo       bar      132`.slice(1),
   );
 });
 
-Deno.test("clone simple table", () => {
+test("clone simple table", () => {
   const table1 = Table.from([
     ["cell1", "cell2", "cell3"],
     ["cell1", "cell2", "cell3"],
@@ -76,7 +77,7 @@ Deno.test("clone simple table", () => {
   assertThrows(() => assertStrictEquals(table2, table3), Error);
 });
 
-Deno.test("table getter", () => {
+test("table getter", () => {
   const header = Row.from(["1", "2", "3"]).border(false);
   const table = new Table()
     .header(header)
@@ -105,7 +106,7 @@ Deno.test("table getter", () => {
   assertEquals(table.hasHeaderBorder(), false);
 });
 
-Deno.test("simple table with min col with", () => {
+test("simple table with min col with", () => {
   assertEquals(
     Table.from([
       ["cell1", "cell2", "cell3"],
@@ -126,7 +127,7 @@ Deno.test("simple table with min col with", () => {
   );
 });
 
-Deno.test("simple table with word break", () => {
+test("simple table with word break", () => {
   assertEquals(
     Table.from([
       ["cell1", "cell2 cell2", "cell3"],
@@ -151,7 +152,7 @@ cell cell cell
   );
 });
 
-Deno.test("simple border table", () => {
+test("simple border table", () => {
   assertEquals(
     Table.from([
       ["cell1", "cell2", "cell3"],
@@ -172,7 +173,7 @@ Deno.test("simple border table", () => {
   );
 });
 
-Deno.test("simple nested table", () => {
+test("simple nested table", () => {
   assertEquals(
     Table.from([[
       Table.from([
@@ -256,7 +257,7 @@ cell1 cell2 cell3 cell1 cell2 cell3 cell1 cell2 cell3`.slice(1),
   );
 });
 
-Deno.test("simple nested border table", () => {
+test("simple nested border table", () => {
   assertEquals(
     Table.from([[
       Table.from([
@@ -361,7 +362,7 @@ Deno.test("simple nested border table", () => {
   );
 });
 
-Deno.test("multiline table", () => {
+test("multiline table", () => {
   assertEquals(
     Table.from([
       [
@@ -416,7 +417,7 @@ cell1           cell2             At vero eos et
   );
 });
 
-Deno.test("multiline border table", () => {
+test("multiline border table", () => {
   assertEquals(
     Table.from([
       [
@@ -476,7 +477,7 @@ Deno.test("multiline border table", () => {
   );
 });
 
-Deno.test("nested multiline border table", () => {
+test("nested multiline border table", () => {
   assertEquals(
     Table.from([[
       Table.from([
@@ -582,7 +583,7 @@ cell1           cell2 cell3                                                     
   );
 });
 
-Deno.test("nested multiline border table", () => {
+test("nested multiline border table", () => {
   assertEquals(
     Table.from([[
       Table.from([
@@ -709,7 +710,7 @@ Deno.test("nested multiline border table", () => {
   );
 });
 
-Deno.test("table with padding", () => {
+test("table with padding", () => {
   assertEquals(
     Table.from([
       [

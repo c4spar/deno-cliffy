@@ -125,12 +125,12 @@ export class Keypress extends EventTarget
    * @param listener  Event listener.
    * @param options   Event listener options.
    */
-  addEventListener(
+  override addEventListener(
     type: "keydown",
     listener: KeyPressEventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
   ): void;
-  addEventListener(
+  override addEventListener(
     type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | AddEventListenerOptions,
@@ -149,12 +149,12 @@ export class Keypress extends EventTarget
    * @param listener  Event listener.
    * @param options   Event listener options.
    */
-  removeEventListener(
+  override removeEventListener(
     type: "keydown",
     listener: KeyPressEventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,
   ): void;
-  removeEventListener(
+  override removeEventListener(
     type: KeyPressEventType,
     listener: EventListenerOrEventListenerObject | null,
     options?: EventListenerOptions | boolean,

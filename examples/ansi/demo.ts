@@ -47,7 +47,7 @@ const colorNames1: Array<keyof typeof stdColors> = [
   "yellow",
   "white",
   "underline",
-  "stripColor",
+  "stripAnsiCode",
   "strikethrough",
   "reset",
   "red",

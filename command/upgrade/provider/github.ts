@@ -73,7 +73,10 @@ export class GithubProvider extends Provider {
     return new URL(`${this.repositoryName}/${version}`, this.registryUrl).href;
   }
 
-  async listVersions(name: string, currentVersion?: string): Promise<void> {
+  override async listVersions(
+    name: string,
+    currentVersion?: string,
+  ): Promise<void> {
     const { tags, branches } = await this.getVersions(name);
     const showBranches: boolean = !!this.listBranches && branches.length > 0;
     const indent = showBranches ? 2 : 0;

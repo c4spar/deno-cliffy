@@ -1,29 +1,31 @@
+import { getOs } from "@cliffy/internal/runtime/get-os";
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
 import { bold, red } from "@std/fmt/colors";
 import { Number } from "../number.ts";
 
-Deno.test("prompt number: value", async () => {
+test("prompt number: value", async () => {
   console.log();
   Number.inject("1");
   const result: number | undefined = await Number.prompt("message");
   assertEquals(result, 1);
 });
 
-Deno.test("prompt number: negative value", async () => {
+test("prompt number: negative value", async () => {
   console.log();
   Number.inject("-1");
   const result: number | undefined = await Number.prompt("message");
   assertEquals(result, -1);
 });
 
-Deno.test("prompt number: number value", async () => {
+test("prompt number: number value", async () => {
   console.log();
   Number.inject("0");
   const result: number | undefined = await Number.prompt("message");
   assertEquals(result, 0);
 });
 
-Deno.test("prompt number: empty value", async () => {
+test("prompt number: empty value", async () => {
   await assertRejects(
     async () => {
       Number.inject("");
@@ -31,12 +33,12 @@ Deno.test("prompt number: empty value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt number: invalid value", async () => {
+test("prompt number: invalid value", async () => {
   await assertRejects(
     async () => {
       Number.inject("abc");
@@ -44,12 +46,12 @@ Deno.test("prompt number: invalid value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });
 
-Deno.test("prompt number: null value", async () => {
+test("prompt number: null value", async () => {
   await assertRejects(
     async () => {
       // deno-lint-ignore no-explicit-any
@@ -58,7 +60,7 @@ Deno.test("prompt number: null value", async () => {
     },
     Error,
     red(
-      `${Deno.build.os === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
+      `${getOs() === "windows" ? bold("× ") : bold("✘ ")}Invalid answer.`,
     ),
   );
 });

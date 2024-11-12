@@ -1,9 +1,10 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Table } from "../table.ts";
 import { assertEquals } from "@std/assert";
 import { Row } from "../row.ts";
 import { Cell } from "../cell.ts";
 
-Deno.test("table - align - align table", () => {
+test("table - align - align table", () => {
   assertEquals(
     new Table()
       .header(["Foo", "Bar", "Baz"])
@@ -28,7 +29,7 @@ Deno.test("table - align - align table", () => {
   );
 });
 
-Deno.test("table - align - align row and cell", () => {
+test("table - align - align row and cell", () => {
   assertEquals(
     new Table()
       .header(Row.from(["Foo", "Bar", "Baz"]).align("center"))
@@ -52,7 +53,7 @@ Deno.test("table - align - align row and cell", () => {
   );
 });
 
-Deno.test("table - align - default direction", () => {
+test("table - align - default direction", () => {
   const cell = new Cell("foo");
   const row = new Row(cell);
   const table = new Table(row);
@@ -63,7 +64,7 @@ Deno.test("table - align - default direction", () => {
   assertEquals(table[0].getAlign(), "left");
 });
 
-Deno.test("table - align - override direction", () => {
+test("table - align - override direction", () => {
   const cell = new Cell("foo").align("center");
   const row = new Row(cell).align("center");
   const table = new Table(row).align("center");
@@ -74,7 +75,7 @@ Deno.test("table - align - override direction", () => {
   assertEquals(table[0].getAlign(), "center");
 });
 
-Deno.test("table - align - inherit direction", () => {
+test("table - align - inherit direction", () => {
   const cell = new Cell("foo");
   const row = new Row(cell);
   const table = new Table(row).align("right");

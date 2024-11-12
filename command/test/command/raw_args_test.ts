@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
-Deno.test("command - raw args - command with useRawArgs disabled", async () => {
+test("command - raw args - command with useRawArgs disabled", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .option("-f, --flag [value:boolean]", "description ...")
@@ -26,7 +27,7 @@ Deno.test("command - raw args - command with useRawArgs disabled", async () => {
   assertEquals(literal, ["--literal-arg1", "--literal-arg2"]);
 });
 
-Deno.test("command - raw args - command with useRawArgs enabled", async () => {
+test("command - raw args - command with useRawArgs enabled", async () => {
   const { options, args, literal } = await new Command()
     .throwErrors()
     .option("-f, --flag [value:boolean]", "description ...")

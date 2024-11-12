@@ -1,7 +1,5 @@
+import type { RuntimeName } from "@cliffy/internal/runtime/runtime-name";
 import type { Runtime } from "./runtime.ts";
-
-/** Names of supported runtimes. */
-export type RuntimeName = "deno" | "node" | "bun";
 
 /** Result of getRuntime(). */
 export interface GetRuntimeResult {

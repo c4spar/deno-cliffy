@@ -1,3 +1,4 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertType, type IsExact } from "@std/testing/types";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
@@ -13,7 +14,7 @@ function cmd() {
     });
 }
 
-Deno.test("command - type - file - with option", async () => {
+test("command - type - file - with option", async () => {
   const { options, args } = await cmd().parse(["--path", "foo/bar/baz"]);
 
   assertType<IsExact<typeof options, { path?: string }>>(true);
@@ -23,7 +24,7 @@ Deno.test("command - type - file - with option", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command - type - file - sub-command with option", async () => {
+test("command - type - file - sub-command with option", async () => {
   const { options, args } = await cmd()
     .command("foo")
     .action((options, ...args) => {
@@ -39,7 +40,7 @@ Deno.test("command - type - file - sub-command with option", async () => {
   assertEquals(args, []);
 });
 
-Deno.test("command - type - file - with argument", async () => {
+test("command - type - file - with argument", async () => {
   const { options, args } = await cmd().parse(["foo/bar/baz"]);
 
   assertType<IsExact<typeof options, { path?: string }>>(true);

@@ -1,8 +1,9 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Cell } from "../cell.ts";
 import { Table } from "../table.ts";
 import { assertEquals } from "@std/assert";
 
-Deno.test("should allow undefined cell values", () => {
+test("should allow undefined cell values", () => {
   assertEquals(
     Table.from([
       ["foo", undefined, "bar"],
@@ -20,7 +21,7 @@ Deno.test("should allow undefined cell values", () => {
   );
 });
 
-Deno.test("should override undefined cell values with col & row span", () => {
+test("should override undefined cell values with col & row span", () => {
   assertEquals(
     Table.from([
       [new Cell("foo").colSpan(2), undefined, "bar"],
@@ -41,7 +42,7 @@ Deno.test("should override undefined cell values with col & row span", () => {
   );
 });
 
-Deno.test("colspan + rowspan 1", () => {
+test("colspan + rowspan 1", () => {
   const expected = `
 ┌────────────────────┬────────────────┬────────────────┐
 │ Row 1 & 2 Column 1 │ Row 1 Column 2 │ Row 1 Column 3 │
@@ -83,7 +84,7 @@ Deno.test("colspan + rowspan 1", () => {
   );
 });
 
-Deno.test("colspan + rowspan 2", () => {
+test("colspan + rowspan 2", () => {
   const expected = `
 ┌────────────────────┬────────────────┬────────────────┐
 │ Row 1 & 2 Column 1 │ Row 1 Column 2 │ Row 1 Column 3 │
@@ -124,7 +125,7 @@ Deno.test("colspan + rowspan 2", () => {
   );
 });
 
-Deno.test("colspan + rowspan 3", () => {
+test("colspan + rowspan 3", () => {
   const expected = `
 ┌────────────────┬─────┐
 │ Row 5 Column 1 │ Row │
@@ -149,7 +150,7 @@ Deno.test("colspan + rowspan 3", () => {
   );
 });
 
-Deno.test("colspan + rowspan 4", () => {
+test("colspan + rowspan 4", () => {
   const expected = `
 ┌─────┐
 │ Row │
@@ -171,7 +172,7 @@ Deno.test("colspan + rowspan 4", () => {
   );
 });
 
-Deno.test("colspan + rowspan 5", () => {
+test("colspan + rowspan 5", () => {
   const expected = `
 ┌────────────────┬────────────────┬────────────────┬────────────────┐
 │ Row 1 Column 1 │ Row 1 Column 2 │ Row 1 Column 3 │ Row 1 Column 4 │
@@ -200,7 +201,7 @@ Deno.test("colspan + rowspan 5", () => {
   );
 });
 
-Deno.test("colspan + rowspan 6", () => {
+test("colspan + rowspan 6", () => {
   const expected = `
 ┌────────────────┬────────────────┬─────────────────────────────────┐
 │ Row 1 Column 1 │ Row 1 Column 2 │ Row 1 & 2 Column 3 & 4          │
@@ -229,7 +230,7 @@ Deno.test("colspan + rowspan 6", () => {
   );
 });
 
-Deno.test("colspan + rowspan 7", () => {
+test("colspan + rowspan 7", () => {
   const expected = `
 ┌────────────────┬────────────────┬──┬──┐
 │ Row 1 Column 1 │ Row 1 Column 2 │  │  │
@@ -265,7 +266,7 @@ Deno.test("colspan + rowspan 7", () => {
   );
 });
 
-Deno.test("colspan + rowspan 8", () => {
+test("colspan + rowspan 8", () => {
   const expected = `
 ┌────────────────┬────────────────────┬──┬──┐
 │ Row 1 Column 1 │ Row 1 & 2 Column 2 │  │  │
@@ -300,7 +301,7 @@ Deno.test("colspan + rowspan 8", () => {
   );
 });
 
-Deno.test("should allow an empty array as first row", () => {
+test("should allow an empty array as first row", () => {
   assertEquals(
     Table.from([
       [],

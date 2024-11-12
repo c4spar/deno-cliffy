@@ -8,7 +8,7 @@ export class ActionListType extends StringType {
   }
 
   /** Complete action names. */
-  public complete(): string[] {
+  public override complete(): string[] {
     return this.cmd.getCompletions()
       .map((type) => type.name)
       // filter unique values

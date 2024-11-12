@@ -1,7 +1,8 @@
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { parseFlags } from "../../flags.ts";
 
-Deno.test("[flags] should parse required value with equals sign", () => {
+test("[flags] should parse required value with equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["--foo=bar"], {
     flags: [{
       name: "foo",
@@ -15,7 +16,7 @@ Deno.test("[flags] should parse required value with equals sign", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse optional value with equals sign", () => {
+test("[flags] should parse optional value with equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["--foo=bar"], {
     flags: [{
       name: "foo",
@@ -30,7 +31,7 @@ Deno.test("[flags] should parse optional value with equals sign", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse required value without equals sign", () => {
+test("[flags] should parse required value without equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["--foo", "bar"], {
     flags: [{
       name: "foo",
@@ -44,7 +45,7 @@ Deno.test("[flags] should parse required value without equals sign", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse optional value without equals sign as argument", () => {
+test("[flags] should parse optional value without equals sign as argument", () => {
   const { flags, unknown, literal } = parseFlags(["--foo", "bar"], {
     flags: [{
       name: "foo",
@@ -59,7 +60,7 @@ Deno.test("[flags] should parse optional value without equals sign as argument",
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse optional value with leading dash with equals sign", () => {
+test("[flags] should parse optional value with leading dash with equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["--foo=-bar"], {
     flags: [{
       name: "foo",
@@ -74,7 +75,7 @@ Deno.test("[flags] should parse optional value with leading dash with equals sig
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse multi short flag with equals sign", () => {
+test("[flags] should parse multi short flag with equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["-abc=foo"]);
 
   assertEquals(flags, { a: true, b: true, c: "foo" });
@@ -82,7 +83,7 @@ Deno.test("[flags] should parse multi short flag with equals sign", () => {
   assertEquals(literal, []);
 });
 
-Deno.test("[flags] should parse multi short flag with required equals sign", () => {
+test("[flags] should parse multi short flag with required equals sign", () => {
   const { flags, unknown, literal } = parseFlags(["-abc=foo"], {
     flags: [{
       name: "a",

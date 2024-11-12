@@ -1,9 +1,10 @@
+import { test } from "@cliffy/internal/testing/test";
 import { Command, EnumType } from "../../mod.ts";
 import { assertType, type IsAny, type IsExact } from "@std/testing/types";
 
 // Not required to execute this code, only type check.
 (() => {
-  Deno.test({
+  test({
     name:
       "[command] - generic types - options and args should be of type any bay default",
     fn() {
@@ -17,7 +18,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - options and args should be of type any with options and arguments",
     fn() {
@@ -34,7 +35,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - command with void options",
     fn() {
       new Command()
@@ -55,7 +56,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - command with void options and arguments",
     fn() {
       new Command<void, void, void, []>()
@@ -66,7 +67,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - command with void options and predefined arguments",
     fn() {
@@ -78,7 +79,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - command with predefined options and arguments",
     fn() {
@@ -101,7 +102,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - pre-defined constructor types with options",
     fn() {
@@ -142,7 +143,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - chained command",
     fn() {
       const cmd = new Command()
@@ -216,7 +217,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - add child commands",
     fn() {
       const foo = new Command<{ debug?: true; logLevel?: true }>()
@@ -323,7 +324,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - simple child command with parent option",
     fn() {
       const fooCommand = new Command<{ main?: true }>();
@@ -334,7 +335,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - child command with parent option",
     fn() {
       const foo = new Command()
@@ -385,7 +386,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - unkown parent option on empty command",
     fn() {
       new Command()
@@ -394,7 +395,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - unkown parent option",
     fn() {
       new Command()
@@ -404,7 +405,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - unkown parent option with sub command",
     fn() {
       new Command()
@@ -419,7 +420,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - global parent option with sub command",
     fn() {
       new Command()
@@ -433,7 +434,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - incompatible parent option type",
     fn() {
       const fooCommand = new Command<{ main?: number }>();
@@ -445,7 +446,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - unkown parent option on command with global option",
     fn() {
@@ -458,7 +459,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - unkown parent option on command with global option 2",
     fn() {
@@ -471,7 +472,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - simple extended command",
     fn() {
       class Foo extends Command {}
@@ -480,7 +481,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - extended command",
     fn() {
       class Foo
@@ -501,7 +502,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - extended command with incompatible parent option type",
     fn() {
@@ -514,7 +515,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - return types",
     fn() {
       new Command()
@@ -542,7 +543,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - just a variadic arg",
     fn() {
       new Command()
@@ -556,7 +557,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - many arguments",
     fn() {
       enum Lang {
@@ -591,7 +592,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - command arguments",
     fn() {
       const colorType = new EnumType(["red", "blue"]);
@@ -614,7 +615,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - command arguments",
     fn() {
       new Command()
@@ -626,7 +627,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - command arguments with just a variadic argument",
     fn() {
@@ -639,7 +640,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - command arguments with custom types",
     fn() {
       const colorType = new EnumType(["red", "blue"]);
@@ -662,7 +663,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - environment variables",
     fn() {
       const colorType = new EnumType(["red", "blue"]);
@@ -696,7 +697,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - env var prefix",
     fn() {
       new Command()
@@ -712,7 +713,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - option with multiple values",
     fn() {
       new Command()
@@ -730,7 +731,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - option with equal sign",
     fn() {
       new Command()
@@ -748,7 +749,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - default value",
     fn() {
       const colorType = new EnumType(["red", "blue"]);
@@ -781,7 +782,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - value option",
     fn() {
       new Command()
@@ -860,7 +861,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - collect option",
     fn() {
       new Command()
@@ -927,7 +928,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - negatable option",
     fn() {
       new Command()
@@ -950,7 +951,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - parse() return value",
     async fn() {
       const { args, cmd, literal, options } = await new Command()
@@ -999,7 +1000,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name:
       "[command] - generic types - parse() return value with child commands",
     async fn() {
@@ -1033,7 +1034,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
     },
   });
 
-  Deno.test({
+  test({
     name: "[command] - generic types - useRawArgs()",
     fn() {
       new Command()

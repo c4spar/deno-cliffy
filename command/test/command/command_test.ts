@@ -1,5 +1,6 @@
 // deno-fmt-ignore-file
 
+import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
 
@@ -15,7 +16,7 @@ function command() {
     .hidden();
 }
 
-Deno.test("command - command - has commands", () => {
+test("command - command - has commands", () => {
   const cmd = command();
   assertEquals(cmd.hasCommands(), true);
   assertEquals(cmd.hasCommands(true), true);
@@ -23,7 +24,7 @@ Deno.test("command - command - has commands", () => {
   assertEquals(new Command().hasCommands(true), false);
 });
 
-Deno.test("command - command - get commands", () => {
+test("command - command - get commands", () => {
   const cmd = command();
   assertEquals(cmd.getCommands().length, 2);
   assertEquals(cmd.getCommands(true).length, 4);
@@ -37,7 +38,7 @@ Deno.test("command - command - get commands", () => {
   assertEquals(!!cmd.getCommands(true).find((cmd) => cmd.getName() === "foo-hidden"), true);
 });
 
-Deno.test("command - command - get base commands", () => {
+test("command - command - get base commands", () => {
   const cmd = command();
   assertEquals(cmd.getBaseCommands().length, 2);
   assertEquals(cmd.getBaseCommands(true).length, 4);
@@ -51,7 +52,7 @@ Deno.test("command - command - get base commands", () => {
   assertEquals(!!cmd.getBaseCommands(true).find((cmd) => cmd.getName() === "foo-hidden"), true);
 });
 
-Deno.test("command - command - get global commands", () => {
+test("command - command - get global commands", () => {
   const cmd = command();
   assertEquals(cmd.getCommand("foo")?.getGlobalCommands().length, 1);
   assertEquals(cmd.getCommand("foo")?.getGlobalCommands(true).length, 2);
@@ -65,7 +66,7 @@ Deno.test("command - command - get global commands", () => {
   assertEquals(!!cmd.getCommand("foo")?.getGlobalCommands(true).find((cmd) => cmd.getName() === "foo-hidden"), false);
 });
 
-Deno.test("command - command - has command", () => {
+test("command - command - has command", () => {
   const cmd = command();
   assertEquals(cmd.hasCommand("global"), true);
   assertEquals(cmd.hasCommand("global-hidden"), false);
@@ -84,7 +85,7 @@ Deno.test("command - command - has command", () => {
   assertEquals(cmd.getCommand("foo")?.getCommand("three")?.hasCommand("unknown"), false);
 });
 
-Deno.test("command - command - get command", () => {
+test("command - command - get command", () => {
   const cmd = command();
   assertEquals(cmd.getCommand("global")?.getName(), "global");
   assertEquals(cmd.getCommand("global-hidden")?.getName(), undefined);
@@ -99,7 +100,7 @@ Deno.test("command - command - get command", () => {
   assertEquals(cmd.getCommand("foo")?.getCommand("unknown")?.getName(), undefined);
 });
 
-Deno.test("command - command - get base command", () => {
+test("command - command - get base command", () => {
   const cmd = command();
   assertEquals(cmd.getBaseCommand("global")?.getName(), "global");
   assertEquals(cmd.getBaseCommand("global-hidden")?.getName(), undefined);
@@ -114,7 +115,7 @@ Deno.test("command - command - get base command", () => {
   assertEquals(cmd.getCommand("foo")?.getBaseCommand("unknown")?.getName(), undefined);
 });
 
-Deno.test("command - command - get global command", () => {
+test("command - command - get global command", () => {
   const cmd = command();
   assertEquals(cmd.getGlobalCommand("global")?.getName(), undefined);
   assertEquals(cmd.getGlobalCommand("global-hidden")?.getName(), undefined);
@@ -136,7 +137,7 @@ Deno.test("command - command - get global command", () => {
   assertEquals(cmd.getCommand("foo")?.getCommand("three")?.getGlobalCommand("unknown")?.getName(), undefined);
 });
 
-Deno.test("command - command - remove command", () => {
+test("command - command - remove command", () => {
   const cmd = command();
   assertEquals(cmd.getCommand("foo")?.getName(), "foo");
   assertEquals(cmd.removeCommand("foo")?.getName(), "foo");
