@@ -171,7 +171,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
   protected override async render(): Promise<void> {
     if (this.settings.files && this.#hasReadPermissions === undefined) {
-      // dnt-shim-ignore dnt-shim-ignore deno-lint-ignore no-explicit-any
+      // dnt-shim-ignore deno-lint-ignore no-explicit-any
       const status = await (globalThis as any).Deno?.permissions.request({
         name: "read",
       });
