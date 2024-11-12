@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Get file info.
  *
@@ -5,7 +7,7 @@
  * @param input Path to the file.
  */
 export async function stat(input: string): Promise<{ isDirectory: boolean }> {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno } = globalThis as any;
 
   if (Deno) {

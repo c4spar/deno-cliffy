@@ -1,4 +1,6 @@
-// dnt-shim-ignore deno-lint-ignore no-explicit-any
+// deno-lint-ignore-file no-explicit-any
+
+// dnt-shim-ignore
 const { Deno, process, Buffer } = globalThis as any;
 const { readSync: readSyncNode } = process
   ? await import("node:fs")

@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import type { RuntimeName } from "@cliffy/internal/runtime/runtime-name";
 import type { Runtime } from "./runtime.ts";
 
@@ -9,7 +11,7 @@ export interface GetRuntimeResult {
 
 /** Get runtime handler for current runtime. */
 export async function getRuntime(): Promise<GetRuntimeResult> {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, process } = globalThis as any;
 
   if (Deno?.version?.deno) {

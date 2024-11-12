@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import type { KeyCode } from "@cliffy/keycode";
 import {
   bold,
@@ -136,7 +138,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
     // Keep support for deno < 1.10.
     if (this.settings.id && "localStorage" in window) {
       try {
-        // dnt-shim-ignore deno-lint-ignore no-explicit-any
+        // dnt-shim-ignore
         return (window as any).localStorage;
       } catch (_) {
         // Ignore error if --location is not set.
@@ -171,7 +173,7 @@ export abstract class GenericSuggestions<TValue, TRawValue>
 
   protected override async render(): Promise<void> {
     if (this.settings.files && this.#hasReadPermissions === undefined) {
-      // dnt-shim-ignore deno-lint-ignore no-explicit-any
+      // dnt-shim-ignore
       const status = await (globalThis as any).Deno?.permissions.request({
         name: "read",
       });

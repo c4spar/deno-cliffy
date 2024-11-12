@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Set environment variable.
  *
@@ -6,7 +8,7 @@
  * @param value The value of the environment variable.
  */
 export function setEnv(name: string, value: string): void {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

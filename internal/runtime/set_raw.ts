@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Set raw mode on stdin.
  *
@@ -9,7 +11,7 @@ export function setRaw(
   mode: boolean,
   { cbreak }: { cbreak?: boolean } = {},
 ): void {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Returns the width of the console window.
  *
@@ -5,7 +7,7 @@
  */
 export function getColumns(): number | null {
   try {
-    // dnt-shim-ignore deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore
     const { Deno, process } = globalThis as any;
 
     // Catch error in none tty mode: Inappropriate ioctl for device (os error 25)

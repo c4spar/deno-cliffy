@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Get operating system name.
  *
@@ -16,7 +18,7 @@ export function getOs():
   | "openbsd"
   | "sunos"
   | "win32" {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Write data to stdout.
  *
@@ -5,7 +7,7 @@
  * @param data Data to write to stdout.
  */
 export function writeSync(data: Uint8Array): number {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, process } = globalThis as any;
 
   if (Deno) {

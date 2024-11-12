@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Get directory list.
  *
@@ -5,7 +7,7 @@
  * @param path Path to the directory.
  */
 export async function readDir(path: string): Promise<Array<{ name: string }>> {
-  // dnt-shim-ignore deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno } = globalThis as any;
   path ||= ".";
 
