@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        deno_version: [v1.x, rc]
+        deno_version: [v1.x, v2.x]
     env:
       RUST_BACKTRACE: full
       DENO_FUTURE: 1
@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.deno_version }}
 
