@@ -2051,6 +2051,7 @@ export class Command<
     names: readonly string[],
   ): Promise<{ name: string; value: string } | undefined> {
     for (const name of names) {
+      // dnt-shim-ignore
       const status = await (globalThis as any).Deno?.permissions.query({
         name: "env",
         variable: name,

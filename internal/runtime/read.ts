@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Read from stdin.
  *
@@ -5,7 +7,7 @@
  * @param data Uint8Array to store the data.
  */
 export async function read(data: Uint8Array): Promise<number | null> {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno, Bun, process } = globalThis as any;
 
   if (Deno) {

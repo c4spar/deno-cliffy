@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import { dim } from "@std/fmt/colors";
 import type { Logger } from "../logger.ts";
 import { NodeRuntime } from "./node_runtime.ts";
@@ -8,9 +10,9 @@ export class BunRuntime extends NodeRuntime {
     isJsr: boolean,
     logger?: Logger,
   ): Promise<void> {
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore
     const Bun = (globalThis as any).Bun;
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore
     const process = (globalThis as any).process;
 
     cmdArgs = isJsr

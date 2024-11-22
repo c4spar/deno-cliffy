@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
 import { getNoColor } from "@cliffy/internal/runtime/no-color";
@@ -197,7 +199,7 @@ export class Spinner {
    * ```
    */
   start() {
-    // deno-lint-ignore no-explicit-any
+    // dnt-shim-ignore
     if (this.#active || (globalThis as any).Deno?.stdout.writable.locked) {
       return;
     }
