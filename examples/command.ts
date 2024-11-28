@@ -13,8 +13,7 @@ await new Command()
     default: "localhost",
   })
   .arguments("[domain]")
-  .action(({ port, host }, domain = "deno.land") => {
-    console.log(`Listening on http://${host}:${port}`);
+  .action(({ port, host }, domain = "deno.com") => {
     Deno.serve({
       hostname: host,
       port,
