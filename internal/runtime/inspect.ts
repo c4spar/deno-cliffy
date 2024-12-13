@@ -1,10 +1,12 @@
+// deno-lint-ignore-file no-explicit-any
+
 /**
  * Inspect values.
  *
  * @internal
  */
 export function inspect(value: unknown, colors: boolean): string {
-  // deno-lint-ignore no-explicit-any
+  // dnt-shim-ignore
   const { Deno } = globalThis as any;
 
   return Deno?.inspect(
