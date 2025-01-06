@@ -457,7 +457,9 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       input = suggestion;
     }
 
-    return this.#isFileModeEnabled() ? normalize(input) : input;
+    return this.#isFileModeEnabled()
+      ? normalize(input || String(this.settings.default))
+      : input;
   }
 
   /** Select previous suggestion. */
