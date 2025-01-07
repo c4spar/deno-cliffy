@@ -79,7 +79,11 @@ export class Input extends GenericSuggestions<string, string> {
 
   /** Get input value. */
   protected getValue(): string {
-    return this.settings.files ? normalize(this.inputValue) : this.inputValue;
+    const value = !this.inputValue.length && this.settings.default
+      ? this.settings.default
+      : this.inputValue;
+
+    return this.settings.files ? normalize(value) : value;
   }
 
   /**
