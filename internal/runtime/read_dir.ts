@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+import { isDirectory } from "./is_directory.ts";
 
 /**
  * Get directory list.
@@ -12,6 +13,9 @@ export async function readDir(path: string): Promise<Array<{ name: string }>> {
   path ||= ".";
 
   if (Deno) {
+    if (!(await isDirectory(path))) {
+      return [];
+    }
     const array = [];
     for await (const item of Deno.readDir(path)) {
       array.push(item);
