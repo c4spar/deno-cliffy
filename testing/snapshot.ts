@@ -183,7 +183,7 @@ async function executeTest(
     if (options.denoArgs) {
       denoArgs = options.denoArgs;
     } else {
-      denoArgs = ["--allow-env=SNAPSHOT_TEST_NAME"];
+      denoArgs = ["--quiet", "--allow-env=SNAPSHOT_TEST_NAME"];
     }
 
     const cmd = new Deno.Command("deno", {
