@@ -88,6 +88,15 @@ test("[command] should parse global options before sub commands", async () => {
   assertEquals(args, []);
 });
 
+test("[command] should parse global options before sub commands with equal sign", async () => {
+  const { options, args } = await cmd().parse(
+    ["-g=foo", "cmd1", "-G", "bar", "cmd2", "-o", "baz"],
+  );
+
+  assertEquals(options, { global: "FOO", global2: "bar", global3: "baz" });
+  assertEquals(args, []);
+});
+
 test("[command] should collect global options before sub commands", async () => {
   const { options, args } = await new Command()
     .noExit()
