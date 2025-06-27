@@ -983,6 +983,8 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
               integer: number;
               string: string;
               boolean: boolean;
+              file: string;
+              secret: string;
             },
             void,
             undefined

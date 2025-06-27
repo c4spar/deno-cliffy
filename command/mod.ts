@@ -38,6 +38,7 @@ export { EnumType } from "./types/enum.ts";
 export { FileType } from "./types/file.ts";
 export { IntegerType } from "./types/integer.ts";
 export { NumberType } from "./types/number.ts";
+export { SecretType } from "./types/secret.ts";
 export { StringType } from "./types/string.ts";
 export { Type } from "./type.ts";
 export { ValidationError, type ValidationErrorOptions } from "./_errors.ts";
