@@ -236,7 +236,12 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       .then((file) => file.isDirectory ? input : dirname(input))
       .catch(() => dirname(input));
 
-    return await listDir(path, this.settings.files);
+      try {
+        return await listDir(path, this.settings.files);
+      } catch (error) {
+        this.setErrorMessage(error instanceof Error ? error.message : String(error));
+        return [];
+      }
   }
 
   protected async getSuggestions(): Promise<Array<string | number>> {
