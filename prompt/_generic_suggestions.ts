@@ -236,12 +236,18 @@ export abstract class GenericSuggestions<TValue, TRawValue>
       .then((file) => file.isDirectory ? input : dirname(input))
       .catch(() => dirname(input));
 
-      try {
-        return await listDir(path, this.settings.files);
-      } catch (error) {
-        this.setErrorMessage(error instanceof Error ? error.message : String(error));
+    try {
+      return await listDir(path, this.settings.files);
+    } catch (error) {
+      if (
+        error instanceof Deno.errors.NotFound ||
+        error instanceof Deno.errors.PermissionDenied
+      ) {
+        this.setErrorMessage(error.message);
         return [];
       }
+      throw error;
+    }
   }
 
   protected async getSuggestions(): Promise<Array<string | number>> {
