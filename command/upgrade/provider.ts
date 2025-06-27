@@ -61,6 +61,8 @@ export abstract class Provider {
     this.logger = logger;
   }
 
+  abstract hasRequiredPermissions(): Promise<boolean>;
+
   abstract getVersions(name: string): Promise<Versions>;
 
   abstract getRepositoryUrl(name: string, version?: string): string;
