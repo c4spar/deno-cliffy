@@ -2,28 +2,40 @@
 
 ### Features
 
-* add support for dnt (#769) ([3d9913b](https://github.com/c4spar/deno-cliffy/commit/3d9913b))
+- add support for dnt (#769)
+  ([3d9913b](https://github.com/c4spar/deno-cliffy/commit/3d9913b))
 
 ### Bug Fixes
 
-* **command:** global options don't handle `=` correctly if passed before subcommand (#797) ([12206c4](https://github.com/c4spar/deno-cliffy/commit/12206c4))
-* **internal:** Use Bun.stdin when using Bun to prevent process hanging (#760) ([db5ae30](https://github.com/c4spar/deno-cliffy/commit/db5ae30))
-* **prompt:** catch `NotFund` and `PermissionDenied` error for file suggestions and show error message (#784) ([79afc20](https://github.com/c4spar/deno-cliffy/commit/79afc20))
-* **prompt:** empty inputs are normalized to `.` if the `files` option is enabled, which causes the default value to be ignored (#783) ([3867697](https://github.com/c4spar/deno-cliffy/commit/3867697))
-* **testing:** suppress diagnostic output for snapshot tests (#798) ([a4a1247](https://github.com/c4spar/deno-cliffy/commit/a4a1247))
+- **command:** global options don't handle `=` correctly if passed before
+  subcommand (#797)
+  ([12206c4](https://github.com/c4spar/deno-cliffy/commit/12206c4))
+- **internal:** Use Bun.stdin when using Bun to prevent process hanging (#760)
+  ([db5ae30](https://github.com/c4spar/deno-cliffy/commit/db5ae30))
+- **prompt:** catch `NotFund` and `PermissionDenied` error for file suggestions
+  and show error message (#784)
+  ([79afc20](https://github.com/c4spar/deno-cliffy/commit/79afc20))
+- **prompt:** empty inputs are normalized to `.` if the `files` option is
+  enabled, which causes the default value to be ignored (#783)
+  ([3867697](https://github.com/c4spar/deno-cliffy/commit/3867697))
+- **testing:** suppress diagnostic output for snapshot tests (#798)
+  ([a4a1247](https://github.com/c4spar/deno-cliffy/commit/a4a1247))
 
 ### Chore
 
-* **ci:** update node and deno version (#767) ([21a4c61](https://github.com/c4spar/deno-cliffy/commit/21a4c61))
+- **ci:** update node and deno version (#767)
+  ([21a4c61](https://github.com/c4spar/deno-cliffy/commit/21a4c61))
+- **ci:** fix test pipeline version matrix
+  ([dfb1762](https://github.com/c4spar/deno-cliffy/commit/dfb1762))
+- **ci:** fix nightly pipeline for node
+  ([979cf6a](https://github.com/c4spar/deno-cliffy/commit/979cf6a))
 
 ### Documentation Updates
 
-* update command example (#773) ([1d5feed](https://github.com/c4spar/deno-cliffy/commit/1d5feed))
-* **ansi:** use cliffy logo in image example (#766) ([e575ca0](https://github.com/c4spar/deno-cliffy/commit/e575ca0))
-* **ci:** fix test pipeline version matrix ([dfb1762](https://github.com/c4spar/deno-cliffy/commit/dfb1762))
-* **ci:** fix nightly pipeline for node ([979cf6a](https://github.com/c4spar/deno-cliffy/commit/979cf6a))
-
-
+- update command example (#773)
+  ([1d5feed](https://github.com/c4spar/deno-cliffy/commit/1d5feed))
+- **ansi:** use cliffy logo in image example (#766)
+  ([e575ca0](https://github.com/c4spar/deno-cliffy/commit/e575ca0))
 
 # [v1.0.0-rc.7](https://github.com/c4spar/deno-cliffy/compare/v1.0.0-rc.6...v1.0.0-rc.7) (Sep 28, 2024)
 
