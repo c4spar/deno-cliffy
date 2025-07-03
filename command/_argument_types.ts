@@ -276,7 +276,8 @@ type BooleanOption<
           TDefault
         >;
       })
-  : (TRequired extends true ? { [Key in OptionName<TName>]: true | TDefault }
+  : (TRequired extends true
+    ? { [Key in OptionName<TName>]: true | NonNullable<TDefault> }
     : { [Key in OptionName<TName>]?: true | TDefault });
 
 type NegatableOption<
