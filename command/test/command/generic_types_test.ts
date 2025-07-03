@@ -1097,7 +1097,7 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
               //
               dottedRequiredRequired: Record<"foo", string>;
               dottedRequiredOptional: Record<"foo", string | true>;
-              dottedRequiredBoolean: Record<"foo", true>; // TODO: type should not be optional!
+              dottedRequiredBoolean: Record<"foo", true>;
               //
               dottedCollectOptionalRequired?: Partial<
                 Record<"foo", Array<string>>
@@ -1120,6 +1120,79 @@ import { assertType, type IsAny, type IsExact } from "@std/testing/types";
         });
     },
   });
+});
+
+test({
+  name: "[command] - generic types - nested dotted options",
+  fn() {
+    new Command()
+      .option("--dotted.optional.required.foo <string>", "...")
+      .option("--dotted.optional.optional.foo [string]", "...")
+      .option("--dotted.optional.boolean.foo", "...")
+      //
+      .option("--dotted.required.required.foo <string>", "...", {
+        required: true,
+      })
+      .option("--dotted.required.optional.foo [string]", "...", {
+        required: true,
+      })
+      .option("--dotted.required.boolean.foo", "...", {
+        required: true,
+      })
+      //
+      .option("--dotted.collect.optional.required.foo <string>", "...", {
+        collect: true,
+      })
+      .option("--dotted.collect.optional.optional.foo [string]", "...", {
+        collect: true,
+      })
+      .option("--dotted.collect.optional.boolean.foo", "...", {
+        collect: true,
+      })
+      //
+      .option("--dotted.collect.required.required.foo <string>", "...", {
+        collect: true,
+        required: true,
+      })
+      .option("--dotted.collect.required.optional.foo [string]", "...", {
+        collect: true,
+        required: true,
+      })
+      .option("--dotted.collect.required.boolean.foo", "...", {
+        collect: true,
+        required: true,
+      })
+      .action((options) => {
+        assertType<
+          IsExact<typeof options, {
+            dotted: {
+              optional?: {
+                required?: Partial<Record<"foo", string>>;
+                optional?: Partial<Record<"foo", string | true>>;
+                boolean?: Partial<Record<"foo", true>>;
+              };
+              required: {
+                required: Record<"foo", string>;
+                optional: Record<"foo", string | true>;
+                boolean: Record<"foo", true>;
+              };
+              collect: {
+                optional?: {
+                  required?: Partial<Record<"foo", Array<string>>>;
+                  optional?: Partial<Record<"foo", Array<string | true>>>;
+                  boolean?: Partial<Record<"foo", Array<true>>>;
+                };
+                required: {
+                  required: Record<"foo", Array<string>>;
+                  optional: Record<"foo", Array<string | true>>;
+                  boolean: Record<"foo", Array<true>>;
+                };
+              };
+            };
+          }>
+        >(true);
+      });
+  },
 });
 
 test({
@@ -1192,6 +1265,79 @@ test({
             wildcardCollectRequiredBoolean: Partial<
               Record<string, Array<true>>
             >;
+          }>
+        >(true);
+      });
+  },
+});
+
+test({
+  name: "[command] - generic types - nested wildcard options",
+  fn() {
+    new Command()
+      .option("--wildcard.optional.required.* <string>", "...")
+      .option("--wildcard.optional.optional.* [string]", "...")
+      .option("--wildcard.optional.boolean.*", "...")
+      //
+      .option("--wildcard.required.required.* <string>", "...", {
+        required: true,
+      })
+      .option("--wildcard.required.optional.* [string]", "...", {
+        required: true,
+      })
+      .option("--wildcard.required.boolean.*", "...", {
+        required: true,
+      })
+      //
+      .option("--wildcard.collect.optional.required.* <string>", "...", {
+        collect: true,
+      })
+      .option("--wildcard.collect.optional.optional.* [string]", "...", {
+        collect: true,
+      })
+      .option("--wildcard.collect.optional.boolean.*", "...", {
+        collect: true,
+      })
+      //
+      .option("--wildcard.collect.required.required.* <string>", "...", {
+        collect: true,
+        required: true,
+      })
+      .option("--wildcard.collect.required.optional.* [string]", "...", {
+        collect: true,
+        required: true,
+      })
+      .option("--wildcard.collect.required.boolean.*", "...", {
+        collect: true,
+        required: true,
+      })
+      .action((options) => {
+        assertType<
+          IsExact<typeof options, {
+            wildcard: {
+              optional?: {
+                required?: Partial<Record<string, string>>;
+                optional?: Partial<Record<string, string | true>>;
+                boolean?: Partial<Record<string, true>>;
+              };
+              required: {
+                required: Partial<Record<string, string>>;
+                optional: Partial<Record<string, string | true>>;
+                boolean: Partial<Record<string, true>>;
+              };
+              collect: {
+                optional?: {
+                  required?: Partial<Record<string, Array<string>>>;
+                  optional?: Partial<Record<string, Array<string | true>>>;
+                  boolean?: Partial<Record<string, Array<true>>>;
+                };
+                required: {
+                  required: Partial<Record<string, Array<string>>>;
+                  optional: Partial<Record<string, Array<string | true>>>;
+                  boolean: Partial<Record<string, Array<true>>>;
+                };
+              };
+            };
           }>
         >(true);
       });
