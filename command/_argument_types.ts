@@ -276,7 +276,8 @@ type BooleanOption<
           TDefault
         >;
       })
-  : (TRequired extends true ? { [Key in OptionName<TName>]: true | TDefault }
+  : (TRequired extends true
+    ? { [Key in OptionName<TName>]: true | NonNullable<TDefault> }
     : { [Key in OptionName<TName>]?: true | TDefault });
 
 type NegatableOption<
@@ -406,14 +407,23 @@ export type MapValue<TOptions, TMappedOptions, TCollect = undefined> =
   TMappedOptions extends undefined ? TCollect extends true ? {
         [Key in keyof TOptions]: TOptions[Key] extends
           (Record<string, unknown> | undefined)
-          ? MapValue<TOptions[Key], TMappedOptions>
+          ? MapValue<TOptions[Key], TMappedOptions, TCollect>
+          // Make values of wildcard options always optional.
+          : string extends Key ? Array<NonNullable<TOptions[Key]>> | undefined
           : Array<NonNullable<TOptions[Key]>>;
       }
-    : TOptions
     : {
       [Key in keyof TOptions]: TOptions[Key] extends
         (Record<string, unknown> | undefined)
-        ? MapValue<TOptions[Key], TMappedOptions>
+        ? MapValue<TOptions[Key], TMappedOptions, TCollect>
+        // Make values of wildcard options always optional.
+        : string extends Key ? TOptions[Key] | undefined
+        : TOptions[Key];
+    }
+    : {
+      [Key in keyof TOptions]: TOptions[Key] extends
+        (Record<string, unknown> | undefined)
+        ? MapValue<TOptions[Key], TMappedOptions, TCollect>
         : TMappedOptions;
     };
 
