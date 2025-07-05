@@ -61,6 +61,7 @@
     "@std/http": "jsr:@std/http@~1.0.7",
     "@std/io": "jsr:@std/io@~0.224.9",
     "@std/path": "jsr:@std/path@~1.0.6",
+    "@std/semver": "jsr:@std/semver@^1.0.5",
     "@std/testing": "jsr:@std/testing@1.0.0",
     "@std/text": "jsr:@std/text@~1.0.7",
     "sinon": "npm:sinon@13.0.2"
