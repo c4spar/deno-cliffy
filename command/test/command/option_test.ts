@@ -39,6 +39,7 @@ test("command - option - option properties", () => {
       standalone: true,
       collect: true,
       default: false,
+      defaultText: "false",
     })
     .getOption("foo-bar", true) as Option;
 
@@ -57,6 +58,7 @@ test("command - option - option properties", () => {
   assertEquals(option.standalone, true);
   assertEquals(option.collect, true);
   assertEquals(option.default, false);
+  assertEquals(option.defaultText, "false");
 
   assertEquals(option.args, [{
     action: "boolean",
