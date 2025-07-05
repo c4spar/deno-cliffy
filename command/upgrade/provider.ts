@@ -1,4 +1,4 @@
-import { parse, compare } from "@std/semver";
+import { compare, parse } from "@std/semver";
 import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "@cliffy/table";
