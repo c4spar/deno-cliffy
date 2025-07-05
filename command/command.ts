@@ -1737,7 +1737,7 @@ export class Command<
 
         if (!subCommand) {
           // Only pre parse globals if first arg ist a global option.
-          const optionName = ctx.unknown[0].replace(/^-+/, "");
+          const optionName = ctx.unknown[0].replace(/^-+/, "").split("=")[0];
           const option = this.getOption(optionName, true);
 
           if (option?.global) {
