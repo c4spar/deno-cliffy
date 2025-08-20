@@ -273,3 +273,14 @@ test("command - option - global option value handler", async () => {
     .parse(["foo", "--foo", "bar"]);
   assertEquals(options, { foo: { value: "bar" } });
 });
+
+test("command - option - should skip optional arguments with an empty value", async () => {
+  const { options } = await new Command()
+    .option("--foo [value:number]", "...")
+    .option("--bar <value:boolean>", "...")
+    .option("--baz <value:string>", "...")
+    .option("--beep <value:number>", "...")
+    .parse(["--foo", "", "--bar", "", "--baz", "", "--beep", "1"]);
+
+  assertEquals(options, { beep: 1 });
+});
