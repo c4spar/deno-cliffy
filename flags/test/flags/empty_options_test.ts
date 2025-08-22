@@ -21,6 +21,14 @@ test("[flags] should skip optional arguments with an empty value", () => {
       "",
       "--beep",
       "beep-value-4",
+      "--multi",
+      "",
+      "multi-value-2",
+      "--variadic",
+      "",
+      "variadic-value-2",
+      "",
+      "variadic-value-4",
     ],
     {
       flags: [{
@@ -40,6 +48,20 @@ test("[flags] should skip optional arguments with an empty value", () => {
       }, {
         name: "boop",
         type: "number",
+      }, {
+        name: "multi",
+        args: [{
+          type: "string",
+          optional: true,
+        }, {
+          type: "string",
+          optional: true,
+        }],
+      }, {
+        name: "variadic",
+        type: "string",
+        optional: true,
+        variadic: true,
       }],
     },
   );
@@ -50,6 +72,14 @@ test("[flags] should skip optional arguments with an empty value", () => {
       "beep-value-4",
     ],
     boop: 1,
+    multi: [
+      undefined,
+      "multi-value-2",
+    ],
+    variadic: [
+      "variadic-value-2",
+      "variadic-value-4",
+    ],
   });
   assertEquals(unknown, []);
   assertEquals(literal, []);

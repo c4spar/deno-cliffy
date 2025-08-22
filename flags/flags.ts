@@ -293,6 +293,8 @@ function parseArgs<TFlagOptions extends FlagOptions>(
     /** Parse next argument for current option. */
     // deno-lint-ignore no-inner-declarations
     function parseNext(option: FlagOptions): void {
+      let skipOptionArgument = false;
+
       if (negate) {
         setFlagValue(false);
         return;
@@ -364,6 +366,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
       }
 
+      if (skipOptionArgument && hasNext(arg)) {
+        parseNext(option);
+        return;
+      }
       if (skipArgument) {
         return;
       }
@@ -374,6 +380,9 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       ) {
         if (!ctx.flags[propName]) {
           setFlagValue([]);
+        }
+        if (result === "") {
+          result = undefined;
         }
 
         (ctx.flags[propName] as Array<unknown>).push(result);
@@ -424,10 +433,17 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       ): unknown {
         let result: unknown;
 
-        if (!option.required && value === "") {
+        if ((!option.required || arg.optional) && value === "") {
           // if the value is empty and the argument is optional,
           // we can skip the argument.
-          skipArgument = true;
+          if (arg.variadic) {
+            skipOptionArgument = true;
+          } else if (option.args?.length === 1) {
+            skipArgument = true;
+          } else {
+            // will be mapped to undefined later.
+            result = "";
+          }
           increase = true;
         } else {
           result = opts.parse
