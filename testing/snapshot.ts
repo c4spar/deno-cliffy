@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { eraseDown } from "@cliffy/ansi/ansi-escapes";
 import { getRuntimeName } from "@cliffy/internal/runtime/runtime-name";
 import { getEnv } from "@cliffy/internal/runtime/get-env";
