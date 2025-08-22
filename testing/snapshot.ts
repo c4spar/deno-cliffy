@@ -1,5 +1,6 @@
 import { eraseDown } from "@cliffy/ansi/ansi-escapes";
 import { getRuntimeName } from "@cliffy/internal/runtime/runtime-name";
+import { getEnv } from "@cliffy/internal/runtime/get-env";
 import { test } from "@cliffy/internal/testing/test";
 
 import { quoteString } from "./_quote_string.ts";
@@ -258,19 +259,26 @@ function addLineBreaks(str: string) {
 }
 
 async function runTest(options: SnapshotTestOptions) {
-  const testName = Deno.env.get("SNAPSHOT_TEST_NAME");
+  const testName = getEnv("SNAPSHOT_TEST_NAME");
   if (testName === options.name) {
     await options.fn();
   }
 }
 
 async function getEnvIfGranted(name: string): Promise<string | undefined> {
-  const { state } = await Deno.permissions.query({
-    name: "env",
-    variable: name,
-  });
+  let state = "granted";
 
-  return state === "granted" && Deno.env.has(name)
-    ? Deno.env.get(name)
-    : undefined;
+  // dnt-shim-ignore
+  const { Deno } = globalThis as any;
+  if (Deno) {
+    const status = await Deno.permissions.query({
+      name: "env",
+      variable: name,
+    });
+    state = status.state;
+  }
+
+  if (state === "granted") {
+    return getEnv(name);
+  }
 }
