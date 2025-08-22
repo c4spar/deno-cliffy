@@ -38,6 +38,7 @@ interface OptionGroup {
 export class HelpGenerator {
   private indent = 2;
   private options: Required<HelpOptions>;
+  private width: number;
 
   /** Generate help text for given command. */
   public static generate(cmd: Command, options?: HelpOptions): string {
@@ -48,6 +49,11 @@ export class HelpGenerator {
     private cmd: Command,
     options: HelpOptions = {},
   ) {
+    try {
+      this.width = Math.min(Deno.consoleSize().columns, 150);
+    } catch (_err) {
+      this.width = 150;
+    }
     this.options = {
       types: false,
       hints: true,
@@ -123,7 +129,8 @@ export class HelpGenerator {
         [dedent(this.cmd.getDescription())],
       ])
         .indent(this.indent)
-        .maxColWidth(140)
+        .maxColWidth(this.width - this.indent)
+        .colRigidity(0)
         .padding(1)
         .toString() +
       "\n";
@@ -188,6 +195,8 @@ export class HelpGenerator {
         ])
           .padding([2, 2, 1, 2])
           .indent(this.indent)
+          .maxTableWidth(this.width - this.indent)
+          .colRigidity([1, 1, 1, 0, 0])
           .maxColWidth([60, 60, 1, 80, 60])
           .toString() +
         "\n";
@@ -203,6 +212,8 @@ export class HelpGenerator {
         ]),
       ])
         .indent(this.indent)
+        .maxTableWidth(this.width - this.indent)
+        .colRigidity([1, 1, 1, 0])
         .maxColWidth([60, 1, 80, 60])
         .padding([2, 1, 2])
         .toString() +
@@ -235,6 +246,8 @@ export class HelpGenerator {
           ]),
         ])
           .indent(this.indent)
+          .maxTableWidth(this.width - this.indent)
+          .colRigidity([1, 1, 1, 0])
           .maxColWidth([60, 60, 1, 80])
           .padding([2, 2, 1, 2])
           .toString() +
@@ -252,6 +265,8 @@ export class HelpGenerator {
           command.getShortDescription(),
         ]),
       ])
+        .maxTableWidth(this.width - this.indent)
+        .colRigidity([1, 1, 0])
         .maxColWidth([60, 1, 80])
         .padding([2, 1, 2])
         .indent(this.indent)
@@ -281,6 +296,8 @@ export class HelpGenerator {
       ])
         .padding([2, 2, 1, 2])
         .indent(this.indent)
+        .maxTableWidth(this.width - this.indent)
+        .colRigidity([1, 1, 1, 0, 0])
         .maxColWidth([60, 60, 1, 80, 10])
         .toString() +
       "\n";
@@ -298,7 +315,7 @@ export class HelpGenerator {
       ]))
         .padding(1)
         .indent(this.indent)
-        .maxColWidth(150)
+        .maxTableWidth(this.width - this.indent)
         .toString() +
       "\n";
   }
