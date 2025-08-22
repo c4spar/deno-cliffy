@@ -282,7 +282,7 @@ test("command - option - should skip optional arguments with an empty value", as
     .option("--baz <value:string>", "...")
     .option("--beep <value:string>", "...", { collect: true })
     .option("--boop <value:number>", "...")
-    .option("--multi [value:string] [value:string]", "...")
+    .option("--multi [value:string] [value:string] [value:string]", "...")
     .option("--variadic [...value:string]", "...")
     .parse([
       "--foo",
@@ -304,11 +304,13 @@ test("command - option - should skip optional arguments with an empty value", as
       "--multi",
       "",
       "multi-value-2",
+      "",
       "--variadic",
       "",
       "variadic-value-2",
       "",
       "variadic-value-4",
+      "",
     ]);
 
   assertEquals({ options, args }, {
@@ -321,6 +323,7 @@ test("command - option - should skip optional arguments with an empty value", as
       multi: [
         undefined,
         "multi-value-2",
+        undefined,
       ],
       variadic: [
         "variadic-value-2",

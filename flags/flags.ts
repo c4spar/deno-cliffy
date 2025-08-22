@@ -366,8 +366,10 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         }
       }
 
-      if (skipOptionArgument && hasNext(arg)) {
-        parseNext(option);
+      if (skipOptionArgument) {
+        if (hasNext(arg)) {
+          parseNext(option);
+        }
         return;
       }
       if (skipArgument) {

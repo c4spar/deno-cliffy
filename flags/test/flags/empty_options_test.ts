@@ -24,11 +24,13 @@ test("[flags] should skip optional arguments with an empty value", () => {
       "--multi",
       "",
       "multi-value-2",
+      "",
       "--variadic",
       "",
       "variadic-value-2",
       "",
       "variadic-value-4",
+      "",
     ],
     {
       flags: [{
@@ -56,6 +58,9 @@ test("[flags] should skip optional arguments with an empty value", () => {
         }, {
           type: "string",
           optional: true,
+        }, {
+          type: "string",
+          optional: true,
         }],
       }, {
         name: "variadic",
@@ -75,6 +80,7 @@ test("[flags] should skip optional arguments with an empty value", () => {
     multi: [
       undefined,
       "multi-value-2",
+      undefined,
     ],
     variadic: [
       "variadic-value-2",
