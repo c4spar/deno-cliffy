@@ -1,5 +1,7 @@
 import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
+import { deleteEnv } from "../../../internal/runtime/delete_env.ts";
+import { setEnv } from "../../../internal/runtime/set_env.ts";
 import { Command } from "../../command.ts";
 
 function command() {
@@ -56,4 +58,32 @@ test("command depends option with default value: should not accept --flag2 test"
     Error,
     `Option "--flag2" depends on option "--flag1".`,
   );
+});
+
+test({
+  name: "command option should depend on environment variable",
+  fn: async () => {
+    const cmd = new Command()
+      .throwErrors()
+      .option("-f, --foo <value:string>", "foo")
+      .option("-b, --bar", "bar", {
+        depends: ["foo"],
+      })
+      .env("FOO=<value:string>", "foo");
+
+    setEnv("FOO", "123");
+
+    const { options, args } = await cmd.parse(["--bar"]);
+
+    assertEquals(options, { foo: "123", bar: true });
+    assertEquals(args, []);
+
+    deleteEnv("FOO");
+
+    await assertRejects(
+      () => cmd.parse(["--bar"]),
+      Error,
+      `Option "--bar" depends on option "--foo".`,
+    );
+  },
 });

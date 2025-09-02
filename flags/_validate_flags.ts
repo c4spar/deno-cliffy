@@ -44,7 +44,7 @@ export function validateFlags<TOptions extends FlagOptions = FlagOptions>(
   for (const [name, option] of options) {
     validateUnknownOption(option, opts);
     validateConflictingOptions(ctx, option);
-    validateDependingOptions(ctx, option);
+    validateDependingOptions(ctx, option, opts);
     validateRequiredValues(ctx, option, name);
   }
 
@@ -95,6 +95,7 @@ function setDefaultValues<TOptions extends FlagOptions = FlagOptions>(
       name = paramCaseToCamelCase(option.name);
     }
 
+    // TODO: remove ignoreDefaults if flags module has support for environment variables
     const hasDefaultValue: boolean = (!opts.ignoreDefaults ||
       typeof opts.ignoreDefaults[name] === "undefined") &&
       typeof ctx.flags[name] === "undefined" && (
@@ -143,16 +144,21 @@ function validateConflictingOptions(
   }
 }
 
-function validateDependingOptions(
+function validateDependingOptions<TOptions extends FlagOptions = FlagOptions>(
   ctx: ParseFlagsContext<Record<string, unknown>>,
   option: FlagOptions,
+  opts: ParseFlagsOptions<TOptions>,
 ): void {
   if (!option.depends) {
     return;
   }
   for (const flag of option.depends) {
     // Don't throw an error if the value is coming from the default option.
-    if (!isset(flag, ctx.flags) && !ctx.defaults[option.name]) {
+    if (
+      !isset(flag, ctx.flags) && !ctx.defaults[option.name] &&
+      // TODO: remove ignoreDefaults if flags module has support for environment variables
+      (!opts.ignoreDefaults || typeof opts.ignoreDefaults[flag] === "undefined")
+    ) {
       throw new DependingOptionError(option.name, flag);
     }
   }
