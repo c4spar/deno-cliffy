@@ -188,6 +188,16 @@ export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
   TReturn
 >;
 
+/** Default display text or a callback method that returns the default display text. */
+export type DefaultText<TValue = unknown> =
+  | string
+  | DefaultTextHandler<TValue>;
+
+/** Default text callback function to lazy load the default display text. */
+export type DefaultTextHandler<TValue = unknown> = (
+  defaultValue: TValue,
+) => string;
+
 type ExcludedCommandOptions =
   | "name"
   | "args"
@@ -220,6 +230,7 @@ export interface GlobalOptionOptions<
   TParentCommand extends Command<any> | undefined = TOptions extends number
     ? any
     : undefined,
+  TDefaultValue = unknown,
 > extends Omit<FlagOptions, ExcludedCommandOptions> {
   override?: boolean;
   hidden?: boolean;
@@ -235,7 +246,8 @@ export interface GlobalOptionOptions<
   >;
   prepend?: boolean;
   value?: OptionValueHandler;
-  default?: DefaultValue;
+  default?: DefaultValue<TDefaultValue>;
+  defaultText?: DefaultText<TDefaultValue>;
 }
 
 export interface OptionOptions<
@@ -257,6 +269,7 @@ export interface OptionOptions<
   TParentCommand extends Command<any> | undefined = TOptions extends number
     ? any
     : undefined,
+  TDefaultValue = unknown,
 > extends
   GlobalOptionOptions<
     TOptions,
@@ -266,7 +279,8 @@ export interface OptionOptions<
     TTypes,
     TGlobalTypes,
     TParentTypes,
-    TParentCommand
+    TParentCommand,
+    TDefaultValue
   > {
   global?: boolean;
 }
