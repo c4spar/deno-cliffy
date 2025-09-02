@@ -81,7 +81,7 @@ test({
     await assertRejects(
       () => cmd.parse(["--bar"]),
       Error,
-      `Option "--bar" depends on option "--foo".`
-    )
+      `Option "--bar" depends on option "--foo".`,
+    );
   },
 });
