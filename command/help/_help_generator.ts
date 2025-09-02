@@ -328,14 +328,27 @@ export class HelpGenerator {
 
     option.required && hints.push(yellow(`required`));
 
-    if (typeof option.default !== "undefined") {
+    const type = this.cmd.getType(option.args[0]?.type)?.handler;
+
+    if (
+      typeof option.default !== "undefined" ||
+      typeof option.defaultText !== "undefined"
+    ) {
       const defaultValue = typeof option.default === "function"
         ? option.default()
         : option.default;
 
-      if (typeof defaultValue !== "undefined") {
+      const defaultText = typeof option.defaultText === "function"
+        ? option.defaultText(defaultValue)
+        : (typeof option.defaultText !== "undefined"
+          ? option.defaultText
+          : ((type instanceof Type && type.defaultText)
+            ? type.defaultText()
+            : defaultValue));
+
+      if (typeof defaultText !== "undefined") {
         hints.push(
-          bold(`Default: `) + inspect(defaultValue, this.options.colors),
+          bold(`Default: `) + inspect(defaultText, this.options.colors),
         );
       }
     }
@@ -350,7 +363,6 @@ export class HelpGenerator {
         italic(option.conflicts.map(getFlag).join(", ")),
     );
 
-    const type = this.cmd.getType(option.args[0]?.type)?.handler;
     if (type instanceof Type) {
       const possibleValues = type.values?.(this.cmd, this.cmd.getParent());
       if (possibleValues?.length) {

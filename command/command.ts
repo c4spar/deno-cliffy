@@ -58,6 +58,7 @@ import type {
   CompleteHandler,
   CompleteOptions,
   Completion,
+  DefaultText,
   DefaultValue,
   Description,
   EnvVar,
@@ -80,6 +81,7 @@ import { BooleanType } from "./types/boolean.ts";
 import { FileType } from "./types/file.ts";
 import { IntegerType } from "./types/integer.ts";
 import { NumberType } from "./types/number.ts";
+import { SecretType } from "./types/secret.ts";
 import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
@@ -129,6 +131,7 @@ export class Command<
       string: string;
       boolean: boolean;
       file: string;
+      secret: string;
     },
   TCommandGlobalTypes extends Record<string, unknown> | void =
     TParentCommandGlobals extends number ? any : void,
@@ -1247,12 +1250,14 @@ export class Command<
           TCommandTypes,
           TCommandGlobalTypes,
           TParentCommandTypes,
-          TParentCommand
+          TParentCommand,
+          TDefaultValue
         >,
         "value"
       >
         & {
           default?: DefaultValue<TDefaultValue>;
+          defaultText?: DefaultText<TDefaultValue>;
           required?: TRequired;
           collect?: TCollect;
           value?: OptionValueHandler<
@@ -1324,13 +1329,15 @@ export class Command<
           TCommandTypes,
           TCommandGlobalTypes,
           TParentCommandTypes,
-          TParentCommand
+          TParentCommand,
+          TDefaultValue
         >,
         "value"
       >
         & {
           global: true;
           default?: DefaultValue<TDefaultValue>;
+          defaultText?: DefaultText<TDefaultValue>;
           required?: TRequired;
           collect?: TCollect;
           value?: OptionValueHandler<
@@ -1385,12 +1392,14 @@ export class Command<
           TCommandTypes,
           TCommandGlobalTypes,
           TParentCommandTypes,
-          TParentCommand
+          TParentCommand,
+          TDefaultValue
         >,
         "value"
       >
         & {
           default?: DefaultValue<TDefaultValue>;
+          defaultText?: DefaultText<TDefaultValue>;
           required?: TRequired;
           collect?: TCollect;
           conflicts?: TConflicts;
@@ -1728,7 +1737,7 @@ export class Command<
 
         if (!subCommand) {
           // Only pre parse globals if first arg ist a global option.
-          const optionName = ctx.unknown[0].replace(/^-+/, "");
+          const optionName = ctx.unknown[0].replace(/^-+/, "").split("=")[0];
           const option = this.getOption(optionName, true);
 
           if (option?.global) {
@@ -1855,6 +1864,8 @@ export class Command<
       this.type("boolean", new BooleanType(), { global: true });
     !this.types.has("file") &&
       this.type("file", new FileType(), { global: true });
+    !this.types.has("secret") &&
+      this.type("secret", new SecretType(), { global: true });
 
     if (!this._help) {
       this.help({});

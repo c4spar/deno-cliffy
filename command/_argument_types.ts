@@ -13,6 +13,7 @@ import type { BooleanType } from "./types/boolean.ts";
 import type { FileType } from "./types/file.ts";
 import type { IntegerType } from "./types/integer.ts";
 import type { NumberType } from "./types/number.ts";
+import type { SecretType } from "./types/secret.ts";
 import type { StringType } from "./types/string.ts";
 
 type DefaultTypes = {
@@ -21,6 +22,7 @@ type DefaultTypes = {
   string: StringType;
   boolean: BooleanType;
   file: FileType;
+  secret: SecretType;
 };
 
 type OptionalOrRequiredValue<TType extends string> =
@@ -276,7 +278,8 @@ type BooleanOption<
           TDefault
         >;
       })
-  : (TRequired extends true ? { [Key in OptionName<TName>]: true | TDefault }
+  : (TRequired extends true
+    ? { [Key in OptionName<TName>]: true | NonNullable<TDefault> }
     : { [Key in OptionName<TName>]?: true | TDefault });
 
 type NegatableOption<
@@ -406,14 +409,23 @@ export type MapValue<TOptions, TMappedOptions, TCollect = undefined> =
   TMappedOptions extends undefined ? TCollect extends true ? {
         [Key in keyof TOptions]: TOptions[Key] extends
           (Record<string, unknown> | undefined)
-          ? MapValue<TOptions[Key], TMappedOptions>
+          ? MapValue<TOptions[Key], TMappedOptions, TCollect>
+          // Make values of wildcard options always optional.
+          : string extends Key ? Array<NonNullable<TOptions[Key]>> | undefined
           : Array<NonNullable<TOptions[Key]>>;
       }
-    : TOptions
     : {
       [Key in keyof TOptions]: TOptions[Key] extends
         (Record<string, unknown> | undefined)
-        ? MapValue<TOptions[Key], TMappedOptions>
+        ? MapValue<TOptions[Key], TMappedOptions, TCollect>
+        // Make values of wildcard options always optional.
+        : string extends Key ? TOptions[Key] | undefined
+        : TOptions[Key];
+    }
+    : {
+      [Key in keyof TOptions]: TOptions[Key] extends
+        (Record<string, unknown> | undefined)
+        ? MapValue<TOptions[Key], TMappedOptions, TCollect>
         : TMappedOptions;
     };
 
