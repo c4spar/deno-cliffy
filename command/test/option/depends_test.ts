@@ -1,5 +1,7 @@
 import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects } from "@std/assert";
+import { deleteEnv } from "../../../internal/runtime/delete_env.ts";
+import { setEnv } from "../../../internal/runtime/set_env.ts";
 import { Command } from "../../command.ts";
 
 function command() {
@@ -69,14 +71,14 @@ test({
       })
       .env("FOO=<value:string>", "foo");
 
-    Deno.env.set("FOO", "123");
+    setEnv("FOO", "123");
 
     const { options, args } = await cmd.parse(["--bar"]);
 
     assertEquals(options, { foo: "123", bar: true });
     assertEquals(args, []);
 
-    Deno.env.delete("FOO");
+    deleteEnv("FOO");
 
     await assertRejects(
       () => cmd.parse(["--bar"]),
