@@ -13,7 +13,7 @@ import {
   strikethrough,
   underline,
   yellow,
-} from "jsr:@stdfmt^1.0.8/colors";
+} from "jsr:@std/fmt@^1.0.8/colors";
 
 tty.cursorHide();
 

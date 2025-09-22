@@ -9,7 +9,7 @@ import { Secret } from "jsr:@cliffy/command@1.0.0-rc.8/secret";
 import { Select } from "jsr:@cliffy/command@1.0.0-rc.8/select";
 import { Toggle } from "jsr:@cliffy/command@1.0.0-rc.8/toggle";
 import { tty } from "jsr:@cliffy/ansi@1.0.0-rc.8/tty";
-import { rgb24 } from "jsr:@stdfmt^1.0.8/colors";
+import { rgb24 } from "jsr:@std/fmt@^1.0.8/colors";
 import { colors } from "./data/colors.ts";
 import { firstNames } from "./data/first_names.ts";
 
