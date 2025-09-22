@@ -1,13 +1,13 @@
 #!/usr/bin/env -S deno run
 
-import { prompt } from "jsr:@cliffy/command@1.0.0-rc.8";
-import { Checkbox } from "jsr:@cliffy/command@1.0.0-rc.8/checkbox";
-import { Input } from "jsr:@cliffy/command@1.0.0-rc.8/input";
-import { List } from "jsr:@cliffy/command@1.0.0-rc.8/list";
-import { Number } from "jsr:@cliffy/command@1.0.0-rc.8/number";
-import { Secret } from "jsr:@cliffy/command@1.0.0-rc.8/secret";
-import { Select } from "jsr:@cliffy/command@1.0.0-rc.8/select";
-import { Toggle } from "jsr:@cliffy/command@1.0.0-rc.8/toggle";
+import { prompt } from "jsr:@cliffy/prompt@1.0.0-rc.8";
+import { Checkbox } from "jsr:@cliffy/prompt@1.0.0-rc.8/checkbox";
+import { Input } from "jsr:@cliffy/prompt@1.0.0-rc.8/input";
+import { List } from "jsr:@cliffy/prompt@1.0.0-rc.8/list";
+import { Number } from "jsr:@cliffy/prompt@1.0.0-rc.8/number";
+import { Secret } from "jsr:@cliffy/prompt@1.0.0-rc.8/secret";
+import { Select } from "jsr:@cliffy/prompt@1.0.0-rc.8/select";
+import { Toggle } from "jsr:@cliffy/prompt@1.0.0-rc.8/toggle";
 import { tty } from "jsr:@cliffy/ansi@1.0.0-rc.8/tty";
 import { rgb24 } from "jsr:@std/fmt@^1.0.8/colors";
 import { colors } from "./data/colors.ts";

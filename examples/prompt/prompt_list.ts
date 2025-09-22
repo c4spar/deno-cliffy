@@ -1,10 +1,10 @@
 #!/usr/bin/env -S deno run
 
-import { prompt, PromptOptions } from "jsr:@cliffy/command@1.0.0-rc.8";
-import { Input } from "jsr:@cliffy/command@1.0.0-rc.8/input";
-import { Number } from "jsr:@cliffy/command@1.0.0-rc.8/number";
-import { Confirm } from "jsr:@cliffy/command@1.0.0-rc.8/confirm";
-import { Checkbox } from "jsr:@cliffy/command@1.0.0-rc.8/checkbox";
+import { prompt, PromptOptions } from "jsr:@cliffy/prompt@1.0.0-rc.8";
+import { Input } from "jsr:@cliffy/prompt@1.0.0-rc.8/input";
+import { Number } from "jsr:@cliffy/prompt@1.0.0-rc.8/number";
+import { Confirm } from "jsr:@cliffy/prompt@1.0.0-rc.8/confirm";
+import { Checkbox } from "jsr:@cliffy/prompt@1.0.0-rc.8/checkbox";
 
 const animalsPrompt: PromptOptions<
   "animals",

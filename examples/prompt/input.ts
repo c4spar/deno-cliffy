@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Input } from "jsr:@cliffy/command@1.0.0-rc.8/input";
+import { Input } from "jsr:@cliffy/prompt@1.0.0-rc.8/input";
 
 const name: string = await Input.prompt("What's your github user name?");
 
