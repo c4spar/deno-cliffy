@@ -12,6 +12,11 @@
   ],
   "lock": false,
   "exclude": ["dist"],
+  "lint": {
+    "rules": {
+      "exclude": ["no-import-prefix"]
+    }
+  },
   "tasks": {
     "lint": "deno lint && deno fmt --check",
     "fmt": "deno fmt",
