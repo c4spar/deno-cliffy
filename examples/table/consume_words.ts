@@ -1,4 +1,4 @@
-import { consumeWords } from "@cliffy/table";
+import { consumeWords } from "jsr:@cliffy/table@1.0.0-rc.8";
 
 const maxLength = 50;
 let text =

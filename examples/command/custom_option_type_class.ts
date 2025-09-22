@@ -1,6 +1,11 @@
 #!/usr/bin/env -S deno run
 
-import { ArgumentValue, Command, Type, ValidationError } from "@cliffy/command";
+import {
+  ArgumentValue,
+  Command,
+  Type,
+  ValidationError,
+} from "jsr:@cliffy/command@1.0.0-rc.8";
 
 class ColorType extends Type<string> {
   private readonly colors = ["red", "blue", "yellow"];

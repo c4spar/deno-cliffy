@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
-import { colors } from "@cliffy/ansi/colors";
-import { tty } from "@cliffy/ansi/tty";
-import { delay } from "@std/async/delay";
+import { colors } from "jsr:@cliffy/ansi@1.0.0-rc.8/colors";
+import { tty } from "jsr:@cliffy/ansi@1.0.0-rc.8/tty";
+import { delay } from "jsr:@std/async@^1.0.14/delay";
 
 const error = colors.bold.red;
 const warn = colors.bold.yellow;

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { KeyCode, parse } from "@cliffy/keycode";
+import { KeyCode, parse } from "jsr:@cliffy/keycode@1.0.0-rc.8";
 
 while (true) {
   const data = new Uint8Array(8);

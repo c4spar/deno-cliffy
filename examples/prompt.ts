@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Confirm, Input, Number, Secret } from "@cliffy/prompt";
+import { Confirm, Input, Number, Secret } from "jsr:@cliffy/prompt@1.0.0-rc.8";
 
 let hostname: string, port: number, password: string;
 

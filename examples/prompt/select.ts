@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Select } from "@cliffy/prompt/select";
+import { Select } from "jsr:@cliffy/prompt@1.0.0-rc.8/select";
 
 const title: string = await Select.prompt({
   message: "Pick a book",

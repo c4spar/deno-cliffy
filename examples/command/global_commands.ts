@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "@cliffy/command";
+import { Command } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 await new Command()
   .command("global [val:string]", "global ...")

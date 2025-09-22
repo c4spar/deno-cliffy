@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { keypress } from "@cliffy/keypress";
+import { keypress } from "jsr:@cliffy/keypress@1.0.0-rc.8";
 
 for await (const event of keypress()) {
   console.log(

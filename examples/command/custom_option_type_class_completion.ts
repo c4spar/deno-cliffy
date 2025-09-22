@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command, StringType } from "@cliffy/command";
+import { Command, StringType } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 class EmailType extends StringType {
   override complete(): string[] {

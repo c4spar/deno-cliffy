@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell, Row, Table } from "@cliffy/table";
+import { Cell, Row, Table } from "jsr:@cliffy/table@1.0.0-rc.8";
 
 new Table()
   .header(Row.from(["Name", "Date", "City", "Country"]).border())

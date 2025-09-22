@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Table } from "@cliffy/table";
+import { Table } from "jsr:@cliffy/table@1.0.0-rc.8";
 
 const table: Table = Table.from([
   ["Baxter Herman", "Oct 1, 2020", "Harderwijk", "Slovenia"],

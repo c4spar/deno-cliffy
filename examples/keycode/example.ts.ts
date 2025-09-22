@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { parse } from "@cliffy/keycode";
+import { parse } from "jsr:@cliffy/keycode@1.0.0-rc.8";
 
 console.log(
   parse(

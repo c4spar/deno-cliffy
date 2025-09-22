@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run
 
-import { Cell, CellType, Table } from "@cliffy/table";
-import { tty } from "@cliffy/ansi/tty";
+import { Cell, CellType, Table } from "jsr:@cliffy/table@1.0.0-rc.8";
+import { tty } from "jsr:@cliffy/ansi@1.0.0-rc.8/tty";
 import {
   blue,
   bold,
@@ -13,7 +13,7 @@ import {
   strikethrough,
   underline,
   yellow,
-} from "@std/fmt/colors";
+} from "jsr:@stdfmt^1.0.8/colors";
 
 tty.cursorHide();
 

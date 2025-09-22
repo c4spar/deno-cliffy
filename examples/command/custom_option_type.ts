@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { ArgumentValue, Command } from "@cliffy/command";
+import { ArgumentValue, Command } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 const colors = ["red", "blue", "yellow"];
 

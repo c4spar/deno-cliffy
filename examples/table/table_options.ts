@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Table } from "@cliffy/table";
+import { Table } from "jsr:@cliffy/table@1.0.0-rc.8";
 
 new Table()
   .header(["Name", "Date", "City", "Country"])

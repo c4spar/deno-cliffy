@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "@cliffy/command";
+import { Command } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 const { options } = await new Command()
   .option("-s, --silent", "disable output.")

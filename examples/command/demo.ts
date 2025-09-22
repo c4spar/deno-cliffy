@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run
 
-import { Command } from "@cliffy/command";
-import { CompletionsCommand } from "@cliffy/command/completions";
-import { HelpCommand } from "@cliffy/command/help";
+import { Command } from "jsr:@cliffy/command@1.0.0-rc.8";
+import { CompletionsCommand } from "jsr:@cliffy/command@1.0.0-rc.8/completions";
+import { HelpCommand } from "jsr:@cliffy/command@1.0.0-rc.8/help";
 
 await new Command()
   .name("cliffy")

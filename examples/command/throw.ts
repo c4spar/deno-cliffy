@@ -1,6 +1,6 @@
 #!/usr/bin/env deno run
 
-import { Command, ValidationError } from "@cliffy/command";
+import { Command, ValidationError } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 const { options, cmd } = await new Command()
   .error((_error, _cmd) => {

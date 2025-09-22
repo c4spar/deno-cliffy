@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Cell, Table } from "@cliffy/table";
+import { Cell, Table } from "jsr:@cliffy/table@1.0.0-rc.8";
 
 const table = new Table(
   [

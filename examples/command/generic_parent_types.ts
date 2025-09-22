@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run
 
-import { Command, EnumType } from "@cliffy/command";
+import { Command, EnumType } from "jsr:@cliffy/command@1.0.0-rc.8";
 
 const colorType = new EnumType(["red", "blue"]);
 
