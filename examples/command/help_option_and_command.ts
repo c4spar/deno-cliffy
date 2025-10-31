@@ -11,4 +11,4 @@ await new Command()
     "Environment variable description ...",
   )
   .command("help", new HelpCommand().global())
-  .parse(Deno.args);
+  .parse();

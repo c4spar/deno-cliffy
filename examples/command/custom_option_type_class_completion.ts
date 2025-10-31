@@ -11,4 +11,4 @@ class EmailType extends StringType {
 await new Command()
   .option("-e, --email <value:email>", "Your email address.")
   .type("email", new EmailType())
-  .parse(Deno.args);
+  .parse();

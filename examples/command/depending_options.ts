@@ -7,6 +7,6 @@ const { options } = await new Command()
   .option("-p, --video-codec <type:string>", "description ...", {
     depends: ["audio-codec"],
   })
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

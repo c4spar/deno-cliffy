@@ -9,4 +9,4 @@ await new Command()
     "example name",
     `Description ...\n\nCan have multiple lines and ${red("colors")}.`,
   )
-  .parse(Deno.args);
+  .parse();

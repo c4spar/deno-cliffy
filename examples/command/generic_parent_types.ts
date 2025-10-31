@@ -30,4 +30,4 @@ await new Command()
   .globalType("color", colorType)
   .globalOption("-d, --debug", "...")
   .command("foo", fooCommand)
-  .parse(Deno.args);
+  .parse();
