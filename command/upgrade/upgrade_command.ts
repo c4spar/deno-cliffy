@@ -169,6 +169,10 @@ export class UpgradeCommand extends Command {
     return versions;
   }
 
+  public async hasRequiredPermissions(): Promise<boolean> {
+    return await this.getProvider().hasRequiredPermissions();
+  }
+
   public async getLatestVersion(): Promise<string> {
     const { latest } = await this.getVersions();
     return latest;
