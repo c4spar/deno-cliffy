@@ -10,6 +10,6 @@ const { options } = await new Command()
   // no default value
   .option("--remote <url:string>", "Remote url.")
   .option("--no-remote", "No remote.")
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

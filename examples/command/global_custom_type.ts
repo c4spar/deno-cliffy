@@ -10,4 +10,4 @@ await new Command()
   .command("bar", "...")
   .option("-b, --background-color [name:color]", "Choose a background color.")
   .action(console.log)
-  .parse(Deno.args);
+  .parse();

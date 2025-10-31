@@ -11,7 +11,7 @@ await new Command()
   .action((_, source: string, destination?: string) => {
     console.log("clone: %s -> %s", source, destination);
   })
-  .parse(Deno.args);
+  .parse();
 
 // Sub-command implemented using a command instance as second parameter.
 await new Command()
@@ -24,4 +24,4 @@ await new Command()
         console.log("clone: %s -> %s", source, destination);
       }),
   )
-  .parse(Deno.args);
+  .parse();

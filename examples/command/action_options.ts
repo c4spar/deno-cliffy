@@ -22,6 +22,6 @@ await new Command()
     },
   })
   .action(() => console.log("main action"))
-  .parse(Deno.args);
+  .parse();
 
 console.log("main context");

@@ -12,4 +12,4 @@ await new Command()
   .group("Other options 2")
   .option("--beep", "Beep option.")
   .option("--boop", "Boop option.")
-  .parse(Deno.args);
+  .parse();

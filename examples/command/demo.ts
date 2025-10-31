@@ -24,4 +24,4 @@ await new Command()
   })
   .command("help", new HelpCommand().global())
   .command("completions", new CompletionsCommand())
-  .parse(Deno.args);
+  .parse();
