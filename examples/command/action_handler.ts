@@ -10,4 +10,4 @@ await new Command()
   .action(({ recursive }, dir: string) => {
     console.log("remove " + dir + (recursive ? " recursively" : ""));
   })
-  .parse(Deno.args);
+  .parse();

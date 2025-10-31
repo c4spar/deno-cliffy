@@ -14,4 +14,4 @@ await new Command()
     "Some example",
     "Example content ...\n\nSome more example content ...",
   )
-  .parse(Deno.args);
+  .parse();

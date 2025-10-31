@@ -7,4 +7,4 @@ await new Command()
     standalone: true,
   })
   .option("-o, --other [value:boolean]", "Some other option.")
-  .parse(Deno.args);
+  .parse();

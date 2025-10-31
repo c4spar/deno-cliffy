@@ -7,4 +7,4 @@ await new Command()
   .option("-c, --cheese [type:string]", "pizza must have cheese", {
     required: true,
   })
-  .parse(Deno.args);
+  .parse();

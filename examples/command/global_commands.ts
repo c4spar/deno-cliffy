@@ -16,4 +16,4 @@ await new Command()
           .description("Some nested sub command."),
       ),
   )
-  .parse(Deno.args);
+  .parse();

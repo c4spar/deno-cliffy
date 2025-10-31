@@ -26,6 +26,7 @@ const proto = Object.create(null);
 const methodNames = Object.keys(stdColors) as Array<PropertyNames>;
 for (const name of methodNames) {
   if (name === "setColorEnabled" || name === "getColorEnabled") {
+    proto[name] = stdColors[name];
     continue;
   }
   Object.defineProperty(proto, name, {

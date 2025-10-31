@@ -11,6 +11,6 @@ const { options } = await new Command()
     "space separated list of strings.",
     { separator: " " },
   )
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

@@ -7,6 +7,6 @@ const { options } = await new Command()
   .option("-i, --stdin [stdin:boolean]", "read from stdin ...", {
     conflicts: ["file"],
   })
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

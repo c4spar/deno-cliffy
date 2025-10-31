@@ -6,6 +6,6 @@ const { options } = await new Command()
   .option("-c, --cheese [type:string]", "add the specified type of cheese", {
     default: "blue",
   })
-  .parse(Deno.args);
+  .parse();
 
 console.log(`cheese: ${options.cheese}`);
