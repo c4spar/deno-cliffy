@@ -13,8 +13,10 @@ const { options } = await new Command()
   .option("-p, --pizza-type <type>", "Flavour of pizza.")
   // Option with required number value.
   .option("-a, --amount <amount:integer>", "Pieces of pizza.")
+  // Option that hides its default value.
+  .option("-t, --token <token:secret>", "Token.", { default: () => "SECRET" })
   // One required and one optional command argument.
   .arguments("<input:string> [output:string]")
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

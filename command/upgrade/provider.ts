@@ -1,3 +1,4 @@
+import { compare, parse } from "@std/semver";
 import { bold, brightBlue, cyan, green, red, yellow } from "@std/fmt/colors";
 import { ValidationError } from "../_errors.ts";
 import { Table } from "@cliffy/table";
@@ -140,7 +141,15 @@ export abstract class Provider {
       indent?: number;
     } = {},
   ): void {
-    versions = versions.slice();
+    versions = versions
+      .sort((versionA, versionB) => {
+        const semverA = parse(versionA);
+        const semverB = parse(versionB);
+
+        return compare(semverB, semverA);
+      })
+      .slice();
+
     if (versions?.length) {
       versions = versions.map((version: string) =>
         currentVersion && currentVersion === version

@@ -26,6 +26,21 @@ function command(defaultOptions?: boolean, hintOption?: boolean) {
       "I have a default value!",
       { default: "test" },
     )
+    .option(
+      "--default-func [val:string]",
+      "I have a default handler!",
+      { default: () => "test" },
+    )
+    .option(
+      "-T, --default-text [val:string]",
+      "I have a default text!",
+      { defaultText: "test" },
+    )
+    .option(
+      "--default-text-func [val:string]",
+      "I have a default text handler!",
+      { default: "test", defaultText: (value) => value },
+    )
     .option("-r, --required [val:string]", "I am required!", { required: true })
     .option(
       "-H, --hidden [val:string]",
@@ -87,15 +102,18 @@ Description:
 
 Options:
 
-  -h, --help                     - Show this help.                                                                                   
-  -V, --version                  - Show the version number for this program.                                                         
-  -t, --test       [val:string]  - test description                                                                                  
-  -D, --default    [val:string]  - I have a default value!                    (Default: "test")                                      
-  -r, --required   [val:string]  - I am required!                             (required)                                             
-  -d, --depends    [val:string]  - I depend on test!                          (Depends: --test)                                      
-  -c, --conflicts  [val:string]  - I conflict with test!                      (Conflicts: --test)                                    
-  -a, --all        <val:string>  - I have many hints!                         (required, Default: "test", Depends: --test, Conflicts:
-                                                                              --depends)                                             
+  -h, --help                         - Show this help.                                                                                   
+  -V, --version                      - Show the version number for this program.                                                         
+  -t, --test           [val:string]  - test description                                                                                  
+  -D, --default        [val:string]  - I have a default value!                    (Default: "test")                                      
+  --default-func       [val:string]  - I have a default handler!                  (Default: "test")                                      
+  -T, --default-text   [val:string]  - I have a default text!                     (Default: "test")                                      
+  --default-text-func  [val:string]  - I have a default text handler!             (Default: "test")                                      
+  -r, --required       [val:string]  - I am required!                             (required)                                             
+  -d, --depends        [val:string]  - I depend on test!                          (Depends: --test)                                      
+  -c, --conflicts      [val:string]  - I conflict with test!                      (Conflicts: --test)                                    
+  -a, --all            <val:string>  - I have many hints!                         (required, Default: "test", Depends: --test, Conflicts:
+                                                                                  --depends)                                             
 
 Commands:
 
@@ -130,13 +148,16 @@ Description:
 
 Options:
 
-  -t, --test       [val:string]  - test description                                                                
-  -D, --default    [val:string]  - I have a default value!  (Default: "test")                                      
-  -r, --required   [val:string]  - I am required!           (required)                                             
-  -d, --depends    [val:string]  - I depend on test!        (Depends: --test)                                      
-  -c, --conflicts  [val:string]  - I conflict with test!    (Conflicts: --test)                                    
-  -a, --all        <val:string>  - I have many hints!       (required, Default: "test", Depends: --test, Conflicts:
-                                                            --depends)                                             
+  -t, --test           [val:string]  - test description                                                                       
+  -D, --default        [val:string]  - I have a default value!         (Default: "test")                                      
+  --default-func       [val:string]  - I have a default handler!       (Default: "test")                                      
+  -T, --default-text   [val:string]  - I have a default text!          (Default: "test")                                      
+  --default-text-func  [val:string]  - I have a default text handler!  (Default: "test")                                      
+  -r, --required       [val:string]  - I am required!                  (required)                                             
+  -d, --depends        [val:string]  - I depend on test!               (Depends: --test)                                      
+  -c, --conflicts      [val:string]  - I conflict with test!           (Conflicts: --test)                                    
+  -a, --all            <val:string>  - I have many hints!              (required, Default: "test", Depends: --test, Conflicts:
+                                                                       --depends)                                             
 
 Commands:
 
