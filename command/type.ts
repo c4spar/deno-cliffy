@@ -1,8 +1,8 @@
 import type { Command } from "./command.ts";
-import type { TypeOrTypeHandler } from "./types.ts";
 import type {
   ArgumentValue,
   CompleteHandlerResult,
+  TypeOrTypeHandler,
   ValuesHandlerResult,
 } from "./types.ts";
 
@@ -33,6 +33,12 @@ import type {
  */
 export abstract class Type<TValue> {
   public abstract parse(type: ArgumentValue): TValue;
+
+  /**
+   * Returns the default display text value for the type. This text will be shown
+   * unless a custom value is provided for option default text.
+   */
+  public defaultText?(): string;
 
   /**
    * Returns values displayed in help text. If no complete method is provided,

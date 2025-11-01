@@ -11,4 +11,4 @@ await new Command()
     console.log("script:", script);
     console.log("args:", args);
   })
-  .parse(Deno.args);
+  .parse();

@@ -7,7 +7,7 @@
  */
 export function getArgs(): Array<string> {
   // dnt-shim-ignore
-  const { Deno, process } = globalThis as any;
+  const { Deno, process, Bun } = globalThis as any;
 
-  return Deno?.args ?? process?.argv.slice(2) ?? [];
+  return Deno?.args ?? Bun?.argv.slice(2) ?? process?.argv.slice(2) ?? [];
 }

@@ -4,6 +4,6 @@ import { Command } from "@cliffy/command";
 
 const { args } = await new Command()
   .arguments("<input> [output:string]")
-  .parse(Deno.args);
+  .parse();
 
 console.log(args);
