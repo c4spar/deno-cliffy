@@ -2148,16 +2148,20 @@ export class Command<
           };
 
           if (expectedArg.variadic) {
-            arg = args.splice(0, args.length).map((value) =>
-              parseArgValue(value)
-            );
+            arg = args
+              .splice(0, args.length)
+              .filter((arg) => !(expectedArg.optional && arg === ""))
+              .map((value) => parseArgValue(value));
           } else {
-            arg = parseArgValue(args.shift() as string);
+            const value = args.shift() as string;
+            if (!(expectedArg.optional && value === "")) {
+              arg = parseArgValue(value);
+            }
           }
 
           if (expectedArg.variadic && Array.isArray(arg)) {
             params.push(...arg);
-          } else if (typeof arg !== "undefined") {
+          } else {
             params.push(arg);
           }
         }
