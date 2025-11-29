@@ -658,17 +658,20 @@ export abstract class GenericList<
   }
 
   /** Select previous option. */
-  protected selectPrevious(loop = true): void {
+  protected selectPrevious(loop = true, startIndex?: number): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
+
+    const start = startIndex ?? this.listIndex;
+
     if (this.listIndex > 0) {
       this.listIndex--;
       if (this.listIndex < this.listOffset) {
         this.listOffset--;
       }
-      if (this.selectedOption?.disabled) {
-        this.selectPrevious();
+      if (this.selectedOption?.disabled && this.listIndex !== start) {
+        this.selectPrevious(loop, start);
       }
     } else if (
       this.settings.search && this.listIndex === 0 &&
@@ -676,26 +679,32 @@ export abstract class GenericList<
     ) {
       this.listIndex = -1;
     } else if (loop) {
-      this.listIndex = this.options.length - 1;
-      this.listOffset = this.options.length - this.getListHeight();
-      if (this.selectedOption?.disabled) {
-        this.selectPrevious();
+      const newIndex = this.options.length - 1;
+      if (newIndex !== start) {
+        this.listIndex = newIndex;
+        this.listOffset = this.options.length - this.getListHeight();
+        if (this.selectedOption?.disabled) {
+          this.selectPrevious(loop, start);
+        }
       }
     }
   }
 
   /** Select next option. */
-  protected selectNext(loop = true): void {
+  protected selectNext(loop = true, startIndex?: number): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
+
+    const start = startIndex ?? this.listIndex;
+
     if (this.listIndex < this.options.length - 1) {
       this.listIndex++;
       if (this.listIndex >= this.listOffset + this.getListHeight()) {
         this.listOffset++;
       }
-      if (this.selectedOption?.disabled) {
-        this.selectNext();
+      if (this.selectedOption?.disabled && this.listIndex !== start) {
+        this.selectNext(loop, start);
       }
     } else if (
       this.settings.search && this.listIndex === this.options.length - 1 &&
@@ -703,9 +712,11 @@ export abstract class GenericList<
     ) {
       this.listIndex = -1;
     } else if (loop) {
-      this.listIndex = this.listOffset = 0;
-      if (this.selectedOption?.disabled) {
-        this.selectNext();
+      if (start !== 0) {
+        this.listIndex = this.listOffset = 0;
+        if (this.selectedOption?.disabled) {
+          this.selectNext(loop, start);
+        }
       }
     }
   }
