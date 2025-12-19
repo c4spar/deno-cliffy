@@ -1,5 +1,6 @@
 import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
+import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
 import { Command } from "../../command.ts";
 
 const version = "1.0.0";
@@ -170,4 +171,25 @@ test("[command] sub command - select sub-command", () => {
     Error,
     `Unknown command "baz". Did you mean command "bar"?`,
   );
+});
+
+test("[command] should execute parse method on child command", async () => {
+  const childActionSpy = spy();
+  const child = new Command()
+    .description("Child command.")
+    .command("foo [bar:string]")
+    .description("Foo command.")
+    .option("--beep [value:number]", "boop")
+    .action(childActionSpy)
+
+  const cmd = new Command()
+    .throwErrors()
+    .command("child", child);
+
+  await cmd.getCommand("child")?.parse(["foo", "bar", "--beep", "1"])
+
+  assertSpyCalls(childActionSpy, 1);
+  assertSpyCall(childActionSpy, 0, {
+    args: [{beep: 1}, "bar"]
+  });
 });
