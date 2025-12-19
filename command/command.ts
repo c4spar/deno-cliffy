@@ -165,6 +165,7 @@ export class Command<
   private args: Array<Argument> = [];
   private isHidden = false;
   private isGlobal = false;
+  private _isRoot = false;
   private hasDefaults = false;
   private _versionOptions?: DefaultOption | false;
   private _helpOptions?: DefaultOption | false;
@@ -1703,6 +1704,7 @@ export class Command<
         TParentCommand
       >
   > {
+    this._isRoot = true;
     const ctx: ParseContext = {
       unknown: args.slice(),
       flags: {},
@@ -1847,7 +1849,13 @@ export class Command<
 
   /** Register default options like `--version` and `--help`. */
   private registerDefaults(): this {
-    if (this.hasDefaults || this.getParent()) {
+    if (this.hasDefaults) {
+      return this;
+    }
+    if (this._parent) {
+      if (this._isRoot) {
+        this.getMainCommand().registerDefaults();
+      }
       return this;
     }
     this.hasDefaults = true;
@@ -2243,7 +2251,7 @@ export class Command<
    * @param name Override the main command name.
    */
   public getPath(name?: string): string {
-    return this._parent
+    return this._parent && !this._isRoot
       ? this._parent.getPath(name) + " " + this._name
       : name || this._name;
   }
