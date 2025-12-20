@@ -180,16 +180,16 @@ test("[command] should execute parse method on child command", async () => {
     .command("foo [bar:string]")
     .description("Foo command.")
     .option("--beep [value:number]", "boop")
-    .action(childActionSpy)
+    .action(childActionSpy);
 
   const cmd = new Command()
     .throwErrors()
     .command("child", child);
 
-  await cmd.getCommand("child")?.parse(["foo", "bar", "--beep", "1"])
+  await cmd.getCommand("child")?.parse(["foo", "bar", "--beep", "1"]);
 
   assertSpyCalls(childActionSpy, 1);
   assertSpyCall(childActionSpy, 0, {
-    args: [{beep: 1}, "bar"]
+    args: [{ beep: 1 }, "bar"],
   });
 });
