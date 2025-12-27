@@ -582,6 +582,12 @@ export abstract class GenericList<
    * @param event Key event.
    */
   protected override async handleEvent(event: KeyCode): Promise<void> {
+    if (this.options.every(option => option.disabled)) {
+      this.setErrorMessage("No selectable options available. All options are disabled.");
+      await super.handleEvent(event);
+      return;
+    }
+
     if (
       this.isKey(this.settings.keys, "open", event) &&
       isOptionGroup(this.selectedOption) &&
@@ -658,20 +664,17 @@ export abstract class GenericList<
   }
 
   /** Select previous option. */
-  protected selectPrevious(loop = true, startIndex?: number): void {
+  protected selectPrevious(loop = true): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
-
-    const start = startIndex ?? this.listIndex;
-
     if (this.listIndex > 0) {
       this.listIndex--;
       if (this.listIndex < this.listOffset) {
         this.listOffset--;
       }
-      if (this.selectedOption?.disabled && this.listIndex !== start) {
-        this.selectPrevious(loop, start);
+      if (this.selectedOption?.disabled) {
+        this.selectPrevious();
       }
     } else if (
       this.settings.search && this.listIndex === 0 &&
@@ -679,32 +682,26 @@ export abstract class GenericList<
     ) {
       this.listIndex = -1;
     } else if (loop) {
-      const newIndex = this.options.length - 1;
-      if (newIndex !== start) {
-        this.listIndex = newIndex;
-        this.listOffset = this.options.length - this.getListHeight();
-        if (this.selectedOption?.disabled) {
-          this.selectPrevious(loop, start);
-        }
+      this.listIndex = this.options.length - 1;
+      this.listOffset = this.options.length - this.getListHeight();
+      if (this.selectedOption?.disabled) {
+        this.selectPrevious();
       }
     }
   }
 
   /** Select next option. */
-  protected selectNext(loop = true, startIndex?: number): void {
+  protected selectNext(loop = true): void {
     if (this.options.length < 2 && !this.isSearchSelected()) {
       return;
     }
-
-    const start = startIndex ?? this.listIndex;
-
     if (this.listIndex < this.options.length - 1) {
       this.listIndex++;
       if (this.listIndex >= this.listOffset + this.getListHeight()) {
         this.listOffset++;
       }
-      if (this.selectedOption?.disabled && this.listIndex !== start) {
-        this.selectNext(loop, start);
+      if (this.selectedOption?.disabled) {
+        this.selectNext();
       }
     } else if (
       this.settings.search && this.listIndex === this.options.length - 1 &&
@@ -712,11 +709,9 @@ export abstract class GenericList<
     ) {
       this.listIndex = -1;
     } else if (loop) {
-      if (start !== 0) {
-        this.listIndex = this.listOffset = 0;
-        if (this.selectedOption?.disabled) {
-          this.selectNext(loop, start);
-        }
+      this.listIndex = this.listOffset = 0;
+      if (this.selectedOption?.disabled) {
+        this.selectNext();
       }
     }
   }
