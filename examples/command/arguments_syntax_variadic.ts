@@ -9,4 +9,4 @@ await new Command()
       console.log("rmdir %s", dir);
     });
   })
-  .parse(Deno.args);
+  .parse();

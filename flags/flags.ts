@@ -1,3 +1,4 @@
+import { getArgs } from "@cliffy/internal/runtime/get-args";
 import {
   getDefaultValue,
   getOption,
@@ -76,7 +77,7 @@ export function parseFlags<
   TFlagOptions extends FlagOptions,
   TFlagsResult extends ParseFlagsContext,
 >(
-  argsOrCtx: string[] | TFlagsResult,
+  argsOrCtx: string[] | TFlagsResult = getArgs(),
   opts: ParseFlagsOptions<TFlagOptions> = {},
 ): TFlagsResult & ParseFlagsContext<TFlags, TFlagOptions> {
   let args: Array<string>;

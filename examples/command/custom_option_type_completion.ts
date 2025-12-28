@@ -8,4 +8,4 @@ await new Command()
     "email",
     () => ["aaa@example.com", "bbb@example.com", "ccc@example.com"],
   )
-  .parse(Deno.args);
+  .parse();

@@ -21,6 +21,6 @@ const { options } = await new Command()
   .arguments("[color-name:color]")
   .option("-c, --color <name:color>", "...")
   .command("foo [color-name:color]", "...")
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

@@ -28,4 +28,4 @@ await new Command()
     console.log("color: %s", color);
     console.log("animal: %s", animal);
   })
-  .parse(Deno.args);
+  .parse();

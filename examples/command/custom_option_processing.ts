@@ -25,6 +25,6 @@ const { options } = await new Command()
       return previous;
     },
   })
-  .parse(Deno.args);
+  .parse();
 
 console.log(options);

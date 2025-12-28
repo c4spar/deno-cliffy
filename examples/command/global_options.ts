@@ -22,4 +22,4 @@ await new Command()
       )
       .reset(),
   )
-  .parse(Deno.args);
+  .parse();
