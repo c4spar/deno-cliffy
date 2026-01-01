@@ -582,6 +582,14 @@ export abstract class GenericList<
    * @param event Key event.
    */
   protected override async handleEvent(event: KeyCode): Promise<void> {
+    if (this.options.every((option) => option.disabled)) {
+      this.setErrorMessage(
+        "No selectable options available. All options are disabled.",
+      );
+      await super.handleEvent(event);
+      return;
+    }
+
     if (
       this.isKey(this.settings.keys, "open", event) &&
       isOptionGroup(this.selectedOption) &&
