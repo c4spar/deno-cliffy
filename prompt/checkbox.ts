@@ -292,10 +292,14 @@ export class Checkbox<TValue> extends GenericList<
     option: CheckboxOptionGroup<TValue>,
   ): CheckboxOptionGroupSettings<TValue> {
     const options = this.mapOptions(promptOptions, option.options);
+    const optionGroup = super.mapOptionGroup(promptOptions, option, false);
     return {
-      ...super.mapOptionGroup(promptOptions, option, false),
+      ...optionGroup,
       get checked() {
         return areAllChecked(options);
+      },
+      get disabled() {
+        return optionGroup.disabled || options.every((opt) => opt.disabled);
       },
       options,
       icon: typeof option.icon === "undefined" ? true : option.icon,
