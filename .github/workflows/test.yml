@@ -13,9 +13,11 @@ jobs:
           - name: deno
             deno-version: v1.x
           - name: deno
-            deno-version: v2.x
+            version-file: .deno-version
           - name: node
-          # - name: bun
+            version-file: .node-version
+          - name: bun
+            version-file: .bun-version
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
@@ -29,7 +31,7 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.runtime.deno-version }}
-          # deno-version-file: ".deno-version"
+          deno-version-file: ${{ matrix.runtime.deno-version-file }}
 
       - name: Create package.json
         if: ${{ matrix.runtime.name == 'node' || matrix.runtime.name == 'bun' }}
@@ -39,13 +41,13 @@ jobs:
         if: ${{ matrix.runtime.name == 'node' }}
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".node-version"
+          node-version-file: ${{ matrix.runtime.node-version-file }}
 
       - name: Setup Bun
         if: ${{ matrix.runtime.name == 'bun' }}
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: ".bun-version"
+          bun-version-file: ${{ matrix.runtime.bun-version-file }}
 
       - name: Setup pnpm
         if: ${{ matrix.runtime.name == 'node' }}
@@ -59,7 +61,7 @@ jobs:
         run: deno task coverage:deno-v1
 
       - name: Run tests
-        if: matrix.runtime.name == 'deno' && matrix.runtime.deno-version == 'rc'
+        if: matrix.runtime.name == 'deno' && matrix.runtime.deno-version-file
         shell: bash
         run: deno task coverage:deno-v2
 
