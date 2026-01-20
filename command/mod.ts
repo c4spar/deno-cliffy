@@ -42,4 +42,3 @@ export { SecretType } from "./types/secret.ts";
 export { StringType } from "./types/string.ts";
 export { Type } from "./type.ts";
 export { ValidationError, type ValidationErrorOptions } from "./_errors.ts";
-export * from "./deprecated.ts";
