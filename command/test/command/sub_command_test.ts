@@ -140,7 +140,7 @@ test("[command] sub command - command with empty name", async () => {
 test("[command] sub command - override child command", async () => {
   await new Command()
     .command("foo")
-    .command("foo", "...", true)
+    .command("foo", "...", {override: true})
     .parse(["foo"]);
 });
 
@@ -157,7 +157,7 @@ test("[command] sub command - duplicate command name", async () => {
   );
 });
 
-test("[command] sub command - select sub-command", async () => {
+test("[command] sub command - select sub-command", () => {
   const cmd = new Command()
     .command("foo")
     .command("bar");
@@ -165,7 +165,7 @@ test("[command] sub command - select sub-command", async () => {
   cmd.select("foo");
   cmd.select("bar");
 
-  await assertThrows(
+  assertThrows(
     () => cmd.select("baz"),
     Error,
     `Unknown command "baz". Did you mean command "bar"?`,
