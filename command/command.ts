@@ -1732,15 +1732,30 @@ export class Command<
 
       // Pre parse globals to support: cmd --global-option sub-command --option
       if (ctx.unknown.length > 0) {
+        // First, split any bundled short flags to make subcommand detection work correctly
+        this.splitBundledFlags(ctx);
+
         // Detect sub command.
         subCommand = this.getSubCommand(ctx);
 
         if (!subCommand) {
-          // Only pre parse globals if first arg ist a global option.
-          const optionName = ctx.unknown[0].replace(/^-+/, "").split("=")[0];
-          const option = this.getOption(optionName, true);
+          // Only pre parse globals if first arg is a global option.
+          const firstArg = ctx.unknown[0];
+          let hasGlobalOption = false;
 
-          if (option?.global) {
+          if (firstArg.startsWith("--")) {
+            // Long option
+            const optionName = firstArg.replace(/^-+/, "").split("=")[0];
+            const option = this.getOption(optionName, true);
+            hasGlobalOption = !!option?.global;
+          } else if (firstArg.startsWith("-") && firstArg.length === 2) {
+            // Single short option (after splitting)
+            const flag = firstArg.slice(1);
+            const option = this.getOption(flag, true);
+            hasGlobalOption = !!option?.global;
+          }
+
+          if (hasGlobalOption) {
             preParseGlobals = true;
             await this.parseGlobalOptionsAndEnvVars(ctx);
           }
@@ -1792,6 +1807,62 @@ export class Command<
     }
 
     return subCommand;
+  }
+
+  private splitBundledFlags(ctx: ParseContext): void {
+    // Split bundled short flags like -abc into -a -b -c
+    // This needs to happen before subcommand detection so that subcommands
+    // aren't confused with bundled flags
+    for (let i = 0; i < ctx.unknown.length; i++) {
+      const arg = ctx.unknown[i];
+
+      // Check if it's a bundled short flag (starts with -, not --, length > 2, not a number)
+      if (
+        arg.startsWith("-") && !arg.startsWith("--") && arg.length > 2 &&
+        arg[2] !== "."
+      ) {
+        // Use the same logic as the flags parser
+        const flag = arg.slice(1);
+        const equalIndex = flag.indexOf("=");
+        const flags = (equalIndex !== -1 ? flag.slice(0, equalIndex) : flag)
+          .split("");
+
+        if (!isNaN(Number(flag[flag.length - 1]))) {
+          // If last character is a number, don't split (e.g., -p8080)
+          continue;
+        }
+
+        // Check if we're before a subcommand - if so, all bundled flags must be global
+        const hasSubcommandAfter = ctx.unknown.slice(i + 1).some((arg) =>
+          !arg.startsWith("-") && this.getCommand(arg, true)
+        );
+
+        if (hasSubcommandAfter) {
+          // Validate all flags in bundle are global
+          for (const f of flags) {
+            const option = this.getOption(f, true);
+            if (option && !option.global) {
+              throw new ValidationError(
+                `Non-global option -${f} cannot appear before subcommand.`,
+              );
+            }
+          }
+        }
+
+        // Split the bundled flag
+        const splitFlags = flags.map((f) => `-${f}`);
+        if (equalIndex !== -1) {
+          // If there was a value (e.g., -abc=value), add it to the last flag
+          splitFlags[splitFlags.length - 1] += `=${flag.slice(equalIndex + 1)}`;
+        }
+
+        // Replace the bundled flag with individual flags
+        ctx.unknown.splice(i, 1, ...splitFlags);
+
+        // Adjust the index to account for the new flags
+        i += splitFlags.length - 1;
+      }
+    }
   }
 
   private async parseGlobalOptionsAndEnvVars(
