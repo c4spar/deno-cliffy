@@ -558,17 +558,3 @@ export function isCheckboxOptionGroup(
 ): option is CheckboxOptionGroup<any> {
   return isOptionGroup(option);
 }
-
-/**
- * Checkbox options type.
- * @deprecated Use `Array<string | CheckboxOption>` instead.
- */
-export type CheckboxValueOptions = Array<string | CheckboxOption<string>>;
-
-/**
- * Checkbox option settings type.
- * @deprecated Use `Array<CheckboxOptionSettings | CheckboxOptionGroupSettings>` instead.
- */
-export type CheckboxValueSettings = Array<
-  CheckboxOptionSettings<string> | CheckboxOptionGroupSettings<string>
->;

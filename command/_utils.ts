@@ -1,5 +1,4 @@
 import {
-  OptionType,
   UnexpectedArgumentAfterVariadicArgumentError,
   UnexpectedRequiredArgumentError,
 } from "@cliffy/flags";
@@ -118,7 +117,7 @@ export function parseArgumentsDefinition<T extends boolean>(
       }
       continue;
     }
-    const type: string | undefined = parts[2] || OptionType.STRING;
+    const type: string | undefined = parts[2] || "string";
 
     const details: Argument = {
       optional: arg[0] === "[",

@@ -13,7 +13,6 @@ export {
   type GenericListOption,
   type GenericListOptionGroup,
   type GenericListOptions,
-  type GenericListValueOptions,
 } from "./_generic_list.ts";
 
 export {
@@ -22,7 +21,6 @@ export {
   type CheckboxOption,
   type CheckboxOptionGroup,
   type CheckboxOptions,
-  type CheckboxValueOptions,
 } from "./checkbox.ts";
 export { Confirm, type ConfirmKeys, type ConfirmOptions } from "./confirm.ts";
 export { Input, type InputKeys, type InputOptions } from "./input.ts";
@@ -35,7 +33,6 @@ export {
   type SelectOption,
   type SelectOptionGroup,
   type SelectOptions,
-  type SelectValueOptions,
 } from "./select.ts";
 export { Toggle, type ToggleKeys, type ToggleOptions } from "./toggle.ts";
 
