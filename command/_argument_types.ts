@@ -7,7 +7,7 @@ import type {
   TrimLeft,
   TrimRight,
 } from "./_type_utils.ts";
-import type { Type } from "./type.ts";
+import type { InferType } from "./type.ts";
 import type { TypeOrTypeHandler } from "./types.ts";
 import type { BooleanType } from "./types/boolean.ts";
 import type { FileType } from "./types/file.ts";
@@ -431,7 +431,7 @@ export type MapValue<TOptions, TMappedOptions, TCollect = undefined> =
 
 export type MapTypes<T> = T extends Record<string, unknown> | Array<unknown>
   ? { [K in keyof T]: MapTypes<T[K]> }
-  : Type.infer<T>;
+  : InferType<T>;
 
 type GetOptionName<TFlags> = TFlags extends `${string}--${infer Name}=${string}`
   ? TrimRight<Name, ",">
