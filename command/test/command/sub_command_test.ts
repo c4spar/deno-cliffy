@@ -140,7 +140,7 @@ test("[command] sub command - command with empty name", async () => {
 test("[command] sub command - override child command", async () => {
   await new Command()
     .command("foo")
-    .command("foo", "...", {override: true})
+    .command("foo", "...", { override: true })
     .parse(["foo"]);
 });
 

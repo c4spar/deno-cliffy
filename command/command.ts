@@ -566,7 +566,7 @@ export class Command<
   command(
     nameAndArguments: string,
     cmdOrDescription?: Command<any> | string,
-    {override}: SubCommandOptions = {},
+    { override }: SubCommandOptions = {},
   ): Command<any> {
     this.reset();
 
