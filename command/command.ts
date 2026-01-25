@@ -854,7 +854,7 @@ export class Command<
     TArgs extends string = string,
   >(
     args: TArgs,
-    descriptions?: Array<string>
+    descriptions?: Array<string>,
   ): Command<
     TParentCommandGlobals,
     TParentCommandTypes,
