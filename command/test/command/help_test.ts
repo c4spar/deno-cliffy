@@ -188,7 +188,8 @@ await snapshotTest({
       .name("arguments-test")
       .option("-f, --file1 <path:file>", "...", { required: true })
       .argument("<foo:string>", "Foo description.")
-      .argument("<bar:number>", "Bar description.")
+      .argument("[bar:number]", "Bar description.")
+      .argument("[...baz:boolean]", "Baz description.")
       .parse();
   },
 });

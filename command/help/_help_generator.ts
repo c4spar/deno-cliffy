@@ -148,7 +148,7 @@ export class HelpGenerator {
           .filter((arg) => arg.description)
           .map((argument: Argument) => [
             highlightArguments(
-              argument.name || "",
+              argument.raw || "",
               this.options.types,
             ),
             red(bold("-")),

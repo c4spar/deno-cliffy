@@ -3,13 +3,14 @@ export const snapshot = {};
 snapshot[`should print help for arguments defined with argument method > help 1`] = `
 stdout:
 "
-Usage:   arguments-test <foo> <bar> --file1 <path>
-Version: 1.0.0                                    
+Usage:   arguments-test <foo> [bar] [baz...] --file1 <path>
+Version: 1.0.0                                             
 
 Arguments:
 
-  foo  - Foo description.  (required)
-  bar  - Bar description.  (required)
+  <foo>     - Foo description.  (required)
+  [bar]     - Bar description.            
+  [baz...]  - Baz description.            
 
 Options:
 
@@ -30,8 +31,8 @@ Version: 1.0.0
 
 Arguments:
 
-  beep  - Beep description.  (required)
-  boop  - Boop description.            
+  <beep>  - Beep description.  (required)
+  [boop]  - Boop description.            
 
 Options:
 
