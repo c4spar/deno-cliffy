@@ -10,6 +10,7 @@ import type {
   MapTypes,
   MapValue,
   MergeOptions,
+  TypedArgument,
   TypedArguments,
   TypedCommandArguments,
   TypedEnv,
@@ -85,6 +86,11 @@ import { SecretType } from "./types/secret.ts";
 import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
+export interface ArgDefinition {
+  arg: string;
+  description?: string;
+}
+
 interface CommandSettings {
   name: string;
   version?: VersionHandler;
@@ -96,7 +102,7 @@ interface CommandSettings {
   usage?: string;
   examples: Array<Example>;
   aliases: Array<string>;
-  arguments?: string;
+  arguments?: Array<ArgDefinition>;
   throwOnError?: boolean;
   allowEmpty?: boolean;
   stopEarly?: boolean;
@@ -848,6 +854,7 @@ export class Command<
     TArgs extends string = string,
   >(
     args: TArgs,
+    ...descriptions: Array<string>
   ): Command<
     TParentCommandGlobals,
     TParentCommandTypes,
@@ -858,7 +865,35 @@ export class Command<
     TCommandGlobalTypes,
     TParentCommand
   > {
-    this.cmd.settings.arguments = args;
+    this.cmd.settings.arguments = args.split(" ").map((arg, index) => ({
+      arg,
+      description: descriptions[index],
+    }));
+    return this as Command<any>;
+  }
+
+  /** Add an command argument. */
+  public argument<
+    TArguments extends TypedArgument<
+      TArg,
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>
+    >,
+    TArg extends string = string,
+  >(
+    arg: TArg,
+    description: string,
+  ): Command<
+    TParentCommandGlobals,
+    TParentCommandTypes,
+    TCommandOptions,
+    [...TCommandArguments, ...TArguments],
+    TCommandGlobals,
+    TCommandTypes,
+    TCommandGlobalTypes,
+    TParentCommand
+  > {
+    this.cmd.settings.arguments ??= [];
+    this.cmd.settings.arguments.push({ arg, description });
     return this as Command<any>;
   }
 
@@ -2296,7 +2331,7 @@ export class Command<
 
   /** Get arguments definition. E.g: <input-file:string> <output-file:string> */
   public getArgsDefinition(): string | undefined {
-    return this.settings.arguments;
+    return this.settings.arguments?.map(({ arg }) => arg).join(" ");
   }
 
   /**
@@ -2319,7 +2354,7 @@ export class Command<
 
   /** Check if command has arguments. */
   public hasArguments(): boolean {
-    return !!this.settings.arguments;
+    return !!this.settings.arguments?.length;
   }
 
   /** Get command version. */

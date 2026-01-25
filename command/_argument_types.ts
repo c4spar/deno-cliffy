@@ -175,6 +175,12 @@ export type TypedArguments<TArgs extends string, TTypes> = number extends TTypes
     ? TArg extends `[${string}]`
       ? [ArgumentType<TArg, TTypes>?, ...TypedArguments<TRestArgs, TTypes>]
     : [ArgumentType<TArg, TTypes>, ...TypedArguments<TRestArgs, TTypes>]
+  : TypedArgument<TArgs, TTypes>;
+
+export type TypedArgument<
+  TArgs extends string,
+  TTypes,
+> = number extends TTypes ? any
   : TArgs extends `${string}...${string}` ? [
       ...ArgumentType<TArgs, TTypes> extends Array<infer TValue>
         ? TArgs extends `[${string}]` ? Array<TValue>

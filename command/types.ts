@@ -141,8 +141,12 @@ export interface Argument extends ArgumentOptions {
   name: string;
   /** Shell completion action. */
   action: string;
-  /** Arguments type. */
+  /** Argument type. */
   type: string;
+  /** Argument description. */
+  description?: string;
+  /** Raw argument definition. */
+  raw: string;
 }
 
 /** Result of `cmd.parse()` method. */

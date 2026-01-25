@@ -1,6 +1,7 @@
 import { test } from "@cliffy/internal/testing/test";
 import { assertEquals } from "@std/assert";
 import { Command } from "../../command.ts";
+import { snapshotTest } from "../../../testing/mod.ts";
 
 test("[command] help - help string", () => {
   const cmd = new Command()
@@ -172,5 +173,41 @@ test({
       .parse(["bar", "--help"]);
 
     assertEquals(ctx.options, { help: true });
+  },
+});
+
+await snapshotTest({
+  name: "should print help for arguments defined with argument method",
+  meta: import.meta,
+  steps: {
+    help: { args: ["-h"] },
+  },
+  async fn(): Promise<void> {
+    await new Command()
+      .version("1.0.0")
+      .name("arguments-test")
+      .option("-f, --file1 <path:file>", "...", { required: true })
+      .argument("<foo:string>", "Foo description.")
+      .argument("<bar:number>", "Bar description.")
+      .parse();
+  },
+});
+
+await snapshotTest({
+  name:
+    "should print help for additionally added arguments with argument method",
+  meta: import.meta,
+  steps: {
+    help: { args: ["-h"] },
+  },
+  async fn(): Promise<void> {
+    await new Command()
+      .version("1.0.0")
+      .name("arguments-test")
+      .option("-f, --file1 <path:file>", "...", { required: true })
+      .arguments("<foo:string> <bar:number>")
+      .argument("<beep:string>", "Beep description.")
+      .argument("[boop:number]", "Boop description.")
+      .parse();
   },
 });
