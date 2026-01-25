@@ -7,11 +7,13 @@ import {
 } from "@cliffy/flags";
 import { bold, brightBlue, red } from "@std/fmt/colors";
 import type {
+  IsRequired,
   MapTypes,
   MapValue,
   MergeOptions,
   TypedArgument,
   TypedArguments,
+  TypedArgumentValue,
   TypedCommandArguments,
   TypedEnv,
   TypedOption,
@@ -55,6 +57,8 @@ import type {
   ActionHandler,
   Argument,
   ArgumentValue,
+  ArgumentValueHandler,
+  CommandArgumentOptions,
   CommandResult,
   CompleteHandler,
   CompleteOptions,
@@ -86,7 +90,7 @@ import { SecretType } from "./types/secret.ts";
 import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
-export interface ArgDefinition {
+export interface ArgDefinition extends CommandArgumentOptions<any, any, any> {
   arg: string;
   description?: string;
 }
@@ -876,24 +880,77 @@ export class Command<
   public argument<
     TArguments extends TypedArgument<
       TArg,
-      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>
+      Merge<TParentCommandTypes, Merge<TCommandGlobalTypes, TCommandTypes>>,
+      TDefaultValue
     >,
-    TArg extends string = string,
+    const TArg extends string = string,
+    const TDefaultValue
+      extends (TArg extends `${string}...${string}`
+        ? ReadonlyArray<unknown> | undefined
+        : unknown) = undefined,
+    const TMappedArguments = undefined,
   >(
     arg: TArg,
     description: string,
+    opts?:
+      | CommandArgumentOptions<
+        TDefaultValue,
+        MapTypes<
+          TypedArgumentValue<
+            TArg,
+            Merge<
+              TParentCommandTypes,
+              Merge<TCommandGlobalTypes, TCommandTypes>
+            >,
+            TDefaultValue
+          >
+        >,
+        TMappedArguments
+      >
+      | ArgumentValueHandler<
+        MapTypes<
+          TypedArgumentValue<
+            TArg,
+            Merge<
+              TParentCommandTypes,
+              Merge<TCommandGlobalTypes, TCommandTypes>
+            >,
+            TDefaultValue
+          >
+        >,
+        TMappedArguments
+      >,
   ): Command<
     TParentCommandGlobals,
     TParentCommandTypes,
     TCommandOptions,
-    [...TCommandArguments, ...TArguments],
+    [
+      ...TCommandArguments,
+      ...TMappedArguments extends undefined
+        ? TArg extends `${string}...${string}`
+          ? TArguments[0] extends ReadonlyArray<unknown> ? TArguments[0]
+          : TArguments
+        : TArguments
+        : TArg extends `${string}...${string}`
+          ? TMappedArguments extends ReadonlyArray<unknown> ? TMappedArguments
+          : IsRequired<
+            TArg extends `<${string}>` ? true : false,
+            TDefaultValue
+          > extends true ? [Awaited<TMappedArguments>]
+          : [Awaited<TMappedArguments>?]
+        : IsRequired<
+          TArg extends `<${string}>` ? true : false,
+          TDefaultValue
+        > extends true ? [Awaited<TMappedArguments>]
+        : [Awaited<TMappedArguments>?],
+    ],
     TCommandGlobals,
     TCommandTypes,
     TCommandGlobalTypes,
     TParentCommand
   > {
     this.cmd.settings.arguments ??= [];
-    this.cmd.settings.arguments.push({ arg, description });
+    this.cmd.settings.arguments.push({ arg, description, ...opts });
     return this as Command<any>;
   }
 
@@ -1041,7 +1098,16 @@ export class Command<
     Merge<TCommandGlobalTypes, TypedType<TName, THandler>>,
     TParentCommand
   > {
-    return this.type(name, handler, { ...options, global: true });
+    return this.type(name, handler, { ...options, global: true }) as Command<
+      TParentCommandGlobals,
+      TParentCommandTypes,
+      TCommandOptions,
+      TCommandArguments,
+      TCommandGlobals,
+      TCommandTypes,
+      Merge<TCommandGlobalTypes, TypedType<TName, THandler>>,
+      TParentCommand
+    >;
   }
 
   /**
@@ -1835,7 +1901,7 @@ export class Command<
       // Parse rest options & env vars.
       await this.parseOptionsAndEnvVars(ctx, preParseGlobals);
       const options = { ...ctx.env, ...ctx.flags };
-      const args = this.parseArguments(ctx, options);
+      const args = await this.parseArguments(ctx, options);
       this.props.literalArgs = ctx.literal;
 
       // Execute option action.
@@ -2166,10 +2232,10 @@ export class Command<
    * @param ctx     Parse context.
    * @param options Parsed command line options.
    */
-  protected parseArguments(
+  protected async parseArguments(
     ctx: ParseContext,
     options: Record<string, unknown>,
-  ): TCommandArguments {
+  ): Promise<TCommandArguments> {
     const params: Array<unknown> = [];
     const args = ctx.unknown.slice();
 
@@ -2187,7 +2253,9 @@ export class Command<
         }
       }
     } else {
-      if (!args.length) {
+      const hasDefaults = this.settings.arguments?.some((arg) => arg.default);
+
+      if (!args.length && !hasDefaults) {
         const required = this.getArguments()
           .filter((expectedArg) => !expectedArg.optional)
           .map((expectedArg) => expectedArg.name);
@@ -2203,10 +2271,35 @@ export class Command<
           }
         }
       } else {
-        for (const expectedArg of this.getArguments()) {
+        for (const [index, expectedArg] of this.getArguments().entries()) {
+          const mapArgValue = (parsed: unknown) => {
+            return this.settings.arguments?.[index].value
+              ? this.settings.arguments[index].value(parsed)
+              : parsed;
+          };
+
           if (!args.length) {
+            if (this.settings.arguments?.[index].default !== undefined) {
+              const defaultValue =
+                typeof this.settings.arguments[index].default === "function"
+                  ? this.settings.arguments[index].default.call(this)
+                  : this.settings.arguments[index].default;
+
+              const mappedValue = mapArgValue(defaultValue);
+
+              if (expectedArg.variadic && Array.isArray(mappedValue)) {
+                params.push(...mappedValue);
+                continue;
+              }
+              params.push(mappedValue);
+              continue;
+            }
+
             if (expectedArg.optional) {
-              break;
+              if (hasDefaults) {
+                params.push(undefined);
+              }
+              continue;
             }
             throw new MissingArgumentError(expectedArg.name);
           }
@@ -2236,6 +2329,8 @@ export class Command<
             arg = parseArgValue(args.shift() as string);
           }
 
+          arg = mapArgValue(arg);
+
           if (expectedArg.variadic && Array.isArray(arg)) {
             params.push(...arg);
           } else if (typeof arg !== "undefined") {
@@ -2248,8 +2343,13 @@ export class Command<
         }
       }
     }
+    const values = await Promise.all(params);
 
-    return params as TCommandArguments;
+    while (values.length && values.at(-1) === undefined) {
+      values.pop();
+    }
+
+    return values as TCommandArguments;
   }
 
   private handleError(error: unknown): never {

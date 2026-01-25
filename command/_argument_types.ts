@@ -175,20 +175,47 @@ export type TypedArguments<TArgs extends string, TTypes> = number extends TTypes
     ? TArg extends `[${string}]`
       ? [ArgumentType<TArg, TTypes>?, ...TypedArguments<TRestArgs, TTypes>]
     : [ArgumentType<TArg, TTypes>, ...TypedArguments<TRestArgs, TTypes>]
-  : TypedArgument<TArgs, TTypes>;
-
-export type TypedArgument<
-  TArgs extends string,
-  TTypes,
-> = number extends TTypes ? any
   : TArgs extends `${string}...${string}` ? [
-      ...ArgumentType<TArgs, TTypes> extends Array<infer TValue>
+      ...ArgumentType<TArgs, TTypes> extends ReadonlyArray<infer TValue>
         ? TArgs extends `[${string}]` ? Array<TValue>
         : [TValue, ...Array<TValue>]
         : never,
     ]
   : TArgs extends `[${string}]` ? [ArgumentType<TArgs, TTypes>?]
   : [ArgumentType<TArgs, TTypes>];
+
+export type TypedArgument<
+  TArg extends string,
+  TTypes,
+  TDefault = undefined,
+> = number extends TTypes ? any
+  : TArg extends `${string}...${string}`
+    ? ArgumentType<TArg, TTypes> extends ReadonlyArray<infer TValue>
+      ? TArg extends `[${string}]`
+        ? [Array<TValue> | MakeArray<NonNullable<TDefault>>]
+      : [[TValue, ...Array<TValue>] | MakeArray<NonNullable<TDefault>>]
+    : never
+  : TArg extends `[${string}]`
+    ? IsRequired<TDefault extends undefined ? false : true, TDefault> extends
+      true ? [NonNullable<TDefault> | ArgumentType<TArg, TTypes>]
+    : [(NonNullable<TDefault> | ArgumentType<TArg, TTypes>)?]
+  : [NonNullable<TDefault> | ArgumentType<TArg, TTypes>];
+
+export type TypedArgumentValue<
+  TArg extends string,
+  TTypes,
+  TDefault = undefined,
+> = number extends TTypes ? any
+  : TArg extends `${string}...${string}`
+    ? ArgumentType<TArg, TTypes> extends ReadonlyArray<infer TValue>
+      ? TArg extends `[${string}]` ? Array<TValue> | NonNullable<TDefault>
+      : [TValue, ...Array<TValue>] | NonNullable<TDefault>
+    : never
+  : TArg extends `[${string}]`
+    ? IsRequired<TDefault extends undefined ? false : true, TDefault> extends
+      true ? NonNullable<TDefault> | ArgumentType<TArg, TTypes>
+    : NonNullable<TDefault> | ArgumentType<TArg, TTypes>
+  : NonNullable<TDefault> | ArgumentType<TArg, TTypes>;
 
 export type TypedCommandArguments<TNameAndArguments extends string, TTypes> =
   number extends TTypes ? any
@@ -457,7 +484,10 @@ type ExtractArgumentsFromFlags<TFlags extends string> = TFlags extends
 type OptionName<Name extends string> = Name extends "*" ? string
   : CamelCase<TrimRight<Name, ",">>;
 
-type IsRequired<TRequired extends boolean | undefined, TDefault> =
+export type IsRequired<TRequired extends boolean | undefined, TDefault> =
   TRequired extends true ? true
     : TDefault extends undefined ? false
     : true;
+
+type MakeArray<TValue> = TValue extends ReadonlyArray<unknown> ? TValue
+  : [TValue];

@@ -185,6 +185,22 @@ export interface CommandResult<
   >;
 }
 
+/* ARGUMENTS TYPES */
+
+export type ArgumentValueHandler<TValue, TReturn> = (
+  value: TValue,
+) => TReturn;
+
+export interface CommandArgumentOptions<
+  TDefault = undefined,
+  TValue = unknown,
+  TReturn = TValue,
+> {
+  default?: DefaultValue<TDefault>;
+  defaultText?: DefaultText<TDefault>;
+  value?: ArgumentValueHandler<TValue, TReturn>;
+}
+
 /* OPTION TYPES */
 
 export type OptionValueHandler<TValue = any, TReturn = TValue> = ValueHandler<
