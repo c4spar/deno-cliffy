@@ -2494,9 +2494,7 @@ export class Command<
         : options;
     };
 
-    return this.parent
-      ? getGlobals(this.parent, this.settings.noGlobals)
-      : [];
+    return this.parent ? getGlobals(this.parent, this.settings.noGlobals) : [];
   }
 
   /**
@@ -2612,9 +2610,7 @@ export class Command<
    */
   public getBaseCommands(hidden?: boolean): Array<Command<any>> {
     const commands = Array.from(this.settings.commands.values());
-    return hidden
-      ? commands
-      : commands.filter((cmd) => !cmd.settings.isHidden);
+    return hidden ? commands : commands.filter((cmd) => !cmd.settings.isHidden);
   }
 
   /**
@@ -2658,9 +2654,7 @@ export class Command<
         : commands;
     };
 
-    return this.parent
-      ? getCommands(this.parent, this.settings.noGlobals)
-      : [];
+    return this.parent ? getCommands(this.parent, this.settings.noGlobals) : [];
   }
 
   /**
