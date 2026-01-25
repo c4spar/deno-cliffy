@@ -85,6 +85,10 @@ import { SecretType } from "./types/secret.ts";
 import { StringType } from "./types/string.ts";
 import { checkVersion } from "./upgrade/_check_version.ts";
 
+export interface SubCommandOptions {
+  override?: boolean;
+}
+
 /**
  * Chainable command factory class.
  *
@@ -420,7 +424,7 @@ export class Command<
    *
    * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param cmd       The new child command to register.
-   * @param override  Override existing child command.
+   * @param options   Sub-command options.
    */
   public command<
     TCommand extends Command<
@@ -451,7 +455,7 @@ export class Command<
   >(
     name: string,
     cmd: TCommand,
-    override?: boolean,
+    options?: SubCommandOptions,
   ): ReturnType<TCommand["reset"]> extends Command<
     Record<string, unknown> | void,
     Record<string, unknown> | void,
@@ -478,7 +482,7 @@ export class Command<
    *
    * @param name      Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param cmd       The new child command to register.
-   * @param override  Override existing child command.
+   * @param options   Sub-command options.
    */
   public command<
     TCommand extends Command<
@@ -500,7 +504,7 @@ export class Command<
   >(
     name: string,
     cmd: TCommand,
-    override?: boolean,
+    options?: SubCommandOptions,
   ): TCommand extends Command<
     Record<string, unknown> | void,
     Record<string, unknown> | void,
@@ -527,7 +531,7 @@ export class Command<
    *
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param desc              The description of the new child command.
-   * @param override          Override existing child command.
+   * @param options           Sub-command options.
    */
   public command<
     TNameAndArguments extends string,
@@ -539,7 +543,7 @@ export class Command<
   >(
     nameAndArguments: TNameAndArguments,
     desc?: string,
-    override?: boolean,
+    options?: SubCommandOptions,
   ): TParentCommandGlobals extends number ? Command<any> : Command<
     TParentCommand extends Command<any> ? TParentCommandGlobals
       : Merge<TParentCommandGlobals, TCommandGlobals>,
@@ -557,12 +561,12 @@ export class Command<
    * Add new sub-command.
    * @param nameAndArguments  Command definition. E.g: `my-command <input-file:string> <output-file:string>`
    * @param cmdOrDescription  The description of the new child command.
-   * @param override          Override existing child command.
+   * @param options           Sub-command options.
    */
   command(
     nameAndArguments: string,
     cmdOrDescription?: Command<any> | string,
-    override?: boolean,
+    { override }: SubCommandOptions = {},
   ): Command<any> {
     this.reset();
 
