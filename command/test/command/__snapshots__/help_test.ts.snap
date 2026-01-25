@@ -26,13 +26,16 @@ stderr:
 snapshot[`should print help for additionally added arguments with argument method > help 1`] = `
 stdout:
 "
-Usage:   arguments-test <foo> <bar> <beep> [boop] --file1 <path>
-Version: 1.0.0                                                  
+Usage:   arguments-test <beep> <boop> <foo> [bar] [baz...] --file1 <path>
+Version: 1.0.0                                                           
 
 Arguments:
 
-  <beep>  - Beep description.  (required)
-  [boop]  - Boop description.            
+  <beep>    - First argument description.   (required)
+  <boop>    - Second argument description.  (required)
+  <foo>     - Foo description.              (required)
+  [bar]     - Bar description.                        
+  [baz...]  - Baz description.                        
 
 Options:
 

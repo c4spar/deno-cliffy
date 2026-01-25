@@ -854,7 +854,7 @@ export class Command<
     TArgs extends string = string,
   >(
     args: TArgs,
-    ...descriptions: Array<string>
+    descriptions?: Array<string>
   ): Command<
     TParentCommandGlobals,
     TParentCommandTypes,
@@ -867,7 +867,7 @@ export class Command<
   > {
     this.cmd.settings.arguments = args.split(" ").map((arg, index) => ({
       arg,
-      description: descriptions[index],
+      description: descriptions?.[index],
     }));
     return this as Command<any>;
   }

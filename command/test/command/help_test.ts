@@ -206,9 +206,13 @@ await snapshotTest({
       .version("1.0.0")
       .name("arguments-test")
       .option("-f, --file1 <path:file>", "...", { required: true })
-      .arguments("<foo:string> <bar:number>")
-      .argument("<beep:string>", "Beep description.")
-      .argument("[boop:number]", "Boop description.")
+      .arguments("<beep:string> <boop:number>", [
+        "First argument description.",
+        "Second argument description.",
+      ])
+      .argument("<foo:string>", "Foo description.")
+      .argument("[bar:number]", "Bar description.")
+      .argument("[...baz:boolean]", "Baz description.")
       .parse();
   },
 });
