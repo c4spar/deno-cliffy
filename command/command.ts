@@ -911,8 +911,7 @@ export class Command<
     TCommandOptions,
     [
       ...TCommandArguments,
-      ...TMappedArguments extends undefined
-        ? TArguments
+      ...TMappedArguments extends undefined ? TArguments
         : TArg extends `${string}...${string}`
           ? TMappedArguments extends ReadonlyArray<unknown> ? TMappedArguments
           : IsRequired<
