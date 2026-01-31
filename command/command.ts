@@ -889,37 +889,22 @@ export class Command<
         ? ReadonlyArray<unknown> | undefined
         : unknown) = undefined,
     const TMappedArguments = undefined,
+    TValue = MapTypes<
+      TypedArgumentValue<
+        TArg,
+        Merge<
+          TParentCommandTypes,
+          Merge<TCommandGlobalTypes, TCommandTypes>
+        >,
+        TDefaultValue
+      >
+    >,
   >(
     arg: TArg,
     description: string,
     opts?:
-      | CommandArgumentOptions<
-        TDefaultValue,
-        MapTypes<
-          TypedArgumentValue<
-            TArg,
-            Merge<
-              TParentCommandTypes,
-              Merge<TCommandGlobalTypes, TCommandTypes>
-            >,
-            TDefaultValue
-          >
-        >,
-        TMappedArguments
-      >
-      | ArgumentValueHandler<
-        MapTypes<
-          TypedArgumentValue<
-            TArg,
-            Merge<
-              TParentCommandTypes,
-              Merge<TCommandGlobalTypes, TCommandTypes>
-            >,
-            TDefaultValue
-          >
-        >,
-        TMappedArguments
-      >,
+      | CommandArgumentOptions<TDefaultValue, TValue, TMappedArguments>
+      | ArgumentValueHandler<TValue, TMappedArguments>,
   ): Command<
     TParentCommandGlobals,
     TParentCommandTypes,
@@ -927,10 +912,7 @@ export class Command<
     [
       ...TCommandArguments,
       ...TMappedArguments extends undefined
-        ? TArg extends `${string}...${string}`
-          ? TArguments[0] extends ReadonlyArray<unknown> ? TArguments[0]
-          : TArguments
-        : TArguments
+        ? TArguments
         : TArg extends `${string}...${string}`
           ? TMappedArguments extends ReadonlyArray<unknown> ? TMappedArguments
           : IsRequired<

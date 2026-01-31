@@ -192,13 +192,13 @@ export type TypedArgument<
   : TArg extends `${string}...${string}`
     ? ArgumentType<TArg, TTypes> extends ReadonlyArray<infer TValue>
       ? TArg extends `[${string}]`
-        ? [Array<TValue> | MakeArray<NonNullable<TDefault>>]
-      : [[TValue, ...Array<TValue>] | MakeArray<NonNullable<TDefault>>]
+        ? Array<TValue> | MakeArray<NonNullable<TDefault>>
+      : [TValue, ...Array<TValue>] | MakeArray<NonNullable<TDefault>>
     : never
   : TArg extends `[${string}]`
     ? IsRequired<TDefault extends undefined ? false : true, TDefault> extends
       true ? [NonNullable<TDefault> | ArgumentType<TArg, TTypes>]
-    : [(NonNullable<TDefault> | ArgumentType<TArg, TTypes>)?]
+    : [(TDefault | ArgumentType<TArg, TTypes>)?]
   : [NonNullable<TDefault> | ArgumentType<TArg, TTypes>];
 
 export type TypedArgumentValue<
@@ -208,13 +208,9 @@ export type TypedArgumentValue<
 > = number extends TTypes ? any
   : TArg extends `${string}...${string}`
     ? ArgumentType<TArg, TTypes> extends ReadonlyArray<infer TValue>
-      ? TArg extends `[${string}]` ? Array<TValue> | NonNullable<TDefault>
-      : [TValue, ...Array<TValue>] | NonNullable<TDefault>
+      ? TArg extends `[${string}]` ? NonNullable<TDefault> | Array<TValue>
+      : NonNullable<TDefault> | [TValue, ...Array<TValue>]
     : never
-  : TArg extends `[${string}]`
-    ? IsRequired<TDefault extends undefined ? false : true, TDefault> extends
-      true ? NonNullable<TDefault> | ArgumentType<TArg, TTypes>
-    : NonNullable<TDefault> | ArgumentType<TArg, TTypes>
   : NonNullable<TDefault> | ArgumentType<TArg, TTypes>;
 
 export type TypedCommandArguments<TNameAndArguments extends string, TTypes> =
