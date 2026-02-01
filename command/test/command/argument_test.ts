@@ -284,9 +284,7 @@ test("should map variadic argument values with default array value", async () =>
     .argument("[...foo:string]", "...", {
       default: [1, 2, 3],
       value: (value) => {
-        assertType<IsExact<typeof value, readonly [1, 2, 3] | Array<string>>>(
-          true,
-        );
+        assertType<IsExact<typeof value, [1, 2, 3] | Array<string>>>(true);
         return { value };
       },
     })
@@ -295,7 +293,7 @@ test("should map variadic argument values with default array value", async () =>
   assertType<
     IsExact<
       typeof args,
-      [{ value: readonly [1, 2, 3] | Array<string> }]
+      [{ value: [1, 2, 3] | Array<string> }]
     >
   >(true);
   assertEquals(args, [{ value: ["a", "b", "c"] }]);

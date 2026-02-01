@@ -44,7 +44,7 @@ import {
 import { exit } from "@cliffy/internal/runtime/exit";
 import { getArgs } from "@cliffy/internal/runtime/get-args";
 import { getEnv } from "@cliffy/internal/runtime/get-env";
-import type { Merge, OneOf, ValueOf } from "./_type_utils.ts";
+import type { Merge, Mutable, OneOf, ValueOf } from "./_type_utils.ts";
 import {
   getDescription,
   parseArgumentsDefinition,
@@ -896,7 +896,7 @@ export class Command<
           TParentCommandTypes,
           Merge<TCommandGlobalTypes, TCommandTypes>
         >,
-        TDefaultValue
+        Mutable<TDefaultValue>
       >
     >,
   >(
