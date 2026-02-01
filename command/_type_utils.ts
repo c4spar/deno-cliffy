@@ -36,3 +36,5 @@ export type MergeRecursive<TLeft, TRight> = TLeft extends void ? TRight
 export type ValueOf<TValue> = TValue extends Record<string, infer V>
   ? ValueOf<V>
   : TValue;
+
+export type Mutable<T> = { -readonly [K in keyof T]: T[K] };

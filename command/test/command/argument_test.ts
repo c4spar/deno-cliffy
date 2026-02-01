@@ -86,6 +86,35 @@ test("should parse correctly a required variadic argument with other args", asyn
   assertEquals(args, ["abc", 1, 2, 3]);
 });
 
+test("should use default value for argument", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<foo:string>", "...")
+    .argument("[bar:string]", "...", { default: 42 })
+    .argument("[baz:string]", "...")
+    .parse(["abc"]);
+
+  assertType<IsExact<typeof args, [string, string | 42, string?]>>(true);
+  assertEquals(args, ["abc", 42]);
+});
+
+test("should map argument value", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<foo:string>", "...", {
+      value: (value) => ({ value }),
+    })
+    .argument("[bar:number]", "...", {
+      value: (value) => ({ value }),
+    })
+    .parse(["abc", "123"]);
+
+  assertType<IsExact<typeof args, [{ value: string }, { value: number }?]>>(
+    true,
+  );
+  assertEquals(args, [{ value: "abc" }, { value: 123 }]);
+});
+
 test("should throw on missing required argument", async () => {
   const command = new Command()
     .throwErrors()
@@ -121,4 +150,151 @@ test("should throw on invalid variadic argument type", async () => {
     ValidationError,
     'Argument "foo" must be of type "number", but got "three".',
   );
+});
+
+test("should parse variadic argument with default array value", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<...foo>", "...", {
+      default: [1],
+    })
+    .parse([]);
+
+  assertType<IsExact<typeof args, [1] | [string, ...Array<string>]>>(
+    true,
+  );
+  assertEquals(args, [1]);
+});
+
+test("should map argument value", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<foo:string>", "...", {
+      value: (value) => ({ value1: value }),
+    })
+    .argument("[bar:number]", "...", {
+      default: 42,
+      value: (value) => ({ value2: value }),
+    })
+    .argument("[baz:number]", "...", {
+      value: (value) => ({ value3: value }),
+    })
+    .parse(["abc"]);
+
+  assertType<
+    IsExact<
+      typeof args,
+      [{ value1: string }, { value2: number }, { value3: number }?]
+    >
+  >(true);
+  assertEquals(args, [{ value1: "abc" }, { value2: 42 }]);
+});
+
+test("should map async argument value", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<foo:string>", "...", {
+      value: async (value) => {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return Promise.resolve({ value1: value });
+      },
+    })
+    .argument("[bar:number]", "...", {
+      default: 42,
+      value: async (value) => {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return Promise.resolve({ value2: value });
+      },
+    })
+    .argument("[baz:number]", "...", {
+      value: async (value) => {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return Promise.resolve({ value3: value });
+      },
+    })
+    .parse(["abc"]);
+
+  assertType<
+    IsExact<
+      typeof args,
+      [{ value1: string }, { value2: number }, { value3: number }?]
+    >
+  >(true);
+  assertEquals(args, [{ value1: "abc" }, { value2: 42 }]);
+});
+
+test("should map required variadic argument values", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<...foo:string>", "...", {
+      value: (value) => ({ value }),
+    })
+    .parse(["a", "b", "c"]);
+
+  assertType<IsExact<typeof args, [{ value: [string, ...Array<string>] }]>>(
+    true,
+  );
+  assertEquals(args, [{ value: ["a", "b", "c"] }]);
+});
+
+test("should map optional variadic argument values", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("[...foo:string]", "...", {
+      value: (value) => ({ value }),
+    })
+    .parse(["a", "b", "c"]);
+
+  assertType<IsExact<typeof args, [{ value: Array<string> }?]>>(true);
+  assertEquals(args, [{ value: ["a", "b", "c"] }]);
+});
+
+test("should map required variadic argument values to array", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("<...foo:string>", "...", {
+      value: ([value, ...values]) => [
+        { value },
+        ...values.map((value) => ({ value })),
+      ],
+    })
+    .parse(["a", "b", "c"]);
+
+  assertType<
+    IsExact<typeof args, [{ value: string }, ...Array<{ value: string }>]>
+  >(true);
+  assertEquals(args, [{ value: "a" }, { value: "b" }, { value: "c" }]);
+});
+
+test("should map optional variadic argument values to array", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("[...foo:string]", "...", {
+      value: (value) => value.map((value) => ({ value })),
+    })
+    .parse(["a", "b", "c"]);
+
+  assertType<IsExact<typeof args, Array<{ value: string }>>>(true);
+  assertEquals(args, [{ value: "a" }, { value: "b" }, { value: "c" }]);
+});
+
+test("should map variadic argument values with default array value", async () => {
+  const { args } = await new Command()
+    .throwErrors()
+    .argument("[...foo:string]", "...", {
+      default: [1, 2, 3],
+      value: (value) => {
+        assertType<IsExact<typeof value, [1, 2, 3] | Array<string>>>(true);
+        return { value };
+      },
+    })
+    .parse(["a", "b", "c"]);
+
+  assertType<
+    IsExact<
+      typeof args,
+      [{ value: [1, 2, 3] | Array<string> }]
+    >
+  >(true);
+  assertEquals(args, [{ value: ["a", "b", "c"] }]);
 });
