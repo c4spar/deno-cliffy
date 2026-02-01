@@ -18,7 +18,6 @@ import {
   UnknownRequiredOptionError,
   UnknownTypeError,
 } from "./_errors.ts";
-import { OptionType } from "./deprecated.ts";
 import type {
   ArgumentOptions,
   ArgumentType,
@@ -212,7 +211,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       option = {
         name: current.replace(/^-+/, ""),
         optionalValue: true,
-        type: OptionType.STRING,
+        type: "string",
       };
     }
 
@@ -304,13 +303,13 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       }
 
       if (!arg.type) {
-        arg.type = OptionType.BOOLEAN;
+        arg.type = "boolean";
       }
 
       // make boolean values optional by default
       if (
         !option.args?.length &&
-        arg.type === OptionType.BOOLEAN &&
+        arg.type === "boolean" &&
         arg.optional === undefined
       ) {
         arg.optional = true;
@@ -346,7 +345,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
       } else {
         if (hasNext(arg)) {
           result = parseValue(option, arg, next());
-        } else if (arg.optional && arg.type === OptionType.BOOLEAN) {
+        } else if (arg.optional && arg.type === "boolean") {
           result = true;
         }
       }
@@ -402,7 +401,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         if (arg.optional || arg.variadic) {
           return nextValue[0] !== "-" ||
             typeof currentValue !== "undefined" ||
-            (arg.type === OptionType.NUMBER && !isNaN(Number(nextValue)));
+            (arg.type === "number" && !isNaN(Number(nextValue)));
         }
 
         return false;
@@ -417,7 +416,7 @@ function parseArgs<TFlagOptions extends FlagOptions>(
         const result: unknown = opts.parse
           ? opts.parse({
             label: "Option",
-            type: arg.type || OptionType.STRING,
+            type: arg.type || "string",
             name: `--${option.name}`,
             value,
           })
@@ -501,7 +500,7 @@ function parseDefaultType(
   arg: ArgumentOptions,
   value: string,
 ): unknown {
-  const type: ArgumentType = arg.type as ArgumentType || OptionType.STRING;
+  const type: ArgumentType = arg.type as ArgumentType || "string";
   const parseType = DefaultTypes[type];
 
   if (!parseType) {

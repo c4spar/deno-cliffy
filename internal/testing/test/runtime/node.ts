@@ -22,7 +22,7 @@ function createNodeTestFn(fn: TestFn): NodeTestFn {
       ...ctx,
       step: createTestFunction(async ({ name, ignore, fn: stepFn }) => {
         const skip = Array.isArray(ignore)
-          ? ignore.includes("deno")
+          ? ignore.includes("node")
           : ignore === true;
 
         await ctx.test(name, { skip }, createNodeTestFn(stepFn));

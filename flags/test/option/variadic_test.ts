@@ -1,6 +1,5 @@
 import { test } from "@cliffy/internal/testing/test";
 import { assertEquals, assertThrows } from "@std/assert";
-import { OptionType } from "../../deprecated.ts";
 import { parseFlags } from "../../flags.ts";
 import type { ParseFlagsOptions } from "../../types.ts";
 
@@ -9,37 +8,37 @@ const options: ParseFlagsOptions = {
   flags: [{
     name: "optional",
     aliases: ["o"],
-    type: OptionType.NUMBER,
+    type: "number",
     variadic: true,
     optionalValue: true,
   }, {
     name: "boolean",
     aliases: ["b"],
-    type: OptionType.BOOLEAN,
+    type: "boolean",
     variadic: true,
   }, {
     name: "string",
     aliases: ["s"],
-    type: OptionType.STRING,
+    type: "string",
     variadic: true,
   }, {
     name: "number",
     aliases: ["n"],
-    type: OptionType.NUMBER,
+    type: "number",
     variadic: true,
   }, {
     name: "variadic-option",
     aliases: ["e"],
     args: [{
-      type: OptionType.NUMBER,
+      type: "number",
     }, {
-      type: OptionType.STRING,
+      type: "string",
       optional: false,
     }, {
-      type: OptionType.STRING,
+      type: "string",
       optional: true,
     }, {
-      type: OptionType.BOOLEAN,
+      type: "boolean",
       optional: true,
       variadic: true,
     }],

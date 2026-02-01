@@ -1,0 +1,49 @@
+export const snapshot = {};
+
+snapshot[`should print help for arguments defined with argument method > help 1`] = `
+stdout:
+"
+Usage:   arguments-test <foo> [bar] [baz...] --file1 <path>
+Version: 1.0.0                                             
+
+Arguments:
+
+  <foo>     - Foo description.  (required)
+  [bar]     - Bar description.            
+  [baz...]  - Baz description.            
+
+Options:
+
+  -h, --help             - Show this help.                                      
+  -V, --version          - Show the version number for this program.            
+  -f, --file1    <path>  - ...                                        (required)
+
+"
+stderr:
+""
+`;
+
+snapshot[`should print help for additionally added arguments with argument method > help 1`] = `
+stdout:
+"
+Usage:   arguments-test <beep> <boop> <foo> [bar] [baz...] --file1 <path>
+Version: 1.0.0                                                           
+
+Arguments:
+
+  <beep>    - First argument description.   (required)
+  <boop>    - Second argument description.  (required)
+  <foo>     - Foo description.              (required)
+  [bar]     - Bar description.                        
+  [baz...]  - Baz description.                        
+
+Options:
+
+  -h, --help             - Show this help.                                      
+  -V, --version          - Show the version number for this program.            
+  -f, --file1    <path>  - ...                                        (required)
+
+"
+stderr:
+""
+`;

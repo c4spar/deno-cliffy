@@ -141,8 +141,12 @@ export interface Argument extends ArgumentOptions {
   name: string;
   /** Shell completion action. */
   action: string;
-  /** Arguments type. */
+  /** Argument type. */
   type: string;
+  /** Argument description. */
+  description?: string;
+  /** Raw argument definition. */
+  raw: string;
 }
 
 /** Result of `cmd.parse()` method. */
@@ -179,6 +183,22 @@ export interface CommandResult<
     TGlobalTypes,
     TParentCommand
   >;
+}
+
+/* ARGUMENTS TYPES */
+
+export type ArgumentValueHandler<TValue, TReturn> = (
+  value: TValue,
+) => TReturn;
+
+export interface CommandArgumentOptions<
+  TDefault = undefined,
+  TValue = unknown,
+  TReturn = TValue,
+> {
+  default?: DefaultValue<TDefault>;
+  defaultText?: DefaultText<TDefault>;
+  value?: ArgumentValueHandler<TValue, TReturn>;
 }
 
 /* OPTION TYPES */
