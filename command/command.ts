@@ -130,6 +130,7 @@ interface CommandProps {
   args: Array<Argument>;
   versionOption?: Option;
   helpOption?: Option;
+  isRoot?: boolean;
 }
 
 interface BuilderProps {
@@ -1826,6 +1827,7 @@ export class Command<
         TParentCommand
       >
   > {
+    this.props.isRoot = true;
     const ctx: ParseContext = {
       unknown: args.slice(),
       flags: {},
@@ -1972,7 +1974,13 @@ export class Command<
 
   /** Register default options like `--version` and `--help`. */
   private registerDefaults(): this {
-    if (this.props.hasDefaults || this.getParent()) {
+    if (this.props.hasDefaults) {
+      return this;
+    }
+    if (this.parent) {
+      if (this.props.isRoot) {
+        this.getMainCommand().registerDefaults();
+      }
       return this;
     }
     this.props.hasDefaults = true;
@@ -2405,7 +2413,7 @@ export class Command<
    * @param name Override the main command name.
    */
   public getPath(name?: string): string {
-    return this.parent
+    return this.parent && !this.props.isRoot
       ? this.parent.getPath(name) + " " + this.settings.name
       : name || this.settings.name;
   }
