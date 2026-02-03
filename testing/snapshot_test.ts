@@ -2,9 +2,11 @@ import { assert } from "@std/assert";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { quoteString } from "./_quote_string.ts";
 import { dirname, fromFileUrl } from "@std/path";
+import { test } from "@cliffy/internal/testing/test";
 
-Deno.test({
+test({
   name: "should run snapshot tests",
+  ignore: ["node", "bun"],
   async fn(ctx) {
     const testDir = dirname(fromFileUrl(import.meta.url));
     const snapshotDir = testDir + "/__snapshots__";
