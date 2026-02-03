@@ -5,7 +5,6 @@ on:
   pull_request:
 jobs:
   lint:
-    name: Lint source deno-${{ matrix.runtime.deno-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
