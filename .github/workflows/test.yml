@@ -13,11 +13,11 @@ jobs:
           - name: deno
             deno-version: v1.x
           - name: deno
-            version-file: .deno-version
+            deno-version-file: .deno-version
           - name: node
-            version-file: .node-version
+            node-version-file: .node-version
           - name: bun
-            version-file: .bun-version
+            bun-version-file: .bun-version
         os: [macOS-latest, windows-latest, ubuntu-latest]
     env:
       RUST_BACKTRACE: full
