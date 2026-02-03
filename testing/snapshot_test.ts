@@ -8,7 +8,6 @@ test({
   name: "should run snapshot tests",
   ignore: ["node", "bun"],
   async fn(ctx) {
-    ctx.origin
     const testDir = dirname(fromFileUrl(import.meta.url));
     const snapshotDir = testDir + "/__snapshots__";
     const snapshotTestDir = testDir + "/__snapshots_test__";
