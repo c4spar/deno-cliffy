@@ -849,7 +849,28 @@ export class Command<
   /**
    * Set command arguments.
    *
-   * Syntax: `<requiredArg:string> [optionalArg: number] [...restArgs:string]`
+   * This will override any previously defined arguments.
+   *
+   * @example
+   * ```ts
+   * import { Command } from "@cliffy/command";
+   *
+   * const cmd = new Command()
+   *   .name("example")
+   *   .arguments("<input-file:string> [output-file:string] [...tags:string]", [
+   *     "The input file.",
+   *     "The output file.",
+   *     "Tags for the file."
+   *   ]);
+   *
+   * // Parsing arguments
+   * const { args } = await cmd.parse(["input.txt", "result.txt", "tag1", "tag2"]);
+   *
+   * console.log(args); // Output: ['input.txt', 'result.txt', 'tag1', 'tag2']
+   *
+   * @param args         The arguments definition string.
+   * @param descriptions The argument descriptions.
+   * @returns            The command instance.
    */
   public arguments<
     TArguments extends TypedArguments<
@@ -877,7 +898,36 @@ export class Command<
     return this as Command<any>;
   }
 
-  /** Add an command argument. */
+  /**
+   * Add a new command argument.
+   *
+   * - When called multiple times, arguments are appended in the order of calls.
+   * - When called after `arguments()`, the new argument is appended after the previously
+   *   defined arguments.
+   * - When called before `arguments()`, the new argument is overwritten by the later
+   *   defined arguments.
+   *
+   * @example
+   * ```ts
+   * import { Command } from "@cliffy/command";
+   *
+   * const cmd = new Command()
+   *   .name("example")
+   *   .argument("<input-file:string>", "The input file.")
+   *   .argument("[output-file:string]", "The output file.", { default: "out.txt" })
+   *   .argument("[...tags:string]", "Tags for the file.");
+   *
+   * // Parsing arguments
+   * const { args } = await cmd.parse(["input.txt", "result.txt", "tag1", "tag2"]);
+   *
+   * console.log(args); // Output: ['input.txt', 'result.txt', 'tag1', 'tag2']
+   * ```
+   *
+   * @param arg         The argument definition. E.g: `<input-file:string>`
+   * @param description The argument description.
+   * @param opts        Argument options.
+   * @returns           The command instance.
+   */
   public argument<
     TArguments extends TypedArgument<
       TArg,
