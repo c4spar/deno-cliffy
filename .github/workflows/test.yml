@@ -25,7 +25,7 @@ jobs:
       CLIFFY_SNAPSHOT_DELAY: 2000
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -39,7 +39,7 @@ jobs:
 
       - name: Setup Node
         if: ${{ matrix.runtime.name == 'node' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ matrix.runtime.node-version-file }}
 
@@ -75,7 +75,7 @@ jobs:
         run: deno task coverage:${{ matrix.runtime.name }}
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           name: ${{ matrix.runtime.name }}-${{ matrix.os }}

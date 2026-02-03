@@ -23,7 +23,7 @@ jobs:
       DENO_FUTURE: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup Node
         if: matrix.runtime.name == 'node'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.runtime.node-version }}
           check-latest: true
