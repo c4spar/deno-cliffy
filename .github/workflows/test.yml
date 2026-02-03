@@ -55,6 +55,10 @@ jobs:
         with:
           run_install: true
 
+      - name: Install bun dependencies
+        if: ${{ matrix.runtime.name == 'bun' }}
+        run: bun install
+
       - name: Run tests
         if: matrix.runtime.name == 'deno' && matrix.runtime.deno-version == 'v1.x'
         shell: bash
