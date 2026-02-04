@@ -8,7 +8,7 @@
  */
 export function read(data: Uint8Array): Promise<number | null> {
   // dnt-shim-ignore
-  const { Deno, Bun, process } = globalThis as any;
+  const { Deno, process } = globalThis as any;
 
   if (Deno) {
     return Deno.stdin.read(data);
