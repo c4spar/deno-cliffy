@@ -2,7 +2,7 @@ import { test } from "@cliffy/internal/testing/test";
 import { assertRejects } from "@std/assert";
 import { Command } from "@cliffy/command";
 import { assertSpyCall, assertSpyCalls, spy } from "@std/testing/mock";
-import { CommandError } from "../../_errors.ts";
+import { DefaultCommandNotFoundError } from "../../_errors.ts";
 
 test("should execute default command if no arguments have been defined", async () => {
   const defaultSpy = spy();
@@ -69,7 +69,7 @@ test("should throw if default command does not exist", async () => {
 
   await assertRejects(
     () => command.parse([]),
-    CommandError,
+    DefaultCommandNotFoundError,
     `Default command "non-existing-command" not found. Did you mean command "my-default-command"?`,
   );
 });
