@@ -67,7 +67,7 @@ test("should throw if default command does not exist", async () => {
     .command("my-default-command", "My default command")
     .action(() => "default");
 
-  assertRejects(
+  await assertRejects(
     () => command.parse([]),
     CommandError,
     `Default command "non-existing-command" not found. Did you mean command "my-default-command"?`,
