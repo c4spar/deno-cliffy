@@ -7,9 +7,12 @@ import { DefaultCommandNotFoundError } from "../../_errors.ts";
 test("should execute default command if no arguments have been defined", async () => {
   const defaultSpy = spy();
   const otherSpy = spy();
+  const mainActionSpy = spy();
+
   const command = new Command()
     .name("test")
     .default("my-default-command")
+    .action(mainActionSpy)
     .command("my-default-command", "My default command")
     .action(defaultSpy)
     .command("other-command", "Other command")
@@ -17,6 +20,7 @@ test("should execute default command if no arguments have been defined", async (
 
   await command.parse([]);
 
+  assertSpyCalls(mainActionSpy, 0);
   assertSpyCalls(defaultSpy, 1);
   assertSpyCalls(otherSpy, 0);
 });
@@ -24,9 +28,12 @@ test("should execute default command if no arguments have been defined", async (
 test("should not execute default command if arguments have been defined", async () => {
   const defaultSpy = spy();
   const otherSpy = spy();
+  const mainActionSpy = spy();
+
   const command = new Command()
     .name("test")
     .default("my-default-command")
+    .action(mainActionSpy)
     .command("my-default-command", "My default command")
     .action(defaultSpy)
     .command("other-command", "Other command")
@@ -34,6 +41,7 @@ test("should not execute default command if arguments have been defined", async 
 
   await command.parse(["other-command"]);
 
+  assertSpyCalls(mainActionSpy, 0);
   assertSpyCalls(defaultSpy, 0);
   assertSpyCalls(otherSpy, 1);
   assertSpyCall(otherSpy, 0, { args: [{}] });
@@ -48,7 +56,7 @@ test("should not execute default command if a global option has been defined", a
     .name("test")
     .globalOption("--global", "Global option")
     .default("my-default-command")
-    .action(() => mainActionSpy)
+    .action(mainActionSpy)
     .command("my-default-command", "My default command")
     .action(defaultSpy)
     .command("other-command", "Other command")
@@ -56,6 +64,8 @@ test("should not execute default command if a global option has been defined", a
 
   await command.parse(["--global"]);
 
+  assertSpyCalls(mainActionSpy, 1);
+  assertSpyCall(mainActionSpy, 0, { args: [{ global: true }] });
   assertSpyCalls(defaultSpy, 0);
   assertSpyCalls(otherSpy, 0);
 });
@@ -65,7 +75,7 @@ test("should throw if default command does not exist", async () => {
     .name("test")
     .default("non-existing-command")
     .command("my-default-command", "My default command")
-    .action(() => "default");
+    .action(() => {});
 
   await assertRejects(
     () => command.parse([]),
