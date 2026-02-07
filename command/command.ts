@@ -1103,8 +1103,10 @@ export class Command<
   }
 
   /**
-   * Set default command. The default command is executed when the program
-   * was called without any argument and if no action handler is registered.
+   * Set default command.
+   *
+   * The default command is executed when the program was called without any
+   * arguments.
    *
    * @param name Name of the default command.
    */
@@ -2117,7 +2119,10 @@ export class Command<
     options: Record<string, unknown>,
     args: Array<unknown>,
   ): Promise<CommandResult> {
-    if (this.settings.defaultCommand) {
+    if (
+      this.settings.defaultCommand && !args.length &&
+      !Object.keys(options).length
+    ) {
       const cmd = this.getCommand(this.settings.defaultCommand, true);
 
       if (!cmd) {
