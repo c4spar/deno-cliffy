@@ -2119,7 +2119,10 @@ export class Command<
     options: Record<string, unknown>,
     args: Array<unknown>,
   ): Promise<CommandResult> {
-    if (this.settings.defaultCommand && !args.length && !Object.keys(options).length) {
+    if (
+      this.settings.defaultCommand && !args.length &&
+      !Object.keys(options).length
+    ) {
       const cmd = this.getCommand(this.settings.defaultCommand, true);
 
       if (!cmd) {
