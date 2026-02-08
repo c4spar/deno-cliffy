@@ -1,13 +1,14 @@
 <img src="logo.png" style="width: 100%" />
 
-[![Latest version](https://deno.land/badge/cliffy/version)](https://deno.land/x/cliffy)
+[![JSR Scope](https://jsr.io/badges/@cliffy)](https://jsr.io/@cliffy)
 [![popularity](https://deno.land/badge/cliffy/popularity)](https://deno.land/x/cliffy)
 [![Build status](https://github.com/c4spar/deno-cliffy/workflows/Test/badge.svg?branch=main)](https://github.com/c4spar/deno-cliffy/actions/workflows/test.yml)
 [![Code coverage](https://codecov.io/gh/c4spar/deno-cliffy/branch/main/graph/badge.svg)](https://codecov.io/gh/c4spar/deno-cliffy)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/ghFYyP53jb)
 
 **Cliffy** is a _simple_ and _type-safe_ commandline framework for building
-complex commandline tools with [deno](https://deno.land).
+complex commandline tools with [Deno](https://deno.land),
+[Node](https://nodejs.org) and [Bun](https://bun.sh).
 
 ## Documentation
 
