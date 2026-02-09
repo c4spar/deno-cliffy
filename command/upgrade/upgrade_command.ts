@@ -26,7 +26,7 @@ export interface UpgradeCommandOptions<
  * provided registry with any supported runtime.
  * Currently supported runtimes are: `deno`, `node` and `bun`.
  *
- * @example Upgrade command example.
+ * @example Upgrade command example
  *
  * ```
  * import { Command } from "@cliffy/command";

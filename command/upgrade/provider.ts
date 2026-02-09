@@ -32,7 +32,7 @@ export interface ProviderUpgradeOptions {
  * The upgrade provider is an api wrapper for a javascript registry which is
  * used by the upgrade command to upgrade the cli to a specific version.
  *
- * @example Upgrade provider example.
+ * @example Upgrade provider example
  *
  * ```
  * import { Command } from "@cliffy/command";
