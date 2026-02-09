@@ -19,7 +19,7 @@
  *
  * ```ts
  * import { assertEquals } from "@std/assert";
- * import { snapshotTest } from "@cliffy/testing/snapshot";
+ * import { snapshotTest } from "@cliffy/testing";
  * import { Select } from "@cliffy/prompt/select";
  * import { ansi } from "@cliffy/ansi";
  *
