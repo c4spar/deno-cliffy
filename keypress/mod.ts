@@ -25,9 +25,9 @@
  * Listen to `KeyPressEvent` events via async iterator:
  *
  * ```ts
- * import { KeyPressEvent, Keypress, keypress } from "@cliffy/keypress";
+ * import { Keypress, keypress } from "@cliffy/keypress";
  *
- * for await (const event: KeyPressEvent of keypress()) {
+ * for await (const event of keypress()) {
  *   console.log("key: %s", event.key);
  *
  *   if (event.ctrlKey && event.key === "c") {

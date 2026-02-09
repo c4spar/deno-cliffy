@@ -34,7 +34,7 @@
  * A CLI to convert volume from liters to gallons or vice versa with.
  *
  * ```ts
- * import { Command } from "@cliffy/command";
+ * import { Command, EnumType } from "@cliffy/command";
  * import { HelpCommand } from "@cliffy/command/help";
  * import { CompletionsCommand } from "@cliffy/command/completions";
  *

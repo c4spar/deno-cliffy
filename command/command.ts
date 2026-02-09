@@ -190,7 +190,7 @@ export interface SubCommandOptions {
  * ```ts
  * import { Command } from "./mod.ts";
  *
- * const addCommand = new Command<{ verbose?: boolean }>()
+ * export const addCommand = new Command<{ verbose?: boolean }>()
  *   .description("Add todo.")
  *   .arguments("<todo>")
  *   .action(({ verbose }, todo: string) => {
@@ -199,7 +199,7 @@ export interface SubCommandOptions {
  *     }
  *   });
  *
- * const deleteCommand = new Command<{ verbose?: boolean }>()
+ * export const deleteCommand = new Command<{ verbose?: boolean }>()
  *   .description("Delete todo.")
  *   .arguments("<id>")
  *   .action(({ verbose }, id: string) => {
@@ -212,7 +212,7 @@ export interface SubCommandOptions {
  *   .name("todo")
  *   .description("Todo cli.")
  *   .globalOption("--verbose", "Enable verbose output.")
- *   .globalEnv("VERBOSE=<value>", "Enable verbose output.")
+ *   .globalEnv("VERBOSE=<value:boolean>", "Enable verbose output.")
  *   .command("add", addCommand)
  *   .command("delete", deleteCommand);
  *

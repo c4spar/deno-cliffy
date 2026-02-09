@@ -27,7 +27,7 @@
  * ```ts
  * import { parseFlags } from "@cliffy/flags";
  *
- * const { flags: { unit }, _: [volume] } = parseFlags(Deno.args, {
+ * const { flags: { unit }, unknown: [volume] } = parseFlags(Deno.args, {
  *   flags: [{
  *     name: "unit",
  *     aliases: ["u"],
@@ -37,10 +37,10 @@
  * });
  *
  * if (unit === "l") {
- *   const gallons = volume * 0.264172;
+ *   const gallons = Number(volume) * 0.264172;
  *   console.log(`${volume} L is ${gallons.toFixed(2)} gal.`);
  * } else {
- *   const liters = volume / 0.264172;
+ *   const liters = Number(volume) / 0.264172;
  *   console.log(`${volume} gal is ${liters.toFixed(2)} L.`);
  * }
  * ```

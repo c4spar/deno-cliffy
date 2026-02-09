@@ -45,7 +45,7 @@
  *
  * This will create a snapshot file with following content:
  *
- * ```ts
+ * ```
  * export const snapshot = {};
  *
  * snapshot[`should select a color 1`] = `
