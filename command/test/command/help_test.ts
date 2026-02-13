@@ -218,7 +218,8 @@ await snapshotTest({
 });
 
 await snapshotTest({
-  name: "should print help when action handler calls showHelp with arrow function",
+  name:
+    "should print help when action handler calls showHelp with arrow function",
   meta: import.meta,
   steps: {
     help: { args: [] },
