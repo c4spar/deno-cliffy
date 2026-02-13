@@ -47,3 +47,22 @@ Options:
 stderr:
 ""
 `;
+
+snapshot[`should print help when action handler calls showHelp with arrow function > help 1`] = `
+stdout:
+"
+Usage: git
+
+Options:
+
+  -h, --help  - Show this help.  
+
+Commands:
+
+  pull   - Pull changes from remote repository. 
+  fetch  - Fetch changes from remote repository.
+
+"
+stderr:
+""
+`;
