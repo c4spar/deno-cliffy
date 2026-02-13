@@ -216,3 +216,22 @@ await snapshotTest({
       .parse();
   },
 });
+
+await snapshotTest({
+  name: "should print help when action handler calls showHelp with arrow function",
+  meta: import.meta,
+  steps: {
+    help: { args: [] },
+  },
+  async fn(): Promise<void> {
+    const cmd = new Command()
+      .name("git")
+      .action(() => cmd.showHelp())
+      .command("pull", "Pull changes from remote repository.")
+      .action(() => console.log("Pulling..."))
+      .command("fetch", "Fetch changes from remote repository.")
+      .action(() => console.log("Fetching..."));
+
+    await cmd.parse();
+  },
+});
