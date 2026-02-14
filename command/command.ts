@@ -130,6 +130,7 @@ interface CommandProps {
   args: Array<Argument>;
   versionOption?: Option;
   helpOption?: Option;
+  isRoot?: boolean;
 }
 
 interface BuilderProps {
@@ -147,12 +148,23 @@ export interface SubCommandOptions {
 /**
  * Chainable command factory class.
  *
+ * The command class can be used to create main and sub commands. All methods
+ * from the command class are chainable. Options, arguments, types, etc. that
+ * belong to the main command, should be registered before the first sub-command
+ * is registered. All options, arguments, etc. that are registered after calling
+ * the `.command()` method will be registered to that child-command.
+ *
+ * When calling the `.reset()` method, options, arguments, etc. will be
+ * registered again to the main command.
+ *
+ * @example Todo cli
+ *
  * ```ts
  * import { Command } from "./mod.ts";
  *
  * export const cli = new Command()
  *   .name("todo")
- *   .description("Example command description")
+ *   .description("Todo cli.")
  *   .globalOption("--verbose", "Enable verbose output.")
  *   .globalEnv("VERBOSE=<value>", "Enable verbose output.")
  *   .command("add <todo>", "Add todo.")
@@ -167,6 +179,42 @@ export interface SubCommandOptions {
  *       console.log("Delete todo with id '%s'.", id);
  *     }
  *   });
+ *
+ * if (import.meta.main) {
+ *   await cli.parse();
+ * }
+ * ```
+ *
+ * @example Use command instance as child command
+ *
+ * ```ts
+ * import { Command } from "./mod.ts";
+ *
+ * export const addCommand = new Command<{ verbose?: boolean }>()
+ *   .description("Add todo.")
+ *   .arguments("<todo>")
+ *   .action(({ verbose }, todo: string) => {
+ *     if (verbose) {
+ *       console.log("Add todo '%s'.", todo);
+ *     }
+ *   });
+ *
+ * export const deleteCommand = new Command<{ verbose?: boolean }>()
+ *   .description("Delete todo.")
+ *   .arguments("<id>")
+ *   .action(({ verbose }, id: string) => {
+ *     if (verbose) {
+ *       console.log("Delete todo with id '%s'.", id);
+ *     }
+ *   });
+ *
+ * export const cli = new Command()
+ *   .name("todo")
+ *   .description("Todo cli.")
+ *   .globalOption("--verbose", "Enable verbose output.")
+ *   .globalEnv("VERBOSE=<value:boolean>", "Enable verbose output.")
+ *   .command("add", addCommand)
+ *   .command("delete", deleteCommand);
  *
  * if (import.meta.main) {
  *   await cli.parse();
@@ -718,7 +766,19 @@ export class Command<
    **** SUB HANDLER ************************************************************
    *****************************************************************************/
 
-  /** Set command name. Used in auto generated help and shell completions */
+  /**
+   * Set command name.
+   *
+   * This method is usually used to set the command name for the main command.
+   * The name should match the name of your program. It is displayed in the auto
+   * generated help and used for shell completions by default.
+   *
+   * When used on child command, the name will be overridden by the command name
+   * passed to the parent command when the command is registered with the
+   * {@linkcode Command.command}.
+   *
+   * @param name The name for the command.
+   */
   public name(name: string): this {
     this.cmd.settings.name = name;
     return this;
@@ -726,6 +786,9 @@ export class Command<
 
   /**
    * Set command version.
+   *
+   * Set the version of your cli. The version is displayed in the auto generated
+   * help and the output from the [version](./help.md#version-option) option.
    *
    * @param version Semantic version string string or method that returns the version string.
    */
@@ -803,7 +866,36 @@ export class Command<
   }
 
   /**
-   * Set the long command description.
+   * Set the command description.
+   *
+   * The description will be displayed in the auto generated help. If the help
+   * option is called with the short flag `-h`, only the first line is
+   * displayed. If called with the long name `--help`, the full description is
+   * displayed.
+   *
+   * For better multiline formatting, unnecessary indentations and empty leading
+   * and trailing lines will be automatically removed.
+   *
+   * @example Multiline formatting
+   *
+   * For example, following description:
+   *
+   * ```ts
+   * import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+   *
+   * new Command()
+   *   .description(`
+   *     This is a multiline description.
+   *       The indentation of this line will be preserved.
+   *   `);
+   * ```
+   *
+   * is formatted as follows:
+   *
+   * ```console
+   * This is a multiline description.
+   *   The indentation of this line will be preserved.
+   * ```
    *
    * @param description The command description.
    */
@@ -825,6 +917,23 @@ export class Command<
 
   /**
    * Set the command usage. Defaults to arguments.
+   *
+   * With the `.usage()` method you can override the usage text that is
+   * displayed at the top of the auto generated help. By default the command
+   * arguments are used. The usage is always prefixed with the command name.
+   *
+   * @example Set custom usage
+   *
+   * ```ts
+   * import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+   *
+   * await new Command()
+   *   .name("script-runner")
+   *   .description("Simple script runner.")
+   *   .usage("[options] [script] [script options]")
+   *   // ...
+   *   .parse(Deno.args);
+   * ```
    *
    * @param usage The command usage.
    */
@@ -848,7 +957,88 @@ export class Command<
   /**
    * Set command arguments.
    *
-   * Syntax: `<requiredArg:string> [optionalArg: number] [...restArgs:string]`
+   * You can use the {@linkcode Command.arguments} method to specify the
+   * arguments for the command.
+   *
+   * This method will override any previously defined arguments.
+   *
+   * Angled brackets (e.g. `<required>`) indicate required input and
+   * square brackets (e.g. `[optional]`) indicate optional input. A required
+   * input cannot be defined after an optional input.
+   *
+   * Arguments can be also defined with the {@linkcode Command.command} method.
+   *
+   * Optionally you can define [types](./types.md) and
+   * [completions](./shell_completions.md) for your arguments after the argument
+   * name separated by colon. If no type is specified the type defaults to
+   * `string`.
+   *
+   * @example Define arguments
+   *
+   * ```ts
+   * import { Command } from "@cliffy/command";
+   *
+   * const cmd = new Command()
+   *   .name("example")
+   *   .arguments("<input-file:string> [output-file:string] [...tags:string]", [
+   *     "The input file.",
+   *     "The output file.",
+   *     "Tags for the file."
+   *   ]);
+   *
+   * // Parsing arguments
+   * const { args } = await cmd.parse(["input.txt", "result.txt", "tag1", "tag2"]);
+   *
+   * console.log(args); // Output: ['input.txt', 'result.txt', 'tag1', 'tag2']
+   * ```
+   *
+   * @example Use custom types in arguments
+   *
+   * ```typescript
+   * import { Command, EnumType } from "@cliffy/command";
+   *
+   * await new Command()
+   *   .type("color", new EnumType(["red", "blue"]))
+   *   .arguments("<color:color>")
+   *   .action((_, color: "red" | "blue") => {
+   *     console.log("color:", color);
+   *   })
+   *   .parse(Deno.args);
+   * ```
+   *
+   * @example Variadic arguments
+   *
+   * The last argument of a command can be variadic. To make an argument
+   * variadic you can append or prepend `...` to the argument name (`<...NAME>`
+   * or `<NAME...>`).
+   *
+   * Required rest arguments `<...args>` requires at least one argument, optional
+   * rest args `[...args]` are completely optional.
+   *
+   * ```typescript
+   * import { Command } from "https://deno.land/x/cliffy/command/mod.ts";
+   *
+   * await new Command()
+   *   .description("Remove directories.")
+   *   .arguments("<dirs...>")
+   *   .action((_, ...dirs: Array<string>) => {
+   *     for (const dir of dirs) {
+   *       console.log("rmdir %s", dir);
+   *     }
+   *   })
+   *   .parse(Deno.args);
+   * ```
+   *
+   * ```console
+   * $ deno run example.ts dir1 dir2 dir3
+   * rmdir dir1
+   * rmdir dir2
+   * rmdir dir3
+   * ```
+   *
+   * @param args         The arguments definition string.
+   * @param descriptions The argument descriptions.
+   * @returns            The command instance.
    */
   public arguments<
     TArguments extends TypedArguments<
@@ -876,7 +1066,36 @@ export class Command<
     return this as Command<any>;
   }
 
-  /** Add an command argument. */
+  /**
+   * Add a new command argument.
+   *
+   * - When called multiple times, arguments are appended in the order of calls.
+   * - When called after `arguments()`, the new argument is appended after the previously
+   *   defined arguments.
+   * - When called before `arguments()`, the new argument is overwritten by the later
+   *   defined arguments.
+   *
+   * @example
+   * ```ts
+   * import { Command } from "@cliffy/command";
+   *
+   * const cmd = new Command()
+   *   .name("example")
+   *   .argument("<input-file:string>", "The input file.")
+   *   .argument("[output-file:string]", "The output file.", { default: "out.txt" })
+   *   .argument("[...tags:string]", "Tags for the file.");
+   *
+   * // Parsing arguments
+   * const { args } = await cmd.parse(["input.txt", "result.txt", "tag1", "tag2"]);
+   *
+   * console.log(args); // Output: ['input.txt', 'result.txt', 'tag1', 'tag2']
+   * ```
+   *
+   * @param arg         The argument definition. E.g: `<input-file:string>`
+   * @param description The argument description.
+   * @param opts        Argument options.
+   * @returns           The command instance.
+   */
   public argument<
     TArguments extends TypedArgument<
       TArg,
@@ -1052,8 +1271,10 @@ export class Command<
   }
 
   /**
-   * Set default command. The default command is executed when the program
-   * was called without any argument and if no action handler is registered.
+   * Set default command.
+   *
+   * The default command is executed when the program was called without any
+   * arguments.
    *
    * @param name Name of the default command.
    */
@@ -1826,6 +2047,7 @@ export class Command<
         TParentCommand
       >
   > {
+    this.props.isRoot = true;
     const ctx: ParseContext = {
       unknown: args.slice(),
       flags: {},
@@ -1972,7 +2194,13 @@ export class Command<
 
   /** Register default options like `--version` and `--help`. */
   private registerDefaults(): this {
-    if (this.props.hasDefaults || this.getParent()) {
+    if (this.props.hasDefaults) {
+      return this;
+    }
+    if (this.parent) {
+      if (this.props.isRoot) {
+        this.getMainCommand().registerDefaults();
+      }
       return this;
     }
     this.props.hasDefaults = true;
@@ -2059,7 +2287,10 @@ export class Command<
     options: Record<string, unknown>,
     args: Array<unknown>,
   ): Promise<CommandResult> {
-    if (this.settings.defaultCommand) {
+    if (
+      this.settings.defaultCommand && !args.length &&
+      !Object.keys(options).length
+    ) {
       const cmd = this.getCommand(this.settings.defaultCommand, true);
 
       if (!cmd) {
@@ -2405,7 +2636,7 @@ export class Command<
    * @param name Override the main command name.
    */
   public getPath(name?: string): string {
-    return this.parent
+    return this.parent && !this.props.isRoot
       ? this.parent.getPath(name) + " " + this.settings.name
       : name || this.settings.name;
   }

@@ -124,7 +124,7 @@ export type ActionHandler<
   >,
   options: CommandOptions<TOptions, TGlobals, TParentGlobals>,
   ...args: MapTypes<TArguments>
-) => unknown;
+) => any;
 
 export type CommandOptions<
   TOptions extends Record<string, any> | void = any,
