@@ -53,5 +53,9 @@ jobs:
         with:
           run_install: true
 
+      - name: Install bun dependencies
+        if: ${{ matrix.runtime.name == 'bun' }}
+        run: bun install
+
       - name: Run tests
         run: deno task test:${{ matrix.runtime.name }}
